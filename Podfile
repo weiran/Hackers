@@ -1,0 +1,6 @@
+platform :ios, '6.0'
+pod 'AFNetworking'
+pod 'SVWebViewController'
+pod 'ODRefreshControl'
+pod 'PopoverView'
+pod 'MPFoldTransition'
