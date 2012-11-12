@@ -10,5 +10,4 @@
 
 @interface WZMainViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-- (IBAction)test:(id)sender;
 @end

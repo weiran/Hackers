@@ -7,13 +7,19 @@
 //
 
 #import "WZCommentCell.h"
-#import "WZComment.h"
+#import "WZCommentModel.h"
+#import <RTLabel/RTLabel.h>
 
 @implementation WZCommentCell
 
-- (void)setComment:(WZComment *)comment {
+- (void)setComment:(WZCommentModel *)comment {
     _comment = comment;
     [self updateLabels];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _commentLabel.text = _comment.content;
 }
 
 - (void)updateLabels {

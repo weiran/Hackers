@@ -41,13 +41,16 @@ static NSString* const commentsPath = @"item";
     [op start];
 }
 
-- (void)fetchCommentsWithCompletion:(void (^)(NSArray *comments, NSError *error))completion {
-    NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:commentsPath];
-    NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
+- (void)fetchCommentsForPost:(NSUInteger)postID completion:(void (^)(NSDictionary *comments, NSError *error))completion {
+    NSURL *requestURL = [[[NSURL URLWithString:baseURL]
+                            URLByAppendingPathComponent:commentsPath]
+                            URLByAppendingPathComponent:[NSString stringWithFormat:@"%d", postID] isDirectory:NO];
+    NSMutableURLRequest *request = [NSURLRequest requestWithURL:requestURL];
+    
     AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
             if (completion) {
-                completion(JSON, nil);
+                completion(JSON[@"comments"], nil);
             }
         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
             if (completion) {

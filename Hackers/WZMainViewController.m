@@ -8,9 +8,10 @@
 
 #import <ODRefreshControl/ODRefreshControl.h>
 #import <SVWebViewController/SVWebViewController.h>
-#import <PopoverView/PopoverView.h>
 
 #import "WZMainViewController.h"
+#import "WZCommentsViewController.h"
+#import "WZMenuViewController.h"
 #import "WZHackersData.h"
 #import "WZPost.h"
 #import "WZRead.h"
@@ -38,6 +39,12 @@
     [self loadData];
     
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
+    
+    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
+    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
+    [panGesture setMaximumNumberOfTouches:2];
+    [panGesture setDelegate:menuViewController];
+    [self.view addGestureRecognizer:panGesture];
 }
 
 - (void)sendFetchRequest:(ODRefreshControl *)sender {
@@ -193,14 +200,15 @@
     return post.cellHeight;
 }
 
-- (void)showNavigationBarPicker:(id)sender {
-    CGPoint point = CGPointMake(self.view.frame.size.width / 2, 0);
-    [PopoverView showPopoverAtPoint:point inView:self.view withStringArray:@[@"Top News", @"Newest"] delegate:self];
+#pragma mark - Segue
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
+        WZCommentsViewController *commentsViewController = segue.destinationViewController;
+        
+        WZPost *post = _news[[_tableView indexPathForCell:sender].row];
+        commentsViewController.post = post;
+    }
 }
 
-- (IBAction)test:(id)sender {
-    _popoverController = [[UIPopoverController alloc] initWithContentViewController:[[UIViewController alloc] init]];
-    _popoverController.popoverContentSize = CGSizeMake(100, 100);
-    [_popoverController presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-}
 @end

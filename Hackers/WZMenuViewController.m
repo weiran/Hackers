@@ -21,13 +21,18 @@
     self.slideMenuDataSource = self;
 }
 
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 - (NSString *)initialSegueId {
     return @"TopNewsSegue";
 }
 
 - (void)configureMenuButton:(UIButton *)menuButton {
-    menuButton.frame = CGRectMake(0, 0, 40, 29);
-    menuButton.titleLabel.text = @"M";
+//    menuButton.frame = CGRectMake(0, 0, 40, 29);
+//    menuButton.titleLabel.text = @"Menu";
 }
 
 @end

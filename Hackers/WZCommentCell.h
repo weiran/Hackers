@@ -8,14 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@class WZComment;
+@class WZCommentModel, RTLabel;
 
 @interface WZCommentCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
-@property (weak, nonatomic) IBOutlet UILabel *commentLabel;
+@property (weak, nonatomic) IBOutlet RTLabel *commentLabel;
 
-@property (copy, nonatomic) WZComment *comment;
+
+@property (copy, nonatomic) WZCommentModel *comment;
 
 @end

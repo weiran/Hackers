@@ -15,6 +15,6 @@
 - (void)fetchNewsWithSuccess:(void (^)(NSArray *posts))success
                      failure:(void (^)(NSError *error))failure;
 
-- (void)fetchCommentsWithCompletion:(void (^)(NSArray *comments, NSError *error))completion;
+- (void)fetchCommentsForPost:(NSUInteger)postID completion:(void (^)(NSDictionary *comments, NSError *error))completion;
 
 @end

@@ -109,11 +109,24 @@ static NSString* const modelName = @"HackersDataModel";
     }
 }
 
+- (void)clearNews {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:WZPost.entityName];
+    fetchRequest.includesPropertyValues = NO;
+    
+    NSArray *news = [_context executeFetchRequest:fetchRequest error:nil];
+    
+    for (NSManagedObject *newsItem in news) {
+        [_context deleteObject:newsItem];
+    }
+    
+    [_context save:nil];
+}
+
 #pragma mark - Fetch data
 
 - (void)fetchTopNewsWithCompletion:(void (^)(NSError *error))completion {
     [WZHackersDataAPI.shared fetchNewsWithSuccess:^(NSArray *posts) {
-        [self resetCoreStorage];
+        [self clearNews];
         
         NSManagedObjectContext *context = [NSManagedObjectContext new];
         context.persistentStoreCoordinator = [WZHackersData.shared persistentStoreCoordinator];
@@ -149,17 +162,6 @@ static NSString* const modelName = @"HackersDataModel";
         NSLog(@"Failed to download top news");
         if (completion) {
             completion(error);
-        }
-    }];
-}
-
-- (void)fetchCommentsForPost:(NSUInteger)postID completion:(void (^)(NSError *))completion {
-    [WZHackersDataAPI.shared fetchCommentsWithCompletion:^(NSArray *comments, NSError *error) {
-        NSManagedObjectContext *context = [NSManagedObjectContext new];
-        context.persistentStoreCoordinator = [WZHackersData.shared persistentStoreCoordinator];
-        
-        for (NSDictionary *comment in comments) {
-            
         }
     }];
 }
