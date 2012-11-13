@@ -8,13 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
+#import "WZHackersData.h"
+
 @interface WZHackersDataAPI : NSObject
 
 + (id)shared;
 
-- (void)fetchNewsWithSuccess:(void (^)(NSArray *posts))success
-                     failure:(void (^)(NSError *error))failure;
+- (void)fetchNewsOfType:(WZNewsType)type
+                success:(void (^)(NSArray *posts))success
+                failure:(void (^)(NSError *error))failure;
 
-- (void)fetchCommentsForPost:(NSUInteger)postID completion:(void (^)(NSDictionary *comments, NSError *error))completion;
+- (void)fetchCommentsForPost:(NSUInteger)postID
+                  completion:(void (^)(NSDictionary *comments, NSError *error))completion;
 
 @end

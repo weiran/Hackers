@@ -8,6 +8,7 @@ const struct WZPostAttributes WZPostAttributes = {
 	.domain = @"domain",
 	.id = @"id",
 	.points = @"points",
+	.postType = @"postType",
 	.rank = @"rank",
 	.timeAgo = @"timeAgo",
 	.title = @"title",
@@ -59,6 +60,10 @@ const struct WZPostFetchedProperties WZPostFetchedProperties = {
 	}
 	if ([key isEqualToString:@"pointsValue"]) {
 		NSSet *affectingKey = [NSSet setWithObject:@"points"];
+		keyPaths = [keyPaths setByAddingObjectsFromSet:affectingKey];
+	}
+	if ([key isEqualToString:@"postTypeValue"]) {
+		NSSet *affectingKey = [NSSet setWithObject:@"postType"];
 		keyPaths = [keyPaths setByAddingObjectsFromSet:affectingKey];
 	}
 	if ([key isEqualToString:@"rankValue"]) {
@@ -151,6 +156,32 @@ const struct WZPostFetchedProperties WZPostFetchedProperties = {
 
 - (void)setPrimitivePointsValue:(int32_t)value_ {
 	[self setPrimitivePoints:[NSNumber numberWithInt:value_]];
+}
+
+
+
+
+
+@dynamic postType;
+
+
+
+- (int16_t)postTypeValue {
+	NSNumber *result = [self postType];
+	return [result shortValue];
+}
+
+- (void)setPostTypeValue:(int16_t)value_ {
+	[self setPostType:[NSNumber numberWithShort:value_]];
+}
+
+- (int16_t)primitivePostTypeValue {
+	NSNumber *result = [self primitivePostType];
+	return [result shortValue];
+}
+
+- (void)setPrimitivePostTypeValue:(int16_t)value_ {
+	[self setPrimitivePostType:[NSNumber numberWithShort:value_]];
 }
 
 

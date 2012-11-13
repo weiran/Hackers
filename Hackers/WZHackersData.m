@@ -12,6 +12,8 @@
 #import "WZComment.h"
 #import "WZRead.h"
 
+#import "WZMainViewController.h"
+
 @interface WZHackersData ()
 @property (nonatomic, strong) NSManagedObjectModel *managedObjectModel;
 @end
@@ -109,8 +111,9 @@ static NSString* const modelName = @"HackersDataModel";
     }
 }
 
-- (void)clearNews {
+- (void)clearNewsWithType:(WZNewsType)type {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:WZPost.entityName];
+    fetchRequest.predicate = [NSPredicate predicateWithFormat:@"postType == %d", type];
     fetchRequest.includesPropertyValues = NO;
     
     NSArray *news = [_context executeFetchRequest:fetchRequest error:nil];
@@ -124,17 +127,18 @@ static NSString* const modelName = @"HackersDataModel";
 
 #pragma mark - Fetch data
 
-- (void)fetchTopNewsWithCompletion:(void (^)(NSError *error))completion {
-    [WZHackersDataAPI.shared fetchNewsWithSuccess:^(NSArray *posts) {
-        [self clearNews];
+- (void)fetchNewsOfType:(WZNewsType)type completion:(void (^)(NSError *error))completion {
+    [WZHackersDataAPI.shared fetchNewsOfType:type success:^(NSArray *posts) {
+        [self clearNewsWithType:type];
         
         NSManagedObjectContext *context = [NSManagedObjectContext new];
         context.persistentStoreCoordinator = [WZHackersData.shared persistentStoreCoordinator];
-
+        
         NSInteger count = 1;
         for (NSDictionary *dictionary in posts) {
             WZPost *post = [WZPost insertInManagedObjectContext:context];
             [post updateAttributes:dictionary];
+            post.postType = @(type);
             post.rank = @(count++);
         }
         
@@ -153,7 +157,7 @@ static NSString* const modelName = @"HackersDataModel";
             } else {
                 NSLog(@"  %@", [error userInfo]);
             }
-
+            
             if (completion) {
                 completion(error);
             }

@@ -9,6 +9,7 @@ extern const struct WZPostAttributes {
 	__unsafe_unretained NSString *domain;
 	__unsafe_unretained NSString *id;
 	__unsafe_unretained NSString *points;
+	__unsafe_unretained NSString *postType;
 	__unsafe_unretained NSString *rank;
 	__unsafe_unretained NSString *timeAgo;
 	__unsafe_unretained NSString *title;
@@ -25,6 +26,7 @@ extern const struct WZPostFetchedProperties {
 } WZPostFetchedProperties;
 
 @class WZComment;
+
 
 
 
@@ -89,6 +91,18 @@ extern const struct WZPostFetchedProperties {
 - (void)setPointsValue:(int32_t)value_;
 
 //- (BOOL)validatePoints:(id*)value_ error:(NSError**)error_;
+
+
+
+
+@property (nonatomic, strong) NSNumber* postType;
+
+
+@property int16_t postTypeValue;
+- (int16_t)postTypeValue;
+- (void)setPostTypeValue:(int16_t)value_;
+
+//- (BOOL)validatePostType:(id*)value_ error:(NSError**)error_;
 
 
 
@@ -197,6 +211,15 @@ extern const struct WZPostFetchedProperties {
 
 - (int32_t)primitivePointsValue;
 - (void)setPrimitivePointsValue:(int32_t)value_;
+
+
+
+
+- (NSNumber*)primitivePostType;
+- (void)setPrimitivePostType:(NSNumber*)value;
+
+- (int16_t)primitivePostTypeValue;
+- (void)setPrimitivePostTypeValue:(int16_t)value_;
 
 
 

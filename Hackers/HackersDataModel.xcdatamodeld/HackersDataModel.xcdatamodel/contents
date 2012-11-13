@@ -15,6 +15,7 @@
         <attribute name="domain" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="points" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="postType" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="rank" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="timeAgo" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
@@ -28,7 +29,7 @@
     </entity>
     <elements>
         <element name="Comment" positionX="160" positionY="192" width="128" height="165"/>
-        <element name="Post" positionX="-11" positionY="168" width="128" height="210"/>
+        <element name="Post" positionX="-11" positionY="168" width="128" height="223"/>
         <element name="Read" positionX="394" positionY="192" width="128" height="60"/>
     </elements>
 </model>

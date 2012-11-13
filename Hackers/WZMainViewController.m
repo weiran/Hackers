@@ -30,38 +30,40 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     _readNews = [NSMutableArray array];
     
     [self setupPullToRefresh];
     [self setupTableView];
-    [self setupNavigationBarGestureRecognizer];
-    
+    [self setupGestureRecognizer];
+    [self setupBarButtons];
+    [self setupTitle];
+
     [self loadData];
     
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
-    
-    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
-    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
-    [panGesture setMaximumNumberOfTouches:2];
-    [panGesture setDelegate:menuViewController];
-    [self.view addGestureRecognizer:panGesture];
 }
 
 - (void)sendFetchRequest:(ODRefreshControl *)sender {
     [sender beginRefreshing];
     [_tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [WZHackersData.shared fetchTopNewsWithCompletion:^(NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [sender endRefreshing];
-        });
-        
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        
-        if (!error) {
-            [self loadData];
-        }
+    
+    [WZHackersData.shared fetchNewsOfType:[self newsType] completion:^(NSError *error) {
+        [self performSelector:@selector(endRefreshing:) withObject:error afterDelay:0.5];
     }];
+}
+
+- (void)endRefreshing:(NSError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_refreshControl endRefreshing];
+    });
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    if (!error) {
+        [self loadData];
+    }
 }
 
 - (void)setupPullToRefresh {
@@ -74,20 +76,41 @@
     _tableView.dataSource = self;
 }
 
-- (void)setupNavigationBarGestureRecognizer {
-    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showNavigationBarPicker:)];
-    gestureRecognizer.numberOfTapsRequired = 1;
-    
-    UIView *navigationView = self.navigationController.navigationBar.subviews[1];
-    navigationView.userInteractionEnabled = YES;
-    [navigationView addGestureRecognizer:gestureRecognizer];
-    
-//    CGRect frame = CGRectMake(self.view.frame.size.width / 4, 0, self.view.frame.size.width / 2, 44);
-//    UIView *navigationBarTapView = [[UIView alloc] initWithFrame:frame];
-//    navigationBarTapView.backgroundColor = [UIColor clearColor];
-//    navigationBarTapView.userInteractionEnabled = YES;
-//    [navigationBarTapView addGestureRecognizer:gestureRecognizer];
+- (void)setupGestureRecognizer {
+    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
+    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
+    [panGesture setMaximumNumberOfTouches:2];
+    [panGesture setDelegate:menuViewController];
+    [self.view addGestureRecognizer:panGesture];
+    [self.navigationController.view addGestureRecognizer:panGesture];
 }
+
+- (void)setupTitle {
+    if ([self newsType] == WZNewsTypeTop) {
+        self.title = @"Top News";
+    } else {
+        self.title = @"Newest";
+    }
+}
+
+- (void)setupBarButtons {
+    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
+    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"menuicon.png"]
+                                                                   style:UIBarButtonItemStyleBordered
+                                                                  target:menuViewController
+                                                                  action:@selector(doSlideOut)];
+    self.navigationItem.leftBarButtonItem = menuButton;
+}
+
+- (WZNewsType)newsType {
+    if (!_newsType) {
+        _newsType = WZNewsTypeTop;
+    }
+    
+    return _newsType;
+}
+
+#pragma mark - Data access
 
 - (void)loadData {
     [self loadNews];
@@ -102,6 +125,7 @@
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:WZPost.entityName];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:YES];
     request.sortDescriptors = @[sortDescriptor];
+    request.predicate = [NSPredicate predicateWithFormat:@"postType == %d", [self newsType]];
     
     _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request
                                                                     managedObjectContext:[WZHackersData.shared context]
@@ -109,6 +133,14 @@
     NSError *error = nil;
     [_fetchedResultsController performFetch:&error];
     _news = _fetchedResultsController.fetchedObjects;
+    
+    if (!_news.count > 0) {
+        _tableView.hidden = YES;
+        _activityIndicator.hidden = NO;
+    } else {
+        _tableView.hidden = NO;
+        _activityIndicator.hidden = YES;
+    }
     
     if (error) {
         NSLog(@"News fetch failed: %@", error.localizedDescription);
@@ -211,4 +243,6 @@
     }
 }
 
+- (IBAction)showMenu:(id)sender {
+}
 @end

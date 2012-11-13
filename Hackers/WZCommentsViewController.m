@@ -7,6 +7,7 @@
 //
 
 #import <RTLabel/RTLabel.h>
+#import <SVWebViewController/SVWebViewController.h>
 
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
@@ -27,11 +28,13 @@
 	// Do any additional setup after loading the view.
     _tableView.delegate = self;
     _tableView.dataSource = self;
+    _tableView.hidden = YES;
     [self fetchComments];
 }
 
 - (void)fetchComments {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
     [WZHackersDataAPI.shared fetchCommentsForPost:_post.id.integerValue completion:^(NSDictionary *comments, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         NSMutableArray *newComments = [NSMutableArray array];
@@ -67,19 +70,22 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZCommentModel *comment = _comments[indexPath.row];
-    
     NSString *cellIdentifier = @"CommentCell";
     
     switch (comment.level.integerValue) {
+        case 0:
+            cellIdentifier = @"CommentCell";
+            break;
         case 1:
             cellIdentifier = @"CommentCellLevel1";
             break;
-            
         case 2:
             cellIdentifier = @"CommentCellLevel2";
             break;
-        
         case 3:
+            cellIdentifier = @"CommentCellLevel3";
+            break;
+        default:
             cellIdentifier = @"CommentCellLevel3";
             break;
     }
@@ -87,8 +93,15 @@
     WZCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.comment = comment;
     cell.commentLabel.delegate = self;
-    cell.indentationLevel = comment.level.integerValue + 1;
-    cell.indentationWidth = 20;
+    
+    if (comment.comments.count > 0) {
+        cell.delegate = self;
+        cell.showRepliesButton.hidden = NO;
+    } else {
+        cell.delegate = nil;
+        cell.showRepliesButton.hidden = YES;
+    }
+    
     return cell;
 }
 
@@ -96,17 +109,35 @@
     WZCommentModel *comment = _comments[indexPath.row];
     
     if (!comment.cellHeight) {
-        RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, _tableView.frame.size.width, 0)];
+        int rootWidth = 300;
+        int replyButtonHeight = 25 + 10; // height + spacing
+        int commentWidth = rootWidth - (10 * comment.level.integerValue);
+        
+        RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, commentWidth, 0)];
         label.text = comment.content;
         CGSize optimumSize = [label optimumSize];
-        comment.cellHeight = @(optimumSize.height + 36);
+        CGFloat height = optimumSize.height + 36;
+
+        if (comment.comments.count > 0) {
+            height = height + replyButtonHeight;
+        }
+        
+        comment.cellHeight = @(height);
     }
     
     return comment.cellHeight.floatValue;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    WZCommentModel *comment = _comments[indexPath.row];
+#pragma mark - RTLabelDelegate
+
+- (void)rtLabel:(id)rtLabel didSelectLinkWithURL:(NSURL *)url {
+    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:url];
+    [self.navigationController pushViewController:webViewController animated:YES];
+}
+
+#pragma mark - WZCommentShowRepliesDelegate
+
+- (void)selectedComment:(WZCommentModel *)comment atIndexPath:(NSIndexPath *)indexPath {
     if (comment.comments && !comment.expanded) {
         comment.expanded = YES;
         
@@ -120,16 +151,30 @@
             [newIndexPaths addObject:newIndexPath];
         }
         
-        [tableView insertRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+        [_tableView insertRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+    } else if (comment.comments && comment.expanded) {
+        comment.expanded = NO;
+        
+        NSMutableArray *newIndexPaths = [NSMutableArray array];
+        
+        int currentRow = indexPath.row + 1;
+        NSMutableArray *commentsToRemove = [NSMutableArray array];
+        
+        for (int i = currentRow; i < _comments.count; i++) {
+            WZCommentModel *currentComment = _comments[i];
+            if (currentComment.level.integerValue > comment.level.integerValue) {
+                [commentsToRemove addObject:currentComment];
+                currentComment.expanded = NO;
+                [newIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+            } else {
+                break;
+            }
+        }
+        
+        [_comments removeObjectsInArray:commentsToRemove];
+        
+        [_tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationTop];
     }
-    
-    [_tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-#pragma mark - RTLabelDelegate
-
-- (void)rtLabel:(id)rtLabel didSelectLinkWithURL:(NSURL *)url {
-    
 }
 
 @end

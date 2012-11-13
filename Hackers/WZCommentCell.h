@@ -10,13 +10,21 @@
 
 @class WZCommentModel, RTLabel;
 
+@protocol WZCommentShowRepliesDelegate <NSObject>
+- (void)selectedComment:(WZCommentModel *)comment atIndexPath:(NSIndexPath *)indexPath;
+@end
+
 @interface WZCommentCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet RTLabel *commentLabel;
 
+- (IBAction)showReplies:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *showRepliesButton;
 
 @property (copy, nonatomic) WZCommentModel *comment;
+
+@property (weak, nonatomic) id <WZCommentShowRepliesDelegate> delegate;
 
 @end

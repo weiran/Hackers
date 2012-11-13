@@ -6,11 +6,15 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import "WZHackersDataAPI.h"
 #import <AFNetworking/AFNetworking.h>
+
+#import "WZHackersDataAPI.h"
+
+#import "WZHackersData.h"
 
 static NSString* const baseURL = @"http://node-hnapi.herokuapp.com";
 static NSString* const topNewsPath = @"news";
+static NSString* const newNewsPath = @"newest";
 static NSString* const commentsPath = @"item";
 
 @implementation WZHackersDataAPI
@@ -23,9 +27,12 @@ static NSString* const commentsPath = @"item";
     return __api;
 }
 
-- (void)fetchNewsWithSuccess:(void (^)(NSArray *posts))success
-                     failure:(void (^)(NSError *error))failure {
-    NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:topNewsPath];
+- (void)fetchNewsOfType:(WZNewsType)type
+                success:(void (^)(NSArray *posts))success
+                failure:(void (^)(NSError *error))failure {
+    NSString *path = type == WZNewsTypeTop ? topNewsPath : newNewsPath;
+    
+    NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:path];
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
@@ -41,7 +48,8 @@ static NSString* const commentsPath = @"item";
     [op start];
 }
 
-- (void)fetchCommentsForPost:(NSUInteger)postID completion:(void (^)(NSDictionary *comments, NSError *error))completion {
+- (void)fetchCommentsForPost:(NSUInteger)postID
+                  completion:(void (^)(NSDictionary *comments, NSError *error))completion {
     NSURL *requestURL = [[[NSURL URLWithString:baseURL]
                             URLByAppendingPathComponent:commentsPath]
                             URLByAppendingPathComponent:[NSString stringWithFormat:@"%d", postID] isDirectory:NO];
