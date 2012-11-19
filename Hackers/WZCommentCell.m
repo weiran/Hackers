@@ -8,7 +8,7 @@
 
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
-#import <RTLabel/RTLabel.h>
+#import <RTLabel.h>
 
 @implementation WZCommentCell
 

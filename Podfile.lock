@@ -3,21 +3,15 @@ DEPENDENCIES:
 - AFNetworking
 - MPFoldTransition
 - ODRefreshControl
-- RTLabel
-- SVWebViewController
-
-COCOAPODS: 0.15.2
 
 PODS: 
 - AFNetworking (1.0.1)
 - MPFoldTransition (0.0.1)
 - ODRefreshControl (1.1.0)
-- RTLabel (1.0)
-- SVWebViewController (0.1)
 
 SPEC CHECKSUMS: 
   MPFoldTransition: 65c1a3bcb5c8e5a179621f844e970666d89aa3a8
-  SVWebViewController: 4004126ffdd39ede42bc645273e8eaae3de700f9
-  ODRefreshControl: 886e323a7c25114b9e5c397a9eefbebc034224a9
-  RTLabel: 124420c05d7897bf7f14b75a26f54f2932ac4ca5
   AFNetworking: 4c11f857c9a18d65f4257c90a1e74ac49f0ac422
+  ODRefreshControl: 886e323a7c25114b9e5c397a9eefbebc034224a9
+
+COCOAPODS: 0.15.2

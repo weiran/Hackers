@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <RTLabel/RTLabel.h>
+#import <RTLabel.h>
 #import "WZCommentCell.h"
 
 @class WZPost;

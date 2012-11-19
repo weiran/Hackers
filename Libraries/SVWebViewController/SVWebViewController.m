@@ -16,6 +16,7 @@
 @property (nonatomic, strong, readonly) UIBarButtonItem *stopBarButtonItem;
 @property (nonatomic, strong, readonly) UIBarButtonItem *actionBarButtonItem;
 @property (nonatomic, strong, readonly) UIActionSheet *pageActionSheet;
+@property (nonatomic, strong, readonly) UIActivityViewController *pageActivityViewController;
 
 @property (nonatomic, strong) UIWebView *mainWebView;
 @property (nonatomic, strong) NSURL *URL;
@@ -39,7 +40,7 @@
 @synthesize availableActions;
 
 @synthesize URL, mainWebView;
-@synthesize backBarButtonItem, forwardBarButtonItem, refreshBarButtonItem, stopBarButtonItem, actionBarButtonItem, pageActionSheet;
+@synthesize backBarButtonItem, forwardBarButtonItem, refreshBarButtonItem, stopBarButtonItem, actionBarButtonItem, pageActionSheet, pageActivityViewController;
 
 #pragma mark - setters and getters
 
@@ -112,6 +113,14 @@
     }
     
     return pageActionSheet;
+}
+
+- (UIActivityViewController *)pageActivityViewController {
+    if (!pageActivityViewController) {
+        pageActivityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[_itemTitle, URL] applicationActivities:nil];
+    }
+    
+    return pageActivityViewController;
 }
 
 #pragma mark - Initialization
@@ -311,14 +320,15 @@
 
 - (void)actionButtonClicked:(id)sender {
     
-    if(pageActionSheet)
-        return;
+//    if(pageActivityViewController)
+//        return;
 	
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        [self.pageActionSheet showFromBarButtonItem:self.actionBarButtonItem animated:YES];
-    else
-        [self.pageActionSheet showFromToolbar:self.navigationController.toolbar];
+//    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+//        [self.pageActionSheet showFromBarButtonItem:self.actionBarButtonItem animated:YES];
+//    else
+//        [self.pageActionSheet showFromToolbar:self.navigationController.toolbar];
     
+    [self presentViewController:[self pageActivityViewController] animated:YES completion:nil];
 }
 
 - (void)doneButtonClicked:(id)sender {

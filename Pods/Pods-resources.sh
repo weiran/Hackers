@@ -17,4 +17,3 @@ install_resource()
       ;;
   esac
 }
-install_resource 'SVWebViewController/SVWebViewController/SVWebViewController.bundle'

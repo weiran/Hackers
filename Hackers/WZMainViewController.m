@@ -7,7 +7,7 @@
 //
 
 #import <ODRefreshControl/ODRefreshControl.h>
-#import <SVWebViewController/SVWebViewController.h>
+#import <SVWebViewController.h>
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -21,7 +21,7 @@
     NSFetchedResultsController *_fetchedResultsController;
     NSArray *_news;
     NSMutableArray *_readNews;
-    ODRefreshControl *_refreshControl;
+    UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
 }
 @end
@@ -44,7 +44,7 @@
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
 }
 
-- (void)sendFetchRequest:(ODRefreshControl *)sender {
+- (void)sendFetchRequest:(UIRefreshControl *)sender {
     [sender beginRefreshing];
     [_tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
@@ -55,19 +55,20 @@
 }
 
 - (void)endRefreshing:(NSError *)error {
+    if (!error) {
+        [self loadData];
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [_refreshControl endRefreshing];
     });
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    if (!error) {
-        [self loadData];
-    }
 }
 
 - (void)setupPullToRefresh {
-    _refreshControl = [[ODRefreshControl alloc] initInScrollView:self.tableView];
+    _refreshControl = [[UIRefreshControl alloc] init];
+    [_tableView addSubview:_refreshControl];
     [_refreshControl addTarget:self action:@selector(sendFetchRequest:) forControlEvents:UIControlEventValueChanged];
 }
 
@@ -213,6 +214,7 @@
     cell.titleLabel.textColor = [UIColor lightGrayColor];
     
     SVWebViewController *webViewController = [[SVWebViewController alloc] initWithAddress:post.url];
+    webViewController.itemTitle = post.title;
     [self.navigationController pushViewController:webViewController animated:YES];
     [_tableView deselectRowAtIndexPath:indexPath animated:NO];
 }

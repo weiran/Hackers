@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <RTLabel/RTLabel.h>
-#import <SVWebViewController/SVWebViewController.h>
+#import <RTLabel.h>
+#import <SVWebViewController.h>
 
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
