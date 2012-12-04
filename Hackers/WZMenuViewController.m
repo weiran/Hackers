@@ -47,8 +47,7 @@
 }
 
 - (void)configureMenuButton:(UIButton *)menuButton {
-//    menuButton.frame = CGRectMake(0, 0, 40, 29);
-//    menuButton.titleLabel.text = @"Menu";
+
 }
 
 @end

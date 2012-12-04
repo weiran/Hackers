@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <ODRefreshControl/ODRefreshControl.h>
 #import <SVWebViewController.h>
 
 #import "WZMainViewController.h"
@@ -46,7 +45,7 @@
 
 - (void)sendFetchRequest:(UIRefreshControl *)sender {
     [sender beginRefreshing];
-    [_tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
     [WZHackersData.shared fetchNewsOfType:[self newsType] completion:^(NSError *error) {
@@ -67,14 +66,22 @@
 }
 
 - (void)setupPullToRefresh {
+    UIColor *backgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1];
+    
     _refreshControl = [[UIRefreshControl alloc] init];
-    [_tableView addSubview:_refreshControl];
+    _refreshControl.backgroundColor = backgroundColor;
     [_refreshControl addTarget:self action:@selector(sendFetchRequest:) forControlEvents:UIControlEventValueChanged];
+    self.refreshControl = _refreshControl;
+    
+    CGRect frame = self.tableView.bounds;
+    frame.origin.y = -frame.size.height;
+    UIView *backgroundView = [[UIView alloc] initWithFrame:frame];
+    backgroundView.backgroundColor = backgroundColor;
+    
+    [self.tableView insertSubview:backgroundView atIndex:0];
 }
 
 - (void)setupTableView {
-    _tableView.delegate = self;
-    _tableView.dataSource = self;
 }
 
 - (void)setupGestureRecognizer {
@@ -136,10 +143,10 @@
     _news = _fetchedResultsController.fetchedObjects;
     
     if (!_news.count > 0) {
-        _tableView.hidden = YES;
+        self.tableView.hidden = YES;
         _activityIndicator.hidden = NO;
     } else {
-        _tableView.hidden = NO;
+        self.tableView.hidden = NO;
         _activityIndicator.hidden = YES;
     }
     
@@ -210,13 +217,13 @@
     [_readNews addObject:post.id];
     [WZHackersData.shared addRead:post.id];
     
-    WZPostCell *cell = (WZPostCell *)[_tableView cellForRowAtIndexPath:indexPath];
+    WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     cell.titleLabel.textColor = [UIColor lightGrayColor];
     
     SVWebViewController *webViewController = [[SVWebViewController alloc] initWithAddress:post.url];
     webViewController.itemTitle = post.title;
     [self.navigationController pushViewController:webViewController animated:YES];
-    [_tableView deselectRowAtIndexPath:indexPath animated:NO];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -240,7 +247,7 @@
     if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
         WZCommentsViewController *commentsViewController = segue.destinationViewController;
         
-        WZPost *post = _news[[_tableView indexPathForCell:sender].row];
+        WZPost *post = _news[[self.tableView indexPathForCell:sender].row];
         commentsViewController.post = post;
     }
 }

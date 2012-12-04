@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZMainViewController.m"
-         timestampString = "374677347.815111"
+         timestampString = "376228422.997763"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "241"
-         endingLineNumber = "241"
+         startingLineNumber = "249"
+         endingLineNumber = "249"
          landmarkName = "-prepareForSegue:sender:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -79,6 +79,32 @@
          startingLineNumber = "97"
          endingLineNumber = "97"
          landmarkName = "-tableView:cellForRowAtIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Libraries/SVWebViewController/SVWebViewController.m"
+         timestampString = "375964353.853633"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "119"
+         endingLineNumber = "119"
+         landmarkName = "-pageActivityViewController"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Hackers/WZPostCell.m"
+         timestampString = "376229038.775808"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "30"
+         endingLineNumber = "30"
+         landmarkName = "-setSelected:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

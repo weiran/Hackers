@@ -9,9 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "WZHackersData.h"
 
-@interface WZMainViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface WZMainViewController : UITableViewController
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic) WZNewsType newsType;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 

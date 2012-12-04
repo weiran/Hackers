@@ -7,6 +7,7 @@
 //  https://github.com/samvermette/SVWebViewController
 
 #import "SVWebViewController.h"
+#import "NNNetwork.h"
 
 @interface SVWebViewController () <UIWebViewDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate>
 
@@ -116,8 +117,16 @@
 }
 
 - (UIActivityViewController *)pageActivityViewController {
+    [[NNInstapaperClient sharedClient] setClientIdentifier:@"JhxaIHH9KhRc3Mj2JaiJ6bYOhMR5Kv7sdeESoBgxlEf51YOdtb"];
+    [[NNInstapaperClient sharedClient] setClientSecret:@"Yl6nzC2cVu2AGm8XrqoTt8QgVI0FJs0ndsV5jWbSN7bI3tBSb1"];
+    NNOAuthCredential *credential = [NNOAuthCredential credentialWithAccessToken:@"user-token" accessSecret:@"user-secret"];
+    NNInstapaperActivity *activity = [[NNInstapaperActivity alloc] initWithCredential:credential];
+    
     if (!pageActivityViewController) {
-        pageActivityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[_itemTitle, URL] applicationActivities:nil];
+        pageActivityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[_itemTitle, URL]
+                                                                       applicationActivities:@[
+                                      UIActivityTypePostToFacebook, UIActivityTypePostToTwitter, UIActivityTypeMessage,
+                                      UIActivityTypeMail, UIActivityTypeCopyToPasteboard, activity]];
     }
     
     return pageActivityViewController;
