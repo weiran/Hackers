@@ -7,6 +7,7 @@
 //
 
 #import <SVWebViewController.h>
+#import <SWRevealViewController/SWRevealViewController.h>
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -33,7 +34,6 @@
     _readNews = [NSMutableArray array];
     
     [self setupPullToRefresh];
-    [self setupTableView];
     [self setupGestureRecognizer];
     [self setupBarButtons];
     [self setupTitle];
@@ -81,16 +81,15 @@
     [self.tableView insertSubview:backgroundView atIndex:0];
 }
 
-- (void)setupTableView {
-}
-
 - (void)setupGestureRecognizer {
-    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
-    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
-    [panGesture setMaximumNumberOfTouches:2];
-    [panGesture setDelegate:menuViewController];
-    [self.view addGestureRecognizer:panGesture];
-    [self.navigationController.view addGestureRecognizer:panGesture];
+//    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
+//    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
+//    [panGesture setMaximumNumberOfTouches:2];
+//    [panGesture setDelegate:menuViewController];
+//    [self.view addGestureRecognizer:panGesture];
+//    [self.navigationController.view addGestureRecognizer:panGesture];
+    
+    [self.view addGestureRecognizer:self.revealViewController.panGestureRecognizer];
 }
 
 - (void)setupTitle {
@@ -102,12 +101,13 @@
 }
 
 - (void)setupBarButtons {
-    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
-    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"menuicon.png"]
-                                                                   style:UIBarButtonItemStyleBordered
-                                                                  target:menuViewController
-                                                                  action:@selector(doSlideOut)];
-    self.navigationItem.leftBarButtonItem = menuButton;
+//    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"menuicon.png"]
+//                                                                   style:UIBarButtonItemStyleBordered
+//                                                                  target:self.revealViewController
+//                                                                  action:@selector(revealToggle:)];
+//    self.navigationItem.leftBarButtonItem = menuButton;
+    _menuBarButtonItem.target = self.revealViewController;
+    _menuBarButtonItem.action = @selector(revealToggle:);
 }
 
 - (WZNewsType)newsType {
@@ -250,8 +250,5 @@
         WZPost *post = _news[[self.tableView indexPathForCell:sender].row];
         commentsViewController.post = post;
     }
-}
-
-- (IBAction)showMenu:(id)sender {
 }
 @end

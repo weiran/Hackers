@@ -1,23 +1,23 @@
-/* 
+/*
  
  Copyright (c) 2012, John Lluch-Zorrilla (joan.lluch@sweetwilliamsl.com)
  Inspired on a similar class by Philip Kluz (Philip.Kluz@zuui.org)
  All rights reserved.
-
+ 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-
+ 
  * Redistributions of source code must retain the above copyright
  notice, this list of conditions and the following disclaimer.
-
+ 
  * Redistributions in binary form must reproduce the above copyright
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
-
+ 
  * Neither the name of John Lluch, 'sweetwilliamsl.com' nor the names of its contributors may
  be used to endorse or promote products derived from this software
  without specific prior written permission.
-
+ 
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -137,6 +137,7 @@ typedef enum
 @optional
 
 - (void)revealController:(SWRevealViewController *)revealController willMoveToPosition:(FrontViewPosition)position;
+- (void)revealController:(SWRevealViewController *)revealController animateToPosition:(FrontViewPosition)position;
 - (void)revealController:(SWRevealViewController *)revealController didMoveToPosition:(FrontViewPosition)position;
 
 - (void)revealController:(SWRevealViewController *)revealController willRevealRearViewController:(UIViewController *)viewController;
@@ -162,3 +163,15 @@ typedef enum
 - (SWRevealViewController*)revealViewController;
 
 @end
+
+
+// This will allow the class to be defined on a storyboard
+#pragma mark - SWRevealViewControllerSegue
+
+@interface SWRevealViewControllerSegue : UIStoryboardSegue
+
+@property (strong) void(^performBlock)( SWRevealViewControllerSegue* segue, UIViewController* svc, UIViewController* dvc );
+
+@end
+
+

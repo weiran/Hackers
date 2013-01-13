@@ -10,6 +10,12 @@
 #import "WZCommentModel.h"
 #import <RTLabel.h>
 
+@interface WZCommentCell ()
+@property (nonatomic, strong) NSLayoutConstraint *userConstraint;
+@property (nonatomic, strong) NSLayoutConstraint *bodyConstraint;
+@property (nonatomic, strong) NSLayoutConstraint *repliesConstraint;
+@end
+
 @implementation WZCommentCell
 
 - (void)setComment:(WZCommentModel *)comment {
@@ -30,6 +36,47 @@
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
 }
 
+- (void)setupConstraints {
+    NSInteger levelValue = _comment.level.integerValue + 1;
+    NSInteger constant = levelValue * 10;
+    
+    if (_userConstraint) {
+        _userConstraint.constant = constant;
+    } else {
+        NSString *userVisualFormat = [NSString stringWithFormat:@"|-%d-[_userLabel]", constant];
+        
+        _userConstraint = [NSLayoutConstraint constraintsWithVisualFormat:userVisualFormat
+                                                                  options:0
+                                                                  metrics:nil
+                                                                    views:NSDictionaryOfVariableBindings(_userLabel)][0];
+        [self addConstraint:_userConstraint];
+    }
+    
+    if (_bodyConstraint) {
+        _bodyConstraint.constant = constant;
+    } else {
+        NSString *bodyVisualFormat = [NSString stringWithFormat:@"|-%d-[_commentLabel]", constant];
+        
+        _bodyConstraint = [NSLayoutConstraint constraintsWithVisualFormat:bodyVisualFormat
+                                                                  options:0
+                                                                  metrics:nil
+                                                                    views:NSDictionaryOfVariableBindings(_commentLabel)][0];
+        [self addConstraint:_bodyConstraint];
+    }
+    
+    if (_repliesConstraint) {
+        _repliesConstraint.constant = constant;
+    } else {
+        NSString *repliesVisualFormat = [NSString stringWithFormat:@"|-%d-[_showRepliesButton]", levelValue * 10];
+        
+        _repliesConstraint = [NSLayoutConstraint constraintsWithVisualFormat:repliesVisualFormat
+                                                                                 options:0
+                                                                                 metrics:nil
+                                                                                   views:NSDictionaryOfVariableBindings(_showRepliesButton)][0];
+        [self addConstraint:_repliesConstraint];
+    }
+}
+
 - (void)updateLabels {
     _userLabel.text = _comment.user;
     _dateLabel.text = _comment.timeAgo;
@@ -39,6 +86,8 @@
     } else {
         [_showRepliesButton setTitle:@"Show replies" forState:UIControlStateNormal];
     }
+    
+    [self setupConstraints];
 }
 
 - (IBAction)showReplies:(id)sender {

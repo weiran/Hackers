@@ -27,4 +27,9 @@
 
 @property (weak, nonatomic) id <WZCommentShowRepliesDelegate> delegate;
 
+
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *repliesButtonLayoutConstraint;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bodyLayoutConstraint;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *userLayoutConstraint;
+
 @end

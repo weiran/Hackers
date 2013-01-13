@@ -6,9 +6,8 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import "SASlideMenuViewController.h"
+#import <UIKit/UIKit.h>
 
-@interface WZMenuViewController : SASlideMenuViewController <SASlideMenuDataSource>
-
+@interface WZMenuViewController : UITableViewController
 
 @end

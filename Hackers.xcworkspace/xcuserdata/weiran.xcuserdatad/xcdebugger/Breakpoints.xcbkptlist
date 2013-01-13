@@ -20,19 +20,6 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Hackers/WZMenuViewController.m"
-         timestampString = "374422467.302932"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "32"
-         endingLineNumber = "32"
-         landmarkName = "-prepareForSegue:sender:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
          timestampString = "374428499.24251"
          startingColumnNumber = "9223372036854775807"
@@ -40,19 +27,6 @@
          startingLineNumber = "38"
          endingLineNumber = "38"
          landmarkName = "-fetchComments"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Hackers/WZMainViewController.m"
-         timestampString = "376228422.997763"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "249"
-         endingLineNumber = "249"
-         landmarkName = "-prepareForSegue:sender:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -105,6 +79,32 @@
          startingLineNumber = "30"
          endingLineNumber = "30"
          landmarkName = "-setSelected:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Hackers/WZMenuViewController.m"
+         timestampString = "379800169.709449"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "41"
+         endingLineNumber = "41"
+         landmarkName = "-prepareForSegue:sender:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/SWRevealViewController/SWRevealViewController/SWRevealViewController.m"
+         timestampString = "379800004.264211"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "981"
+         endingLineNumber = "981"
+         landmarkName = "-perform"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

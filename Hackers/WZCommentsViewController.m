@@ -72,23 +72,23 @@
     WZCommentModel *comment = _comments[indexPath.row];
     NSString *cellIdentifier = @"CommentCell";
     
-    switch (comment.level.integerValue) {
-        case 0:
-            cellIdentifier = @"CommentCell";
-            break;
-        case 1:
-            cellIdentifier = @"CommentCellLevel1";
-            break;
-        case 2:
-            cellIdentifier = @"CommentCellLevel2";
-            break;
-        case 3:
-            cellIdentifier = @"CommentCellLevel3";
-            break;
-        default:
-            cellIdentifier = @"CommentCellLevel3";
-            break;
-    }
+//    switch (comment.level.integerValue) {
+//        case 0:
+//            cellIdentifier = @"CommentCell";
+//            break;
+//        case 1:
+//            cellIdentifier = @"CommentCellLevel1";
+//            break;
+//        case 2:
+//            cellIdentifier = @"CommentCellLevel2";
+//            break;
+//        case 3:
+//            cellIdentifier = @"CommentCellLevel3";
+//            break;
+//        default:
+//            cellIdentifier = @"CommentCellLevel3";
+//            break;
+//    }
     
     WZCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.comment = comment;
@@ -110,13 +110,13 @@
     
     if (!comment.cellHeight) {
         int rootWidth = 300;
-        int replyButtonHeight = 25 + 10; // height + spacing
-        int commentWidth = rootWidth - (10 * comment.level.integerValue);
+        int replyButtonHeight = 30 + 10; // height + spacing
+        int commentWidth = rootWidth - (10 * (comment.level.integerValue + 1));
         
         RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, commentWidth, 0)];
         label.text = comment.content;
         CGSize optimumSize = [label optimumSize];
-        CGFloat height = optimumSize.height + 36;
+        CGFloat height = optimumSize.height + 36; // 26 points to top, 10 points to bottom
 
         if (comment.comments.count > 0) {
             height = height + replyButtonHeight;
