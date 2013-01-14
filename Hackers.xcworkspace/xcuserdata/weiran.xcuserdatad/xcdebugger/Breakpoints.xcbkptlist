@@ -60,11 +60,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZPostCell.m"
-         timestampString = "376229038.775808"
+         timestampString = "379889030.719264"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "30"
-         endingLineNumber = "30"
+         startingLineNumber = "36"
+         endingLineNumber = "36"
          landmarkName = "-setSelected:"
          landmarkType = "5">
       </FileBreakpoint>

@@ -203,7 +203,7 @@
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
     
     if (filteredReadNews.count > 0) {
-        cell.titleLabel.textColor = [UIColor lightGrayColor];
+        cell.titleLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
     } else {
         cell.titleLabel.textColor = [UIColor blackColor];
     }
@@ -219,10 +219,6 @@
     
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     cell.titleLabel.textColor = [UIColor lightGrayColor];
-    
-//    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithAddress:post.url];
-//    webViewController.itemTitle = post.title;
-//    [self.navigationController pushViewController:webViewController animated:YES];
     
     TSMiniWebBrowser *webBrowser = [[TSMiniWebBrowser alloc] initWithUrl:[NSURL URLWithString:post.url]];
     [self.navigationController pushViewController:webBrowser animated:YES];

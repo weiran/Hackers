@@ -21,6 +21,12 @@
         self.backgroundView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
         self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     }
+    
+    _titleLabel.highlightedTextColor = _titleLabel.textColor;
+    _domainLabel.highlightedTextColor = _domainLabel.textColor;
+    _detailLabel.highlightedTextColor = _detailLabel.textColor;
+    _moreDetailLabel.highlightedTextColor = _moreDetailLabel.textColor;
+    _rankLabel.highlightedTextColor = _rankLabel.textColor;
 }
 
 - (void)setSelected:(BOOL)selected {
