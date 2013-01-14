@@ -1,0 +1,3 @@
+[submodule "Libraries/DTCoreText"]
+	path = Libraries/DTCoreText
+	url = https://github.com/Cocoanetics/DTCoreText.git

@@ -88,6 +88,10 @@
 		24C4401E16A44EF700055D65 /* NNReadabilityActivity@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 24C4401216A44EF700055D65 /* NNReadabilityActivity@2x~iphone.png */; };
 		24C4401F16A44EF700055D65 /* NNReadabilityActivity~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 24C4401316A44EF700055D65 /* NNReadabilityActivity~ipad.png */; };
 		24C4402016A44EF700055D65 /* NNReadabilityActivity~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 24C4401416A44EF700055D65 /* NNReadabilityActivity~iphone.png */; };
+		24C4413816A458A800055D65 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24C4412416A4587400055D65 /* libDTCoreText.a */; };
+		24C4413A16A458B100055D65 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 24C4413916A458B100055D65 /* libxml2.dylib */; };
+		24C4413C16A458B900055D65 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24C4413B16A458B900055D65 /* ImageIO.framework */; };
+		24C4413E16A458C600055D65 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24C4413D16A458C600055D65 /* MobileCoreServices.framework */; };
 		24EAA5B51647D56900105FE1 /* HackersDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5B31647D56900105FE1 /* HackersDataModel.xcdatamodeld */; };
 		24EAA5CC1647DC9C00105FE1 /* _WZComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C51647DC9C00105FE1 /* _WZComment.m */; };
 		24EAA5CD1647DC9C00105FE1 /* _WZPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C71647DC9C00105FE1 /* _WZPost.m */; };
@@ -105,6 +109,65 @@
 		24EAA61C164967DF00105FE1 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24EAA61B164967DF00105FE1 /* MessageUI.framework */; };
 		DFCC5074B30047A392BC2180 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECD4604DC1E846869F39B01C /* libPods.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		24C4411F16A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D6058910D05DD3D006BFB54;
+			remoteInfo = DemoApp;
+		};
+		24C4412116A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A70F119B14863198009202BF;
+			remoteInfo = "Static Framework";
+		};
+		24C4412316A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A70F11DE148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+		24C4412516A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A788CA681486456100E1AFD9;
+			remoteInfo = UnitTest;
+		};
+		24C4412716A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7949A5814CC456000A8CCDE;
+			remoteInfo = MacUnitTest;
+		};
+		24C4412916A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7F7EFCD1573603100F5A4D0;
+			remoteInfo = "Static Library (no DTFoundation)";
+		};
+		24C4412B16A4587400055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E2262DC61638331500BFDAD7;
+			remoteInfo = "Mac Framework";
+		};
+		24C4413616A4588D00055D65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A70F11DD148632CD009202BF;
+			remoteInfo = "Static Library";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
@@ -244,6 +307,10 @@
 		24C4401216A44EF700055D65 /* NNReadabilityActivity@2x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNReadabilityActivity@2x~iphone.png"; sourceTree = "<group>"; };
 		24C4401316A44EF700055D65 /* NNReadabilityActivity~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNReadabilityActivity~ipad.png"; sourceTree = "<group>"; };
 		24C4401416A44EF700055D65 /* NNReadabilityActivity~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNReadabilityActivity~iphone.png"; sourceTree = "<group>"; };
+		24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DTCoreText.xcodeproj; path = DTCoreText/DTCoreText.xcodeproj; sourceTree = "<group>"; };
+		24C4413916A458B100055D65 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		24C4413B16A458B900055D65 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		24C4413D16A458C600055D65 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HackersDataModel.xcdatamodel; sourceTree = "<group>"; };
 		24EAA5C41647DC9C00105FE1 /* _WZComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZComment.h; sourceTree = "<group>"; };
 		24EAA5C51647DC9C00105FE1 /* _WZComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZComment.m; sourceTree = "<group>"; };
@@ -278,6 +345,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24C4413E16A458C600055D65 /* MobileCoreServices.framework in Frameworks */,
+				24C4413C16A458B900055D65 /* ImageIO.framework in Frameworks */,
+				24C4413A16A458B100055D65 /* libxml2.dylib in Frameworks */,
+				24C4413816A458A800055D65 /* libDTCoreText.a in Frameworks */,
 				245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */,
 				249827561652A42E001C0ECF /* CoreText.framework in Frameworks */,
 				24EAA61C164967DF00105FE1 /* MessageUI.framework in Frameworks */,
@@ -395,6 +466,8 @@
 		24972C9C1643BC3C00B4EFB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				24C4413D16A458C600055D65 /* MobileCoreServices.framework */,
+				24C4413B16A458B900055D65 /* ImageIO.framework */,
 				245F85D016690AE3000D3EE1 /* Security.framework */,
 				249827551652A42E001C0ECF /* CoreText.framework */,
 				24EAA61B164967DF00105FE1 /* MessageUI.framework */,
@@ -404,6 +477,7 @@
 				24972C9F1643BC3C00B4EFB4 /* Foundation.framework */,
 				24972CA11643BC3C00B4EFB4 /* CoreGraphics.framework */,
 				24972CA31643BC3C00B4EFB4 /* CoreData.framework */,
+				24C4413916A458B100055D65 /* libxml2.dylib */,
 				ECD4604DC1E846869F39B01C /* libPods.a */,
 			);
 			name = Frameworks;
@@ -448,6 +522,7 @@
 		24975A72164A88A5000143A1 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */,
 				24C43FE916A44DCC00055D65 /* TUSafariActivity */,
 				24C43FCF16A447F800055D65 /* TSMiniWebBrowser */,
 				245F85CC1669090A000D3EE1 /* SSKeychain */,
@@ -588,6 +663,20 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		24C4410D16A4587400055D65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				24C4412016A4587400055D65 /* RTDemoApp.app */,
+				24C4412216A4587400055D65 /* DTCoreText.framework */,
+				24C4412416A4587400055D65 /* libDTCoreText.a */,
+				24C4412616A4587400055D65 /* UnitTest.octest */,
+				24C4412816A4587400055D65 /* MacUnitTest.octest */,
+				24C4412A16A4587400055D65 /* libDTCoreText_no_DTFoundation.a */,
+				24C4412C16A4587400055D65 /* DTCoreText.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		24EAA5B01647C56400105FE1 /* API */ = {
 			isa = PBXGroup;
 			children = (
@@ -680,6 +769,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				24C4413716A4588D00055D65 /* PBXTargetDependency */,
 			);
 			name = Hackers;
 			productName = Hackers;
@@ -721,12 +811,70 @@
 			mainGroup = 24972C8E1643BC3C00B4EFB4;
 			productRefGroup = 24972C9A1643BC3C00B4EFB4 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 24C4410D16A4587400055D65 /* Products */;
+					ProjectRef = 24C4410C16A4587400055D65 /* DTCoreText.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				24972C981643BC3C00B4EFB4 /* Hackers */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		24C4412016A4587400055D65 /* RTDemoApp.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = RTDemoApp.app;
+			remoteRef = 24C4411F16A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412216A4587400055D65 /* DTCoreText.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = DTCoreText.framework;
+			remoteRef = 24C4412116A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412416A4587400055D65 /* libDTCoreText.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libDTCoreText.a;
+			remoteRef = 24C4412316A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412616A4587400055D65 /* UnitTest.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = UnitTest.octest;
+			remoteRef = 24C4412516A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412816A4587400055D65 /* MacUnitTest.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = MacUnitTest.octest;
+			remoteRef = 24C4412716A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412A16A4587400055D65 /* libDTCoreText_no_DTFoundation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libDTCoreText_no_DTFoundation.a;
+			remoteRef = 24C4412916A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		24C4412C16A4587400055D65 /* DTCoreText.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = DTCoreText.framework;
+			remoteRef = 24C4412B16A4587400055D65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		24972C971643BC3C00B4EFB4 /* Resources */ = {
@@ -852,6 +1000,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		24C4413716A4588D00055D65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Static Library";
+			targetProxy = 24C4413616A4588D00055D65 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		24972CA81643BC3C00B4EFB4 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -945,6 +1101,7 @@
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -957,6 +1114,7 @@
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
