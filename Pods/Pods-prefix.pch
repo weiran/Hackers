@@ -12,5 +12,3 @@
   #import <CoreServices/CoreServices.h>
 #endif
 #endif /* __OBJC__ */
-
-#import <CoreText/CoreText.h>
