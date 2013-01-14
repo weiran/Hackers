@@ -8,6 +8,9 @@
 
 #import "WZCommentCell.h"
 
+#import <CoreTextToy/CLinkingCoreTextLabel.h>
+#import <CoreTextToy/CMarkupValueTransformer.h>
+
 @interface WZCommentCell () {
     NSUInteger _indentationPoints;
 }
@@ -27,6 +30,18 @@
     [_showRepliesButton setBackgroundImage:buttonImage forState:UIControlStateNormal];
     [_showRepliesButton setBackgroundImage:buttonImageHighlight forState:UIControlStateHighlighted];
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
+    
+    _commentLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    _commentLabel.font = [UIFont systemFontOfSize:14];
+    _commentLabel.shadowColor = [UIColor whiteColor];
+    _commentLabel.shadowOffset = CGSizeMake(0, 1);
+    _commentLabel.URLHandler = ^(NSRange range, NSURL *url) {
+        if ([_linkDelegate respondsToSelector:@selector(tappedLink:)]) {
+            [_linkDelegate tappedLink:url];
+        }
+        
+        return YES;
+    };
 }
 
 - (void)setContentIndent:(NSUInteger)contentIndent {
@@ -38,6 +53,17 @@
 
 - (NSUInteger)contentIndent {
     return _indentationPoints;
+}
+
+- (void)setHTML:(NSString *)html {
+    CMarkupValueTransformer *transformer = [[CMarkupValueTransformer alloc] init];
+    NSError *transformError = nil;
+    NSAttributedString *attributedString = [transformer transformedValue:html error:&transformError];
+    if (!transformError) {
+        _commentLabel.text = attributedString;
+    } else {
+        NSLog(@"Error transforming text");
+    }
 }
 
 - (void)setupConstraints {

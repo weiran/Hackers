@@ -190,7 +190,8 @@ enum actionSheetButtonIndex {
     [self.view addSubview:webView];
     
     webView.scalesPageToFit = YES;
-    
+    webView.scrollView.scrollsToTop = YES;
+    ((UIScrollView *)[[webView subviews] objectAtIndex:0]).scrollsToTop = NO;
     webView.delegate = self;
     
     // Load the URL in the webView
@@ -263,11 +264,6 @@ enum actionSheetButtonIndex {
         [self setTitleBarText:forcedTitleBarText];
     }
     
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
 }
 
 -(void) viewWillDisappear:(BOOL)animated {

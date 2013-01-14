@@ -8,19 +8,25 @@
 
 #import <UIKit/UIKit.h>
 
-@class RTLabel;
+@class RTLabel, CLinkingCoreTextLabel;
 
 @protocol WZCommentShowRepliesDelegate <NSObject>
 - (void)selectedCommentAtIndexPath:(NSIndexPath *)indexPath;
+@end
+
+@protocol WZCommentURLRequested <NSObject>
+- (void)tappedLink:(NSURL *)url;
 @end
 
 @interface WZCommentCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
-@property (weak, nonatomic) IBOutlet RTLabel *commentLabel;
+@property (weak, nonatomic) IBOutlet CLinkingCoreTextLabel *commentLabel;
 
 - (IBAction)showReplies:(id)sender;
+- (void)setHTML:(NSString *)html;
+
 @property (weak, nonatomic) IBOutlet UIButton *showRepliesButton;
 
 @property (nonatomic) NSUInteger contentIndent;
@@ -28,5 +34,6 @@
 @property (nonatomic) NSUInteger repliesCount;
 
 @property (weak, nonatomic) id <WZCommentShowRepliesDelegate> delegate;
+@property (weak, nonatomic) id <WZCommentURLRequested> linkDelegate;
 
 @end

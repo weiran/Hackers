@@ -6,8 +6,9 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <RTLabel.h>
-#import <SVWebViewController.h>
+#import <TSMiniWebBrowser.h>
+#import <CoreTextToy/CLinkingCoreTextLabel.h>
+#import <CoreTextToy/CMarkupValueTransformer.h>
 
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
@@ -73,11 +74,12 @@
     NSString *cellIdentifier = @"CommentCell";
     
     WZCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    cell.commentLabel.delegate = self; // for opening links
+    cell.linkDelegate = self;
+    //cell.commentLabel.delegate = self; // for opening links
     
     cell.userLabel.text = comment.user;
     cell.dateLabel.text = comment.timeAgo;
-    cell.commentLabel.text = comment.content;
+    [cell setHTML:comment.content];
     
     if (comment.comments.count > 0) {
         cell.delegate = self;
@@ -88,10 +90,7 @@
         cell.showRepliesButton.hidden = YES;
     }
     
-    NSUInteger baseIndentation = 10;
-    NSUInteger indentStep = 15;
-    NSUInteger indentation = baseIndentation + (indentStep * comment.level.integerValue);
-    cell.contentIndent = indentation;
+    cell.contentIndent = [self indentPointsForComment:comment];
     
     return cell;
 }
@@ -100,17 +99,17 @@
     WZCommentModel *comment = _comments[indexPath.row];
     
     if (!comment.cellHeight) {
-        int rootWidth = 300;
         int replyButtonHeight = 30 + 10; // height + spacing
-        int commentWidth = rootWidth - (10 * (comment.level.integerValue + 1));
+        int labelHeight = [self heightForCommentLabel:comment];
+        CGFloat height = labelHeight + 36;
         
-        RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, commentWidth, 0)];
-        label.text = comment.content;
-        CGSize optimumSize = [label optimumSize];
-        CGFloat height = optimumSize.height + 36; // 26 points to top, 10 points to bottom
+//        RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, commentWidth, 0)];
+//        label.text = comment.content;
+//        CGSize optimumSize = [label optimumSize];
+//        CGFloat height = optimumSize.height + 36; // 26 points to top, 10 points to bottom
 
         if (comment.comments.count > 0) {
-            height = height + replyButtonHeight;
+            height += replyButtonHeight;
         }
         
         comment.cellHeight = @(height);
@@ -119,11 +118,37 @@
     return comment.cellHeight.floatValue;
 }
 
-#pragma mark - RTLabelDelegate
+- (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
+    NSUInteger baseIndentation = 10;
+    NSUInteger indentPerLevel = 15;
+    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
+    return indentation;
+}
 
-- (void)rtLabel:(id)rtLabel didSelectLinkWithURL:(NSURL *)url {
-    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:url];
-    [self.navigationController pushViewController:webViewController animated:YES];
+- (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
+    CMarkupValueTransformer *transformer = [[CMarkupValueTransformer alloc] init];
+    NSError *transformError = nil;
+    NSAttributedString *attributedString = [transformer transformedValue:comment.content error:&transformError];
+    if (!transformError) {
+        int rootWidth = 300;
+        int indentPoints = [self indentPointsForComment:comment];
+        int width = (rootWidth + 10) - indentPoints;
+        CLinkingCoreTextLabel *label = [[CLinkingCoreTextLabel alloc] init];
+        label.lineBreakMode = NSLineBreakByWordWrapping;
+        label.font = [UIFont systemFontOfSize:14];
+        CGSize size = [label sizeForString:attributedString constrainedToSize:CGSizeMake(width, 0)];
+        return size.height;
+    } else {
+        NSLog(@"Error transforming attributed string.");
+        return 0;
+    }
+}
+
+#pragma mark - WZCommentURLTappedDelegate
+
+- (void)tappedLink:(NSURL *)url {
+    TSMiniWebBrowser *webBrowser = [[TSMiniWebBrowser alloc] initWithUrl:url];
+    [self.navigationController pushViewController:webBrowser animated:YES];
 }
 
 #pragma mark - WZCommentShowRepliesDelegate

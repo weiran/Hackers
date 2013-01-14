@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <RTLabel.h>
 #import "WZCommentCell.h"
 
 @class WZPost;
 
-@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, RTLabelDelegate, WZCommentShowRepliesDelegate>
+@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;

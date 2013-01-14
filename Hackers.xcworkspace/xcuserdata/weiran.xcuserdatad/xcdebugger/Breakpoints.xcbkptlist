@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "374428499.24251"
+         timestampString = "379885020.839372"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "38"
-         endingLineNumber = "38"
+         startingLineNumber = "39"
+         endingLineNumber = "39"
          landmarkName = "-fetchComments"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "379856428.14839"
+         timestampString = "379885020.839372"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "158"
-         endingLineNumber = "158"
+         startingLineNumber = "183"
+         endingLineNumber = "183"
          landmarkName = "-selectedCommentAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "379856108.692019"
+         timestampString = "379885020.839372"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "82"
-         endingLineNumber = "82"
+         startingLineNumber = "84"
+         endingLineNumber = "84"
          landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>

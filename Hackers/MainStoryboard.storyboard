@@ -305,7 +305,6 @@
                     <navigationItem key="navigationItem" title="Hacker News" id="eDU-Dq-Unc">
                         <barButtonItem key="leftBarButtonItem" image="menuicon.png" id="HhO-Ra-0in"/>
                     </navigationItem>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="activityIndicator" destination="kSF-af-Q0P" id="TWb-3l-I0y"/>
                         <outlet property="menuBarButtonItem" destination="HhO-Ra-0in" id="9gc-c1-XSj"/>
@@ -345,6 +344,8 @@
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                                                     <color key="textColor" red="0.50196081400000003" green="0.1662508925" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <size key="shadowOffset" width="0.0" height="1"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8oW-2d-tbU">
                                                     <constraints>
@@ -353,8 +354,10 @@
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <size key="shadowOffset" width="0.0" height="1"/>
                                                 </label>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dgd-bJ-Mbb" customClass="RTLabel">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dgd-bJ-Mbb" customClass="CLinkingCoreTextLabel">
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                 </view>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUV-CZ-R1S">
@@ -393,7 +396,7 @@
                                             <constraint firstAttribute="bottom" secondItem="dgd-bJ-Mbb" secondAttribute="bottom" constant="10" type="user" id="s8G-yT-CHg"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="commentLabel" destination="dgd-bJ-Mbb" id="HPA-Xb-b9Z"/>
+                                            <outlet property="commentLabel" destination="dgd-bJ-Mbb" id="Dlc-6c-Wv0"/>
                                             <outlet property="dateLabel" destination="8oW-2d-tbU" id="dct-sE-V4Y"/>
                                             <outlet property="showRepliesButton" destination="QUV-CZ-R1S" id="ADn-6H-Tvg"/>
                                             <outlet property="userLabel" destination="V9m-5n-3oQ" id="dmo-SQ-Cm5"/>
@@ -402,7 +405,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="0rA-qm-jad"/>
                             <constraint firstItem="t2X-yB-S8x" firstAttribute="centerY" secondItem="Smx-0F-YVN" secondAttribute="centerY" type="user" id="BfO-SI-Zzw"/>
@@ -535,11 +538,14 @@
         <image name="menuicon.png" width="20" height="17"/>
     </resources>
     <classes>
+        <class className="CCoreTextLabel" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CCoreTextLabel.h"/>
+        </class>
+        <class className="CLinkingCoreTextLabel" superclassName="CCoreTextLabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CLinkingCoreTextLabel.h"/>
+        </class>
         <class className="NSLayoutConstraint" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="RTLabel" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/RTLabel.h"/>
         </class>
         <class className="SWRevealViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/SWRevealViewController.h"/>
@@ -548,7 +554,7 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
             <relationships>
                 <relationship kind="action" name="showReplies:"/>
-                <relationship kind="outlet" name="commentLabel" candidateClass="RTLabel"/>
+                <relationship kind="outlet" name="commentLabel" candidateClass="CLinkingCoreTextLabel"/>
                 <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>

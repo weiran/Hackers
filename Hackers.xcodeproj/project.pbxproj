@@ -47,10 +47,6 @@
 		24975A7A164A88DE000143A1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975A77164A88DE000143A1 /* Reachability.m */; };
 		24975A7B164A88DE000143A1 /* RNCachingURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975A79164A88DE000143A1 /* RNCachingURLProtocol.m */; };
 		24975AF5164C08D1000143A1 /* WZMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975AF4164C08D1000143A1 /* WZMenuViewController.m */; };
-		2498272F1652A28B001C0ECF /* RTLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2498272E1652A28B001C0ECF /* RTLabel.m */; };
-		249827431652A31B001C0ECF /* SVModalWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2498273F1652A31B001C0ECF /* SVModalWebViewController.m */; };
-		249827441652A31B001C0ECF /* SVWebViewController.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 249827401652A31B001C0ECF /* SVWebViewController.bundle */; };
-		249827451652A31B001C0ECF /* SVWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 249827421652A31B001C0ECF /* SVWebViewController.m */; };
 		249827561652A42E001C0ECF /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 249827551652A42E001C0ECF /* CoreText.framework */; };
 		24AA08FB165187EA00FA9FEC /* greyButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08F7165187EA00FA9FEC /* greyButton.png */; };
 		24AA08FC165187EA00FA9FEC /* greyButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08F8165187EA00FA9FEC /* greyButton@2x.png */; };
@@ -176,13 +172,6 @@
 		24975A79164A88DE000143A1 /* RNCachingURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCachingURLProtocol.m; sourceTree = "<group>"; };
 		24975AF3164C08D1000143A1 /* WZMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZMenuViewController.h; sourceTree = "<group>"; };
 		24975AF4164C08D1000143A1 /* WZMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZMenuViewController.m; sourceTree = "<group>"; };
-		2498272D1652A28B001C0ECF /* RTLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTLabel.h; sourceTree = "<group>"; };
-		2498272E1652A28B001C0ECF /* RTLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTLabel.m; sourceTree = "<group>"; };
-		2498273E1652A31B001C0ECF /* SVModalWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVModalWebViewController.h; sourceTree = "<group>"; };
-		2498273F1652A31B001C0ECF /* SVModalWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVModalWebViewController.m; sourceTree = "<group>"; };
-		249827401652A31B001C0ECF /* SVWebViewController.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SVWebViewController.bundle; sourceTree = "<group>"; };
-		249827411652A31B001C0ECF /* SVWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVWebViewController.h; sourceTree = "<group>"; };
-		249827421652A31B001C0ECF /* SVWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVWebViewController.m; sourceTree = "<group>"; };
 		249827551652A42E001C0ECF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		24AA08F7165187EA00FA9FEC /* greyButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greyButton.png; sourceTree = "<group>"; };
 		24AA08F8165187EA00FA9FEC /* greyButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "greyButton@2x.png"; sourceTree = "<group>"; };
@@ -452,8 +441,6 @@
 				24C43FCF16A447F800055D65 /* TSMiniWebBrowser */,
 				245F85CC1669090A000D3EE1 /* SSKeychain */,
 				245F8598166908DB000D3EE1 /* NNNetwork */,
-				2498272C1652A26E001C0ECF /* RTLabel */,
-				2498272B1652A24D001C0ECF /* SVWebViewController */,
 				24B7D8EF164ACE0600F55B3D /* SASlideMenu */,
 				24975A73164A88DE000143A1 /* RNCachingURLProtocol */,
 			);
@@ -485,27 +472,6 @@
 			children = (
 			);
 			path = scopes;
-			sourceTree = "<group>";
-		};
-		2498272B1652A24D001C0ECF /* SVWebViewController */ = {
-			isa = PBXGroup;
-			children = (
-				249827401652A31B001C0ECF /* SVWebViewController.bundle */,
-				2498273E1652A31B001C0ECF /* SVModalWebViewController.h */,
-				2498273F1652A31B001C0ECF /* SVModalWebViewController.m */,
-				249827411652A31B001C0ECF /* SVWebViewController.h */,
-				249827421652A31B001C0ECF /* SVWebViewController.m */,
-			);
-			path = SVWebViewController;
-			sourceTree = "<group>";
-		};
-		2498272C1652A26E001C0ECF /* RTLabel */ = {
-			isa = PBXGroup;
-			children = (
-				2498272D1652A28B001C0ECF /* RTLabel.h */,
-				2498272E1652A28B001C0ECF /* RTLabel.m */,
-			);
-			path = RTLabel;
 			sourceTree = "<group>";
 		};
 		24B2BF49164C5BDC00C588F1 /* Comments */ = {
@@ -744,7 +710,6 @@
 				24AA08FC165187EA00FA9FEC /* greyButton@2x.png in Resources */,
 				24AA08FD165187EA00FA9FEC /* greyButtonHighlight.png in Resources */,
 				24AA08FE165187EA00FA9FEC /* greyButtonHighlight@2x.png in Resources */,
-				249827441652A31B001C0ECF /* SVWebViewController.bundle in Resources */,
 				2443934A166CB071008D7960 /* cell-background@2x.png in Resources */,
 				24439351166CC222008D7960 /* cell-background-dark@2x.png in Resources */,
 				24439356166CC6F4008D7960 /* cell-background.png in Resources */,
@@ -824,9 +789,6 @@
 				24B2BF4D164C5BEF00C588F1 /* WZCommentsViewController.m in Sources */,
 				24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */,
 				2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */,
-				2498272F1652A28B001C0ECF /* RTLabel.m in Sources */,
-				249827431652A31B001C0ECF /* SVModalWebViewController.m in Sources */,
-				249827451652A31B001C0ECF /* SVWebViewController.m in Sources */,
 				245F85BC166908FD000D3EE1 /* NNInstapaperActivity.m in Sources */,
 				245F85BD166908FD000D3EE1 /* NNInstapaperClient.m in Sources */,
 				245F85BE166908FD000D3EE1 /* NNOAuth.m in Sources */,
