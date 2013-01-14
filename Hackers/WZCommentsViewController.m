@@ -72,35 +72,26 @@
     WZCommentModel *comment = _comments[indexPath.row];
     NSString *cellIdentifier = @"CommentCell";
     
-//    switch (comment.level.integerValue) {
-//        case 0:
-//            cellIdentifier = @"CommentCell";
-//            break;
-//        case 1:
-//            cellIdentifier = @"CommentCellLevel1";
-//            break;
-//        case 2:
-//            cellIdentifier = @"CommentCellLevel2";
-//            break;
-//        case 3:
-//            cellIdentifier = @"CommentCellLevel3";
-//            break;
-//        default:
-//            cellIdentifier = @"CommentCellLevel3";
-//            break;
-//    }
-    
     WZCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    cell.comment = comment;
-    cell.commentLabel.delegate = self;
+    cell.commentLabel.delegate = self; // for opening links
+    
+    cell.userLabel.text = comment.user;
+    cell.dateLabel.text = comment.timeAgo;
+    cell.commentLabel.text = comment.content;
     
     if (comment.comments.count > 0) {
         cell.delegate = self;
         cell.showRepliesButton.hidden = NO;
+        cell.showRepliesButton.titleLabel.text = [self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded];
     } else {
         cell.delegate = nil;
         cell.showRepliesButton.hidden = YES;
     }
+    
+    NSUInteger baseIndentation = 10;
+    NSUInteger indentStep = 15;
+    NSUInteger indentation = baseIndentation + (indentStep * comment.level.integerValue);
+    cell.contentIndent = indentation;
     
     return cell;
 }
@@ -137,7 +128,10 @@
 
 #pragma mark - WZCommentShowRepliesDelegate
 
-- (void)selectedComment:(WZCommentModel *)comment atIndexPath:(NSIndexPath *)indexPath {
+- (void)selectedCommentAtIndexPath:(NSIndexPath *)indexPath {
+    WZCommentModel *comment = _comments[indexPath.row];
+    WZCommentCell *cell = (WZCommentCell *)[_tableView cellForRowAtIndexPath:indexPath];
+    
     if (comment.comments && !comment.expanded) {
         comment.expanded = YES;
         
@@ -151,7 +145,7 @@
             [newIndexPaths addObject:newIndexPath];
         }
         
-        [_tableView insertRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+        [_tableView insertRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
     } else if (comment.comments && comment.expanded) {
         comment.expanded = NO;
         
@@ -173,7 +167,17 @@
         
         [_comments removeObjectsInArray:commentsToRemove];
         
-        [_tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationTop];
+        [_tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
+    }
+    
+    cell.showRepliesButton.titleLabel.text = [self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded];
+}
+
+- (NSString *)commentButtonLabelTextWithCount:(NSUInteger)count expanded:(BOOL)expanded {
+    if (count > 1) {
+        return [NSString stringWithFormat:@"%@ %d replies", expanded ? @"Hide" : @"Show", count];
+    } else {
+        return [NSString stringWithFormat:@"%@ 1 reply", expanded ? @"Hide" : @"Show"];
     }
 }
 

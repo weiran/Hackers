@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@class WZCommentModel, RTLabel;
+@class RTLabel;
 
 @protocol WZCommentShowRepliesDelegate <NSObject>
-- (void)selectedComment:(WZCommentModel *)comment atIndexPath:(NSIndexPath *)indexPath;
+- (void)selectedCommentAtIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @interface WZCommentCell : UITableViewCell
@@ -23,13 +23,10 @@
 - (IBAction)showReplies:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *showRepliesButton;
 
-@property (copy, nonatomic) WZCommentModel *comment;
+@property (nonatomic) NSUInteger contentIndent;
+@property (nonatomic) BOOL expanded;
+@property (nonatomic) NSUInteger repliesCount;
 
 @property (weak, nonatomic) id <WZCommentShowRepliesDelegate> delegate;
-
-
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *repliesButtonLayoutConstraint;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bodyLayoutConstraint;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *userLayoutConstraint;
 
 @end

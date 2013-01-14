@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <SVWebViewController.h>
+#import <TSMiniWebBrowser.h>
 #import <SWRevealViewController/SWRevealViewController.h>
 
 #import "WZMainViewController.h"
@@ -220,9 +220,12 @@
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     cell.titleLabel.textColor = [UIColor lightGrayColor];
     
-    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithAddress:post.url];
-    webViewController.itemTitle = post.title;
-    [self.navigationController pushViewController:webViewController animated:YES];
+//    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithAddress:post.url];
+//    webViewController.itemTitle = post.title;
+//    [self.navigationController pushViewController:webViewController animated:YES];
+    
+    TSMiniWebBrowser *webBrowser = [[TSMiniWebBrowser alloc] initWithUrl:[NSURL URLWithString:post.url]];
+    [self.navigationController pushViewController:webBrowser animated:YES];
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 

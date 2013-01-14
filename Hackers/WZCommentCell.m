@@ -7,10 +7,10 @@
 //
 
 #import "WZCommentCell.h"
-#import "WZCommentModel.h"
-#import <RTLabel.h>
 
-@interface WZCommentCell ()
+@interface WZCommentCell () {
+    NSUInteger _indentationPoints;
+}
 @property (nonatomic, strong) NSLayoutConstraint *userConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *bodyConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *repliesConstraint;
@@ -18,15 +18,8 @@
 
 @implementation WZCommentCell
 
-- (void)setComment:(WZCommentModel *)comment {
-    _comment = comment;
-    [self updateLabels];
-}
-
 - (void)layoutSubviews {
     [super layoutSubviews];
-    _commentLabel.text = _comment.content;
-    
     UIImage *buttonImage = [[UIImage imageNamed:@"greyButton"]
                             resizableImageWithCapInsets:UIEdgeInsetsMake(18, 18, 18, 18)];
     UIImage *buttonImageHighlight = [[UIImage imageNamed:@"greyButtonHighlight.png"]
@@ -36,14 +29,22 @@
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
 }
 
+- (void)setContentIndent:(NSUInteger)contentIndent {
+    if (contentIndent != _indentationPoints) {
+        _indentationPoints = contentIndent;
+        [self setupConstraints];
+    }
+}
+
+- (NSUInteger)contentIndent {
+    return _indentationPoints;
+}
+
 - (void)setupConstraints {
-    NSInteger levelValue = _comment.level.integerValue + 1;
-    NSInteger constant = levelValue * 10;
-    
     if (_userConstraint) {
-        _userConstraint.constant = constant;
+        _userConstraint.constant = _indentationPoints;
     } else {
-        NSString *userVisualFormat = [NSString stringWithFormat:@"|-%d-[_userLabel]", constant];
+        NSString *userVisualFormat = [NSString stringWithFormat:@"|-%d-[_userLabel]", _indentationPoints];
         
         _userConstraint = [NSLayoutConstraint constraintsWithVisualFormat:userVisualFormat
                                                                   options:0
@@ -53,9 +54,9 @@
     }
     
     if (_bodyConstraint) {
-        _bodyConstraint.constant = constant;
+        _bodyConstraint.constant = _indentationPoints;
     } else {
-        NSString *bodyVisualFormat = [NSString stringWithFormat:@"|-%d-[_commentLabel]", constant];
+        NSString *bodyVisualFormat = [NSString stringWithFormat:@"|-%d-[_commentLabel]", _indentationPoints];
         
         _bodyConstraint = [NSLayoutConstraint constraintsWithVisualFormat:bodyVisualFormat
                                                                   options:0
@@ -65,9 +66,9 @@
     }
     
     if (_repliesConstraint) {
-        _repliesConstraint.constant = constant;
+        _repliesConstraint.constant = _indentationPoints;
     } else {
-        NSString *repliesVisualFormat = [NSString stringWithFormat:@"|-%d-[_showRepliesButton]", levelValue * 10];
+        NSString *repliesVisualFormat = [NSString stringWithFormat:@"|-%d-[_showRepliesButton]", _indentationPoints];
         
         _repliesConstraint = [NSLayoutConstraint constraintsWithVisualFormat:repliesVisualFormat
                                                                                  options:0
@@ -77,27 +78,12 @@
     }
 }
 
-- (void)updateLabels {
-    _userLabel.text = _comment.user;
-    _dateLabel.text = _comment.timeAgo;
-    _commentLabel.text = _comment.content;
-    if (_comment.expanded) {
-        [_showRepliesButton setTitle:@"Hide replies" forState:UIControlStateNormal];
-    } else {
-        [_showRepliesButton setTitle:@"Show replies" forState:UIControlStateNormal];
-    }
-    
-    [self setupConstraints];
-}
-
 - (IBAction)showReplies:(id)sender {
     UITableView *tableView = (UITableView *)self.superview;
     NSIndexPath *indexPath = [tableView indexPathForCell:self];
     
-    if ([_delegate respondsToSelector:@selector(selectedComment:atIndexPath:)]) {
-        [_delegate selectedComment:_comment atIndexPath:indexPath];
+    if ([_delegate respondsToSelector:@selector(selectedCommentAtIndexPath:)]) {
+        [_delegate selectedCommentAtIndexPath:indexPath];
     }
-    
-    [self updateLabels];
 }
 @end
