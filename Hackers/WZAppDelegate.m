@@ -13,6 +13,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [NSURLProtocol registerClass:[RNCachingURLProtocol class]];
+    [[UINavigationBar appearance] setTintColor:[UIColor darkGrayColor]];
     return YES;
 }
 
