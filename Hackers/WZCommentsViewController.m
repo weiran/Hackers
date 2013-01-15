@@ -42,11 +42,7 @@
         for (NSDictionary *commentDictionary in comments) {
             WZCommentModel *comment = [[WZCommentModel alloc] init];
             [comment updateAttributes:commentDictionary];
-            
-//            if ([comment.content hasPrefix:@"<p>"]) {
-//                comment.content = [comment.content substringFromIndex:3];
-//            }
-            
+                        
             [newComments addObject:comment];
         }
         _comments = newComments;
