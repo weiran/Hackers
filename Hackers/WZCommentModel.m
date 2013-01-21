@@ -9,6 +9,10 @@
 #import "WZCommentModel.h"
 #import "NSDictionary+ObjectForKeyOrNil.h"
 
+#import "DTAttributedLabel.h"
+#import "DTHTMLAttributedStringBuilder.h"
+#import "DTCoreTextConstants.h"
+
 @implementation WZCommentModel
 
 - (void)updateAttributes:(NSDictionary *)attributes {
@@ -18,6 +22,7 @@
     self.timeAgo = [attributes objectForKeyOrNil:@"time_ago"];
     self.user = [attributes objectForKeyOrNil:@"user"];
     NSDictionary *comments = [attributes objectForKeyOrNil:@"comments"];
+    self.attributedContent = [self attributedStringForHTML:self.content];
     
     if (comments) {
         NSMutableArray *newComments = [NSMutableArray array];
@@ -33,6 +38,25 @@
         }
         _comments = newComments;
     }
+}
+
+- (NSAttributedString *)attributedStringForHTML:(NSString *)html {
+    NSDictionary *stringBuilderOptions = @{
+        DTDefaultFontFamily: @"Helvetica Neue",
+        NSTextSizeMultiplierDocumentOption: @(1.15)
+    };
+    
+    DTHTMLAttributedStringBuilder *builder = [[DTHTMLAttributedStringBuilder alloc]
+                                              initWithHTML:[html dataUsingEncoding:NSUTF8StringEncoding]
+                                              options:stringBuilderOptions
+                                              documentAttributes:nil];
+    return [builder generatedAttributedString];
+}
+
+- (CGSize)sizeToFitWidth:(CGFloat)width {
+    DTAttributedLabel *label = [[DTAttributedLabel alloc] init];
+    [label setAttributedString:self.attributedContent];
+    return [label suggestedFrameSizeToFitEntireStringConstraintedToWidth:width];
 }
 
 @end

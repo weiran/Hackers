@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "379885020.839372"
+         timestampString = "380399849.836444"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "39"
-         endingLineNumber = "39"
+         startingLineNumber = "38"
+         endingLineNumber = "38"
          landmarkName = "-fetchComments"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,25 +34,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "379936459.072323"
+         timestampString = "380402958.814795"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "179"
-         endingLineNumber = "179"
+         startingLineNumber = "176"
+         endingLineNumber = "176"
          landmarkName = "-selectedCommentAtIndexPath:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Hackers/WZCommentsViewController.m"
-         timestampString = "379936459.072323"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "80"
-         endingLineNumber = "80"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -131,6 +118,19 @@
          startingLineNumber = "340"
          endingLineNumber = "340"
          landmarkName = "-actionButtonClicked:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Libraries/DTCoreText/Core/Source/DTAttributedTextContentView.m"
+         timestampString = "380401943.231523"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "444"
+         endingLineNumber = "444"
+         landmarkName = "-suggestedFrameSizeToFitEntireStringConstraintedToWidth:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

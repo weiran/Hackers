@@ -1,1 +1,0 @@
-../../CoreTextToy/Source/CCoreTextLabel.h

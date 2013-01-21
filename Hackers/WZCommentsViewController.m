@@ -7,13 +7,12 @@
 //
 
 #import <TSMiniWebBrowser.h>
-#import <CoreTextToy/CLinkingCoreTextLabel.h>
-#import <CoreTextToy/CMarkupValueTransformer.h>
 
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
+#import "DTAttributedLabel.h"
 #import "WZPost.h"
 
 @interface WZCommentsViewController () {
@@ -75,7 +74,8 @@
     
     cell.userLabel.text = comment.user;
     cell.dateLabel.text = comment.timeAgo;
-    [cell setHTML:comment.content];
+    cell.contentIndent = [self indentPointsForComment:comment];
+    cell.commentLabel.attributedString = comment.attributedContent;
     
     if (comment.comments.count > 0) {
         cell.delegate = self;
@@ -84,10 +84,7 @@
     } else {
         cell.delegate = nil;
         cell.showRepliesButton.hidden = YES;
-    }
-    
-    cell.contentIndent = [self indentPointsForComment:comment];
-    
+    }    
     return cell;
 }
 
@@ -97,13 +94,8 @@
     if (!comment.cellHeight) {
         int replyButtonHeight = 30 + 10; // height + spacing
         int labelHeight = [self heightForCommentLabel:comment];
-        CGFloat height = labelHeight + 36;
+        CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
         
-//        RTLabel *label = [[RTLabel alloc] initWithFrame:CGRectMake(0, 0, commentWidth, 0)];
-//        label.text = comment.content;
-//        CGSize optimumSize = [label optimumSize];
-//        CGFloat height = optimumSize.height + 36; // 26 points to top, 10 points to bottom
-
         if (comment.comments.count > 0) {
             height += replyButtonHeight;
         }
@@ -122,22 +114,27 @@
 }
 
 - (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
-    CMarkupValueTransformer *transformer = [[CMarkupValueTransformer alloc] init];
-    NSError *transformError = nil;
-    NSAttributedString *attributedString = [transformer transformedValue:comment.content error:&transformError];
-    if (!transformError) {
-        int rootWidth = 300;
-        int indentPoints = [self indentPointsForComment:comment];
-        int width = (rootWidth + 10) - indentPoints;
-        CLinkingCoreTextLabel *label = [[CLinkingCoreTextLabel alloc] init];
-        label.lineBreakMode = NSLineBreakByWordWrapping;
-        label.font = [UIFont systemFontOfSize:14];
-        CGSize size = [label sizeForString:attributedString constrainedToSize:CGSizeMake(width, 0)];
-        return size.height;
-    } else {
-        NSLog(@"Error transforming attributed string.");
-        return 0;
-    }
+
+//    CMarkupValueTransformer *transformer = [[CMarkupValueTransformer alloc] init];
+//    NSError *transformError = nil;
+//    NSAttributedString *attributedString = [transformer transformedValue:comment.content error:&transformError];
+//    if (!transformError) {
+//        int rootWidth = 300;
+//        int indentPoints = [self indentPointsForComment:comment];
+//        int width = (rootWidth + 10) - indentPoints;
+//        CLinkingCoreTextLabel *label = [[CLinkingCoreTextLabel alloc] init];
+//        label.lineBreakMode = NSLineBreakByWordWrapping;
+//        label.font = [UIFont systemFontOfSize:14];
+//        CGSize size = [label sizeForString:attributedString constrainedToSize:CGSizeMake(width, 0)];
+//        return size.height;
+//    } else {
+//        NSLog(@"Error transforming attributed string.");
+//        return 0;
+//    }
+    int rootWidth = 300;
+    int indentPoints = [self indentPointsForComment:comment];
+    int width = (rootWidth + 10) - indentPoints;
+    return [comment sizeToFitWidth:width].height;
 }
 
 #pragma mark - WZCommentURLTappedDelegate

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class RTLabel, CLinkingCoreTextLabel;
+@class DTAttributedLabel;
 
 @protocol WZCommentShowRepliesDelegate <NSObject>
 - (void)selectedCommentAtIndexPath:(NSIndexPath *)indexPath;
@@ -22,10 +22,9 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
-@property (weak, nonatomic) IBOutlet CLinkingCoreTextLabel *commentLabel;
+@property (weak, nonatomic) IBOutlet DTAttributedLabel *commentLabel;
 
 - (IBAction)showReplies:(id)sender;
-- (void)setHTML:(NSString *)html;
 
 @property (weak, nonatomic) IBOutlet UIButton *showRepliesButton;
 

@@ -11,6 +11,7 @@
 @interface WZCommentModel : NSObject
 
 @property (nonatomic, strong) NSString* content;
+@property (nonatomic, strong) NSAttributedString *attributedContent;
 @property (nonatomic, strong) NSNumber* id;
 @property (nonatomic, strong) NSNumber* level;
 @property (nonatomic, strong) NSString* timeAgo;
@@ -20,5 +21,6 @@
 @property (nonatomic) BOOL expanded;
 
 - (void)updateAttributes:(NSDictionary *)attributes;
+- (CGSize)sizeToFitWidth:(CGFloat)width;
 
 @end

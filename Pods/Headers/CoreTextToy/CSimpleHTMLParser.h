@@ -1,1 +1,0 @@
-../../CoreTextToy/Source/CSimpleHTMLParser.h
