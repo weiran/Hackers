@@ -133,16 +133,34 @@ enum actionSheetButtonIndex {
     toolBar.barStyle = barStyle;
     [self.view addSubview:toolBar];
     
-    buttonGoBack = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"back_icon.png"] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonTouchUp:)];
+    UIImage *backImage = [UIImage imageNamed:@"back_icon.png"];
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    backButton.bounds = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    [backButton setImage:backImage forState:UIControlStateNormal];
+    [backButton addTarget:self action:@selector(backButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside];
+
+    buttonGoBack = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 30;
     
-    buttonGoForward = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forward_icon.png"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonTouchUp:)];
+    UIImage *forwardImage = [UIImage imageNamed:@"forward_icon.png"];
+    UIButton *forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    forwardButton.bounds = CGRectMake(0, 0, forwardImage.size.width, forwardImage.size.height);
+    [forwardButton setImage:forwardImage forState:UIControlStateNormal];
+    [forwardButton addTarget:self action:@selector(forwardButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside];
+    
+    buttonGoForward = [[UIBarButtonItem alloc] initWithCustomView:forwardButton];
     
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
-    UIBarButtonItem *buttonReload = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"reload_icon.png"] style:UIBarButtonItemStylePlain target:self action:@selector(reloadButtonTouchUp:)];
+    UIImage *reloadImage = [UIImage imageNamed:@"reload_icon.png"];
+    UIButton *reloadButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    reloadButtonView.bounds = CGRectMake(0, 0, reloadImage.size.width, reloadImage.size.height);
+    [reloadButtonView setImage:reloadImage forState:UIControlStateNormal];
+    [reloadButtonView addTarget:self action:@selector(reloadButtonTouchUp:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *buttonReload = [[UIBarButtonItem alloc] initWithCustomView:reloadButtonView];
     
     UIBarButtonItem *fixedSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace2.width = 20;
@@ -254,7 +272,7 @@ enum actionSheetButtonIndex {
     }
     
     // Status bar style
-    [[UIApplication sharedApplication] setStatusBarStyle:barStyle animated:YES];
+    //[[UIApplication sharedApplication] setStatusBarStyle:barStyle animated:YES];
     
     // UI state
     buttonGoBack.enabled = NO;
@@ -289,7 +307,7 @@ enum actionSheetButtonIndex {
     }
     
     // Restore Status bar style
-    [[UIApplication sharedApplication] setStatusBarStyle:originalBarStyle animated:NO];
+    //[[UIApplication sharedApplication] setStatusBarStyle:originalBarStyle animated:NO];
     
     // Stop loading
     [webView stopLoading];

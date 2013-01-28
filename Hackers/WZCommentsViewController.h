@@ -24,4 +24,5 @@
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata1Label;
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata2Label;
 
+- (IBAction)showActivityView:(id)sender;
 @end

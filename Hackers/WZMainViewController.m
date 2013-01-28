@@ -12,7 +12,6 @@
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
-#import "WZMenuViewController.h"
 #import "WZHackersData.h"
 #import "WZPost.h"
 #import "WZRead.h"
@@ -84,7 +83,7 @@
 
 - (void)setupTitle {
     if ([self newsType] == WZNewsTypeTop) {
-        self.title = @"Top News";
+        self.title = @"Hacker News";
     } else {
         self.title = @"Newest";
     }

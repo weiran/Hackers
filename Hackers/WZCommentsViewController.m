@@ -9,6 +9,9 @@
 #import <TSMiniWebBrowser.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
 
+#import "NNNetwork.h"
+#import "TUSafariActivity.h"
+
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
@@ -61,7 +64,7 @@
 - (void)setupTableView {
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    _tableView.hidden = YES;
+    //_tableView.hidden = YES;
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
     
@@ -266,4 +269,16 @@
     }];
 }
 
+- (IBAction)showActivityView:(id)sender {
+    [[NNInstapaperClient sharedClient] setClientIdentifier:@"JhxaIHH9KhRc3Mj2JaiJ6bYOhMR5Kv7sdeESoBgxlEf51YOdtb"];
+    [[NNInstapaperClient sharedClient] setClientSecret:@"Yl6nzC2cVu2AGm8XrqoTt8QgVI0FJs0ndsV5jWbSN7bI3tBSb1"];
+    NNOAuthCredential *credential = [NNOAuthCredential credentialWithAccessToken:@"user-token" accessSecret:@"user-secret"];
+    NNInstapaperActivity *activity = [[NNInstapaperActivity alloc] initWithCredential:credential];
+    
+    TUSafariActivity *safariActivity = [[TUSafariActivity alloc] init];
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL URLWithString:_post.url]]
+                                                                                         applicationActivities:@[safariActivity, activity]];
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
 @end
