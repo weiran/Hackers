@@ -10,6 +10,7 @@
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		2402A75F165120E400F637E5 /* menuicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75D165120E400F637E5 /* menuicon.png */; };
 		2402A760165120E400F637E5 /* menuicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75E165120E400F637E5 /* menuicon@2x.png */; };
+		24382B8616B7032A00337007 /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24382B8516B7032A00337007 /* WZNavigationController.m */; };
 		245F85BC166908FD000D3EE1 /* NNInstapaperActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */; };
 		245F85BD166908FD000D3EE1 /* NNInstapaperClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859D166908FD000D3EE1 /* NNInstapaperClient.m */; };
 		245F85BE166908FD000D3EE1 /* NNOAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F85A0166908FD000D3EE1 /* NNOAuth.m */; };
@@ -166,6 +167,8 @@
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		2402A75D165120E400F637E5 /* menuicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuicon.png; sourceTree = "<group>"; };
 		2402A75E165120E400F637E5 /* menuicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menuicon@2x.png"; sourceTree = "<group>"; };
+		24382B8416B7032A00337007 /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
+		24382B8516B7032A00337007 /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
 		245F859A166908FD000D3EE1 /* NNInstapaperActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperActivity.h; sourceTree = "<group>"; };
 		245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNInstapaperActivity.m; sourceTree = "<group>"; };
 		245F859C166908FD000D3EE1 /* NNInstapaperClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperClient.h; sourceTree = "<group>"; };
@@ -657,6 +660,8 @@
 				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
 				24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */,
 				24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */,
+				24382B8416B7032A00337007 /* WZNavigationController.h */,
+				24382B8516B7032A00337007 /* WZNavigationController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -893,6 +898,7 @@
 				24C43FE016A447F800055D65 /* TSMiniWebBrowser.m in Sources */,
 				24C4400616A44DCC00055D65 /* TUSafariActivity.m in Sources */,
 				24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */,
+				24382B8616B7032A00337007 /* WZNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

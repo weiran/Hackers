@@ -1,4 +1,4 @@
-//
+    //
 //  WZMainViewController.m
 //  Hackers
 //
@@ -37,7 +37,6 @@
     
     [self setupPullToRefresh];
     [self setupTitle];
-    
     [self loadData];
     
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
@@ -133,6 +132,11 @@
         NSLog(@"News fetch failed: %@", error.localizedDescription);
     }
     
+}
+
+- (void)updateNavigationBarBackground {
+    _navBarInDefaultState = NO;
+    [self scrollViewDidScroll:self.tableView];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {

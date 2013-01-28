@@ -34,6 +34,8 @@
         }
         _comments = newComments;
     }
+    
+    self.cellHeight = [self heightForComment:self];
 }
 
 - (NSAttributedString *)attributedStringForHTML:(NSString *)html {
@@ -54,9 +56,36 @@
     paragraphStyle.paragraphSpacing = 12.f;
     attributedString.paragraphStyle = paragraphStyle;
     [attributedString setFont:[UIFont fontWithName:@"Avenir" size:14]];
-    //[attributedString setFont:[UIFont systemFontOfSize:14]];
     
     return attributedString;
+}
+
+- (NSNumber *)heightForComment:(WZCommentModel *)comment {
+    int replyButtonHeight = 30 + 10; // height + spacing
+    
+    CGFloat rootWidth = 300;
+    int indentPoints = [self indentPointsForComment:comment];
+    CGFloat width = rootWidth - indentPoints;
+    
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(comment.attributedContent));
+    CGSize sz = CGSizeMake(0.f, 0.f);
+    CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
+    
+    if (framesetter) {
+        CFRange fitCFRange = CFRangeMake(0,0);
+        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, maxSize, &fitCFRange);
+        CFRelease(framesetter);
+    }
+    
+    int labelHeight = sz.height;
+    
+    CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
+    
+    if (self.comments.count > 0) {
+        height += replyButtonHeight;
+    }
+    
+    return @(height);
 }
 
 - (CGSize)sizeToFitWidth:(CGFloat)width {
@@ -71,6 +100,17 @@
     }
     
     return sz;
+}
+
+- (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
+    NSUInteger baseIndentation = 10;
+    NSUInteger indentPerLevel = 15;
+    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
+    return indentation;
+}
+
+- (NSUInteger)indentPoints {
+    return [self indentPointsForComment:self];
 }
 
 @end

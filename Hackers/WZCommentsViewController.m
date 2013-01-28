@@ -13,13 +13,13 @@
 #import "TUSafariActivity.h"
 
 #import "WZCommentsViewController.h"
+#import "WZMainViewController.h"
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
 #import "WZPost.h"
 
 @interface WZCommentsViewController ()
-@property (nonatomic, strong) TSMiniWebBrowser *webBrowserViewController;
 @end
 
 @implementation WZCommentsViewController
@@ -31,6 +31,10 @@
                                                   forBarMetrics:UIBarMetricsDefault];
     [self setupTableView];
     [self fetchComments];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self updateNavigationBarBackground];
 }
 
 - (void)fetchComments {
@@ -115,7 +119,7 @@
     
     cell.userLabel.text = comment.user;
     cell.dateLabel.text = comment.timeAgo;
-    cell.contentIndent = [self indentPointsForComment:comment];
+    cell.contentIndent = [comment indentPoints];
     cell.commentLabel.attributedText = comment.attributedContent;
     
     if (comment.comments.count > 0) {
@@ -133,71 +137,69 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZCommentModel *comment = _comments[indexPath.row];
     
-    if (!comment.cellHeight) {
-        int replyButtonHeight = 30 + 10; // height + spacing
-        int labelHeight = [self heightForCommentLabel:comment];
-        CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
-        
-        if (comment.comments.count > 0) {
-            height += replyButtonHeight;
-        }
-        
-        comment.cellHeight = @(height);
-    }
-    
     return comment.cellHeight.floatValue;
+//    if (!comment.cellHeight) {
+//        int replyButtonHeight = 30 + 10; // height + spacing
+//        int labelHeight = [self heightForCommentLabel:comment];
+//        CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
+//        
+//        if (comment.comments.count > 0) {
+//            height += replyButtonHeight;
+//        }
+//        
+//        comment.cellHeight = @(height);
+//    }
+//    
+//    return comment.cellHeight.floatValue;
 }
-
-- (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
-    NSUInteger baseIndentation = 10;
-    NSUInteger indentPerLevel = 15;
-    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
-    return indentation;
-}
-
-- (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
-    BOOL widthWithinConstraint = NO;
-    CGFloat rootWidth = 300;
-    int indentPoints = [self indentPointsForComment:comment];
-    CGFloat width = rootWidth - indentPoints;
-    CGFloat workingWidth = width;
-    
-    return [comment sizeToFitWidth:workingWidth].height;
-
-    
-    CGFloat calculatedHeight;
-    
-    while (!widthWithinConstraint) {
-        CGSize calculatedSize = [comment sizeToFitWidth:workingWidth];
-        if (calculatedSize.width > width) {
-            if (workingWidth > 0) {
-                workingWidth -= 5;
-                NSLog(@"Returned width: %f greater than actual width: %f", calculatedSize.width, width);
-            } else {
-                calculatedHeight = 0;
-                widthWithinConstraint = YES;
-            }
-        } else {
-            calculatedHeight = calculatedSize.height;
-            widthWithinConstraint = YES;
-        }
-    }
-    
-    return calculatedHeight;
-}
+//
+//- (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
+//    NSUInteger baseIndentation = 10;
+//    NSUInteger indentPerLevel = 15;
+//    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
+//    return indentation;
+//}
+//
+//- (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
+//    BOOL widthWithinConstraint = NO;
+//    CGFloat rootWidth = 300;
+//    int indentPoints = [self indentPointsForComment:comment];
+//    CGFloat width = rootWidth - indentPoints;
+//    CGFloat workingWidth = width;
+//    
+//    return [comment sizeToFitWidth:workingWidth].height;
+//
+//    
+//    CGFloat calculatedHeight;
+//    
+//    while (!widthWithinConstraint) {
+//        CGSize calculatedSize = [comment sizeToFitWidth:workingWidth];
+//        if (calculatedSize.width > width) {
+//            if (workingWidth > 0) {
+//                workingWidth -= 5;
+//                NSLog(@"Returned width: %f greater than actual width: %f", calculatedSize.width, width);
+//            } else {
+//                calculatedHeight = 0;
+//                widthWithinConstraint = YES;
+//            }
+//        } else {
+//            calculatedHeight = calculatedSize.height;
+//            widthWithinConstraint = YES;
+//        }
+//    }
+//    
+//    return calculatedHeight;
+//}
 
 #pragma mark - WZCommentURLTappedDelegate
 
 - (void)tappedLink:(NSURL *)url {
-    if (!_webBrowserViewController) {
-        _webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
-        _webBrowserViewController.delegate = self;
-        _webBrowserViewController.mode = TSMiniWebBrowserModeModal;
-        _webBrowserViewController.modalDismissButtonTitle = @"Close";
-        _webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
-    }
-    
-    [self presentViewController:_webBrowserViewController animated:YES completion:nil];
+    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
+    webBrowserViewController.delegate = self;
+    webBrowserViewController.mode = TSMiniWebBrowserModeModal;
+    webBrowserViewController.modalDismissButtonTitle = @"Close";
+    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];    
+    [self presentViewController:webBrowserViewController animated:YES completion:nil];
 }
 
 #pragma mark - WZCommentShowRepliesDelegate
@@ -263,10 +265,20 @@
 
 #pragma mark - TSMiniWebBrowserDelegate
 
--(void) tsMiniWebBrowserDidDismiss {
-    [UIView animateWithDuration:0.7 animations:^{
+- (void)tsMiniWebBrowserDidDismiss {
+    [UIView animateWithDuration:0.5 animations:^{
         _headerView.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
     }];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
+                                                  forBarMetrics:UIBarMetricsDefault];
+}
+
+- (void)updateNavigationBarBackground {
+    UINavigationController *navigationController = (UINavigationController *)self.parentViewController;
+    if ([navigationController.viewControllers[0] isKindOfClass:[WZMainViewController class]]) {
+        WZMainViewController *mainViewController = (WZMainViewController *)self.navigationController.viewControllers[0];
+        [mainViewController updateNavigationBarBackground];
+    }
 }
 
 - (IBAction)showActivityView:(id)sender {

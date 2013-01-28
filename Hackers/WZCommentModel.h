@@ -22,5 +22,6 @@
 
 - (void)updateAttributes:(NSDictionary *)attributes;
 - (CGSize)sizeToFitWidth:(CGFloat)width;
+- (NSUInteger)indentPoints;
 
 @end

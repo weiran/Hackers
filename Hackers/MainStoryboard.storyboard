@@ -135,7 +135,7 @@
         <!--Navigation Controller-->
         <scene sceneID="Vwz-dx-Dpd">
             <objects>
-                <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" sceneMemberID="viewController">
+                <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" customClass="WZNavigationController" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE" customClass="WZNavigationBar">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -619,11 +619,13 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-                <relationship kind="outlet" name="menuBarButtonItem" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
         <class className="WZNavigationBar" superclassName="UINavigationBar">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
+        </class>
+        <class className="WZNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
         </class>
         <class className="WZPostCell" superclassName="UITableViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
