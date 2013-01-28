@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "WZCommentCell.h"
 
-@class WZPost;
+@class WZPost, TSMiniWebBrowser;
 
-@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested>
+@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, TSMiniWebBrowserDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
@@ -23,7 +23,5 @@
 @property (weak, nonatomic) IBOutlet UILabel *headerDomainLabel;
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata1Label;
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata2Label;
-- (IBAction)showPost:(id)sender;
-
 
 @end

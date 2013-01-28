@@ -7,7 +7,6 @@
 //
 
 #import <TSMiniWebBrowser.h>
-#import <SWRevealViewController/SWRevealViewController.h>
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -38,8 +37,6 @@
     _readNews = [NSMutableArray array];
     
     [self setupPullToRefresh];
-    [self setupGestureRecognizer];
-    [self setupBarButtons];
     [self setupTitle];
     
     [self loadData];
@@ -85,21 +82,12 @@
     [self.tableView insertSubview:backgroundView atIndex:0];
 }
 
-- (void)setupGestureRecognizer {
-    [self.view addGestureRecognizer:self.revealViewController.panGestureRecognizer];
-}
-
 - (void)setupTitle {
     if ([self newsType] == WZNewsTypeTop) {
         self.title = @"Top News";
     } else {
         self.title = @"Newest";
     }
-}
-
-- (void)setupBarButtons {
-    _menuBarButtonItem.target = self.revealViewController;
-    _menuBarButtonItem.action = @selector(revealToggle:);
 }
 
 - (WZNewsType)newsType {
@@ -222,9 +210,10 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     WZPost *post = _news[indexPath.row];
-    
     [_readNews addObject:post.id];
     [WZHackersData.shared addRead:post.id];
+    WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+    cell.titleLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

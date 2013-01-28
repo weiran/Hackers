@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@class OHAttributedLabel;
+#import <OHAttributedLabel/OHAttributedLabel.h>
 
 @protocol WZCommentShowRepliesDelegate <NSObject>
 - (void)selectedCommentAtIndexPath:(NSIndexPath *)indexPath;
@@ -18,7 +17,7 @@
 - (void)tappedLink:(NSURL *)url;
 @end
 
-@interface WZCommentCell : UITableViewCell
+@interface WZCommentCell : UITableViewCell <OHAttributedLabelDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;

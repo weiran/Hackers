@@ -44,8 +44,6 @@
 		24972CB41643BC3C00B4EFB4 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24972CB31643BC3C00B4EFB4 /* Default@2x.png */; };
 		24972CB61643BC3C00B4EFB4 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */; };
 		24972CC11643C0F000B4EFB4 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24972CC01643C0F000B4EFB4 /* MainStoryboard.storyboard */; };
-		24975A7A164A88DE000143A1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975A77164A88DE000143A1 /* Reachability.m */; };
-		24975A7B164A88DE000143A1 /* RNCachingURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975A79164A88DE000143A1 /* RNCachingURLProtocol.m */; };
 		24975AF5164C08D1000143A1 /* WZMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24975AF4164C08D1000143A1 /* WZMenuViewController.m */; };
 		249827561652A42E001C0ECF /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 249827551652A42E001C0ECF /* CoreText.framework */; };
 		24AA08FB165187EA00FA9FEC /* greyButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08F7165187EA00FA9FEC /* greyButton.png */; };
@@ -54,8 +52,6 @@
 		24AA08FE165187EA00FA9FEC /* greyButtonHighlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08FA165187EA00FA9FEC /* greyButtonHighlight@2x.png */; };
 		24B2BF4D164C5BEF00C588F1 /* WZCommentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */; };
 		24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */; };
-		24B7D8F5164ACE0600F55B3D /* SASlideMenuStoryboardSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8F2164ACE0600F55B3D /* SASlideMenuStoryboardSegue.m */; };
-		24B7D8F6164ACE0600F55B3D /* SASlideMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8F4164ACE0600F55B3D /* SASlideMenuViewController.m */; };
 		24B7D8FF164ADA3F00F55B3D /* _WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FC164ADA3F00F55B3D /* _WZRead.m */; };
 		24B7D900164ADA3F00F55B3D /* WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FE164ADA3F00F55B3D /* WZRead.m */; };
 		24C43FDA16A447F800055D65 /* back_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 24C43FD116A447F800055D65 /* back_icon.png */; };
@@ -231,10 +227,6 @@
 		24972CB31643BC3C00B4EFB4 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		24972CC01643C0F000B4EFB4 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
-		24975A76164A88DE000143A1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		24975A77164A88DE000143A1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		24975A78164A88DE000143A1 /* RNCachingURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCachingURLProtocol.h; sourceTree = "<group>"; };
-		24975A79164A88DE000143A1 /* RNCachingURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCachingURLProtocol.m; sourceTree = "<group>"; };
 		24975AF3164C08D1000143A1 /* WZMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZMenuViewController.h; sourceTree = "<group>"; };
 		24975AF4164C08D1000143A1 /* WZMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZMenuViewController.m; sourceTree = "<group>"; };
 		249827551652A42E001C0ECF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -246,11 +238,6 @@
 		24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentsViewController.m; sourceTree = "<group>"; };
 		24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentCell.h; sourceTree = "<group>"; };
 		24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentCell.m; sourceTree = "<group>"; };
-		24B7D8F0164ACE0600F55B3D /* SASlideMenuDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SASlideMenuDataSource.h; sourceTree = "<group>"; };
-		24B7D8F1164ACE0600F55B3D /* SASlideMenuStoryboardSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SASlideMenuStoryboardSegue.h; sourceTree = "<group>"; };
-		24B7D8F2164ACE0600F55B3D /* SASlideMenuStoryboardSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SASlideMenuStoryboardSegue.m; sourceTree = "<group>"; };
-		24B7D8F3164ACE0600F55B3D /* SASlideMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SASlideMenuViewController.h; sourceTree = "<group>"; };
-		24B7D8F4164ACE0600F55B3D /* SASlideMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SASlideMenuViewController.m; sourceTree = "<group>"; };
 		24B7D8FB164ADA3F00F55B3D /* _WZRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZRead.h; sourceTree = "<group>"; };
 		24B7D8FC164ADA3F00F55B3D /* _WZRead.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZRead.m; sourceTree = "<group>"; };
 		24B7D8FD164ADA3F00F55B3D /* WZRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZRead.h; sourceTree = "<group>"; };
@@ -535,37 +522,8 @@
 				24C43FCF16A447F800055D65 /* TSMiniWebBrowser */,
 				245F85CC1669090A000D3EE1 /* SSKeychain */,
 				245F8598166908DB000D3EE1 /* NNNetwork */,
-				24B7D8EF164ACE0600F55B3D /* SASlideMenu */,
-				24975A73164A88DE000143A1 /* RNCachingURLProtocol */,
 			);
 			path = Libraries;
-			sourceTree = "<group>";
-		};
-		24975A73164A88DE000143A1 /* RNCachingURLProtocol */ = {
-			isa = PBXGroup;
-			children = (
-				24975A74164A88DE000143A1 /* .idea */,
-				24975A76164A88DE000143A1 /* Reachability.h */,
-				24975A77164A88DE000143A1 /* Reachability.m */,
-				24975A78164A88DE000143A1 /* RNCachingURLProtocol.h */,
-				24975A79164A88DE000143A1 /* RNCachingURLProtocol.m */,
-			);
-			path = RNCachingURLProtocol;
-			sourceTree = "<group>";
-		};
-		24975A74164A88DE000143A1 /* .idea */ = {
-			isa = PBXGroup;
-			children = (
-				24975A75164A88DE000143A1 /* scopes */,
-			);
-			path = .idea;
-			sourceTree = "<group>";
-		};
-		24975A75164A88DE000143A1 /* scopes */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = scopes;
 			sourceTree = "<group>";
 		};
 		24B2BF49164C5BDC00C588F1 /* Comments */ = {
@@ -580,18 +538,6 @@
 				24D0DAFE16B58D13001342A8 /* WZCommentsHeaderView.xib */,
 			);
 			name = Comments;
-			sourceTree = "<group>";
-		};
-		24B7D8EF164ACE0600F55B3D /* SASlideMenu */ = {
-			isa = PBXGroup;
-			children = (
-				24B7D8F0164ACE0600F55B3D /* SASlideMenuDataSource.h */,
-				24B7D8F1164ACE0600F55B3D /* SASlideMenuStoryboardSegue.h */,
-				24B7D8F2164ACE0600F55B3D /* SASlideMenuStoryboardSegue.m */,
-				24B7D8F3164ACE0600F55B3D /* SASlideMenuViewController.h */,
-				24B7D8F4164ACE0600F55B3D /* SASlideMenuViewController.m */,
-			);
-			path = SASlideMenu;
 			sourceTree = "<group>";
 		};
 		24C43FCF16A447F800055D65 /* TSMiniWebBrowser */ = {
@@ -936,10 +882,6 @@
 				24EAA5F01647F25A00105FE1 /* WZMainViewController.m in Sources */,
 				24EAA5F31647F39400105FE1 /* WZHackersData.m in Sources */,
 				24EAA5F6164807E200105FE1 /* WZPostCell.m in Sources */,
-				24975A7A164A88DE000143A1 /* Reachability.m in Sources */,
-				24975A7B164A88DE000143A1 /* RNCachingURLProtocol.m in Sources */,
-				24B7D8F5164ACE0600F55B3D /* SASlideMenuStoryboardSegue.m in Sources */,
-				24B7D8F6164ACE0600F55B3D /* SASlideMenuViewController.m in Sources */,
 				24B7D8FF164ADA3F00F55B3D /* _WZRead.m in Sources */,
 				24B7D900164ADA3F00F55B3D /* WZRead.m in Sources */,
 				24975AF5164C08D1000143A1 /* WZMenuViewController.m in Sources */,

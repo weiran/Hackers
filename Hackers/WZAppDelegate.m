@@ -7,12 +7,11 @@
 //
 
 #import "WZAppDelegate.h"
-#import "RNCachingURLProtocol.h"
 
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [NSURLProtocol registerClass:[RNCachingURLProtocol class]];
+    //[NSURLProtocol registerClass:[RNCachingURLProtocol class]];
     [[UINavigationBar appearance] setTintColor:[UIColor darkGrayColor]];
     [[UIToolbar appearance] setTintColor:[UIColor darkGrayColor]];
     [[UINavigationBar appearance] setTitleTextAttributes:@{

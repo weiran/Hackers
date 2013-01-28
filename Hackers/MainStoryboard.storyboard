@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2844" systemVersion="12C60" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="131-3G-RgI">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2844" systemVersion="12C60" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="kHE-jZ-QLL">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1930"/>
     </dependencies>
     <scenes>
-        <!--Reveal View Controller-->
-        <scene sceneID="WEt-ki-jly">
-            <objects>
-                <viewController id="131-3G-RgI" customClass="SWRevealViewController" sceneMemberID="viewController">
-                    <connections>
-                        <segue destination="kHE-jZ-QLL" kind="custom" identifier="sw_front" customClass="SWRevealViewControllerSegue" id="Dta-wT-daI"/>
-                        <segue destination="4WW-lp-g4T" kind="custom" identifier="sw_rear" customClass="SWRevealViewControllerSegue" id="S5j-vA-cTM"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="A4j-Hi-QIW" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1504" y="437"/>
-        </scene>
         <!--Menu View Controller-->
         <scene sceneID="ovf-46-LIP">
             <objects>
@@ -52,9 +39,6 @@
                                             <constraint firstItem="7rr-nD-V2N" firstAttribute="centerX" secondItem="kZj-4v-Fqe" secondAttribute="centerX" type="default" id="VE9-Ua-rFd"/>
                                             <constraint firstItem="7rr-nD-V2N" firstAttribute="top" secondItem="kZj-4v-Fqe" secondAttribute="top" type="default" id="tvH-i8-4ng"/>
                                         </constraints>
-                                        <connections>
-                                            <segue destination="AoS-mg-Efs" kind="custom" identifier="TopNewsSegue" customClass="SWRevealViewControllerSegue" id="VDo-Ga-pak"/>
-                                        </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="u5c-dQ-9jO" customClass="WZMenuCell">
                                         <rect key="frame" x="0.0" y="66" width="320" height="44"/>
@@ -80,9 +64,6 @@
                                             <constraint firstItem="tNx-kA-nXY" firstAttribute="top" secondItem="u5c-dQ-9jO" secondAttribute="top" type="default" id="h2e-pS-6Q0"/>
                                             <constraint firstItem="tNx-kA-nXY" firstAttribute="centerX" secondItem="u5c-dQ-9jO" secondAttribute="centerX" type="default" id="vax-w9-2gR"/>
                                         </constraints>
-                                        <connections>
-                                            <segue destination="AoS-mg-Efs" kind="custom" identifier="NewNewsSegue" customClass="SWRevealViewControllerSegue" id="dWp-Os-Kwq"/>
-                                        </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="krT-Ql-7fw" customClass="WZMenuCell">
                                         <rect key="frame" x="0.0" y="110" width="320" height="44"/>
@@ -108,9 +89,6 @@
                                             <constraint firstItem="mPo-HY-faQ" firstAttribute="centerX" secondItem="krT-Ql-7fw" secondAttribute="centerX" type="default" id="bkH-oL-BaU"/>
                                             <constraint firstItem="mPo-HY-faQ" firstAttribute="top" secondItem="krT-Ql-7fw" secondAttribute="top" type="default" id="fgE-kU-LO9"/>
                                         </constraints>
-                                        <connections>
-                                            <segue destination="M1f-sj-yGu" kind="custom" customClass="SWRevealViewControllerSegue" trigger="accessoryAction" id="Nzg-uU-YLt"/>
-                                        </connections>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -152,21 +130,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V8t-HK-sA1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-935" y="58"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="BAE-sV-q4H">
-            <objects>
-                <viewController id="M1f-sj-yGu" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="VG8-IH-nKy">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3pG-V0-ZtI" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-346" y="-325"/>
+            <point key="canvasLocation" x="-816" y="1072"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Vwz-dx-Dpd">
@@ -185,7 +149,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oc5-zi-AvU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-935" y="804"/>
+            <point key="canvasLocation" x="-816" y="345"/>
         </scene>
         <!--Main View Controller - Hacker News-->
         <scene sceneID="K9x-j6-n9L">
@@ -302,7 +266,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Hacker News" id="eDU-Dq-Unc">
-                        <barButtonItem key="leftBarButtonItem" image="menuicon.png" style="plain" id="HhO-Ra-0in"/>
+                        <barButtonItem key="leftBarButtonItem" image="menuicon.png" id="HhO-Ra-0in"/>
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="kSF-af-Q0P" id="TWb-3l-I0y"/>
@@ -387,26 +351,11 @@
                                                 <constraint firstItem="qSR-oi-e0H" firstAttribute="centerY" secondItem="tbw-87-toH" secondAttribute="centerY" type="default" id="zlz-H2-Fr5"/>
                                             </constraints>
                                         </view>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NZK-CR-7tG">
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                            <state key="normal">
-                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                            </state>
-                                            <state key="highlighted">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="showPost:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="SyS-S7-NVa"/>
-                                            </connections>
-                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" red="0.86736686862244894" green="0.86736686862244894" blue="0.86736686862244894" alpha="1" colorSpace="calibratedRGB"/>
                                     <constraints>
                                         <constraint firstItem="Id7-HX-F73" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" constant="10" type="user" id="6kF-40-FBq"/>
-                                        <constraint firstAttribute="centerY" secondItem="NZK-CR-7tG" secondAttribute="centerY" type="user" id="7wZ-q6-Xw4"/>
                                         <constraint firstItem="Id7-HX-F73" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" constant="6" type="user" id="9tU-0N-iDw"/>
-                                        <constraint firstAttribute="trailing" secondItem="NZK-CR-7tG" secondAttribute="trailing" constant="10" type="user" id="KXW-7K-zXr"/>
                                         <constraint firstAttribute="bottom" secondItem="Id7-HX-F73" secondAttribute="bottom" constant="56" type="user" id="L3a-8D-zX6"/>
                                         <constraint firstItem="Id7-HX-F73" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="default" id="MPF-fO-eNW"/>
                                         <constraint firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" constant="6" type="user" id="ZfA-FR-M8w"/>
@@ -635,72 +584,9 @@
     <resources>
         <image name="menuicon.png" width="20" height="17"/>
     </resources>
-    <classes>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="SWRevealViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SWRevealViewController.h"/>
-        </class>
-        <class className="WZCommentCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
-            <relationships>
-                <relationship kind="action" name="showReplies:"/>
-                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
-                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="WZCommentsViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="showPost:"/>
-                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="WZMainViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-                <relationship kind="outlet" name="menuBarButtonItem" candidateClass="UIBarButtonItem"/>
-            </relationships>
-        </class>
-        <class className="WZMenuCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
-        </class>
-        <class className="WZNavigationBar" superclassName="UINavigationBar">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
-        </class>
-        <class className="WZPostCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
-    <inferredMetricsTieBreakers>
-        <segue reference="LV5-XZ-Q4O"/>
-    </inferredMetricsTieBreakers>
 </document>

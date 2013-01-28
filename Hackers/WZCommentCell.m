@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
+#import <OHAttributedLabel/OHAttributedLabel.h>
 #import "WZCommentCell.h"
 
 @interface WZCommentCell () {
@@ -28,6 +29,7 @@
     [_showRepliesButton setBackgroundImage:buttonImage forState:UIControlStateNormal];
     [_showRepliesButton setBackgroundImage:buttonImageHighlight forState:UIControlStateHighlighted];
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
+    _commentLabel.delegate = self;
 }
 
 - (void)setContentIndent:(NSUInteger)contentIndent {
@@ -88,4 +90,14 @@
         [_delegate selectedCommentAtIndexPath:indexPath];
     }
 }
+
+-(BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel shouldFollowLink:(NSTextCheckingResult*)linkInfo {
+    if ([_linkDelegate respondsToSelector:@selector(tappedLink:)]) {
+        [_linkDelegate tappedLink:linkInfo.extendedURL];
+        return NO;
+    }
+    
+    return YES;
+}
+
 @end

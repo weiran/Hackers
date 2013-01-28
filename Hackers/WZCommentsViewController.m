@@ -15,10 +15,8 @@
 #import "WZCommentModel.h"
 #import "WZPost.h"
 
-@interface WZCommentsViewController () {
-
-}
-
+@interface WZCommentsViewController ()
+@property (nonatomic, strong) TSMiniWebBrowser *webBrowserViewController;
 @end
 
 @implementation WZCommentsViewController
@@ -26,6 +24,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
+                                                  forBarMetrics:UIBarMetricsDefault];
     [self setupTableView];
     [self fetchComments];
 }
@@ -75,12 +75,12 @@
     _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %@ comments", _post.timeAgo, _post.commentsCount];
     _headerTitleLabel.text = _post.title;
     
-    CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont boldSystemFontOfSize:15]
+    CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
                                     constrainedToSize:CGSizeMake(252, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
     CGFloat height = MAX(titleLabelSize.height, 21);
     CGRect headerViewFrame = _headerView.frame;
-    headerViewFrame.size.height = height + 68;
+    headerViewFrame.size.height = height + 72;
     _headerView.frame = headerViewFrame;
     
     // err, fixes some kinda bug
@@ -186,8 +186,15 @@
 #pragma mark - WZCommentURLTappedDelegate
 
 - (void)tappedLink:(NSURL *)url {
-    TSMiniWebBrowser *webBrowser = [[TSMiniWebBrowser alloc] initWithUrl:url];
-    [self.navigationController pushViewController:webBrowser animated:YES];
+    if (!_webBrowserViewController) {
+        _webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
+        _webBrowserViewController.delegate = self;
+        _webBrowserViewController.mode = TSMiniWebBrowserModeModal;
+        _webBrowserViewController.modalDismissButtonTitle = @"Close";
+        _webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
+    }
+    
+    [self presentViewController:_webBrowserViewController animated:YES completion:nil];
 }
 
 #pragma mark - WZCommentShowRepliesDelegate
@@ -247,7 +254,16 @@
 }
 
 - (IBAction)showPost:(id)sender {
-    _headerView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    _headerView.backgroundColor = [UIColor lightGrayColor];
     [self tappedLink:[NSURL URLWithString:_post.url]];
 }
+
+#pragma mark - TSMiniWebBrowserDelegate
+
+-(void) tsMiniWebBrowserDidDismiss {
+    [UIView animateWithDuration:0.7 animations:^{
+        _headerView.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+    }];
+}
+
 @end

@@ -1,17 +1,17 @@
 
+COCOAPODS: 0.16.1
+
 PODS: 
 - AFNetworking (1.0.1)
+- JASidePanels (1.2.0)
 - OHAttributedLabel (3.3.0)
-- SWRevealViewController (0.0.1)
-
-SPEC CHECKSUMS: 
-  OHAttributedLabel: ed2e659c01af4c6cdc23909f04ffcdd417d37ae4
-  AFNetworking: 0bce3ae41023e080e96b8a2e0d07c94709f72a81
-  SWRevealViewController: 9a3d2c555fc89fe10483b2517af7a64f976d883c
 
 DEPENDENCIES: 
 - AFNetworking
+- JASidePanels
 - OHAttributedLabel
-- SWRevealViewController
 
-COCOAPODS: 0.16.1
+SPEC CHECKSUMS: 
+  OHAttributedLabel: ed2e659c01af4c6cdc23909f04ffcdd417d37ae4
+  JASidePanels: 9a5796c3a56b016d885d5cc84907ac6cc41a20c8
+  AFNetworking: 0bce3ae41023e080e96b8a2e0d07c94709f72a81

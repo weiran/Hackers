@@ -40,6 +40,8 @@
 @synthesize barStyle;
 @synthesize modalDismissButtonTitle;
 @synthesize barTintColor;
+@synthesize domainLockList;
+@synthesize currentURL;
 
 #define kToolBarHeight  44
 #define kTabBarHeight   49
@@ -60,7 +62,7 @@ enum actionSheetButtonIndex {
     }
 }
 
--(void) toggleBackForwardButtons {
+-(void)toggleBackForwardButtons {
     buttonGoBack.enabled = webView.canGoBack;
     buttonGoForward.enabled = webView.canGoForward;
 }
@@ -77,9 +79,10 @@ enum actionSheetButtonIndex {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
--(void) dismissController {
-    if ( webView.loading ) {
+-(void)dismissController {
+    if (webView.loading) {
         [webView stopLoading];
+        [self hideActivityIndicators];
     }
     [self dismissViewControllerAnimated:YES completion:nil];
     
@@ -91,15 +94,14 @@ enum actionSheetButtonIndex {
 
 //Added in the dealloc method to remove the webview delegate, because if you use this in a navigation controller
 //TSMiniWebBrowser can get deallocated while the page is still loading and the web view will call its delegate-- resulting in a crash
--(void)dealloc
-{
+-(void)dealloc {
     [webView setDelegate:nil];
 }
 
 #pragma mark - Init
 
 // This method is only used in modal mode
--(void) initTitleBar {
+-(void)initTitleBar {
     UIBarButtonItem *buttonDone = [[UIBarButtonItem alloc] initWithTitle:modalDismissButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(dismissController)];
     
     UINavigationItem *titleBar = [[UINavigationItem alloc] initWithTitle:@""];
@@ -115,7 +117,7 @@ enum actionSheetButtonIndex {
     [self.view addSubview:navigationBarModal];
 }
 
--(void) initToolBar {
+-(void)initToolBar {
     if (mode == TSMiniWebBrowserModeNavigation) {
         self.navigationController.navigationBar.barStyle = barStyle;
     }
@@ -161,7 +163,7 @@ enum actionSheetButtonIndex {
     [toolBarButtons addObject:buttonGoForward];
     [toolBarButtons addObject:flexibleSpace];
     [toolBarButtons addObject:buttonContainer];
-    if (showReloadButton) { 
+    if (showReloadButton) {
         [toolBarButtons addObject:buttonReload];
     }
     if (showActionButton) {
@@ -176,7 +178,7 @@ enum actionSheetButtonIndex {
 	[toolBar setTintColor:barTintColor];
 }
 
--(void) initWebView {
+-(void)initWebView {
     CGSize viewSize = self.view.frame.size;
     if (mode == TSMiniWebBrowserModeModal) {
         webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, kToolBarHeight, viewSize.width, viewSize.height-kToolBarHeight*2)];
@@ -190,8 +192,7 @@ enum actionSheetButtonIndex {
     [self.view addSubview:webView];
     
     webView.scalesPageToFit = YES;
-    webView.scrollView.scrollsToTop = YES;
-    ((UIScrollView *)[[webView subviews] objectAtIndex:0]).scrollsToTop = NO;
+    
     webView.delegate = self;
     
     // Load the URL in the webView
@@ -203,8 +204,7 @@ enum actionSheetButtonIndex {
 
 - (id)initWithUrl:(NSURL*)url {
     self = [self init];
-    if(self)
-    {
+    if (self) {
         urlToLoad = url;
         
         // Defaults
@@ -224,8 +224,7 @@ enum actionSheetButtonIndex {
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     // Main view frame.
@@ -266,7 +265,22 @@ enum actionSheetButtonIndex {
     
 }
 
--(void) viewWillDisappear:(BOOL)animated {
+- (void)viewDidUnload {
+    [super viewDidUnload];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+	for (id subview in self.view.subviews) {
+		if ([subview isKindOfClass:[UIWebView class]]) {
+			UIWebView *sv = subview;
+			[sv.scrollView setScrollsToTop:NO];
+		}
+	}
+	
+	[webView.scrollView setScrollsToTop:YES];
+}
+
+-(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
     // Restore navigationBar bar style.
@@ -281,8 +295,7 @@ enum actionSheetButtonIndex {
     [webView stopLoading];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
@@ -307,7 +320,7 @@ enum actionSheetButtonIndex {
             break;
         default:
             // Going to Landscape mode
-            for (UIScrollView *scroll in [webView subviews]) { //we get the scrollview 
+            for (UIScrollView *scroll in [webView subviews]) { //we get the scrollview
                 // Make sure it really is a scroll view and reset the zoom scale.
                 if ([scroll respondsToSelector:@selector(setZoomScale:)]){
                     scroll.minimumZoomScale = scroll.minimumZoomScale *ratioAspect;
@@ -319,8 +332,7 @@ enum actionSheetButtonIndex {
     }
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
 }
@@ -328,34 +340,6 @@ enum actionSheetButtonIndex {
 #pragma mark - Action Sheet
 
 - (void)showActionSheet {
-//    NSString *urlString = @"";
-//    if (showURLStringOnActionSheetTitle) {
-//        NSURL* url = [webView.request URL];
-//        urlString = [url absoluteString];
-//    }
-//    UIActionSheet *actionSheet = [[UIActionSheet alloc] init];
-//    actionSheet.title = urlString;
-//    actionSheet.delegate = self;
-//    [actionSheet addButtonWithTitle:NSLocalizedString(@"Open in Safari", nil)];
-//    
-//    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"googlechrome://"]]) {
-//        // Chrome is installed, add the option to open in chrome.
-//        [actionSheet addButtonWithTitle:NSLocalizedString(@"Open in Chrome", nil)];
-//    }
-//    
-//    actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
-//	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-//    
-//    if (mode == TSMiniWebBrowserModeTabBar) {
-//        [actionSheet showFromTabBar:self.tabBarController.tabBar];
-//    }
-//    //else if (mode == TSMiniWebBrowserModeNavigation && [self.navigationController respondsToSelector:@selector(tabBarController)]) {
-//    else if (mode == TSMiniWebBrowserModeNavigation && self.navigationController.tabBarController != nil) {
-//        [actionSheet showFromTabBar:self.navigationController.tabBarController.tabBar];
-//    }
-//    else {
-//        [actionSheet showInView:self.view];
-//    }
     [[NNInstapaperClient sharedClient] setClientIdentifier:@"JhxaIHH9KhRc3Mj2JaiJ6bYOhMR5Kv7sdeESoBgxlEf51YOdtb"];
     [[NNInstapaperClient sharedClient] setClientSecret:@"Yl6nzC2cVu2AGm8XrqoTt8QgVI0FJs0ndsV5jWbSN7bI3tBSb1"];
     NNOAuthCredential *credential = [NNOAuthCredential credentialWithAccessToken:@"user-token" accessSecret:@"user-secret"];
@@ -445,16 +429,43 @@ enum actionSheetButtonIndex {
     if ([[request.URL absoluteString] hasPrefix:@"sms:"]) {
         [[UIApplication sharedApplication] openURL:request.URL];
         return NO;
-    }
-    
-    if ([[request.URL absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
-        [[request.URL absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
-        [[request.URL absoluteString] hasPrefix:@"http://phobos.apple.com/"]) {
-        [[UIApplication sharedApplication] openURL:request.URL];
-        return NO;
-    }
-    
-    return YES;
+    } else {
+		if ([[request.URL absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
+			[[request.URL absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
+			[[request.URL absoluteString] hasPrefix:@"http://phobos.apple.com/"]) {
+			[[UIApplication sharedApplication] openURL:request.URL];
+			return NO;
+		} else {
+            if (domainLockList == nil || [domainLockList isEqualToString:@""]) {
+				if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+					currentURL = request.URL.absoluteString;
+				}
+                
+                return YES;
+            } else {
+                NSArray *domainList = [domainLockList componentsSeparatedByString:@","];
+                BOOL sendToSafari = YES;
+                
+                for (int x = 0; x < domainList.count; x++) {
+                    if ([[request.URL absoluteString] hasPrefix:(NSString *)[domainList objectAtIndex:x]] == YES) {
+                        sendToSafari = NO;
+                    }
+                }
+				
+                if (sendToSafari == YES) {
+                    [[UIApplication sharedApplication] openURL:[request URL]];
+                    
+                    return NO;
+                } else {
+					if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+						currentURL = request.URL.absoluteString;
+					}
+                    
+                    return YES;
+                }
+            }
+		}
+	}
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView {
@@ -483,7 +494,7 @@ enum actionSheetButtonIndex {
     if ([error code] == NSURLErrorCancelled) {
         return;
     }
-
+	
     // Show error alert
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Could not load page", nil)
                                                     message:error.localizedDescription
