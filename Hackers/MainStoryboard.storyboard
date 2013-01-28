@@ -172,7 +172,7 @@
         <scene sceneID="Vwz-dx-Dpd">
             <objects>
                 <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE" customClass="WZNavigationBar">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="FG2-nV-7tb">
@@ -191,16 +191,16 @@
         <scene sceneID="K9x-j6-n9L">
             <objects>
                 <tableViewController id="AoS-mg-Efs" customClass="WZMainViewController" sceneMemberID="viewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="2B6-0L-Ugl">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="2B6-0L-Ugl">
                         <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="79" id="0eV-31-z4v" customClass="WZPostCell">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="79" id="0eV-31-z4v" customClass="WZPostCell">
                                 <rect key="frame" x="0.0" y="22" width="320" height="79"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="287" height="78"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="78"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="News Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="248" translatesAutoresizingMaskIntoConstraints="NO" id="V5Q-hv-dC3" userLabel="Title">
@@ -208,22 +208,21 @@
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="248" type="user" id="Vhv-xY-cnj"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="15"/>
                                             <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                            <size key="shadowOffset" width="0.0" height="1"/>
+                                            <size key="shadowOffset" width="0.0" height="0.0"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="1." textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hex-7h-gRj" userLabel="Rank">
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" type="user" id="D1n-cp-O9w"/>
                                                 <constraint firstAttribute="width" constant="24" type="user" id="mU8-5i-ncU"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="15"/>
                                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="shadowOffset" width="0.0" height="1"/>
+                                            <size key="shadowOffset" width="0.0" height="0.0"/>
                                         </label>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ngT-AR-F0S" userLabel="Metadata View">
                                             <subviews>
@@ -232,31 +231,31 @@
                                                         <constraint firstAttribute="width" constant="252" id="J8W-wi-VGm"/>
                                                         <constraint firstAttribute="height" constant="21" type="user" id="pxM-v7-MA8"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                                                    <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="13"/>
                                                     <color key="textColor" red="0.31764705879999999" green="0.40000000000000002" blue="0.56862745100000001" alpha="1" colorSpace="deviceRGB"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <size key="shadowOffset" width="0.0" height="1"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="10 points by blah" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T0D-f2-7g6" userLabel="Metadata 1">
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" type="user" id="m2G-Dm-ckw"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <fontDescription key="fontDescription" name="AvenirNextCondensed-Medium" family="Avenir Next Condensed" pointSize="13"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <size key="shadowOffset" width="0.0" height="1"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="1 hour ago · 10 comments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R0V-Pf-NuH" userLabel="Metadata 2">
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" type="user" id="SvQ-KX-jzH"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                                    <fontDescription key="fontDescription" name="AvenirNextCondensed-Medium" family="Avenir Next Condensed" pointSize="13"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <size key="shadowOffset" width="0.0" height="1"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
                                                 </label>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -282,7 +281,7 @@
                                     <constraint firstItem="V5Q-hv-dC3" firstAttribute="top" secondItem="Hex-7h-gRj" secondAttribute="top" type="user" id="14e-Tg-XNT"/>
                                     <constraint firstAttribute="bottom" secondItem="V5Q-hv-dC3" secondAttribute="bottom" constant="56" type="user" id="8pd-ac-zr5"/>
                                     <constraint firstAttribute="trailing" secondItem="ngT-AR-F0S" secondAttribute="trailing" constant="37" type="user" id="Nq5-Lv-llE"/>
-                                    <constraint firstItem="Hex-7h-gRj" firstAttribute="leading" secondItem="0eV-31-z4v" secondAttribute="leading" constant="3" type="user" id="Vvh-mj-Qop"/>
+                                    <constraint firstItem="Hex-7h-gRj" firstAttribute="leading" secondItem="0eV-31-z4v" secondAttribute="leading" constant="5" type="user" id="Vvh-mj-Qop"/>
                                     <constraint firstAttribute="trailing" secondItem="V5Q-hv-dC3" secondAttribute="trailing" constant="37" type="user" id="W6b-Wh-PXU"/>
                                     <constraint firstItem="V5Q-hv-dC3" firstAttribute="leading" secondItem="0eV-31-z4v" secondAttribute="leading" constant="35" type="user" id="o6g-Fx-AtB"/>
                                     <constraint firstAttribute="bottom" secondItem="ngT-AR-F0S" secondAttribute="bottom" constant="3" type="user" id="p5a-MH-uyN"/>
@@ -293,7 +292,7 @@
                                     <outlet property="moreDetailLabel" destination="R0V-Pf-NuH" id="99b-eB-xKz"/>
                                     <outlet property="rankLabel" destination="Hex-7h-gRj" id="YYY-4d-vOd"/>
                                     <outlet property="titleLabel" destination="V5Q-hv-dC3" id="gqA-y5-bWb"/>
-                                    <segue destination="LYY-JJ-fbY" kind="push" identifier="ShowCommentsSegue" trigger="accessoryAction" id="b8P-6e-hFc"/>
+                                    <segue destination="LYY-JJ-fbY" kind="push" identifier="ShowCommentsSegue" id="JbF-YJ-KnY"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -303,7 +302,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Hacker News" id="eDU-Dq-Unc">
-                        <barButtonItem key="leftBarButtonItem" image="menuicon.png" id="HhO-Ra-0in"/>
+                        <barButtonItem key="leftBarButtonItem" image="menuicon.png" style="plain" id="HhO-Ra-0in"/>
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="kSF-af-Q0P" id="TWb-3l-I0y"/>
@@ -328,14 +327,95 @@
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="t2X-yB-S8x"/>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="113" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Smx-0F-YVN">
                                 <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
-                                <view key="tableHeaderView" contentMode="scaleToFill" id="byi-Ju-oOe">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="84"/>
+                                <view key="tableHeaderView" contentMode="scaleToFill" id="byi-Ju-oOe" userLabel="Header View">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                    <subviews>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="News Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="248" translatesAutoresizingMaskIntoConstraints="NO" id="Id7-HX-F73" userLabel="Title">
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="15"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <size key="shadowOffset" width="0.0" height="0.0"/>
+                                        </label>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tbw-87-toH" userLabel="Metadata View">
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="domain.com" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="is6-MS-yNN" userLabel="Domain">
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="252" id="FEP-wG-ss7"/>
+                                                        <constraint firstAttribute="height" constant="21" type="user" id="fcH-Qa-lws"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="13"/>
+                                                    <color key="textColor" red="0.31764705879999999" green="0.40000000000000002" blue="0.56862745100000001" alpha="1" colorSpace="deviceRGB"/>
+                                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
+                                                </label>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="10 points by blah" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qSR-oi-e0H" userLabel="Metadata 1">
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" type="user" id="bsf-YV-Dwq"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" name="AvenirNextCondensed-Medium" family="Avenir Next Condensed" pointSize="13"/>
+                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
+                                                </label>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="1 hour ago · 10 comments" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cGR-KB-5u7" userLabel="Metadata 2">
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" type="user" id="wjF-5E-G9I"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" name="AvenirNextCondensed-Medium" family="Avenir Next Condensed" pointSize="13"/>
+                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <constraints>
+                                                <constraint firstItem="cGR-KB-5u7" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="2tg-3r-uNY"/>
+                                                <constraint firstAttribute="height" constant="56" type="user" id="3BX-Ge-WPb"/>
+                                                <constraint firstItem="cGR-KB-5u7" firstAttribute="trailing" secondItem="qSR-oi-e0H" secondAttribute="trailing" type="default" id="3oT-rd-Z6I"/>
+                                                <constraint firstItem="cGR-KB-5u7" firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" type="default" id="ENF-PA-gBk"/>
+                                                <constraint firstItem="is6-MS-yNN" firstAttribute="trailing" secondItem="qSR-oi-e0H" secondAttribute="trailing" type="default" id="PoM-nz-brp"/>
+                                                <constraint firstAttribute="width" constant="248" type="user" id="S9A-ym-6m6"/>
+                                                <constraint firstItem="qSR-oi-e0H" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="bCD-FJ-mrU"/>
+                                                <constraint firstItem="is6-MS-yNN" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="r4y-mP-UHC"/>
+                                                <constraint firstItem="is6-MS-yNN" firstAttribute="top" secondItem="tbw-87-toH" secondAttribute="top" type="default" id="uu5-cY-Iiu"/>
+                                                <constraint firstItem="qSR-oi-e0H" firstAttribute="centerY" secondItem="tbw-87-toH" secondAttribute="centerY" type="default" id="zlz-H2-Fr5"/>
+                                            </constraints>
+                                        </view>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NZK-CR-7tG">
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="showPost:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="SyS-S7-NVa"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <color key="backgroundColor" red="0.86736686862244894" green="0.86736686862244894" blue="0.86736686862244894" alpha="1" colorSpace="calibratedRGB"/>
+                                    <constraints>
+                                        <constraint firstItem="Id7-HX-F73" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" constant="10" type="user" id="6kF-40-FBq"/>
+                                        <constraint firstAttribute="centerY" secondItem="NZK-CR-7tG" secondAttribute="centerY" type="user" id="7wZ-q6-Xw4"/>
+                                        <constraint firstItem="Id7-HX-F73" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" constant="6" type="user" id="9tU-0N-iDw"/>
+                                        <constraint firstAttribute="trailing" secondItem="NZK-CR-7tG" secondAttribute="trailing" constant="10" type="user" id="KXW-7K-zXr"/>
+                                        <constraint firstAttribute="bottom" secondItem="Id7-HX-F73" secondAttribute="bottom" constant="56" type="user" id="L3a-8D-zX6"/>
+                                        <constraint firstItem="Id7-HX-F73" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="default" id="MPF-fO-eNW"/>
+                                        <constraint firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" constant="6" type="user" id="ZfA-FR-M8w"/>
+                                        <constraint firstItem="tbw-87-toH" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" constant="10" type="user" id="hqI-D3-UPl"/>
+                                    </constraints>
                                 </view>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CommentCell" rowHeight="113" id="8RA-zL-sDn" customClass="WZCommentCell">
-                                        <rect key="frame" x="0.0" y="106" width="320" height="113"/>
+                                        <rect key="frame" x="0.0" y="101" width="320" height="113"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="112"/>
@@ -346,33 +426,39 @@
                                                         <constraint firstAttribute="width" constant="148" id="Jr6-dY-4KN"/>
                                                         <constraint firstAttribute="height" constant="21" id="xf8-0E-9hN"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="14"/>
                                                     <color key="textColor" red="0.50196081400000003" green="0.1662508925" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <size key="shadowOffset" width="0.0" height="1"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8oW-2d-tbU">
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="151" id="21Z-OM-V6l"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="14"/>
                                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <size key="shadowOffset" width="0.0" height="1"/>
+                                                    <size key="shadowOffset" width="0.0" height="0.0"/>
                                                 </label>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dgd-bJ-Mbb" customClass="DTAttributedLabel">
-                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                </view>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="deh-xx-lpy" customClass="OHAttributedLabel">
+                                                    <accessibility key="accessibilityConfiguration">
+                                                        <accessibilityTraits key="traits" none="YES"/>
+                                                    </accessibility>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUV-CZ-R1S">
                                                     <constraints>
+                                                        <constraint firstAttribute="width" constant="300" type="user" id="694-Aw-RhZ"/>
                                                         <constraint firstAttribute="height" constant="30" id="QMt-zI-CEz"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                                                    <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="13"/>
                                                     <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                     <size key="titleShadowOffset" width="1" height="1"/>
-                                                    <state key="normal" title="Show 2 replies">
+                                                    <state key="normal">
                                                         <color key="titleColor" red="0.19607843137254902" green="0.30980392156862746" blue="0.52156862745098043" alpha="1" colorSpace="calibratedRGB"/>
                                                         <color key="titleShadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
@@ -387,21 +473,21 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="leading" secondItem="dgd-bJ-Mbb" secondAttribute="leading" type="default" id="0Rb-LW-DuX"/>
-                                            <constraint firstItem="dgd-bJ-Mbb" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="26" id="12x-9d-h8S"/>
-                                            <constraint firstItem="8oW-2d-tbU" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" type="user" id="4Aq-aX-Ghh"/>
+                                            <constraint firstItem="deh-xx-lpy" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="26" type="user" id="29C-HR-LSn"/>
                                             <constraint firstItem="8oW-2d-tbU" firstAttribute="baseline" secondItem="V9m-5n-3oQ" secondAttribute="baseline" type="default" id="5tE-GN-IeL"/>
-                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" type="user" id="Cfd-0W-Aei"/>
-                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="DSE-4H-Oa1"/>
-                                            <constraint firstAttribute="trailing" secondItem="dgd-bJ-Mbb" secondAttribute="trailing" constant="10" type="user" id="Mys-N3-BN6"/>
-                                            <constraint firstAttribute="bottom" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" type="user" id="UbA-AO-D1h"/>
-                                            <constraint firstAttribute="trailing" secondItem="8oW-2d-tbU" secondAttribute="trailing" constant="10" type="user" id="e1b-k0-9Os"/>
-                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="trailing" secondItem="dgd-bJ-Mbb" secondAttribute="trailing" type="default" id="lcG-EI-B07"/>
-                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="centerX" secondItem="8RA-zL-sDn" secondAttribute="centerX" type="default" id="muA-mS-KES"/>
-                                            <constraint firstAttribute="bottom" secondItem="dgd-bJ-Mbb" secondAttribute="bottom" constant="10" type="user" id="s8G-yT-CHg"/>
+                                            <constraint firstItem="deh-xx-lpy" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="6zZ-hg-Mdm"/>
+                                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" type="user" id="7NC-1C-gcz"/>
+                                            <constraint firstItem="deh-xx-lpy" firstAttribute="trailing" secondItem="QUV-CZ-R1S" secondAttribute="trailing" type="default" id="900-Zk-MJn"/>
+                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="Ftj-mJ-zT0"/>
+                                            <constraint firstAttribute="bottom" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" id="GSm-Lk-IWZ"/>
+                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="trailing" secondItem="8oW-2d-tbU" secondAttribute="trailing" type="default" id="LrS-00-u7i"/>
+                                            <constraint firstAttribute="trailing" secondItem="deh-xx-lpy" secondAttribute="trailing" constant="10" type="user" id="N4z-AK-Lc4"/>
+                                            <constraint firstAttribute="bottom" secondItem="deh-xx-lpy" secondAttribute="bottom" constant="9" type="user" id="adN-Zy-NF3"/>
+                                            <constraint firstItem="8oW-2d-tbU" firstAttribute="top" secondItem="V9m-5n-3oQ" secondAttribute="top" type="default" id="c9L-lw-81i"/>
+                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" id="tDm-Hx-cs0"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="commentLabel" destination="dgd-bJ-Mbb" id="9KN-lg-sna"/>
+                                            <outlet property="commentLabel" destination="deh-xx-lpy" id="QCK-Fx-HPP"/>
                                             <outlet property="dateLabel" destination="8oW-2d-tbU" id="dct-sE-V4Y"/>
                                             <outlet property="showRepliesButton" destination="QUV-CZ-R1S" id="ADn-6H-Tvg"/>
                                             <outlet property="userLabel" destination="V9m-5n-3oQ" id="dmo-SQ-Cm5"/>
@@ -420,9 +506,16 @@
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="hDb-Gg-kec"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Nxx-jT-vpE"/>
+                    <navigationItem key="navigationItem" id="Nxx-jT-vpE">
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="xPM-Ng-m17"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="t2X-yB-S8x" id="VcH-cw-tLz"/>
+                        <outlet property="headerDomainLabel" destination="is6-MS-yNN" id="mLH-Rd-zDM"/>
+                        <outlet property="headerMetadata1Label" destination="qSR-oi-e0H" id="DAd-bI-EIZ"/>
+                        <outlet property="headerMetadata2Label" destination="cGR-KB-5u7" id="KUs-3O-njN"/>
+                        <outlet property="headerTitleLabel" destination="Id7-HX-F73" id="cbv-GW-Pae"/>
+                        <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
                     </connections>
                 </viewController>
@@ -542,6 +635,66 @@
     <resources>
         <image name="menuicon.png" width="20" height="17"/>
     </resources>
+    <classes>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="SWRevealViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SWRevealViewController.h"/>
+        </class>
+        <class className="WZCommentCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
+            <relationships>
+                <relationship kind="action" name="showReplies:"/>
+                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WZCommentsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="showPost:"/>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="WZMainViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="menuBarButtonItem" candidateClass="UIBarButtonItem"/>
+            </relationships>
+        </class>
+        <class className="WZMenuCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
+        </class>
+        <class className="WZNavigationBar" superclassName="UINavigationBar">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
+        </class>
+        <class className="WZPostCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

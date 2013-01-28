@@ -6,10 +6,11 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
+#import <OHAttributedLabel/OHAttributedLabel.h>
+
 #import "WZCommentModel.h"
 #import "NSDictionary+ObjectForKeyOrNil.h"
 
-#import "DTAttributedLabel.h"
 #import "DTHTMLAttributedStringBuilder.h"
 #import "DTCoreTextConstants.h"
 
@@ -29,11 +30,6 @@
         for (NSDictionary *commentDictionary in comments) {
             WZCommentModel *comment = [[WZCommentModel alloc] init];
             [comment updateAttributes:commentDictionary];
-            
-            if ([comment.content hasPrefix:@"<p>"]) {
-                comment.content = [comment.content substringFromIndex:3];
-            }
-            
             [newComments addObject:comment];
         }
         _comments = newComments;
@@ -41,22 +37,40 @@
 }
 
 - (NSAttributedString *)attributedStringForHTML:(NSString *)html {
-    NSDictionary *stringBuilderOptions = @{
-        DTDefaultFontFamily: @"Helvetica Neue",
-        NSTextSizeMultiplierDocumentOption: @(1.15)
-    };
+    // first parse any unnecessary html paragraphs out
+    if ([html hasSuffix:@"<p>"]) {
+        html = [html substringToIndex:html.length - 3];
+    }
     
     DTHTMLAttributedStringBuilder *builder = [[DTHTMLAttributedStringBuilder alloc]
                                               initWithHTML:[html dataUsingEncoding:NSUTF8StringEncoding]
-                                              options:stringBuilderOptions
+                                              options:nil
                                               documentAttributes:nil];
-    return [builder generatedAttributedString];
+    NSMutableAttributedString *attributedString = [[builder generatedAttributedString] mutableCopy];
+    
+    OHParagraphStyle *paragraphStyle = [OHParagraphStyle defaultParagraphStyle];
+    paragraphStyle.lineBreakMode = kCTLineBreakByWordWrapping;
+    paragraphStyle.lineSpacing = 3.f;
+    paragraphStyle.paragraphSpacing = 12.f;
+    attributedString.paragraphStyle = paragraphStyle;
+    [attributedString setFont:[UIFont fontWithName:@"Avenir" size:14]];
+    //[attributedString setFont:[UIFont systemFontOfSize:14]];
+    
+    return attributedString;
 }
 
 - (CGSize)sizeToFitWidth:(CGFloat)width {
-    DTAttributedLabel *label = [[DTAttributedLabel alloc] init];
-    [label setAttributedString:self.attributedContent];
-    return [label suggestedFrameSizeToFitEntireStringConstraintedToWidth:width];
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_attributedContent));
+    CGSize sz = CGSizeMake(0.f, 0.f);
+    CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
+    
+    if (framesetter) {
+        CFRange fitCFRange = CFRangeMake(0,0);
+        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, maxSize, &fitCFRange);
+        CFRelease(framesetter);
+    }
+    
+    return sz;
 }
 
 @end

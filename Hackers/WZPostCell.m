@@ -14,33 +14,25 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    if (!self.backgroundView) {
-        UIImage *backgroundImage = [[UIImage imageNamed:@"cell-background"] resizableImageWithCapInsets:UIEdgeInsetsMake(2, 0, 0, 0)];
-        self.backgroundView = [[UIImageView alloc] initWithImage:backgroundImage];
-        self.backgroundView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-        self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    }
-    
-    _titleLabel.highlightedTextColor = _titleLabel.textColor;
-    _domainLabel.highlightedTextColor = _domainLabel.textColor;
-    _detailLabel.highlightedTextColor = _detailLabel.textColor;
-    _moreDetailLabel.highlightedTextColor = _moreDetailLabel.textColor;
-    _rankLabel.highlightedTextColor = _rankLabel.textColor;
 }
 
-- (void)setSelected:(BOOL)selected {
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+    
     if (selected) {
-        self.layer.sublayers = nil;
-        
-        UIColor *gradientStartColor = [UIColor colorWithRed:202/255 green:209/255 blue:223/255 alpha:1];
-        UIColor *gradientEndColor = [UIColor colorWithRed:179/255 green:188/255 blue:203/255 alpha:1];
-        
-        self.backgroundView = nil;
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = self.bounds;
-        gradient.colors = @[gradientStartColor, gradientEndColor];
-        [self.layer insertSublayer:gradient atIndex:0];
+        self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+    } else {
+        self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    }
+}
+
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+    
+    if (highlighted) {
+        self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+    } else {
+        self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
     }
 }
 

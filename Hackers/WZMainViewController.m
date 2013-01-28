@@ -8,6 +8,8 @@
 
 #import <TSMiniWebBrowser.h>
 #import <SWRevealViewController/SWRevealViewController.h>
+#import <QuartzCore/QuartzCore.h>
+
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -23,6 +25,8 @@
     NSMutableArray *_readNews;
     UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
+    BOOL _navBarInScrolledState;
+    BOOL _navBarInDefaultState;
 }
 @end
 
@@ -37,7 +41,7 @@
     [self setupGestureRecognizer];
     [self setupBarButtons];
     [self setupTitle];
-
+    
     [self loadData];
     
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
@@ -82,13 +86,6 @@
 }
 
 - (void)setupGestureRecognizer {
-//    WZMenuViewController *menuViewController = (WZMenuViewController *)self.parentViewController.parentViewController;
-//    UIPanGestureRecognizer* panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:menuViewController action:@selector(panItem:)];
-//    [panGesture setMaximumNumberOfTouches:2];
-//    [panGesture setDelegate:menuViewController];
-//    [self.view addGestureRecognizer:panGesture];
-//    [self.navigationController.view addGestureRecognizer:panGesture];
-    
     [self.view addGestureRecognizer:self.revealViewController.panGestureRecognizer];
 }
 
@@ -101,11 +98,6 @@
 }
 
 - (void)setupBarButtons {
-//    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"menuicon.png"]
-//                                                                   style:UIBarButtonItemStyleBordered
-//                                                                  target:self.revealViewController
-//                                                                  action:@selector(revealToggle:)];
-//    self.navigationItem.leftBarButtonItem = menuButton;
     _menuBarButtonItem.target = self.revealViewController;
     _menuBarButtonItem.action = @selector(revealToggle:);
 }
@@ -156,6 +148,23 @@
     
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    CGPoint offset = scrollView.contentOffset;
+    
+    if (offset.y > 0 && !_navBarInScrolledState) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
+                                                      forBarMetrics:UIBarMetricsDefault];
+        _navBarInScrolledState = YES;
+        _navBarInDefaultState = NO;
+
+    } else if (offset.y <= 0 && !_navBarInDefaultState) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"]
+                                                      forBarMetrics:UIBarMetricsDefault];
+        _navBarInScrolledState = NO;
+        _navBarInDefaultState = YES;
+    }
+}
+
 - (void)loadRead {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:WZRead.entityName];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"id" ascending:NO];
@@ -203,7 +212,7 @@
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
     
     if (filteredReadNews.count > 0) {
-        cell.titleLabel.textColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+        cell.titleLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
     } else {
         cell.titleLabel.textColor = [UIColor blackColor];
     }
@@ -216,20 +225,13 @@
     
     [_readNews addObject:post.id];
     [WZHackersData.shared addRead:post.id];
-    
-    WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-    cell.titleLabel.textColor = [UIColor lightGrayColor];
-    
-    TSMiniWebBrowser *webBrowser = [[TSMiniWebBrowser alloc] initWithUrl:[NSURL URLWithString:post.url]];
-    [self.navigationController pushViewController:webBrowser animated:YES];
-    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZPost *post = _news[indexPath.row];
     
     if (!post.cellHeight) {
-        CGSize size = [post.title sizeWithFont:[UIFont boldSystemFontOfSize:15.0f]
+        CGSize size = [post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
                              constrainedToSize:CGSizeMake(252, CGFLOAT_MAX)
                                  lineBreakMode:NSLineBreakByWordWrapping];
         

@@ -7,12 +7,12 @@
 //
 
 #import <TSMiniWebBrowser.h>
+#import <OHAttributedLabel/OHAttributedLabel.h>
 
 #import "WZCommentsViewController.h"
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
-#import "DTAttributedLabel.h"
 #import "WZPost.h"
 
 @interface WZCommentsViewController () {
@@ -26,9 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    _tableView.delegate = self;
-    _tableView.dataSource = self;
-    _tableView.hidden = YES;
+    [self setupTableView];
     [self fetchComments];
 }
 
@@ -60,6 +58,47 @@
 
 #pragma mark - UITableView
 
+- (void)setupTableView {
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    _tableView.hidden = YES;
+    [self layoutTableViewHeader];
+    [self layoutTableViewBackgrounds];
+    
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showPost:)];
+    [_headerView addGestureRecognizer:tapGestureRecognizer];
+}
+
+- (void)layoutTableViewHeader {
+    _headerDomainLabel.text = _post.domain;
+    _headerMetadata1Label.text = [NSString stringWithFormat:@"%@ points by %@", _post.points, _post.user];
+    _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %@ comments", _post.timeAgo, _post.commentsCount];
+    _headerTitleLabel.text = _post.title;
+    
+    CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont boldSystemFontOfSize:15]
+                                    constrainedToSize:CGSizeMake(252, CGFLOAT_MAX)
+                                        lineBreakMode:NSLineBreakByWordWrapping];
+    CGFloat height = MAX(titleLabelSize.height, 21);
+    CGRect headerViewFrame = _headerView.frame;
+    headerViewFrame.size.height = height + 68;
+    _headerView.frame = headerViewFrame;
+    
+    // err, fixes some kinda bug
+    _tableView.tableHeaderView = _tableView.tableHeaderView;
+}
+
+- (void)layoutTableViewBackgrounds {
+    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
+    topView.backgroundColor = [UIColor lightGrayColor];
+    [_tableView addSubview:topView];
+    
+    _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 1000)];
+    footerView.backgroundColor = [UIColor lightGrayColor];
+    footerView.opaque = YES;
+    [_tableView.tableFooterView addSubview:footerView];
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return _comments.count;
 }
@@ -70,21 +109,21 @@
     
     WZCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.linkDelegate = self;
-    //cell.commentLabel.delegate = self; // for opening links
     
     cell.userLabel.text = comment.user;
     cell.dateLabel.text = comment.timeAgo;
     cell.contentIndent = [self indentPointsForComment:comment];
-    cell.commentLabel.attributedString = comment.attributedContent;
+    cell.commentLabel.attributedText = comment.attributedContent;
     
     if (comment.comments.count > 0) {
         cell.delegate = self;
         cell.showRepliesButton.hidden = NO;
-        cell.showRepliesButton.titleLabel.text = [self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded];
+        [cell.showRepliesButton setTitle:[self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded] forState:UIControlStateNormal];
     } else {
         cell.delegate = nil;
         cell.showRepliesButton.hidden = YES;
-    }    
+    }
+    
     return cell;
 }
 
@@ -114,27 +153,34 @@
 }
 
 - (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
-
-//    CMarkupValueTransformer *transformer = [[CMarkupValueTransformer alloc] init];
-//    NSError *transformError = nil;
-//    NSAttributedString *attributedString = [transformer transformedValue:comment.content error:&transformError];
-//    if (!transformError) {
-//        int rootWidth = 300;
-//        int indentPoints = [self indentPointsForComment:comment];
-//        int width = (rootWidth + 10) - indentPoints;
-//        CLinkingCoreTextLabel *label = [[CLinkingCoreTextLabel alloc] init];
-//        label.lineBreakMode = NSLineBreakByWordWrapping;
-//        label.font = [UIFont systemFontOfSize:14];
-//        CGSize size = [label sizeForString:attributedString constrainedToSize:CGSizeMake(width, 0)];
-//        return size.height;
-//    } else {
-//        NSLog(@"Error transforming attributed string.");
-//        return 0;
-//    }
-    int rootWidth = 300;
+    BOOL widthWithinConstraint = NO;
+    CGFloat rootWidth = 300;
     int indentPoints = [self indentPointsForComment:comment];
-    int width = (rootWidth + 10) - indentPoints;
-    return [comment sizeToFitWidth:width].height;
+    CGFloat width = rootWidth - indentPoints;
+    CGFloat workingWidth = width;
+    
+    return [comment sizeToFitWidth:workingWidth].height;
+
+    
+    CGFloat calculatedHeight;
+    
+    while (!widthWithinConstraint) {
+        CGSize calculatedSize = [comment sizeToFitWidth:workingWidth];
+        if (calculatedSize.width > width) {
+            if (workingWidth > 0) {
+                workingWidth -= 5;
+                NSLog(@"Returned width: %f greater than actual width: %f", calculatedSize.width, width);
+            } else {
+                calculatedHeight = 0;
+                widthWithinConstraint = YES;
+            }
+        } else {
+            calculatedHeight = calculatedSize.height;
+            widthWithinConstraint = YES;
+        }
+    }
+    
+    return calculatedHeight;
 }
 
 #pragma mark - WZCommentURLTappedDelegate
@@ -188,7 +234,8 @@
         [_tableView deleteRowsAtIndexPaths:newIndexPaths withRowAnimation:UITableViewRowAnimationMiddle];
     }
     
-    cell.showRepliesButton.titleLabel.text = [self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded];
+    [cell.showRepliesButton setTitle:[self commentButtonLabelTextWithCount:comment.comments.count expanded:comment.expanded]
+                            forState:UIControlStateNormal];
 }
 
 - (NSString *)commentButtonLabelTextWithCount:(NSUInteger)count expanded:(BOOL)expanded {
@@ -199,4 +246,8 @@
     }
 }
 
+- (IBAction)showPost:(id)sender {
+    _headerView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    [self tappedLink:[NSURL URLWithString:_post.url]];
+}
 @end

@@ -7,9 +7,6 @@
 //
 
 #import "WZCommentCell.h"
-//#import "DTAttributedLabel.h"
-//#import "DTHTMLAttributedStringBuilder.h"
-//#import "DTCoreTextConstants.h"
 
 @interface WZCommentCell () {
     NSUInteger _indentationPoints;
@@ -23,6 +20,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
     UIImage *buttonImage = [[UIImage imageNamed:@"greyButton"]
                             resizableImageWithCapInsets:UIEdgeInsetsMake(18, 18, 18, 18)];
     UIImage *buttonImageHighlight = [[UIImage imageNamed:@"greyButtonHighlight.png"]
@@ -54,7 +52,7 @@
                                                                   options:0
                                                                   metrics:nil
                                                                     views:NSDictionaryOfVariableBindings(_userLabel)][0];
-        [self addConstraint:_userConstraint];
+        [self.contentView addConstraint:_userConstraint];
     }
     
     if (_bodyConstraint) {
@@ -66,7 +64,7 @@
                                                                   options:0
                                                                   metrics:nil
                                                                     views:NSDictionaryOfVariableBindings(_commentLabel)][0];
-        [self addConstraint:_bodyConstraint];
+        [self.contentView addConstraint:_bodyConstraint];
     }
     
     if (_repliesConstraint) {
@@ -78,7 +76,7 @@
                                                                                  options:0
                                                                                  metrics:nil
                                                                                    views:NSDictionaryOfVariableBindings(_showRepliesButton)][0];
-        [self addConstraint:_repliesConstraint];
+        [self.contentView addConstraint:_repliesConstraint];
     }
 }
 

@@ -18,4 +18,12 @@
 @property (weak, nonatomic) WZPost *post;
 @property (strong, nonatomic) NSMutableArray *comments;
 
+@property (weak, nonatomic) IBOutlet UIView *headerView;
+@property (weak, nonatomic) IBOutlet UILabel *headerTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *headerDomainLabel;
+@property (weak, nonatomic) IBOutlet UILabel *headerMetadata1Label;
+@property (weak, nonatomic) IBOutlet UILabel *headerMetadata2Label;
+- (IBAction)showPost:(id)sender;
+
+
 @end
