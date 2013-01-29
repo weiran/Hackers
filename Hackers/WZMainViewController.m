@@ -224,11 +224,11 @@
     
     if (!post.cellHeight) {
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
-                             constrainedToSize:CGSizeMake(252, CGFLOAT_MAX)
+                             constrainedToSize:CGSizeMake(275, CGFLOAT_MAX)
                                  lineBreakMode:NSLineBreakByWordWrapping];
         
         CGFloat height = MAX(size.height, 21);
-        post.cellHeight = 58 + height;
+        post.cellHeight = 54 + height;
     }
     
     return post.cellHeight;
