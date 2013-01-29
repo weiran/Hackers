@@ -69,6 +69,7 @@
     
     _refreshControl = [[UIRefreshControl alloc] init];
     _refreshControl.backgroundColor = backgroundColor;
+    _refreshControl.tintColor = [UIColor colorWithWhite:0.4 alpha:1];
     [_refreshControl addTarget:self action:@selector(sendFetchRequest:) forControlEvents:UIControlEventValueChanged];
     self.refreshControl = _refreshControl;
     

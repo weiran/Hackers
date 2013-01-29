@@ -68,7 +68,6 @@
 - (void)setupTableView {
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    //_tableView.hidden = YES;
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
     
@@ -83,11 +82,11 @@
     _headerTitleLabel.text = _post.title;
     
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
-                                    constrainedToSize:CGSizeMake(252, CGFLOAT_MAX)
+                                    constrainedToSize:CGSizeMake(301, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
     CGFloat height = MAX(titleLabelSize.height, 21);
     CGRect headerViewFrame = _headerView.frame;
-    headerViewFrame.size.height = height + 72;
+    headerViewFrame.size.height = height + 54;
     _headerView.frame = headerViewFrame;
     
     // err, fixes some kinda bug
@@ -138,58 +137,7 @@
     WZCommentModel *comment = _comments[indexPath.row];
     
     return comment.cellHeight.floatValue;
-//    if (!comment.cellHeight) {
-//        int replyButtonHeight = 30 + 10; // height + spacing
-//        int labelHeight = [self heightForCommentLabel:comment];
-//        CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
-//        
-//        if (comment.comments.count > 0) {
-//            height += replyButtonHeight;
-//        }
-//        
-//        comment.cellHeight = @(height);
-//    }
-//    
-//    return comment.cellHeight.floatValue;
 }
-//
-//- (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
-//    NSUInteger baseIndentation = 10;
-//    NSUInteger indentPerLevel = 15;
-//    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
-//    return indentation;
-//}
-//
-//- (CGFloat)heightForCommentLabel:(WZCommentModel *)comment {
-//    BOOL widthWithinConstraint = NO;
-//    CGFloat rootWidth = 300;
-//    int indentPoints = [self indentPointsForComment:comment];
-//    CGFloat width = rootWidth - indentPoints;
-//    CGFloat workingWidth = width;
-//    
-//    return [comment sizeToFitWidth:workingWidth].height;
-//
-//    
-//    CGFloat calculatedHeight;
-//    
-//    while (!widthWithinConstraint) {
-//        CGSize calculatedSize = [comment sizeToFitWidth:workingWidth];
-//        if (calculatedSize.width > width) {
-//            if (workingWidth > 0) {
-//                workingWidth -= 5;
-//                NSLog(@"Returned width: %f greater than actual width: %f", calculatedSize.width, width);
-//            } else {
-//                calculatedHeight = 0;
-//                widthWithinConstraint = YES;
-//            }
-//        } else {
-//            calculatedHeight = calculatedSize.height;
-//            widthWithinConstraint = YES;
-//        }
-//    }
-//    
-//    return calculatedHeight;
-//}
 
 #pragma mark - WZCommentURLTappedDelegate
 
