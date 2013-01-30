@@ -10,7 +10,6 @@
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		2402A75F165120E400F637E5 /* menuicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75D165120E400F637E5 /* menuicon.png */; };
 		2402A760165120E400F637E5 /* menuicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75E165120E400F637E5 /* menuicon@2x.png */; };
-		24382B8616B7032A00337007 /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24382B8516B7032A00337007 /* WZNavigationController.m */; };
 		245F85BC166908FD000D3EE1 /* NNInstapaperActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */; };
 		245F85BD166908FD000D3EE1 /* NNInstapaperClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859D166908FD000D3EE1 /* NNInstapaperClient.m */; };
 		245F85BE166908FD000D3EE1 /* NNOAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F85A0166908FD000D3EE1 /* NNOAuth.m */; };
@@ -167,8 +166,6 @@
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		2402A75D165120E400F637E5 /* menuicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuicon.png; sourceTree = "<group>"; };
 		2402A75E165120E400F637E5 /* menuicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menuicon@2x.png"; sourceTree = "<group>"; };
-		24382B8416B7032A00337007 /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
-		24382B8516B7032A00337007 /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
 		245F859A166908FD000D3EE1 /* NNInstapaperActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperActivity.h; sourceTree = "<group>"; };
 		245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNInstapaperActivity.m; sourceTree = "<group>"; };
 		245F859C166908FD000D3EE1 /* NNInstapaperClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperClient.h; sourceTree = "<group>"; };
@@ -215,15 +212,15 @@
 		24972C9F1643BC3C00B4EFB4 /* Foundation.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24972CA11643BC3C00B4EFB4 /* CoreGraphics.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		24972CA31643BC3C00B4EFB4 /* CoreData.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		24972CA71643BC3C00B4EFB4 /* Hackers-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Hackers-Info.plist"; sourceTree = "<group>"; };
+		24972CA71643BC3C00B4EFB4 /* Hackers-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Hackers-Info.plist"; path = "Hackers/Hackers-Info.plist"; sourceTree = "<group>"; };
 		24972CA91643BC3C00B4EFB4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		24972CAB1643BC3C00B4EFB4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		24972CAD1643BC3C00B4EFB4 /* Hackers-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers-Prefix.pch"; sourceTree = "<group>"; };
 		24972CAE1643BC3C00B4EFB4 /* WZAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WZAppDelegate.h; sourceTree = "<group>"; };
 		24972CAF1643BC3C00B4EFB4 /* WZAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WZAppDelegate.m; sourceTree = "<group>"; };
-		24972CB11643BC3C00B4EFB4 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		24972CB31643BC3C00B4EFB4 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
-		24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		24972CB11643BC3C00B4EFB4 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
+		24972CB31643BC3C00B4EFB4 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
+		24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		24972CC01643C0F000B4EFB4 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
 		249827551652A42E001C0ECF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		24AA08F7165187EA00FA9FEC /* greyButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greyButton.png; sourceTree = "<group>"; };
@@ -344,6 +341,9 @@
 		2402A75A165120B500F637E5 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				24972CB11643BC3C00B4EFB4 /* Default.png */,
+				24972CB31643BC3C00B4EFB4 /* Default@2x.png */,
+				24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */,
 				24D0DB0416B5DE57001342A8 /* navbar-bg-highlighted.png */,
 				24D0DB0516B5DE57001342A8 /* navbar-bg-highlighted@2x.png */,
 				24D0DB0016B5DB98001342A8 /* navbar-bg@2x.png */,
@@ -355,16 +355,91 @@
 				24AA08F9165187EA00FA9FEC /* greyButtonHighlight.png */,
 				24AA08FA165187EA00FA9FEC /* greyButtonHighlight@2x.png */,
 			);
-			path = Images;
+			name = Images;
+			path = Hackers/Images;
 			sourceTree = "<group>";
 		};
-		2443934C166CBAF1008D7960 /* Subviews */ = {
+		2417B65F16B9ADCA009E11EC /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				2417B66716B9ADDB009E11EC /* Main */,
+				2417B66816B9ADDF009E11EC /* Comments */,
+			);
+			name = "View Controllers";
+			sourceTree = "<group>";
+		};
+		2417B66716B9ADDB009E11EC /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				24EAA5EE1647F25A00105FE1 /* WZMainViewController.h */,
+				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
+			);
+			name = Main;
+			sourceTree = "<group>";
+		};
+		2417B66816B9ADDF009E11EC /* Comments */ = {
+			isa = PBXGroup;
+			children = (
+				24B2BF4B164C5BEF00C588F1 /* WZCommentsViewController.h */,
+				24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */,
+			);
+			name = Comments;
+			sourceTree = "<group>";
+		};
+		2417B66916B9AE06009E11EC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2417B66C16B9AE60009E11EC /* Navigation */,
+				24972CBF1643BD2900B4EFB4 /* Storyboards */,
+				2417B66A16B9AE0D009E11EC /* Cells */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		2417B66A16B9AE0D009E11EC /* Cells */ = {
 			isa = PBXGroup;
 			children = (
 				24EAA5F4164807E200105FE1 /* WZPostCell.h */,
 				24EAA5F5164807E200105FE1 /* WZPostCell.m */,
+				24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */,
+				24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */,
 			);
-			name = Subviews;
+			name = Cells;
+			sourceTree = "<group>";
+		};
+		2417B66C16B9AE60009E11EC /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */,
+				24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */,
+			);
+			name = Navigation;
+			sourceTree = "<group>";
+		};
+		2417B66D16B9AED8009E11EC /* View Models */ = {
+			isa = PBXGroup;
+			children = (
+				2402A6D5164D224100F637E5 /* WZCommentModel.h */,
+				2402A6D6164D224100F637E5 /* WZCommentModel.m */,
+			);
+			name = "View Models";
+			sourceTree = "<group>";
+		};
+		2417B66E16B9AF29009E11EC /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				24972CA51643BC3C00B4EFB4 /* Hackers */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		2417B66F16B9AF3D009E11EC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				24972CA71643BC3C00B4EFB4 /* Hackers-Info.plist */,
+				2402A75A165120B500F637E5 /* Images */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		245F8598166908DB000D3EE1 /* NNNetwork */ = {
@@ -435,7 +510,9 @@
 		24972C8E1643BC3C00B4EFB4 = {
 			isa = PBXGroup;
 			children = (
-				24972CA51643BC3C00B4EFB4 /* Hackers */,
+				2417B66E16B9AF29009E11EC /* Classes */,
+				24972CA61643BC3C00B4EFB4 /* Supporting Files */,
+				2417B66F16B9AF3D009E11EC /* Resources */,
 				24975A72164A88A5000143A1 /* Libraries */,
 				24972C9C1643BC3C00B4EFB4 /* Frameworks */,
 				24972C9A1643BC3C00B4EFB4 /* Products */,
@@ -474,13 +551,13 @@
 		24972CA51643BC3C00B4EFB4 /* Hackers */ = {
 			isa = PBXGroup;
 			children = (
-				24EAA5EC1647F15400105FE1 /* UI */,
+				2417B66916B9AE06009E11EC /* Views */,
+				2417B65F16B9ADCA009E11EC /* View Controllers */,
+				2417B66D16B9AED8009E11EC /* View Models */,
+				24EAA5B21647D52300105FE1 /* Models */,
 				24EAA5E61647EBCE00105FE1 /* App */,
 				24EAA5D51647DDD200105FE1 /* Categories */,
-				24EAA5B21647D52300105FE1 /* Models */,
 				24EAA5B01647C56400105FE1 /* API */,
-				2402A75A165120B500F637E5 /* Images */,
-				24972CA61643BC3C00B4EFB4 /* Supporting Files */,
 			);
 			path = Hackers;
 			sourceTree = "<group>";
@@ -488,15 +565,12 @@
 		24972CA61643BC3C00B4EFB4 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				24972CA71643BC3C00B4EFB4 /* Hackers-Info.plist */,
 				24972CA81643BC3C00B4EFB4 /* InfoPlist.strings */,
 				24972CAB1643BC3C00B4EFB4 /* main.m */,
 				24972CAD1643BC3C00B4EFB4 /* Hackers-Prefix.pch */,
-				24972CB11643BC3C00B4EFB4 /* Default.png */,
-				24972CB31643BC3C00B4EFB4 /* Default@2x.png */,
-				24972CB51643BC3C00B4EFB4 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			path = Hackers;
 			sourceTree = "<group>";
 		};
 		24972CBF1643BD2900B4EFB4 /* Storyboards */ = {
@@ -517,19 +591,6 @@
 				245F8598166908DB000D3EE1 /* NNNetwork */,
 			);
 			path = Libraries;
-			sourceTree = "<group>";
-		};
-		24B2BF49164C5BDC00C588F1 /* Comments */ = {
-			isa = PBXGroup;
-			children = (
-				2402A6D5164D224100F637E5 /* WZCommentModel.h */,
-				2402A6D6164D224100F637E5 /* WZCommentModel.m */,
-				24B2BF4B164C5BEF00C588F1 /* WZCommentsViewController.h */,
-				24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */,
-				24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */,
-				24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */,
-			);
-			name = Comments;
 			sourceTree = "<group>";
 		};
 		24C43FCF16A447F800055D65 /* TSMiniWebBrowser */ = {
@@ -640,30 +701,6 @@
 				24972CAF1643BC3C00B4EFB4 /* WZAppDelegate.m */,
 			);
 			name = App;
-			sourceTree = "<group>";
-		};
-		24EAA5EC1647F15400105FE1 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				24972CBF1643BD2900B4EFB4 /* Storyboards */,
-				24EAA5ED1647F15800105FE1 /* Main */,
-				24B2BF49164C5BDC00C588F1 /* Comments */,
-			);
-			name = UI;
-			sourceTree = "<group>";
-		};
-		24EAA5ED1647F15800105FE1 /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				2443934C166CBAF1008D7960 /* Subviews */,
-				24EAA5EE1647F25A00105FE1 /* WZMainViewController.h */,
-				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
-				24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */,
-				24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */,
-				24382B8416B7032A00337007 /* WZNavigationController.h */,
-				24382B8516B7032A00337007 /* WZNavigationController.m */,
-			);
-			name = Main;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -898,7 +935,6 @@
 				24C43FE016A447F800055D65 /* TSMiniWebBrowser.m in Sources */,
 				24C4400616A44DCC00055D65 /* TUSafariActivity.m in Sources */,
 				24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */,
-				24382B8616B7032A00337007 /* WZNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

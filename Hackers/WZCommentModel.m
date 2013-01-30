@@ -79,7 +79,7 @@
     
     int labelHeight = sz.height;
     
-    CGFloat height = labelHeight + 36; // 26 points to top, 10 points to bottom
+    CGFloat height = labelHeight + 39; // 29 points to top, 10 points to bottom
     
     if (self.comments.count > 0) {
         height += replyButtonHeight;

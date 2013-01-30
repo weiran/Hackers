@@ -390,6 +390,9 @@
                                                     <accessibility key="accessibilityConfiguration">
                                                         <accessibilityTraits key="traits" none="YES"/>
                                                     </accessibility>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="75" type="user" id="Ffj-JO-HUU"/>
+                                                    </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -417,7 +420,6 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="deh-xx-lpy" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="26" type="user" id="29C-HR-LSn"/>
                                             <constraint firstItem="8oW-2d-tbU" firstAttribute="baseline" secondItem="V9m-5n-3oQ" secondAttribute="baseline" type="default" id="5tE-GN-IeL"/>
                                             <constraint firstItem="deh-xx-lpy" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="6zZ-hg-Mdm"/>
                                             <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" type="user" id="7NC-1C-gcz"/>
@@ -426,9 +428,10 @@
                                             <constraint firstAttribute="bottom" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" id="GSm-Lk-IWZ"/>
                                             <constraint firstItem="QUV-CZ-R1S" firstAttribute="trailing" secondItem="8oW-2d-tbU" secondAttribute="trailing" type="default" id="LrS-00-u7i"/>
                                             <constraint firstAttribute="trailing" secondItem="deh-xx-lpy" secondAttribute="trailing" constant="10" type="user" id="N4z-AK-Lc4"/>
-                                            <constraint firstAttribute="bottom" secondItem="deh-xx-lpy" secondAttribute="bottom" constant="9" type="user" id="adN-Zy-NF3"/>
+                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" id="RVT-Un-gjY"/>
                                             <constraint firstItem="8oW-2d-tbU" firstAttribute="top" secondItem="V9m-5n-3oQ" secondAttribute="top" type="default" id="c9L-lw-81i"/>
-                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" id="tDm-Hx-cs0"/>
+                                            <constraint firstItem="deh-xx-lpy" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="29" type="user" id="fHW-rE-kk4"/>
+                                            <constraint firstAttribute="bottom" secondItem="deh-xx-lpy" secondAttribute="bottom" constant="9" type="user" id="zgr-CA-H7E"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="commentLabel" destination="deh-xx-lpy" id="QCK-Fx-HPP"/>
