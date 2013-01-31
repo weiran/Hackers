@@ -20,6 +20,7 @@
 #import "WZPost.h"
 
 @interface WZCommentsViewController ()
+- (IBAction)backButtonTapped:(id)sender;
 @end
 
 @implementation WZCommentsViewController
@@ -240,5 +241,8 @@
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL URLWithString:_post.url]]
                                                                                          applicationActivities:@[safariActivity, activity]];
     [self presentViewController:activityViewController animated:YES completion:nil];
+}
+- (IBAction)backButtonTapped:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 @end

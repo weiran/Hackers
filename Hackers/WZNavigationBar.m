@@ -7,6 +7,7 @@
 //
 
 #import "WZNavigationBar.h"
+#import "WZNavigationPickerViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation WZNavigationBar
@@ -20,5 +21,4 @@
     [super setBackgroundImage:backgroundImage forBarMetrics:barMetrics];
 }
 
-
-@end
+@end;

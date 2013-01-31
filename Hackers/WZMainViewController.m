@@ -39,7 +39,21 @@
     [self setupTitle];
     [self loadData];
     
+    UITapGestureRecognizer *navigationBarTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                                              action:@selector(navigationBarTapped:)];
+    navigationBarTapGesture.numberOfTapsRequired = 1;
+    navigationBarTapGesture.delegate = self;
+    //[self.navigationController.navigationBar addGestureRecognizer:navigationBarTapGesture];
+    
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
+}
+
+- (void)navigationBarTapped:(id)sender {
+    NSLog(@"Nav bar tapped");
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ![[touch.view class] isSubclassOfClass:[UIControl class]];
 }
 
 - (void)sendFetchRequest:(UIRefreshControl *)sender {

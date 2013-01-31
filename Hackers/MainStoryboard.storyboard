@@ -138,6 +138,10 @@
                 <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" customClass="WZNavigationController" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE" customClass="WZNavigationBar">
                         <autoresizingMask key="autoresizingMask"/>
+                        <gestureRecognizers/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="E1c-Sn-H3T" appends="YES" id="9r2-VF-f41"/>
+                        </connections>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="FG2-nV-7tb">
                         <rect key="frame" x="0.0" y="416" width="320" height="44"/>
@@ -148,6 +152,12 @@
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oc5-zi-AvU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="E1c-Sn-H3T">
+                    <connections>
+                        <action selector="navigationBarTapped:" destination="kHE-jZ-QLL" id="4HK-gM-r7f"/>
+                        <outlet property="delegate" destination="kHE-jZ-QLL" id="sr2-Yb-3D8"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-816" y="345"/>
         </scene>
@@ -455,6 +465,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Nxx-jT-vpE">
+                        <barButtonItem key="leftBarButtonItem" title="Back" id="HnL-wT-iZM">
+                            <connections>
+                                <action selector="backButtonTapped:" destination="LYY-JJ-fbY" id="089-xM-MiM"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="action" id="xPM-Ng-m17">
                             <connections>
                                 <action selector="showActivityView:" destination="LYY-JJ-fbY" id="v7A-5A-UFS"/>
@@ -607,6 +622,7 @@
         <class className="WZCommentsViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
             <relationships>
+                <relationship kind="action" name="backButtonTapped:"/>
                 <relationship kind="action" name="showActivityView:"/>
                 <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
                 <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
@@ -628,6 +644,9 @@
         </class>
         <class className="WZNavigationController" superclassName="UINavigationController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
+            <relationships>
+                <relationship kind="action" name="navigationBarTapped:"/>
+            </relationships>
         </class>
         <class className="WZPostCell" superclassName="UITableViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>

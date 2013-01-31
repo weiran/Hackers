@@ -10,6 +10,9 @@
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		2402A75F165120E400F637E5 /* menuicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75D165120E400F637E5 /* menuicon.png */; };
 		2402A760165120E400F637E5 /* menuicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75E165120E400F637E5 /* menuicon@2x.png */; };
+		2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67116B9B59C009E11EC /* WZNavigationController.m */; };
+		2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */; };
+		2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */; };
 		245F85BC166908FD000D3EE1 /* NNInstapaperActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */; };
 		245F85BD166908FD000D3EE1 /* NNInstapaperClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F859D166908FD000D3EE1 /* NNInstapaperClient.m */; };
 		245F85BE166908FD000D3EE1 /* NNOAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 245F85A0166908FD000D3EE1 /* NNOAuth.m */; };
@@ -166,6 +169,12 @@
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		2402A75D165120E400F637E5 /* menuicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuicon.png; sourceTree = "<group>"; };
 		2402A75E165120E400F637E5 /* menuicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menuicon@2x.png"; sourceTree = "<group>"; };
+		2417B67016B9B59C009E11EC /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
+		2417B67116B9B59C009E11EC /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
+		2417B67316B9C6AA009E11EC /* WZNavigationPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationPickerView.h; sourceTree = "<group>"; };
+		2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationPickerView.m; sourceTree = "<group>"; };
+		2417B67716B9CBDA009E11EC /* WZNavigationPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationPickerViewController.h; sourceTree = "<group>"; };
+		2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationPickerViewController.m; sourceTree = "<group>"; };
 		245F859A166908FD000D3EE1 /* NNInstapaperActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperActivity.h; sourceTree = "<group>"; };
 		245F859B166908FD000D3EE1 /* NNInstapaperActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NNInstapaperActivity.m; sourceTree = "<group>"; };
 		245F859C166908FD000D3EE1 /* NNInstapaperClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NNInstapaperClient.h; sourceTree = "<group>"; };
@@ -373,6 +382,8 @@
 			children = (
 				24EAA5EE1647F25A00105FE1 /* WZMainViewController.h */,
 				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
+				2417B67016B9B59C009E11EC /* WZNavigationController.h */,
+				2417B67116B9B59C009E11EC /* WZNavigationController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -410,6 +421,7 @@
 		2417B66C16B9AE60009E11EC /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				2417B67616B9CBC2009E11EC /* Picker */,
 				24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */,
 				24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */,
 			);
@@ -440,6 +452,17 @@
 				2402A75A165120B500F637E5 /* Images */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		2417B67616B9CBC2009E11EC /* Picker */ = {
+			isa = PBXGroup;
+			children = (
+				2417B67716B9CBDA009E11EC /* WZNavigationPickerViewController.h */,
+				2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */,
+				2417B67316B9C6AA009E11EC /* WZNavigationPickerView.h */,
+				2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */,
+			);
+			name = Picker;
 			sourceTree = "<group>";
 		};
 		245F8598166908DB000D3EE1 /* NNNetwork */ = {
@@ -935,6 +958,9 @@
 				24C43FE016A447F800055D65 /* TSMiniWebBrowser.m in Sources */,
 				24C4400616A44DCC00055D65 /* TUSafariActivity.m in Sources */,
 				24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */,
+				2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */,
+				2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */,
+				2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

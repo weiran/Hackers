@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "WZHackersData.h"
 
-@interface WZMainViewController : UITableViewController
+@interface WZMainViewController : UITableViewController <UIGestureRecognizerDelegate>
 
 @property (nonatomic) WZNewsType newsType;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
