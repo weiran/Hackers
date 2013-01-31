@@ -63,9 +63,10 @@
 - (NSNumber *)heightForComment:(WZCommentModel *)comment {
     int replyButtonHeight = 30 + 10; // height + spacing
     
-    CGFloat rootWidth = 300;
+    CGFloat rootWidth = 320;
     int indentPoints = [self indentPointsForComment:comment];
-    CGFloat width = rootWidth - indentPoints;
+    int leftMargin = 10;
+    CGFloat width = rootWidth - indentPoints - leftMargin;
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(comment.attributedContent));
     CGSize sz = CGSizeMake(0.f, 0.f);
