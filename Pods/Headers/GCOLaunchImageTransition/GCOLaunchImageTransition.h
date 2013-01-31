@@ -1,0 +1,1 @@
+../../GCOLaunchImageTransition/GCOLaunchImageTransition/GCOLaunchImageTransition.h
