@@ -102,7 +102,11 @@ enum actionSheetButtonIndex {
 
 // This method is only used in modal mode
 -(void)initTitleBar {
-    UIBarButtonItem *buttonDone = [[UIBarButtonItem alloc] initWithTitle:modalDismissButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(dismissController)];
+//    UIBarButtonItem *buttonDone = [[UIBarButtonItem alloc] initWithTitle:modalDismissButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(dismissController)];
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
+    [button addTarget:self action:@selector(dismissController) forControlEvents:UIControlEventTouchUpInside];
+    [button setImage:[UIImage imageNamed:@"x.png"] forState:UIControlStateNormal];
+    UIBarButtonItem *buttonDone = [[UIBarButtonItem alloc] initWithCustomView:button];
     
     UINavigationItem *titleBar = [[UINavigationItem alloc] initWithTitle:@""];
     titleBar.leftBarButtonItem = buttonDone;

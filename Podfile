@@ -1,5 +1,5 @@
 platform :ios, '6.0'
 pod 'AFNetworking'
 pod 'OHAttributedLabel'
-pod 'JASidePanels'
 pod 'GCOLaunchImageTransition'
+pod 'SDSegmentedControl', :podspec => 'https://raw.github.com/weiran/SDSegmentedControl/master/SDSegmentedControl.podspec'

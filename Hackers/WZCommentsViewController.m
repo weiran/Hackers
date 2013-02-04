@@ -8,9 +8,8 @@
 
 #import <TSMiniWebBrowser.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
-
-#import "NNNetwork.h"
-#import "TUSafariActivity.h"
+#import <SDSegmentedControl/SDSegmentedControl.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
@@ -18,9 +17,14 @@
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
 #import "WZPost.h"
+#import "WZActivityView.h"
 
-@interface WZCommentsViewController ()
+@interface WZCommentsViewController () {
+    BOOL _isNavigatingBack;
+}
 - (IBAction)backButtonTapped:(id)sender;
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+@property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
 @end
 
 @implementation WZCommentsViewController
@@ -31,11 +35,26 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
                                                   forBarMetrics:UIBarMetricsDefault];
     [self setupTableView];
+    [self setupSegmentedController];
+    [self setupWebView];
     [self fetchComments];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    _webView.scrollView.scrollsToTop = NO;
+    _tableView.scrollsToTop = YES;
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
-    [self updateNavigationBarBackground];
+    [super viewWillDisappear:animated];
+    if (_isNavigatingBack) {
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+        [self updateNavigationBarBackground];
+        _isNavigatingBack = NO;
+    }
 }
 
 - (void)fetchComments {
@@ -58,9 +77,57 @@
     }];
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    for (WZCommentModel *model in _comments) {
-        model.cellHeight = nil;
+- (void)setupSegmentedController {
+    // todo: appearence stuff still isnt working
+    SDSegmentView *segmenteViewAppearance = [SDSegmentView appearance];
+    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
+    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
+    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
+    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(2, 0, 0, -8);
+    
+    SDStainView *stainViewAppearance = [SDStainView appearance];
+    stainViewAppearance.shadowColor = [UIColor clearColor];
+    stainViewAppearance.shadowOffset = CGSizeMake(0, 0);
+    stainViewAppearance.layer.shadowOpacity = 0;
+    stainViewAppearance.layer.shadowRadius = 0;
+    stainViewAppearance.innerStrokeColor = [UIColor clearColor];
+    stainViewAppearance.innerStrokeLineWidth = 0;
+    
+    _segmentedControl.backgroundColor = [UIColor colorWithWhite:0.67 alpha:1];
+    _segmentedControl.borderColor = [UIColor clearColor];
+    _segmentedControl.arrowHeightFactor = 0;
+    
+    SDSegmentedControl *segmentedControlAppearence = [SDSegmentedControl appearance];
+    segmentedControlAppearence.borderColor = [UIColor clearColor];
+    _segmentedControl.borderColor = [UIColor clearColor];
+    _segmentedControl.layer.shadowOpacity = 0;
+    _segmentedControl.layer.shadowRadius = 0;
+    
+    [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
+}
+
+- (void)setupWebView {
+    _webView.scalesPageToFit = YES;
+}
+
+- (void)segmentDidChange:(id)sender {
+    switch ([sender selectedSegmentIndex]) {
+        case 0:
+            _tableView.hidden = NO;
+            _webView.hidden = YES;
+            _webView.scrollView.scrollsToTop = NO;
+            _tableView.scrollsToTop = YES;
+            break;
+        case 1:
+            _tableView.hidden = YES;
+            _webView.hidden = NO;
+            _webView.scrollView.scrollsToTop = YES;
+            _tableView.scrollsToTop = NO;
+            
+            if (!_webView.request) {
+                [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_post.url]]];
+            }
+            break;
     }
 }
 
@@ -69,11 +136,10 @@
 - (void)setupTableView {
     _tableView.delegate = self;
     _tableView.dataSource = self;
+    _tableView.scrollsToTop = YES;
+    
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
-    
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showPost:)];
-    [_headerView addGestureRecognizer:tapGestureRecognizer];
 }
 
 - (void)layoutTableViewHeader {
@@ -96,14 +162,8 @@
 
 - (void)layoutTableViewBackgrounds {
     UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
-    topView.backgroundColor = [UIColor lightGrayColor];
+    topView.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
     [_tableView addSubview:topView];
-    
-    _tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
-    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 1000)];
-    footerView.backgroundColor = [UIColor lightGrayColor];
-    footerView.opaque = YES;
-    [_tableView.tableFooterView addSubview:footerView];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -147,7 +207,7 @@
     webBrowserViewController.delegate = self;
     webBrowserViewController.mode = TSMiniWebBrowserModeModal;
     webBrowserViewController.modalDismissButtonTitle = @"Close";
-    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];    
+    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
     [self presentViewController:webBrowserViewController animated:YES completion:nil];
 }
 
@@ -207,11 +267,6 @@
     }
 }
 
-- (IBAction)showPost:(id)sender {
-    _headerView.backgroundColor = [UIColor lightGrayColor];
-    [self tappedLink:[NSURL URLWithString:_post.url]];
-}
-
 #pragma mark - TSMiniWebBrowserDelegate
 
 - (void)tsMiniWebBrowserDidDismiss {
@@ -222,6 +277,8 @@
                                                   forBarMetrics:UIBarMetricsDefault];
 }
 
+#pragma mark - Action methods
+
 - (void)updateNavigationBarBackground {
     UINavigationController *navigationController = (UINavigationController *)self.parentViewController;
     if ([navigationController.viewControllers[0] isKindOfClass:[WZMainViewController class]]) {
@@ -231,18 +288,11 @@
 }
 
 - (IBAction)showActivityView:(id)sender {
-    [[NNInstapaperClient sharedClient] setClientIdentifier:@"JhxaIHH9KhRc3Mj2JaiJ6bYOhMR5Kv7sdeESoBgxlEf51YOdtb"];
-    [[NNInstapaperClient sharedClient] setClientSecret:@"Yl6nzC2cVu2AGm8XrqoTt8QgVI0FJs0ndsV5jWbSN7bI3tBSb1"];
-    NNOAuthCredential *credential = [NNOAuthCredential credentialWithAccessToken:@"user-token" accessSecret:@"user-secret"];
-    NNInstapaperActivity *activity = [[NNInstapaperActivity alloc] initWithCredential:credential];
-    
-    TUSafariActivity *safariActivity = [[TUSafariActivity alloc] init];
-    
-    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL URLWithString:_post.url]]
-                                                                                         applicationActivities:@[safariActivity, activity]];
+    UIActivityViewController *activityViewController = [WZActivityView activitViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
 - (IBAction)backButtonTapped:(id)sender {
+    _isNavigatingBack = YES;
     [self.navigationController popViewControllerAnimated:YES];
 }
 @end
