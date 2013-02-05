@@ -56,6 +56,7 @@
 		2484385316C11B4F001D2AA0 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385016C11B4F001D2AA0 /* Default.png */; };
 		2484385416C11B4F001D2AA0 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385116C11B4F001D2AA0 /* Default@2x.png */; };
 		2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2484386016C11E73001D2AA0 /* WZActivityViewController.m */; };
+		2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2484386C16C12664001D2AA0 /* WZPostModel.m */; };
 		24972C9E1643BC3C00B4EFB4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24972C9D1643BC3C00B4EFB4 /* UIKit.framework */; };
 		24972CA01643BC3C00B4EFB4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24972C9F1643BC3C00B4EFB4 /* Foundation.framework */; };
 		24972CA21643BC3C00B4EFB4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24972CA11643BC3C00B4EFB4 /* CoreGraphics.framework */; };
@@ -258,6 +259,8 @@
 		2484385116C11B4F001D2AA0 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		2484385F16C11E73001D2AA0 /* WZActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZActivityViewController.h; sourceTree = "<group>"; };
 		2484386016C11E73001D2AA0 /* WZActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZActivityViewController.m; sourceTree = "<group>"; };
+		2484386B16C12664001D2AA0 /* WZPostModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZPostModel.h; sourceTree = "<group>"; };
+		2484386C16C12664001D2AA0 /* WZPostModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZPostModel.m; sourceTree = "<group>"; };
 		24972C991643BC3C00B4EFB4 /* Hackers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24972C9D1643BC3C00B4EFB4 /* UIKit.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		24972C9F1643BC3C00B4EFB4 /* Foundation.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -486,6 +489,8 @@
 			children = (
 				2402A6D5164D224100F637E5 /* WZCommentModel.h */,
 				2402A6D6164D224100F637E5 /* WZCommentModel.m */,
+				2484386B16C12664001D2AA0 /* WZPostModel.h */,
+				2484386C16C12664001D2AA0 /* WZPostModel.m */,
 			);
 			name = "View Models";
 			sourceTree = "<group>";
@@ -1071,6 +1076,7 @@
 				2434A1CA16BEED7400C383CA /* WZWebView.m in Sources */,
 				2484384316C11A3F001D2AA0 /* SDSegmentedControl.m in Sources */,
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
+				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

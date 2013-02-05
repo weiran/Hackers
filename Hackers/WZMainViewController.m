@@ -16,6 +16,7 @@
 #import "WZPost.h"
 #import "WZRead.h"
 #import "WZPostCell.h"
+#import "WZPostModel.h"
 
 @interface WZMainViewController () {
     NSFetchedResultsController *_fetchedResultsController;
@@ -38,12 +39,6 @@
     [self setupPullToRefresh];
     [self setupTitle];
     [self loadData];
-    
-    UITapGestureRecognizer *navigationBarTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                                              action:@selector(navigationBarTapped:)];
-    navigationBarTapGesture.numberOfTapsRequired = 1;
-    navigationBarTapGesture.delegate = self;
-    //[self.navigationController.navigationBar addGestureRecognizer:navigationBarTapGesture];
     
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
 }
@@ -133,12 +128,19 @@
                                                                       sectionNameKeyPath:nil cacheName:nil];
     NSError *error = nil;
     [_fetchedResultsController performFetch:&error];
-    _news = _fetchedResultsController.fetchedObjects;
+    
+    NSMutableArray *postArray = [NSMutableArray array];
+    
+    for (WZPost *post in _fetchedResultsController.fetchedObjects) {
+        WZPostModel *postModel = [[WZPostModel alloc] initWithPost:post];
+        [postArray addObject:postModel];
+    }
+    
+    _news = [NSArray arrayWithArray:postArray];
     
     if (error) {
         NSLog(@"News fetch failed: %@", error.localizedDescription);
     }
-    
 }
 
 - (void)updateNavigationBarBackground {
@@ -198,15 +200,15 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString* const cellIdentifier = @"PostCell";
-    WZPost *post = _news[indexPath.row];
+    WZPostModel *post = _news[indexPath.row];
     WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.domainLabel.text = post.domain;
-    cell.detailLabel.text = [NSString stringWithFormat:@"%@ points by %@", post.points, post.user];
-    cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %@ comments", post.timeAgo, post.commentsCount];
-    cell.rankLabel.text = [NSString stringWithFormat:@"%@.", post.rank];
+    cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
+    cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
+    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
     cell.titleLabel.text = post.title;
     
-    NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"self == %@", post.id];
+    NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"self == %lu", post.id];
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
     
     if (filteredReadNews.count > 0) {
@@ -219,15 +221,15 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    WZPost *post = _news[indexPath.row];
-    [_readNews addObject:post.id];
-    [WZHackersData.shared addRead:post.id];
+    WZPostModel *post = _news[indexPath.row];
+    [_readNews addObject:[NSNumber numberWithInteger:post.id]];
+    [WZHackersData.shared addRead:[NSNumber numberWithInteger:post.id]];
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     cell.titleLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WZPost *post = _news[indexPath.row];
+    WZPostModel *post = _news[indexPath.row];
     
     if (!post.cellHeight) {
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
@@ -247,7 +249,7 @@
     if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
         WZCommentsViewController *commentsViewController = segue.destinationViewController;
         
-        WZPost *post = _news[[self.tableView indexPathForCell:sender].row];
+        WZPostModel *post = _news[[self.tableView indexPathForCell:sender].row];
         commentsViewController.post = post;
     }
 }

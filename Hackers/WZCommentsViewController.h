@@ -9,12 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "WZCommentCell.h"
 
-@class WZPost, TSMiniWebBrowser;
+@class WZPostModel, TSMiniWebBrowser;
 
 @interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, TSMiniWebBrowserDelegate, UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) WZPost *post;
+@property (weak, nonatomic) WZPostModel *post;
 @property (strong, nonatomic) NSMutableArray *comments;
 
 @property (weak, nonatomic) IBOutlet UIView *headerView;

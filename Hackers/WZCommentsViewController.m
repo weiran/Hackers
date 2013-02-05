@@ -17,7 +17,7 @@
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
-#import "WZPost.h"
+#import "WZPostModel.h"
 #import "WZWebView.h"
 
 @interface WZCommentsViewController () {
@@ -72,7 +72,7 @@
 - (void)fetchComments {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    [WZHackersDataAPI.shared fetchCommentsForPost:_post.id.integerValue completion:^(NSDictionary *comments, NSError *error) {
+    [WZHackersDataAPI.shared fetchCommentsForPost:_post.id completion:^(NSDictionary *comments, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         NSMutableArray *newComments = [NSMutableArray array];
         for (NSDictionary *commentDictionary in comments) {
@@ -82,8 +82,12 @@
             [newComments addObject:comment];
         }
         _comments = newComments;
-        _tableView.hidden = NO;
         _activityIndicatorView.hidden = YES;
+        
+        if (_segmentedControl.selectedSegmentIndex == 0) {
+            _tableView.hidden = NO;
+        }
+        
         [_tableView reloadData];
     }];
 }
@@ -166,8 +170,8 @@
 
 - (void)layoutTableViewHeader {
     _headerDomainLabel.text = _post.domain;
-    _headerMetadata1Label.text = [NSString stringWithFormat:@"%@ points by %@", _post.points, _post.user];
-    _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %@ comments", _post.timeAgo, _post.commentsCount];
+    _headerMetadata1Label.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)_post.points, _post.user];
+    _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
     _headerTitleLabel.text = _post.title;
     
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
