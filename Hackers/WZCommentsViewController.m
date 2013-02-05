@@ -8,16 +8,16 @@
 
 #import <TSMiniWebBrowser.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
-#import <SDSegmentedControl/SDSegmentedControl.h>
 #import <QuartzCore/QuartzCore.h>
+#import "SDSegmentedControl.h"
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
+#import "WZActivityViewController.h"
 #import "WZHackersDataAPI.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
 #import "WZPost.h"
-#import "WZActivityView.h"
 #import "WZWebView.h"
 
 @interface WZCommentsViewController () {
@@ -46,9 +46,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
-    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
-                                                  forBarMetrics:UIBarMetricsDefault];
     [self setupActivityIndicatorView];
     [self setupTableView];
     [self setupSegmentedController];
@@ -59,7 +56,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    
     _webView.scrollView.scrollsToTop = NO;
     _tableView.scrollsToTop = YES;
 }
@@ -68,8 +64,8 @@
     [super viewWillDisappear:animated];
     if (_isNavigatingBack) {
         [self.navigationController setNavigationBarHidden:NO animated:YES];
-        [self updateNavigationBarBackground];
         _isNavigatingBack = NO;
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     }
 }
 
@@ -102,7 +98,7 @@
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
-    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(4, 0, 0, -8);
+    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(5, 0, 0, -8);
     
     SDStainView *stainViewAppearance = [SDStainView appearance];
     stainViewAppearance.shadowColor = [UIColor clearColor];
@@ -111,6 +107,7 @@
     stainViewAppearance.layer.shadowRadius = 0;
     stainViewAppearance.innerStrokeColor = [UIColor clearColor];
     stainViewAppearance.innerStrokeLineWidth = 0;
+    stainViewAppearance.edgeInsets = UIEdgeInsetsMake(2, 0.5, 0.5, 0.5);
     
     _segmentedControl.backgroundColor = [UIColor colorWithWhite:0.67 alpha:1];
     _segmentedControl.borderColor = [UIColor clearColor];
@@ -373,9 +370,10 @@
 }
 
 - (IBAction)showActivityView:(id)sender {
-    UIActivityViewController *activityViewController = [WZActivityView activitViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
+    WZActivityViewController *activityViewController = [WZActivityViewController activityViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
+
 - (IBAction)backButtonTapped:(id)sender {
     _isNavigatingBack = YES;
     [self.navigationController popViewControllerAnimated:YES];

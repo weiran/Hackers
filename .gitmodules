@@ -1,3 +1,6 @@
 [submodule "Libraries/DTCoreText"]
 	path = Libraries/DTCoreText
 	url = https://github.com/Cocoanetics/DTCoreText.git
+[submodule "Libraries/SDSegmentedControl"]
+	path = Libraries/SDSegmentedControl
+	url = https://github.com/weiran/SDSegmentedControl.git
