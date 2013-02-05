@@ -928,7 +928,8 @@ const CGFloat kSDSegmentedControlScrollOffset = 20;
     {
         _imageSize = kSDSegmentedControlImageSize;
         self.titleLabel.shadowOffset = CGSizeMake(0, 0.5);
-        self.titleLabel.font = [UIFont boldSystemFontOfSize:14];
+        //self.titleLabel.font = [UIFont boldSystemFontOfSize:14];
+		self.titleLabel.font = [UIFont fontWithName:@"Futura" size:14];
         self.userInteractionEnabled = YES;
         self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         self.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;

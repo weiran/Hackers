@@ -11,10 +11,9 @@
 
 @class WZPost, TSMiniWebBrowser;
 
-@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, TSMiniWebBrowserDelegate>
+@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, TSMiniWebBrowserDelegate, UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) WZPost *post;
 @property (strong, nonatomic) NSMutableArray *comments;
 

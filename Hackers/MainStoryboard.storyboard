@@ -170,11 +170,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="74" id="0eV-31-z4v" customClass="WZPostCell">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="74" id="0eV-31-z4v" customClass="WZPostCell">
                                 <rect key="frame" x="0.0" y="22" width="320" height="74"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="73"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="73"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="News Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="275" translatesAutoresizingMaskIntoConstraints="NO" id="V5Q-hv-dC3" userLabel="Title">
@@ -264,7 +264,7 @@
                                     <outlet property="moreDetailLabel" destination="R0V-Pf-NuH" id="99b-eB-xKz"/>
                                     <outlet property="rankLabel" destination="Hex-7h-gRj" id="YYY-4d-vOd"/>
                                     <outlet property="titleLabel" destination="V5Q-hv-dC3" id="gqA-y5-bWb"/>
-                                    <segue destination="LYY-JJ-fbY" kind="push" identifier="ShowCommentsSegue" id="JbF-YJ-KnY"/>
+                                    <segue destination="LYY-JJ-fbY" kind="push" identifier="ShowCommentsSegue" id="KY6-6m-g0D"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -301,7 +301,6 @@
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" image="back-arrow.png">
                                     <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <state key="highlighted">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -326,14 +325,23 @@
                                     <action selector="showActivityView:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="mFD-ql-t5m"/>
                                 </connections>
                             </button>
-                            <webView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gz2-Wh-jFN">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vex-b4-wZn" userLabel="Activity Indicator View">
+                                <subviews>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="t2X-yB-S8x">
+                                        <color key="color" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </activityIndicatorView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.86736686860000001" green="0.86736686860000001" blue="0.86736686860000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="centerY" secondItem="t2X-yB-S8x" secondAttribute="centerY" type="user" id="b1q-uT-3Ow"/>
+                                    <constraint firstAttribute="centerX" secondItem="t2X-yB-S8x" secondAttribute="centerX" type="user" id="qW1-bT-NTJ"/>
+                                </constraints>
+                            </view>
+                            <webView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gz2-Wh-jFN" customClass="WZWebView">
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </webView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="113" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Smx-0F-YVN">
                                 <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="504" type="user" id="xlS-gH-dwa"/>
-                                </constraints>
                                 <view key="tableHeaderView" contentMode="scaleToFill" id="byi-Ju-oOe" userLabel="Header View">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -491,7 +499,6 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="t2X-yB-S8x"/>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Zko-nc-fi0" customClass="SDSegmentedControl">
                                 <constraints>
                                     <constraint firstAttribute="width" constant="232" id="GOg-Li-AgZ"/>
@@ -501,33 +508,97 @@
                                     <segment title="Link"/>
                                 </segments>
                             </segmentedControl>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PcO-O3-ybD">
+                                <color key="backgroundColor" red="0.86736686860000001" green="0.86736686860000001" blue="0.86736686860000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <items>
+                                    <barButtonItem enabled="NO" style="plain" id="2ot-sY-B0q">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="qit-I8-LPS">
+                                            <rect key="frame" x="12" y="6" width="28" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal" title="Back" image="back-icon.png">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="toolbarBackButtonPressed:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="lTQ-RS-w5u"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
+                                    <barButtonItem width="30" style="plain" systemItem="fixedSpace" id="hzF-jp-YCd"/>
+                                    <barButtonItem enabled="NO" style="plain" id="2kC-ri-CWt">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="lUf-WZ-zjU">
+                                            <rect key="frame" x="80" y="6" width="28" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal" title="Forward" image="forward-icon.png">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="forwardButtonPressed:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="8tu-Wm-iGo"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="oiD-0b-qW6"/>
+                                    <barButtonItem style="plain" id="BNt-9U-GMq">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="0tj-kN-QN7">
+                                            <rect key="frame" x="280" y="6" width="28" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal" title="Refresh" image="refresh-icon.png">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="toolbarRefreshPressed:" destination="LYY-JJ-fbY" eventType="touchUpInside" id="edr-dE-tn1"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="2OT-1f-WKG"/>
+                            <constraint firstItem="PcO-O3-ybD" firstAttribute="centerX" secondItem="Zko-nc-fi0" secondAttribute="centerX" type="default" id="5SU-77-KCi"/>
                             <constraint firstItem="d4J-Ft-d7f" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="default" id="5qQ-Be-aKe"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="BDT-EA-rW7"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="C4B-Vp-IXd"/>
-                            <constraint firstItem="t2X-yB-S8x" firstAttribute="centerX" secondItem="Smx-0F-YVN" secondAttribute="centerX" type="user" id="DEv-Y3-bAc"/>
-                            <constraint firstItem="Smx-0F-YVN" firstAttribute="top" secondItem="Gz2-Wh-jFN" secondAttribute="top" type="user" id="NLg-10-REf"/>
-                            <constraint firstItem="Gz2-Wh-jFN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="OMV-eZ-m18"/>
+                            <constraint firstItem="Gz2-Wh-jFN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="user" id="OMV-eZ-m18"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="default" id="OW6-nn-97u"/>
                             <constraint firstItem="Zko-nc-fi0" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="-1" id="QE1-1f-50y"/>
                             <constraint firstItem="d4J-Ft-d7f" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="TCR-YE-wqZ"/>
                             <constraint firstItem="Gz2-Wh-jFN" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="TQO-dI-UsR"/>
+                            <constraint firstItem="PcO-O3-ybD" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="Tck-Gb-6aS"/>
                             <constraint firstItem="Gz2-Wh-jFN" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="user" id="UPU-SD-a8U"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="ZRM-UL-M8M"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="bottom" secondItem="d4J-Ft-d7f" secondAttribute="bottom" type="default" id="dgC-Wf-Cub"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="eJ7-mo-ol0"/>
-                            <constraint firstAttribute="bottom" secondItem="t2X-yB-S8x" secondAttribute="bottom" constant="184" id="f0c-rb-4HC"/>
+                            <constraint firstAttribute="bottom" secondItem="PcO-O3-ybD" secondAttribute="bottom" constant="-44" type="user" id="f5N-ub-8KF"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="hDb-Gg-kec"/>
                             <constraint firstItem="Gz2-Wh-jFN" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="user" id="lVC-E6-ztG"/>
-                            <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="user" id="mWb-B4-o1e"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="lod-rd-s2s"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="mt1-L4-rWs"/>
-                            <constraint firstItem="Zko-nc-fi0" firstAttribute="centerX" secondItem="t2X-yB-S8x" secondAttribute="centerX" type="default" id="pBT-4z-dEG"/>
+                            <constraint firstItem="PcO-O3-ybD" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="uAh-Uf-WCS"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="wC8-LO-Lmj"/>
                         </constraints>
                     </view>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="Nxx-jT-vpE"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
-                        <outlet property="activityIndicator" destination="t2X-yB-S8x" id="VcH-cw-tLz"/>
+                        <outlet property="activityIndicatorView" destination="Vex-b4-wZn" id="Wys-LV-3Re"/>
+                        <outlet property="activityIndicatorViewTopSpacing" destination="wC8-LO-Lmj" id="5i9-Ap-IcO"/>
                         <outlet property="headerDomainLabel" destination="is6-MS-yNN" id="mLH-Rd-zDM"/>
                         <outlet property="headerMetadata1Label" destination="qSR-oi-e0H" id="DAd-bI-EIZ"/>
                         <outlet property="headerMetadata2Label" destination="cGR-KB-5u7" id="KUs-3O-njN"/>
@@ -535,7 +606,12 @@
                         <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
                         <outlet property="segmentedControl" destination="Zko-nc-fi0" id="FxY-5h-deS"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
+                        <outlet property="toolbar" destination="PcO-O3-ybD" id="wyC-L1-Lxz"/>
+                        <outlet property="toolbarBackButton" destination="qit-I8-LPS" id="VX6-z4-aL6"/>
+                        <outlet property="toolbarBottomSpacing" destination="f5N-ub-8KF" id="QAM-q5-WMv"/>
+                        <outlet property="toolbarForwardButton" destination="2kC-ri-CWt" id="McE-yy-Um4"/>
                         <outlet property="webView" destination="Gz2-Wh-jFN" id="t38-uf-GgC"/>
+                        <outlet property="webViewBottomSpacing" destination="OMV-eZ-m18" id="NJ6-ap-04i"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v7d-Ub-TwX" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -653,6 +729,9 @@
     </scenes>
     <resources>
         <image name="back-arrow.png" width="19" height="16"/>
+        <image name="back-icon.png" width="28" height="28"/>
+        <image name="forward-icon.png" width="28" height="28"/>
+        <image name="refresh-icon.png" width="24" height="26"/>
         <image name="share-icon.png" width="22" height="22"/>
     </resources>
     <classes>
@@ -682,8 +761,12 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
             <relationships>
                 <relationship kind="action" name="backButtonTapped:"/>
+                <relationship kind="action" name="forwardButtonPressed:"/>
                 <relationship kind="action" name="showActivityView:"/>
-                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="action" name="toolbarBackButtonPressed:"/>
+                <relationship kind="action" name="toolbarRefreshPressed:"/>
+                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
                 <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
@@ -691,7 +774,12 @@
                 <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="segmentedControl" candidateClass="SDSegmentedControl"/>
                 <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
+                <relationship kind="outlet" name="toolbarBackButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="toolbarBottomSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="toolbarForwardButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="webView" candidateClass="WZWebView"/>
+                <relationship kind="outlet" name="webViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
             </relationships>
         </class>
         <class className="WZMainViewController" superclassName="UITableViewController">
@@ -718,6 +806,9 @@
                 <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
             </relationships>
+        </class>
+        <class className="WZWebView" superclassName="UIWebView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZWebView.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

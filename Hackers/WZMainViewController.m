@@ -135,14 +135,6 @@
     [_fetchedResultsController performFetch:&error];
     _news = _fetchedResultsController.fetchedObjects;
     
-    if (!_news.count > 0) {
-        self.tableView.hidden = YES;
-        _activityIndicator.hidden = NO;
-    } else {
-        self.tableView.hidden = NO;
-        _activityIndicator.hidden = YES;
-    }
-    
     if (error) {
         NSLog(@"News fetch failed: %@", error.localizedDescription);
     }

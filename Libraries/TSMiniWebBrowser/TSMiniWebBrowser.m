@@ -137,7 +137,7 @@ enum actionSheetButtonIndex {
     toolBar.barStyle = barStyle;
     [self.view addSubview:toolBar];
     
-    UIImage *backImage = [UIImage imageNamed:@"back_icon.png"];
+    UIImage *backImage = [UIImage imageNamed:@"back-icon.png"];
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
     backButton.bounds = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
     [backButton setImage:backImage forState:UIControlStateNormal];
@@ -148,7 +148,7 @@ enum actionSheetButtonIndex {
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpace.width = 30;
     
-    UIImage *forwardImage = [UIImage imageNamed:@"forward_icon.png"];
+    UIImage *forwardImage = [UIImage imageNamed:@"forward-icon.png"];
     UIButton *forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
     forwardButton.bounds = CGRectMake(0, 0, forwardImage.size.width, forwardImage.size.height);
     [forwardButton setImage:forwardImage forState:UIControlStateNormal];
@@ -158,7 +158,7 @@ enum actionSheetButtonIndex {
     
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
-    UIImage *reloadImage = [UIImage imageNamed:@"reload_icon.png"];
+    UIImage *reloadImage = [UIImage imageNamed:@"refresh-icon.png"];
     UIButton *reloadButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
     reloadButtonView.bounds = CGRectMake(0, 0, reloadImage.size.width, reloadImage.size.height);
     [reloadButtonView setImage:reloadImage forState:UIControlStateNormal];
@@ -175,7 +175,7 @@ enum actionSheetButtonIndex {
     activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     activityIndicator.frame = CGRectMake(11, 7, 20, 20);
     UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 43, 33)];
-    [containerView addSubview:activityIndicator];
+    //[containerView addSubview:activityIndicator];
     UIBarButtonItem *buttonContainer = [[UIBarButtonItem alloc] initWithCustomView:containerView];
     
     // Add butons to an array
@@ -188,10 +188,10 @@ enum actionSheetButtonIndex {
     if (showReloadButton) {
         [toolBarButtons addObject:buttonReload];
     }
-    if (showActionButton) {
-        [toolBarButtons addObject:fixedSpace2];
-        [toolBarButtons addObject:buttonAction];
-    }
+//    if (showActionButton) {
+//        [toolBarButtons addObject:fixedSpace2];
+//        [toolBarButtons addObject:buttonAction];
+//    }
     
     // Set buttons to tool bar
     [toolBar setItems:toolBarButtons animated:YES];

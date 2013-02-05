@@ -17,6 +17,9 @@
     self.type = [attributes objectForKeyOrNil:@"type"];
     self.url = [attributes objectForKeyOrNil:@"url"];
     self.user = [attributes objectForKeyOrNil:@"user"];
+    
+    // hacky hacky
+    self.timeAgo = [self.timeAgo stringByReplacingOccurrencesOfString:@"minutes" withString:@"mins"];
 }
 
 @end

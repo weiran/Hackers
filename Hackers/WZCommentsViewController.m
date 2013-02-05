@@ -18,13 +18,28 @@
 #import "WZCommentModel.h"
 #import "WZPost.h"
 #import "WZActivityView.h"
+#import "WZWebView.h"
 
 @interface WZCommentsViewController () {
     BOOL _isNavigatingBack;
 }
-- (IBAction)backButtonTapped:(id)sender;
-@property (weak, nonatomic) IBOutlet UIWebView *webView;
+- (IBAction)backButtonTapped:(id)sender; // back navigation
+
+@property (weak, nonatomic) IBOutlet UIView *activityIndicatorView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *activityIndicatorViewTopSpacing;
+
 @property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
+
+@property (weak, nonatomic) IBOutlet WZWebView *webView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewBottomSpacing;
+
+@property (strong, nonatomic) IBOutlet UIToolbar *toolbar;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *toolbarBottomSpacing;
+@property (weak, nonatomic) IBOutlet UIButton *toolbarBackButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *toolbarForwardButton;
+- (IBAction)toolbarBackButtonPressed:(id)sender;
+- (IBAction)forwardButtonPressed:(id)sender;
+- (IBAction)toolbarRefreshPressed:(id)sender;
 @end
 
 @implementation WZCommentsViewController
@@ -34,6 +49,7 @@
 	// Do any additional setup after loading the view.
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
                                                   forBarMetrics:UIBarMetricsDefault];
+    [self setupActivityIndicatorView];
     [self setupTableView];
     [self setupSegmentedController];
     [self setupWebView];
@@ -71,10 +87,13 @@
         }
         _comments = newComments;
         _tableView.hidden = NO;
-        [_activityIndicator stopAnimating];
-        _activityIndicator.hidden = YES;
+        _activityIndicatorView.hidden = YES;
         [_tableView reloadData];
     }];
+}
+
+- (void)setupActivityIndicatorView {
+    [self.view bringSubviewToFront:_activityIndicatorView];
 }
 
 - (void)setupSegmentedController {
@@ -83,7 +102,7 @@
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
-    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(2, 0, 0, -8);
+    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(4, 0, 0, -8);
     
     SDStainView *stainViewAppearance = [SDStainView appearance];
     stainViewAppearance.shadowColor = [UIColor clearColor];
@@ -108,17 +127,20 @@
 
 - (void)setupWebView {
     _webView.scalesPageToFit = YES;
+    _webView.delegate = self;
 }
 
 - (void)segmentDidChange:(id)sender {
     switch ([sender selectedSegmentIndex]) {
-        case 0:
+        case 0: {
             _tableView.hidden = NO;
             _webView.hidden = YES;
             _webView.scrollView.scrollsToTop = NO;
             _tableView.scrollsToTop = YES;
-            break;
-        case 1:
+            [self hideToolbar];
+        }
+        break;
+        case 1: {
             _tableView.hidden = YES;
             _webView.hidden = NO;
             _webView.scrollView.scrollsToTop = YES;
@@ -127,7 +149,10 @@
             if (!_webView.request) {
                 [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_post.url]]];
             }
-            break;
+            
+            [self showToolbar];
+        }
+        break;
     }
 }
 
@@ -158,6 +183,8 @@
     
     // err, fixes some kinda bug
     _tableView.tableHeaderView = _tableView.tableHeaderView;
+    
+    _activityIndicatorViewTopSpacing.constant = 44 + (height + 54);
 }
 
 - (void)layoutTableViewBackgrounds {
@@ -275,6 +302,64 @@
     }];
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
                                                   forBarMetrics:UIBarMetricsDefault];
+}
+
+#pragma mark - UIWebView delegate
+
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    _toolbarBackButton.enabled = [webView canGoBack];
+    _toolbarForwardButton.enabled = [webView canGoForward];
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    _toolbarBackButton.enabled = [webView canGoBack];
+    _toolbarForwardButton.enabled = [webView canGoForward];
+}
+
+#pragma mark - Toolbar
+
+- (void)showToolbar {
+    _toolbarBottomSpacing.constant = 0;
+    _webViewBottomSpacing.constant = -44;
+    [_toolbar setNeedsUpdateConstraints];
+    [_webView setNeedsUpdateConstraints];
+    
+    [UIView animateWithDuration:0.2
+                          delay:0
+                        options:UIViewAnimationCurveEaseInOut
+                     animations:^{
+                         [_toolbar layoutIfNeeded];
+                         [_webView layoutIfNeeded];
+                     } completion:nil];
+}
+
+- (void)hideToolbar {
+    _toolbarBottomSpacing.constant = -44;
+    _webViewBottomSpacing.constant = 0;
+    [_toolbar setNeedsUpdateConstraints];
+    [_webView setNeedsUpdateConstraints];
+    
+    [UIView animateWithDuration:0.2
+                          delay:0
+                        options:UIViewAnimationCurveEaseInOut
+                     animations:^{
+                         [_toolbar layoutIfNeeded];
+                         [_webView layoutIfNeeded];
+                     } completion:nil];
+}
+
+- (IBAction)toolbarBackButtonPressed:(id)sender {
+    [_webView goBack];
+}
+
+- (IBAction)forwardButtonPressed:(id)sender {
+    [_webView goForward];
+}
+
+- (IBAction)toolbarRefreshPressed:(id)sender {
+    [_webView reload];
 }
 
 #pragma mark - Action methods
