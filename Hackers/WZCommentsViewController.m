@@ -47,6 +47,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupActivityIndicatorView];
+    [self setupToolbar];
     [self setupTableView];
     [self setupSegmentedController];
     [self setupWebView];
@@ -129,6 +130,10 @@
 - (void)setupWebView {
     _webView.scalesPageToFit = YES;
     _webView.delegate = self;
+}
+
+- (void)setupToolbar {
+    _toolbar.layer.shadowOpacity = 0;
 }
 
 - (void)segmentDidChange:(id)sender {
