@@ -7,21 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "WZCommentCell.h"
 
-@class WZPostModel, TSMiniWebBrowser;
+@class WZPostModel;
 
-@interface WZCommentsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, TSMiniWebBrowserDelegate, UIWebViewDelegate>
+@interface WZCommentsViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) WZPostModel *post;
 @property (strong, nonatomic) NSMutableArray *comments;
 
-@property (weak, nonatomic) IBOutlet UIView *headerView;
-@property (weak, nonatomic) IBOutlet UILabel *headerTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *headerDomainLabel;
-@property (weak, nonatomic) IBOutlet UILabel *headerMetadata1Label;
-@property (weak, nonatomic) IBOutlet UILabel *headerMetadata2Label;
-
-- (IBAction)showActivityView:(id)sender;
 @end

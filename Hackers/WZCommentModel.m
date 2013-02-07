@@ -14,6 +14,8 @@
 #import "DTHTMLAttributedStringBuilder.h"
 #import "DTCoreTextConstants.h"
 
+#import <OHAttributedLabel/OHASBasicHTMLParser.h>
+
 @implementation WZCommentModel
 
 - (void)updateAttributes:(NSDictionary *)attributes {

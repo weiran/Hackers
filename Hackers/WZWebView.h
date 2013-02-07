@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WZWebView : UIWebView
-
+@interface WZWebView : UIView <UIWebViewDelegate>
+@property (nonatomic, strong) UIWebView *webView;
 @end
