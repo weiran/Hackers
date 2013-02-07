@@ -16,6 +16,13 @@
 
 #import <OHAttributedLabel/OHASBasicHTMLParser.h>
 
+#define kCellWidth 320
+#define kBodyLabelMarginTop 29
+#define kBodyLabelMarginBottom 10
+#define kReplyButtonHeightWithMargin 40
+#define kDefaultTrailingMargin 10
+
+
 @implementation WZCommentModel
 
 - (void)updateAttributes:(NSDictionary *)attributes {
@@ -62,30 +69,26 @@
     return attributedString;
 }
 
-- (NSNumber *)heightForComment:(WZCommentModel *)comment {
-    int replyButtonHeight = 30 + 10; // height + spacing
-    
-    CGFloat rootWidth = 320;
+- (NSNumber *)heightForComment:(WZCommentModel *)comment {    
     int indentPoints = [self indentPointsForComment:comment];
-    int leftMargin = 10;
-    CGFloat width = rootWidth - indentPoints - leftMargin;
+    CGFloat width = kCellWidth - indentPoints - kDefaultTrailingMargin;
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(comment.attributedContent));
     CGSize sz = CGSizeMake(0.f, 0.f);
     CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
     
     if (framesetter) {
-        CFRange fitCFRange = CFRangeMake(0,0);
-        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, maxSize, &fitCFRange);
+        CFRange fitCFRange = CFRangeMake(0, 0);
+        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, maxSize, &fitCFRange);
         CFRelease(framesetter);
     }
     
     int labelHeight = sz.height;
     
-    CGFloat height = labelHeight + 39; // 29 points to top, 10 points to bottom
+    CGFloat height = labelHeight + kBodyLabelMarginTop + kBodyLabelMarginBottom; // 29 points to top, 10 points to bottom
     
     if (self.comments.count > 0) {
-        height += replyButtonHeight;
+        height += kReplyButtonHeightWithMargin;
     }
     
     return @(height);
@@ -105,10 +108,11 @@
     return sz;
 }
 
+#define kBaseIndent 10
+#define kIndentPerLevel 15
+
 - (NSUInteger)indentPointsForComment:(WZCommentModel *)comment {
-    NSUInteger baseIndentation = 10;
-    NSUInteger indentPerLevel = 15;
-    NSUInteger indentation = baseIndentation + (indentPerLevel * comment.level.integerValue);
+    NSUInteger indentation = kBaseIndent + (kIndentPerLevel * comment.level.integerValue);
     return indentation;
 }
 
