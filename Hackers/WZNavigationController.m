@@ -21,7 +21,9 @@
 }
 
 - (IBAction)navigationBarTapped:(id)sender {
-    WZNavigationPickerViewController *pickerViewController = [[WZNavigationPickerViewController alloc] init];
-    [self.view addSubview:pickerViewController.view];
+//    WZNavigationPickerViewController *pickerViewController = [[WZNavigationPickerViewController alloc] init];
+//    [self.view addSubview:pickerViewController.view];
+    
 }
+
 @end

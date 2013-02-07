@@ -12,9 +12,14 @@
 @interface WZCommentCell () {
     NSUInteger _indentationPoints;
 }
-@property (nonatomic, strong) NSLayoutConstraint *userConstraint;
-@property (nonatomic, strong) NSLayoutConstraint *bodyConstraint;
-@property (nonatomic, strong) NSLayoutConstraint *repliesConstraint;
+//@property (nonatomic, strong) NSLayoutConstraint *userConstraint;
+//@property (nonatomic, strong) NSLayoutConstraint *bodyConstraint;
+//@property (nonatomic, strong) NSLayoutConstraint *repliesConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bodyConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *userConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *repliesConstraint;
+
+
 @end
 
 @implementation WZCommentCell
@@ -30,6 +35,10 @@
     [_showRepliesButton setBackgroundImage:buttonImageHighlight forState:UIControlStateHighlighted];
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
     _commentLabel.delegate = self;
+}
+
+- (void)awakeFromNib {
+    
 }
 
 - (void)setContentIndent:(NSUInteger)contentIndent {

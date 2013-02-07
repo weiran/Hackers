@@ -319,16 +319,12 @@
                                                     <accessibility key="accessibilityConfiguration">
                                                         <accessibilityTraits key="traits" none="YES"/>
                                                     </accessibility>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="75" type="user" id="Ffj-JO-HUU"/>
-                                                    </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUV-CZ-R1S">
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="300" type="user" id="694-Aw-RhZ"/>
                                                         <constraint firstAttribute="height" constant="30" id="QMt-zI-CEz"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="13"/>
@@ -350,22 +346,25 @@
                                         </view>
                                         <constraints>
                                             <constraint firstItem="8oW-2d-tbU" firstAttribute="baseline" secondItem="V9m-5n-3oQ" secondAttribute="baseline" type="default" id="5tE-GN-IeL"/>
-                                            <constraint firstItem="deh-xx-lpy" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="6zZ-hg-Mdm"/>
-                                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" type="user" id="7NC-1C-gcz"/>
-                                            <constraint firstItem="deh-xx-lpy" firstAttribute="trailing" secondItem="QUV-CZ-R1S" secondAttribute="trailing" type="default" id="900-Zk-MJn"/>
-                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="leading" secondItem="QUV-CZ-R1S" secondAttribute="leading" type="default" id="Ftj-mJ-zT0"/>
-                                            <constraint firstAttribute="bottom" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" id="GSm-Lk-IWZ"/>
+                                            <constraint firstAttribute="bottom" secondItem="QUV-CZ-R1S" secondAttribute="bottom" constant="10" type="user" id="7NC-1C-gcz"/>
+                                            <constraint firstItem="V9m-5n-3oQ" firstAttribute="leading" secondItem="8RA-zL-sDn" secondAttribute="leading" constant="10" type="user" id="Fvv-Ts-rml"/>
                                             <constraint firstItem="QUV-CZ-R1S" firstAttribute="trailing" secondItem="8oW-2d-tbU" secondAttribute="trailing" type="default" id="LrS-00-u7i"/>
                                             <constraint firstAttribute="trailing" secondItem="deh-xx-lpy" secondAttribute="trailing" constant="10" type="user" id="N4z-AK-Lc4"/>
                                             <constraint firstItem="V9m-5n-3oQ" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="5" id="RVT-Un-gjY"/>
+                                            <constraint firstItem="deh-xx-lpy" firstAttribute="leading" secondItem="8RA-zL-sDn" secondAttribute="leading" constant="10" type="user" id="Vcb-Xc-cN8"/>
                                             <constraint firstItem="8oW-2d-tbU" firstAttribute="top" secondItem="V9m-5n-3oQ" secondAttribute="top" type="default" id="c9L-lw-81i"/>
                                             <constraint firstItem="deh-xx-lpy" firstAttribute="top" secondItem="8RA-zL-sDn" secondAttribute="top" constant="29" type="user" id="fHW-rE-kk4"/>
+                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="leading" secondItem="8RA-zL-sDn" secondAttribute="leading" constant="10" type="user" id="fcQ-5i-IpT"/>
+                                            <constraint firstItem="QUV-CZ-R1S" firstAttribute="trailing" secondItem="deh-xx-lpy" secondAttribute="trailing" type="default" id="pwY-l0-XLG"/>
                                             <constraint firstAttribute="bottom" secondItem="deh-xx-lpy" secondAttribute="bottom" constant="9" type="user" id="zgr-CA-H7E"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="bodyConstraint" destination="Vcb-Xc-cN8" id="aCA-jN-KdG"/>
                                             <outlet property="commentLabel" destination="deh-xx-lpy" id="QCK-Fx-HPP"/>
                                             <outlet property="dateLabel" destination="8oW-2d-tbU" id="dct-sE-V4Y"/>
+                                            <outlet property="repliesConstraint" destination="fcQ-5i-IpT" id="Ibt-oh-OBp"/>
                                             <outlet property="showRepliesButton" destination="QUV-CZ-R1S" id="ADn-6H-Tvg"/>
+                                            <outlet property="userConstraint" destination="Fvv-Ts-rml" id="BD7-sZ-f1b"/>
                                             <outlet property="userLabel" destination="V9m-5n-3oQ" id="dmo-SQ-Cm5"/>
                                         </connections>
                                     </tableViewCell>
@@ -515,9 +514,12 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
             <relationships>
                 <relationship kind="action" name="showReplies:"/>
+                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
                 <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
                 <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
                 <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
                 <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
             </relationships>
         </class>
