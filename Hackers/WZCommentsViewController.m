@@ -102,6 +102,8 @@
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
+    //segmenteViewAppearance.titleLabel.font = [UIFont fontWithName:kTitleFontName size:10];
+    [segmenteViewAppearance setFont:[UIFont fontWithName:@"HelveticaNeue-Medium" size:14]];
     segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(5, 0, 0, -8);
     
     SDStainView *stainViewAppearance = [SDStainView appearance];
@@ -150,7 +152,7 @@
     // err, fixes some kinda bug
     _tableView.tableHeaderView = _tableView.tableHeaderView;
     
-    _activityIndicatorViewTopSpacing.constant = 44 + (height + 54);
+    _activityIndicatorViewTopSpacing.constant = 44 + (kHeaderTitleTopMargin + height + kHeaderTitleBottomMargin);
 }
 
 - (void)layoutTableViewBackgrounds {

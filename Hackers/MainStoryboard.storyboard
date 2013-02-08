@@ -223,7 +223,6 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="301" id="2en-yl-Yky"/>
-                                                <constraint firstAttribute="height" constant="21" type="user" id="Aca-GS-KiZ"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -385,28 +384,25 @@
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="1Mg-9O-pCT"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="2OT-1f-WKG"/>
                             <constraint firstItem="d4J-Ft-d7f" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="default" id="5qQ-Be-aKe"/>
-                            <constraint firstItem="Vex-b4-wZn" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="user" id="BDT-EA-rW7"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="9rL-bs-n8b"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="C4B-Vp-IXd"/>
-                            <constraint firstItem="Zko-nc-fi0" firstAttribute="centerX" secondItem="Smx-0F-YVN" secondAttribute="centerX" type="default" id="DEE-iu-azA"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="Glp-0a-dcr"/>
                             <constraint firstItem="CFE-xm-LcO" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="user" id="Hsu-rg-SHc"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="default" id="OW6-nn-97u"/>
                             <constraint firstItem="Zko-nc-fi0" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="-1" id="QE1-1f-50y"/>
                             <constraint firstItem="d4J-Ft-d7f" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="TCR-YE-wqZ"/>
-                            <constraint firstItem="Vex-b4-wZn" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="user" id="ZRM-UL-M8M"/>
                             <constraint firstItem="CFE-xm-LcO" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="user" id="aLd-M0-qVe"/>
                             <constraint firstItem="CFE-xm-LcO" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="user" id="bqV-8t-4Dd"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="bottom" secondItem="d4J-Ft-d7f" secondAttribute="bottom" type="default" id="dgC-Wf-Cub"/>
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="eJ7-mo-ol0"/>
                             <constraint firstItem="CFE-xm-LcO" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="flS-4b-f7E"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="hDb-Gg-kec"/>
-                            <constraint firstItem="CFE-xm-LcO" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="user" id="k3B-bR-jYI"/>
-                            <constraint firstItem="CFE-xm-LcO" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="user" id="l39-2x-1yI"/>
-                            <constraint firstItem="Vex-b4-wZn" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="user" id="lod-rd-s2s"/>
+                            <constraint firstItem="Vex-b4-wZn" firstAttribute="centerX" secondItem="Zko-nc-fi0" secondAttribute="centerX" type="default" id="iFZ-cK-R12"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="mt1-L4-rWs"/>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="wC8-LO-Lmj"/>
-                            <constraint firstItem="CFE-xm-LcO" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="user" id="wH5-9g-dV0"/>
                         </constraints>
                     </view>
                     <toolbarItems/>

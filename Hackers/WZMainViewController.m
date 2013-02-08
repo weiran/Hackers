@@ -19,7 +19,7 @@
 #import "WZPostModel.h"
 
 #define kTitleUnreadTextColorWithWhite 0
-#define kTitleReadTextColorWithWhite 0.6
+#define kTitleReadTextColorWithWhite 0.4
 #define kCellTitleTopMargin 9
 #define kCellTitleBottomMargin 44
 
