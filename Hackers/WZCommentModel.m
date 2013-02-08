@@ -22,7 +22,6 @@
 #define kReplyButtonHeightWithMargin 40
 #define kDefaultTrailingMargin 10
 
-
 @implementation WZCommentModel
 
 - (void)updateAttributes:(NSDictionary *)attributes {
@@ -64,7 +63,7 @@
     paragraphStyle.lineSpacing = 3.f;
     paragraphStyle.paragraphSpacing = 12.f;
     attributedString.paragraphStyle = paragraphStyle;
-    [attributedString setFont:[UIFont fontWithName:@"Avenir" size:14]];
+    [attributedString setFont:[UIFont fontWithName:kBodyFontName size:kBodyFontSize]];
     
     return attributedString;
 }

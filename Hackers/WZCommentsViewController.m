@@ -20,6 +20,9 @@
 #import "WZPostModel.h"
 #import "WZWebView.h"
 
+#define kHeaderTitleTopMargin 9
+#define kHeaderTitleBottomMargin 44
+
 @interface WZCommentsViewController () <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested> {
     BOOL _isNavigatingBack;
 }
@@ -125,7 +128,6 @@
 - (void)setupTableView {
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    _tableView.scrollsToTop = YES;
     
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
@@ -137,12 +139,12 @@
     _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
     _headerTitleLabel.text = _post.title;
     
-    CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
-                                    constrainedToSize:CGSizeMake(301, CGFLOAT_MAX)
+    CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
+                                    constrainedToSize:CGSizeMake(300, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
-    CGFloat height = MAX(titleLabelSize.height, 21);
+    CGFloat height = titleLabelSize.height;
     CGRect headerViewFrame = _headerView.frame;
-    headerViewFrame.size.height = height + 54;
+    headerViewFrame.size.height = kHeaderTitleTopMargin + height + kHeaderTitleBottomMargin;
     _headerView.frame = headerViewFrame;
     
     // err, fixes some kinda bug

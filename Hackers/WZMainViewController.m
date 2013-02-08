@@ -18,6 +18,11 @@
 #import "WZPostCell.h"
 #import "WZPostModel.h"
 
+#define kTitleUnreadTextColorWithWhite 0
+#define kTitleReadTextColorWithWhite 0.6
+#define kCellTitleTopMargin 9
+#define kCellTitleBottomMargin 44
+
 @interface WZMainViewController () {
     NSFetchedResultsController *_fetchedResultsController;
     NSArray *_news;
@@ -212,9 +217,9 @@
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
     
     if (filteredReadNews.count > 0) {
-        cell.titleLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
+        cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleReadTextColorWithWhite alpha:1];
     } else {
-        cell.titleLabel.textColor = [UIColor blackColor];
+        cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleUnreadTextColorWithWhite alpha:1];
     }
     
     return cell;
@@ -225,19 +230,18 @@
     [_readNews addObject:[NSNumber numberWithInteger:post.id]];
     [WZHackersData.shared addRead:[NSNumber numberWithInteger:post.id]];
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-    cell.titleLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
+    cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleReadTextColorWithWhite alpha:1];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZPostModel *post = _news[indexPath.row];
     
     if (!post.cellHeight) {
-        CGSize size = [post.title sizeWithFont:[UIFont fontWithName:@"Futura" size:15]
+        CGSize size = [post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
                              constrainedToSize:CGSizeMake(275, CGFLOAT_MAX)
                                  lineBreakMode:NSLineBreakByWordWrapping];
-        
-        CGFloat height = MAX(size.height, 21);
-        post.cellHeight = 54 + height;
+        CGFloat height = size.height;
+        post.cellHeight = kCellTitleTopMargin + height + kCellTitleBottomMargin;
     }
     
     return post.cellHeight;

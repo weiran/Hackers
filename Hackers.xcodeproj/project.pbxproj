@@ -105,6 +105,7 @@
 		24D0DB0616B5DE57001342A8 /* navbar-bg-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 24D0DB0416B5DE57001342A8 /* navbar-bg-highlighted.png */; };
 		24D0DB0716B5DE57001342A8 /* navbar-bg-highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24D0DB0516B5DE57001342A8 /* navbar-bg-highlighted@2x.png */; };
 		24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */; };
+		24D11C1016C42681000AE946 /* WZDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D11C0F16C42681000AE946 /* WZDefaults.m */; };
 		24EAA5B51647D56900105FE1 /* HackersDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5B31647D56900105FE1 /* HackersDataModel.xcdatamodeld */; };
 		24EAA5CC1647DC9C00105FE1 /* _WZComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C51647DC9C00105FE1 /* _WZComment.m */; };
 		24EAA5CD1647DC9C00105FE1 /* _WZPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C71647DC9C00105FE1 /* _WZPost.m */; };
@@ -335,6 +336,8 @@
 		24D0DB0516B5DE57001342A8 /* navbar-bg-highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg-highlighted@2x.png"; sourceTree = "<group>"; };
 		24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationBar.h; sourceTree = "<group>"; };
 		24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationBar.m; sourceTree = "<group>"; };
+		24D11C0E16C42681000AE946 /* WZDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZDefaults.h; sourceTree = "<group>"; };
+		24D11C0F16C42681000AE946 /* WZDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZDefaults.m; sourceTree = "<group>"; };
 		24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HackersDataModel.xcdatamodel; sourceTree = "<group>"; };
 		24EAA5C41647DC9C00105FE1 /* _WZComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZComment.h; sourceTree = "<group>"; };
 		24EAA5C51647DC9C00105FE1 /* _WZComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZComment.m; sourceTree = "<group>"; };
@@ -819,6 +822,8 @@
 			children = (
 				24972CAE1643BC3C00B4EFB4 /* WZAppDelegate.h */,
 				24972CAF1643BC3C00B4EFB4 /* WZAppDelegate.m */,
+				24D11C0E16C42681000AE946 /* WZDefaults.h */,
+				24D11C0F16C42681000AE946 /* WZDefaults.m */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -1077,6 +1082,7 @@
 				2484384316C11A3F001D2AA0 /* SDSegmentedControl.m in Sources */,
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
+				24D11C1016C42681000AE946 /* WZDefaults.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
