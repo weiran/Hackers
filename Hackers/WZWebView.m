@@ -31,6 +31,7 @@
     _webView.backgroundColor = [UIColor underPageBackgroundColor];
     _webView.delegate = self;
     _webView.scalesPageToFit = YES;
+    _webView.scrollView.scrollsToTop = NO;
     [self addSubview:_webView];
     
     [self layoutToolbar];

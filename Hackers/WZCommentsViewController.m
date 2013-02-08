@@ -55,8 +55,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    _webView.webView.scrollView.scrollsToTop = NO;
-    _tableView.scrollsToTop = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
