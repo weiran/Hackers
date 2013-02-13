@@ -112,6 +112,8 @@
 		24DD253316CBACC2005ED6EA /* mobilizer-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD253116CBACC2005ED6EA /* mobilizer-icon@2x.png */; };
 		24DD253616CBB0A8005ED6EA /* mobilizer-icon-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD253416CBB0A8005ED6EA /* mobilizer-icon-highlighted.png */; };
 		24DD253716CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD253516CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png */; };
+		24DD254016CBE920005ED6EA /* WZWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DD253F16CBE920005ED6EA /* WZWebViewController.m */; };
+		24DD254916CBF368005ED6EA /* WZWebView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24DD254816CBF368005ED6EA /* WZWebView.xib */; };
 		24EAA5B51647D56900105FE1 /* HackersDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5B31647D56900105FE1 /* HackersDataModel.xcdatamodeld */; };
 		24EAA5CC1647DC9C00105FE1 /* _WZComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C51647DC9C00105FE1 /* _WZComment.m */; };
 		24EAA5CD1647DC9C00105FE1 /* _WZPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C71647DC9C00105FE1 /* _WZPost.m */; };
@@ -350,6 +352,9 @@
 		24DD253116CBACC2005ED6EA /* mobilizer-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mobilizer-icon@2x.png"; sourceTree = "<group>"; };
 		24DD253416CBB0A8005ED6EA /* mobilizer-icon-highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mobilizer-icon-highlighted.png"; sourceTree = "<group>"; };
 		24DD253516CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mobilizer-icon-highlighted@2x.png"; sourceTree = "<group>"; };
+		24DD253E16CBE920005ED6EA /* WZWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZWebViewController.h; sourceTree = "<group>"; };
+		24DD253F16CBE920005ED6EA /* WZWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZWebViewController.m; sourceTree = "<group>"; };
+		24DD254816CBF368005ED6EA /* WZWebView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WZWebView.xib; sourceTree = "<group>"; };
 		24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HackersDataModel.xcdatamodel; sourceTree = "<group>"; };
 		24EAA5C41647DC9C00105FE1 /* _WZComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZComment.h; sourceTree = "<group>"; };
 		24EAA5C51647DC9C00105FE1 /* _WZComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZComment.m; sourceTree = "<group>"; };
@@ -556,6 +561,9 @@
 			children = (
 				2434A1C816BEED7400C383CA /* WZWebView.h */,
 				2434A1C916BEED7400C383CA /* WZWebView.m */,
+				24DD253E16CBE920005ED6EA /* WZWebViewController.h */,
+				24DD253F16CBE920005ED6EA /* WZWebViewController.m */,
+				24DD254816CBF368005ED6EA /* WZWebView.xib */,
 			);
 			name = Web;
 			sourceTree = "<group>";
@@ -1033,6 +1041,7 @@
 				24DD253316CBACC2005ED6EA /* mobilizer-icon@2x.png in Resources */,
 				24DD253616CBB0A8005ED6EA /* mobilizer-icon-highlighted.png in Resources */,
 				24DD253716CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png in Resources */,
+				24DD254916CBF368005ED6EA /* WZWebView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1107,6 +1116,7 @@
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
 				24D11C1016C42681000AE946 /* WZDefaults.m in Sources */,
+				24DD254016CBE920005ED6EA /* WZWebViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

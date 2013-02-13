@@ -19,6 +19,7 @@
 #import "WZCommentModel.h"
 #import "WZPostModel.h"
 #import "WZWebView.h"
+#import "WZWebViewController.h"
 
 #define kHeaderTitleTopMargin 9
 #define kHeaderTitleBottomMargin 44
@@ -223,12 +224,15 @@
 #pragma mark - WZCommentURLTappedDelegate
 
 - (void)tappedLink:(NSURL *)url {
-    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
-    webBrowserViewController.mode = TSMiniWebBrowserModeModal;
-    webBrowserViewController.modalDismissButtonTitle = @"Close";
-    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
-    webBrowserViewController.view.backgroundColor = [UIColor underPageBackgroundColor];
-    [self presentViewController:webBrowserViewController animated:YES completion:nil];
+    WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
+    [self presentViewController:webViewController animated:NO completion:nil];
+    
+//    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
+//    webBrowserViewController.mode = TSMiniWebBrowserModeModal;
+//    webBrowserViewController.modalDismissButtonTitle = @"Close";
+//    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
+//    webBrowserViewController.view.backgroundColor = [UIColor underPageBackgroundColor];
+//    [self presentViewController:webBrowserViewController animated:YES completion:nil];
 }
 
 #pragma mark - WZCommentShowRepliesDelegate

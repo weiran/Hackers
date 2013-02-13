@@ -9,6 +9,7 @@
 #import "WZWebView.h"
 
 #import <QuartzCore/QuartzCore.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 
 #define kToolBarHeight 44
 #define kToolBarFixedWidth 20
@@ -21,6 +22,7 @@
     NSURL *_currentURL;
 }
 @property (nonatomic, strong) UIToolbar *toolbar;
+@property (nonatomic, strong) UINavigationBar *navigationBar;
 @property (nonatomic, strong) UIBarButtonItem *backBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *mobilizerBarButtonItem;
@@ -29,18 +31,30 @@
 
 @implementation WZWebView
 
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        _webView = [[UIWebView alloc] initWithFrame:frame];
+    }
+    return self;
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    _webView = [[UIWebView alloc] init];
+    [self layoutWebView];
+    [self layoutToolbar];
+}
+
+- (void)layoutWebView {
+    if (!_webView) {
+        _webView = [[UIWebView alloc] init];
+    }
     _webView.backgroundColor = [UIColor underPageBackgroundColor];
     _webView.delegate = self;
     _webView.scalesPageToFit = YES;
     _webView.scrollView.scrollsToTop = NO;
     
     [self addSubview:_webView];
-    
-    [self layoutToolbar];
 }
 
 - (void)layoutToolbar {
@@ -67,7 +81,7 @@
         
         UIButton *mobilizerButton = [UIButton buttonWithType:UIButtonTypeCustom];
         mobilizerButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-        mobilizerButton.accessibilityLabel = @"Forward";
+        mobilizerButton.accessibilityLabel = @"Mobilizer";
         [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon"] forState:UIControlStateNormal];
         [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon-highlighted"] forState:UIControlStateSelected];
         [mobilizerButton addTarget:self action:@selector(mobilizerButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -141,6 +155,8 @@
         NSString *mobilizerURL = [NSString stringWithFormat:[mobilizerURLString stringByAppendingString:@"%@"], encodedURLString];
         requestURL = [NSURL URLWithString:mobilizerURL];
         [mobilizerButton setSelected:YES];
+        
+        [MBProgressHUD showHUDAddedTo:self.webView animated:YES];
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
@@ -153,18 +169,22 @@
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [self updateButtonsEnabled];
     _currentURL = webView.request.URL;
+    self.navigationBar.topItem.title = webView.request.URL.absoluteString;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    [MBProgressHUD hideHUDForView:self.webView animated:YES];
     [self updateButtonsEnabled];
     _currentURL = webView.request.URL;
+    self.navigationBar.topItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    [MBProgressHUD hideHUDForView:self.webView animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading page"
-                                                    message:@"There was a problem loading the page"
+                                                    message:error.localizedDescription
                                                    delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
     [alert show];
 }
