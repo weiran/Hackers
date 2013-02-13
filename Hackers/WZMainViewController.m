@@ -31,6 +31,7 @@
     UIPopoverController *_popoverController;
     BOOL _navBarInScrolledState;
     BOOL _navBarInDefaultState;
+    NSIndexPath *_selectedIndexPath;
 }
 @end
 
@@ -42,10 +43,16 @@
     _readNews = [NSMutableArray array];
     
     [self setupPullToRefresh];
-    [self setupTitle];
     [self loadData];
     
-    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.2];
+    self.clearsSelectionOnViewWillAppear = NO;
+    
+    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
 }
 
 - (void)navigationBarTapped:(id)sender {
@@ -93,14 +100,6 @@
     backgroundView.backgroundColor = backgroundColor;
     
     [self.tableView insertSubview:backgroundView atIndex:0];
-}
-
-- (void)setupTitle {
-    if ([self newsType] == WZNewsTypeTop) {
-        self.title = @"Hacker News";
-    } else {
-        self.title = @"Newest";
-    }
 }
 
 - (WZNewsType)newsType {
@@ -195,6 +194,12 @@
 
 #pragma mark - UITableViewController methods
 
+- (void)deselectCurrentRow {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView deselectRowAtIndexPath:_selectedIndexPath animated:YES]; 
+    });
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (!_news) {
         return 0;
@@ -222,6 +227,12 @@
         cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleUnreadTextColorWithWhite alpha:1];
     }
     
+    if ([_selectedIndexPath isEqual:indexPath]) {
+        [cell setSelected:YES];
+    } else {
+        [cell setSelected:NO];
+    }
+    
     return cell;
 }
 
@@ -231,6 +242,7 @@
     [WZHackersData.shared addRead:[NSNumber numberWithInteger:post.id]];
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleReadTextColorWithWhite alpha:1];
+    _selectedIndexPath = indexPath;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

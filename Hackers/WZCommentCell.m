@@ -12,9 +12,7 @@
 @interface WZCommentCell () {
     NSUInteger _indentationPoints;
 }
-//@property (nonatomic, strong) NSLayoutConstraint *userConstraint;
-//@property (nonatomic, strong) NSLayoutConstraint *bodyConstraint;
-//@property (nonatomic, strong) NSLayoutConstraint *repliesConstraint;
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bodyConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *userConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *repliesConstraint;

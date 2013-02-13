@@ -217,6 +217,8 @@ enum actionSheetButtonIndex {
     
     webView.delegate = self;
     
+    webView.backgroundColor = [UIColor underPageBackgroundColor];
+    
     // Load the URL in the webView
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:urlToLoad];
     [webView loadRequest:requestObj];

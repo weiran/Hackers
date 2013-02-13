@@ -19,21 +19,20 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
     
-    if (selected) {
-        self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
-    } else {
-        self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
-    }
-}
-
-- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
-    [super setHighlighted:highlighted animated:animated];
+    double duration = 0;
     
-    if (highlighted) {
-        self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
-    } else {
-        self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    if (animated) {
+        duration = 0.2;
     }
+    
+    [UIView animateWithDuration:duration
+                     animations:^{
+        if (selected) {
+            self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+        } else {
+            self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+        }
+    }];
 }
 
 @end

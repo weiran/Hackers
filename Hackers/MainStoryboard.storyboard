@@ -428,7 +428,7 @@
     </scenes>
     <resources>
         <image name="back-arrow.png" width="19" height="16"/>
-        <image name="share-icon.png" width="22" height="22"/>
+        <image name="share-icon.png" width="23" height="18"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
