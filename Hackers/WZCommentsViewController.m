@@ -17,7 +17,6 @@
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
 #import "WZPostModel.h"
-#import "WZWebView.h"
 #import "WZWebViewController.h"
 
 #define kHeaderTitleTopMargin 9

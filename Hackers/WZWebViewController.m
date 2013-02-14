@@ -10,8 +10,7 @@
 #import <MBProgressHUD/MBProgressHUD.h>
 
 #import "WZWebViewController.h"
-#import "WZWebView.h"
-
+#define kNavigationBarHeight 44
 #define kToolBarHeight 44
 #define kToolBarFixedWidth 20
 #define kBarButtonIconWidth 28
@@ -19,10 +18,8 @@
 #define kMobilizerURL @"http://www.instapaper.com/m?u="
 
 @interface WZWebViewController () {
-    
     NSURL *_mobilizedURL;
     NSURL *_currentURL;
-
 }
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (weak, nonatomic) IBOutlet UINavigationBar *navigationBar;
@@ -58,11 +55,11 @@
     if (_navigationBarHidden) {
         _webViewTopSpacingConstraint.constant = 0;
     } else {
-        _webViewTopSpacingConstraint.constant = 44;
+        _webViewTopSpacingConstraint.constant = kNavigationBarHeight;
     }
     
     UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    closeButton.frame = CGRectMake(0, 0, 32, 32);
+    closeButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     closeButton.accessibilityLabel = @"Close";
     [closeButton addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
@@ -182,6 +179,8 @@
         [MBProgressHUD showHUDAddedTo:self.webView animated:YES];
     }
     
+    [_webView stopLoading];
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     [_webView loadRequest:request];
 }
@@ -204,11 +203,15 @@
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    if (error.code == NSURLErrorCancelled) {
+        return;
+    }
+    
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [MBProgressHUD hideHUDForView:self.webView animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading page"
                                                     message:error.localizedDescription
-                                                   delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                                                   delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
     [alert show];
 }
 
@@ -232,6 +235,5 @@
 - (void)loadURL:(NSURL *)url {
     [_webView loadRequest:[NSURLRequest requestWithURL:url]];
 }
-
 
 @end

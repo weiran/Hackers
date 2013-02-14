@@ -19,7 +19,6 @@
 		2434A1AE16BD6DBA00C383CA /* back-arrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1AC16BD6DBA00C383CA /* back-arrow@2x.png */; };
 		2434A1C516BEB48900C383CA /* x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1C316BEB48900C383CA /* x.png */; };
 		2434A1C616BEB48900C383CA /* x@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1C416BEB48900C383CA /* x@2x.png */; };
-		2434A1CA16BEED7400C383CA /* WZWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2434A1C916BEED7400C383CA /* WZWebView.m */; };
 		2434A1EE16C0380B00C383CA /* forward-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1EA16C0380B00C383CA /* forward-icon.png */; };
 		2434A1EF16C0380B00C383CA /* forward-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1EB16C0380B00C383CA /* forward-icon@2x.png */; };
 		2434A1F016C0380B00C383CA /* back-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1EC16C0380B00C383CA /* back-icon.png */; };
@@ -172,8 +171,6 @@
 		2434A1AC16BD6DBA00C383CA /* back-arrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-arrow@2x.png"; sourceTree = "<group>"; };
 		2434A1C316BEB48900C383CA /* x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = x.png; sourceTree = "<group>"; };
 		2434A1C416BEB48900C383CA /* x@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "x@2x.png"; sourceTree = "<group>"; };
-		2434A1C816BEED7400C383CA /* WZWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZWebView.h; sourceTree = "<group>"; };
-		2434A1C916BEED7400C383CA /* WZWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZWebView.m; sourceTree = "<group>"; };
 		2434A1EA16C0380B00C383CA /* forward-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "forward-icon.png"; sourceTree = "<group>"; };
 		2434A1EB16C0380B00C383CA /* forward-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "forward-icon@2x.png"; sourceTree = "<group>"; };
 		2434A1EC16C0380B00C383CA /* back-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-icon.png"; sourceTree = "<group>"; };
@@ -465,8 +462,6 @@
 		2434A1CB16BEED7A00C383CA /* Web */ = {
 			isa = PBXGroup;
 			children = (
-				2434A1C816BEED7400C383CA /* WZWebView.h */,
-				2434A1C916BEED7400C383CA /* WZWebView.m */,
 				24DD253E16CBE920005ED6EA /* WZWebViewController.h */,
 				24DD253F16CBE920005ED6EA /* WZWebViewController.m */,
 				24DD254816CBF368005ED6EA /* WZWebView.xib */,
@@ -883,7 +878,6 @@
 				2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */,
 				2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */,
 				2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */,
-				2434A1CA16BEED7400C383CA /* WZWebView.m in Sources */,
 				2484384316C11A3F001D2AA0 /* SDSegmentedControl.m in Sources */,
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
