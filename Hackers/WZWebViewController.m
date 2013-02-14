@@ -25,12 +25,13 @@
 
 }
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
-@property (nonatomic, strong) NSURL *defaultURL;
-@property (nonatomic, strong) UINavigationBar *navigationBar;
+@property (weak, nonatomic) IBOutlet UINavigationBar *navigationBar;
 @property (nonatomic, strong) UIBarButtonItem *backBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *mobilizerBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *reloadBarButtonItem;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewTopSpacingConstraint;
+@property (nonatomic, strong) NSURL *defaultURL;
 
 @end
 
@@ -49,74 +50,93 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutWebView];
+    [self layoutNavigationBar];
     [self layoutToolbar];
 }
 
-- (void)layoutWebView {
-    if (!_webView) {
-        //_webView = [[UIWebView alloc] init];
+- (void)layoutNavigationBar {
+    if (_navigationBarHidden) {
+        _webViewTopSpacingConstraint.constant = 0;
+    } else {
+        _webViewTopSpacingConstraint.constant = 44;
     }
+    
+    UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    closeButton.frame = CGRectMake(0, 0, 32, 32);
+    closeButton.accessibilityLabel = @"Close";
+    [closeButton addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
+    
+    UIBarButtonItem *closeBarButton = [[UIBarButtonItem alloc] initWithCustomView:closeButton];
+    
+    UINavigationItem *navigationItem = [[UINavigationItem alloc] initWithTitle:@""];
+    [navigationItem setLeftBarButtonItem:closeBarButton];
+    
+    [_navigationBar pushNavigationItem:navigationItem animated:NO];
+}
+
+- (void)layoutWebView {
     _webView.backgroundColor = [UIColor underPageBackgroundColor];
     _webView.delegate = self;
     _webView.scalesPageToFit = YES;
     _webView.scrollView.scrollsToTop = NO;
     
-    //[self addSubview:_webView];
+    if (_defaultURL) {
+        [self loadURL:_defaultURL];
+    }
 }
 
 - (void)layoutToolbar {
-        //        CGRect webViewFrame = self.frame;
-        //        CGRect webViewNewFrame = CGRectMake(0, 0, webViewFrame.size.width, webViewFrame.size.height - kToolBarHeight);
-        //        _webView.frame = webViewNewFrame;
-        
-        //        CGRect toolbarFrame = CGRectMake(0, webViewFrame.size.height - 44, webViewFrame.size.width, kToolBarHeight);
-        //        _toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
-//        _toolbar.layer.shadowOpacity = 0;
-        
-        UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        backButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-        backButton.accessibilityLabel = @"Back";
-        [backButton setImage:[UIImage imageNamed:@"back-icon"] forState:UIControlStateNormal];
-        [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        
-        UIButton *forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        forwardButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-        forwardButton.accessibilityLabel = @"Forward";
-        [forwardButton setImage:[UIImage imageNamed:@"forward-icon"] forState:UIControlStateNormal];
-        [forwardButton addTarget:self action:@selector(forwardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        
-        UIButton *mobilizerButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        mobilizerButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-        mobilizerButton.accessibilityLabel = @"Mobilizer";
-        [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon"] forState:UIControlStateNormal];
-        [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon-highlighted"] forState:UIControlStateSelected];
-        [mobilizerButton addTarget:self action:@selector(mobilizerButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        
-        UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        reloadButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-        reloadButton.accessibilityLabel = @"Reload";
-        reloadButton.enabled = NO;
-        [reloadButton setImage:[UIImage imageNamed:@"refresh-icon"] forState:UIControlStateNormal];
-        [reloadButton addTarget:self action:@selector(reloadButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        
-        UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        fixedSpace.width = kToolBarFixedWidth;
-        
-        UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        
-        _backBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
-        _forwardBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:forwardButton];
-        _mobilizerBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:mobilizerButton];
-        _reloadBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:reloadButton];
-        
-        _backBarButtonItem.enabled = NO;
-        _forwardBarButtonItem.enabled = NO;
-        _mobilizerBarButtonItem.enabled = YES;
-        _reloadBarButtonItem.enabled = YES;
-        
-        NSArray *toolbarItems = @[_backBarButtonItem, fixedSpace, _forwardBarButtonItem, flexibleSpace, _mobilizerBarButtonItem, fixedSpace, _reloadBarButtonItem];
-        
-        [_toolbar setItems:toolbarItems animated:YES];
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    backButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    backButton.accessibilityLabel = @"Back";
+    [backButton setImage:[UIImage imageNamed:@"back-icon"] forState:UIControlStateNormal];
+    [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    forwardButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    forwardButton.accessibilityLabel = @"Forward";
+    [forwardButton setImage:[UIImage imageNamed:@"forward-icon"] forState:UIControlStateNormal];
+    [forwardButton addTarget:self action:@selector(forwardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *mobilizerButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    mobilizerButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    mobilizerButton.accessibilityLabel = @"Mobilizer";
+    [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon"] forState:UIControlStateNormal];
+    [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon-highlighted"] forState:UIControlStateSelected];
+    [mobilizerButton addTarget:self action:@selector(mobilizerButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    reloadButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    reloadButton.accessibilityLabel = @"Reload";
+    reloadButton.enabled = NO;
+    [reloadButton setImage:[UIImage imageNamed:@"refresh-icon"] forState:UIControlStateNormal];
+    [reloadButton addTarget:self action:@selector(reloadButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    fixedSpace.width = kToolBarFixedWidth;
+    
+    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
+    _backBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
+    _forwardBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:forwardButton];
+    _mobilizerBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:mobilizerButton];
+    _reloadBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:reloadButton];
+    
+    _backBarButtonItem.enabled = NO;
+    _forwardBarButtonItem.enabled = NO;
+    _mobilizerBarButtonItem.enabled = YES;
+    _reloadBarButtonItem.enabled = YES;
+    
+    NSArray *toolbarItems = @[_backBarButtonItem, fixedSpace, _forwardBarButtonItem, flexibleSpace, _mobilizerBarButtonItem, fixedSpace, _reloadBarButtonItem];
+    
+    [_toolbar setItems:toolbarItems animated:YES];
+}
+
+#pragma mark - Navigation Bar Buttons
+
+- (void)close:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Toolbar Buttons
@@ -213,15 +233,5 @@
     [_webView loadRequest:[NSURLRequest requestWithURL:url]];
 }
 
-- (void)layoutNavigationBar {
-    UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    closeButton.frame = CGRectMake(0, 0, 32, 32);
-    closeButton.accessibilityLabel = @"Close";
-    [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
-    
-    UIBarButtonItem *closeBarButton = [[UIBarButtonItem alloc] initWithCustomView:closeButton];
-    
-    [self.navigationItem setLeftBarButtonItem:closeBarButton];
-}
 
 @end

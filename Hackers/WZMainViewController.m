@@ -6,9 +6,7 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <TSMiniWebBrowser.h>
 #import <QuartzCore/QuartzCore.h>
-
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"

@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#import <TSMiniWebBrowser.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
 #import "SDSegmentedControl.h"
@@ -104,7 +103,7 @@
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
-    // setFont: is deprecated however titleLabel.font property doesn't seem 
+    // setFont: is deprecated however titleLabel.font property doesn't seem work
     [segmenteViewAppearance setFont:[UIFont fontWithName:@"HelveticaNeue-Medium" size:14]];
     segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(5, 0, 0, -8);
     
@@ -139,29 +138,44 @@
 
 - (void)setupWebView {
     _webViewController = [[WZWebViewController alloc] init];
-    CGRect frame = CGRectMake(0, 44, 320, 504);
+    _webViewController.navigationBarHidden = YES;
     [_webViewController didMoveToParentViewController:self];
-    _webViewController.view.frame = frame;
     _webView = _webViewController.view;
     _webView.hidden = YES;
     
-//    _webView.translatesAutoresizingMaskIntoConstraints = NO;
+    _webView.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self addChildViewController:_webViewController];
     [self.view addSubview:_webView];
-        
-//    NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[_webView]-|"
-//                                                                                options:0
-//                                                                                metrics:nil
-//                                                                                  views:NSDictionaryOfVariableBindings(_webView)][0];
-//    NSLayoutConstraint *horizontalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"|-[_webView]-|"
-//                                                                                options:0
-//                                                                                metrics:nil
-//                                                                                  views:NSDictionaryOfVariableBindings(_webView)][0];
-//    [self.view addConstraint:verticalConstraint];
-//    [self.view addConstraint:horizontalConstraint];
-//    
-//    [self.view setNeedsUpdateConstraints];
+    
+    NSDictionary *viewDictionary = @{ @"webView": _webView };
+    
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView(>=416)]"
+                                                                                     options:0
+                                                                                     metrics:nil
+                                                                                       views:viewDictionary][0];
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"[webView(>=320)]"
+                                                                                       options:0
+                                                                                       metrics:nil
+                                                                                         views:viewDictionary][0];
+
+    NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[webView]"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:viewDictionary][0];
+    NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView]|"
+                                                                                     options:0
+                                                                                     metrics:nil
+                                                                                       views:viewDictionary][0];
+    NSLayoutConstraint *horizontalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"|[webView]|"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:viewDictionary][0];
+    [self.view addConstraint:heightConstraint];
+    [self.view addConstraint:widthConstraint];
+    [self.view addConstraint:topConstraint];
+    [self.view addConstraint:bottomConstraint];
+    [self.view addConstraint:horizontalConstraint];
 }
 
 
@@ -255,8 +269,7 @@
 #pragma mark - WZCommentURLTappedDelegate
 
 - (void)tappedLink:(NSURL *)url {
-    WZWebViewController *webViewController = [[WZWebViewController alloc] init];
-    [webViewController loadURL:url];
+    WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
     [self presentViewController:webViewController animated:YES completion:nil];
     
 //    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];

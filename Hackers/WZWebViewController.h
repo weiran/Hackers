@@ -11,6 +11,7 @@
 @interface WZWebViewController : UIViewController <UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
+@property (nonatomic) BOOL navigationBarHidden;
 
 - (id)initWithURL:(NSURL *)url;
 - (void)loadURL:(NSURL *)url;

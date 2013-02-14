@@ -8,7 +8,6 @@
 
 #import "WZActivityViewController.h"
 
-#import <NNNetwork/NNNetwork.h>
 #import <TUSafariActivity/TUSafariActivity.h>
 
 @implementation WZActivityViewController
@@ -35,9 +34,8 @@
 }
 
 + (WZActivityViewController *)activityViewControllerWithUrl:(NSURL *)url text:(NSString *)text {
-    NNInstapaperActivity *instapaperActivity = [[NNInstapaperActivity alloc] init];
     TUSafariActivity *safariActivity = [[TUSafariActivity alloc] init];
-    NSArray *activities = @[safariActivity, instapaperActivity];
+    NSArray *activities = @[safariActivity];
     NSArray *activityItems = @[url, text];
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];
