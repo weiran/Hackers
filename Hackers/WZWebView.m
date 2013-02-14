@@ -21,7 +21,8 @@
     NSURL *_mobilizedURL;
     NSURL *_currentURL;
 }
-@property (nonatomic, strong) UIToolbar *toolbar;
+@property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
+//@property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UINavigationBar *navigationBar;
 @property (nonatomic, strong) UIBarButtonItem *backBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardBarButtonItem;
@@ -34,7 +35,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _webView = [[UIWebView alloc] initWithFrame:frame];
+        //_webView = [[UIWebView alloc] initWithFrame:frame];
     }
     return self;
 }
@@ -47,25 +48,25 @@
 
 - (void)layoutWebView {
     if (!_webView) {
-        _webView = [[UIWebView alloc] init];
+        //_webView = [[UIWebView alloc] init];
     }
     _webView.backgroundColor = [UIColor underPageBackgroundColor];
     _webView.delegate = self;
     _webView.scalesPageToFit = YES;
     _webView.scrollView.scrollsToTop = NO;
     
-    [self addSubview:_webView];
+    //[self addSubview:_webView];
 }
 
 - (void)layoutToolbar {
     if (!_toolbar) {
-        CGRect webViewFrame = self.frame;
-        CGRect webViewNewFrame = CGRectMake(0, 0, webViewFrame.size.width, webViewFrame.size.height - kToolBarHeight);
-        _webView.frame = webViewNewFrame;
+//        CGRect webViewFrame = self.frame;
+//        CGRect webViewNewFrame = CGRectMake(0, 0, webViewFrame.size.width, webViewFrame.size.height - kToolBarHeight);
+//        _webView.frame = webViewNewFrame;
         
-        CGRect toolbarFrame = CGRectMake(0, webViewFrame.size.height - 44, webViewFrame.size.width, kToolBarHeight);
-        _toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
-        _toolbar.layer.shadowOpacity = 0;        
+//        CGRect toolbarFrame = CGRectMake(0, webViewFrame.size.height - 44, webViewFrame.size.width, kToolBarHeight);
+//        _toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
+        _toolbar.layer.shadowOpacity = 0;
         
         UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
         backButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);

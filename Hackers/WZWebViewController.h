@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WZWebViewController : UIViewController
+@interface WZWebViewController : UIViewController <UIWebViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
 
 - (id)initWithURL:(NSURL *)url;
 - (void)loadURL:(NSURL *)url;

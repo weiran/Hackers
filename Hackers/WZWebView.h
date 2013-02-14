@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface WZWebView : UIView <UIWebViewDelegate>
-@property (nonatomic, strong) UIWebView *webView;
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+
 @end

@@ -386,6 +386,7 @@
                         <constraints>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="1Mg-9O-pCT"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="2OT-1f-WKG"/>
+                            <constraint firstItem="Zko-nc-fi0" firstAttribute="centerX" secondItem="CFE-xm-LcO" secondAttribute="centerX" type="default" id="5gC-wp-f6Q"/>
                             <constraint firstItem="d4J-Ft-d7f" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="default" id="5qQ-Be-aKe"/>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="9rL-bs-n8b"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="leading" secondItem="MGV-48-7mG" secondAttribute="leading" type="default" id="C4B-Vp-IXd"/>
@@ -400,7 +401,6 @@
                             <constraint firstItem="Okv-mq-4RQ" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="eJ7-mo-ol0"/>
                             <constraint firstItem="CFE-xm-LcO" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="flS-4b-f7E"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="trailing" secondItem="MGV-48-7mG" secondAttribute="trailing" type="default" id="hDb-Gg-kec"/>
-                            <constraint firstItem="Vex-b4-wZn" firstAttribute="centerX" secondItem="Zko-nc-fi0" secondAttribute="centerX" type="default" id="iFZ-cK-R12"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="mt1-L4-rWs"/>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="wC8-LO-Lmj"/>
                         </constraints>
@@ -418,7 +418,6 @@
                         <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
                         <outlet property="segmentedControl" destination="Zko-nc-fi0" id="FxY-5h-deS"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
-                        <outlet property="webView" destination="CFE-xm-LcO" id="OUN-an-c9P"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v7d-Ub-TwX" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -430,6 +429,82 @@
         <image name="back-arrow.png" width="19" height="16"/>
         <image name="share-icon.png" width="23" height="18"/>
     </resources>
+    <classes>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="SDSegmentedControl" superclassName="UISegmentedControl">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SDSegmentedControl.h"/>
+        </class>
+        <class className="WZCommentCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
+            <relationships>
+                <relationship kind="action" name="showReplies:"/>
+                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WZCommentsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="backButtonTapped:"/>
+                <relationship kind="action" name="showActivityView:"/>
+                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="segmentedControl" candidateClass="SDSegmentedControl"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIView"/>
+            </relationships>
+        </class>
+        <class className="WZMainViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+            </relationships>
+        </class>
+        <class className="WZNavigationBar" superclassName="UINavigationBar">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
+        </class>
+        <class className="WZNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
+            <relationships>
+                <relationship kind="action" name="navigationBarTapped:"/>
+            </relationships>
+        </class>
+        <class className="WZPostCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WZWebView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZWebView.h"/>
+            <relationships>
+                <relationship kind="outlet" name="toolbar" candidateClass="UIToolbar"/>
+                <relationship kind="outlet" name="webView" candidateClass="UIWebView"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

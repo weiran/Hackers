@@ -31,11 +31,13 @@
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)showActivityView:(id)sender;
 
+@property (weak, nonatomic) UIView *webView;
+@property (strong, nonatomic) WZWebViewController *webViewController;
+
 @property (weak, nonatomic) IBOutlet UIView *activityIndicatorView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *activityIndicatorViewTopSpacing;
 @property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet WZWebView *webView;
 @property (weak, nonatomic) IBOutlet UIView *headerView;
 @property (weak, nonatomic) IBOutlet UILabel *headerTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *headerDomainLabel;
@@ -50,6 +52,7 @@
     [self setupActivityIndicatorView];
     [self setupTableView];
     [self setupSegmentedController];
+    [self setupWebView];
     [self fetchComments];
 }
 
@@ -134,6 +137,34 @@
     [self layoutTableViewBackgrounds];
 }
 
+- (void)setupWebView {
+    _webViewController = [[WZWebViewController alloc] init];
+    CGRect frame = CGRectMake(0, 44, 320, 504);
+    [_webViewController didMoveToParentViewController:self];
+    _webViewController.view.frame = frame;
+    _webView = _webViewController.view;
+    _webView.hidden = YES;
+    
+//    _webView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self addChildViewController:_webViewController];
+    [self.view addSubview:_webView];
+        
+//    NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[_webView]-|"
+//                                                                                options:0
+//                                                                                metrics:nil
+//                                                                                  views:NSDictionaryOfVariableBindings(_webView)][0];
+//    NSLayoutConstraint *horizontalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"|-[_webView]-|"
+//                                                                                options:0
+//                                                                                metrics:nil
+//                                                                                  views:NSDictionaryOfVariableBindings(_webView)][0];
+//    [self.view addConstraint:verticalConstraint];
+//    [self.view addConstraint:horizontalConstraint];
+//    
+//    [self.view setNeedsUpdateConstraints];
+}
+
+
 - (void)layoutTableViewHeader {
     _headerDomainLabel.text = _post.domain;
     _headerMetadata1Label.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)_post.points, _post.user];
@@ -167,19 +198,19 @@
         case 0: {
             _tableView.hidden = NO;
             _webView.hidden = YES;
-            _webView.webView.scrollView.scrollsToTop = NO;
+            _webViewController.webView.scrollView.scrollsToTop = NO;
             _tableView.scrollsToTop = YES;
         }
         break;
         case 1: {
             _tableView.hidden = YES;
             _webView.hidden = NO;
-            _webView.webView.scrollView.scrollsToTop = YES;
+            _webViewController.webView.scrollView.scrollsToTop = YES;
             _tableView.scrollsToTop = NO;
             _activityIndicatorView.hidden = YES;
             
-            if (!_webView.webView.request) {
-                [_webView.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_post.url]]];
+            if (!_webViewController.webView.request) {
+                [_webViewController loadURL:[NSURL URLWithString:_post.url]];
             }
         }
         break;
@@ -224,8 +255,9 @@
 #pragma mark - WZCommentURLTappedDelegate
 
 - (void)tappedLink:(NSURL *)url {
-    WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
-    [self presentViewController:webViewController animated:NO completion:nil];
+    WZWebViewController *webViewController = [[WZWebViewController alloc] init];
+    [webViewController loadURL:url];
+    [self presentViewController:webViewController animated:YES completion:nil];
     
 //    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
 //    webBrowserViewController.mode = TSMiniWebBrowserModeModal;
