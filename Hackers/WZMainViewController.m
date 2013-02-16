@@ -262,7 +262,6 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
         WZCommentsViewController *commentsViewController = segue.destinationViewController;
-        
         WZPostModel *post = _news[[self.tableView indexPathForCell:sender].row];
         commentsViewController.post = post;
     }

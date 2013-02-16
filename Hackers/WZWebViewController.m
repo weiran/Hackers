@@ -13,7 +13,7 @@
 #define kNavigationBarHeight 44
 #define kToolBarHeight 44
 #define kToolBarFixedWidth 20
-#define kBarButtonIconWidth 28
+#define kBarButtonIconWidth 33
 #define kBarButtonIconHeight 33
 #define kMobilizerURL @"http://www.instapaper.com/m?u="
 

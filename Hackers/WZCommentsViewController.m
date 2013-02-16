@@ -29,6 +29,7 @@
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)showActivityView:(id)sender;
 
+@property (weak, nonatomic) IBOutlet UIView *navigationView;
 @property (weak, nonatomic) UIView *webView;
 @property (strong, nonatomic) WZWebViewController *webViewController;
 
@@ -47,6 +48,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self setupNavigationView];
     [self setupActivityIndicatorView];
     [self setupTableView];
     [self setupSegmentedController];
@@ -93,6 +96,20 @@
 
 #pragma mark - Setup Views
 
+- (void)setupNavigationView {
+    _navigationView.layer.masksToBounds = NO;
+    _navigationView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+    _navigationView.layer.shadowColor = [UIColor blackColor].CGColor;
+    _navigationView.layer.shadowOpacity = 0.3f;
+    _navigationView.layer.shadowRadius = 2;
+    _navigationView.clipsToBounds = NO;
+    
+    // not set a shadowPath here as the navigation view is never animated or changed,
+    // if it needs to be animated, the set the path
+    //    CGRect shadowPath = CGRectMake(0, 43, 320, 1);
+    //    _navigationView.layer.shadowPath = [UIBezierPath bezierPathWithRect:shadowPath].CGPath;
+}
+
 - (void)setupActivityIndicatorView {
     [self.view bringSubviewToFront:_activityIndicatorView];
 }
@@ -114,7 +131,7 @@
     stainViewAppearance.innerStrokeColor = [UIColor clearColor];
     stainViewAppearance.innerStrokeLineWidth = 0;
     
-    _segmentedControl.backgroundColor = [UIColor colorWithWhite:0.67 alpha:1];
+    _segmentedControl.backgroundColor = [UIColor clearColor];
     _segmentedControl.borderColor = [UIColor clearColor];
     _segmentedControl.arrowHeightFactor = 0;
     
@@ -145,7 +162,7 @@
     _webView.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self addChildViewController:_webViewController];
-    [self.view addSubview:_webView];
+    [self.view insertSubview:_webView belowSubview:_navigationView];
     
     NSDictionary *viewDictionary = @{ @"webView": _webView };
     
@@ -269,6 +286,7 @@
 
 - (void)tappedLink:(NSURL *)url {
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
+    webViewController.view.layer.speed = 2.0;
     [self presentViewController:webViewController animated:YES completion:nil];
     
 //    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
@@ -351,7 +369,8 @@
 }
 
 - (IBAction)backButtonTapped:(id)sender {
-    _isNavigatingBack = YES;
+    _isNavigatingBack = YES; 
     [self.navigationController popViewControllerAnimated:YES];
 }
+
 @end
