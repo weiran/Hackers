@@ -13,7 +13,7 @@
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[UINavigationBar appearance] setTintColor:[UIColor darkGrayColor]];
+    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UIToolbar appearance] setTintColor:[UIColor darkGrayColor]];
     [[UINavigationBar appearance] setTitleTextAttributes:@{
                                     UITextAttributeFont : [UIFont fontWithName:@"HelveticaNeue-Light" size:20],
@@ -22,7 +22,7 @@
                                     }];
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forBarMetrics:UIBarMetricsDefault];
     [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
+//    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
     return YES;
 }
 

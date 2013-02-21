@@ -1,20 +1,20 @@
 
+SPEC CHECKSUMS: 
+  GCOLaunchImageTransition: 6d4d895fc3cb187f142f4f582439bde61cf1b9aa
+  AFNetworking: 0bce3ae41023e080e96b8a2e0d07c94709f72a81
+  OHAttributedLabel: ed2e659c01af4c6cdc23909f04ffcdd417d37ae4
+  MBProgressHUD: b23ee11c42253d6d804e8e0bfabdc334e8b2571f
+
 PODS: 
 - AFNetworking (1.0.1)
 - GCOLaunchImageTransition (0.9.0)
 - MBProgressHUD (0.5)
 - OHAttributedLabel (3.3.0)
 
+COCOAPODS: 0.16.3
+
 DEPENDENCIES: 
 - AFNetworking
 - GCOLaunchImageTransition
 - MBProgressHUD
 - OHAttributedLabel
-
-COCOAPODS: 0.16.1
-
-SPEC CHECKSUMS: 
-  OHAttributedLabel: ed2e659c01af4c6cdc23909f04ffcdd417d37ae4
-  MBProgressHUD: b23ee11c42253d6d804e8e0bfabdc334e8b2571f
-  AFNetworking: 0bce3ae41023e080e96b8a2e0d07c94709f72a81
-  GCOLaunchImageTransition: 6d4d895fc3cb187f142f4f582439bde61cf1b9aa

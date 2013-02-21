@@ -146,7 +146,25 @@
                             <outlet property="delegate" destination="AoS-mg-Efs" id="tpv-Ay-So6"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Hacker News" id="eDU-Dq-Unc"/>
+                    <navigationItem key="navigationItem" title="Hacker News" id="eDU-Dq-Unc">
+                        <barButtonItem key="leftBarButtonItem" style="plain" id="9v8-sS-ztz">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Li1-it-FNQ">
+                                <rect key="frame" x="5" y="0.0" width="44" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Menu" image="menu-icon.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="menuButtonPressed:" destination="AoS-mg-Efs" eventType="touchUpInside" id="geH-ig-MPS"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="kSF-af-Q0P" id="TWb-3l-I0y"/>
                     </connections>
@@ -386,7 +404,7 @@
                                     <constraint firstItem="d4J-Ft-d7f" firstAttribute="bottom" secondItem="aC6-LQ-nV5" secondAttribute="bottom" type="default" id="7cV-Gg-Vc8"/>
                                     <constraint firstItem="Okv-mq-4RQ" firstAttribute="trailing" secondItem="aC6-LQ-nV5" secondAttribute="trailing" type="user" id="A7B-KP-txY"/>
                                     <constraint firstItem="d4J-Ft-d7f" firstAttribute="top" secondItem="aC6-LQ-nV5" secondAttribute="top" type="default" id="Ekb-SU-DVJ"/>
-                                    <constraint firstItem="Zko-nc-fi0" firstAttribute="top" secondItem="aC6-LQ-nV5" secondAttribute="top" type="default" id="TrC-h2-uRL"/>
+                                    <constraint firstItem="Zko-nc-fi0" firstAttribute="top" secondItem="aC6-LQ-nV5" secondAttribute="top" constant="-1" id="SK9-sc-WBs"/>
                                     <constraint firstItem="d4J-Ft-d7f" firstAttribute="leading" secondItem="aC6-LQ-nV5" secondAttribute="leading" type="user" id="bXE-So-BJV"/>
                                     <constraint firstItem="Zko-nc-fi0" firstAttribute="centerX" secondItem="aC6-LQ-nV5" secondAttribute="centerX" type="user" id="gUK-b3-ln4"/>
                                     <constraint firstItem="Okv-mq-4RQ" firstAttribute="top" secondItem="aC6-LQ-nV5" secondAttribute="top" type="default" id="kA2-oy-z5R"/>
@@ -432,6 +450,7 @@
     </scenes>
     <resources>
         <image name="back-arrow.png" width="19" height="16"/>
+        <image name="menu-icon.png" width="23" height="18"/>
         <image name="share-icon.png" width="23" height="18"/>
     </resources>
     <classes>
@@ -480,6 +499,7 @@
         <class className="WZMainViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
             <relationships>
+                <relationship kind="action" name="menuButtonPressed:"/>
                 <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
             </relationships>
         </class>

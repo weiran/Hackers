@@ -100,7 +100,7 @@
     _navigationView.layer.masksToBounds = NO;
     _navigationView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
     _navigationView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _navigationView.layer.shadowOpacity = 0.3f;
+    _navigationView.layer.shadowOpacity = 0.4f;
     _navigationView.layer.shadowRadius = 2;
     _navigationView.clipsToBounds = NO;
     
@@ -288,13 +288,6 @@
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
     webViewController.view.layer.speed = 2.0;
     [self presentViewController:webViewController animated:YES completion:nil];
-    
-//    TSMiniWebBrowser *webBrowserViewController = [[TSMiniWebBrowser alloc] initWithUrl:url];
-//    webBrowserViewController.mode = TSMiniWebBrowserModeModal;
-//    webBrowserViewController.modalDismissButtonTitle = @"Close";
-//    webBrowserViewController.barTintColor = [UIColor colorWithWhite:0.95 alpha:1];
-//    webBrowserViewController.view.backgroundColor = [UIColor underPageBackgroundColor];
-//    [self presentViewController:webBrowserViewController animated:YES completion:nil];
 }
 
 #pragma mark - WZCommentShowRepliesDelegate

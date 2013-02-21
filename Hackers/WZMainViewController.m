@@ -7,6 +7,7 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+#import "REMenu.h"
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -24,13 +25,16 @@
 @interface WZMainViewController () {
     NSFetchedResultsController *_fetchedResultsController;
     NSArray *_news;
+    NSArray *_newNews;
     NSMutableArray *_readNews;
     UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
     BOOL _navBarInScrolledState;
     BOOL _navBarInDefaultState;
     NSIndexPath *_selectedIndexPath;
+    REMenu *_menu;
 }
+- (IBAction)menuButtonPressed:(id)sender;
 @end
 
 @implementation WZMainViewController
@@ -39,8 +43,10 @@
     [super viewDidLoad];
 
     _readNews = [NSMutableArray array];
+    _newsType = WZNewsTypeTop;
     
     [self setupPullToRefresh];
+    [self setupMenu];
     [self loadData];
     
     self.clearsSelectionOnViewWillAppear = NO;
@@ -100,12 +106,54 @@
     [self.tableView insertSubview:backgroundView atIndex:0];
 }
 
+- (void)setupMenu {
+    REMenuItem *topNewsItem = [[REMenuItem alloc] initWithTitle:@"Top News"
+                                                          image:nil
+                                               highlightedImage:nil
+                                                         action:^(REMenuItem *item) {
+                                                             [self menuButtonTopPressed:item];
+                                                         }];
+    REMenuItem *newNewsItem = [[REMenuItem alloc] initWithTitle:@"New News"
+                                                          image:nil
+                                               highlightedImage:nil
+                                                         action:^(REMenuItem *item) {
+                                                             [self menuButtonNewPressed:item];
+                                                         }];
+    _menu = [[REMenu alloc] initWithItems:@[topNewsItem, newNewsItem]];
+    _menu.backgroundColor = [UIColor colorWithWhite:0.94 alpha:1];
+    _menu.cornerRadius = 0;
+    _menu.shadowColor = [UIColor blackColor];
+    _menu.shadowOffset = CGSizeMake(0, 0);
+    _menu.shadowOpacity = 0.4;
+    _menu.shadowRadius = 2;
+    _menu.separatorColor = [UIColor colorWithWhite:0.87 alpha:1];
+    _menu.highlightedSeparatorColor = [UIColor colorWithWhite:0.87 alpha:1];
+    _menu.separatorHeight = 1;
+    _menu.font = [UIFont fontWithName:kTitleFontName size:kTitleFontSize];
+    _menu.textColor = [UIColor blackColor];
+    _menu.highlighedTextColor = [UIColor blackColor];
+    _menu.textShadowColor = [UIColor clearColor];
+    _menu.highlighedTextShadowColor = [UIColor clearColor];
+    _menu.borderWidth = 0;
+    _menu.highligtedBackgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+}
+
 - (WZNewsType)newsType {
     if (!_newsType) {
         _newsType = WZNewsTypeTop;
     }
     
     return _newsType;
+}
+
+- (NSArray *)activeNews {
+    if (_newsType == WZNewsTypeTop) {
+        return _news;
+    } else if (_newsType == WZNewsTypeNew) {
+        return _newNews;
+    } else {
+        return nil;
+    }
 }
 
 #pragma mark - Data access
@@ -138,7 +186,11 @@
         [postArray addObject:postModel];
     }
     
-    _news = [NSArray arrayWithArray:postArray];
+    if (_newsType == WZNewsTypeTop) {
+        _news = [NSArray arrayWithArray:postArray];
+    } else if (_newsType == WZNewsTypeNew) {
+        _newNews = [NSArray arrayWithArray:postArray];
+    }
     
     if (error) {
         NSLog(@"News fetch failed: %@", error.localizedDescription);
@@ -199,16 +251,17 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (!_news) {
+    if (![self activeNews]) {
         return 0;
     } else {
-        return _news.count;
+        return [self activeNews].count;
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString* const cellIdentifier = @"PostCell";
-    WZPostModel *post = _news[indexPath.row];
+    
+    WZPostModel *post = [self activeNews][indexPath.row];
     WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.domainLabel.text = post.domain;
     cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
@@ -235,7 +288,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    WZPostModel *post = _news[indexPath.row];
+    WZPostModel *post = [self activeNews][indexPath.row];
     [_readNews addObject:[NSNumber numberWithInteger:post.id]];
     [WZHackersData.shared addRead:[NSNumber numberWithInteger:post.id]];
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
@@ -244,7 +297,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    WZPostModel *post = _news[indexPath.row];
+    WZPostModel *post = [self activeNews][indexPath.row];
     
     if (!post.cellHeight) {
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
@@ -262,8 +315,37 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
         WZCommentsViewController *commentsViewController = segue.destinationViewController;
-        WZPostModel *post = _news[[self.tableView indexPathForCell:sender].row];
+        WZPostModel *post = [self activeNews][[self.tableView indexPathForCell:sender].row];
         commentsViewController.post = post;
     }
 }
+
+#pragma - mark Menu
+
+- (IBAction)menuButtonPressed:(id)sender {
+    if ([_menu isOpen]) {
+        [_menu close];
+    } else {
+        [_menu showFromNavigationController:self.navigationController];
+    }
+}
+
+- (void)menuButtonTopPressed:(id)sender {
+    self.newsType = WZNewsTypeTop;
+    [self.tableView reloadData];
+    
+    if (![self activeNews].count > 0) {
+        [self sendFetchRequest:_refreshControl];
+    }
+}
+
+- (void)menuButtonNewPressed:(id)sender {
+    self.newsType = WZNewsTypeNew;
+    [self.tableView reloadData];
+    
+    if (![self activeNews].count > 0) {
+        [self sendFetchRequest:_refreshControl];
+    }
+}
+
 @end
