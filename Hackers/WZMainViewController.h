@@ -13,5 +13,5 @@
 
 @property (nonatomic) WZNewsType newsType;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
-- (void)updateNavigationBarBackground;
+
 @end

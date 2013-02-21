@@ -348,14 +348,6 @@
 
 #pragma mark - Action methods
 
-- (void)updateNavigationBarBackground {
-    UINavigationController *navigationController = (UINavigationController *)self.parentViewController;
-    if ([navigationController.viewControllers[0] isKindOfClass:[WZMainViewController class]]) {
-        WZMainViewController *mainViewController = (WZMainViewController *)self.navigationController.viewControllers[0];
-        [mainViewController updateNavigationBarBackground];
-    }
-}
-
 - (IBAction)showActivityView:(id)sender {
     WZActivityViewController *activityViewController = [WZActivityViewController activityViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
     [self presentViewController:activityViewController animated:YES completion:nil];

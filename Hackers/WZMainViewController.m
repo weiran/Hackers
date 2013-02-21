@@ -197,28 +197,6 @@
     }
 }
 
-- (void)updateNavigationBarBackground {
-    _navBarInDefaultState = NO;
-    [self scrollViewDidScroll:self.tableView];
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    CGPoint offset = scrollView.contentOffset;
-    
-    if (offset.y > 0 && !_navBarInScrolledState) {
-        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg-highlighted.png"]
-                                                      forBarMetrics:UIBarMetricsDefault];
-        _navBarInScrolledState = YES;
-        _navBarInDefaultState = NO;
-
-    } else if (offset.y <= 0 && !_navBarInDefaultState) {
-        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"]
-                                                      forBarMetrics:UIBarMetricsDefault];
-        _navBarInScrolledState = NO;
-        _navBarInDefaultState = YES;
-    }
-}
-
 - (void)loadRead {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:WZRead.entityName];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"id" ascending:NO];
