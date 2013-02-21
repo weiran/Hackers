@@ -196,7 +196,11 @@
 
 
 - (void)layoutTableViewHeader {
-    _headerDomainLabel.text = _post.domain;
+    if ([_post.type isEqualToString:@"ask"]) {
+        _headerDomainLabel.text = @"Ask Hacker News";
+    } else {
+        _headerDomainLabel.text = _post.domain;
+    }
     _headerMetadata1Label.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)_post.points, _post.user];
     _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
     _headerTitleLabel.text = _post.title;

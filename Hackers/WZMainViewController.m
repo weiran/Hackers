@@ -241,11 +241,15 @@
     
     WZPostModel *post = [self activeNews][indexPath.row];
     WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    cell.domainLabel.text = post.domain;
     cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
     cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
     cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
     cell.titleLabel.text = post.title;
+    if ([post.type isEqualToString:@"ask"]) {
+        cell.domainLabel.text = @"Ask Hacker News";
+    } else {
+        cell.domainLabel.text = post.domain;
+    }
     
     NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"self == %lu", post.id];
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
