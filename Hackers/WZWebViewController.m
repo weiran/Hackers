@@ -23,6 +23,7 @@
 }
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (weak, nonatomic) IBOutlet UINavigationBar *navigationBar;
+@property (strong, nonatomic) UIActivityIndicatorView *activityIndicatorView;
 @property (nonatomic, strong) UIBarButtonItem *backBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *forwardBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *mobilizerBarButtonItem;
@@ -70,10 +71,17 @@
     [closeButton addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
     
+    _activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicatorView.hidden = YES;
+    _activityIndicatorView.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    [_activityIndicatorView startAnimating];
+    
     UIBarButtonItem *closeBarButton = [[UIBarButtonItem alloc] initWithCustomView:closeButton];
+    UIBarButtonItem *activityIndicatorButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicatorView];
     
     UINavigationItem *navigationItem = [[UINavigationItem alloc] initWithTitle:@""];
     [navigationItem setLeftBarButtonItem:closeBarButton];
+    [navigationItem setRightBarButtonItem:activityIndicatorButton];
     
     [_navigationBar pushNavigationItem:navigationItem animated:NO];
 }
@@ -197,6 +205,7 @@
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [self updateButtonsEnabled];
     _currentURL = webView.request.URL;
+    _activityIndicatorView.hidden = NO;
     self.navigationBar.topItem.title = webView.request.URL.absoluteString;
 }
 
@@ -205,6 +214,7 @@
     [MBProgressHUD hideHUDForView:self.webView animated:YES];
     [self updateButtonsEnabled];
     _currentURL = webView.request.URL;
+    _activityIndicatorView.hidden = YES;
     self.navigationBar.topItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
@@ -212,7 +222,7 @@
     if (error.code == NSURLErrorCancelled) {
         return;
     }
-    
+    _activityIndicatorView.hidden = YES;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [MBProgressHUD hideHUDForView:self.webView animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading page"
