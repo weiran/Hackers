@@ -14,13 +14,17 @@
 #import "WZMainViewController.h"
 #import "WZActivityViewController.h"
 #import "WZHackersDataAPI.h"
+#import "WZHackersData.h"
 #import "WZCommentCell.h"
 #import "WZCommentModel.h"
 #import "WZPostModel.h"
 #import "WZWebViewController.h"
 
-#define kHeaderTitleTopMargin 9
+#define kHeaderTitleTopMargin 10
 #define kHeaderTitleBottomMargin 44
+#define kHeaderTextBottomMargin 10
+#define kHeaderTextWidth 300
+#define kNavigationBarHeight 44
 
 @interface WZCommentsViewController () <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested> {
     BOOL _isNavigatingBack;
@@ -38,10 +42,15 @@
 @property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *headerView;
+@property (weak, nonatomic) IBOutlet UIView *headerDetailsContainerView;
 @property (weak, nonatomic) IBOutlet UILabel *headerTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *headerDomainLabel;
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata1Label;
 @property (weak, nonatomic) IBOutlet UILabel *headerMetadata2Label;
+@property (weak, nonatomic) IBOutlet OHAttributedLabel *headerTextView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerDetailViewBottomSpacing;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewBottomSpacing;
 @end
 
 @implementation WZCommentsViewController
@@ -74,8 +83,20 @@
 - (void)fetchComments {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    [WZHackersDataAPI.shared fetchCommentsForPost:_post.id completion:^(NSDictionary *comments, NSError *error) {
+    [WZHackersDataAPI.shared fetchCommentsForPost:_post.id completion:^(NSDictionary *items, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        // update post model if content exists
+        id content = items[@"content"];
+        if (content != [NSNull null]) {
+            [[WZHackersData shared] updatePost:_post.id withContent:content];
+            _post.content = content;
+            [self layoutTableViewHeader];
+        }
+        
+        // fetch comments into array
+        NSDictionary *comments = items[@"comments"];
+        
         NSMutableArray *newComments = [NSMutableArray array];
         for (NSDictionary *commentDictionary in comments) {
             WZCommentModel *comment = [[WZCommentModel alloc] init];
@@ -205,23 +226,49 @@
     _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
     _headerTitleLabel.text = _post.title;
     
+    // calculate heights
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
                                     constrainedToSize:CGSizeMake(300, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
-    CGFloat height = titleLabelSize.height;
+    CGFloat titleHeight = titleLabelSize.height;
+    
+    CGFloat contentHeight = 0; // total height
+    // set header details container frame to match contents height
+    CGRect headerDetailsContainerViewFrame = _headerDetailsContainerView.frame;
+    contentHeight = kHeaderTitleTopMargin + titleHeight + kHeaderTitleBottomMargin; // add details
+    headerDetailsContainerViewFrame.size.height = contentHeight;
+    
+    CGFloat headerTextViewHeight = 0;
+    
+    // set the post content (AskHN)
+    CGFloat headerTextViewBottomSpacingConstant = 0;
+    if (_post.content) {
+        headerTextViewBottomSpacingConstant = kHeaderTextBottomMargin;
+        _headerTextView.hidden = NO;
+        _headerTextView.attributedText = _post.attributedContent;
+        headerTextViewHeight = [_post contentHeightForWidth:kHeaderTextWidth] + kHeaderTextBottomMargin;
+        contentHeight += headerTextViewHeight;
+    }
+    
+    // set header view frame to match
     CGRect headerViewFrame = _headerView.frame;
-    headerViewFrame.size.height = kHeaderTitleTopMargin + height + kHeaderTitleBottomMargin;
+    headerViewFrame.size.height = contentHeight;
     _headerView.frame = headerViewFrame;
+    
+    // set heights to views
+    _headerDetailsContainerView.frame = headerDetailsContainerViewFrame;
+    _headerTextViewTopConstraint.constant = headerDetailsContainerViewFrame.size.height;
+    _headerTextViewBottomSpacing.constant = headerTextViewBottomSpacingConstant;
+    _headerDetailViewBottomSpacing.constant = headerTextViewHeight;
+    _activityIndicatorViewTopSpacing.constant = kNavigationBarHeight + headerDetailsContainerViewFrame.size.height;
     
     // err, fixes some kinda bug
     _tableView.tableHeaderView = _tableView.tableHeaderView;
-    
-    _activityIndicatorViewTopSpacing.constant = 44 + (kHeaderTitleTopMargin + height + kHeaderTitleBottomMargin);
 }
 
 - (void)layoutTableViewBackgrounds {
     UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
-    topView.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+    topView.backgroundColor = [UIColor whiteColor];
     [_tableView addSubview:topView];
 }
 
@@ -322,7 +369,7 @@
         int currentRow = indexPath.row + 1;
         NSMutableArray *commentsToRemove = [NSMutableArray array];
         
-        for (int i = currentRow; i < _comments.count; i++) {
+        for (NSUInteger i = currentRow; i < _comments.count; i++) {
             WZCommentModel *currentComment = _comments[i];
             if (currentComment.level.integerValue > comment.level.integerValue) {
                 [commentsToRemove addObject:currentComment];

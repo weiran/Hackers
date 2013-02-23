@@ -9,6 +9,9 @@
 #import "WZPostModel.h"
 #import "WZPost.h"
 
+#import "OHAttributedLabel.h"
+#import "NSString+AttributedStringForHTML.h"
+
 @implementation WZPostModel
 
 - (id)initWithPost:(WZPost *)post
@@ -28,8 +31,28 @@
         _user = post.user;
         _cellHeight = post.cellHeight;
         _labelHeight = post.labelHeight;
+        _content = post.content;
     }
     return self;
+}
+
+- (void)setContent:(NSString *)content {
+    _content = content;
+    _attributedContent = [content attributedStringFromHTML];
+}
+
+- (CGFloat)contentHeightForWidth:(CGFloat)width {
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_attributedContent));
+    CGSize sz = CGSizeMake(0.f, 0.f);
+    CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
+    
+    if (framesetter) {
+        CFRange fitCFRange = CFRangeMake(0, 0);
+        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, maxSize, &fitCFRange);
+        CFRelease(framesetter);
+    }
+    
+    return sz.height;
 }
 
 @end

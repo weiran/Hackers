@@ -5,6 +5,7 @@
 
 const struct WZPostAttributes WZPostAttributes = {
 	.commentsCount = @"commentsCount",
+	.content = @"content",
 	.domain = @"domain",
 	.id = @"id",
 	.points = @"points",
@@ -98,6 +99,13 @@ const struct WZPostFetchedProperties WZPostFetchedProperties = {
 - (void)setPrimitiveCommentsCountValue:(int32_t)value_ {
 	[self setPrimitiveCommentsCount:[NSNumber numberWithInt:value_]];
 }
+
+
+
+
+
+@dynamic content;
+
 
 
 

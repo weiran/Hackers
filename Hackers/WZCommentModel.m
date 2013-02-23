@@ -10,11 +10,7 @@
 
 #import "WZCommentModel.h"
 #import "NSDictionary+ObjectForKeyOrNil.h"
-
-#import "DTHTMLAttributedStringBuilder.h"
-#import "DTCoreTextConstants.h"
-
-#import <OHAttributedLabel/OHASBasicHTMLParser.h>
+#import "NSString+AttributedStringForHTML.h"
 
 #define kCellWidth 320
 #define kBodyLabelMarginTop 29
@@ -47,25 +43,7 @@
 }
 
 - (NSAttributedString *)attributedStringForHTML:(NSString *)html {
-    // first parse any unnecessary html paragraphs out
-    if ([html hasSuffix:@"<p>"]) {
-        html = [html substringToIndex:html.length - 3];
-    }
-    
-    DTHTMLAttributedStringBuilder *builder = [[DTHTMLAttributedStringBuilder alloc]
-                                              initWithHTML:[html dataUsingEncoding:NSUTF8StringEncoding]
-                                              options:nil
-                                              documentAttributes:nil];
-    NSMutableAttributedString *attributedString = [[builder generatedAttributedString] mutableCopy];
-    
-    OHParagraphStyle *paragraphStyle = [OHParagraphStyle defaultParagraphStyle];
-    paragraphStyle.lineBreakMode = kCTLineBreakByWordWrapping;
-    paragraphStyle.lineSpacing = 3.f;
-    paragraphStyle.paragraphSpacing = 12.f;
-    attributedString.paragraphStyle = paragraphStyle;
-    [attributedString setFont:[UIFont fontWithName:kBodyFontName size:kBodyFontSize]];
-    
-    return attributedString;
+    return [html attributedStringFromHTML];
 }
 
 - (NSNumber *)heightForComment:(WZCommentModel *)comment {    

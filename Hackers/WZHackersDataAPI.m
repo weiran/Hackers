@@ -15,6 +15,7 @@
 static NSString* const baseURL = @"http://node-hnapi.herokuapp.com";
 static NSString* const topNewsPath = @"news";
 static NSString* const newNewsPath = @"newest";
+static NSString* const askNewsPath = @"ask";
 static NSString* const commentsPath = @"item";
 
 @implementation WZHackersDataAPI
@@ -30,7 +31,21 @@ static NSString* const commentsPath = @"item";
 - (void)fetchNewsOfType:(WZNewsType)type
                 success:(void (^)(NSArray *posts))success
                 failure:(void (^)(NSError *error))failure {
-    NSString *path = type == WZNewsTypeTop ? topNewsPath : newNewsPath;
+    NSString *path = nil;
+    
+    switch (type) {
+        case WZNewsTypeTop:
+            path = topNewsPath;
+            break;
+            
+        case WZNewsTypeNew:
+            path = newNewsPath;
+            break;
+            
+        case WZNewsTypeAsk:
+            path = askNewsPath;
+            break;
+    }
     
     NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:path];
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
@@ -48,8 +63,8 @@ static NSString* const commentsPath = @"item";
     [op start];
 }
 
-- (void)fetchCommentsForPost:(NSUInteger)postID
-                  completion:(void (^)(NSDictionary *comments, NSError *error))completion {
+- (void)fetchCommentsForPost:(NSInteger)postID
+                  completion:(void (^)(NSDictionary *items, NSError *error))completion {
     NSURL *requestURL = [[[NSURL URLWithString:baseURL]
                             URLByAppendingPathComponent:commentsPath]
                             URLByAppendingPathComponent:[NSString stringWithFormat:@"%d", postID] isDirectory:NO];
@@ -58,7 +73,7 @@ static NSString* const commentsPath = @"item";
     AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
             if (completion) {
-                completion(JSON[@"comments"], nil);
+                completion(JSON, nil);
             }
         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
             if (completion) {

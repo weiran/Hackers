@@ -26,6 +26,7 @@
     NSFetchedResultsController *_fetchedResultsController;
     NSArray *_news;
     NSArray *_newNews;
+    NSArray *_askNews;
     NSMutableArray *_readNews;
     UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
@@ -59,13 +60,9 @@
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
 }
 
-- (void)navigationBarTapped:(id)sender {
-    NSLog(@"Nav bar tapped");
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ![[touch.view class] isSubclassOfClass:[UIControl class]];
-}
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+//    return ![[touch.view class] isSubclassOfClass:[UIControl class]];
+//}
 
 - (void)sendFetchRequest:(UIRefreshControl *)sender {
     [sender beginRefreshing];
@@ -111,15 +108,21 @@
                                                           image:nil
                                                highlightedImage:nil
                                                          action:^(REMenuItem *item) {
-                                                             [self menuButtonTopPressed:item];
+                                                             [self menuSubButtonPressed:WZNewsTypeTop];
                                                          }];
     REMenuItem *newNewsItem = [[REMenuItem alloc] initWithTitle:@"New News"
                                                           image:nil
                                                highlightedImage:nil
                                                          action:^(REMenuItem *item) {
-                                                             [self menuButtonNewPressed:item];
+                                                             [self menuSubButtonPressed:WZNewsTypeNew];
                                                          }];
-    _menu = [[REMenu alloc] initWithItems:@[topNewsItem, newNewsItem]];
+    REMenuItem *askNewsItem = [[REMenuItem alloc] initWithTitle:@"Ask Hacker News"
+                                                          image:nil
+                                               highlightedImage:nil
+                                                         action:^(REMenuItem *item) {
+                                                             [self menuSubButtonPressed:WZNewsTypeAsk];
+                                                         }];
+    _menu = [[REMenu alloc] initWithItems:@[topNewsItem, newNewsItem, askNewsItem]];
     _menu.backgroundColor = [UIColor colorWithWhite:0.94 alpha:1];
     _menu.cornerRadius = 0;
     _menu.shadowColor = [UIColor blackColor];
@@ -151,6 +154,8 @@
         return _news;
     } else if (_newsType == WZNewsTypeNew) {
         return _newNews;
+    } else if (_newsType == WZNewsTypeAsk) {
+        return _askNews;
     } else {
         return nil;
     }
@@ -190,6 +195,8 @@
         _news = [NSArray arrayWithArray:postArray];
     } else if (_newsType == WZNewsTypeNew) {
         _newNews = [NSArray arrayWithArray:postArray];
+    } else if (_newsType == WZNewsTypeAsk) {
+        _askNews = [NSArray arrayWithArray:postArray];
     }
     
     if (error) {
@@ -312,17 +319,8 @@
     }
 }
 
-- (void)menuButtonTopPressed:(id)sender {
-    self.newsType = WZNewsTypeTop;
-    [self.tableView reloadData];
-    
-    if (![self activeNews].count > 0) {
-        [self sendFetchRequest:_refreshControl];
-    }
-}
-
-- (void)menuButtonNewPressed:(id)sender {
-    self.newsType = WZNewsTypeNew;
+- (void)menuSubButtonPressed:(WZNewsType)newsType {
+    _newsType = newsType;
     [self.tableView reloadData];
     
     if (![self activeNews].count > 0) {

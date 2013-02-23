@@ -62,6 +62,7 @@
 		24B2215F16D6A1E400B35EAC /* Screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2214716D6A1E400B35EAC /* Screenshot.png */; };
 		24B2216E16D6BB2200B35EAC /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2216C16D6BB2200B35EAC /* menu-icon.png */; };
 		24B2216F16D6BB2200B35EAC /* menu-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2216D16D6BB2200B35EAC /* menu-icon@2x.png */; };
+		24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */; };
 		24B2BF4D164C5BEF00C588F1 /* WZCommentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */; };
 		24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */; };
 		24B7D8FF164ADA3F00F55B3D /* _WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FC164ADA3F00F55B3D /* _WZRead.m */; };
@@ -235,6 +236,9 @@
 		24B2214716D6A1E400B35EAC /* Screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Screenshot.png; sourceTree = "<group>"; };
 		24B2216C16D6BB2200B35EAC /* menu-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon.png"; sourceTree = "<group>"; };
 		24B2216D16D6BB2200B35EAC /* menu-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon@2x.png"; sourceTree = "<group>"; };
+		24B2217716D8DB6100B35EAC /* NSString+AttributedStringForHTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AttributedStringForHTML.h"; sourceTree = "<group>"; };
+		24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+AttributedStringForHTML.m"; sourceTree = "<group>"; };
+		24B2217A16D8F37400B35EAC /* HackersDataModel 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HackersDataModel 1.1.xcdatamodel"; sourceTree = "<group>"; };
 		24B2BF4B164C5BEF00C588F1 /* WZCommentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentsViewController.h; sourceTree = "<group>"; };
 		24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentsViewController.m; sourceTree = "<group>"; };
 		24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentCell.h; sourceTree = "<group>"; };
@@ -410,9 +414,9 @@
 		2417B66916B9AE06009E11EC /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				24972CBF1643BD2900B4EFB4 /* Storyboards */,
 				2434A1CB16BEED7A00C383CA /* Web */,
 				2417B66C16B9AE60009E11EC /* Navigation */,
-				24972CBF1643BD2900B4EFB4 /* Storyboards */,
 				2417B66A16B9AE0D009E11EC /* Cells */,
 			);
 			name = Views;
@@ -697,6 +701,8 @@
 				24EAA5D71647DDF300105FE1 /* NSString+NamingConventions.m */,
 				24EAA5E01647E02500105FE1 /* NSDictionary+ObjectForKeyOrNil.h */,
 				24EAA5E11647E02500105FE1 /* NSDictionary+ObjectForKeyOrNil.m */,
+				24B2217716D8DB6100B35EAC /* NSString+AttributedStringForHTML.h */,
+				24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -947,6 +953,7 @@
 				24B2214B16D6A1E400B35EAC /* REMenuContainerView.m in Sources */,
 				24B2214C16D6A1E400B35EAC /* REMenuItem.m in Sources */,
 				24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */,
+				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1100,6 +1107,7 @@
 		24EAA5B31647D56900105FE1 /* HackersDataModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				24B2217A16D8F37400B35EAC /* HackersDataModel 1.1.xcdatamodel */,
 				24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */,
 			);
 			currentVersion = 24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */;

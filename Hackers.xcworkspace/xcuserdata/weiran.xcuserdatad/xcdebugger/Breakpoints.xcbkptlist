@@ -7,140 +7,49 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Pods/RTLabel/RTLabelProject/Classes/RTLabel.m"
-         timestampString = "374182837.630266"
+         filePath = "Hackers/WZHackersData.m"
+         timestampString = "383319041.693551"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "136"
-         endingLineNumber = "136"
-         landmarkName = "-initWithFrame:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Hackers/WZMenuViewController.m"
-         timestampString = "379800169.709449"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "41"
-         endingLineNumber = "41"
-         landmarkName = "-prepareForSegue:sender:"
+         startingLineNumber = "219"
+         endingLineNumber = "219"
+         landmarkName = "-updatePost:withContent:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Pods/SWRevealViewController/SWRevealViewController/SWRevealViewController.m"
-         timestampString = "379800004.264211"
+         filePath = "Hackers/WZHackersData.m"
+         timestampString = "383319107.635727"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "981"
-         endingLineNumber = "981"
-         landmarkName = "-perform"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Libraries/SVWebViewController/SVWebViewController.m"
-         timestampString = "379864151.643933"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "94"
-         endingLineNumber = "94"
-         landmarkName = "-pageActionSheet"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Libraries/SVWebViewController/SVWebViewController.m"
-         timestampString = "379864154.474029"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "120"
-         endingLineNumber = "120"
-         landmarkName = "-pageActivityViewController"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Libraries/SVWebViewController/SVWebViewController.m"
-         timestampString = "379864212.755039"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "340"
-         endingLineNumber = "340"
-         landmarkName = "-actionButtonClicked:"
+         startingLineNumber = "186"
+         endingLineNumber = "186"
+         landmarkName = "-fetchPostWithID:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Libraries/DTCoreText/Core/Source/DTAttributedTextContentView.m"
-         timestampString = "380401943.231523"
+         filePath = "Hackers/WZPostModel.m"
+         timestampString = "383320065.265828"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "444"
-         endingLineNumber = "444"
-         landmarkName = "-suggestedFrameSizeToFitEntireStringConstraintedToWidth:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Pods/OHAttributedLabel/OHAttributedLabel/Source/OHAttributedLabel.m"
-         timestampString = "380981466.500116"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "838"
-         endingLineNumber = "838"
-         landmarkName = "-warnAboutKnownIssues_CheckLineBreakMode_FromXIB:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Libraries/DTCoreText/Core/Source/DTHTMLElement.m"
-         timestampString = "381941076.647775"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "144"
-         endingLineNumber = "144"
-         landmarkName = "-attributesDictionary"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Hackers/WZMainViewController.m"
-         timestampString = "383171931.800274"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "240"
-         endingLineNumber = "240"
-         landmarkName = "-tableView:cellForRowAtIndexPath:"
+         startingLineNumber = "45"
+         endingLineNumber = "45"
+         landmarkName = "-contentHeightForWidth:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
-   <SymbolicBreakpoints>
-      <SymbolicBreakpoint
-         shouldBeEnabled = "Yes"
+   <ExceptionBreakpoints>
+      <ExceptionBreakpoint
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         symbolName = "-[NSObject(NSObject) doesNotRecognizeSelector:]"
-         moduleName = "">
-      </SymbolicBreakpoint>
-   </SymbolicBreakpoints>
+         scope = "0"
+         stopOnStyle = "0">
+      </ExceptionBreakpoint>
+   </ExceptionBreakpoints>
 </Bucket>

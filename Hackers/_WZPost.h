@@ -6,6 +6,7 @@
 
 extern const struct WZPostAttributes {
 	__unsafe_unretained NSString *commentsCount;
+	__unsafe_unretained NSString *content;
 	__unsafe_unretained NSString *domain;
 	__unsafe_unretained NSString *id;
 	__unsafe_unretained NSString *points;
@@ -39,6 +40,7 @@ extern const struct WZPostFetchedProperties {
 
 
 
+
 @interface WZPostID : NSManagedObjectID {}
 @end
 
@@ -59,6 +61,14 @@ extern const struct WZPostFetchedProperties {
 - (void)setCommentsCountValue:(int32_t)value_;
 
 //- (BOOL)validateCommentsCount:(id*)value_ error:(NSError**)error_;
+
+
+
+
+@property (nonatomic, strong) NSString* content;
+
+
+//- (BOOL)validateContent:(id*)value_ error:(NSError**)error_;
 
 
 
@@ -187,6 +197,12 @@ extern const struct WZPostFetchedProperties {
 
 - (int32_t)primitiveCommentsCountValue;
 - (void)setPrimitiveCommentsCountValue:(int32_t)value_;
+
+
+
+
+- (NSString*)primitiveContent;
+- (void)setPrimitiveContent:(NSString*)value;
 
 
 

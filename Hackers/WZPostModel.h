@@ -28,5 +28,9 @@
 @property (nonatomic) BOOL isRead;
 @property (nonatomic) CGFloat cellHeight;
 @property (nonatomic) CGFloat labelHeight;
+@property (nonatomic, strong) NSString *content;
+@property (nonatomic, strong) NSAttributedString *attributedContent;
+
+- (CGFloat)contentHeightForWidth:(CGFloat)width;
 
 @end

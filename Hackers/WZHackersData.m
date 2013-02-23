@@ -131,8 +131,7 @@ static NSString* const modelName = @"HackersDataModel";
     [WZHackersDataAPI.shared fetchNewsOfType:type success:^(NSArray *posts) {
         [self clearNewsWithType:type];
         
-        NSManagedObjectContext *context = [NSManagedObjectContext new];
-        context.persistentStoreCoordinator = [WZHackersData.shared persistentStoreCoordinator];
+        NSManagedObjectContext *context = [self context];
         
         NSInteger count = 1;
         for (NSDictionary *dictionary in posts) {
@@ -170,12 +169,32 @@ static NSString* const modelName = @"HackersDataModel";
     }];
 }
 
+- (WZPost *)fetchPostWithID:(NSInteger)postID {
+    NSManagedObjectContext *context = [self context];
+    
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:[WZPost entityName]];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"id == %d", postID];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"id" ascending:YES];
+    request.predicate = predicate;
+    request.sortDescriptors = @[sortDescriptor];
+    
+    NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request
+                                                                                               managedObjectContext:context
+                                                                                                 sectionNameKeyPath:nil cacheName:nil];
+    NSArray *result = fetchedResultsController.fetchedObjects;
+    
+    if (result.count > 0) {
+        return result[0];
+    } else {
+        return nil;
+    }
+}
+
 #pragma mark - Modify data
 
 - (void)addRead:(NSNumber *)id {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSManagedObjectContext *context = [NSManagedObjectContext new];
-        context.persistentStoreCoordinator = [WZHackersData.shared persistentStoreCoordinator];
+        NSManagedObjectContext *context = [self context];
 
         WZRead *read = [WZRead insertInManagedObjectContext:context];
         read.id = id;
@@ -194,6 +213,15 @@ static NSString* const modelName = @"HackersDataModel";
             }
         }
     });
+}
+
+- (void)updatePost:(NSInteger)postID withContent:(NSString *)content {
+    NSManagedObjectContext *context = [self context];
+    WZPost *post = [self fetchPostWithID:postID];
+    if (post) {
+        post.content = content;
+        [context save:nil];
+    }
 }
 
 @end

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
-    WZNewsTypeTop, WZNewsTypeNew
+    WZNewsTypeTop, WZNewsTypeNew, WZNewsTypeAsk
 } WZNewsType;
 
 @interface WZHackersData : NSObject
@@ -19,9 +19,8 @@ typedef enum {
 @property (nonatomic, readonly) NSManagedObjectContext *context;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-
 - (void)fetchNewsOfType:(WZNewsType)type completion:(void (^)(NSError *error))completion;
-
 - (void)addRead:(NSNumber *)id;
+- (void)updatePost:(NSInteger)postID withContent:(NSString *)content;
 
 @end
