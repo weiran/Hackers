@@ -26,7 +26,7 @@
 #define kHeaderTextWidth 300
 #define kNavigationBarHeight 44
 
-@interface WZCommentsViewController () <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested> {
+@interface WZCommentsViewController () <UITableViewDelegate, UITableViewDataSource, WZCommentShowRepliesDelegate, WZCommentURLRequested, OHAttributedLabelDelegate> {
     BOOL _isNavigatingBack;
 }
 
@@ -136,6 +136,10 @@
 }
 
 - (void)setupSegmentedController {
+    if ([_post.type isEqualToString:@"ask"]) { // hide if post is ASK HN
+        _segmentedControl.hidden = YES;
+    }
+    
     SDSegmentView *segmenteViewAppearance = [SDSegmentView appearance];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
@@ -245,6 +249,7 @@
     if (_post.content) {
         headerTextViewBottomSpacingConstant = kHeaderTextBottomMargin;
         _headerTextView.hidden = NO;
+        _headerTextView.delegate = self;
         _headerTextView.attributedText = _post.attributedContent;
         headerTextViewHeight = [_post contentHeightForWidth:kHeaderTextWidth] + kHeaderTextBottomMargin;
         contentHeight += headerTextViewHeight;
@@ -260,6 +265,8 @@
     _headerTextViewTopConstraint.constant = headerDetailsContainerViewFrame.size.height;
     _headerTextViewBottomSpacing.constant = headerTextViewBottomSpacingConstant;
     _headerDetailViewBottomSpacing.constant = headerTextViewHeight;
+    
+    // update related views
     _activityIndicatorViewTopSpacing.constant = kNavigationBarHeight + headerDetailsContainerViewFrame.size.height;
     
     // err, fixes some kinda bug
@@ -333,12 +340,28 @@
     return comment.cellHeight.floatValue;
 }
 
-#pragma mark - WZCommentURLTappedDelegate
+#pragma mark - WZCommentURLTappedDelegate & HeaderTextView link delegate
 
 - (void)tappedLink:(NSURL *)url {
+    if ([[url absoluteString] hasPrefix:@"sms:"]) {
+        [[UIApplication sharedApplication] openURL:url];
+        return;
+    } else {
+		if ([[url absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
+			[[url absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
+			[[url absoluteString] hasPrefix:@"http://phobos.apple.com/"]) {
+			[[UIApplication sharedApplication] openURL:url];
+            return;
+		}
+	}
+    
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
-    webViewController.view.layer.speed = 2.0;
     [self presentViewController:webViewController animated:YES completion:nil];
+}
+
+- (BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel shouldFollowLink:(NSTextCheckingResult*)linkInfo {
+    [self tappedLink:linkInfo.extendedURL];
+    return NO;
 }
 
 #pragma mark - WZCommentShowRepliesDelegate
