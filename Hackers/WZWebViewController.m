@@ -51,6 +51,12 @@
     [self layoutToolbar];
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    _webView.scrollView.scrollsToTop = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:WZWebViewControllerDismissed object:self];
+}
+
 - (void)layoutNavigationBar {
     if (_navigationBarHidden) {
         _webViewTopSpacingConstraint.constant = 0;

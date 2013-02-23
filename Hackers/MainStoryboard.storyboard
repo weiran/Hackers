@@ -58,17 +58,6 @@
                                             <color key="shadowColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                             <size key="shadowOffset" width="0.0" height="0.0"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="1." textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hex-7h-gRj" userLabel="Rank">
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="24" type="user" id="mU8-5i-ncU"/>
-                                                <constraint firstAttribute="height" constant="20" type="user" id="xHz-7I-Y5c"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
-                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                            <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="shadowOffset" width="0.0" height="0.0"/>
-                                        </label>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ngT-AR-F0S" userLabel="Metadata View">
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="domain.com" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FJU-bY-X0Y" userLabel="Domain">
@@ -117,17 +106,18 @@
                                                 <constraint firstItem="R0V-Pf-NuH" firstAttribute="leading" secondItem="T0D-f2-7g6" secondAttribute="trailing" constant="8" symbolic="YES" type="default" id="rRr-1N-5Up"/>
                                             </constraints>
                                         </view>
+                                        <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" image="unread-badge.png" translatesAutoresizingMaskIntoConstraints="NO" id="TKc-12-Cra" userLabel="Unread badge"/>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstItem="Hex-7h-gRj" firstAttribute="leading" secondItem="0eV-31-z4v" secondAttribute="leading" constant="6" id="1Gx-iU-Pqa"/>
-                                    <constraint firstItem="Hex-7h-gRj" firstAttribute="top" secondItem="0eV-31-z4v" secondAttribute="top" constant="9" type="user" id="GSB-L9-Aru"/>
+                                    <constraint firstItem="TKc-12-Cra" firstAttribute="leading" secondItem="0eV-31-z4v" secondAttribute="leading" constant="11" type="user" id="1Gw-lA-hVz"/>
                                     <constraint firstAttribute="bottom" secondItem="V5Q-hv-dC3" secondAttribute="bottom" constant="44" type="user" id="OMI-Om-L96"/>
                                     <constraint firstAttribute="trailing" secondItem="ngT-AR-F0S" secondAttribute="trailing" constant="10" type="user" id="Ofk-x3-QvG"/>
                                     <constraint firstAttribute="bottom" secondItem="ngT-AR-F0S" secondAttribute="bottom" constant="11" type="user" id="RzT-zN-GWE"/>
                                     <constraint firstItem="V5Q-hv-dC3" firstAttribute="top" secondItem="0eV-31-z4v" secondAttribute="top" constant="9" type="user" id="fnc-uR-X4D"/>
+                                    <constraint firstAttribute="centerY" secondItem="TKc-12-Cra" secondAttribute="centerY" type="user" id="gZR-b6-PrA"/>
                                     <constraint firstItem="V5Q-hv-dC3" firstAttribute="trailing" secondItem="ngT-AR-F0S" secondAttribute="trailing" type="default" id="l0k-vN-K4k"/>
                                     <constraint firstItem="ngT-AR-F0S" firstAttribute="leading" secondItem="V5Q-hv-dC3" secondAttribute="leading" type="default" id="vGb-kW-fNp"/>
                                 </constraints>
@@ -135,7 +125,7 @@
                                     <outlet property="detailLabel" destination="T0D-f2-7g6" id="CWc-Ev-JE0"/>
                                     <outlet property="domainLabel" destination="FJU-bY-X0Y" id="O6p-3r-sWz"/>
                                     <outlet property="moreDetailLabel" destination="R0V-Pf-NuH" id="99b-eB-xKz"/>
-                                    <outlet property="rankLabel" destination="Hex-7h-gRj" id="YYY-4d-vOd"/>
+                                    <outlet property="readBadgeImageView" destination="TKc-12-Cra" id="dRY-CP-3mV"/>
                                     <outlet property="titleLabel" destination="V5Q-hv-dC3" id="gqA-y5-bWb"/>
                                     <segue destination="LYY-JJ-fbY" kind="push" identifier="ShowCommentsSegue" customClass="" id="KY6-6m-g0D"/>
                                 </connections>
@@ -479,82 +469,8 @@
         <image name="back-arrow.png" width="19" height="16"/>
         <image name="menu-icon.png" width="23" height="18"/>
         <image name="share-icon.png" width="23" height="18"/>
+        <image name="unread-badge.png" width="12" height="12"/>
     </resources>
-    <classes>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="SDSegmentedControl" superclassName="UISegmentedControl">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/SDSegmentedControl.h"/>
-        </class>
-        <class className="WZCommentCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
-            <relationships>
-                <relationship kind="action" name="showReplies:"/>
-                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
-                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="WZCommentsViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="backButtonTapped:"/>
-                <relationship kind="action" name="showActivityView:"/>
-                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerDetailViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerDetailsContainerView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerTextView" candidateClass="OHAttributedLabel"/>
-                <relationship kind="outlet" name="headerTextViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerTextViewTopConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="navigationView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="segmentedControl" candidateClass="SDSegmentedControl"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="WZMainViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="menuButtonPressed:"/>
-                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-            </relationships>
-        </class>
-        <class className="WZNavigationBar" superclassName="UINavigationBar">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
-        </class>
-        <class className="WZNavigationController" superclassName="UINavigationController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
-            <relationships>
-                <relationship kind="action" name="navigationBarTapped:"/>
-            </relationships>
-        </class>
-        <class className="WZPostCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

@@ -250,7 +250,7 @@
     WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
     cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
-    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
+//    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
     cell.titleLabel.text = post.title;
     if ([post.type isEqualToString:@"ask"]) {
         cell.domainLabel.text = @"Ask Hacker News";
@@ -262,9 +262,9 @@
     NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
     
     if (filteredReadNews.count > 0) {
-        cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleReadTextColorWithWhite alpha:1];
+        cell.readBadgeImageView.hidden = YES;
     } else {
-        cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleUnreadTextColorWithWhite alpha:1];
+        cell.readBadgeImageView.hidden = NO;
     }
     
     if ([_selectedIndexPath isEqual:indexPath]) {
@@ -281,7 +281,7 @@
     [_readNews addObject:[NSNumber numberWithInteger:post.id]];
     [WZHackersData.shared addRead:[NSNumber numberWithInteger:post.id]];
     WZPostCell *cell = (WZPostCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-    cell.titleLabel.textColor = [UIColor colorWithWhite:kTitleReadTextColorWithWhite alpha:1];
+    cell.readBadgeImageView.hidden = YES;
     _selectedIndexPath = indexPath;
 }
 

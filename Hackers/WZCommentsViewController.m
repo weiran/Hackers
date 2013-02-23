@@ -64,12 +64,20 @@
     [self setupSegmentedController];
     [self setupWebView];
     [self fetchComments];
+    
+    
+    _webViewController.webView.scrollView.scrollsToTop = NO;
+    _tableView.scrollsToTop = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
+
+//- (void)viewDidAppear:(BOOL)animated {
+//    [super viewDidAppear:animated];
+//}
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -356,7 +364,16 @@
 	}
     
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
     [self presentViewController:webViewController animated:YES completion:nil];
+    
+    _tableView.scrollsToTop = NO;
+    webViewController.webView.scrollView.scrollsToTop = YES;
+}
+
+- (void)webViewPopupClosed {
+    _tableView.scrollsToTop = YES;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:WZWebViewControllerDismissed object:nil];
 }
 
 - (BOOL)attributedLabel:(OHAttributedLabel*)attributedLabel shouldFollowLink:(NSTextCheckingResult*)linkInfo {

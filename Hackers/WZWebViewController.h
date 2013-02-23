@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define WZWebViewControllerDismissed @"WZWebViewControllerDismissed"
+
 @interface WZWebViewController : UIViewController <UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;

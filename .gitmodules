@@ -7,3 +7,6 @@
 [submodule "Libraries/REMenu"]
 	path = Libraries/REMenu
 	url = https://github.com/romaonthego/REMenu.git
+[submodule "Libraries/URBSegmentedControl"]
+	path = Libraries/URBSegmentedControl
+	url = https://github.com/u10int/URBSegmentedControl.git
