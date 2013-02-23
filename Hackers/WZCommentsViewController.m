@@ -8,7 +8,6 @@
 
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
-#import "SDSegmentedControl.h"
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
@@ -32,6 +31,7 @@
 
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)showActivityView:(id)sender;
+- (IBAction)headerViewTapped:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UIView *navigationView;
 @property (weak, nonatomic) UIView *webView;
@@ -39,7 +39,7 @@
 
 @property (weak, nonatomic) IBOutlet UIView *activityIndicatorView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *activityIndicatorViewTopSpacing;
-@property (weak, nonatomic) IBOutlet SDSegmentedControl *segmentedControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *headerView;
 @property (weak, nonatomic) IBOutlet UIView *headerDetailsContainerView;
@@ -73,11 +73,13 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    // set selected segement colours
+    // uses GCD as it wont work if run immediately
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.05 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self segmentDidChange:_segmentedControl];
+    });
 }
-
-//- (void)viewDidAppear:(BOOL)animated {
-//    [super viewDidAppear:animated];
-//}
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -147,32 +149,14 @@
     if ([_post.type isEqualToString:@"ask"]) { // hide if post is ASK HN
         _segmentedControl.hidden = YES;
     }
+
+    NSDictionary *textAttributes =  @{
+                                      UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
+                                      UITextAttributeTextColor: [UIColor colorWithWhite:0.1 alpha:1],
+                                      UITextAttributeTextShadowColor: [UIColor clearColor]
+                                    };
     
-    SDSegmentView *segmenteViewAppearance = [SDSegmentView appearance];
-    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
-    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateSelected];
-    [segmenteViewAppearance setTitleShadowColor:[UIColor clearColor] forState:UIControlStateDisabled];
-    // setFont: is deprecated however titleLabel.font property doesn't seem work
-    [segmenteViewAppearance setFont:[UIFont fontWithName:@"HelveticaNeue-Medium" size:14]];
-    segmenteViewAppearance.titleEdgeInsets = UIEdgeInsetsMake(5, 0, 0, -8);
-    
-    SDStainView *stainViewAppearance = [SDStainView appearance];
-    stainViewAppearance.shadowColor = [UIColor clearColor];
-    stainViewAppearance.shadowOffset = CGSizeMake(0, 0);
-    stainViewAppearance.layer.shadowOpacity = 0;
-    stainViewAppearance.layer.shadowRadius = 0;
-    stainViewAppearance.innerStrokeColor = [UIColor clearColor];
-    stainViewAppearance.innerStrokeLineWidth = 0;
-    
-    _segmentedControl.backgroundColor = [UIColor clearColor];
-    _segmentedControl.borderColor = [UIColor clearColor];
-    _segmentedControl.arrowHeightFactor = 0;
-    
-    SDSegmentedControl *segmentedControlAppearence = [SDSegmentedControl appearance];
-    segmentedControlAppearence.borderColor = [UIColor clearColor];
-    _segmentedControl.borderColor = [UIColor clearColor];
-    _segmentedControl.layer.shadowOpacity = 0;
-    _segmentedControl.layer.shadowRadius = 0;
+    [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
     
     [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
 }
@@ -290,7 +274,9 @@
 #pragma mark - UISegmentDelegate
 
 - (void)segmentDidChange:(id)sender {
-    switch ([sender selectedSegmentIndex]) {
+    UISegmentedControl *segmentedControl = (UISegmentedControl *)sender;
+    
+    switch (segmentedControl.selectedSegmentIndex) {
         case 0: {
             _tableView.hidden = NO;
             _webView.hidden = YES;
@@ -310,6 +296,15 @@
             }
         }
         break;
+    }
+    
+    for (int i = 0; i < segmentedControl.subviews.count; i++) {
+        id segment = segmentedControl.subviews[i];
+        if ([segment isSelected]) {
+            [segment setTintColor:[UIColor colorWithWhite:0.82 alpha:1]];
+        } else {
+            [segment setTintColor:[UIColor colorWithWhite:0.95 alpha:1]];
+        }
     }
 }
 
@@ -442,6 +437,11 @@
 - (IBAction)showActivityView:(id)sender {
     WZActivityViewController *activityViewController = [WZActivityViewController activityViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
     [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
+- (IBAction)headerViewTapped:(id)sender {
+    [_segmentedControl setSelectedSegmentIndex:1];
+    [self segmentDidChange:_segmentedControl];
 }
 
 - (IBAction)backButtonTapped:(id)sender {

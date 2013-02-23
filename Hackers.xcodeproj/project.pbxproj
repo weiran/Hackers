@@ -30,10 +30,6 @@
 		247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6516AC57DB00534229 /* ImageIO.framework */; };
 		247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6616AC57DB00534229 /* libxml2.dylib */; };
 		247A2D6A16AC57DB00534229 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6716AC57DB00534229 /* MobileCoreServices.framework */; };
-		2484384116C11A3F001D2AA0 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 2484383116C11A3F001D2AA0 /* LICENSE */; };
-		2484384216C11A3F001D2AA0 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 2484383216C11A3F001D2AA0 /* README.md */; };
-		2484384316C11A3F001D2AA0 /* SDSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 2484383416C11A3F001D2AA0 /* SDSegmentedControl.m */; };
-		2484384416C11A3F001D2AA0 /* SDSegmentedControl.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 2484383516C11A3F001D2AA0 /* SDSegmentedControl.podspec */; };
 		2484385216C11B4F001D2AA0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484384F16C11B4F001D2AA0 /* Default-568h@2x.png */; };
 		2484385316C11B4F001D2AA0 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385016C11B4F001D2AA0 /* Default.png */; };
 		2484385416C11B4F001D2AA0 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385116C11B4F001D2AA0 /* Default@2x.png */; };
@@ -65,7 +61,6 @@
 		24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */; };
 		24B2217D16D91A4800B35EAC /* unread-badge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2217B16D91A4800B35EAC /* unread-badge@2x.png */; };
 		24B2217E16D91A4800B35EAC /* unread-badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2217C16D91A4800B35EAC /* unread-badge.png */; };
-		24B221AD16D949B900B35EAC /* URBSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2219B16D949B900B35EAC /* URBSegmentedControl.m */; };
 		24B2BF4D164C5BEF00C588F1 /* WZCommentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */; };
 		24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */; };
 		24B7D8FF164ADA3F00F55B3D /* _WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FC164ADA3F00F55B3D /* _WZRead.m */; };
@@ -196,11 +191,6 @@
 		247A2D6516AC57DB00534229 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		247A2D6616AC57DB00534229 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		247A2D6716AC57DB00534229 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		2484383116C11A3F001D2AA0 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		2484383216C11A3F001D2AA0 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		2484383316C11A3F001D2AA0 /* SDSegmentedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDSegmentedControl.h; sourceTree = "<group>"; };
-		2484383416C11A3F001D2AA0 /* SDSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDSegmentedControl.m; sourceTree = "<group>"; };
-		2484383516C11A3F001D2AA0 /* SDSegmentedControl.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SDSegmentedControl.podspec; sourceTree = "<group>"; };
 		2484384F16C11B4F001D2AA0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		2484385016C11B4F001D2AA0 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		2484385116C11B4F001D2AA0 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -244,8 +234,6 @@
 		24B2217A16D8F37400B35EAC /* HackersDataModel 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HackersDataModel 1.1.xcdatamodel"; sourceTree = "<group>"; };
 		24B2217B16D91A4800B35EAC /* unread-badge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unread-badge@2x.png"; sourceTree = "<group>"; };
 		24B2217C16D91A4800B35EAC /* unread-badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unread-badge.png"; sourceTree = "<group>"; };
-		24B2219A16D949B900B35EAC /* URBSegmentedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URBSegmentedControl.h; sourceTree = "<group>"; };
-		24B2219B16D949B900B35EAC /* URBSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URBSegmentedControl.m; sourceTree = "<group>"; };
 		24B2BF4B164C5BEF00C588F1 /* WZCommentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentsViewController.h; sourceTree = "<group>"; };
 		24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentsViewController.m; sourceTree = "<group>"; };
 		24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentCell.h; sourceTree = "<group>"; };
@@ -522,18 +510,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2484381B16C11A3E001D2AA0 /* SDSegmentedControl */ = {
-			isa = PBXGroup;
-			children = (
-				2484383116C11A3F001D2AA0 /* LICENSE */,
-				2484383216C11A3F001D2AA0 /* README.md */,
-				2484383316C11A3F001D2AA0 /* SDSegmentedControl.h */,
-				2484383416C11A3F001D2AA0 /* SDSegmentedControl.m */,
-				2484383516C11A3F001D2AA0 /* SDSegmentedControl.podspec */,
-			);
-			path = SDSegmentedControl;
-			sourceTree = "<group>";
-		};
 		2484385716C11E54001D2AA0 /* ActivityView */ = {
 			isa = PBXGroup;
 			children = (
@@ -621,9 +597,7 @@
 		24975A72164A88A5000143A1 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				24B2217F16D949B900B35EAC /* URBSegmentedControl */,
 				24B2212116D6A1E400B35EAC /* REMenu */,
-				2484381B16C11A3E001D2AA0 /* SDSegmentedControl */,
 				247A2D3816AC575000534229 /* DTCoreText.xcodeproj */,
 				24C43FE916A44DCC00055D65 /* TUSafariActivity */,
 			);
@@ -655,15 +629,6 @@
 				24B2212C16D6A1E400B35EAC /* REMenuItemView.m */,
 			);
 			path = REMenu;
-			sourceTree = "<group>";
-		};
-		24B2217F16D949B900B35EAC /* URBSegmentedControl */ = {
-			isa = PBXGroup;
-			children = (
-				24B2219A16D949B900B35EAC /* URBSegmentedControl.h */,
-				24B2219B16D949B900B35EAC /* URBSegmentedControl.m */,
-			);
-			path = URBSegmentedControl;
 			sourceTree = "<group>";
 		};
 		24C43FE916A44DCC00055D65 /* TUSafariActivity */ = {
@@ -891,9 +856,6 @@
 				2434A1F116C0380B00C383CA /* back-icon@2x.png in Resources */,
 				2434A1FB16C0398800C383CA /* refresh-icon.png in Resources */,
 				2434A1FC16C0398800C383CA /* refresh-icon@2x.png in Resources */,
-				2484384116C11A3F001D2AA0 /* LICENSE in Resources */,
-				2484384216C11A3F001D2AA0 /* README.md in Resources */,
-				2484384416C11A3F001D2AA0 /* SDSegmentedControl.podspec in Resources */,
 				2484385216C11B4F001D2AA0 /* Default-568h@2x.png in Resources */,
 				2484385316C11B4F001D2AA0 /* Default.png in Resources */,
 				2484385416C11B4F001D2AA0 /* Default@2x.png in Resources */,
@@ -965,7 +927,6 @@
 				2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */,
 				2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */,
 				2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */,
-				2484384316C11A3F001D2AA0 /* SDSegmentedControl.m in Sources */,
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
 				24D11C1016C42681000AE946 /* WZDefaults.m in Sources */,
@@ -975,7 +936,6 @@
 				24B2214C16D6A1E400B35EAC /* REMenuItem.m in Sources */,
 				24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */,
 				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
-				24B221AD16D949B900B35EAC /* URBSegmentedControl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,12 +1,6 @@
-[submodule "Libraries/SDSegmentedControl"]
-	path = Libraries/SDSegmentedControl
-	url = https://github.com/weiran/SDSegmentedControl.git
 [submodule "Libraries/DTCoreText"]
 	path = Libraries/DTCoreText
 	url = https://github.com/weiran/DTCoreText.git
 [submodule "Libraries/REMenu"]
 	path = Libraries/REMenu
 	url = https://github.com/romaonthego/REMenu.git
-[submodule "Libraries/URBSegmentedControl"]
-	path = Libraries/URBSegmentedControl
-	url = https://github.com/u10int/URBSegmentedControl.git
