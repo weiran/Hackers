@@ -6,4 +6,4 @@
 	url = https://github.com/weiran/DTCoreText.git
 [submodule "Libraries/REMenu"]
 	path = Libraries/REMenu
-	url = https://github.com/weiran/REMenu.git
+	url = https://github.com/romaonthego/REMenu.git
