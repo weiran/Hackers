@@ -49,6 +49,7 @@
     [self setupPullToRefresh];
     [self setupMenu];
     [self loadData];
+    [self updateTitle];
     
     self.clearsSelectionOnViewWillAppear = NO;
     
@@ -227,6 +228,25 @@
 
 }
 
+- (void)updateTitle {
+    switch (_newsType) {
+        case WZNewsTypeTop:
+            self.title = @"Top Hacker News";
+            break;
+            
+        case WZNewsTypeNew:
+            self.title = @"New Hacker News";
+            break;
+            
+        case WZNewsTypeAsk:
+            self.title = @"Ask Hacker News";
+            break;
+            
+        default:
+            break;
+    }
+}
+
 #pragma mark - UITableViewController methods
 
 - (void)deselectCurrentRow {
@@ -326,6 +346,8 @@
     if (![self activeNews].count > 0) {
         [self sendFetchRequest:_refreshControl];
     }
+
+    [self updateTitle];
 }
 
 @end
