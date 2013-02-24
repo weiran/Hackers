@@ -352,7 +352,10 @@
     } else {
 		if ([[url absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
 			[[url absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
-			[[url absoluteString] hasPrefix:@"http://phobos.apple.com/"]) {
+			[[url absoluteString] hasPrefix:@"http://phobos.apple.com/"] ||
+            [[url absoluteString] hasPrefix:@"https://www.youtube.com/v/"] ||
+			[[url absoluteString] hasPrefix:@"https://itunes.apple.com/"] ||
+			[[url absoluteString] hasPrefix:@"https://phobos.apple.com/"]) {
 			[[UIApplication sharedApplication] openURL:url];
             return;
 		}
@@ -440,8 +443,10 @@
 }
 
 - (IBAction)headerViewTapped:(id)sender {
-    [_segmentedControl setSelectedSegmentIndex:1];
-    [self segmentDidChange:_segmentedControl];
+    if (![_post.type isEqualToString:@"ask"]) {
+        [_segmentedControl setSelectedSegmentIndex:1];
+        [self segmentDidChange:_segmentedControl];
+    }
 }
 
 - (IBAction)backButtonTapped:(id)sender {

@@ -254,6 +254,7 @@
                                                 </view>
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                            <gestureRecognizers/>
                                             <constraints>
                                                 <constraint firstItem="Id7-HX-F73" firstAttribute="leading" secondItem="vWs-h5-qXe" secondAttribute="leading" constant="10" type="user" id="4Fc-VI-Na9"/>
                                                 <constraint firstAttribute="bottom" secondItem="Id7-HX-F73" secondAttribute="bottom" constant="44" type="user" id="GSq-la-C7L"/>
@@ -262,6 +263,9 @@
                                                 <constraint firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" constant="10" type="user" id="w30-ZL-jCe"/>
                                                 <constraint firstItem="tbw-87-toH" firstAttribute="trailing" secondItem="Id7-HX-F73" secondAttribute="trailing" type="user" id="ydf-8f-bhM"/>
                                             </constraints>
+                                            <connections>
+                                                <outletCollection property="gestureRecognizers" destination="uUo-zy-6jh" appends="YES" id="che-yB-Ppt"/>
+                                            </connections>
                                         </view>
                                         <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OCr-CW-KLR" customClass="OHAttributedLabel">
                                             <constraints>
@@ -283,9 +287,6 @@
                                         <constraint firstAttribute="bottom" secondItem="vWs-h5-qXe" secondAttribute="bottom" constant="80" type="user" id="kqn-xA-mG0"/>
                                         <constraint firstItem="vWs-h5-qXe" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" type="default" id="zKa-xJ-ES3"/>
                                     </constraints>
-                                    <connections>
-                                        <outletCollection property="gestureRecognizers" destination="uUo-zy-6jh" appends="YES" id="TqB-Vs-RKV"/>
-                                    </connections>
                                 </view>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CommentCell" rowHeight="113" id="8RA-zL-sDn" customClass="WZCommentCell">
