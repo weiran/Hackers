@@ -10,9 +10,6 @@
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		2402A75F165120E400F637E5 /* menuicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75D165120E400F637E5 /* menuicon.png */; };
 		2402A760165120E400F637E5 /* menuicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2402A75E165120E400F637E5 /* menuicon@2x.png */; };
-		2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67116B9B59C009E11EC /* WZNavigationController.m */; };
-		2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */; };
-		2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */; };
 		241EA0AA16C54E7F005D802F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0A916C54E7F005D802F /* Icon.png */; };
 		241EA0AC16C54E86005D802F /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0AB16C54E86005D802F /* Icon@2x.png */; };
 		2434A1AD16BD6DBA00C383CA /* back-arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1AB16BD6DBA00C383CA /* back-arrow.png */; };
@@ -75,7 +72,6 @@
 		24D0DB0316B5DB98001342A8 /* navbar-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 24D0DB0116B5DB98001342A8 /* navbar-bg.png */; };
 		24D0DB0616B5DE57001342A8 /* navbar-bg-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 24D0DB0416B5DE57001342A8 /* navbar-bg-highlighted.png */; };
 		24D0DB0716B5DE57001342A8 /* navbar-bg-highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24D0DB0516B5DE57001342A8 /* navbar-bg-highlighted@2x.png */; };
-		24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */; };
 		24D11C1016C42681000AE946 /* WZDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D11C0F16C42681000AE946 /* WZDefaults.m */; };
 		24DD252E16CBA676005ED6EA /* share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD252C16CBA676005ED6EA /* share-icon.png */; };
 		24DD252F16CBA676005ED6EA /* share-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD252D16CBA676005ED6EA /* share-icon@2x.png */; };
@@ -168,12 +164,6 @@
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		2402A75D165120E400F637E5 /* menuicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuicon.png; sourceTree = "<group>"; };
 		2402A75E165120E400F637E5 /* menuicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menuicon@2x.png"; sourceTree = "<group>"; };
-		2417B67016B9B59C009E11EC /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
-		2417B67116B9B59C009E11EC /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
-		2417B67316B9C6AA009E11EC /* WZNavigationPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationPickerView.h; sourceTree = "<group>"; };
-		2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationPickerView.m; sourceTree = "<group>"; };
-		2417B67716B9CBDA009E11EC /* WZNavigationPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationPickerViewController.h; sourceTree = "<group>"; };
-		2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationPickerViewController.m; sourceTree = "<group>"; };
 		241EA0A916C54E7F005D802F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../Icon.png; sourceTree = "<group>"; };
 		241EA0AB16C54E86005D802F /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../Icon@2x.png"; sourceTree = "<group>"; };
 		2434A1AB16BD6DBA00C383CA /* back-arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-arrow.png"; sourceTree = "<group>"; };
@@ -231,7 +221,7 @@
 		24B2216D16D6BB2200B35EAC /* menu-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon@2x.png"; sourceTree = "<group>"; };
 		24B2217716D8DB6100B35EAC /* NSString+AttributedStringForHTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AttributedStringForHTML.h"; sourceTree = "<group>"; };
 		24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+AttributedStringForHTML.m"; sourceTree = "<group>"; };
-		24B2217A16D8F37400B35EAC /* HackersDataModel 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HackersDataModel 1.1.xcdatamodel"; sourceTree = "<group>"; };
+		24B2217A16D8F37400B35EAC /* HackersDataModel 1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "HackersDataModel 1.1.xcdatamodel"; sourceTree = "<group>"; };
 		24B2217B16D91A4800B35EAC /* unread-badge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unread-badge@2x.png"; sourceTree = "<group>"; };
 		24B2217C16D91A4800B35EAC /* unread-badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "unread-badge.png"; sourceTree = "<group>"; };
 		24B2BF4B164C5BEF00C588F1 /* WZCommentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentsViewController.h; sourceTree = "<group>"; };
@@ -268,8 +258,6 @@
 		24D0DB0116B5DB98001342A8 /* navbar-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg.png"; sourceTree = "<group>"; };
 		24D0DB0416B5DE57001342A8 /* navbar-bg-highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg-highlighted.png"; sourceTree = "<group>"; };
 		24D0DB0516B5DE57001342A8 /* navbar-bg-highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg-highlighted@2x.png"; sourceTree = "<group>"; };
-		24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationBar.h; sourceTree = "<group>"; };
-		24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationBar.m; sourceTree = "<group>"; };
 		24D11C0E16C42681000AE946 /* WZDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZDefaults.h; sourceTree = "<group>"; };
 		24D11C0F16C42681000AE946 /* WZDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZDefaults.m; sourceTree = "<group>"; };
 		24DD252C16CBA676005ED6EA /* share-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "share-icon.png"; sourceTree = "<group>"; };
@@ -381,9 +369,9 @@
 		2417B65F16B9ADCA009E11EC /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				2484385716C11E54001D2AA0 /* ActivityView */,
 				2417B66716B9ADDB009E11EC /* Main */,
 				2417B66816B9ADDF009E11EC /* Comments */,
+				2484385716C11E54001D2AA0 /* ActivityView */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -393,8 +381,6 @@
 			children = (
 				24EAA5EE1647F25A00105FE1 /* WZMainViewController.h */,
 				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
-				2417B67016B9B59C009E11EC /* WZNavigationController.h */,
-				2417B67116B9B59C009E11EC /* WZNavigationController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -413,7 +399,6 @@
 			children = (
 				24972CBF1643BD2900B4EFB4 /* Storyboards */,
 				2434A1CB16BEED7A00C383CA /* Web */,
-				2417B66C16B9AE60009E11EC /* Navigation */,
 				2417B66A16B9AE0D009E11EC /* Cells */,
 			);
 			name = Views;
@@ -428,16 +413,6 @@
 				24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */,
 			);
 			name = Cells;
-			sourceTree = "<group>";
-		};
-		2417B66C16B9AE60009E11EC /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-				2417B67616B9CBC2009E11EC /* Picker */,
-				24D0DB0816B5E2CA001342A8 /* WZNavigationBar.h */,
-				24D0DB0916B5E2CA001342A8 /* WZNavigationBar.m */,
-			);
-			name = Navigation;
 			sourceTree = "<group>";
 		};
 		2417B66D16B9AED8009E11EC /* View Models */ = {
@@ -466,17 +441,6 @@
 				2402A75A165120B500F637E5 /* Images */,
 			);
 			name = Resources;
-			sourceTree = "<group>";
-		};
-		2417B67616B9CBC2009E11EC /* Picker */ = {
-			isa = PBXGroup;
-			children = (
-				2417B67716B9CBDA009E11EC /* WZNavigationPickerViewController.h */,
-				2417B67816B9CBDA009E11EC /* WZNavigationPickerViewController.m */,
-				2417B67316B9C6AA009E11EC /* WZNavigationPickerView.h */,
-				2417B67416B9C6AA009E11EC /* WZNavigationPickerView.m */,
-			);
-			name = Picker;
 			sourceTree = "<group>";
 		};
 		2434A19E16BD640300C383CA /* Misc */ = {
@@ -923,10 +887,6 @@
 				24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */,
 				2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */,
 				24C4400616A44DCC00055D65 /* TUSafariActivity.m in Sources */,
-				24D0DB0A16B5E2CA001342A8 /* WZNavigationBar.m in Sources */,
-				2417B67216B9B59C009E11EC /* WZNavigationController.m in Sources */,
-				2417B67516B9C6AA009E11EC /* WZNavigationPickerView.m in Sources */,
-				2417B67916B9CBDA009E11EC /* WZNavigationPickerViewController.m in Sources */,
 				2484386116C11E73001D2AA0 /* WZActivityViewController.m in Sources */,
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
 				24D11C1016C42681000AE946 /* WZDefaults.m in Sources */,
