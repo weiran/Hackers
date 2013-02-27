@@ -23,6 +23,7 @@
 		2434A1FB16C0398800C383CA /* refresh-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1F916C0398800C383CA /* refresh-icon.png */; };
 		2434A1FC16C0398800C383CA /* refresh-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1FA16C0398800C383CA /* refresh-icon@2x.png */; };
 		245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 245F85D016690AE3000D3EE1 /* Security.framework */; };
+		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
 		247A2D6416AC57DB00534229 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D5016AC575000534229 /* libDTCoreText.a */; };
 		247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6516AC57DB00534229 /* ImageIO.framework */; };
 		247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6616AC57DB00534229 /* libxml2.dylib */; };
@@ -177,6 +178,7 @@
 		2434A1F916C0398800C383CA /* refresh-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon.png"; sourceTree = "<group>"; };
 		2434A1FA16C0398800C383CA /* refresh-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon@2x.png"; sourceTree = "<group>"; };
 		245F85D016690AE3000D3EE1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		2475EC5B16DE591100FEAD45 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		247A2D3816AC575000534229 /* DTCoreText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DTCoreText.xcodeproj; path = DTCoreText/DTCoreText.xcodeproj; sourceTree = "<group>"; };
 		247A2D6516AC57DB00534229 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		247A2D6616AC57DB00534229 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
@@ -317,6 +319,7 @@
 				24972CA21643BC3C00B4EFB4 /* CoreGraphics.framework in Frameworks */,
 				24972CA41643BC3C00B4EFB4 /* CoreData.framework in Frameworks */,
 				DFCC5074B30047A392BC2180 /* libPods.a in Frameworks */,
+				2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,6 +510,7 @@
 		24972C9C1643BC3C00B4EFB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2475EC5B16DE591100FEAD45 /* Crashlytics.framework */,
 				247A2D6516AC57DB00534229 /* ImageIO.framework */,
 				247A2D6616AC57DB00534229 /* libxml2.dylib */,
 				247A2D6716AC57DB00534229 /* MobileCoreServices.framework */,
@@ -677,6 +681,7 @@
 				24972C961643BC3C00B4EFB4 /* Frameworks */,
 				24972C971643BC3C00B4EFB4 /* Resources */,
 				5683DFF2267742068CBCEC9E /* Copy Pods Resources */,
+				2475EC5316DE58EB00FEAD45 /* Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -846,6 +851,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2475EC5316DE58EB00FEAD45 /* Crashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Crashlytics;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Crashlytics.framework/run 6b3b4eba8698666ed08b19d6091a9728deaabab9";
+		};
 		5683DFF2267742068CBCEC9E /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -998,6 +1017,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
@@ -1012,6 +1035,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
