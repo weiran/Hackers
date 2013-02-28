@@ -18,6 +18,7 @@
 #import "WZCommentModel.h"
 #import "WZPostModel.h"
 #import "WZWebViewController.h"
+#import "WZNavigationController.h"
 
 #define kHeaderTitleTopMargin 10
 #define kHeaderTitleBottomMargin 44
@@ -32,7 +33,9 @@
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)showActivityView:(id)sender;
 - (IBAction)headerViewTapped:(id)sender;
+- (IBAction)swipedBack:(id)sender;
 
+@property (strong, nonatomic) IBOutlet UISwipeGestureRecognizer *swipeBackGestureRecognizer;
 @property (weak, nonatomic) IBOutlet UIView *navigationView;
 @property (weak, nonatomic) UIView *webView;
 @property (strong, nonatomic) WZWebViewController *webViewController;
@@ -51,6 +54,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerDetailViewBottomSpacing;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewBottomSpacing;
+@property (strong, nonatomic) NSLayoutConstraint *webViewTopSpacing;
 @end
 
 @implementation WZCommentsViewController
@@ -58,6 +62,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self setupOrientationNotifications];
     [self setupNavigationView];
     [self setupActivityIndicatorView];
     [self setupTableView];
@@ -84,6 +89,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     if (_isNavigatingBack) {
+        [self removeOrientationNotifications];
         [self.navigationController setNavigationBarHidden:NO animated:YES];
         _isNavigatingBack = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
@@ -125,6 +131,41 @@
         
         [_tableView reloadData];
     }];
+}
+
+#pragma mark - Rotation
+
+- (void)setupOrientationNotifications {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:)
+                                                 name:@"UIDeviceOrientationDidChangeNotification"
+                                               object:nil];
+}
+
+- (void)removeOrientationNotifications {
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:WZWebViewControllerSwipeRight object:nil];
+}
+
+- (void)didRotate:(id)sender {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    // ignore upside down orientation
+    if (orientation == UIDeviceOrientationPortraitUpsideDown) {
+        return;
+    }
+
+    BOOL isLandscape = UIDeviceOrientationIsLandscape(orientation);
+    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
+    
+    _navigationView.hidden = webViewVisible && isLandscape;
+
+    if (webViewVisible && isLandscape) {
+        _webViewTopSpacing.constant = 0;
+    } else {
+        _webViewTopSpacing.constant = kNavigationBarHeight;
+    }
 }
 
 #pragma mark - Setup Views
@@ -176,18 +217,21 @@
 - (void)setupWebView {
     _webViewController = [[WZWebViewController alloc] init];
     _webViewController.navigationBarHidden = YES;
+    _webViewController.enabledGestures = YES;
     [_webViewController didMoveToParentViewController:self];
+    
     _webView = _webViewController.view;
     _webView.hidden = YES;
-    
     _webView.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self addChildViewController:_webViewController];
     [self.view insertSubview:_webView belowSubview:_navigationView];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewSwipeRight:) name:WZWebViewControllerSwipeRight object:nil];
+    
     NSDictionary *viewDictionary = @{ @"webView": _webView };
     
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView(>=416)]"
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView(<=504)]"
                                                                                      options:0
                                                                                      metrics:nil
                                                                                        views:viewDictionary][0];
@@ -196,23 +240,29 @@
                                                                                        metrics:nil
                                                                                          views:viewDictionary][0];
 
-    NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[webView]"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:viewDictionary][0];
+    _webViewTopSpacing = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[webView]"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:viewDictionary][0];
+    
     NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView]|"
                                                                                      options:0
                                                                                      metrics:nil
                                                                                        views:viewDictionary][0];
-    NSLayoutConstraint *horizontalConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"|[webView]|"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:viewDictionary][0];
+    NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"|[webView]"
+                                                                                    options:0
+                                                                                 metrics:nil
+                                                                                   views:viewDictionary][0];
+    NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"[webView]|"
+                                                                                  options:0
+                                                                                  metrics:nil
+                                                                                    views:viewDictionary][0];
     [self.view addConstraint:heightConstraint];
     [self.view addConstraint:widthConstraint];
-    [self.view addConstraint:topConstraint];
+    [self.view addConstraint:_webViewTopSpacing];
     [self.view addConstraint:bottomConstraint];
-    [self.view addConstraint:horizontalConstraint];
+    [self.view addConstraint:leftConstraint];
+    [self.view addConstraint:rightConstraint];
 }
 
 
@@ -279,6 +329,7 @@
 
 - (void)segmentDidChange:(id)sender {
     UISegmentedControl *segmentedControl = (UISegmentedControl *)sender;
+    WZNavigationController *navigationController = (WZNavigationController *)self.navigationController;
     
     switch (segmentedControl.selectedSegmentIndex) {
         case 0: {
@@ -286,6 +337,7 @@
             _webView.hidden = YES;
             _webViewController.webView.scrollView.scrollsToTop = NO;
             _tableView.scrollsToTop = YES;
+            navigationController.allowsRotation = NO;
         }
         break;
         case 1: {
@@ -298,6 +350,8 @@
             if (!_webViewController.webView.request) {
                 [_webViewController loadURL:[NSURL URLWithString:_post.url]];
             }
+            
+            navigationController.allowsRotation = YES;
         }
         break;
     }
@@ -453,9 +507,25 @@
     }
 }
 
+- (void)navigateBack {
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (UIInterfaceOrientationIsPortrait(orientation)) {
+        _isNavigatingBack = YES;
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+- (IBAction)swipedBack:(id)sender {
+    [self navigateBack];
+}
+
 - (IBAction)backButtonTapped:(id)sender {
-    _isNavigatingBack = YES; 
-    [self.navigationController popViewControllerAnimated:YES];
+    [self navigateBack];
+}
+
+- (void)webViewSwipeRight:(id)sender {
+    [self navigateBack];
 }
 
 @end

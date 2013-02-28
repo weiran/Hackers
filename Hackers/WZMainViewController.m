@@ -61,9 +61,7 @@
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
 }
 
-//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-//    return ![[touch.view class] isSubclassOfClass:[UIControl class]];
-//}
+#pragma mark - Fetch
 
 - (void)sendFetchRequest:(UIRefreshControl *)sender {
     [sender beginRefreshing];
@@ -343,11 +341,8 @@
 - (void)menuSubButtonPressed:(WZNewsType)newsType {
     _newsType = newsType;
     [self.tableView reloadData];
-    
-    if (![self activeNews].count > 0) {
-        [self sendFetchRequest:_refreshControl];
-    }
-
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
     [self updateTitle];
 }
 

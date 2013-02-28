@@ -11,15 +11,20 @@
 
 #import "WZWebViewController.h"
 #define kNavigationBarHeight 44
+#define kToolbarBarHeight 44
 #define kToolBarHeight 44
 #define kToolBarFixedWidth 20
 #define kBarButtonIconWidth 33
 #define kBarButtonIconHeight 33
 #define kMobilizerURL @"http://www.instapaper.com/m?u="
+#define kHorizontalContentOffsetTrigger -66
 
 @interface WZWebViewController () {
     NSURL *_mobilizedURL;
     NSURL *_currentURL;
+    
+    BOOL _navigationBarCurrentlyHidden;
+    BOOL _toolbarCurrentlyHidden;
 }
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (weak, nonatomic) IBOutlet UINavigationBar *navigationBar;
@@ -29,6 +34,7 @@
 @property (nonatomic, strong) UIBarButtonItem *mobilizerBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *reloadBarButtonItem;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewTopSpacingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewBottomSpacingConstraint;
 @property (nonatomic, strong) NSURL *defaultURL;
 
 @end
@@ -47,23 +53,28 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    _navigationBarCurrentlyHidden = _navigationBarHidden;
+    _toolbarCurrentlyHidden = _toolbarHidden;
+    
     [self layoutWebView];
+    [self layoutWebViewConstraints];
     [self layoutNavigationBar];
     [self layoutToolbar];
+    [self setupOrientationNotifications];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     _webView.scrollView.scrollsToTop = NO;
+    [self removeOrientationNotifications];
     [[NSNotificationCenter defaultCenter] postNotificationName:WZWebViewControllerDismissed object:self];
 }
 
+#pragma mark - Layout
+
 - (void)layoutNavigationBar {
-    if (_navigationBarHidden) {
-        _webViewTopSpacingConstraint.constant = 0;
-    } else {
-        _webViewTopSpacingConstraint.constant = kNavigationBarHeight;
-    }
+    _navigationBar.hidden = _navigationBarCurrentlyHidden;
     
     UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
     closeButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
@@ -89,6 +100,7 @@
 - (void)layoutWebView {
     _webView.backgroundColor = [UIColor underPageBackgroundColor];
     _webView.delegate = self;
+    _webView.scrollView.delegate = self;
     _webView.scalesPageToFit = YES;
     _webView.scrollView.scrollsToTop = NO;
     
@@ -97,7 +109,23 @@
     }
 }
 
+- (void)layoutWebViewConstraints {
+    if (_navigationBarCurrentlyHidden) {
+        _webViewTopSpacingConstraint.constant = 0;
+    } else {
+        _webViewTopSpacingConstraint.constant = kNavigationBarHeight;
+    }
+    
+    if (_toolbarCurrentlyHidden) {
+        _webViewBottomSpacingConstraint.constant = 0;
+    } else {
+        _webViewBottomSpacingConstraint.constant = kToolbarBarHeight;
+    }
+}
+
 - (void)layoutToolbar {
+    _toolbar.hidden = _toolbarHidden;
+    
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
     backButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     backButton.accessibilityLabel = @"Back";
@@ -142,6 +170,46 @@
     NSArray *toolbarItems = @[_backBarButtonItem, fixedSpace, _forwardBarButtonItem, flexibleSpace, _mobilizerBarButtonItem, fixedSpace, _reloadBarButtonItem];
     
     [_toolbar setItems:toolbarItems animated:YES];
+}
+
+#pragma mark - Rotation
+
+- (void)setupOrientationNotifications {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:)
+                                                 name:@"UIDeviceOrientationDidChangeNotification"
+                                               object:nil];
+}
+
+- (void)removeOrientationNotifications {
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
+- (void)didRotate:(NSNotification *)notification {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    // ignore upside down orientation
+    if (orientation == UIDeviceOrientationPortraitUpsideDown) {
+        return;
+    }
+    
+    BOOL isLandscape = UIDeviceOrientationIsLandscape(orientation);
+
+    _navigationBar.hidden = _navigationBarHidden || isLandscape;
+    _toolbar.hidden = _toolbarHidden || isLandscape;
+    _navigationBarCurrentlyHidden = _navigationBarHidden || isLandscape;
+    _toolbarCurrentlyHidden = _toolbarHidden || isLandscape;
+    
+    [self layoutWebViewConstraints];
 }
 
 #pragma mark - Navigation Bar Buttons
@@ -253,6 +321,15 @@
 
 - (void)loadURL:(NSURL *)url {
     [_webView loadRequest:[NSURLRequest requestWithURL:url]];
+}
+
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    NSLog(@"x: %f, y: %f", scrollView.contentOffset.x, scrollView.contentOffset.y);
+    if (scrollView.contentOffset.x <= kHorizontalContentOffsetTrigger && _enabledGestures) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:WZWebViewControllerSwipeRight object:nil];
+    }
 }
 
 @end

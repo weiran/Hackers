@@ -7,7 +7,7 @@
         <!--Navigation Controller-->
         <scene sceneID="Vwz-dx-Dpd">
             <objects>
-                <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" sceneMemberID="viewController">
+                <navigationController definesPresentationContext="YES" id="kHE-jZ-QLL" customClass="WZNavigationController" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE">
                         <autoresizingMask key="autoresizingMask"/>
                         <gestureRecognizers/>
@@ -423,6 +423,7 @@
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="1Mg-9O-pCT"/>
                             <constraint firstItem="Smx-0F-YVN" firstAttribute="bottom" secondItem="MGV-48-7mG" secondAttribute="bottom" type="default" id="2OT-1f-WKG"/>
@@ -435,6 +436,9 @@
                             <constraint firstItem="aC6-LQ-nV5" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" type="user" id="vFV-ez-2bf"/>
                             <constraint firstItem="Vex-b4-wZn" firstAttribute="top" secondItem="MGV-48-7mG" secondAttribute="top" constant="44" type="user" id="wC8-LO-Lmj"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="cFH-gD-048" appends="YES" id="OFT-a0-GKJ"/>
+                        </connections>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="Nxx-jT-vpE"/>
@@ -454,6 +458,7 @@
                         <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
                         <outlet property="navigationView" destination="aC6-LQ-nV5" id="4aH-1L-XjD"/>
                         <outlet property="segmentedControl" destination="Zko-nc-fi0" id="FxY-5h-deS"/>
+                        <outlet property="swipeBackGestureRecognizer" destination="cFH-gD-048" id="DaK-gJ-iQn"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
                     </connections>
                 </viewController>
@@ -463,6 +468,11 @@
                         <action selector="headerViewTapped:" destination="LYY-JJ-fbY" id="zLB-wn-5k5"/>
                     </connections>
                 </tapGestureRecognizer>
+                <swipeGestureRecognizer direction="right" id="cFH-gD-048">
+                    <connections>
+                        <action selector="swipedBack:" destination="LYY-JJ-fbY" id="nbu-Am-dZx"/>
+                    </connections>
+                </swipeGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="97" y="345"/>
         </scene>
@@ -502,6 +512,7 @@
                 <relationship kind="action" name="backButtonTapped:"/>
                 <relationship kind="action" name="headerViewTapped:"/>
                 <relationship kind="action" name="showActivityView:"/>
+                <relationship kind="action" name="swipedBack:"/>
                 <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
                 <relationship kind="outlet" name="headerDetailViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
@@ -516,6 +527,7 @@
                 <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="navigationView" candidateClass="UIView"/>
                 <relationship kind="outlet" name="segmentedControl" candidateClass="UISegmentedControl"/>
+                <relationship kind="outlet" name="swipeBackGestureRecognizer" candidateClass="UISwipeGestureRecognizer"/>
                 <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
             </relationships>
         </class>
@@ -525,6 +537,9 @@
                 <relationship kind="action" name="menuButtonPressed:"/>
                 <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
             </relationships>
+        </class>
+        <class className="WZNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
         </class>
         <class className="WZPostCell" superclassName="UITableViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>

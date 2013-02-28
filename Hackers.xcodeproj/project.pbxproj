@@ -24,6 +24,7 @@
 		2434A1FC16C0398800C383CA /* refresh-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1FA16C0398800C383CA /* refresh-icon@2x.png */; };
 		245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 245F85D016690AE3000D3EE1 /* Security.framework */; };
 		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
+		2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2475EC6916DF617500FEAD45 /* WZNavigationController.m */; };
 		247A2D6416AC57DB00534229 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D5016AC575000534229 /* libDTCoreText.a */; };
 		247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6516AC57DB00534229 /* ImageIO.framework */; };
 		247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6616AC57DB00534229 /* libxml2.dylib */; };
@@ -179,6 +180,8 @@
 		2434A1FA16C0398800C383CA /* refresh-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon@2x.png"; sourceTree = "<group>"; };
 		245F85D016690AE3000D3EE1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2475EC5B16DE591100FEAD45 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		2475EC6816DF617500FEAD45 /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
+		2475EC6916DF617500FEAD45 /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
 		247A2D3816AC575000534229 /* DTCoreText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DTCoreText.xcodeproj; path = DTCoreText/DTCoreText.xcodeproj; sourceTree = "<group>"; };
 		247A2D6516AC57DB00534229 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		247A2D6616AC57DB00534229 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
@@ -384,6 +387,8 @@
 			children = (
 				24EAA5EE1647F25A00105FE1 /* WZMainViewController.h */,
 				24EAA5EF1647F25A00105FE1 /* WZMainViewController.m */,
+				2475EC6816DF617500FEAD45 /* WZNavigationController.h */,
+				2475EC6916DF617500FEAD45 /* WZNavigationController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -915,6 +920,7 @@
 				24B2214C16D6A1E400B35EAC /* REMenuItem.m in Sources */,
 				24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */,
 				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
+				2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
