@@ -18,7 +18,7 @@
     [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UIToolbar appearance] setTintColor:[UIColor darkGrayColor]];
     [[UINavigationBar appearance] setTitleTextAttributes:@{
-                                    UITextAttributeFont : [UIFont fontWithName:@"HelveticaNeue-Light" size:20],
+                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
                                UITextAttributeTextColor : [UIColor blackColor],
                         UITextAttributeTextShadowOffset : [NSValue valueWithCGSize:CGSizeMake(0, 0)]
                                     }];

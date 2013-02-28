@@ -133,13 +133,13 @@
     _menu.separatorColor = [UIColor colorWithWhite:0.87 alpha:1];
     _menu.highlightedSeparatorColor = [UIColor colorWithWhite:0.87 alpha:1];
     _menu.separatorHeight = 1;
-    _menu.font = [UIFont fontWithName:kTitleFontName size:kTitleFontSize];
+    _menu.font = [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize];
     _menu.textColor = [UIColor blackColor];
-    _menu.highlighedTextColor = [UIColor blackColor];
+    _menu.highlightedTextColor = [UIColor blackColor];
     _menu.textShadowColor = [UIColor clearColor];
-    _menu.highlighedTextShadowColor = [UIColor clearColor];
+    _menu.highlightedTextShadowColor = [UIColor clearColor];
     _menu.borderWidth = 0;
-    _menu.highligtedBackgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+    _menu.highlightedBackgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
 }
 
 - (WZNewsType)newsType {
@@ -335,6 +335,7 @@
     if ([_menu isOpen]) {
         [_menu close];
     } else {
+        [self setupMenu];
         [_menu showFromNavigationController:self.navigationController];
     }
 }

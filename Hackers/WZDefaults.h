@@ -14,6 +14,9 @@
 #define kBodyFontName @"HelveticaNeue-Light"
 #define kBodyFontSize 14
 
+#define kNavigationFontName @"HelveticaNeue-Light"
+#define kNavigationFontSize 20
+
 @interface WZDefaults : NSObject
 
 @end
