@@ -300,20 +300,17 @@
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    if ([[request.URL absoluteString] hasPrefix:@"sms:"]) {
+    if ([[request.URL absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
+        [[request.URL absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
+        [[request.URL absoluteString] hasPrefix:@"http://phobos.apple.com/"] ||
+        [[request.URL absoluteString] hasPrefix:@"https://www.youtube.com/v/"] ||
+        [[request.URL absoluteString] hasPrefix:@"https://itunes.apple.com/"] ||
+        [[request.URL absoluteString] hasPrefix:@"https://phobos.apple.com/"] ||
+        [[request.URL scheme] isEqual:@"mailto"] ||
+        [[request.URL scheme] isEqual:@"sms"]) {
         [[UIApplication sharedApplication] openURL:request.URL];
         return NO;
-    } else {
-		if ([[request.URL absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
-			[[request.URL absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
-			[[request.URL absoluteString] hasPrefix:@"http://phobos.apple.com/"] ||
-            [[request.URL absoluteString] hasPrefix:@"https://www.youtube.com/v/"] ||
-			[[request.URL absoluteString] hasPrefix:@"https://itunes.apple.com/"] ||
-			[[request.URL absoluteString] hasPrefix:@"https://phobos.apple.com/"]) {
-			[[UIApplication sharedApplication] openURL:request.URL];
-			return NO;
-		}
-	}
+    }
     
     return YES;
 }

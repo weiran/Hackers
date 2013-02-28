@@ -404,20 +404,17 @@
 #pragma mark - WZCommentURLTappedDelegate & HeaderTextView link delegate
 
 - (void)tappedLink:(NSURL *)url {
-    if ([[url absoluteString] hasPrefix:@"sms:"]) {
+    if ([[url absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
+        [[url absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
+        [[url absoluteString] hasPrefix:@"http://phobos.apple.com/"] ||
+        [[url absoluteString] hasPrefix:@"https://www.youtube.com/v/"] ||
+        [[url absoluteString] hasPrefix:@"https://itunes.apple.com/"] ||
+        [[url absoluteString] hasPrefix:@"https://phobos.apple.com/"] ||
+        [[url scheme] isEqual:@"mailto"] ||
+        [[url scheme] isEqual:@"sms"]) {
         [[UIApplication sharedApplication] openURL:url];
         return;
-    } else {
-		if ([[url absoluteString] hasPrefix:@"http://www.youtube.com/v/"] ||
-			[[url absoluteString] hasPrefix:@"http://itunes.apple.com/"] ||
-			[[url absoluteString] hasPrefix:@"http://phobos.apple.com/"] ||
-            [[url absoluteString] hasPrefix:@"https://www.youtube.com/v/"] ||
-			[[url absoluteString] hasPrefix:@"https://itunes.apple.com/"] ||
-			[[url absoluteString] hasPrefix:@"https://phobos.apple.com/"]) {
-			[[UIApplication sharedApplication] openURL:url];
-            return;
-		}
-	}
+    }
     
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
