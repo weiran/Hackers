@@ -121,6 +121,8 @@
             _tableView.hidden = NO;
         }
         
+        _tableView.scrollEnabled = YES;
+        
         [_tableView reloadData];
     }];
 }
@@ -167,6 +169,8 @@
     
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
+    
+    _tableView.scrollEnabled = NO; // disable scrolling until comments loaded
 }
 
 - (void)setupWebView {
