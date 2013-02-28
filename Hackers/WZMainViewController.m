@@ -272,6 +272,8 @@
     cell.titleLabel.text = post.title;
     if ([post.type isEqualToString:@"ask"]) {
         cell.domainLabel.text = @"Ask Hacker News";
+    } else if ([post.type isEqualToString:@"ask"]) {
+        cell.domainLabel.text = @"Job";
     } else {
         cell.domainLabel.text = post.domain;
     }

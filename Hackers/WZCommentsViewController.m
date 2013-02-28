@@ -189,7 +189,7 @@
 }
 
 - (void)setupSegmentedController {
-    if ([_post.type isEqualToString:@"ask"]) { // hide if post is ASK HN
+    if ([_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"]) { // hide if post is ASK HN
         _segmentedControl.hidden = YES;
     }
 
@@ -269,6 +269,8 @@
 - (void)layoutTableViewHeader {
     if ([_post.type isEqualToString:@"ask"]) {
         _headerDomainLabel.text = @"Ask Hacker News";
+    } else if ([_post.type isEqualToString:@"job"]) {
+        _headerDomainLabel.text = @"Jobs";
     } else {
         _headerDomainLabel.text = _post.domain;
     }
@@ -498,7 +500,7 @@
 }
 
 - (IBAction)headerViewTapped:(id)sender {
-    if (![_post.type isEqualToString:@"ask"]) {
+    if (![_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"]) {
         [_segmentedControl setSelectedSegmentIndex:1];
         [self segmentDidChange:_segmentedControl];
     }
