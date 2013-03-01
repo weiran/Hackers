@@ -16,6 +16,7 @@
 #import "WZRead.h"
 #import "WZPostCell.h"
 #import "WZPostModel.h"
+#import "WZNotify.h"
 
 #define kTitleUnreadTextColorWithWhite 0
 #define kTitleReadTextColorWithWhite 0.4
@@ -76,6 +77,8 @@
 - (void)endRefreshing:(NSError *)error {
     if (!error) {
         [self loadData];
+    } else {
+        [WZNotify showMessage:@"Failed refreshing Hacker News" inView:self.view duration:2];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{

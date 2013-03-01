@@ -19,6 +19,7 @@
 #import "WZPostModel.h"
 #import "WZWebViewController.h"
 #import "WZNavigationController.h"
+#import "WZNotify.h"
 
 #define kHeaderTitleTopMargin 10
 #define kHeaderTitleBottomMargin 44
@@ -101,6 +102,10 @@
     
     [WZHackersDataAPI.shared fetchCommentsForPost:_post.id completion:^(NSDictionary *items, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        if (error) {
+            [WZNotify showMessage:@"Failed getting comments" inView:self.view duration:2];
+        }
         
         // update post model if content exists
         id content = items[@"content"];
