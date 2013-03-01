@@ -16,15 +16,19 @@
     [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
     
     [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-    [[UIToolbar appearance] setTintColor:[UIColor darkGrayColor]];
+    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UINavigationBar appearance] setTitleTextAttributes:@{
                                     UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
                                UITextAttributeTextColor : [UIColor blackColor],
-                        UITextAttributeTextShadowOffset : [NSValue valueWithCGSize:CGSizeMake(0, 0)]
+                        UITextAttributeTextShadowColor  : [UIColor clearColor]
                                     }];
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forBarMetrics:UIBarMetricsDefault];
     [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-//    [[UINavigationBar appearance] setShadowImage:[UIImage new]];
+    [[UIBarButtonItem appearance] setTitleTextAttributes:@{
+                               UITextAttributeTextColor : [UIColor blackColor],
+                        UITextAttributeTextShadowColor  : [UIColor clearColor]
+     }
+                                                forState:UIControlStateNormal];
     return YES;
 }
 
