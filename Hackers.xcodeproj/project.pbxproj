@@ -23,6 +23,7 @@
 		2434A1FB16C0398800C383CA /* refresh-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1F916C0398800C383CA /* refresh-icon.png */; };
 		2434A1FC16C0398800C383CA /* refresh-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1FA16C0398800C383CA /* refresh-icon@2x.png */; };
 		245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 245F85D016690AE3000D3EE1 /* Security.framework */; };
+		2463930D16E0AA30005114ED /* WZNotify.m in Sources */ = {isa = PBXBuildFile; fileRef = 2463930C16E0AA30005114ED /* WZNotify.m */; };
 		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
 		2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2475EC6916DF617500FEAD45 /* WZNavigationController.m */; };
 		247A2D6416AC57DB00534229 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D5016AC575000534229 /* libDTCoreText.a */; };
@@ -179,6 +180,8 @@
 		2434A1F916C0398800C383CA /* refresh-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon.png"; sourceTree = "<group>"; };
 		2434A1FA16C0398800C383CA /* refresh-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon@2x.png"; sourceTree = "<group>"; };
 		245F85D016690AE3000D3EE1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		2463930B16E0AA30005114ED /* WZNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNotify.h; sourceTree = "<group>"; };
+		2463930C16E0AA30005114ED /* WZNotify.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNotify.m; sourceTree = "<group>"; };
 		2475EC5B16DE591100FEAD45 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		2475EC6816DF617500FEAD45 /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
 		2475EC6916DF617500FEAD45 /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
@@ -375,9 +378,11 @@
 		2417B65F16B9ADCA009E11EC /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				2463930A16E0AA21005114ED /* Notify */,
 				2417B66716B9ADDB009E11EC /* Main */,
 				2417B66816B9ADDF009E11EC /* Comments */,
 				2484385716C11E54001D2AA0 /* ActivityView */,
+				2434A1CB16BEED7A00C383CA /* Web */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -406,7 +411,6 @@
 			isa = PBXGroup;
 			children = (
 				24972CBF1643BD2900B4EFB4 /* Storyboards */,
-				2434A1CB16BEED7A00C383CA /* Web */,
 				2417B66A16B9AE0D009E11EC /* Cells */,
 			);
 			name = Views;
@@ -466,6 +470,15 @@
 				24DD254816CBF368005ED6EA /* WZWebView.xib */,
 			);
 			name = Web;
+			sourceTree = "<group>";
+		};
+		2463930A16E0AA21005114ED /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				2463930B16E0AA30005114ED /* WZNotify.h */,
+				2463930C16E0AA30005114ED /* WZNotify.m */,
+			);
+			name = Notify;
 			sourceTree = "<group>";
 		};
 		247A2D3916AC575000534229 /* Products */ = {
@@ -921,6 +934,7 @@
 				24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */,
 				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
 				2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */,
+				2463930D16E0AA30005114ED /* WZNotify.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
