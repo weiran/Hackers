@@ -104,7 +104,7 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
         if (error) {
-            [WZNotify showMessage:@"Failed getting comments" inView:self.view duration:2];
+            [WZNotify showMessage:@"Failed getting comments" inView:self.navigationController.view duration:2];
         }
         
         // update post model if content exists
