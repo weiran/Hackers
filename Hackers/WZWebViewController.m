@@ -195,14 +195,8 @@
 }
 
 - (void)didRotate:(NSNotification *)notification {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    // ignore upside down orientation
-    if (orientation == UIDeviceOrientationPortraitUpsideDown) {
-        return;
-    }
-    
-    BOOL isLandscape = UIDeviceOrientationIsLandscape(orientation);
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
 
     _navigationBar.hidden = _navigationBarHidden || isLandscape;
     _toolbar.hidden = _toolbarHidden || isLandscape;

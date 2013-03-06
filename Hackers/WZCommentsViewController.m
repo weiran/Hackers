@@ -122,7 +122,6 @@
         for (NSDictionary *commentDictionary in comments) {
             WZCommentModel *comment = [[WZCommentModel alloc] init];
             [comment updateAttributes:commentDictionary];
-                        
             [newComments addObject:comment];
         }
         _comments = newComments;
@@ -154,14 +153,8 @@
 }
 
 - (void)didRotate:(id)sender {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    // ignore upside down orientation
-    if (orientation == UIDeviceOrientationPortraitUpsideDown) {
-        return;
-    }
-
-    BOOL isLandscape = UIDeviceOrientationIsLandscape(orientation);
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
     BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
     
     _navigationView.hidden = webViewVisible && isLandscape;
