@@ -127,9 +127,11 @@ static NSString* const modelName = @"HackersDataModel";
 
 #pragma mark - Fetch data
 
-- (void)fetchNewsOfType:(WZNewsType)type completion:(void (^)(NSError *error))completion {
-    [WZHackersDataAPI.shared fetchNewsOfType:type success:^(NSArray *posts) {
-        [self clearNewsWithType:type];
+- (void)fetchNewsOfType:(WZNewsType)type page:(NSInteger)page completion:(void (^)(NSError *error))completion {
+    [WZHackersDataAPI.shared fetchNewsOfType:type page:page success:^(NSArray *posts) {
+        if (page <= 1) {
+            [self clearNewsWithType:type];
+        }
         
         NSManagedObjectContext *context = [self context];
         

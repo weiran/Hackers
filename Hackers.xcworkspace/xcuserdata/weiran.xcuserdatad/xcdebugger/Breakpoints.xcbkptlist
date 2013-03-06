@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZHackersData.m"
-         timestampString = "383319041.693551"
+         timestampString = "384280693.869495"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "219"
-         endingLineNumber = "219"
+         startingLineNumber = "221"
+         endingLineNumber = "221"
          landmarkName = "-updatePost:withContent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Hackers/WZHackersData.m"
-         timestampString = "383319107.635727"
+         timestampString = "384280693.869495"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "186"
-         endingLineNumber = "186"
+         startingLineNumber = "188"
+         endingLineNumber = "188"
          landmarkName = "-fetchPostWithID:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -40,6 +40,32 @@
          startingLineNumber = "45"
          endingLineNumber = "45"
          landmarkName = "-contentHeightForWidth:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Hackers/WZHackersData.m"
+         timestampString = "384281179.180444"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "132"
+         endingLineNumber = "132"
+         landmarkName = "-fetchNewsOfType:page:completion:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Hackers/WZMainViewController.m"
+         timestampString = "384281208.559778"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "98"
+         endingLineNumber = "98"
+         landmarkName = "-endRefreshing:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

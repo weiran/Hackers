@@ -15,6 +15,7 @@
 + (id)shared;
 
 - (void)fetchNewsOfType:(WZNewsType)type
+                   page:(NSInteger)page
                 success:(void (^)(NSArray *posts))success
                 failure:(void (^)(NSError *error))failure;
 

@@ -19,7 +19,7 @@ typedef enum {
 @property (nonatomic, readonly) NSManagedObjectContext *context;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-- (void)fetchNewsOfType:(WZNewsType)type completion:(void (^)(NSError *error))completion;
+- (void)fetchNewsOfType:(WZNewsType)type page:(NSInteger)page completion:(void (^)(NSError *error))completion;
 - (void)addRead:(NSNumber *)id;
 - (void)updatePost:(NSInteger)postID withContent:(NSString *)content;
 

@@ -29,6 +29,7 @@ static NSString* const commentsPath = @"item";
 }
 
 - (void)fetchNewsOfType:(WZNewsType)type
+                   page:(NSInteger)page
                 success:(void (^)(NSArray *posts))success
                 failure:(void (^)(NSError *error))failure {
     NSString *path = nil;
@@ -48,6 +49,12 @@ static NSString* const commentsPath = @"item";
     }
     
     NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:path];
+    
+    // support 2nd page
+    if (page == 2 && type == WZNewsTypeTop) {
+        
+    }
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {

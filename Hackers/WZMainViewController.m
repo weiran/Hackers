@@ -28,6 +28,8 @@
     NSArray *_news;
     NSArray *_newNews;
     NSArray *_askNews;
+    NSInteger _topNewsPage;
+    
     NSMutableArray *_readNews;
     UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
@@ -46,6 +48,7 @@
 
     _readNews = [NSMutableArray array];
     _newsType = WZNewsTypeTop;
+    _topNewsPage = 1;
     
     [self setupPullToRefresh];
     [self setupMenu];
@@ -69,8 +72,22 @@
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    [WZHackersData.shared fetchNewsOfType:[self newsType] completion:^(NSError *error) {
+    NSInteger newsPage = 1;
+    if (_newsType == WZNewsTypeTop) {
+        newsPage = _topNewsPage;
+    }
+    
+    [WZHackersData.shared fetchNewsOfType:[self newsType] page:newsPage completion:^(NSError *error) {
         [self performSelector:@selector(endRefreshing:) withObject:error afterDelay:0.5];
+    }];
+}
+
+- (void)sendFetchRequestWithPage:(NSInteger)page {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    _topNewsPage = page;
+    
+    [WZHackersData.shared fetchNewsOfType:[self newsType] page:page completion:^(NSError *error) {
+        [self endRefreshing:error];
     }];
 }
 
@@ -260,43 +277,55 @@
     if (![self activeNews]) {
         return 0;
     } else {
-        return [self activeNews].count;
+        if (_newsType == WZNewsTypeTop) {
+            return _news.count + 1;
+        } else {
+            return [self activeNews].count;
+        }
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString* const cellIdentifier = @"PostCell";
+    static NSString* const postCellIdentifier = @"PostCell";
+    static NSString *const loadingCellIdentifier = @"LoadingCell";
     
-    WZPostModel *post = [self activeNews][indexPath.row];
-    WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
-    cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
-//    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
-    cell.titleLabel.text = post.title;
-    if ([post.type isEqualToString:@"ask"]) {
-        cell.domainLabel.text = @"Ask Hacker News";
-    } else if ([post.type isEqualToString:@"ask"]) {
-        cell.domainLabel.text = @"Job";
-    } else {
-        cell.domainLabel.text = post.domain;
+    // if we're on the loading cell
+    if (_newsType == WZNewsTypeTop && indexPath.row == _news.count && _topNewsPage == 1) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:loadingCellIdentifier];
+        [self sendFetchRequestWithPage:2];
+        return cell;
+    } else {    
+        WZPostModel *post = [self activeNews][indexPath.row];
+        WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:postCellIdentifier];
+        cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
+        cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
+    //    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
+        cell.titleLabel.text = post.title;
+        if ([post.type isEqualToString:@"ask"]) {
+            cell.domainLabel.text = @"Ask Hacker News";
+        } else if ([post.type isEqualToString:@"ask"]) {
+            cell.domainLabel.text = @"Job";
+        } else {
+            cell.domainLabel.text = post.domain;
+        }
+        
+        NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"self == %lu", post.id];
+        NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
+        
+        if (filteredReadNews.count > 0) {
+            cell.readBadgeImageView.hidden = YES;
+        } else {
+            cell.readBadgeImageView.hidden = NO;
+        }
+        
+        if ([_selectedIndexPath isEqual:indexPath]) {
+            [cell setSelected:YES];
+        } else {
+            [cell setSelected:NO];
+        }
+        
+        return cell;
     }
-    
-    NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"self == %lu", post.id];
-    NSArray *filteredReadNews = [_readNews filteredArrayUsingPredicate:filterPredicate];
-    
-    if (filteredReadNews.count > 0) {
-        cell.readBadgeImageView.hidden = YES;
-    } else {
-        cell.readBadgeImageView.hidden = NO;
-    }
-    
-    if ([_selectedIndexPath isEqual:indexPath]) {
-        [cell setSelected:YES];
-    } else {
-        [cell setSelected:NO];
-    }
-    
-    return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -309,6 +338,12 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    // if it's the loading cell
+    if (_newsType == WZNewsTypeTop && indexPath.row == _news.count && _topNewsPage == 1) {
+        return 74;
+    }
+    
+    
     WZPostModel *post = [self activeNews][indexPath.row];
     
     if (!post.cellHeight) {
