@@ -79,10 +79,12 @@
 }
 
 - (void)sendFetchRequestWithPage:(NSInteger)page {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    _topNewsPage = page;
-    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;    
     [WZHackersData.shared fetchNewsOfType:[self newsType] page:page completion:^(NSError *error) {
+        if (!error) {
+            _topNewsPage = page;
+        }
+        
         [self endRefreshing:error];
     }];
 }
@@ -91,7 +93,7 @@
     if (!error) {
         [self loadData];
     } else {
-        [WZNotify showMessage:@"Failed refreshing Hacker News" inView:self.navigationController.view duration:2];
+        [WZNotify showMessage:@"Failed loading news" inView:self.navigationController.view duration:2];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
