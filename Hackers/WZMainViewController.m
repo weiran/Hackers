@@ -71,13 +71,9 @@
     [sender beginRefreshing];
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
-    NSInteger newsPage = 1;
-    if (_newsType == WZNewsTypeTop) {
-        newsPage = _topNewsPage;
-    }
-    
-    [WZHackersData.shared fetchNewsOfType:[self newsType] page:newsPage completion:^(NSError *error) {
+        
+    [WZHackersData.shared fetchNewsOfType:[self newsType] page:1 completion:^(NSError *error) {
+        _topNewsPage = 1;
         [self performSelector:@selector(endRefreshing:) withObject:error afterDelay:0.5];
     }];
 }
@@ -106,7 +102,7 @@
 }
 
 - (void)setupPullToRefresh {
-    UIColor *backgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1];
+    UIColor *backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
     
     _refreshControl = [[UIRefreshControl alloc] init];
     _refreshControl.backgroundColor = backgroundColor;
@@ -278,7 +274,12 @@
         return 0;
     } else {
         if (_newsType == WZNewsTypeTop) {
-            return _news.count + 1;
+            // currently, only support page 2
+            if (_topNewsPage > 1) {
+                return _news.count;
+            } else {
+                return _news.count + 1;
+            }
         } else {
             return [self activeNews].count;
         }
@@ -342,7 +343,6 @@
     if (_newsType == WZNewsTypeTop && indexPath.row == _news.count && _topNewsPage == 1) {
         return 74;
     }
-    
     
     WZPostModel *post = [self activeNews][indexPath.row];
     

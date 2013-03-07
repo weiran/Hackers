@@ -52,7 +52,7 @@ static NSString* const commentsPath = @"item";
     
     // support 2nd page
     if (page == 2 && type == WZNewsTypeTop) {
-        
+        requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:@"news2"];
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];

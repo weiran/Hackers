@@ -135,7 +135,8 @@ static NSString* const modelName = @"HackersDataModel";
         
         NSManagedObjectContext *context = [self context];
         
-        NSInteger count = 1;
+        NSInteger count = (page - 1) * 30 + 1;
+        
         for (NSDictionary *dictionary in posts) {
             WZPost *post = [WZPost insertInManagedObjectContext:context];
             [post updateAttributes:dictionary];
