@@ -11,6 +11,13 @@ Hackers is an iPhone app for reading Hacker News on the go. It's optimised for q
 * Filter by top news, new news, or Ask HN.
 * Instapaper mobilizer support.
 
+## Links
+
+Hackers is [available for sale in the App Store](https://itunes.apple.com/us/app/hackers-hacker-news-reading/id603503901)
+
+I wrote [a blog post introducing Hackers](http://weiranzhang.com/blog/2013/3/hackers-a-hacker-news-app-for-iphone). You can follow [Hackers' progress on my blogs tagged Hackers](http://weiranzhang.com/?tag=hackers).
+
+You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
 ## About
 
