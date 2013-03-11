@@ -7,13 +7,18 @@
 //
 
 #import "WZAppDelegate.h"
-#import <Crashlytics/Crashlytics.h>
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
+
+#if NDEBUG
+#import <Crashlytics/Crashlytics.h>
+#endif
 
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+#if NDEBUG
     [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
+#endif
     
     [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
