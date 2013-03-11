@@ -26,7 +26,6 @@
 		2463930D16E0AA30005114ED /* WZNotify.m in Sources */ = {isa = PBXBuildFile; fileRef = 2463930C16E0AA30005114ED /* WZNotify.m */; };
 		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
 		2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2475EC6916DF617500FEAD45 /* WZNavigationController.m */; };
-		247A2D6416AC57DB00534229 /* libDTCoreText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D5016AC575000534229 /* libDTCoreText.a */; };
 		247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6516AC57DB00534229 /* ImageIO.framework */; };
 		247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6616AC57DB00534229 /* libxml2.dylib */; };
 		247A2D6A16AC57DB00534229 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6716AC57DB00534229 /* MobileCoreServices.framework */; };
@@ -48,14 +47,6 @@
 		24AA08FC165187EA00FA9FEC /* greyButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08F8165187EA00FA9FEC /* greyButton@2x.png */; };
 		24AA08FD165187EA00FA9FEC /* greyButtonHighlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08F9165187EA00FA9FEC /* greyButtonHighlight.png */; };
 		24AA08FE165187EA00FA9FEC /* greyButtonHighlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24AA08FA165187EA00FA9FEC /* greyButtonHighlight@2x.png */; };
-		24B2214816D6A1E400B35EAC /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 24B2212216D6A1E400B35EAC /* LICENSE */; };
-		24B2214916D6A1E400B35EAC /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 24B2212316D6A1E400B35EAC /* README.md */; };
-		24B2214A16D6A1E400B35EAC /* REMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2212616D6A1E400B35EAC /* REMenu.m */; };
-		24B2214B16D6A1E400B35EAC /* REMenuContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2212816D6A1E400B35EAC /* REMenuContainerView.m */; };
-		24B2214C16D6A1E400B35EAC /* REMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2212A16D6A1E400B35EAC /* REMenuItem.m */; };
-		24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2212C16D6A1E400B35EAC /* REMenuItemView.m */; };
-		24B2214E16D6A1E400B35EAC /* REMenu.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 24B2212D16D6A1E400B35EAC /* REMenu.podspec */; };
-		24B2215F16D6A1E400B35EAC /* Screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2214716D6A1E400B35EAC /* Screenshot.png */; };
 		24B2216E16D6BB2200B35EAC /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2216C16D6BB2200B35EAC /* menu-icon.png */; };
 		24B2216F16D6BB2200B35EAC /* menu-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2216D16D6BB2200B35EAC /* menu-icon@2x.png */; };
 		24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2217816D8DB6100B35EAC /* NSString+AttributedStringForHTML.m */; };
@@ -102,65 +93,6 @@
 		DFCC5074B30047A392BC2180 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECD4604DC1E846869F39B01C /* libPods.a */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		247A2D4B16AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1D6058910D05DD3D006BFB54;
-			remoteInfo = DemoApp;
-		};
-		247A2D4D16AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A70F119B14863198009202BF;
-			remoteInfo = "Static Framework";
-		};
-		247A2D4F16AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A70F11DE148632CD009202BF;
-			remoteInfo = "Static Library";
-		};
-		247A2D5116AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A788CA681486456100E1AFD9;
-			remoteInfo = UnitTest;
-		};
-		247A2D5316AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A7949A5814CC456000A8CCDE;
-			remoteInfo = MacUnitTest;
-		};
-		247A2D5516AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A7F7EFCD1573603100F5A4D0;
-			remoteInfo = "Static Library (no DTFoundation)";
-		};
-		247A2D5716AC575000534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E2262DC61638331500BFDAD7;
-			remoteInfo = "Mac Framework";
-		};
-		247A2D6216AC579700534229 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A70F11DD148632CD009202BF;
-			remoteInfo = "Static Library";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		2402A6D5164D224100F637E5 /* WZCommentModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentModel.h; sourceTree = "<group>"; };
@@ -185,7 +117,6 @@
 		2475EC5B16DE591100FEAD45 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		2475EC6816DF617500FEAD45 /* WZNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNavigationController.h; sourceTree = "<group>"; };
 		2475EC6916DF617500FEAD45 /* WZNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNavigationController.m; sourceTree = "<group>"; };
-		247A2D3816AC575000534229 /* DTCoreText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DTCoreText.xcodeproj; path = DTCoreText/DTCoreText.xcodeproj; sourceTree = "<group>"; };
 		247A2D6516AC57DB00534229 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		247A2D6616AC57DB00534229 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		247A2D6716AC57DB00534229 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -213,18 +144,6 @@
 		24AA08F8165187EA00FA9FEC /* greyButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "greyButton@2x.png"; sourceTree = "<group>"; };
 		24AA08F9165187EA00FA9FEC /* greyButtonHighlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greyButtonHighlight.png; sourceTree = "<group>"; };
 		24AA08FA165187EA00FA9FEC /* greyButtonHighlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "greyButtonHighlight@2x.png"; sourceTree = "<group>"; };
-		24B2212216D6A1E400B35EAC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		24B2212316D6A1E400B35EAC /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		24B2212516D6A1E400B35EAC /* REMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REMenu.h; sourceTree = "<group>"; };
-		24B2212616D6A1E400B35EAC /* REMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REMenu.m; sourceTree = "<group>"; };
-		24B2212716D6A1E400B35EAC /* REMenuContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REMenuContainerView.h; sourceTree = "<group>"; };
-		24B2212816D6A1E400B35EAC /* REMenuContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REMenuContainerView.m; sourceTree = "<group>"; };
-		24B2212916D6A1E400B35EAC /* REMenuItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REMenuItem.h; sourceTree = "<group>"; };
-		24B2212A16D6A1E400B35EAC /* REMenuItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REMenuItem.m; sourceTree = "<group>"; };
-		24B2212B16D6A1E400B35EAC /* REMenuItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REMenuItemView.h; sourceTree = "<group>"; };
-		24B2212C16D6A1E400B35EAC /* REMenuItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REMenuItemView.m; sourceTree = "<group>"; };
-		24B2212D16D6A1E400B35EAC /* REMenu.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = REMenu.podspec; sourceTree = "<group>"; };
-		24B2214716D6A1E400B35EAC /* Screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Screenshot.png; sourceTree = "<group>"; };
 		24B2216C16D6BB2200B35EAC /* menu-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon.png"; sourceTree = "<group>"; };
 		24B2216D16D6BB2200B35EAC /* menu-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon@2x.png"; sourceTree = "<group>"; };
 		24B2217716D8DB6100B35EAC /* NSString+AttributedStringForHTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+AttributedStringForHTML.h"; sourceTree = "<group>"; };
@@ -314,7 +233,6 @@
 				247A2D6A16AC57DB00534229 /* MobileCoreServices.framework in Frameworks */,
 				247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */,
 				247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */,
-				247A2D6416AC57DB00534229 /* libDTCoreText.a in Frameworks */,
 				249827561652A42E001C0ECF /* CoreText.framework in Frameworks */,
 				24EAA60F1649647B00105FE1 /* QuartzCore.framework in Frameworks */,
 				245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */,
@@ -481,20 +399,6 @@
 			name = Notify;
 			sourceTree = "<group>";
 		};
-		247A2D3916AC575000534229 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				247A2D4C16AC575000534229 /* RTDemoApp.app */,
-				247A2D4E16AC575000534229 /* DTCoreText.framework */,
-				247A2D5016AC575000534229 /* libDTCoreText.a */,
-				247A2D5216AC575000534229 /* UnitTest.octest */,
-				247A2D5416AC575000534229 /* MacUnitTest.octest */,
-				247A2D5616AC575000534229 /* libDTCoreText_no_DTFoundation.a */,
-				247A2D5816AC575000534229 /* DTCoreText.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		2484385716C11E54001D2AA0 /* ActivityView */ = {
 			isa = PBXGroup;
 			children = (
@@ -583,38 +487,9 @@
 		24975A72164A88A5000143A1 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				24B2212116D6A1E400B35EAC /* REMenu */,
-				247A2D3816AC575000534229 /* DTCoreText.xcodeproj */,
 				24C43FE916A44DCC00055D65 /* TUSafariActivity */,
 			);
 			path = Libraries;
-			sourceTree = "<group>";
-		};
-		24B2212116D6A1E400B35EAC /* REMenu */ = {
-			isa = PBXGroup;
-			children = (
-				24B2212216D6A1E400B35EAC /* LICENSE */,
-				24B2212316D6A1E400B35EAC /* README.md */,
-				24B2212416D6A1E400B35EAC /* REMenu */,
-				24B2212D16D6A1E400B35EAC /* REMenu.podspec */,
-				24B2214716D6A1E400B35EAC /* Screenshot.png */,
-			);
-			path = REMenu;
-			sourceTree = "<group>";
-		};
-		24B2212416D6A1E400B35EAC /* REMenu */ = {
-			isa = PBXGroup;
-			children = (
-				24B2212516D6A1E400B35EAC /* REMenu.h */,
-				24B2212616D6A1E400B35EAC /* REMenu.m */,
-				24B2212716D6A1E400B35EAC /* REMenuContainerView.h */,
-				24B2212816D6A1E400B35EAC /* REMenuContainerView.m */,
-				24B2212916D6A1E400B35EAC /* REMenuItem.h */,
-				24B2212A16D6A1E400B35EAC /* REMenuItem.m */,
-				24B2212B16D6A1E400B35EAC /* REMenuItemView.h */,
-				24B2212C16D6A1E400B35EAC /* REMenuItemView.m */,
-			);
-			path = REMenu;
 			sourceTree = "<group>";
 		};
 		24C43FE916A44DCC00055D65 /* TUSafariActivity */ = {
@@ -704,7 +579,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				247A2D6316AC579700534229 /* PBXTargetDependency */,
 			);
 			name = Hackers;
 			productName = Hackers;
@@ -746,70 +620,12 @@
 			mainGroup = 24972C8E1643BC3C00B4EFB4;
 			productRefGroup = 24972C9A1643BC3C00B4EFB4 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 247A2D3916AC575000534229 /* Products */;
-					ProjectRef = 247A2D3816AC575000534229 /* DTCoreText.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				24972C981643BC3C00B4EFB4 /* Hackers */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		247A2D4C16AC575000534229 /* RTDemoApp.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = RTDemoApp.app;
-			remoteRef = 247A2D4B16AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D4E16AC575000534229 /* DTCoreText.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = DTCoreText.framework;
-			remoteRef = 247A2D4D16AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D5016AC575000534229 /* libDTCoreText.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libDTCoreText.a;
-			remoteRef = 247A2D4F16AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D5216AC575000534229 /* UnitTest.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = UnitTest.octest;
-			remoteRef = 247A2D5116AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D5416AC575000534229 /* MacUnitTest.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = MacUnitTest.octest;
-			remoteRef = 247A2D5316AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D5616AC575000534229 /* libDTCoreText_no_DTFoundation.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libDTCoreText_no_DTFoundation.a;
-			remoteRef = 247A2D5516AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		247A2D5816AC575000534229 /* DTCoreText.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = DTCoreText.framework;
-			remoteRef = 247A2D5716AC575000534229 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		24972C971643BC3C00B4EFB4 /* Resources */ = {
@@ -855,10 +671,6 @@
 				24DD253616CBB0A8005ED6EA /* mobilizer-icon-highlighted.png in Resources */,
 				24DD253716CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png in Resources */,
 				24DD254916CBF368005ED6EA /* WZWebView.xib in Resources */,
-				24B2214816D6A1E400B35EAC /* LICENSE in Resources */,
-				24B2214916D6A1E400B35EAC /* README.md in Resources */,
-				24B2214E16D6A1E400B35EAC /* REMenu.podspec in Resources */,
-				24B2215F16D6A1E400B35EAC /* Screenshot.png in Resources */,
 				24B2216E16D6BB2200B35EAC /* menu-icon.png in Resources */,
 				24B2216F16D6BB2200B35EAC /* menu-icon@2x.png in Resources */,
 				24B2217D16D91A4800B35EAC /* unread-badge@2x.png in Resources */,
@@ -928,10 +740,6 @@
 				2484386D16C12664001D2AA0 /* WZPostModel.m in Sources */,
 				24D11C1016C42681000AE946 /* WZDefaults.m in Sources */,
 				24DD254016CBE920005ED6EA /* WZWebViewController.m in Sources */,
-				24B2214A16D6A1E400B35EAC /* REMenu.m in Sources */,
-				24B2214B16D6A1E400B35EAC /* REMenuContainerView.m in Sources */,
-				24B2214C16D6A1E400B35EAC /* REMenuItem.m in Sources */,
-				24B2214D16D6A1E400B35EAC /* REMenuItemView.m in Sources */,
 				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
 				2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */,
 				2463930D16E0AA30005114ED /* WZNotify.m in Sources */,
@@ -939,14 +747,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		247A2D6316AC579700534229 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Static Library";
-			targetProxy = 247A2D6216AC579700534229 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		24972CA81643BC3C00B4EFB4 /* InfoPlist.strings */ = {

@@ -13,4 +13,6 @@
 #endif
 #endif /* __OBJC__ */
 
+#import <CoreText/CoreText.h>
+
 #define OHATTRIBUTEDLABEL_DEDICATED_PROJECT
