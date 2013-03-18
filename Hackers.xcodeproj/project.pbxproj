@@ -54,6 +54,9 @@
 		24B2217E16D91A4800B35EAC /* unread-badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B2217C16D91A4800B35EAC /* unread-badge.png */; };
 		24B2BF4D164C5BEF00C588F1 /* WZCommentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */; };
 		24B2BF50164C5C7700C588F1 /* WZCommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */; };
+		24B3019E16F753B7005405CD /* frontViewControllerDropShadow.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B3019A16F753B7005405CD /* frontViewControllerDropShadow.png */; };
+		24B3019F16F753B7005405CD /* frontViewControllerDropShadow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24B3019B16F753B7005405CD /* frontViewControllerDropShadow@2x.png */; };
+		24B301A016F753B7005405CD /* JSSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B3019D16F753B7005405CD /* JSSlidingViewController.m */; };
 		24B7D8FF164ADA3F00F55B3D /* _WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FC164ADA3F00F55B3D /* _WZRead.m */; };
 		24B7D900164ADA3F00F55B3D /* WZRead.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D8FE164ADA3F00F55B3D /* WZRead.m */; };
 		24C4400116A44DCC00055D65 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24C43FEA16A44DCC00055D65 /* TUSafariActivity.strings */; };
@@ -155,6 +158,10 @@
 		24B2BF4C164C5BEF00C588F1 /* WZCommentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentsViewController.m; sourceTree = "<group>"; };
 		24B2BF4E164C5C7700C588F1 /* WZCommentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentCell.h; sourceTree = "<group>"; };
 		24B2BF4F164C5C7700C588F1 /* WZCommentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentCell.m; sourceTree = "<group>"; };
+		24B3019A16F753B7005405CD /* frontViewControllerDropShadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = frontViewControllerDropShadow.png; sourceTree = "<group>"; };
+		24B3019B16F753B7005405CD /* frontViewControllerDropShadow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "frontViewControllerDropShadow@2x.png"; sourceTree = "<group>"; };
+		24B3019C16F753B7005405CD /* JSSlidingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSSlidingViewController.h; sourceTree = "<group>"; };
+		24B3019D16F753B7005405CD /* JSSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSSlidingViewController.m; sourceTree = "<group>"; };
 		24B7D8FB164ADA3F00F55B3D /* _WZRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZRead.h; sourceTree = "<group>"; };
 		24B7D8FC164ADA3F00F55B3D /* _WZRead.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZRead.m; sourceTree = "<group>"; };
 		24B7D8FD164ADA3F00F55B3D /* WZRead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZRead.h; sourceTree = "<group>"; };
@@ -487,9 +494,21 @@
 		24975A72164A88A5000143A1 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				24B3019916F753B7005405CD /* JSSlidingViewController */,
 				24C43FE916A44DCC00055D65 /* TUSafariActivity */,
 			);
 			path = Libraries;
+			sourceTree = "<group>";
+		};
+		24B3019916F753B7005405CD /* JSSlidingViewController */ = {
+			isa = PBXGroup;
+			children = (
+				24B3019A16F753B7005405CD /* frontViewControllerDropShadow.png */,
+				24B3019B16F753B7005405CD /* frontViewControllerDropShadow@2x.png */,
+				24B3019C16F753B7005405CD /* JSSlidingViewController.h */,
+				24B3019D16F753B7005405CD /* JSSlidingViewController.m */,
+			);
+			path = JSSlidingViewController;
 			sourceTree = "<group>";
 		};
 		24C43FE916A44DCC00055D65 /* TUSafariActivity */ = {
@@ -675,6 +694,8 @@
 				24B2216F16D6BB2200B35EAC /* menu-icon@2x.png in Resources */,
 				24B2217D16D91A4800B35EAC /* unread-badge@2x.png in Resources */,
 				24B2217E16D91A4800B35EAC /* unread-badge.png in Resources */,
+				24B3019E16F753B7005405CD /* frontViewControllerDropShadow.png in Resources */,
+				24B3019F16F753B7005405CD /* frontViewControllerDropShadow@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -743,6 +764,7 @@
 				24B2217916D8DB6100B35EAC /* NSString+AttributedStringForHTML.m in Sources */,
 				2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */,
 				2463930D16E0AA30005114ED /* WZNotify.m in Sources */,
+				24B301A016F753B7005405CD /* JSSlidingViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class JSSlidingViewController;
+
 @interface WZAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) JSSlidingViewController *viewController;
 
 @end

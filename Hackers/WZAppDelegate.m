@@ -9,6 +9,9 @@
 #import "WZAppDelegate.h"
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 
+#import "WZNavigationController.h"
+#import "JSSlidingViewController.h"
+
 #if NDEBUG
 #import <Crashlytics/Crashlytics.h>
 #endif
@@ -19,7 +22,6 @@
 #if NDEBUG
     [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
 #endif
-    
     [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
     [[UINavigationBar appearance] setTitleTextAttributes:@{
@@ -34,6 +36,19 @@
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
      }
                                                 forState:UIControlStateNormal];
+    
+    // initilise storyboard with JSSlidingViewController
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+    WZNavigationController *navigationController = [storyboard instantiateInitialViewController];
+    UITableViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+    
+    _viewController = [[JSSlidingViewController alloc] initWithFrontViewController:navigationController backViewController:menuController];
+
+    self.window.rootViewController = _viewController;
+    [self.window makeKeyAndVisible];
+    
     return YES;
 }
 

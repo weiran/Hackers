@@ -8,6 +8,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import "REMenu.h"
+#import "JSSlidingViewController.h"
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -63,6 +64,14 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
+    WZAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    delegate.viewController.locked = false;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    WZAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    delegate.viewController.locked = true;
 }
 
 #pragma mark - Fetch

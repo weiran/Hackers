@@ -11,4 +11,5 @@
     #import <MobileCoreServices/MobileCoreServices.h>
     #import <SystemConfiguration/SystemConfiguration.h>
     #import "WZDefaults.h"
+    #import "WZAppDelegate.h"
 #endif
