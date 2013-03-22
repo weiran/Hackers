@@ -6,17 +6,21 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
+#define BACKUP_API_ENDPOINTS @[@"http://node-hnapi.herokuapp.com", @"http://node-hnapi.ap01.aws.af.cm", @"http://node-hnapi-hp.hp.af.cm", @"http://node-hnapi-rs.rs.af.cm", @"http://node-hnapi.azurewebsites.net"]
+#define TOP_NEWS_PATH @"news"
+#define NEW_NEWS_PATH @"newest"
+#define ASK_HN_PATH @"ask"
+#define COMMENTS_PATH @"item"
+
 #import <AFNetworking/AFNetworking.h>
-
 #import "WZHackersDataAPI.h"
-
 #import "WZHackersData.h"
 
-static NSString* const baseURL = @"http://node-hnapi.herokuapp.com";
-static NSString* const topNewsPath = @"news";
-static NSString* const newNewsPath = @"newest";
-static NSString* const askNewsPath = @"ask";
-static NSString* const commentsPath = @"item";
+@interface WZHackersDataAPI () {
+    NSString *_baseURL;
+    NSInteger _endpointIndex;
+}
+@end
 
 @implementation WZHackersDataAPI
 
@@ -28,6 +32,15 @@ static NSString* const commentsPath = @"item";
     return __api;
 }
 
+- (id)init {
+    self = [super init];
+    if (self) {
+        _endpointIndex = 0;
+        _baseURL = [self nextEndpoint];
+    }
+    return self;
+}
+
 - (void)fetchNewsOfType:(WZNewsType)type
                    page:(NSInteger)page
                 success:(void (^)(NSArray *posts))success
@@ -36,23 +49,23 @@ static NSString* const commentsPath = @"item";
     
     switch (type) {
         case WZNewsTypeTop:
-            path = topNewsPath;
+            path = TOP_NEWS_PATH;
             break;
             
         case WZNewsTypeNew:
-            path = newNewsPath;
+            path = NEW_NEWS_PATH;
             break;
             
         case WZNewsTypeAsk:
-            path = askNewsPath;
+            path = ASK_HN_PATH;
             break;
     }
     
-    NSURL *requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:path];
+    NSURL *requestURL = [[NSURL URLWithString:_baseURL] URLByAppendingPathComponent:path];
     
     // support 2nd page
     if (page == 2 && type == WZNewsTypeTop) {
-        requestURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:@"news2"];
+        requestURL = [[NSURL URLWithString:_baseURL] URLByAppendingPathComponent:@"news2"];
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
@@ -62,8 +75,15 @@ static NSString* const commentsPath = @"item";
                 success(JSON);
             }
         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-            if (failure) {
-                failure(error);
+            NSString *nextEndpoint = [self nextEndpoint];
+            if (nextEndpoint) {
+                _baseURL = nextEndpoint;
+                // if there is another endpoint to try, try it
+                [self fetchNewsOfType:type page:page success:success failure:failure];
+            } else {
+                if (failure) {
+                    failure(error);
+                }
             }
         }];
     
@@ -72,8 +92,8 @@ static NSString* const commentsPath = @"item";
 
 - (void)fetchCommentsForPost:(NSInteger)postID
                   completion:(void (^)(NSDictionary *items, NSError *error))completion {
-    NSURL *requestURL = [[[NSURL URLWithString:baseURL]
-                            URLByAppendingPathComponent:commentsPath]
+    NSURL *requestURL = [[[NSURL URLWithString:_baseURL]
+                            URLByAppendingPathComponent:COMMENTS_PATH]
                             URLByAppendingPathComponent:[NSString stringWithFormat:@"%d", postID] isDirectory:NO];
     NSMutableURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     
@@ -83,12 +103,28 @@ static NSString* const commentsPath = @"item";
                 completion(JSON, nil);
             }
         } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-            if (completion) {
-                completion(nil, error);
+            NSString *nextEndpoint = [self nextEndpoint];
+            if (nextEndpoint) {
+                _baseURL = nextEndpoint;
+                // if there is another endpoint to try, try it
+                [self fetchCommentsForPost:postID completion:completion];
+            } else {
+                if (completion) {
+                    completion(nil, error);
+                }
             }
         }];
     
     [op start];
+}
+
+- (NSString *)nextEndpoint {
+    NSArray *endpoints = BACKUP_API_ENDPOINTS;
+    if (_endpointIndex < endpoints.count) {
+        return endpoints[_endpointIndex++];
+    } else {
+        return nil;
+    }
 }
 
 @end
