@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
-#define BACKUP_API_ENDPOINTS @[@"http://node-hnapi.herokuapp.com", @"http://node-hnapi.ap01.aws.af.cm", @"http://node-hnapi-hp.hp.af.cm", @"http://node-hnapi-rs.rs.af.cm", @"http://node-hnapi.azurewebsites.net"]
+#define BACKUP_API_ENDPOINTS @[@"http://hackers.rs.af.cm", @"http://node-hnapi.herokuapp.com", @"http://node-hnapi.ap01.aws.af.cm", @"http://node-hnapi-hp.hp.af.cm", @"http://node-hnapi-rs.rs.af.cm", @"http://node-hnapi.azurewebsites.net"]
 #define TOP_NEWS_PATH @"news"
 #define NEW_NEWS_PATH @"newest"
 #define ASK_HN_PATH @"ask"
