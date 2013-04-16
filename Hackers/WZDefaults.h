@@ -17,6 +17,10 @@
 #define kNavigationFontName @"HelveticaNeue-Light"
 #define kNavigationFontSize 20
 
+@class WZAppDelegate;
+
 @interface WZDefaults : NSObject
+
++ (WZAppDelegate *)appDelegate;
 
 @end

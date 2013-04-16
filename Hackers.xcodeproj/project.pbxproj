@@ -78,6 +78,7 @@
 		24DD253716CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24DD253516CBB0A8005ED6EA /* mobilizer-icon-highlighted@2x.png */; };
 		24DD254016CBE920005ED6EA /* WZWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DD253F16CBE920005ED6EA /* WZWebViewController.m */; };
 		24DD254916CBF368005ED6EA /* WZWebView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24DD254816CBF368005ED6EA /* WZWebView.xib */; };
+		24DF0C8D171D99380095491D /* WZMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DF0C8C171D99380095491D /* WZMenuViewController.m */; };
 		24EAA5B51647D56900105FE1 /* HackersDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5B31647D56900105FE1 /* HackersDataModel.xcdatamodeld */; };
 		24EAA5CC1647DC9C00105FE1 /* _WZComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C51647DC9C00105FE1 /* _WZComment.m */; };
 		24EAA5CD1647DC9C00105FE1 /* _WZPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5C71647DC9C00105FE1 /* _WZPost.m */; };
@@ -203,6 +204,8 @@
 		24DD253E16CBE920005ED6EA /* WZWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZWebViewController.h; sourceTree = "<group>"; };
 		24DD253F16CBE920005ED6EA /* WZWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZWebViewController.m; sourceTree = "<group>"; };
 		24DD254816CBF368005ED6EA /* WZWebView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WZWebView.xib; sourceTree = "<group>"; };
+		24DF0C8B171D99380095491D /* WZMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZMenuViewController.h; sourceTree = "<group>"; };
+		24DF0C8C171D99380095491D /* WZMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZMenuViewController.m; sourceTree = "<group>"; };
 		24EAA5B41647D56900105FE1 /* HackersDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HackersDataModel.xcdatamodel; sourceTree = "<group>"; };
 		24EAA5C41647DC9C00105FE1 /* _WZComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WZComment.h; sourceTree = "<group>"; };
 		24EAA5C51647DC9C00105FE1 /* _WZComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _WZComment.m; sourceTree = "<group>"; };
@@ -303,6 +306,7 @@
 		2417B65F16B9ADCA009E11EC /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				24DF0C8A171D992B0095491D /* Menu */,
 				2463930A16E0AA21005114ED /* Notify */,
 				2417B66716B9ADDB009E11EC /* Main */,
 				2417B66816B9ADDF009E11EC /* Comments */,
@@ -523,6 +527,15 @@
 				24C43FFE16A44DCC00055D65 /* TUSafariActivity.m */,
 			);
 			path = TUSafariActivity;
+			sourceTree = "<group>";
+		};
+		24DF0C8A171D992B0095491D /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				24DF0C8B171D99380095491D /* WZMenuViewController.h */,
+				24DF0C8C171D99380095491D /* WZMenuViewController.m */,
+			);
+			name = Menu;
 			sourceTree = "<group>";
 		};
 		24EAA5B01647C56400105FE1 /* API */ = {
@@ -765,6 +778,7 @@
 				2475EC6A16DF617500FEAD45 /* WZNavigationController.m in Sources */,
 				2463930D16E0AA30005114ED /* WZNotify.m in Sources */,
 				24B301A016F753B7005405CD /* JSSlidingViewController.m in Sources */,
+				24DF0C8D171D99380095491D /* WZMenuViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

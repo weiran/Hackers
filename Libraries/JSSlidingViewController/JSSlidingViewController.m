@@ -14,10 +14,6 @@ NSString * const JSSlidingViewControllerDidOpenNotification = @"JSSlidingViewCon
 NSString * const JSSlidingViewControllerDidCloseNotification = @"JSSlidingViewControllerDidCloseNotification";
 NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlidingViewControllerWillBeginDraggingNotification";
 
-@interface SlidingScrollView : UIScrollView
-
-@end
-
 @implementation SlidingScrollView
 
 - (id)initWithFrame:(CGRect)frame {
@@ -45,7 +41,7 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
 
 @interface JSSlidingViewController () <UIScrollViewDelegate>
 
-@property (nonatomic, strong) SlidingScrollView *slidingScrollView;
+@property (nonatomic, strong, readwrite) SlidingScrollView *slidingScrollView;
 @property (nonatomic, strong) UIButton *invisibleCloseSliderButton;
 @property (nonatomic, assign) CGFloat sliderOpeningWidth;
 @property (assign, nonatomic) CGFloat desiredVisiblePortionOfFrontViewWhenOpen;
@@ -84,14 +80,34 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
         _frontViewController = frontVC;
         _backViewController = backVC;
         _useBouncyAnimations = YES;
-        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusBarFrameWillChange:) name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
+        [self addObservations];
     }
     return self;
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
+    [self removeObservations];
+}
+
+- (void)addObservations {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(statusBarFrameWillChange:)
+                                                 name:UIApplicationWillChangeStatusBarFrameNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+}
+
+- (void)removeObservations {
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIApplicationWillChangeStatusBarFrameNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIApplicationWillEnterForegroundNotification
+                                                  object:nil];
 }
 
 - (void)viewDidLoad {
@@ -100,6 +116,7 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
     CGRect frame = self.view.bounds;
     
     self.backViewController.view.frame = frame;
+    self.backViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self addChildViewController:self.backViewController];
     [self.view insertSubview:self.backViewController.view atIndex:0];
     [self.backViewController didMoveToParentViewController:self];
@@ -177,27 +194,61 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
     _slidingScrollView.contentOffset = CGPointMake(_sliderOpeningWidth, 0);
     _slidingScrollView.frame = CGRectMake(targetOriginForSlidingScrollView, 0, frame.size.width, frame.size.height);
     self.frontViewController.view.frame = CGRectMake(_sliderOpeningWidth, 0, frame.size.width, frame.size.height);
-    self.invisibleCloseSliderButton.frame = CGRectMake(_sliderOpeningWidth, self.invisibleCloseSliderButton.frame.origin.y, frame.size.width, frame.size.height);
+    self.invisibleCloseSliderButton.frame = CGRectMake(_sliderOpeningWidth, self.invisibleCloseSliderButton.frame.origin.y, _desiredVisiblePortionOfFrontViewWhenOpen, frame.size.height);
+    
+    if (self.backViewController.view.superview == nil) {
+        // Update this manually, since auto-resizing won't take care of it,
+        // because it's been temporarily removed from the view hierarchy
+        CGRect backvcframe = self.backViewController.view.frame;
+        backvcframe = self.view.bounds;
+        self.backViewController.view.frame = backvcframe;
+    }
 }
 
 #pragma mark - Status Bar Changes
 
 - (void)statusBarFrameWillChange:(NSNotification *)notification {
     NSDictionary *dictionary = notification.userInfo;
-    CGRect statusbarframe = CGRectZero;
+    
+    CGRect targetStatusBarFrame = CGRectZero;
     NSValue *rectValue = [dictionary valueForKey:UIApplicationStatusBarFrameUserInfoKey];
-    [rectValue getValue:&statusbarframe];
-    CGRect mainbounds = [[UIScreen mainScreen] bounds];
-    CGFloat targetHeight = mainbounds.size.height-statusbarframe.size.height;
+    [rectValue getValue:&targetStatusBarFrame];
+    
+    CGRect screenbounds = [[UIScreen mainScreen] bounds];
+    CGFloat targetHeight = screenbounds.size.height - targetStatusBarFrame.size.height;
+    
     [UIView animateWithDuration:0.25f animations:^{
-        self.slidingScrollView.contentSize = CGSizeMake(self.slidingScrollView.contentSize.width, targetHeight);
-        CGRect shadowFrame = self.frontViewControllerDropShadow.frame;
-        shadowFrame.size.height = targetHeight;
-        self.frontViewControllerDropShadow.frame = shadowFrame;
-        shadowFrame = self.frontViewControllerDropShadow_right.frame;
-        shadowFrame.size.height = targetHeight;
-        self.frontViewControllerDropShadow_right.frame = shadowFrame;
+        [self updateContentSizeForViewHeight:targetHeight];
     }];
+}
+
+- (void)appWillEnterForeground:(NSNotification *)notification {
+    [self updateContentSizeForViewHeight:self.view.bounds.size.height];
+}
+
+- (void)updateContentSizeForViewHeight:(CGFloat)targetHeight {
+    
+    // Adjust the content size for the sliding scroll to the new target height
+    self.slidingScrollView.contentSize = CGSizeMake(self.slidingScrollView.contentSize.width, targetHeight);
+    
+    // Manually fix the back vc's height if the view isn't visible.
+    // If it's visible, auto-resizing will correct it.
+    if (self.backViewController.view.superview == nil) {
+        CGRect backvcframe = self.backViewController.view.frame;
+        backvcframe.size.height = targetHeight;
+        self.backViewController.view.frame = backvcframe;
+    }
+    
+    // Don't fix front vc. It'll get adjusted as the scroll view's content size changes,
+    // as long as it has the right autoresizing mask (flexible height).
+
+    // Fix dropshadows (helps with translucent status bar apps).
+    CGRect shadowFrame = self.frontViewControllerDropShadow.frame;
+    shadowFrame.size.height = targetHeight;
+    self.frontViewControllerDropShadow.frame = shadowFrame;
+    shadowFrame = self.frontViewControllerDropShadow_right.frame;
+    shadowFrame.size.height = targetHeight;
+    self.frontViewControllerDropShadow_right.frame = shadowFrame;
 }
 
 #pragma mark - Controlling the Slider
@@ -388,6 +439,7 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
     NSAssert(viewController, @"JSSlidingViewController requires both a front and a back view controller");
     UIViewController *newBackViewController = viewController;
     newBackViewController.view.frame = self.view.bounds;
+    newBackViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self addChildViewController:newBackViewController];
     [self.view insertSubview:newBackViewController.view atIndex:0];
     CGFloat duration = 0.0f;
@@ -653,9 +705,10 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
     if (_frontViewControllerHasOpenCloseNavigationBarButton) {
         yOrigin = 44.0f;
     }
-    self.invisibleCloseSliderButton.frame = CGRectMake(self.frontViewController.view.frame.origin.x, yOrigin, self.view.frame.size.width, self.view.frame.size.height - yOrigin);
+    self.invisibleCloseSliderButton.frame = CGRectMake(self.frontViewController.view.frame.origin.x, yOrigin, _desiredVisiblePortionOfFrontViewWhenOpen, self.view.frame.size.height - yOrigin);
     self.invisibleCloseSliderButton.backgroundColor = [UIColor clearColor];
-    self.invisibleCloseSliderButton.accessibilityElementsHidden = YES;
+    self.invisibleCloseSliderButton.isAccessibilityElement = YES;
+    self.invisibleCloseSliderButton.accessibilityLabel = self.localizedAccessibilityLabelForInvisibleCloseSliderButton;
     [self.invisibleCloseSliderButton addTarget:self action:@selector(invisibleButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     [_slidingScrollView addSubview:self.invisibleCloseSliderButton];
 }
@@ -759,6 +812,17 @@ NSString * const JSSlidingViewControllerWillBeginDraggingNotification = @"JSSlid
 - (BOOL)accessibilityPerformEscape {
     [self closeSlider:YES completion:nil];
     return YES;
+}
+
+- (NSString *)localizedAccessibilityLabelForInvisibleCloseSliderButton {
+    NSString *locTitle = nil;
+    if ([self.delegate respondsToSelector:@selector(localizedAccessibilityLabelForInvisibleCloseSliderButton:)]) {
+        locTitle = [self.delegate localizedAccessibilityLabelForInvisibleCloseSliderButton:self];
+    }
+    if (locTitle.length == 0) {
+        locTitle = @"Visible Edge of Main Content";
+    }
+    return locTitle;
 }
 
 @end

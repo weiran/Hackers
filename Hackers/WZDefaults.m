@@ -10,4 +10,8 @@
 
 @implementation WZDefaults
 
++ (WZAppDelegate *)appDelegate {
+    return (WZAppDelegate *)[[UIApplication sharedApplication] delegate];
+}
+
 @end
