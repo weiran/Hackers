@@ -10,6 +10,7 @@
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 
 #import "WZNavigationController.h"
+#import "WZMenuViewController.h"
 #import "JSSlidingViewController.h"
 
 #if NDEBUG
@@ -41,11 +42,8 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-    WZNavigationController *navigationController = [storyboard instantiateInitialViewController];
-    UITableViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
-    
-    _viewController = [[JSSlidingViewController alloc] initWithFrontViewController:navigationController backViewController:menuController];
-    
+    WZMenuViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+    _viewController = [[JSSlidingViewController alloc] initWithFrontViewController:menuController.mainNavViewController backViewController:menuController];
     self.window.rootViewController = _viewController;
     [self.window makeKeyAndVisible];
     

@@ -8,6 +8,7 @@
 
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
+#import <JSSlidingViewController.h>
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
@@ -82,9 +83,11 @@
     
     // set selected segement colours
     // uses GCD as it wont work if run immediately
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.05 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self segmentDidChange:_segmentedControl];
     });
+    
+    [[[WZDefaults appDelegate] viewController] setLocked:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -94,6 +97,7 @@
         [self.navigationController setNavigationBarHidden:NO animated:YES];
         _isNavigatingBack = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [[[WZDefaults appDelegate] viewController] setLocked:NO];
     }
 }
 

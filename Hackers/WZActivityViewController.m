@@ -9,6 +9,7 @@
 #import "WZActivityViewController.h"
 
 #import <TUSafariActivity/TUSafariActivity.h>
+#import "WZInstapaperActivity.h"
 
 @interface WZActivityViewController () {
     UITapGestureRecognizer *_tapGestureRecognizer;
@@ -49,7 +50,8 @@
 
 + (WZActivityViewController *)activityViewControllerWithUrl:(NSURL *)url text:(NSString *)text {
     TUSafariActivity *safariActivity = [[TUSafariActivity alloc] init];
-    NSArray *activities = @[safariActivity];
+    WZInstapaperActivity *instapaperActivity = [[WZInstapaperActivity alloc] init];
+    NSArray *activities = @[safariActivity, instapaperActivity];
     NSArray *activityItems = @[url, text];
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];

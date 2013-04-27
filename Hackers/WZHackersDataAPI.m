@@ -127,4 +127,30 @@
     }
 }
 
+#pragma mark - Read Later
+
+- (void)sendToInstapaper:(NSString *)url username:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL success, BOOL invalidCredentials))completion {
+    NSDictionary *parameters = @{
+                                 @"username": username,
+                                 @"password": password,
+                                 @"url": url
+                               };
+    AFHTTPClient *client = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://www.instapaper.com/api/"]];
+    [client postPath:@"add"
+          parameters:parameters
+             success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                 if (completion)
+                     completion(YES, NO);
+             } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                 if (completion) {
+                     BOOL invalidCredentials = NO;
+                     if (operation.response.statusCode == 403) {
+                         invalidCredentials = YES;
+                     }
+                     
+                     completion(NO, invalidCredentials);
+                 }
+             }];
+}
+
 @end

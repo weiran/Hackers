@@ -38,6 +38,7 @@
     BOOL _navBarInDefaultState;
     NSIndexPath *_selectedIndexPath;
     REMenu *_menu;
+    WZNewsType _newsType;
 }
 - (IBAction)menuButtonPressed:(id)sender;
 @end
@@ -52,7 +53,6 @@
     _topNewsPage = 1;
     
     [self setupPullToRefresh];
-    [self setupMenu];
     [self loadData];
     [self updateTitle];
     
@@ -64,14 +64,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
-    WZAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    delegate.viewController.locked = false;
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    WZAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    delegate.viewController.locked = true;
 }
 
 #pragma mark - Fetch
@@ -129,43 +121,6 @@
     [self.tableView insertSubview:backgroundView atIndex:0];
 }
 
-- (void)setupMenu {
-    REMenuItem *topNewsItem = [[REMenuItem alloc] initWithTitle:@"Top News"
-                                                          image:nil
-                                               highlightedImage:nil
-                                                         action:^(REMenuItem *item) {
-                                                             [self menuSubButtonPressed:WZNewsTypeTop];
-                                                         }];
-    REMenuItem *newNewsItem = [[REMenuItem alloc] initWithTitle:@"New News"
-                                                          image:nil
-                                               highlightedImage:nil
-                                                         action:^(REMenuItem *item) {
-                                                             [self menuSubButtonPressed:WZNewsTypeNew];
-                                                         }];
-    REMenuItem *askNewsItem = [[REMenuItem alloc] initWithTitle:@"Ask Hacker News"
-                                                          image:nil
-                                               highlightedImage:nil
-                                                         action:^(REMenuItem *item) {
-                                                             [self menuSubButtonPressed:WZNewsTypeAsk];
-                                                         }];
-    _menu = [[REMenu alloc] initWithItems:@[topNewsItem, newNewsItem, askNewsItem]];
-    _menu.backgroundColor = [UIColor colorWithWhite:0.94 alpha:1];
-    _menu.cornerRadius = 0;
-    _menu.shadowColor = [UIColor blackColor];
-    _menu.shadowOffset = CGSizeMake(0, 0);
-    _menu.shadowOpacity = 0.4;
-    _menu.shadowRadius = 2;
-    _menu.separatorColor = [UIColor colorWithWhite:0.87 alpha:1];
-    _menu.highlightedSeparatorColor = [UIColor colorWithWhite:0.87 alpha:1];
-    _menu.separatorHeight = 1;
-    _menu.font = [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize];
-    _menu.textColor = [UIColor blackColor];
-    _menu.highlightedTextColor = [UIColor blackColor];
-    _menu.textShadowColor = [UIColor clearColor];
-    _menu.highlightedTextShadowColor = [UIColor clearColor];
-    _menu.borderWidth = 0;
-    _menu.highlightedBackgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
-}
 
 - (WZNewsType)newsType {
     if (!_newsType) {
@@ -173,6 +128,15 @@
     }
     
     return _newsType;
+}
+
+- (void)setNewsType:(WZNewsType)newsType {
+    _newsType = newsType;
+    [self.tableView reloadData];
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
+    [self updateTitle];
+    
 }
 
 - (NSArray *)activeNews {
@@ -381,20 +345,11 @@
 #pragma - mark Menu
 
 - (IBAction)menuButtonPressed:(id)sender {
-    if ([_menu isOpen]) {
-        [_menu close];
+    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
+        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
     } else {
-        [self setupMenu];
-        [_menu showFromNavigationController:self.navigationController];
+        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
     }
-}
-
-- (void)menuSubButtonPressed:(WZNewsType)newsType {
-    _newsType = newsType;
-    [self.tableView reloadData];
-    [self.tableView setContentOffset:CGPointZero animated:YES];
-    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
-    [self updateTitle];
 }
 
 @end

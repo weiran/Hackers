@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WZMainViewController.h"
 
 @interface WZNavigationController : UINavigationController
 
 @property (nonatomic, assign) BOOL allowsRotation;
+- (void)setNewsType:(WZNewsType)newsType;
 
 @end

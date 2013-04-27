@@ -17,10 +17,20 @@
 #define kNavigationFontName @"HelveticaNeue-Light"
 #define kNavigationFontSize 20
 
+#define kBackgroundColorLight [UIColor colorWithWhite:0.95 alpha:1]
+
+// NSUserDefault keys
+
+#define kSettingsInstapaper @"Instapaper"
+#define kSettingsInstapaperEnabled @"EnableInstapaper"
+#define kSettingsInstapaperUsername @"InstapaperUsername"
+#define kSettingsInstapaperPassword @"InstapaperPassword"
+
 @class WZAppDelegate;
 
 @interface WZDefaults : NSObject
 
 + (WZAppDelegate *)appDelegate;
++ (BOOL)getBoolKey:(NSString *)key;
 
 @end

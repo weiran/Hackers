@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WZMenuViewController : UITableViewController
+#import <IASKAppSettingsViewController.h>
+
+@class WZNavigationController;
+
+@interface WZMenuViewController : UITableViewController <IASKSettingsDelegate>
+
+@property (nonatomic, strong) WZNavigationController *mainNavViewController;
 
 @end

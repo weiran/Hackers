@@ -22,4 +22,7 @@
 - (void)fetchCommentsForPost:(NSInteger)postID
                   completion:(void (^)(NSDictionary *items, NSError *error))completion;
 
+// read later (perhaps refactor this into its own class)
+
+- (void)sendToInstapaper:(NSString *)url username:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL success, BOOL invalidCredentials))completion;
 @end

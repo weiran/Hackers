@@ -7,6 +7,7 @@
 //
 
 #import "DTASN1Parser.h"
+#import "DTASN1BitString.h"
 
 @implementation DTASN1Parser
 {
@@ -26,9 +27,12 @@
 		unsigned int delegateSupportsDocumentEnd:1;
 		unsigned int delegateSupportsContainerStart:1;
 		unsigned int delegateSupportsContainerEnd:1;
+		unsigned int delegateSupportsContextStart:1;
+		unsigned int delegateSupportsContextEnd:1;
 		unsigned int delegateSupportsString:1;
 		unsigned int delegateSupportsInteger:1;
 		unsigned int delegateSupportsData:1;
+		unsigned int delegateSupportsBitString:1;
 		unsigned int delegateSupportsNumber:1;
 		unsigned int delegateSupportsNull:1;
 		unsigned int delegateSupportsError:1;
@@ -210,7 +214,7 @@
 			
 		case DTASN1TypeBitString:
 		{
-			if (_delegateFlags.delegateSupportsData)
+			if (_delegateFlags.delegateSupportsBitString)
 			{
 				char *buffer = malloc(dataRange.length);
 				[_data getBytes:buffer range:dataRange];
@@ -218,15 +222,10 @@
 				// primitive encoding
 				NSUInteger unusedBits = buffer[0];
 				
-				if (unusedBits>0)
-				{
-					[self _parseErrorEncountered:@"Encountered bit string with unused bits > 0, not implemented"];
-					free(buffer);
-					return NO;
-				}
-				
 				NSData *data = [NSData dataWithBytes:buffer+1 length:dataRange.length-1];
-				[_delegate parser:self foundData:data];
+				DTASN1BitString *bitstring = [[DTASN1BitString alloc] initWithData:data unusedBits:unusedBits];
+				
+				[_delegate parser:self foundBitString:bitstring];
 				
 				free(buffer);
 			}
@@ -313,19 +312,21 @@
 		case DTASN1TypeTeletexString:
 		case DTASN1TypeGraphicString:
 		case DTASN1TypePrintableString:
+        case DTASN1TypeUTF8String:
+        case DTASN1TypeIA5String:
 		{
 			if (_delegateFlags.delegateSupportsString)
 			{
 				char *buffer = malloc(dataRange.length);
 				[_data getBytes:buffer range:dataRange];
 				
-				NSString *string = [[NSString alloc] initWithBytesNoCopy:buffer length:dataRange.length encoding:NSASCIIStringEncoding freeWhenDone:YES];
+				NSString *string = [[NSString alloc] initWithBytesNoCopy:buffer length:dataRange.length encoding:NSUTF8StringEncoding freeWhenDone:YES];
 				
 				[_delegate parser:self foundString:string];
 			}
 			break;
 		}
-			
+            
 		case DTASN1TypeUTCTime:
 		case DTASN1TypeGeneralizedTime:
 		{
@@ -382,14 +383,11 @@
 		[_data getBytes:&tagByte range:NSMakeRange(location, 1)];
 		location++;
 		
-		//		BOOL isSeq = tagByte & 32;
-		//		BOOL isContext = tagByte & 128;
-		
-		//NSUInteger tagClass = tagByte >> 6;
+		NSUInteger tagClass = tagByte >> 6;
 		DTASN1Type tagType = tagByte & 31;
 		BOOL tagConstructed = (tagByte >> 5) & 1;
 		
-		if (tagType == 0x1f)
+		if (tagType == DTASN1TypeUsesLongForm)
 		{
 			[self _parseErrorEncountered:@"Long form not implemented"];
 			return NO;
@@ -410,18 +408,38 @@
 		// make range
 		NSRange subRange = NSMakeRange(location, length);
 		
+		if (NSMaxRange(subRange) > NSMaxRange(range))
+		{
+			return NO;
+		}
+		
+		if (tagClass == 2)
+		{
+			if (_delegateFlags.delegateSupportsContextStart)
+			{
+				[_delegate parser:self didStartContextWithTag:tagType];
+			}
+			
+			if (!tagConstructed)
+			{
+				tagType = DTASN1TypeOctetString;
+			}
+		}
+		
 		if (tagConstructed)
 		{
-			// constructed element
-			
 			if (_delegateFlags.delegateSupportsContainerStart)
 			{
 				[_delegate parser:self didStartContainerWithType:tagType];
 			}
 			
-			if (![self _parseRange:subRange])
+			// allow for sequence without content
+			if (subRange.length > 0)
 			{
-				_abortParsing = YES;
+				if (![self _parseRange:subRange])
+				{
+					_abortParsing = YES;
+				}
 			}
 			
 			if (_delegateFlags.delegateSupportsContainerEnd)
@@ -435,6 +453,14 @@
 			if (![self _parseValueWithTag:tagType dataRange:subRange])
 			{
 				_abortParsing = YES;
+			}
+		}
+		
+		if (tagClass == 2)
+		{
+			if (_delegateFlags.delegateSupportsContextStart)
+			{
+				[_delegate parser:self didEndContextWithTag:tagType];
 			}
 		}
 		
@@ -511,6 +537,16 @@
 		_delegateFlags.delegateSupportsContainerEnd= YES;
 	}
 	
+	if ([_delegate respondsToSelector:@selector(parser:didStartContextWithTag:)])
+	{
+		_delegateFlags.delegateSupportsContextStart = YES;
+	}
+	
+	if ([_delegate respondsToSelector:@selector(parser:didEndContextWithTag:)])
+	{
+		_delegateFlags.delegateSupportsContextEnd = YES;
+	}
+	
 	if ([_delegate respondsToSelector:@selector(parser:parseErrorOccurred:)])
 	{
 		_delegateFlags.delegateSupportsError = YES;
@@ -534,6 +570,11 @@
 	if ([_delegate respondsToSelector:@selector(parser:foundData:)])
 	{
 		_delegateFlags.delegateSupportsData = YES;
+	}
+	
+	if ([_delegate respondsToSelector:@selector(parser:foundBitString:)])
+	{
+		_delegateFlags.delegateSupportsBitString = YES;
 	}
 	
 	if ([_delegate respondsToSelector:@selector(parser:foundNumber:)])

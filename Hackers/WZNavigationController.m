@@ -28,4 +28,9 @@
     return _allowsRotation;
 }
 
+- (void)setNewsType:(WZNewsType)newsType {
+    WZMainViewController *mainViewController = self.viewControllers[0];
+    mainViewController.newsType = newsType;
+}
+
 @end
