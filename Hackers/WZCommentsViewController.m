@@ -71,7 +71,7 @@
     [self setupSegmentedController];
     [self setupWebView];
     [self fetchComments];
-    
+    [self showDefaultView];
     
     _webViewController.webView.scrollView.scrollsToTop = NO;
     _tableView.scrollsToTop = YES;
@@ -170,6 +170,17 @@
     }
 }
 
+- (void)showDefaultView {
+    NSString *defaultView = [[NSUserDefaults standardUserDefaults] valueForKey:kSettingsDefaultReadingView];
+    if ([defaultView isEqualToString:kSettingsDefaultReadingViewComments]) {
+        _segmentedControl.selectedSegmentIndex = 0;
+        [self segmentDidChange:_segmentedControl];
+    } else if ([defaultView isEqualToString:kSettingsDefaultReadingViewLink]) {
+        _segmentedControl.selectedSegmentIndex = 1;
+        [self segmentDidChange:_segmentedControl];
+    }
+}
+
 #pragma mark - Setup Views
 
 - (void)setupNavigationView {
@@ -265,6 +276,10 @@
     [self.view addConstraint:bottomConstraint];
     [self.view addConstraint:leftConstraint];
     [self.view addConstraint:rightConstraint];
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kSettingsPreloadLink]) {
+        [_webViewController loadURL:[NSURL URLWithString:_post.url]];
+    }
 }
 
 

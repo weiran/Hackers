@@ -26,6 +26,11 @@
 #define kSettingsInstapaperUsername @"InstapaperUsername"
 #define kSettingsInstapaperPassword @"InstapaperPassword"
 
+#define kSettingsDefaultReadingView @"DefaultReadingView"
+#define kSettingsDefaultReadingViewComments @"comments"
+#define kSettingsDefaultReadingViewLink @"link"
+#define kSettingsPreloadLink @"PreloadLink"
+
 @class WZAppDelegate;
 
 @interface WZDefaults : NSObject

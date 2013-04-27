@@ -37,7 +37,6 @@
     BOOL _navBarInScrolledState;
     BOOL _navBarInDefaultState;
     NSIndexPath *_selectedIndexPath;
-    REMenu *_menu;
     WZNewsType _newsType;
 }
 - (IBAction)menuButtonPressed:(id)sender;
