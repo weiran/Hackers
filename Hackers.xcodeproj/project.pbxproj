@@ -23,7 +23,6 @@
 		2434A1FB16C0398800C383CA /* refresh-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1F916C0398800C383CA /* refresh-icon.png */; };
 		2434A1FC16C0398800C383CA /* refresh-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1FA16C0398800C383CA /* refresh-icon@2x.png */; };
 		243749B0172BE942007762FC /* WZSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 243749AF172BE942007762FC /* WZSettingsViewController.m */; };
-		243749B2172BEC23007762FC /* HackersSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 243749B1172BEC23007762FC /* HackersSettings.bundle */; };
 		24374A18172C16A5007762FC /* NNInstapaperActivity@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A0C172C16A5007762FC /* NNInstapaperActivity@2x~ipad.png */; };
 		24374A19172C16A5007762FC /* NNInstapaperActivity@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A0D172C16A5007762FC /* NNInstapaperActivity@2x~iphone.png */; };
 		24374A1A172C16A5007762FC /* NNInstapaperActivity~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A0E172C16A5007762FC /* NNInstapaperActivity~ipad.png */; };
@@ -38,6 +37,13 @@
 		24374A23172C16A5007762FC /* NNReadabilityActivity~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A17172C16A5007762FC /* NNReadabilityActivity~iphone.png */; };
 		24374A27172C1A13007762FC /* WZInstapaperActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 24374A26172C1A13007762FC /* WZInstapaperActivity.m */; };
 		24374A2A172C44B8007762FC /* WZAccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 24374A29172C44B8007762FC /* WZAccountManager.m */; };
+		243D1F3A1732C3F70033BC0F /* WZTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 243D1F391732C3F70033BC0F /* WZTheme.m */; };
+		243D1F3C1732CA1C0033BC0F /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F3B1732CA1C0033BC0F /* InAppSettings.bundle */; };
+		243D1F3F1732D0940033BC0F /* WZPinboardActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 243D1F3E1732D0930033BC0F /* WZPinboardActivity.m */; };
+		243D1F441732D42D0033BC0F /* pinboard-icon~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F401732D42D0033BC0F /* pinboard-icon~iphone.png */; };
+		243D1F451732D42D0033BC0F /* pinboard-icon@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F411732D42D0033BC0F /* pinboard-icon@2x~iphone.png */; };
+		243D1F461732D42D0033BC0F /* pinboard-icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F421732D42D0033BC0F /* pinboard-icon~ipad.png */; };
+		243D1F471732D42D0033BC0F /* pinboard-icon@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F431732D42D0033BC0F /* pinboard-icon@2x~ipad.png */; };
 		245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 245F85D016690AE3000D3EE1 /* Security.framework */; };
 		2463930D16E0AA30005114ED /* WZNotify.m in Sources */ = {isa = PBXBuildFile; fileRef = 2463930C16E0AA30005114ED /* WZNotify.m */; };
 		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
@@ -133,7 +139,6 @@
 		2434A1FA16C0398800C383CA /* refresh-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "refresh-icon@2x.png"; sourceTree = "<group>"; };
 		243749AE172BE942007762FC /* WZSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZSettingsViewController.h; sourceTree = "<group>"; };
 		243749AF172BE942007762FC /* WZSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZSettingsViewController.m; sourceTree = "<group>"; };
-		243749B1172BEC23007762FC /* HackersSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = HackersSettings.bundle; path = Hackers/HackersSettings.bundle; sourceTree = "<group>"; };
 		24374A0C172C16A5007762FC /* NNInstapaperActivity@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNInstapaperActivity@2x~ipad.png"; sourceTree = "<group>"; };
 		24374A0D172C16A5007762FC /* NNInstapaperActivity@2x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNInstapaperActivity@2x~iphone.png"; sourceTree = "<group>"; };
 		24374A0E172C16A5007762FC /* NNInstapaperActivity~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNInstapaperActivity~ipad.png"; sourceTree = "<group>"; };
@@ -150,6 +155,15 @@
 		24374A26172C1A13007762FC /* WZInstapaperActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZInstapaperActivity.m; sourceTree = "<group>"; };
 		24374A28172C44B8007762FC /* WZAccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZAccountManager.h; sourceTree = "<group>"; };
 		24374A29172C44B8007762FC /* WZAccountManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZAccountManager.m; sourceTree = "<group>"; };
+		243D1F381732C3F70033BC0F /* WZTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZTheme.h; sourceTree = "<group>"; };
+		243D1F391732C3F70033BC0F /* WZTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZTheme.m; sourceTree = "<group>"; };
+		243D1F3B1732CA1C0033BC0F /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = InAppSettings.bundle; path = Hackers/InAppSettings.bundle; sourceTree = "<group>"; };
+		243D1F3D1732D0930033BC0F /* WZPinboardActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZPinboardActivity.h; sourceTree = "<group>"; };
+		243D1F3E1732D0930033BC0F /* WZPinboardActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZPinboardActivity.m; sourceTree = "<group>"; };
+		243D1F401732D42D0033BC0F /* pinboard-icon~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pinboard-icon~iphone.png"; sourceTree = "<group>"; };
+		243D1F411732D42D0033BC0F /* pinboard-icon@2x~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pinboard-icon@2x~iphone.png"; sourceTree = "<group>"; };
+		243D1F421732D42D0033BC0F /* pinboard-icon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pinboard-icon~ipad.png"; sourceTree = "<group>"; };
+		243D1F431732D42D0033BC0F /* pinboard-icon@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pinboard-icon@2x~ipad.png"; sourceTree = "<group>"; };
 		245F85D016690AE3000D3EE1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2463930B16E0AA30005114ED /* WZNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNotify.h; sourceTree = "<group>"; };
 		2463930C16E0AA30005114ED /* WZNotify.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNotify.m; sourceTree = "<group>"; };
@@ -345,6 +359,10 @@
 				24374A15172C16A5007762FC /* NNReadabilityActivity@2x~iphone.png */,
 				24374A16172C16A5007762FC /* NNReadabilityActivity~ipad.png */,
 				24374A17172C16A5007762FC /* NNReadabilityActivity~iphone.png */,
+				243D1F401732D42D0033BC0F /* pinboard-icon~iphone.png */,
+				243D1F411732D42D0033BC0F /* pinboard-icon@2x~iphone.png */,
+				243D1F421732D42D0033BC0F /* pinboard-icon~ipad.png */,
+				243D1F431732D42D0033BC0F /* pinboard-icon@2x~ipad.png */,
 			);
 			name = Images;
 			path = Hackers/Images;
@@ -465,6 +483,8 @@
 			children = (
 				24374A25172C1A13007762FC /* WZInstapaperActivity.h */,
 				24374A26172C1A13007762FC /* WZInstapaperActivity.m */,
+				243D1F3D1732D0930033BC0F /* WZPinboardActivity.h */,
+				243D1F3E1732D0930033BC0F /* WZPinboardActivity.m */,
 			);
 			name = Activities;
 			sourceTree = "<group>";
@@ -497,7 +517,7 @@
 				24975A72164A88A5000143A1 /* Libraries */,
 				24972C9C1643BC3C00B4EFB4 /* Frameworks */,
 				24972C9A1643BC3C00B4EFB4 /* Products */,
-				243749B1172BEC23007762FC /* HackersSettings.bundle */,
+				243D1F3B1732CA1C0033BC0F /* InAppSettings.bundle */,
 				0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
@@ -661,6 +681,8 @@
 				24972CAF1643BC3C00B4EFB4 /* WZAppDelegate.m */,
 				24D11C0E16C42681000AE946 /* WZDefaults.h */,
 				24D11C0F16C42681000AE946 /* WZDefaults.m */,
+				243D1F381732C3F70033BC0F /* WZTheme.h */,
+				243D1F391732C3F70033BC0F /* WZTheme.m */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -779,7 +801,6 @@
 				24B2217E16D91A4800B35EAC /* unread-badge.png in Resources */,
 				24B3019E16F753B7005405CD /* frontViewControllerDropShadow.png in Resources */,
 				24B3019F16F753B7005405CD /* frontViewControllerDropShadow@2x.png in Resources */,
-				243749B2172BEC23007762FC /* HackersSettings.bundle in Resources */,
 				24374A18172C16A5007762FC /* NNInstapaperActivity@2x~ipad.png in Resources */,
 				24374A19172C16A5007762FC /* NNInstapaperActivity@2x~iphone.png in Resources */,
 				24374A1A172C16A5007762FC /* NNInstapaperActivity~ipad.png in Resources */,
@@ -792,6 +813,11 @@
 				24374A21172C16A5007762FC /* NNReadabilityActivity@2x~iphone.png in Resources */,
 				24374A22172C16A5007762FC /* NNReadabilityActivity~ipad.png in Resources */,
 				24374A23172C16A5007762FC /* NNReadabilityActivity~iphone.png in Resources */,
+				243D1F3C1732CA1C0033BC0F /* InAppSettings.bundle in Resources */,
+				243D1F441732D42D0033BC0F /* pinboard-icon~iphone.png in Resources */,
+				243D1F451732D42D0033BC0F /* pinboard-icon@2x~iphone.png in Resources */,
+				243D1F461732D42D0033BC0F /* pinboard-icon~ipad.png in Resources */,
+				243D1F471732D42D0033BC0F /* pinboard-icon@2x~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -865,6 +891,8 @@
 				243749B0172BE942007762FC /* WZSettingsViewController.m in Sources */,
 				24374A27172C1A13007762FC /* WZInstapaperActivity.m in Sources */,
 				24374A2A172C44B8007762FC /* WZAccountManager.m in Sources */,
+				243D1F3A1732C3F70033BC0F /* WZTheme.m in Sources */,
+				243D1F3F1732D0940033BC0F /* WZPinboardActivity.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

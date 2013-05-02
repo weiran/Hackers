@@ -11,28 +11,6 @@
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
-			<key>Titles</key>
-			<array>
-				<string>Small Font</string>
-				<string>Medium Font</string>
-				<string>Large Font</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>small</string>
-				<string>medium</string>
-				<string>large</string>
-			</array>
-			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-			<key>Title</key>
-			<string>Font Size</string>
-			<key>Key</key>
-			<string>FontSize</string>
-			<key>DefaultValue</key>
-			<string>medium</string>
-		</dict>
-		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Titles</key>

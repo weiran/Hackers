@@ -25,4 +25,5 @@
 // read later (perhaps refactor this into its own class)
 
 - (void)sendToInstapaper:(NSString *)url username:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL success, BOOL invalidCredentials))completion;
+- (void)sendToPinboardUrl:(NSString *)url title:(NSString *)title username:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL success, BOOL invalidCredentials))completion;
 @end

@@ -153,4 +153,30 @@
              }];
 }
 
+- (void)sendToPinboardUrl:(NSString *)url title:(NSString *)title username:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL success, BOOL invalidCredentials))completion {
+    NSDictionary *parameters = @{
+                                 @"url": url,
+                                 @"description": title
+                                 };
+    AFHTTPClient *client = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://api.pinboard.in/v1/"]];
+    [client setAuthorizationHeaderWithUsername:username password:password];
+    [client getPath:@"posts/add"
+          parameters:parameters
+             success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                 if (completion)
+                     completion(YES, NO);
+             } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                 if (completion) {
+                     BOOL invalidCredentials = NO;
+                     if (operation.response.statusCode == 401) {
+                         invalidCredentials = YES;
+                     } else {
+                         NSLog(@"Error sending to Pinboard, response: %d", operation.response.statusCode);
+                     }
+                     
+                     completion(NO, invalidCredentials);
+                 }
+             }];
+}
+
 @end

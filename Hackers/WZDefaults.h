@@ -26,6 +26,11 @@
 #define kSettingsInstapaperUsername @"InstapaperUsername"
 #define kSettingsInstapaperPassword @"InstapaperPassword"
 
+#define kSettingsPinboard @"Pinboard"
+#define kSettingsPinboardEnabled @"EnablePinboard"
+#define kSettingsPinboardUsername @"PinboardUsername"
+#define kSettingsPinboardPassword @"PinboardPassword"
+
 #define kSettingsDefaultReadingView @"DefaultReadingView"
 #define kSettingsDefaultReadingViewComments @"comments"
 #define kSettingsDefaultReadingViewLink @"link"

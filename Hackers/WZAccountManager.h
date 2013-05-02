@@ -15,5 +15,6 @@
 + (NSString *)passwordForService:(NSString *)service;
 
 - (void)sendURL:(NSString *)url toService:(NSString *)service;
+- (void)sendURL:(NSString *)url title:(NSString *)title toService:(NSString *)service;
 
 @end

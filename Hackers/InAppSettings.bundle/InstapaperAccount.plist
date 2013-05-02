@@ -11,16 +11,6 @@
 			<string>Account Details</string>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<string>YES</string>
-			<key>Key</key>
-			<string>EnableInstapaper</string>
-			<key>Title</key>
-			<string>Enable Instapaper</string>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-		</dict>
-		<dict>
 			<key>Key</key>
 			<string>InstapaperUsername</string>
 			<key>Title</key>

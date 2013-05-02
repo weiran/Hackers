@@ -14,6 +14,8 @@
 
 @interface WZAccountManager () {
     NSString *_url;
+    NSString *_title;
+    NSString *_service;
 }
 @end
 
@@ -40,22 +42,37 @@
 }
 
 - (void)sendURL:(NSString *)url toService:(NSString *)service {
+    [self sendURL:url title:nil toService:service];
+}
+
+- (void)sendURL:(NSString *)url title:(NSString *)title toService:(NSString *)service {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *username = [defaults stringForKey:kSettingsInstapaperUsername];
+    
     _url = url;
+    _title = title;
+    _service = service;
     
     if (username.length > 0) {
-        [self sendToInstapaper];
+        if ([service isEqualToString:kSettingsInstapaper]) {
+            [self sendToInstapaperUrl:url];
+        } else if ([service isEqualToString:kSettingsPinboard]) {
+            [self sendToPinboardUrl:url title:title];
+        }
     } else {
-        [self showAuthenticateAlertFromWrongPassword:NO];
+        [self showAuthenticateAlertFromWrongPassword:NO forService:service];
     }
 }
 
-- (void)showAuthenticateAlertFromWrongPassword:(BOOL)wrongPassword {
-    NSString *message = wrongPassword ? @"Your existing credentials are wrong" : @"Enter your Instapaper credentials";
+- (void)showAuthenticateAlertFromWrongPassword:(BOOL)wrongPassword forService:(NSString *)service {
     
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Login to Instapaper"
-                                                        message:message
+//    NSString *incorrectCredentialsMessage = [NSString stringWithFormat:@"Your existing %@ credentials are wrong", service];
+//    NSString *enterCredentialsMessage = [NSString stringWithFormat:@"Enter your %@ credentials", service];
+//    
+//    NSString *message = wrongPassword ? incorrectCredentialsMessage : enterCredentialsMessage;
+    
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Login to %@", service]
+                                                        message:nil
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                               otherButtonTitles:@"Login", nil];
@@ -78,12 +95,20 @@
             // Login
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             NSString *username = [alertView textFieldAtIndex:0].text;
-            [defaults setValue:username forKey:kSettingsInstapaperUsername];
+            if ([_service isEqualToString:kSettingsInstapaper]) {
+                [defaults setValue:username forKey:kSettingsInstapaperUsername];
+            } else if ([_service isEqualToString:kSettingsPinboard]) {
+                [defaults setValue:username forKey:kSettingsPinboardUsername];
+            }
             [defaults synchronize];
             NSString *password = [alertView textFieldAtIndex:1].text;
-            [WZAccountManager setPassword:password forService:kSettingsInstapaper];
+            [WZAccountManager setPassword:password forService:_service];
             
-            [self sendToInstapaper];
+            if ([_service isEqualToString:kSettingsInstapaper]) {
+                [self sendToInstapaperUrl:_url];
+            } else if ([_service isEqualToString:kSettingsPinboard]) {
+                [self sendToPinboardUrl:_url title:_title];
+            }
             break;
         }
         default:
@@ -91,19 +116,37 @@
     }
 }
 
-- (void)sendToInstapaper {
+- (void)sendToInstapaperUrl:(NSString *)url {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         NSString *username = [defaults stringForKey:kSettingsInstapaperUsername];
         NSString *password = [WZAccountManager passwordForService:kSettingsInstapaper];
-        [[WZHackersDataAPI shared] sendToInstapaper:_url username:username password:password completion:^(BOOL success, BOOL invalidCredentials) {
+        [[WZHackersDataAPI shared] sendToInstapaper:url username:username password:password completion:^(BOOL success, BOOL invalidCredentials) {
             if (!success && invalidCredentials) {
-                [self showAuthenticateAlertFromWrongPassword:YES];
+                [self showAuthenticateAlertFromWrongPassword:YES forService:kSettingsInstapaper];
             }
             
             if (success) {
                 [WZNotify showMessage:@"Sent to Instapaper" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
+            }
+        }];
+    });
+}
+
+- (void)sendToPinboardUrl:(NSString *)url title:(NSString *)title {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *username = [defaults stringForKey:kSettingsPinboardUsername];
+        NSString *password = [WZAccountManager passwordForService:kSettingsPinboard];
+        [[WZHackersDataAPI shared] sendToPinboardUrl:_url title:_title username:username password:password completion:^(BOOL success, BOOL invalidCredentials) {
+            if (!success && invalidCredentials) {
+                [self showAuthenticateAlertFromWrongPassword:YES forService:kSettingsPinboard];
+            }
+            
+            if (success) {
+                [WZNotify showMessage:@"Sent to Pinboard" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
             }
         }];
     });

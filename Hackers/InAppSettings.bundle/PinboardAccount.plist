@@ -11,16 +11,6 @@
 			<string>Account Details</string>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<string>NO</string>
-			<key>Key</key>
-			<string>EnablePinboard</string>
-			<key>Title</key>
-			<string>Enable Pinboard</string>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-		</dict>
-		<dict>
 			<key>Key</key>
 			<string>PinboardUsername</string>
 			<key>Title</key>
