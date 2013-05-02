@@ -12,6 +12,9 @@
 
 + (void)defaults;
 
++ (bool)lightTheme;
++ (bool)darkTheme;
+
 + (UIColor *)titleTextColor;
 + (UIColor *)subtitleTextColor;
 + (UIColor *)detailTextColor;
@@ -21,5 +24,15 @@
 + (UIColor *)backgroundColor;
 + (UIColor *)highlightedBackgroundColor;
 + (UIColor *)lightBackgroundColor;
+
++ (UIColor *)separatorColor;
++ (UIColor *)navigationColor;
+
++ (UIColor *)segmentBackgroundColor;
++ (UIColor *)segmentSelectedBackgroundColor;
+
++ (UIColor *)buttonTitleShadowColor;
+
++ (void)updateNavigationBar:(UINavigationBar *)navigation;
 
 @end

@@ -19,6 +19,7 @@
 
 - (void)setTheme {
     _titleLabel.textColor = [WZTheme titleTextColor];
+    _domainLabel.textColor = [WZTheme subtitleTextColor];
     if (self.selected) {
         self.backgroundColor = [WZTheme highlightedBackgroundColor];
     } else {

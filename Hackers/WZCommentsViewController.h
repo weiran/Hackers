@@ -12,7 +12,7 @@
 
 @interface WZCommentsViewController : UIViewController
 
-@property (weak, nonatomic) WZPostModel *post;
+@property (strong, nonatomic) WZPostModel *post;
 @property (strong, nonatomic) NSMutableArray *comments;
 
 @end

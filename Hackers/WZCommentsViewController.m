@@ -83,11 +83,16 @@
     
     // set selected segement colours
     // uses GCD as it wont work if run immediately
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self segmentDidChange:_segmentedControl];
     });
     
     [[[WZDefaults appDelegate] viewController] setLocked:YES];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self segmentDidChange:_segmentedControl];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -193,6 +198,7 @@
     _navigationView.layer.shadowRadius = 2;
     _navigationView.clipsToBounds = NO;
     
+    _navigationView.backgroundColor = [WZTheme navigationColor];
     // not set a shadowPath here as the navigation view is never animated or changed,
     // if it needs to be animated, the set the path
     //    CGRect shadowPath = CGRectMake(0, 43, 320, 1);
@@ -214,10 +220,10 @@
 
     NSDictionary *textAttributes =  @{
                                       UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
-                                      UITextAttributeTextColor: [UIColor colorWithWhite:0.1 alpha:1],
+                                      UITextAttributeTextColor: [WZTheme titleTextColor],
                                       UITextAttributeTextShadowColor: [UIColor clearColor]
                                     };
-    
+    _segmentedControl.tintColor = [UIColor blackColor];
     [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
     
     [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
@@ -226,6 +232,9 @@
 - (void)setupTableView {
     _tableView.delegate = self;
     _tableView.dataSource = self;
+    _tableView.backgroundColor = [WZTheme backgroundColor];
+    _tableView.separatorColor = [WZTheme separatorColor];
+    _activityIndicatorView.backgroundColor = [WZTheme backgroundColor];
     
     [self layoutTableViewHeader];
     [self layoutTableViewBackgrounds];
@@ -292,6 +301,15 @@
 
 
 - (void)layoutTableViewHeader {
+    // theme
+    _headerTitleLabel.textColor = [WZTheme titleTextColor];
+    _headerDomainLabel.textColor = [WZTheme subtitleTextColor];
+    _headerMetadata1Label.textColor = [WZTheme detailTextColor];
+    _headerMetadata2Label.textColor = [WZTheme detailTextColor];
+    _headerTextView.textColor = [WZTheme mainTextColor];
+    _headerView.backgroundColor = [WZTheme lightBackgroundColor];
+    _headerDetailsContainerView.backgroundColor = [WZTheme lightBackgroundColor];
+    
     if ([_post.type isEqualToString:@"ask"]) {
         _headerDomainLabel.text = @"Ask Hacker News";
     } else if ([_post.type isEqualToString:@"job"]) {
@@ -348,7 +366,7 @@
 
 - (void)layoutTableViewBackgrounds {
     UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
-    topView.backgroundColor = [UIColor whiteColor];
+    topView.backgroundColor = [WZTheme lightBackgroundColor];
     [_tableView addSubview:topView];
 }
 
@@ -386,9 +404,9 @@
     for (int i = 0; i < segmentedControl.subviews.count; i++) {
         id segment = segmentedControl.subviews[i];
         if ([segment isSelected]) {
-            [segment setTintColor:[UIColor colorWithWhite:0.82 alpha:1]];
+            [segment setTintColor:[WZTheme segmentSelectedBackgroundColor]];
         } else {
-            [segment setTintColor:[UIColor colorWithWhite:0.95 alpha:1]];
+            [segment setTintColor:[WZTheme segmentBackgroundColor]];
         }
     }
 }

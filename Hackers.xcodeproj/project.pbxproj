@@ -46,6 +46,7 @@
 		243D1F471732D42D0033BC0F /* pinboard-icon@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F431732D42D0033BC0F /* pinboard-icon@2x~ipad.png */; };
 		243D1F4A1732DE850033BC0F /* navbar-bg-dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F481732DE850033BC0F /* navbar-bg-dark.png */; };
 		243D1F4B1732DE850033BC0F /* navbar-bg-dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F491732DE850033BC0F /* navbar-bg-dark@2x.png */; };
+		243D1F4E1732FB8B0033BC0F /* WZButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 243D1F4D1732FB8A0033BC0F /* WZButton.m */; };
 		245F85D116690AE3000D3EE1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 245F85D016690AE3000D3EE1 /* Security.framework */; };
 		2463930D16E0AA30005114ED /* WZNotify.m in Sources */ = {isa = PBXBuildFile; fileRef = 2463930C16E0AA30005114ED /* WZNotify.m */; };
 		2475EC5C16DE591100FEAD45 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2475EC5B16DE591100FEAD45 /* Crashlytics.framework */; };
@@ -168,6 +169,8 @@
 		243D1F431732D42D0033BC0F /* pinboard-icon@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pinboard-icon@2x~ipad.png"; sourceTree = "<group>"; };
 		243D1F481732DE850033BC0F /* navbar-bg-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg-dark.png"; sourceTree = "<group>"; };
 		243D1F491732DE850033BC0F /* navbar-bg-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbar-bg-dark@2x.png"; sourceTree = "<group>"; };
+		243D1F4C1732FB8A0033BC0F /* WZButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZButton.h; sourceTree = "<group>"; };
+		243D1F4D1732FB8A0033BC0F /* WZButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZButton.m; sourceTree = "<group>"; };
 		245F85D016690AE3000D3EE1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2463930B16E0AA30005114ED /* WZNotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZNotify.h; sourceTree = "<group>"; };
 		2463930C16E0AA30005114ED /* WZNotify.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZNotify.m; sourceTree = "<group>"; };
@@ -413,6 +416,8 @@
 			children = (
 				24972CBF1643BD2900B4EFB4 /* Storyboards */,
 				2417B66A16B9AE0D009E11EC /* Cells */,
+				243D1F4C1732FB8A0033BC0F /* WZButton.h */,
+				243D1F4D1732FB8A0033BC0F /* WZButton.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -901,6 +906,7 @@
 				24374A2A172C44B8007762FC /* WZAccountManager.m in Sources */,
 				243D1F3A1732C3F70033BC0F /* WZTheme.m in Sources */,
 				243D1F3F1732D0940033BC0F /* WZPinboardActivity.m in Sources */,
+				243D1F4E1732FB8B0033BC0F /* WZButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

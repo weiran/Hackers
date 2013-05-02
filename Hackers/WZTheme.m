@@ -58,11 +58,30 @@
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forBarMetrics:UIBarMetricsDefault];
     [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{
-                               UITextAttributeTextColor : [UIColor blackColor],
+                               UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
      }
                                                 forState:UIControlStateNormal];
-    [[UITableViewCell appearance] setBackgroundColor:[UIColor colorWithWhite:0.87 alpha:1]];
+}
+
++ (void)updateNavigationBar:(UINavigationBar *)navigation {
+    if ([self lightTheme]) {
+        [navigation setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
+        [navigation setTitleTextAttributes:@{
+                                        UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
+                                   UITextAttributeTextColor : [UIColor blackColor],
+                            UITextAttributeTextShadowColor  : [UIColor clearColor]
+         }];
+        [navigation setBackgroundImage:[UIImage imageNamed:@"navbar-bg"] forBarMetrics:UIBarMetricsDefault];
+    } else {
+        [navigation setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
+        [navigation setTitleTextAttributes:@{
+                      UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
+                 UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
+          UITextAttributeTextShadowColor  : [UIColor clearColor]
+         }];
+        [navigation setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark"] forBarMetrics:UIBarMetricsDefault];
+    }
 }
 
 + (UIColor *)titleTextColor {
@@ -84,7 +103,7 @@
         return lightSubtitleTextColor;
     } else {
         static UIColor *darkSubtitleTextColor = nil;
-        if (!darkSubtitleTextColor) darkSubtitleTextColor = [UIColor colorWithRed:132.0/255.0 green:160.0/255.0 blue:237.0/255.0 alpha:1.0];
+        if (!darkSubtitleTextColor) darkSubtitleTextColor = [UIColor colorWithRed:123.0/255.0 green:136.0/255.0 blue:201.0/255.0 alpha:1.0];
         return darkSubtitleTextColor;
     }
 }
@@ -99,17 +118,23 @@
 
 + (UIColor *)mainTextColor {
     if ([self lightTheme]) {
-        
+        return [UIColor blackColor];
     } else {
-        
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.77 alpha:1.0];
+        return color;
     }
 }
 
 + (UIColor *)userTextColor {
     if ([self lightTheme]) {
-        
+        static UIColor *lightUserTextColor = nil;
+        if (!lightUserTextColor) lightUserTextColor = [UIColor colorWithRed:128.0/255.0 green:42.0/255.0 blue:0.0/255.0 alpha:1.0];
+        return lightUserTextColor;
     } else {
-        
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithRed:201.0/255.0 green:64.0/255.0 blue:60.0/255.0 alpha:1.0];
+        return color;
     }
 }
 
@@ -139,9 +164,69 @@
 
 + (UIColor *)lightBackgroundColor {
     if ([self lightTheme]) {
-        
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:1.0 alpha:1];
+        return color;
     } else {
-        
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.2 alpha:1];
+        return color;
+    }
+}
+
++ (UIColor *)separatorColor {
+    if ([self lightTheme]) {
+        return [UIColor colorWithWhite:0.83 alpha:1.0];
+    } else {
+        return [UIColor darkGrayColor];
+    }
+}
+
++ (UIColor *)navigationColor {
+    if ([self lightTheme]) {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.97 alpha:1];
+        return color;
+    } else {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.0 alpha:1];
+        return color;
+    }
+}
+
++ (UIColor *)segmentBackgroundColor {
+    if ([self lightTheme]) {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.95 alpha:1];
+        return color;
+    } else {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.3 alpha:1];
+        return color;
+    }
+}
+
++ (UIColor *)segmentSelectedBackgroundColor {
+    if ([self lightTheme]) {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.82 alpha:1];
+        return color;
+    } else {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.0 alpha:1];
+        return color;
+    }
+}
+
++ (UIColor *)buttonTitleShadowColor {
+    if ([self lightTheme]) {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor whiteColor];
+        return color;
+    } else {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0.5 alpha:1];
+        return color;
     }
 }
 

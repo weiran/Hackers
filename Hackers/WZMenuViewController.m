@@ -32,6 +32,20 @@
     self.tableView.scrollsToTop = NO;
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // setup theme notification
+    [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:kSettingsTheme options:NSKeyValueObservingOptionNew context:NULL];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    // setup theme notification
+    [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:kSettingsTheme];
+}
+
 - (WZNavigationController *)mainNavViewController {
     if (!_mainNavViewController) {
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
@@ -140,5 +154,15 @@
 	}
 }
 
+
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    //    [WZTheme defaults];
+    [WZTheme updateNavigationBar:_mainNavViewController.navigationBar];
+    [WZTheme updateNavigationBar:_settingsNavController.navigationBar];
+    _mainNavViewController.navigationItem.title = [_mainNavViewController.navigationItem.title copy];
+    _settingsNavController.navigationItem.title = [_settingsNavController.navigationItem.title copy];
+//    [_mainNavViewController.navigationBar setNeedsDisplay];
+//    [_settingsNavController.navigationBar setNeedsDisplay];
+}
 
 @end

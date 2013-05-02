@@ -25,18 +25,20 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    UIImage *buttonImage = [[UIImage imageNamed:@"greyButton"]
-                            resizableImageWithCapInsets:UIEdgeInsetsMake(18, 18, 18, 18)];
-    UIImage *buttonImageHighlight = [[UIImage imageNamed:@"greyButtonHighlight.png"]
-                                     resizableImageWithCapInsets:UIEdgeInsetsMake(18, 18, 18, 18)];
-    [_showRepliesButton setBackgroundImage:buttonImage forState:UIControlStateNormal];
-    [_showRepliesButton setBackgroundImage:buttonImageHighlight forState:UIControlStateHighlighted];
+    [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
+    [_showRepliesButton setTitleShadowColor:[WZTheme buttonTitleShadowColor] forState:UIControlStateNormal];
+    [_commentLabel setLinkColor:[WZTheme subtitleTextColor]];
     _commentLabel.delegate = self;
+    
+    [self setTheme];
 }
 
-- (void)awakeFromNib {
-    
+- (void)setTheme {
+    _userLabel.textColor = [WZTheme userTextColor];
+    _commentLabel.textColor = [WZTheme mainTextColor];
+    _dateLabel.textColor = [WZTheme detailTextColor];
+    self.backgroundColor = [WZTheme backgroundColor];
 }
 
 - (void)setContentIndent:(NSUInteger)contentIndent {
