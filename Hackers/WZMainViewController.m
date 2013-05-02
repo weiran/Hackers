@@ -131,11 +131,11 @@
 
 - (void)setNewsType:(WZNewsType)newsType {
     _newsType = newsType;
-    [self.tableView reloadData];
+//    [self.tableView reloadData];
+    [self reloadTableViewAnimated:YES];
     [self.tableView setContentOffset:CGPointZero animated:YES];
     [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
     [self updateTitle];
-    
 }
 
 - (NSArray *)activeNews {
@@ -165,7 +165,7 @@
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:WZPost.entityName];
     NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:YES];
     request.sortDescriptors = @[sortDescriptor];
-    request.predicate = [NSPredicate predicateWithFormat:@"postType == %d", [self newsType]];
+//    request.predicate = [NSPredicate predicateWithFormat:@"postType == %d", [self newsType]];
     
     _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request
                                                                     managedObjectContext:[WZHackersData.shared context]
@@ -173,20 +173,24 @@
     NSError *error = nil;
     [_fetchedResultsController performFetch:&error];
     
-    NSMutableArray *postArray = [NSMutableArray array];
+    NSMutableArray *topPostArray = [NSMutableArray array];
+    NSMutableArray *newPostArray = [NSMutableArray array];
+    NSMutableArray *askPostArray = [NSMutableArray array];
     
     for (WZPost *post in _fetchedResultsController.fetchedObjects) {
         WZPostModel *postModel = [[WZPostModel alloc] initWithPost:post];
-        [postArray addObject:postModel];
+        if (postModel.postType == 0) {
+            [topPostArray addObject:postModel];
+        } else if (postModel.postType == 1) {
+            [newPostArray addObject:postModel];
+        } else if (postModel.postType == 2) {
+            [askPostArray addObject:postModel];
+        }
     }
     
-    if (_newsType == WZNewsTypeTop) {
-        _news = [NSArray arrayWithArray:postArray];
-    } else if (_newsType == WZNewsTypeNew) {
-        _newNews = [NSArray arrayWithArray:postArray];
-    } else if (_newsType == WZNewsTypeAsk) {
-        _askNews = [NSArray arrayWithArray:postArray];
-    }
+    _news = [NSArray arrayWithArray:topPostArray];
+    _newNews = [NSArray arrayWithArray:newPostArray];
+    _askNews = [NSArray arrayWithArray:askPostArray];
     
     if (error) {
         NSLog(@"News fetch failed: %@", error.localizedDescription);
@@ -219,11 +223,11 @@
 - (void)updateTitle {
     switch (_newsType) {
         case WZNewsTypeTop:
-            self.title = @"Top Hacker News";
+            self.title = @"Hacker News";
             break;
             
         case WZNewsTypeNew:
-            self.title = @"New Hacker News";
+            self.title = @"New";
             break;
             
         case WZNewsTypeAsk:
@@ -233,6 +237,15 @@
         default:
             break;
     }
+}
+
+- (void)reloadTableViewAnimated:(bool)animated {
+    [UIView transitionWithView:self.tableView
+                      duration:0.3f
+                       options:UIViewAnimationOptionTransitionCrossDissolve
+                    animations:^(void) {
+                        [self.tableView reloadData];
+                    } completion:nil];
 }
 
 #pragma mark - UITableViewController methods

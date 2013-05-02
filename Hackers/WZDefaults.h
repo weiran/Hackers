@@ -36,6 +36,5 @@
 @interface WZDefaults : NSObject
 
 + (WZAppDelegate *)appDelegate;
-+ (BOOL)getBoolKey:(NSString *)key;
 
 @end

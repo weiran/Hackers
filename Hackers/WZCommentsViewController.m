@@ -171,13 +171,15 @@
 }
 
 - (void)showDefaultView {
-    NSString *defaultView = [[NSUserDefaults standardUserDefaults] valueForKey:kSettingsDefaultReadingView];
-    if ([defaultView isEqualToString:kSettingsDefaultReadingViewComments]) {
-        _segmentedControl.selectedSegmentIndex = 0;
-        [self segmentDidChange:_segmentedControl];
-    } else if ([defaultView isEqualToString:kSettingsDefaultReadingViewLink]) {
-        _segmentedControl.selectedSegmentIndex = 1;
-        [self segmentDidChange:_segmentedControl];
+    if (![self postIsAskOrJob]) {
+        NSString *defaultView = [[NSUserDefaults standardUserDefaults] valueForKey:kSettingsDefaultReadingView];
+        if ([defaultView isEqualToString:kSettingsDefaultReadingViewComments]) {
+            _segmentedControl.selectedSegmentIndex = 0;
+            [self segmentDidChange:_segmentedControl];
+        } else if ([defaultView isEqualToString:kSettingsDefaultReadingViewLink]) {
+            _segmentedControl.selectedSegmentIndex = 1;
+            [self segmentDidChange:_segmentedControl];
+        }
     }
 }
 
@@ -201,8 +203,12 @@
     [self.view bringSubviewToFront:_activityIndicatorView];
 }
 
+- (bool)postIsAskOrJob {
+    return [_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"];
+}
+
 - (void)setupSegmentedController {
-    if ([_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"]) { // hide if post is ASK HN
+    if ([self postIsAskOrJob]) { // hide if post is ASK HN
         _segmentedControl.hidden = YES;
     }
 
@@ -277,8 +283,10 @@
     [self.view addConstraint:leftConstraint];
     [self.view addConstraint:rightConstraint];
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:kSettingsPreloadLink]) {
-        [_webViewController loadURL:[NSURL URLWithString:_post.url]];
+    if (![self postIsAskOrJob]) {
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:kSettingsPreloadLink]) {
+            [_webViewController loadURL:[NSURL URLWithString:_post.url]];
+        }
     }
 }
 

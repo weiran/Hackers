@@ -14,12 +14,12 @@
 
 - (id)initWithPost:(WZPost *)post;
 
-@property (nonatomic) NSUInteger *commentsCount;
+@property (nonatomic) NSUInteger commentsCount;
 @property (nonatomic, strong) NSString *domain;
-@property (nonatomic) NSUInteger *id;
-@property (nonatomic) NSUInteger *points;
-@property (nonatomic) NSUInteger *postType;
-@property (nonatomic) NSUInteger *rank;
+@property (nonatomic) NSUInteger id;
+@property (nonatomic) NSUInteger points;
+@property (nonatomic) NSUInteger postType;
+@property (nonatomic) NSUInteger rank;
 @property (nonatomic, strong) NSString *timeAgo;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *type;
