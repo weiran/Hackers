@@ -51,6 +51,8 @@
     _newsType = WZNewsTypeTop;
     _topNewsPage = 1;
     
+    self.tableView.backgroundColor = [WZTheme backgroundColor];
+    
     [self setupPullToRefresh];
     [self loadData];
     [self updateTitle];
@@ -104,7 +106,7 @@
 }
 
 - (void)setupPullToRefresh {
-    UIColor *backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    UIColor *backgroundColor = [WZTheme backgroundColor];
     
     _refreshControl = [[UIRefreshControl alloc] init];
     _refreshControl.backgroundColor = backgroundColor;
@@ -280,6 +282,7 @@
     // if we're on the loading cell
     if (_newsType == WZNewsTypeTop && indexPath.row == _news.count && _topNewsPage == 1) {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:loadingCellIdentifier];
+        cell.contentView.backgroundColor = [WZTheme backgroundColor];
         [self sendFetchRequestWithPage:2];
         return cell;
     } else {    
@@ -287,7 +290,6 @@
         WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:postCellIdentifier];
         cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
         cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
-    //    cell.rankLabel.text = [NSString stringWithFormat:@"%lu.", (unsigned long)post.rank];
         cell.titleLabel.text = post.title;
         if ([post.type isEqualToString:@"ask"]) {
             cell.domainLabel.text = @"Ask Hacker News";

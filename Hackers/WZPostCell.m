@@ -14,6 +14,16 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    [self setTheme];
+}
+
+- (void)setTheme {
+    _titleLabel.textColor = [WZTheme titleTextColor];
+    if (self.selected) {
+        self.backgroundColor = [WZTheme highlightedBackgroundColor];
+    } else {
+        self.backgroundColor = [WZTheme backgroundColor];
+    }
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
@@ -36,9 +46,9 @@
     [UIView animateWithDuration:duration
                      animations:^{
                          if (highlighted) {
-                             self.backgroundColor = [UIColor colorWithWhite:0.87 alpha:1];
+                             self.backgroundColor = [WZTheme highlightedBackgroundColor];
                          } else {
-                             self.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+                             self.backgroundColor = [WZTheme backgroundColor];
                          }
                      }];
 }

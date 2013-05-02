@@ -12,6 +12,7 @@
 #import "WZNavigationController.h"
 #import "WZMenuViewController.h"
 #import "JSSlidingViewController.h"
+#import "WZTheme.h"
 
 #if NDEBUG
 #import <Crashlytics/Crashlytics.h>
@@ -23,21 +24,7 @@
 #if NDEBUG
     [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
 #endif
-    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{
-                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-                               UITextAttributeTextColor : [UIColor blackColor],
-                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-                                    }];
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forBarMetrics:UIBarMetricsDefault];
-    [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    [[UIBarButtonItem appearance] setTitleTextAttributes:@{
-                               UITextAttributeTextColor : [UIColor blackColor],
-                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-     }
-                                                forState:UIControlStateNormal];
-    
+    [WZTheme defaults];
     // initilise storyboard with JSSlidingViewController
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     

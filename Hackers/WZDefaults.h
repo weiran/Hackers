@@ -36,6 +36,10 @@
 #define kSettingsDefaultReadingViewLink @"link"
 #define kSettingsPreloadLink @"PreloadLink"
 
+#define kSettingsTheme @"Theme"
+#define kSettingsThemeLight @"light"
+#define kSettingsThemeDark @"dark"
+
 @class WZAppDelegate;
 
 @interface WZDefaults : NSObject
