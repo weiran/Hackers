@@ -31,6 +31,7 @@
     NSArray *_askNews;
     NSInteger _topNewsPage;
     
+    UIView *_tableViewBackgroundView;
     NSMutableArray *_readNews;
     UIRefreshControl *_refreshControl;
     UIPopoverController *_popoverController;
@@ -51,8 +52,6 @@
     _newsType = WZNewsTypeTop;
     _topNewsPage = 1;
     
-    self.tableView.backgroundColor = [WZTheme backgroundColor];
-    
     [self setupPullToRefresh];
     [self loadData];
     [self updateTitle];
@@ -65,6 +64,12 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.tableView.backgroundColor = [WZTheme backgroundColor];
+    [self setupPullToRefresh];
 }
 
 #pragma mark - Fetch
@@ -108,18 +113,22 @@
 - (void)setupPullToRefresh {
     UIColor *backgroundColor = [WZTheme backgroundColor];
     
-    _refreshControl = [[UIRefreshControl alloc] init];
+    if (!_refreshControl) {
+        _refreshControl = [[UIRefreshControl alloc] init];
+        [_refreshControl addTarget:self action:@selector(sendFetchRequest:) forControlEvents:UIControlEventValueChanged];
+        _refreshControl.tintColor = [UIColor colorWithWhite:0.4 alpha:1];
+        self.refreshControl = _refreshControl;
+    }
     _refreshControl.backgroundColor = backgroundColor;
-    _refreshControl.tintColor = [UIColor colorWithWhite:0.4 alpha:1];
-    [_refreshControl addTarget:self action:@selector(sendFetchRequest:) forControlEvents:UIControlEventValueChanged];
-    self.refreshControl = _refreshControl;
+
+    if (!_tableViewBackgroundView) {
+        CGRect frame = self.tableView.bounds;
+        frame.origin.y = -frame.size.height;
+        _tableViewBackgroundView = [[UIView alloc] initWithFrame:frame];
     
-    CGRect frame = self.tableView.bounds;
-    frame.origin.y = -frame.size.height;
-    UIView *backgroundView = [[UIView alloc] initWithFrame:frame];
-    backgroundView.backgroundColor = backgroundColor;
-    
-    [self.tableView insertSubview:backgroundView atIndex:0];
+        [self.tableView insertSubview:_tableViewBackgroundView atIndex:0];
+    }
+    _tableViewBackgroundView.backgroundColor = backgroundColor;
 }
 
 
