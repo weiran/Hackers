@@ -69,9 +69,11 @@
     if ([self lightTheme]) {
 //        [navigation.navigationBar setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
         navigation.titleLabel.textColor = [UIColor blackColor];
+        [navigation.navigationBar setNeedsDisplay];
     } else {
 //        [navigation.navigationBar setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
         navigation.titleLabel.textColor = [UIColor colorWithWhite:0.87 alpha:1.0];
+        [navigation.navigationBar setNeedsDisplay];
     }
 }
 
