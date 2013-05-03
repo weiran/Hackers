@@ -8,7 +8,7 @@
         <scene sceneID="Vwz-dx-Dpd">
             <objects>
                 <navigationController storyboardIdentifier="MainNavigationController" definesPresentationContext="YES" id="kHE-jZ-QLL" customClass="WZNavigationController" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="nAW-3G-0rE" customClass="WZNavigationBar">
                         <autoresizingMask key="autoresizingMask"/>
                         <gestureRecognizers/>
                     </navigationBar>
@@ -665,6 +665,9 @@
                 <relationship kind="outlet" name="showNewCell" candidateClass="UITableViewCell"/>
                 <relationship kind="outlet" name="topCell" candidateClass="UITableViewCell"/>
             </relationships>
+        </class>
+        <class className="WZNavigationBar" superclassName="UINavigationBar">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
         </class>
         <class className="WZNavigationController" superclassName="UINavigationController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>

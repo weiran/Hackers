@@ -9,6 +9,7 @@
 #import "WZMenuViewController.h"
 #import "WZNavigationController.h"
 #import "WZAccountManager.h"
+#import "WZNavigationBar.h"
 
 #import <JSSlidingViewController.h>
 #import <IASKSpecifierValuesViewController.h>
@@ -16,7 +17,7 @@
 #import <SSKeychain.h>
 
 @interface WZMenuViewController ()
-@property (nonatomic, strong) UINavigationController *settingsNavController;
+@property (nonatomic, strong) WZNavigationController *settingsNavController;
 @property (nonatomic, strong) IASKAppSettingsViewController *settingsViewController;
 @property (weak, nonatomic) IBOutlet UITableViewCell *settingsCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *askCell;
@@ -61,20 +62,8 @@
         _settingsViewController.delegate = self;
         _settingsViewController.showDoneButton = NO;
         _settingsViewController.showCreditsFooter = NO;
-//        _settingsViewController.hiddenKeys = [NSSet setWithObjects:@"InstapaperUsername", @"InstapaperPassword", nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(settingDidChange:) name:kIASKAppSettingChanged object:nil];
-        
-        // TODO: setting appearance breaks
-//        id settingsTableViewAppearance = [UITableView appearanceWhenContainedIn:[IASKAppSettingsViewController class], nil];
-//        UIView *backgroundView = [UIView new];
-//        backgroundView.backgroundColor = kBackgroundColorLight;
-//        [settingsTableViewAppearance setBackgroundView:backgroundView];
-//        
-//        id settingsDetailViewAppearance = [UITableView appearanceWhenContainedIn:[IASKSpecifierValuesViewController class], nil];
-//        UIView *detailBackgroundView = [UIView new];
-//        detailBackgroundView.backgroundColor = kBackgroundColorLight;
-//        [settingsDetailViewAppearance setBackgroundView:detailBackgroundView];
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.frame = CGRectMake(0, 0, 44, 44);
@@ -91,7 +80,10 @@
 
 -(UINavigationController *)settingsNavController {
     if (!_settingsNavController) {
-        _settingsNavController = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
+//        _settingsNavController = [[UINavigationController alloc] initWithNavigationBarClass:[WZNavigationBar class] toolbarClass:[UIToolbar class]];
+//        
+        _settingsNavController = [[WZNavigationController alloc] initWithRootViewController:self.settingsViewController];
+        [_settingsNavController setValue:[[WZNavigationBar alloc]init] forKeyPath:@"navigationBar"];
     }
     
     return _settingsNavController;
@@ -157,12 +149,8 @@
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     //    [WZTheme defaults];
-    [WZTheme updateNavigationBar:_mainNavViewController.navigationBar];
-    [WZTheme updateNavigationBar:_settingsNavController.navigationBar];
-    _mainNavViewController.navigationItem.title = [_mainNavViewController.navigationItem.title copy];
-    _settingsNavController.navigationItem.title = [_settingsNavController.navigationItem.title copy];
-//    [_mainNavViewController.navigationBar setNeedsDisplay];
-//    [_settingsNavController.navigationBar setNeedsDisplay];
+    [WZTheme updateNavigationBar:_mainNavViewController];
+    [WZTheme updateNavigationBar:_settingsNavController];
 }
 
 @end

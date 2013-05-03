@@ -12,6 +12,7 @@
 @interface WZNavigationController : UINavigationController
 
 @property (nonatomic, assign) BOOL allowsRotation;
+@property (nonatomic, readonly) UILabel *titleLabel;
 - (void)setNewsType:(WZNewsType)newsType;
 
 @end

@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class WZNavigationController;
+
 @interface WZTheme : NSObject
 
 + (void)defaults;
@@ -33,6 +35,6 @@
 
 + (UIColor *)buttonTitleShadowColor;
 
-+ (void)updateNavigationBar:(UINavigationBar *)navigation;
++ (void)updateNavigationBar:(WZNavigationController *)navigation;
 
 @end
