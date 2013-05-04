@@ -58,6 +58,10 @@
     _navigationBarCurrentlyHidden = _navigationBarHidden;
     _toolbarCurrentlyHidden = _toolbarHidden;
     
+    UISwipeGestureRecognizer *closeGestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(close:)];
+    closeGestureRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
+    [self.navigationBar addGestureRecognizer:closeGestureRecognizer];
+    
     [self layoutWebView];
     [self layoutWebViewConstraints];
     [self layoutNavigationBar];

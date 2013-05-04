@@ -337,7 +337,7 @@
     
     CGFloat headerTextViewHeight = 0;
     
-    // set the post content (AskHN)
+    // set the post content (AskHN or Job)
     CGFloat headerTextViewBottomSpacingConstant = 0;
     if (_post.content) {
         headerTextViewBottomSpacingConstant = kHeaderTextBottomMargin;
