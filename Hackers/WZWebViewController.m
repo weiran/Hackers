@@ -85,13 +85,13 @@
     closeButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     closeButton.accessibilityLabel = @"Close";
     [closeButton addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
-    [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
+    [closeButton setImage:[UIImage themeImageNamed:@"x"] forState:UIControlStateNormal];
     
     UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
     shareButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     shareButton.accessibilityLabel = @"Share";
     [shareButton addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
-    [shareButton setImage:[UIImage imageNamed:@"share-icon"] forState:UIControlStateNormal];
+    [shareButton setImage:[UIImage themeImageNamed:@"share-icon"] forState:UIControlStateNormal];
     
 //    _activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
 //    _activityIndicatorView.hidden = YES;
@@ -141,27 +141,27 @@
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
     backButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     backButton.accessibilityLabel = @"Back";
-    [backButton setImage:[UIImage imageNamed:@"back-icon"] forState:UIControlStateNormal];
+    [backButton setImage:[UIImage themeImageNamed:@"back-icon"] forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     UIButton *forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
     forwardButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     forwardButton.accessibilityLabel = @"Forward";
-    [forwardButton setImage:[UIImage imageNamed:@"forward-icon"] forState:UIControlStateNormal];
+    [forwardButton setImage:[UIImage themeImageNamed:@"forward-icon"] forState:UIControlStateNormal];
     [forwardButton addTarget:self action:@selector(forwardButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     UIButton *mobilizerButton = [UIButton buttonWithType:UIButtonTypeCustom];
     mobilizerButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     mobilizerButton.accessibilityLabel = @"Mobilizer";
-    [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon"] forState:UIControlStateNormal];
-    [mobilizerButton setImage:[UIImage imageNamed:@"mobilizer-icon-highlighted"] forState:UIControlStateSelected];
+    [mobilizerButton setImage:[UIImage themeImageNamed:@"mobilizer-icon"] forState:UIControlStateNormal];
+    [mobilizerButton setImage:[UIImage themeImageNamed:@"mobilizer-icon-highlighted"] forState:UIControlStateSelected];
     [mobilizerButton addTarget:self action:@selector(mobilizerButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeCustom];
     reloadButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
     reloadButton.accessibilityLabel = @"Reload";
     reloadButton.enabled = NO;
-    [reloadButton setImage:[UIImage imageNamed:@"refresh-icon"] forState:UIControlStateNormal];
+    [reloadButton setImage:[UIImage themeImageNamed:@"refresh-icon"] forState:UIControlStateNormal];
     [reloadButton addTarget:self action:@selector(reloadButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
