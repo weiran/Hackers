@@ -35,7 +35,7 @@
     paragraphStyle.paragraphSpacing = 12.f;
     attributedString.paragraphStyle = paragraphStyle;
     [attributedString setFont:[UIFont fontWithName:kBodyFontName size:kBodyFontSize]];
-    
+    [attributedString setTextColor:[WZTheme mainTextColor]];
     return attributedString;
 }
 

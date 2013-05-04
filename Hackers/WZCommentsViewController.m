@@ -306,9 +306,11 @@
     _headerDomainLabel.textColor = [WZTheme subtitleTextColor];
     _headerMetadata1Label.textColor = [WZTheme detailTextColor];
     _headerMetadata2Label.textColor = [WZTheme detailTextColor];
-    _headerTextView.textColor = [WZTheme mainTextColor];
     _headerView.backgroundColor = [WZTheme lightBackgroundColor];
     _headerDetailsContainerView.backgroundColor = [WZTheme lightBackgroundColor];
+    
+    _headerTextView.textColor = [WZTheme mainTextColor];
+    [_headerTextView setNeedsDisplay];
     
     if ([_post.type isEqualToString:@"ask"]) {
         _headerDomainLabel.text = @"Ask Hacker News";
