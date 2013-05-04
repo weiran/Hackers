@@ -33,29 +33,30 @@
 
 + (void)setLightTheme {
 //    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{
-                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-                               UITextAttributeTextColor : [UIColor blackColor],
-                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-     }];
+//    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
+//    [[UINavigationBar appearance] setTitleTextAttributes:@{
+//                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
+//                               UITextAttributeTextColor : [UIColor blackColor],
+//                        UITextAttributeTextShadowColor  : [UIColor clearColor]
+//     }];
 //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forBarMetrics:UIBarMetricsDefault];
 //    [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{
-                               UITextAttributeTextColor : [UIColor blackColor],
+                               UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
      }
                                                 forState:UIControlStateNormal];
+    [[UIBarButtonItem appearance] setTintColor:[UIColor colorWithWhite:0.5 alpha:1.0]];
 }
 
 + (void)setDarkTheme {
 //    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
-    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{
-                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-                               UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
-                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-     }];
+//    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
+//    [[UINavigationBar appearance] setTitleTextAttributes:@{
+//                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
+//                               UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
+//                        UITextAttributeTextShadowColor  : [UIColor clearColor]
+//     }];
 //    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forBarMetrics:UIBarMetricsDefault];
 //    [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{
@@ -63,18 +64,13 @@
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
      }
                                                 forState:UIControlStateNormal];
+    [[UIBarButtonItem appearance] setTintColor:[UIColor colorWithWhite:0.5 alpha:1.0]];
 }
 
 + (void)updateNavigationBar:(WZNavigationController *)navigation {
-    if ([self lightTheme]) {
-//        [navigation.navigationBar setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-        navigation.titleLabel.textColor = [UIColor blackColor];
-        [navigation.navigationBar setNeedsDisplay];
-    } else {
-//        [navigation.navigationBar setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
-        navigation.titleLabel.textColor = [UIColor colorWithWhite:0.87 alpha:1.0];
-        [navigation.navigationBar setNeedsDisplay];
-    }
+//    navigation.titleLabel.textColor = [self titleTextColor];
+    navigation.navigationItem.title = @"Test";
+    [navigation.navigationBar setNeedsDisplay];
 }
 
 + (UIColor *)titleTextColor {
@@ -182,7 +178,7 @@
         return color;
     } else {
         static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.0 alpha:1];
+        if (!color) color = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha: 1];
         return color;
     }
 }

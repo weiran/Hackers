@@ -82,7 +82,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Preload link</string>
+			<string>Load link in background</string>
 			<key>Key</key>
 			<string>PreloadLink</string>
 			<key>DefaultValue</key>

@@ -10,6 +10,7 @@
 #import <MBProgressHUD/MBProgressHUD.h>
 
 #import "WZWebViewController.h"
+#import "WZActivityViewController.h"
 #define kNavigationBarHeight 44
 #define kToolbarBarHeight 44
 #define kToolBarHeight 44
@@ -82,17 +83,24 @@
     [closeButton addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     [closeButton setImage:[UIImage imageNamed:@"x"] forState:UIControlStateNormal];
     
-    _activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    _activityIndicatorView.hidden = YES;
-    _activityIndicatorView.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
-    [_activityIndicatorView startAnimating];
+    UIButton *shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    shareButton.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+    shareButton.accessibilityLabel = @"Share";
+    [shareButton addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
+    [shareButton setImage:[UIImage imageNamed:@"share-icon"] forState:UIControlStateNormal];
+    
+//    _activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+//    _activityIndicatorView.hidden = YES;
+//    _activityIndicatorView.frame = CGRectMake(0, 0, kBarButtonIconWidth, kBarButtonIconHeight);
+//    [_activityIndicatorView startAnimating];
     
     UIBarButtonItem *closeBarButton = [[UIBarButtonItem alloc] initWithCustomView:closeButton];
-    UIBarButtonItem *activityIndicatorButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicatorView];
+    UIBarButtonItem *shareBarButton = [[UIBarButtonItem alloc] initWithCustomView:shareButton];
+//    UIBarButtonItem *activityIndicatorButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicatorView];
     
     UINavigationItem *navigationItem = [[UINavigationItem alloc] initWithTitle:@""];
     [navigationItem setLeftBarButtonItem:closeBarButton];
-    [navigationItem setRightBarButtonItem:activityIndicatorButton];
+    [navigationItem setRightBarButtonItem:shareBarButton];
     
     [_navigationBar pushNavigationItem:navigationItem animated:NO];
 }
@@ -210,6 +218,13 @@
 
 - (void)close:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)share:(id)sender {
+    WZActivityViewController *activityViewController =
+        [WZActivityViewController activityViewControllerWithUrl:_defaultURL
+                                                           text:[_webView stringByEvaluatingJavaScriptFromString:@"document.title" ]];
+    [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
 #pragma mark - Toolbar Buttons

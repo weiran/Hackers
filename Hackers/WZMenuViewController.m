@@ -80,8 +80,6 @@
 
 -(UINavigationController *)settingsNavController {
     if (!_settingsNavController) {
-//        _settingsNavController = [[UINavigationController alloc] initWithNavigationBarClass:[WZNavigationBar class] toolbarClass:[UIToolbar class]];
-//        
         _settingsNavController = [[WZNavigationController alloc] initWithRootViewController:self.settingsViewController];
         [_settingsNavController setValue:[[WZNavigationBar alloc]init] forKeyPath:@"navigationBar"];
     }
@@ -151,6 +149,8 @@
     //    [WZTheme defaults];
     [WZTheme updateNavigationBar:_mainNavViewController];
     [WZTheme updateNavigationBar:_settingsNavController];
+    _mainNavViewController.title = @"Test";
+    _settingsNavController.title = @"Test";
 }
 
 @end
