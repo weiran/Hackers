@@ -9,6 +9,7 @@
 #import "WZActivityViewController.h"
 
 #import <TUSafariActivity/TUSafariActivity.h>
+#import <ARChromeActivity/ARChromeActivity.h>
 #import "WZInstapaperActivity.h"
 #import "WZPinboardActivity.h"
 
@@ -53,8 +54,9 @@
     TUSafariActivity *safariActivity = [[TUSafariActivity alloc] init];
     WZInstapaperActivity *instapaperActivity = [[WZInstapaperActivity alloc] init];
     WZPinboardActivity *pinboardActivity = [[WZPinboardActivity alloc] init];
-    NSArray *activities = @[safariActivity, instapaperActivity, pinboardActivity];
-    NSArray *activityItems = @[url, text];
+    ARChromeActivity *chromeActivity = [[ARChromeActivity alloc] init];
+    NSArray *activities = @[safariActivity, chromeActivity, instapaperActivity, pinboardActivity];
+    NSArray *activityItems = @[text, url];
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];
     

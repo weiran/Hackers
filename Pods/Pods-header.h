@@ -2,6 +2,7 @@
 #define __COCOA_PODS
 
 #define __POD_AFNetworking
+#define __POD_ARChromeActivity
 #define __POD_DTCoreText
 #define __POD_DTFoundation_Core
 #define __POD_DTFoundation_DTHMLParser

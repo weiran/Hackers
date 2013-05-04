@@ -25,4 +25,8 @@ install_resource()
       ;;
   esac
 }
+install_resource 'ARChromeActivity/ARChromeActivity/ARChromeActivity.png'
+install_resource 'ARChromeActivity/ARChromeActivity/ARChromeActivity@2x.png'
+install_resource 'ARChromeActivity/ARChromeActivity/ARChromeActivity@2x~ipad.png'
+install_resource 'ARChromeActivity/ARChromeActivity/ARChromeActivity~ipad.png'
 install_resource 'DTCoreText/Demo/Resources/DTCoreTextFontOverrides.plist'
