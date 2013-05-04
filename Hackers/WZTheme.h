@@ -35,6 +35,10 @@
 
 + (UIColor *)buttonTitleShadowColor;
 
++ (UIColor *)menuBackgroundColor;
++ (UIColor *)menuSeparatorColor;
++ (UIColor *)menuTitleColor;
+
 + (void)updateNavigationBar:(WZNavigationController *)navigation;
 
 @end

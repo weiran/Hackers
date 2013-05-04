@@ -80,7 +80,7 @@
         return lightTitleTextColor;
     } else {
         static UIColor *darkTitleTextColor = nil;
-        if (!darkTitleTextColor) darkTitleTextColor = [UIColor colorWithWhite:0.77 alpha:1.0];
+        if (!darkTitleTextColor) darkTitleTextColor = [UIColor colorWithWhite:0.7 alpha:1.0];
         return darkTitleTextColor;
     }
 }
@@ -101,7 +101,7 @@
     if ([self lightTheme]) {
         return [UIColor lightGrayColor];
     } else {
-        return [UIColor lightGrayColor];
+        return [UIColor colorWithWhite:0.5 alpha:1.0];
     }
 }
 
@@ -134,7 +134,8 @@
         return lightBackgroundColor;
     } else {
         static UIColor *darkBackgroundColor = nil;
-        if (!darkBackgroundColor) darkBackgroundColor = [UIColor colorWithWhite:0.13 alpha:1.0];
+//        if (!darkBackgroundColor) darkBackgroundColor = [UIColor colorWithWhite:0.13 alpha:1.0];
+        if (!darkBackgroundColor) darkBackgroundColor = [UIColor blackColor];
         return darkBackgroundColor;
     }
 }
@@ -167,9 +168,11 @@
     if ([self lightTheme]) {
         return [UIColor colorWithWhite:0.83 alpha:1.0];
     } else {
-        return [UIColor darkGrayColor];
+//        return [UIColor colorWithWhite:0.1 alpha:1.0];
+        return [UIColor colorWithWhite:0.14 alpha:1.0];
     }
 }
+
 
 + (UIColor *)navigationColor {
     if ([self lightTheme]) {
@@ -178,7 +181,7 @@
         return color;
     } else {
         static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha: 1];
+        if (!color) color = [UIColor colorWithWhite:0.1 alpha:1.0];
         return color;
     }
 }
@@ -219,4 +222,22 @@
     }
 }
 
++ (UIColor *)menuBackgroundColor {
+    static UIColor *color = nil;
+    if (!color) color = [UIColor colorWithWhite:0.12 alpha:1];
+    return color;
+}
+
+
++ (UIColor *)menuSeparatorColor {
+    static UIColor *color = nil;
+    if (!color) color = [UIColor colorWithWhite:0.14 alpha:1.0];
+    return color;
+}
+
++ (UIColor *)menuTitleColor {
+    static UIColor *color = nil;
+    if (!color) color = [UIColor colorWithWhite:0.7 alpha:1.0];
+    return color;
+}
 @end

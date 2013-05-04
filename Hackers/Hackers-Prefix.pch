@@ -13,4 +13,5 @@
     #import "WZDefaults.h"
     #import "WZAppDelegate.h"
     #import "WZTheme.h"
+    #import "UIImage+Theme.h"
 #endif

@@ -25,9 +25,9 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [_showRepliesButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
-    [_showRepliesButton setTitleShadowColor:[WZTheme buttonTitleShadowColor] forState:UIControlStateNormal];
+    [_showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateNormal];
+    [_showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateHighlighted];
+    [_showRepliesButton setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     [_commentLabel setLinkColor:[WZTheme subtitleTextColor]];
     _commentLabel.delegate = self;
     

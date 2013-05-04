@@ -12,7 +12,8 @@
 
 - (void)awakeFromNib {
     [self setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    self.titleLabel.textColor = [UIColor colorWithRed:50.0/255.0 green:79.0/255.0 blue:133.0/255.0 alpha:1];
+    self.titleLabel.textColor = [WZTheme titleTextColor];
+    self.titleLabel.shadowColor = [UIColor clearColor];
     self.titleLabel.font = [UIFont fontWithName:kBodyFontName size:kBodyFontSize];
 }
 
@@ -31,12 +32,9 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     //// Color Declarations
+    UIColor* baseGradientBottomColor = [UIColor colorWithRed: 0.122 green: 0.122 blue: 0.122 alpha: 1];
+    UIColor* buttonColor = [UIColor colorWithRed: 0.184 green: 0.184 blue: 0.184 alpha: 1];
     UIColor* iconShadow = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.8];
-    UIColor* buttonColor = [UIColor colorWithRed: 0.616 green: 0.639 blue: 0.71 alpha: 1];
-    CGFloat buttonColorRGBA[4];
-    [buttonColor getRed: &buttonColorRGBA[0] green: &buttonColorRGBA[1] blue: &buttonColorRGBA[2] alpha: &buttonColorRGBA[3]];
-    
-    UIColor* baseGradientBottomColor = [UIColor colorWithRed: (buttonColorRGBA[0] * 0.6) green: (buttonColorRGBA[1] * 0.6) blue: (buttonColorRGBA[2] * 0.6) alpha: (buttonColorRGBA[3] * 0.6 + 0.4)];
     
     //// Gradient Declarations
     NSArray* baseGradientColors = [NSArray arrayWithObjects:
@@ -46,12 +44,13 @@
     CGGradientRef baseGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)baseGradientColors, baseGradientLocations);
     
     //// Shadow Declarations
-    UIColor* buttonShadow = iconShadow;
-    CGSize buttonShadowOffset = CGSizeMake(0.1, 1.1);
-    CGFloat buttonShadowBlurRadius = 2;
+//    UIColor* buttonShadow = iconShadow;
+//    CGSize buttonShadowOffset = CGSizeMake(0.1, -0.1);
+//    CGFloat buttonShadowBlurRadius = 2;
     
     //// Frames
     CGRect frame = self.bounds;
+    
     
     //// Button
     {
@@ -59,7 +58,7 @@
         CGRect buttonRectangleRect = CGRectMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 1, CGRectGetWidth(frame) - 4, CGRectGetHeight(frame) - 3);
         UIBezierPath* buttonRectanglePath = [UIBezierPath bezierPathWithRoundedRect: buttonRectangleRect cornerRadius: 3];
         CGContextSaveGState(context);
-        CGContextSetShadowWithColor(context, buttonShadowOffset, buttonShadowBlurRadius, buttonShadow.CGColor);
+//        CGContextSetShadowWithColor(context, buttonShadowOffset, buttonShadowBlurRadius, buttonShadow.CGColor);
         CGContextBeginTransparencyLayer(context, NULL);
         [buttonRectanglePath addClip];
         CGContextDrawLinearGradient(context, baseGradient,
@@ -70,11 +69,6 @@
         CGContextRestoreGState(context);
         
     }
-    
-    
-    //// Cleanup
-    CGGradientRelease(baseGradient);
-    CGColorSpaceRelease(colorSpace);
 }
 
 - (void)drawLightTheme {
@@ -83,12 +77,9 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     //// Color Declarations
-    UIColor* iconShadow = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.8];
+    UIColor* baseGradientBottomColor = [UIColor colorWithRed: 0.945 green: 0.945 blue: 0.945 alpha: 1];
     UIColor* buttonColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 1];
-    CGFloat buttonColorRGBA[4];
-    [buttonColor getRed: &buttonColorRGBA[0] green: &buttonColorRGBA[1] blue: &buttonColorRGBA[2] alpha: &buttonColorRGBA[3]];
-    
-    UIColor* baseGradientBottomColor = [UIColor colorWithRed: (buttonColorRGBA[0] * 0.8) green: (buttonColorRGBA[1] * 0.8) blue: (buttonColorRGBA[2] * 0.8) alpha: (buttonColorRGBA[3] * 0.8 + 0.2)];
+    UIColor* iconShadow = [UIColor colorWithRed: 0.2 green: 0.2 blue: 0.2 alpha: 1];
     
     //// Gradient Declarations
     NSArray* baseGradientColors = [NSArray arrayWithObjects:
@@ -104,6 +95,7 @@
     
     //// Frames
     CGRect frame = self.bounds;
+    
     
     //// Button
     {

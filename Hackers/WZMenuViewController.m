@@ -30,7 +30,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.scrollsToTop = NO;
+    [self layoutTableView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -40,11 +40,37 @@
     [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:kSettingsTheme options:NSKeyValueObservingOptionNew context:NULL];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (![self.tableView indexPathForSelectedRow]) {
+        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+    }
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
     // setup theme notification
     [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:kSettingsTheme];
+}
+
+- (void)layoutTableView {
+    self.tableView.scrollsToTop = NO;
+    self.tableView.backgroundColor = [WZTheme menuBackgroundColor];
+    self.tableView.separatorColor = [WZTheme menuSeparatorColor];
+    
+    [self layoutCell:_settingsCell];
+    [self layoutCell:_askCell];
+    [self layoutCell:_showNewCell];
+    [self layoutCell:_topCell];
+}
+
+- (void)layoutCell:(UITableViewCell *)cell {
+    cell.backgroundColor = [WZTheme menuBackgroundColor];
+    cell.textLabel.textColor = [WZTheme menuTitleColor];
+    cell.textLabel.font = [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize];
+    cell.textLabel.highlightedTextColor = [UIColor blackColor];
 }
 
 - (WZNavigationController *)mainNavViewController {
@@ -149,8 +175,8 @@
     //    [WZTheme defaults];
     [WZTheme updateNavigationBar:_mainNavViewController];
     [WZTheme updateNavigationBar:_settingsNavController];
-    _mainNavViewController.title = @"Test";
-    _settingsNavController.title = @"Test";
+    [self layoutTableView];
+    [self.tableView reloadData];
 }
 
 @end

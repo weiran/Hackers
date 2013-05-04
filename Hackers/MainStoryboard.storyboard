@@ -165,6 +165,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="kSF-af-Q0P" id="TWb-3l-I0y"/>
+                        <outlet property="menuButton" destination="Li1-it-FNQ" id="cLG-98-Vnw"/>
                     </connections>
                 </tableViewController>
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" animating="YES" style="gray" id="kSF-af-Q0P">
@@ -463,6 +464,7 @@
                     <connections>
                         <outlet property="activityIndicatorView" destination="Vex-b4-wZn" id="Wys-LV-3Re"/>
                         <outlet property="activityIndicatorViewTopSpacing" destination="wC8-LO-Lmj" id="5i9-Ap-IcO"/>
+                        <outlet property="backButton" destination="d4J-Ft-d7f" id="2tu-Mc-Jkg"/>
                         <outlet property="headerDetailViewBottomSpacing" destination="kqn-xA-mG0" id="0pl-Tq-4w5"/>
                         <outlet property="headerDetailsContainerView" destination="vWs-h5-qXe" id="DOk-U1-Pi9"/>
                         <outlet property="headerDomainLabel" destination="is6-MS-yNN" id="mLH-Rd-zDM"/>
@@ -475,6 +477,7 @@
                         <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
                         <outlet property="navigationView" destination="aC6-LQ-nV5" id="4aH-1L-XjD"/>
                         <outlet property="segmentedControl" destination="Zko-nc-fi0" id="FxY-5h-deS"/>
+                        <outlet property="shareButton" destination="Okv-mq-4RQ" id="oIQ-u2-dwy"/>
                         <outlet property="swipeBackGestureRecognizer" destination="cFH-gD-048" id="DaK-gJ-iQn"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
                     </connections>
@@ -501,11 +504,16 @@
                         <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="Eoe-Kl-ilE" customClass="WZMenuHeaderView">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="33"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        </view>
                         <sections>
-                            <tableViewSection headerTitle="Hacker News" id="QCf-lk-6hq">
+                            <tableViewSection id="QCf-lk-6hq">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="ZD3-xT-C2A" style="IBUITableViewCellStyleDefault" id="I3W-a7-8RF">
-                                        <rect key="frame" x="0.0" y="22" width="320" height="44"/>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="ZD3-xT-C2A" style="IBUITableViewCellStyleDefault" id="I3W-a7-8RF" customClass="WZMenuCell">
+                                        <rect key="frame" x="0.0" y="33" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -514,14 +522,14 @@
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Top" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZD3-xT-C2A">
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="21H-q6-j0M" style="IBUITableViewCellStyleDefault" id="gVA-YC-Ria">
-                                        <rect key="frame" x="0.0" y="66" width="320" height="44"/>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="21H-q6-j0M" style="IBUITableViewCellStyleDefault" id="gVA-YC-Ria" customClass="WZMenuCell">
+                                        <rect key="frame" x="0.0" y="77" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -536,8 +544,8 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="7RY-SO-Vc8" style="IBUITableViewCellStyleDefault" id="YnB-gE-mx6">
-                                        <rect key="frame" x="0.0" y="110" width="320" height="44"/>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="7RY-SO-Vc8" style="IBUITableViewCellStyleDefault" id="YnB-gE-mx6" customClass="WZMenuCell">
+                                        <rect key="frame" x="0.0" y="121" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -552,12 +560,8 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                     </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                            <tableViewSection headerTitle="Settings" id="Jpj-5C-CNP">
-                                <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="mvb-TW-QXj" style="IBUITableViewCellStyleDefault" id="VUe-uC-auU">
-                                        <rect key="frame" x="0.0" y="176" width="320" height="44"/>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="mvb-TW-QXj" style="IBUITableViewCellStyleDefault" id="VUe-uC-auU" customClass="WZMenuCell">
+                                        <rect key="frame" x="0.0" y="165" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -599,6 +603,100 @@
         <image name="share-icon.png" width="23" height="18"/>
         <image name="unread-badge.png" width="12" height="12"/>
     </resources>
+    <classes>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="WZButton" superclassName="UIButton">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZButton.h"/>
+        </class>
+        <class className="WZCommentCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
+            <relationships>
+                <relationship kind="action" name="showReplies:"/>
+                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WZCommentsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="backButtonTapped:"/>
+                <relationship kind="action" name="headerViewTapped:"/>
+                <relationship kind="action" name="showActivityView:"/>
+                <relationship kind="action" name="swipedBack:"/>
+                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="headerDetailViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerDetailsContainerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerTextView" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="headerTextViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerTextViewTopConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="navigationView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="segmentedControl" candidateClass="UISegmentedControl"/>
+                <relationship kind="outlet" name="shareButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="swipeBackGestureRecognizer" candidateClass="UISwipeGestureRecognizer"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="WZMainViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="menuButtonPressed:"/>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="menuButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="WZMenuCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
+        </class>
+        <class className="WZMenuHeaderView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuHeaderView.h"/>
+        </class>
+        <class className="WZMenuViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="askCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="settingsCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="showNewCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="topCell" candidateClass="UITableViewCell"/>
+            </relationships>
+        </class>
+        <class className="WZNavigationBar" superclassName="UINavigationBar">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
+        </class>
+        <class className="WZNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
+        </class>
+        <class className="WZPostCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="readBadgeImageView" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

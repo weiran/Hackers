@@ -41,6 +41,7 @@
     WZNewsType _newsType;
 }
 - (IBAction)menuButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *menuButton;
 @end
 
 @implementation WZMainViewController
@@ -64,6 +65,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self performSelector:@selector(deselectCurrentRow) withObject:nil afterDelay:0.3];
+    
+    [_menuButton setImage:[UIImage themeImageNamed:@"menu-icon"] forState:UIControlStateNormal];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

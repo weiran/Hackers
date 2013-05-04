@@ -57,6 +57,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerTextViewBottomSpacing;
 @property (strong, nonatomic) NSLayoutConstraint *webViewTopSpacing;
+@property (weak, nonatomic) IBOutlet UIButton *backButton;
+@property (weak, nonatomic) IBOutlet UIButton *shareButton;
 @end
 
 @implementation WZCommentsViewController
@@ -199,6 +201,9 @@
     _navigationView.clipsToBounds = NO;
     
     _navigationView.backgroundColor = [WZTheme navigationColor];
+    
+    [_backButton setImage:[UIImage themeImageNamed:@"back-arrow"] forState:UIControlStateNormal];
+    [_shareButton setImage:[UIImage themeImageNamed:@"share-icon"] forState:UIControlStateNormal];
     // not set a shadowPath here as the navigation view is never animated or changed,
     // if it needs to be animated, the set the path
     //    CGRect shadowPath = CGRectMake(0, 43, 320, 1);
@@ -306,8 +311,8 @@
     _headerDomainLabel.textColor = [WZTheme subtitleTextColor];
     _headerMetadata1Label.textColor = [WZTheme detailTextColor];
     _headerMetadata2Label.textColor = [WZTheme detailTextColor];
-    _headerView.backgroundColor = [WZTheme lightBackgroundColor];
-    _headerDetailsContainerView.backgroundColor = [WZTheme lightBackgroundColor];
+    _headerView.backgroundColor = [WZTheme navigationColor];
+    _headerDetailsContainerView.backgroundColor = [WZTheme navigationColor];
     
     _headerTextView.textColor = [WZTheme mainTextColor];
     [_headerTextView setNeedsDisplay];
