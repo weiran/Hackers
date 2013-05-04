@@ -20,6 +20,11 @@
 + (bool)lightTheme {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *theme = [defaults stringForKey:kSettingsTheme];
+    if (!theme) {
+        [defaults setValue:kSettingsThemeLight forKey:kSettingsTheme];
+        [defaults synchronize];
+        return YES;
+    }
     return [theme isEqualToString:kSettingsThemeLight];
 }
 
@@ -32,15 +37,6 @@
 }
 
 + (void)setLightTheme {
-//    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-//    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.87 alpha:1]];
-//    [[UINavigationBar appearance] setTitleTextAttributes:@{
-//                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-//                               UITextAttributeTextColor : [UIColor blackColor],
-//                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-//     }];
-//    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forBarMetrics:UIBarMetricsDefault];
-//    [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{
                                UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
@@ -50,15 +46,6 @@
 }
 
 + (void)setDarkTheme {
-//    [[UINavigationBar appearance] setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
-//    [[UIToolbar appearance] setTintColor:[UIColor colorWithWhite:0.13 alpha:1]];
-//    [[UINavigationBar appearance] setTitleTextAttributes:@{
-//                                    UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-//                               UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
-//                        UITextAttributeTextShadowColor  : [UIColor clearColor]
-//     }];
-//    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forBarMetrics:UIBarMetricsDefault];
-//    [[UIToolbar appearance] setBackgroundImage:[UIImage imageNamed:@"navbar-bg-dark.png"] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{
                                UITextAttributeTextColor : [UIColor colorWithWhite:0.87 alpha:1.0],
                         UITextAttributeTextShadowColor  : [UIColor clearColor]
