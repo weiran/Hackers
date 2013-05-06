@@ -170,13 +170,13 @@
 	}
 }
 
-
+#pragma Settings Changed
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    //    [WZTheme defaults];
-    [WZTheme updateNavigationBar:_mainNavViewController];
-    [WZTheme updateNavigationBar:_settingsNavController];
-    [self layoutTableView];
-    [self.tableView reloadData];
+    if ([keyPath isEqualToString:kSettingsTheme]) {
+//        [WZTheme updateNavigationBar:_settingsNavController];
+//        _settingsNavController = nil;
+        _mainNavViewController = nil;
+    }
 }
 
 @end

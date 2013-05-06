@@ -12,8 +12,7 @@
 
 @implementation WZPostCell
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
+- (void)awakeFromNib {
     [self setTheme];
 }
 

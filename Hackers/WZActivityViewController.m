@@ -55,6 +55,7 @@
     WZInstapaperActivity *instapaperActivity = [[WZInstapaperActivity alloc] init];
     WZPinboardActivity *pinboardActivity = [[WZPinboardActivity alloc] init];
     ARChromeActivity *chromeActivity = [[ARChromeActivity alloc] init];
+    chromeActivity.activityTitle = @"Open in Chrome";
     NSArray *activities = @[safariActivity, chromeActivity, instapaperActivity, pinboardActivity];
     NSArray *activityItems = @[text, url];
     

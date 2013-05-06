@@ -31,6 +31,7 @@
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     WZMenuViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
     _viewController = [[JSSlidingViewController alloc] initWithFrontViewController:menuController.mainNavViewController backViewController:menuController];
+    _viewController.useBouncyAnimations = NO;
     self.window.rootViewController = _viewController;
     [self.window makeKeyAndVisible];
     
