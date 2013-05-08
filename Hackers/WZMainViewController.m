@@ -79,7 +79,7 @@
 
 - (void)sendFetchRequest:(UIRefreshControl *)sender {
     [sender beginRefreshing];
-    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 2, 2) animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
     [WZHackersData.shared fetchNewsOfType:[self newsType] page:1 completion:^(NSError *error) {
@@ -144,12 +144,13 @@
 }
 
 - (void)setNewsType:(WZNewsType)newsType {
-    _newsType = newsType;
-//    [self.tableView reloadData];
-    [self reloadTableViewAnimated:YES];
-    [self.tableView setContentOffset:CGPointZero animated:YES];
-    [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.5];
-    [self updateTitle];
+    if (_newsType != newsType) {
+        _newsType = newsType;
+        [self reloadTableViewAnimated:YES];
+        [self.tableView setContentOffset:CGPointZero animated:YES];
+        [self performSelector:@selector(sendFetchRequest:) withObject:_refreshControl afterDelay:0.3];
+        [self updateTitle];
+    }
 }
 
 - (NSArray *)activeNews {
