@@ -315,7 +315,7 @@
     _headerDetailsContainerView.backgroundColor = [WZTheme navigationColor];
     
     _headerTextView.textColor = [WZTheme mainTextColor];
-    [_headerTextView setNeedsDisplay];
+    _headerTextView.linkColor = [WZTheme subtitleTextColor];
     
     if ([_post.type isEqualToString:@"ask"]) {
         _headerDomainLabel.text = @"Ask Hacker News";
@@ -373,7 +373,7 @@
 
 - (void)layoutTableViewBackgrounds {
     UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
-    topView.backgroundColor = [WZTheme lightBackgroundColor];
+    topView.backgroundColor = [WZTheme navigationColor];
     [_tableView addSubview:topView];
 }
 
