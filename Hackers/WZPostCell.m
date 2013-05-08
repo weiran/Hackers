@@ -27,13 +27,17 @@
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
-    [super setHighlighted:highlighted animated:animated];
-    [self updateBackgroundColorHighlighted:highlighted animated:animated];
+    if (self.highlighted != highlighted) {
+        [super setHighlighted:highlighted animated:animated];
+        [self updateBackgroundColorHighlighted:highlighted animated:animated];
+    }
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-    [self updateBackgroundColorHighlighted:selected animated:animated];
+    if (self.selected != selected) {
+        [super setSelected:selected animated:animated];
+        [self updateBackgroundColorHighlighted:selected animated:animated];
+    }
 }
 
 - (void)updateBackgroundColorHighlighted:(BOOL)highlighted animated:(BOOL)animated {

@@ -34,7 +34,6 @@
     //// Color Declarations
     UIColor* baseGradientBottomColor = [UIColor colorWithRed: 0.122 green: 0.122 blue: 0.122 alpha: 1];
     UIColor* buttonColor = [UIColor colorWithRed: 0.184 green: 0.184 blue: 0.184 alpha: 1];
-    UIColor* iconShadow = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 0.8];
     
     //// Gradient Declarations
     NSArray* baseGradientColors = [NSArray arrayWithObjects:

@@ -11,12 +11,14 @@
 @implementation WZMenuCell
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+    if (self.selected != selected) {
+        [super setSelected:selected animated:animated];
 
-    if (selected) {
-        self.textLabel.textColor = [UIColor blackColor];
-    } else {
-        self.textLabel.textColor = [WZTheme menuTitleColor];
+        if (selected) {
+            self.textLabel.textColor = [UIColor blackColor];
+        } else {
+            self.textLabel.textColor = [WZTheme menuTitleColor];
+        }
     }
 }
 
