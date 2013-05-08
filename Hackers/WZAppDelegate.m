@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Weiran Zhang. All rights reserved.
 //
 
+
 #import "WZAppDelegate.h"
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 
@@ -14,16 +15,26 @@
 #import "JSSlidingViewController.h"
 #import "WZTheme.h"
 
-#if NDEBUG
+#ifndef DEBUG
 #import <Crashlytics/Crashlytics.h>
 #endif
+//#if DEBUG
+//#import <SparkInspector/SparkInspector.h>
+//#endif
 
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-#if NDEBUG
+//    // Enable the Spark Inspector
+//    #if DEBUG
+//    [SparkInspector enableObservation];
+//    NSLog(@"SparkInspector registered.");
+//    #endif
+
+    #ifndef DEBUG
     [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
-#endif
+    NSLog(@"Crashlytics registered.");
+    #endif
     [WZTheme defaults];
     
     // initilise storyboard with JSSlidingViewController
