@@ -74,6 +74,8 @@
     _webView.scrollView.scrollsToTop = NO;
     [self removeOrientationNotifications];
     [[NSNotificationCenter defaultCenter] postNotificationName:WZWebViewControllerDismissed object:self];
+    [_webView stopLoading];
+    _webView.delegate = nil;
 }
 
 #pragma mark - Layout
