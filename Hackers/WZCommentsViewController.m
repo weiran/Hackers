@@ -38,7 +38,6 @@
 - (IBAction)swipedBack:(id)sender;
 
 @property (strong, nonatomic) IBOutlet UISwipeGestureRecognizer *swipeBackGestureRecognizer;
-@property (weak, nonatomic) IBOutlet UIView *navigationView;
 @property (weak, nonatomic) UIView *webView;
 @property (strong, nonatomic) WZWebViewController *webViewController;
 
@@ -67,7 +66,6 @@
     [super viewDidLoad];
     
     [self setupOrientationNotifications];
-    [self setupNavigationView];
     [self setupActivityIndicatorView];
     [self setupTableView];
     [self setupSegmentedController];
@@ -81,7 +79,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     // set selected segement colours
     // uses GCD as it wont work if run immediately
@@ -101,7 +98,6 @@
     [super viewWillDisappear:animated];
     if (_isNavigatingBack) {
         [self removeOrientationNotifications];
-        [self.navigationController setNavigationBarHidden:NO animated:YES];
         _isNavigatingBack = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         [[[WZDefaults appDelegate] viewController] setLocked:NO];
@@ -163,19 +159,19 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:WZWebViewControllerSwipeRight object:nil];
 }
 
-- (void)didRotate:(id)sender {
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
-    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
-    
-    _navigationView.hidden = webViewVisible && isLandscape;
-
-    if (webViewVisible && isLandscape) {
-        _webViewTopSpacing.constant = 0;
-    } else {
-        _webViewTopSpacing.constant = kNavigationBarHeight;
-    }
-}
+//- (void)didRotate:(id)sender {
+//    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+//    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
+//    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
+//    
+//    _navigationView.hidden = webViewVisible && isLandscape;
+//
+////    if (webViewVisible && isLandscape) {
+////        _webViewTopSpacing.constant = 0;
+////    } else {
+////        _webViewTopSpacing.constant = kNavigationBarHeight;
+////    }
+//}
 
 - (void)showDefaultView {
     if (![self postIsAskOrJob]) {
@@ -191,24 +187,6 @@
 }
 
 #pragma mark - Setup Views
-
-- (void)setupNavigationView {
-    _navigationView.layer.masksToBounds = NO;
-    _navigationView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-    _navigationView.layer.shadowColor = [UIColor blackColor].CGColor;
-    _navigationView.layer.shadowOpacity = 0.4f;
-    _navigationView.layer.shadowRadius = 2;
-    _navigationView.clipsToBounds = NO;
-    
-    _navigationView.backgroundColor = [WZTheme navigationColor];
-    
-    [_backButton setImage:[UIImage themeImageNamed:@"back-arrow"] forState:UIControlStateNormal];
-    [_shareButton setImage:[UIImage themeImageNamed:@"share-icon"] forState:UIControlStateNormal];
-    // not set a shadowPath here as the navigation view is never animated or changed,
-    // if it needs to be animated, the set the path
-    //    CGRect shadowPath = CGRectMake(0, 43, 320, 1);
-    //    _navigationView.layer.shadowPath = [UIBezierPath bezierPathWithRect:shadowPath].CGPath;
-}
 
 - (void)setupActivityIndicatorView {
     [self.view bringSubviewToFront:_activityIndicatorView];
@@ -258,7 +236,7 @@
     _webView.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self addChildViewController:_webViewController];
-    [self.view insertSubview:_webView belowSubview:_navigationView];
+    [self.view addSubview:_webView];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewSwipeRight:) name:WZWebViewControllerSwipeRight object:nil];
     
@@ -273,7 +251,7 @@
                                                                                        metrics:nil
                                                                                          views:viewDictionary][0];
 
-    _webViewTopSpacing = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[webView]"
+    _webViewTopSpacing = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[webView]"
                                                                  options:0
                                                                  metrics:nil
                                                                    views:viewDictionary][0];
