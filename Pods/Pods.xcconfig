@@ -1,4 +1,5 @@
 ALWAYS_SEARCH_USER_PATHS = YES
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 HEADER_SEARCH_PATHS = ${PODS_HEADERS_SEARCH_PATHS} "$(SDKROOT)/usr/include/libxml2" $(SDKROOT)/usr/include/libxml2
 OTHER_LDFLAGS = -ObjC -lxml2 -framework CoreGraphics -framework CoreText -framework ImageIO -framework MediaPlayer -framework MessageUI -framework MobileCoreServices -framework QuartzCore -framework Security -framework SystemConfiguration
 PODS_BUILD_HEADERS_SEARCH_PATHS = "${PODS_ROOT}/BuildHeaders" "${PODS_ROOT}/BuildHeaders/AFNetworking" "${PODS_ROOT}/BuildHeaders/ARChromeActivity" "${PODS_ROOT}/BuildHeaders/DTCoreText" "${PODS_ROOT}/BuildHeaders/DTFoundation" "${PODS_ROOT}/BuildHeaders/GCOLaunchImageTransition" "${PODS_ROOT}/BuildHeaders/InAppSettingsKit" "${PODS_ROOT}/BuildHeaders/MBProgressHUD" "${PODS_ROOT}/BuildHeaders/OHAttributedLabel" "${PODS_ROOT}/BuildHeaders/REMenu" "${PODS_ROOT}/BuildHeaders/SSKeychain"
