@@ -1,7 +1,5 @@
 # Hackers
 
-## Hacker News reading app for iPhone
-
 Hackers is an iPhone app for reading Hacker News on the go. It's optimised for quickly catching up on the latest news and comments without getting in your way.
 
 ## Features
@@ -22,7 +20,7 @@ Hackers is open source and licenced under the MIT licence. Feel free to build an
 [1]: https://itunes.apple.com/us/app/hackers-hacker-news-reading/id603503901
 [2]: http://i.imgur.com/oRdf2WM.png
 
-# Links
+## Links
 
 * I wrote [a blog post introducing Hackers](http://weiranzhang.com/blog/2013/3/hackers-a-hacker-news-app-for-iphone). 
 * You can follow [Hackers' progress on my blogs tagged Hackers](http://weiranzhang.com/?tag=hackers).
