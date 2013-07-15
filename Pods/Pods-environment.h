@@ -28,13 +28,13 @@
 #define COCOAPODS_POD_AVAILABLE_DTFoundation_Core
 #define COCOAPODS_VERSION_MAJOR_DTFoundation_Core 1
 #define COCOAPODS_VERSION_MINOR_DTFoundation_Core 4
-#define COCOAPODS_VERSION_PATCH_DTFoundation_Core 3
+#define COCOAPODS_VERSION_PATCH_DTFoundation_Core 4
 
 // DTFoundation/DTHMLParser
 #define COCOAPODS_POD_AVAILABLE_DTFoundation_DTHMLParser
 #define COCOAPODS_VERSION_MAJOR_DTFoundation_DTHMLParser 1
 #define COCOAPODS_VERSION_MINOR_DTFoundation_DTHMLParser 4
-#define COCOAPODS_VERSION_PATCH_DTFoundation_DTHMLParser 3
+#define COCOAPODS_VERSION_PATCH_DTFoundation_DTHMLParser 4
 
 // GCOLaunchImageTransition
 #define COCOAPODS_POD_AVAILABLE_GCOLaunchImageTransition
@@ -59,12 +59,6 @@
 #define COCOAPODS_VERSION_MAJOR_OHAttributedLabel 3
 #define COCOAPODS_VERSION_MINOR_OHAttributedLabel 3
 #define COCOAPODS_VERSION_PATCH_OHAttributedLabel 0
-
-// REMenu
-#define COCOAPODS_POD_AVAILABLE_REMenu
-#define COCOAPODS_VERSION_MAJOR_REMenu 1
-#define COCOAPODS_VERSION_MINOR_REMenu 2
-#define COCOAPODS_VERSION_PATCH_REMenu 4
 
 // SSKeychain
 #define COCOAPODS_POD_AVAILABLE_SSKeychain

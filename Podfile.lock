@@ -4,14 +4,13 @@ PODS:
   - DTCoreText (1.3.2):
     - DTFoundation/Core (~> 1.1)
     - DTFoundation/DTHMLParser (~> 1.0)
-  - DTFoundation/Core (1.4.3)
-  - DTFoundation/DTHMLParser (1.4.3):
+  - DTFoundation/Core (1.4.4)
+  - DTFoundation/DTHMLParser (1.4.4):
     - DTFoundation/Core
   - GCOLaunchImageTransition (0.9.0)
   - InAppSettingsKit (1.0)
   - MBProgressHUD (0.5)
   - OHAttributedLabel (3.3.0)
-  - REMenu (1.2.4)
   - SSKeychain (1.0.3)
 
 DEPENDENCIES:
@@ -22,19 +21,17 @@ DEPENDENCIES:
   - InAppSettingsKit
   - MBProgressHUD
   - OHAttributedLabel
-  - REMenu
   - SSKeychain
 
 SPEC CHECKSUMS:
   AFNetworking: 0bce3ae41023e080e96b8a2e0d07c94709f72a81
   ARChromeActivity: bc451ea1d8f1ab142ea2b3aed1e4dc0afcb53cc5
   DTCoreText: ea0506fd102311311da09a3842170ce07f0a1b29
-  DTFoundation: d7ca9c9092c5db130c5aeb8977e72dc5db8870fa
+  DTFoundation: c2fd15b2163d8245773911e990ac665b888c4d76
   GCOLaunchImageTransition: 6d4d895fc3cb187f142f4f582439bde61cf1b9aa
   InAppSettingsKit: 8d5ae557a5890ca48c6e2085d6301194e4e2b48a
   MBProgressHUD: b23ee11c42253d6d804e8e0bfabdc334e8b2571f
   OHAttributedLabel: ed2e659c01af4c6cdc23909f04ffcdd417d37ae4
-  REMenu: 21a0090837b10547f7d32626a068762574321ffa
   SSKeychain: 0e7add9e329975653cb66c9d527493a5539755f6
 
 COCOAPODS: 0.20.2
