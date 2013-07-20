@@ -1,1 +1,0 @@
-../../InAppSettingsKit/InAppSettingsKit/Models/IASKSettingsStore.h

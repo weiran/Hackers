@@ -2,3 +2,4 @@ DerivedData
 .idea
 Hackers.xcworkspace/xcuserdata/weiran.xcuserdatad/UserInterfaceState.xcuserstate
 Pods
+Podfile.lock
