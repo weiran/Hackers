@@ -8,7 +8,7 @@
 
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
-#import <JSSlidingViewController.h>
+#import "JSSlidingViewController.h"
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"

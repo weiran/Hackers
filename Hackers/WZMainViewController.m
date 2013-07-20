@@ -7,7 +7,6 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-#import "REMenu.h"
 #import "JSSlidingViewController.h"
 
 #import "WZMainViewController.h"
@@ -298,7 +297,8 @@
         cell.contentView.backgroundColor = [WZTheme backgroundColor];
         [self sendFetchRequestWithPage:2];
         return cell;
-    } else {    
+    } else {
+        // standard cell
         WZPostModel *post = [self activeNews][indexPath.row];
         WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:postCellIdentifier];
         cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
@@ -306,7 +306,7 @@
         cell.titleLabel.text = post.title;
         if ([post.type isEqualToString:@"ask"]) {
             cell.domainLabel.text = @"Ask Hacker News";
-        } else if ([post.type isEqualToString:@"ask"]) {
+        } else if ([post.type isEqualToString:@"job"]) {
             cell.domainLabel.text = @"Job";
         } else {
             cell.domainLabel.text = post.domain;

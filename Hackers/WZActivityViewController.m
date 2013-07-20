@@ -8,7 +8,7 @@
 
 #import "WZActivityViewController.h"
 
-#import <TUSafariActivity/TUSafariActivity.h>
+#import "TUSafariActivity/TUSafariActivity.h"
 #import <ARChromeActivity/ARChromeActivity.h>
 #import "WZInstapaperActivity.h"
 #import "WZPinboardActivity.h"

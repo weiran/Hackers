@@ -11,10 +11,12 @@
 #import "WZAccountManager.h"
 #import "WZNavigationBar.h"
 
-#import <JSSlidingViewController.h>
+#import "JSSlidingViewController.h"
 #import <IASKSpecifierValuesViewController.h>
 #import <IASKSettingsReader.h>
 #import <SSKeychain.h>
+#import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory.h>
+#import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory+iOS.h>
 
 @interface WZMenuViewController ()
 @property (nonatomic, strong) WZNavigationController *settingsNavController;
@@ -23,6 +25,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *askCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *showNewCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *topCell;
+@property (weak, nonatomic) IBOutlet UITableViewCell *creditsCell;
 
 @end
 
@@ -64,6 +67,14 @@
     [self layoutCell:_askCell];
     [self layoutCell:_showNewCell];
     [self layoutCell:_topCell];
+    [self layoutCell:_creditsCell];
+    
+    NIKFontAwesomeIconFactory *factory = [NIKFontAwesomeIconFactory tabBarItemIconFactory];
+    [_settingsCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconCog]];
+    [_askCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconQuestionSign]];
+    [_showNewCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconTime]];
+    [_topCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconStar]];
+    [_creditsCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconInfoSign]];
 }
 
 - (void)layoutCell:(UITableViewCell *)cell {
@@ -173,9 +184,9 @@
 #pragma Settings Changed
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:kSettingsTheme]) {
-//        [WZTheme updateNavigationBar:_settingsNavController];
-//        _settingsNavController = nil;
-        _mainNavViewController = nil;
+        self.mainNavViewController = nil;
+        self.settingsNavController.navigationBar.tintColor = [WZTheme navigationColor];
+        self.settingsNavController.navigationBar.titleTextAttributes = @{ UITextAttributeTextColor: [WZTheme titleTextColor] };
     }
 }
 
