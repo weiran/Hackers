@@ -26,6 +26,12 @@ Hackers is open source and licenced under the MIT licence. Feel free to build an
 * You can follow [Hackers' progress on my blogs tagged Hackers](http://weiranzhang.com/?tag=hackers).
 * You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
+## How to build
+
+1. Install [cocoapods](http://cocoapods.org/), you can use RubyGems: `gem install cocoapods`.
+2. Install pods, in the project root folder, run `pod install`.
+3. Open in Xcode 4.6.3 or later, and build.
+
 ## About
 
 Hackers is an open source project by [Weiran Zhang](http://weiranzhang.com) licensed under the [MIT license](http://opensource.org/licenses/MIT).
