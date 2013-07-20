@@ -25,16 +25,7 @@
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-//    // Enable the Spark Inspector
-//    #if DEBUG
-//    [SparkInspector enableObservation];
-//    NSLog(@"SparkInspector registered.");
-//    #endif
 
-    #ifndef DEBUG
-    [Crashlytics startWithAPIKey:@"6b3b4eba8698666ed08b19d6091a9728deaabab9"];
-    NSLog(@"Crashlytics registered.");
-    #endif
     [WZTheme defaults];
     
     // initilise storyboard with JSSlidingViewController
