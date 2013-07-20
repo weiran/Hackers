@@ -8,7 +8,7 @@
 
 #import "WZSettingsViewController.h"
 
-#import <JSSlidingViewController.h>
+#import "JSSlidingViewController.h"
 
 @interface WZSettingsViewController ()
 
