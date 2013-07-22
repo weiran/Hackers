@@ -10,6 +10,7 @@
 
 #import "TUSafariActivity/TUSafariActivity.h"
 #import <ARChromeActivity/ARChromeActivity.h>
+#import <ARKippsterActivity/ARKippsteractivity.h>
 #import "WZInstapaperActivity.h"
 #import "WZPinboardActivity.h"
 
@@ -56,7 +57,10 @@
     WZPinboardActivity *pinboardActivity = [[WZPinboardActivity alloc] init];
     ARChromeActivity *chromeActivity = [[ARChromeActivity alloc] init];
     chromeActivity.activityTitle = @"Open in Chrome";
-    NSArray *activities = @[safariActivity, chromeActivity, instapaperActivity, pinboardActivity];
+    ARKippsterActivity *kippsterActivity = [[ARKippsterActivity alloc] init];
+    kippsterActivity.activityTitle = @"Send to Kippster";
+    
+    NSArray *activities = @[safariActivity, chromeActivity, kippsterActivity, instapaperActivity, pinboardActivity];
     NSArray *activityItems = @[text, url];
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];
