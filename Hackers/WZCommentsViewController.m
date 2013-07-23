@@ -159,19 +159,11 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:WZWebViewControllerSwipeRight object:nil];
 }
 
-//- (void)didRotate:(id)sender {
+- (void)didRotate:(id)sender {
 //    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 //    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
 //    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
-//    
-//    _navigationView.hidden = webViewVisible && isLandscape;
-//
-////    if (webViewVisible && isLandscape) {
-////        _webViewTopSpacing.constant = 0;
-////    } else {
-////        _webViewTopSpacing.constant = kNavigationBarHeight;
-////    }
-//}
+}
 
 - (void)showDefaultView {
     if (![self postIsAskOrJob]) {
