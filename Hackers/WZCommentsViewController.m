@@ -185,7 +185,7 @@
 }
 
 - (bool)postIsAskOrJob {
-    return [_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"];
+    return [_post.type isEqualToString:@"ask"] || [_post.type isEqualToString:@"job"];
 }
 
 - (void)setupSegmentedController {
@@ -287,16 +287,18 @@
     _headerTextView.textColor = [WZTheme mainTextColor];
     _headerTextView.linkColor = [WZTheme subtitleTextColor];
     
+    _headerMetadata1Label.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)_post.points, _post.user];
+    _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
+    _headerTitleLabel.text = _post.title;
+    
     if ([_post.type isEqualToString:@"ask"]) {
         _headerDomainLabel.text = @"Ask Hacker News";
     } else if ([_post.type isEqualToString:@"job"]) {
         _headerDomainLabel.text = @"Jobs";
+        _headerMetadata1Label.text = @"";
     } else {
         _headerDomainLabel.text = _post.domain;
     }
-    _headerMetadata1Label.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)_post.points, _post.user];
-    _headerMetadata2Label.text = [NSString stringWithFormat:@"%@ · %lu comments", _post.timeAgo, (unsigned long)_post.commentsCount];
-    _headerTitleLabel.text = _post.title;
     
     // calculate heights
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
@@ -520,7 +522,7 @@
 }
 
 - (IBAction)headerViewTapped:(id)sender {
-    if (![_post.type isEqualToString:@"ask"] && ![_post.type isEqualToString:@"job"]) {
+    if (![self postIsAskOrJob]) {
         [_segmentedControl setSelectedSegmentIndex:1];
         [self segmentDidChange:_segmentedControl];
     }

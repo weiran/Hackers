@@ -308,6 +308,7 @@
             cell.domainLabel.text = @"Ask Hacker News";
         } else if ([post.type isEqualToString:@"job"]) {
             cell.domainLabel.text = @"Job";
+            cell.detailLabel.text = @"";
         } else {
             cell.domainLabel.text = post.domain;
         }
