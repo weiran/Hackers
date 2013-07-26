@@ -15,26 +15,28 @@
 #import "JSSlidingViewController.h"
 #import "WZTheme.h"
 
-#ifndef DEBUG
-#import <Crashlytics/Crashlytics.h>
-#endif
-//#if DEBUG
-//#import <SparkInspector/SparkInspector.h>
-//#endif
+#import "TSTapstream.h"
 
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-
+    
     [WZTheme defaults];
     
     // initilise storyboard with JSSlidingViewController
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-    WZMenuViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
-    _viewController = [[JSSlidingViewController alloc] initWithFrontViewController:menuController.mainNavViewController backViewController:menuController];
-    _viewController.useBouncyAnimations = NO;
-    self.window.rootViewController = _viewController;
+    UIStoryboard *storyboard;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_ipad" bundle:nil];
+        self.viewController = [storyboard instantiateInitialViewController];
+    } else {
+        storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+        WZMenuViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+        self.viewController = [[JSSlidingViewController alloc] initWithFrontViewController:menuController.mainNavViewController backViewController:menuController];
+        self.viewController.useBouncyAnimations = NO;
+    }
+    
+    self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     
     return YES;
