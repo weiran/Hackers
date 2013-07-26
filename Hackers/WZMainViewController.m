@@ -301,6 +301,7 @@
         // standard cell
         WZPostModel *post = [self activeNews][indexPath.row];
         WZPostCell *cell = [tableView dequeueReusableCellWithIdentifier:postCellIdentifier];
+
         cell.detailLabel.text = [NSString stringWithFormat:@"%lu points by %@", (unsigned long)post.points, post.user];
         cell.moreDetailLabel.text = [NSString stringWithFormat:@"%@ · %lu comments", post.timeAgo, (unsigned long)post.commentsCount];
         cell.titleLabel.text = post.title;
@@ -350,11 +351,26 @@
     WZPostModel *post = [self activeNews][indexPath.row];
     
     if (!post.cellHeight) {
+        CGFloat width = 275; //iphone width
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            width = self.view.frame.size.width - 55;
+        }
+        
+        UIFont *font = [UIFont fontWithName:kTitleFontName size:kTitleFontSize];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            font = [UIFont fontWithName:kTitleFontName size:18];
+        }
+        
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
-                             constrainedToSize:CGSizeMake(275, CGFLOAT_MAX)
+                             constrainedToSize:CGSizeMake(width, CGFLOAT_MAX)
                                  lineBreakMode:NSLineBreakByWordWrapping];
         CGFloat height = size.height;
-        post.cellHeight = kCellTitleTopMargin + height + kCellTitleBottomMargin;
+        CGFloat cellHeight = kCellTitleTopMargin + height + kCellTitleBottomMargin;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            cellHeight += 10;
+        }
+        
+        post.cellHeight = cellHeight;
     }
     
     return post.cellHeight;

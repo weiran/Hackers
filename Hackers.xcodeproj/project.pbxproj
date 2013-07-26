@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		24005EF517A2B60B007D1ACF /* MainStoryboard_ipad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24005EF417A2B60B007D1ACF /* MainStoryboard_ipad.storyboard */; };
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		241EA0AA16C54E7F005D802F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0A916C54E7F005D802F /* Icon.png */; };
 		241EA0AC16C54E86005D802F /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0AB16C54E86005D802F /* Icon@2x.png */; };
@@ -144,6 +145,7 @@
 
 /* Begin PBXFileReference section */
 		0A3F0AC425EC4C248CA0E46A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		24005EF417A2B60B007D1ACF /* MainStoryboard_ipad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_ipad.storyboard; sourceTree = "<group>"; };
 		2402A6D5164D224100F637E5 /* WZCommentModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCommentModel.h; sourceTree = "<group>"; };
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		241EA0A916C54E7F005D802F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../Icon.png; sourceTree = "<group>"; };
@@ -659,6 +661,7 @@
 			isa = PBXGroup;
 			children = (
 				24972CC01643C0F000B4EFB4 /* MainStoryboard.storyboard */,
+				24005EF417A2B60B007D1ACF /* MainStoryboard_ipad.storyboard */,
 			);
 			name = Storyboards;
 			sourceTree = "<group>";
@@ -915,6 +918,7 @@
 				243D1F791735613E0033BC0F /* refresh-icon-darktheme@2x.png in Resources */,
 				243D1F7A1735613E0033BC0F /* x-darktheme.png in Resources */,
 				243D1F7B1735613E0033BC0F /* x-darktheme@2x.png in Resources */,
+				24005EF517A2B60B007D1ACF /* MainStoryboard_ipad.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1083,8 +1087,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1101,8 +1106,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hackers/Hackers-Prefix.pch";
 				INFOPLIST_FILE = "Hackers/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				WRAPPER_EXTENSION = app;
 			};

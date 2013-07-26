@@ -86,7 +86,9 @@
         [self segmentDidChange:_segmentedControl];
     });
     
-    [[[WZDefaults appDelegate] viewController] setLocked:YES];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        [[[WZDefaults appDelegate] viewController] setLocked:YES];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
