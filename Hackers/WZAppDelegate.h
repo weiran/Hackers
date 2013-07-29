@@ -8,11 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@class JSSlidingViewController;
+@class JSSlidingViewController, WZSplitCascadeViewController;
 
 @interface WZAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) JSSlidingViewController *viewController;
+
+@property (nonatomic, strong) WZSplitCascadeViewController *splitCascadeViewController;
+
+@property (strong, nonatomic) UIViewController *viewController;
+@property (readonly, nonatomic) JSSlidingViewController *phoneViewController;
 
 @end

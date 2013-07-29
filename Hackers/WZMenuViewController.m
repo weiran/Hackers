@@ -17,6 +17,7 @@
 #import <SSKeychain.h>
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory.h>
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory+iOS.h>
+#import "UIViewController+CLCascade.h"
 
 @interface WZMenuViewController ()
 @property (nonatomic, strong) WZNavigationController *settingsNavController;
@@ -86,7 +87,8 @@
 
 - (WZNavigationController *)mainNavViewController {
     if (!_mainNavViewController) {
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+        NSString *storyboardName = IS_IPAD() ? @"MainStoryboard_ipad" : @"MainStoryboard";
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:nil];
         _mainNavViewController = [storyboard instantiateViewControllerWithIdentifier:@"MainNavigationController"];
     }
     
@@ -131,14 +133,20 @@
     _settingsViewController = nil;
 }
 
+
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([indexPath isEqual:[tableView indexPathForCell:_settingsCell]]) {
-        if (![[[WZDefaults appDelegate] viewController].frontViewController isEqual:self.settingsNavController]) {
-            [[[WZDefaults appDelegate] viewController] setFrontViewController:self.settingsNavController animated:YES completion:nil];
+        if (![[[WZDefaults appDelegate] phoneViewController].frontViewController isEqual:self.settingsNavController]) {
+            [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.settingsNavController animated:YES completion:nil];
         }
         [self toggleSlider];
     } else if ([indexPath isEqual:[tableView indexPathForCell:_topCell]]) {
-        [self showMainNavViewController];
+        if (IS_IPAD()) {
+            [self.cascadeNavigationController setRootViewController:self.mainNavViewController animated:YES];
+        } else {
+            [self showMainNavViewController];
+        }
         [self.mainNavViewController setNewsType:WZNewsTypeTop];
         [self toggleSlider];
     } else if ([indexPath isEqual:[tableView indexPathForCell:_showNewCell]]) {
@@ -153,16 +161,16 @@
 }
 
 - (void)showMainNavViewController {
-    if (![[[[WZDefaults appDelegate] viewController] frontViewController ] isEqual:self.mainNavViewController]) {
-        [[[WZDefaults appDelegate] viewController] setFrontViewController:self.mainNavViewController animated:YES completion:nil];
+    if (![[[[WZDefaults appDelegate] phoneViewController] frontViewController ] isEqual:self.mainNavViewController]) {
+        [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.mainNavViewController animated:YES completion:nil];
     }
 }
 
 - (void)toggleSlider {
-    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
-        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
+    if ([[[WZDefaults appDelegate] phoneViewController] isOpen]) {
+        [[[WZDefaults appDelegate] phoneViewController] closeSlider:YES completion:nil];
     } else {
-        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
+        [[[WZDefaults appDelegate] phoneViewController] openSlider:YES completion:nil];
     }
 }
 

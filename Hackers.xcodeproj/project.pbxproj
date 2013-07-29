@@ -11,6 +11,20 @@
 		2402A6D7164D224100F637E5 /* WZCommentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2402A6D6164D224100F637E5 /* WZCommentModel.m */; };
 		241EA0AA16C54E7F005D802F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0A916C54E7F005D802F /* Icon.png */; };
 		241EA0AC16C54E86005D802F /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 241EA0AB16C54E86005D802F /* Icon@2x.png */; };
+		2428FE3517A525070063C4C3 /* CLCascadeNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE1917A525070063C4C3 /* CLCascadeNavigationController.m */; };
+		2428FE3617A525070063C4C3 /* CLCascadeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE1B17A525070063C4C3 /* CLCascadeView.m */; };
+		2428FE3717A525070063C4C3 /* CLCategoriesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE1E17A525070063C4C3 /* CLCategoriesView.m */; };
+		2428FE3817A525070063C4C3 /* CLCategoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2017A525070063C4C3 /* CLCategoriesViewController.m */; };
+		2428FE3917A525070063C4C3 /* CLSplitCascadeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2317A525070063C4C3 /* CLSplitCascadeView.m */; };
+		2428FE3A17A525070063C4C3 /* CLSplitCascadeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2517A525070063C4C3 /* CLSplitCascadeViewController.m */; };
+		2428FE3B17A525070063C4C3 /* CLSplitCascadeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2428FE2617A525070063C4C3 /* CLSplitCascadeViewController.xib */; };
+		2428FE3C17A525070063C4C3 /* CLBorderShadowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2917A525070063C4C3 /* CLBorderShadowView.m */; };
+		2428FE3D17A525070063C4C3 /* CLScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2C17A525070063C4C3 /* CLScrollView.m */; };
+		2428FE3E17A525070063C4C3 /* CLSegmentedView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE2E17A525070063C4C3 /* CLSegmentedView+Extension.m */; };
+		2428FE3F17A525070063C4C3 /* CLSegmentedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE3017A525070063C4C3 /* CLSegmentedView.m */; };
+		2428FE4017A525070063C4C3 /* UIViewController+CLCascade.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE3217A525070063C4C3 /* UIViewController+CLCascade.m */; };
+		2428FE4117A525070063C4C3 /* UIViewController+CLSegmentedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE3417A525070063C4C3 /* UIViewController+CLSegmentedView.m */; };
+		2428FE4617A5271C0063C4C3 /* WZSplitCascadeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2428FE4517A5271C0063C4C3 /* WZSplitCascadeViewController.m */; };
 		2434A1AD16BD6DBA00C383CA /* back-arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1AB16BD6DBA00C383CA /* back-arrow.png */; };
 		2434A1AE16BD6DBA00C383CA /* back-arrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1AC16BD6DBA00C383CA /* back-arrow@2x.png */; };
 		2434A1C516BEB48900C383CA /* x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2434A1C316BEB48900C383CA /* x.png */; };
@@ -150,6 +164,35 @@
 		2402A6D6164D224100F637E5 /* WZCommentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCommentModel.m; sourceTree = "<group>"; };
 		241EA0A916C54E7F005D802F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../../Icon.png; sourceTree = "<group>"; };
 		241EA0AB16C54E86005D802F /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../../Icon@2x.png"; sourceTree = "<group>"; };
+		2428FE1617A525070063C4C3 /* Cascade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cascade.h; sourceTree = "<group>"; };
+		2428FE1817A525070063C4C3 /* CLCascadeNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLCascadeNavigationController.h; sourceTree = "<group>"; };
+		2428FE1917A525070063C4C3 /* CLCascadeNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLCascadeNavigationController.m; sourceTree = "<group>"; };
+		2428FE1A17A525070063C4C3 /* CLCascadeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLCascadeView.h; sourceTree = "<group>"; };
+		2428FE1B17A525070063C4C3 /* CLCascadeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLCascadeView.m; sourceTree = "<group>"; };
+		2428FE1D17A525070063C4C3 /* CLCategoriesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLCategoriesView.h; sourceTree = "<group>"; };
+		2428FE1E17A525070063C4C3 /* CLCategoriesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLCategoriesView.m; sourceTree = "<group>"; };
+		2428FE1F17A525070063C4C3 /* CLCategoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLCategoriesViewController.h; sourceTree = "<group>"; };
+		2428FE2017A525070063C4C3 /* CLCategoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLCategoriesViewController.m; sourceTree = "<group>"; };
+		2428FE2217A525070063C4C3 /* CLSplitCascadeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLSplitCascadeView.h; sourceTree = "<group>"; };
+		2428FE2317A525070063C4C3 /* CLSplitCascadeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLSplitCascadeView.m; sourceTree = "<group>"; };
+		2428FE2417A525070063C4C3 /* CLSplitCascadeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLSplitCascadeViewController.h; sourceTree = "<group>"; };
+		2428FE2517A525070063C4C3 /* CLSplitCascadeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLSplitCascadeViewController.m; sourceTree = "<group>"; };
+		2428FE2617A525070063C4C3 /* CLSplitCascadeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CLSplitCascadeViewController.xib; sourceTree = "<group>"; };
+		2428FE2817A525070063C4C3 /* CLBorderShadowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLBorderShadowView.h; sourceTree = "<group>"; };
+		2428FE2917A525070063C4C3 /* CLBorderShadowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLBorderShadowView.m; sourceTree = "<group>"; };
+		2428FE2A17A525070063C4C3 /* CLGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLGlobal.h; sourceTree = "<group>"; };
+		2428FE2B17A525070063C4C3 /* CLScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLScrollView.h; sourceTree = "<group>"; };
+		2428FE2C17A525070063C4C3 /* CLScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLScrollView.m; sourceTree = "<group>"; };
+		2428FE2D17A525070063C4C3 /* CLSegmentedView+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLSegmentedView+Extension.h"; sourceTree = "<group>"; };
+		2428FE2E17A525070063C4C3 /* CLSegmentedView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLSegmentedView+Extension.m"; sourceTree = "<group>"; };
+		2428FE2F17A525070063C4C3 /* CLSegmentedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLSegmentedView.h; sourceTree = "<group>"; };
+		2428FE3017A525070063C4C3 /* CLSegmentedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLSegmentedView.m; sourceTree = "<group>"; };
+		2428FE3117A525070063C4C3 /* UIViewController+CLCascade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CLCascade.h"; sourceTree = "<group>"; };
+		2428FE3217A525070063C4C3 /* UIViewController+CLCascade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CLCascade.m"; sourceTree = "<group>"; };
+		2428FE3317A525070063C4C3 /* UIViewController+CLSegmentedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CLSegmentedView.h"; sourceTree = "<group>"; };
+		2428FE3417A525070063C4C3 /* UIViewController+CLSegmentedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CLSegmentedView.m"; sourceTree = "<group>"; };
+		2428FE4417A5271C0063C4C3 /* WZSplitCascadeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZSplitCascadeViewController.h; sourceTree = "<group>"; };
+		2428FE4517A5271C0063C4C3 /* WZSplitCascadeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZSplitCascadeViewController.m; sourceTree = "<group>"; };
 		2434A1AB16BD6DBA00C383CA /* back-arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-arrow.png"; sourceTree = "<group>"; };
 		2434A1AC16BD6DBA00C383CA /* back-arrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back-arrow@2x.png"; sourceTree = "<group>"; };
 		2434A1C316BEB48900C383CA /* x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = x.png; sourceTree = "<group>"; };
@@ -442,13 +485,8 @@
 		2417B65F16B9ADCA009E11EC /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				243749AD172BE91D007762FC /* Settings */,
-				24DF0C8A171D992B0095491D /* Menu */,
-				2463930A16E0AA21005114ED /* Notify */,
-				2417B66716B9ADDB009E11EC /* Main */,
-				2417B66816B9ADDF009E11EC /* Comments */,
-				2484385716C11E54001D2AA0 /* ActivityView */,
-				2434A1CB16BEED7A00C383CA /* Web */,
+				2428FE4B17A528EB0063C4C3 /* iPhone */,
+				2428FE4217A526FB0063C4C3 /* iPad */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -529,6 +567,95 @@
 				2402A75A165120B500F637E5 /* Images */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		2428FE1517A524D80063C4C3 /* FSPanes */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE1617A525070063C4C3 /* Cascade.h */,
+				2428FE1717A525070063C4C3 /* CLCascadeNavigationController */,
+				2428FE1C17A525070063C4C3 /* CLCategories */,
+				2428FE2117A525070063C4C3 /* CLSplitViewController */,
+				2428FE2717A525070063C4C3 /* Other */,
+			);
+			path = FSPanes;
+			sourceTree = "<group>";
+		};
+		2428FE1717A525070063C4C3 /* CLCascadeNavigationController */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE1817A525070063C4C3 /* CLCascadeNavigationController.h */,
+				2428FE1917A525070063C4C3 /* CLCascadeNavigationController.m */,
+				2428FE1A17A525070063C4C3 /* CLCascadeView.h */,
+				2428FE1B17A525070063C4C3 /* CLCascadeView.m */,
+			);
+			path = CLCascadeNavigationController;
+			sourceTree = "<group>";
+		};
+		2428FE1C17A525070063C4C3 /* CLCategories */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE1D17A525070063C4C3 /* CLCategoriesView.h */,
+				2428FE1E17A525070063C4C3 /* CLCategoriesView.m */,
+				2428FE1F17A525070063C4C3 /* CLCategoriesViewController.h */,
+				2428FE2017A525070063C4C3 /* CLCategoriesViewController.m */,
+			);
+			path = CLCategories;
+			sourceTree = "<group>";
+		};
+		2428FE2117A525070063C4C3 /* CLSplitViewController */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE2217A525070063C4C3 /* CLSplitCascadeView.h */,
+				2428FE2317A525070063C4C3 /* CLSplitCascadeView.m */,
+				2428FE2417A525070063C4C3 /* CLSplitCascadeViewController.h */,
+				2428FE2517A525070063C4C3 /* CLSplitCascadeViewController.m */,
+				2428FE2617A525070063C4C3 /* CLSplitCascadeViewController.xib */,
+			);
+			path = CLSplitViewController;
+			sourceTree = "<group>";
+		};
+		2428FE2717A525070063C4C3 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE2817A525070063C4C3 /* CLBorderShadowView.h */,
+				2428FE2917A525070063C4C3 /* CLBorderShadowView.m */,
+				2428FE2A17A525070063C4C3 /* CLGlobal.h */,
+				2428FE2B17A525070063C4C3 /* CLScrollView.h */,
+				2428FE2C17A525070063C4C3 /* CLScrollView.m */,
+				2428FE2D17A525070063C4C3 /* CLSegmentedView+Extension.h */,
+				2428FE2E17A525070063C4C3 /* CLSegmentedView+Extension.m */,
+				2428FE2F17A525070063C4C3 /* CLSegmentedView.h */,
+				2428FE3017A525070063C4C3 /* CLSegmentedView.m */,
+				2428FE3117A525070063C4C3 /* UIViewController+CLCascade.h */,
+				2428FE3217A525070063C4C3 /* UIViewController+CLCascade.m */,
+				2428FE3317A525070063C4C3 /* UIViewController+CLSegmentedView.h */,
+				2428FE3417A525070063C4C3 /* UIViewController+CLSegmentedView.m */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		2428FE4217A526FB0063C4C3 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				2428FE4417A5271C0063C4C3 /* WZSplitCascadeViewController.h */,
+				2428FE4517A5271C0063C4C3 /* WZSplitCascadeViewController.m */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+		2428FE4B17A528EB0063C4C3 /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				243749AD172BE91D007762FC /* Settings */,
+				24DF0C8A171D992B0095491D /* Menu */,
+				2463930A16E0AA21005114ED /* Notify */,
+				2417B66716B9ADDB009E11EC /* Main */,
+				2417B66816B9ADDF009E11EC /* Comments */,
+				2484385716C11E54001D2AA0 /* ActivityView */,
+				2434A1CB16BEED7A00C383CA /* Web */,
+			);
+			name = iPhone;
 			sourceTree = "<group>";
 		};
 		2434A19E16BD640300C383CA /* Misc */ = {
@@ -669,6 +796,7 @@
 		24975A72164A88A5000143A1 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				2428FE1517A524D80063C4C3 /* FSPanes */,
 				24B3019916F753B7005405CD /* JSSlidingViewController */,
 				24C43FE916A44DCC00055D65 /* TUSafariActivity */,
 			);
@@ -919,6 +1047,7 @@
 				243D1F7A1735613E0033BC0F /* x-darktheme.png in Resources */,
 				243D1F7B1735613E0033BC0F /* x-darktheme@2x.png in Resources */,
 				24005EF517A2B60B007D1ACF /* MainStoryboard_ipad.storyboard in Resources */,
+				2428FE3B17A525070063C4C3 /* CLSplitCascadeViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -986,6 +1115,19 @@
 				243D1F601735546E0033BC0F /* WZMenuHeaderView.m in Sources */,
 				243D1F6317355BF70033BC0F /* WZMenuCell.m in Sources */,
 				243D1F7E173562340033BC0F /* WZToolbar.m in Sources */,
+				2428FE3517A525070063C4C3 /* CLCascadeNavigationController.m in Sources */,
+				2428FE3617A525070063C4C3 /* CLCascadeView.m in Sources */,
+				2428FE3717A525070063C4C3 /* CLCategoriesView.m in Sources */,
+				2428FE3817A525070063C4C3 /* CLCategoriesViewController.m in Sources */,
+				2428FE3917A525070063C4C3 /* CLSplitCascadeView.m in Sources */,
+				2428FE3A17A525070063C4C3 /* CLSplitCascadeViewController.m in Sources */,
+				2428FE3C17A525070063C4C3 /* CLBorderShadowView.m in Sources */,
+				2428FE3D17A525070063C4C3 /* CLScrollView.m in Sources */,
+				2428FE3E17A525070063C4C3 /* CLSegmentedView+Extension.m in Sources */,
+				2428FE3F17A525070063C4C3 /* CLSegmentedView.m in Sources */,
+				2428FE4017A525070063C4C3 /* UIViewController+CLCascade.m in Sources */,
+				2428FE4117A525070063C4C3 /* UIViewController+CLSegmentedView.m in Sources */,
+				2428FE4617A5271C0063C4C3 /* WZSplitCascadeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

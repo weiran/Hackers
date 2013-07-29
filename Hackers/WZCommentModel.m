@@ -13,8 +13,8 @@
 #import "NSString+AttributedStringForHTML.h"
 
 #define kCellWidth 320
-#define kBodyLabelMarginTop 29
-#define kBodyLabelMarginBottom 10
+#define kCellWidthiPad 480
+#define kCellPadding IS_IPAD() ? 44 : 39
 #define kReplyButtonHeightWithMargin 40
 #define kDefaultTrailingMargin 10
 
@@ -46,43 +46,51 @@
     return [html attributedStringFromHTML];
 }
 
-- (NSNumber *)heightForComment:(WZCommentModel *)comment {    
+- (NSNumber *)heightForComment:(WZCommentModel *)comment constrainedToSize:(CGSize)size {
     int indentPoints = [self indentPointsForComment:comment];
-    CGFloat width = kCellWidth - indentPoints - kDefaultTrailingMargin;
+    CGFloat width = size.width - indentPoints - kDefaultTrailingMargin;
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(comment.attributedContent));
-    CGSize sz = CGSizeMake(0.f, 0.f);
-    CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
+    CGSize calculatedSize = CGSizeMake(0.f, 0.f);
+    CGSize maxSize = CGSizeMake(width, size.height);
     
     if (framesetter) {
         CFRange fitCFRange = CFRangeMake(0, 0);
-        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, maxSize, &fitCFRange);
+        calculatedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, maxSize, &fitCFRange);
         CFRelease(framesetter);
     }
     
-    int labelHeight = sz.height;
+    int labelHeight = calculatedSize.height;
     
-    CGFloat height = labelHeight + kBodyLabelMarginTop + kBodyLabelMarginBottom; // 29 points to top, 10 points to bottom
+    CGFloat cellPadding = IS_IPAD() ? 48 : 39;
+    
+    CGFloat height = cellPadding + labelHeight; // 29 points to top, 10 points to bottom
     
     if (self.comments.count > 0) {
         height += kReplyButtonHeightWithMargin;
     }
     
     return @(height);
+
+}
+
+- (NSNumber *)heightForComment:(WZCommentModel *)comment {
+    CGFloat cellWidth = IS_IPAD() ? kCellWidthiPad : kCellWidth;
+    return [self heightForComment:comment constrainedToSize:CGSizeMake(cellWidth, CGFLOAT_MAX)];
 }
 
 - (CGSize)sizeToFitWidth:(CGFloat)width {
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_attributedContent));
-    CGSize sz = CGSizeMake(0.f, 0.f);
+    CGSize calculatedSize = CGSizeMake(0.f, 0.f);
     CGSize maxSize = CGSizeMake(width, CGFLOAT_MAX);
     
     if (framesetter) {
         CFRange fitCFRange = CFRangeMake(0,0);
-        sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, maxSize, &fitCFRange);
+        calculatedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, maxSize, &fitCFRange);
         CFRelease(framesetter);
     }
     
-    return sz;
+    return calculatedSize;
 }
 
 #define kBaseIndent 10

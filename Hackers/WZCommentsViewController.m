@@ -40,6 +40,7 @@
 @property (strong, nonatomic) IBOutlet UISwipeGestureRecognizer *swipeBackGestureRecognizer;
 @property (weak, nonatomic) UIView *webView;
 @property (strong, nonatomic) WZWebViewController *webViewController;
+@property (strong, nonatomic) UIPopoverController *activityPopoverController;
 
 @property (weak, nonatomic) IBOutlet UIView *activityIndicatorView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *activityIndicatorViewTopSpacing;
@@ -73,6 +74,10 @@
     [self fetchComments];
     [self showDefaultView];
     
+    if (IS_IPAD()) {
+        self.backButton.hidden = YES;
+    }
+    
     _webViewController.webView.scrollView.scrollsToTop = NO;
     _tableView.scrollsToTop = YES;
 }
@@ -87,7 +92,7 @@
     });
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [[[WZDefaults appDelegate] viewController] setLocked:YES];
+        [[[WZDefaults appDelegate] phoneViewController] setLocked:YES];
     }
 }
 
@@ -102,7 +107,7 @@
         [self removeOrientationNotifications];
         _isNavigatingBack = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-        [[[WZDefaults appDelegate] viewController] setLocked:NO];
+        [[[WZDefaults appDelegate] phoneViewController] setLocked:NO];
     }
 }
 
@@ -236,11 +241,14 @@
     
     NSDictionary *viewDictionary = @{ @"webView": _webView };
     
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView(<=504)]"
+    NSInteger width = IS_IPAD() ? 480 : 320;
+    NSInteger height = IS_IPAD() ? 1000 : 504;
+    
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[webView(<=%d)]", height]
                                                                                      options:0
                                                                                      metrics:nil
                                                                                        views:viewDictionary][0];
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"[webView(>=320)]"
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[webView(>=%d)]", width]
                                                                                        options:0
                                                                                        metrics:nil
                                                                                          views:viewDictionary][0];
@@ -303,15 +311,17 @@
     }
     
     // calculate heights
+    CGFloat labelWidth = IS_IPAD() ? 460 : 300;
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
-                                    constrainedToSize:CGSizeMake(300, CGFLOAT_MAX)
+                                    constrainedToSize:CGSizeMake(labelWidth, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
     CGFloat titleHeight = titleLabelSize.height;
     
     CGFloat contentHeight = 0; // total height
     // set header details container frame to match contents height
     CGRect headerDetailsContainerViewFrame = _headerDetailsContainerView.frame;
-    contentHeight = kHeaderTitleTopMargin + titleHeight + kHeaderTitleBottomMargin; // add details
+    NSInteger cellPadding = IS_IPAD() ? 72 : 53;
+    contentHeight = titleHeight + cellPadding; // add details
     headerDetailsContainerViewFrame.size.height = contentHeight;
     
     CGFloat headerTextViewHeight = 0;
@@ -319,11 +329,12 @@
     // set the post content (AskHN or Job)
     CGFloat headerTextViewBottomSpacingConstant = 0;
     if (_post.content) {
-        headerTextViewBottomSpacingConstant = kHeaderTextBottomMargin;
+        NSInteger bottomMargin = IS_IPAD() ? 20 : kHeaderTextBottomMargin;
+        headerTextViewBottomSpacingConstant = bottomMargin;
         _headerTextView.hidden = NO;
         _headerTextView.delegate = self;
         _headerTextView.attributedText = _post.attributedContent;
-        headerTextViewHeight = [_post contentHeightForWidth:kHeaderTextWidth] + kHeaderTextBottomMargin;
+        headerTextViewHeight = [_post contentHeightForWidth:labelWidth] + bottomMargin;
         contentHeight += headerTextViewHeight;
     }
     
@@ -520,7 +531,15 @@
 
 - (IBAction)showActivityView:(id)sender {
     WZActivityViewController *activityViewController = [WZActivityViewController activityViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
-    [self presentViewController:activityViewController animated:YES completion:nil];
+    if (IS_IPAD()) {
+        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        [self.activityPopoverController presentPopoverFromRect:CGRectMake(self.shareButton.frame.origin.x, self.shareButton.frame.origin.y, 0, 0)
+                                                        inView:self.view
+                                      permittedArrowDirections:UIPopoverArrowDirectionUp
+                                                      animated:YES];
+    } else {
+        [self presentViewController:activityViewController animated:YES completion:nil];
+    }
 }
 
 - (IBAction)headerViewTapped:(id)sender {

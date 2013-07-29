@@ -8,11 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef UI_USER_INTERFACE_IDIOM()
+#define IS_IPAD() (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+#else
+#define IS_IPAD() (false)
+#endif
+
 #define kTitleFontName @"HelveticaNeue"
-#define kTitleFontSize 15
+#define kTitleFontSize IS_IPAD() ? 18 : 15
 
 #define kBodyFontName @"HelveticaNeue-Light"
-#define kBodyFontSize 14
+#define kBodyFontSize IS_IPAD() ? 17 : 14
 
 #define kNavigationFontName @"HelveticaNeue-Light"
 #define kNavigationFontSize 20

@@ -8,6 +8,8 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import "JSSlidingViewController.h"
+#import "UIViewController+CLCascade.h"
+#import "CLCascadeNavigationController.h"
 
 #import "WZMainViewController.h"
 #import "WZCommentsViewController.h"
@@ -20,8 +22,6 @@
 
 #define kTitleUnreadTextColorWithWhite 0
 #define kTitleReadTextColorWithWhite 0.4
-#define kCellTitleTopMargin 9
-#define kCellTitleBottomMargin 44
 
 @interface WZMainViewController () {
     NSFetchedResultsController *_fetchedResultsController;
@@ -237,7 +237,7 @@
 - (void)updateTitle {
     switch (_newsType) {
         case WZNewsTypeTop:
-            self.title = @"Hacker News";
+            self.title = @"Top";
             break;
             
         case WZNewsTypeNew:
@@ -245,7 +245,7 @@
             break;
             
         case WZNewsTypeAsk:
-            self.title = @"Ask Hacker News";
+            self.title = @"Ask";
             break;
             
         default:
@@ -343,6 +343,8 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger cellPadding = IS_IPAD() ? 72 : 53;
+    
     // if it's the loading cell
     if (_newsType == WZNewsTypeTop && indexPath.row == _news.count && _topNewsPage == 1) {
         return 74;
@@ -353,23 +355,14 @@
     if (!post.cellHeight) {
         CGFloat width = 275; //iphone width
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            width = self.view.frame.size.width - 55;
-        }
-        
-        UIFont *font = [UIFont fontWithName:kTitleFontName size:kTitleFontSize];
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            font = [UIFont fontWithName:kTitleFontName size:18];
+            width = self.view.frame.size.width;
         }
         
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
                              constrainedToSize:CGSizeMake(width, CGFLOAT_MAX)
                                  lineBreakMode:NSLineBreakByWordWrapping];
         CGFloat height = size.height;
-        CGFloat cellHeight = kCellTitleTopMargin + height + kCellTitleBottomMargin;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            cellHeight += 10;
-        }
-        
+        CGFloat cellHeight = cellPadding + height;
         post.cellHeight = cellHeight;
     }
     
@@ -377,6 +370,21 @@
 }
 
 #pragma mark - Segue
+
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    if ([identifier isEqualToString:@"ShowCommentsSegue"]) {
+        if (IS_IPAD()) {
+            // prevent segue and do custom push
+            UINavigationController *commentsNavController = [self.storyboard instantiateViewControllerWithIdentifier:@"CommentsNavigationController"];
+            WZCommentsViewController *commentsViewController = commentsNavController.viewControllers[0];
+            commentsViewController.post = [self activeNews][[self.tableView indexPathForCell:sender].row];
+            [self.cascadeNavigationController addViewController:commentsNavController sender:self animated:YES];
+            return NO;
+        }
+    }
+    
+    return YES;
+}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ShowCommentsSegue"]) {
@@ -389,11 +397,11 @@
 #pragma - mark Menu
 
 - (IBAction)menuButtonPressed:(id)sender {
-    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
-        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
-    } else {
-        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
-    }
+//    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
+//        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
+//    } else {
+//        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
+//    }
 }
 
 @end
