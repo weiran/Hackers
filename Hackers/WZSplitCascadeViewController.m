@@ -18,8 +18,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.cascadeNavigationController.leftInset = 58.0f;
-    self.cascadeNavigationController.widerLeftInset = 210.0f;
+    self.cascadeNavigationController.leftInset = 40.0f;
+    self.cascadeNavigationController.widerLeftInset = 160.0f;
 }
 
 @end
