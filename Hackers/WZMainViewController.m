@@ -397,11 +397,13 @@
 #pragma - mark Menu
 
 - (IBAction)menuButtonPressed:(id)sender {
-//    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
-//        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
-//    } else {
-//        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
-//    }
+    if (!IS_IPAD()) {
+        if ([[[WZDefaults appDelegate] phoneViewController] isOpen]) {
+            [[[WZDefaults appDelegate] phoneViewController] closeSlider:YES completion:nil];
+        } else {
+            [[[WZDefaults appDelegate] phoneViewController] openSlider:YES completion:nil];
+        }
+    }
 }
 
 @end

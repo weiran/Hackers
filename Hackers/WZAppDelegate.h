@@ -13,9 +13,7 @@
 @interface WZAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
 @property (nonatomic, strong) WZSplitCascadeViewController *splitCascadeViewController;
-
 @property (strong, nonatomic) UIViewController *viewController;
 @property (readonly, nonatomic) JSSlidingViewController *phoneViewController;
 
