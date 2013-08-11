@@ -35,6 +35,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutTableView];
+    
+    if (IS_IPAD()) {
+        [self.cascadeNavigationController setRootViewController:self.mainNavViewController animated:YES];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {

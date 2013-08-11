@@ -9,6 +9,8 @@
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
 #import "JSSlidingViewController.h"
+#import "UIViewController+CLCascade.h"
+#import "CLCascadeNavigationController.h"
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
@@ -21,6 +23,7 @@
 #import "WZWebViewController.h"
 #import "WZNavigationController.h"
 #import "WZNotify.h"
+#import "NSString+AttributedStringForHTML.h"
 
 #define kHeaderTitleTopMargin 10
 #define kHeaderTitleBottomMargin 44
@@ -170,6 +173,7 @@
 //    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 //    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
 //    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
+    [self.tableView reloadData];
 }
 
 - (void)showDefaultView {
@@ -311,7 +315,7 @@
     }
     
     // calculate heights
-    CGFloat labelWidth = IS_IPAD() ? 460 : 300;
+    CGFloat labelWidth = IS_IPAD() ? 473 : 300;
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
                                     constrainedToSize:CGSizeMake(labelWidth, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
@@ -357,7 +361,7 @@
 }
 
 - (void)layoutTableViewBackgrounds {
-    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
+    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, self.view.frame.size.width, 480)];
     topView.backgroundColor = [WZTheme navigationColor];
     [_tableView addSubview:topView];
 }
@@ -435,7 +439,13 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZCommentModel *comment = _comments[indexPath.row];
-    return comment.cellHeight.floatValue;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
+    if (isLandscape) {
+        return comment.cellHeightLandscape.floatValue;
+    } else {
+        return comment.cellHeight.floatValue;
+    }
 }
 
 #pragma mark - WZCommentURLTappedDelegate & HeaderTextView link delegate
@@ -454,11 +464,17 @@
     }
     
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
-    [self presentViewController:webViewController animated:YES completion:nil];
     
-    _tableView.scrollsToTop = NO;
-    webViewController.webView.scrollView.scrollsToTop = YES;
+    if (IS_IPAD()) {
+        [self.cascadeNavigationController addViewController:webViewController sender:self.navigationController animated:YES viewSize:CLViewSizeWider];
+    } else {
+        WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
+        [self presentViewController:webViewController animated:YES completion:nil];
+        
+        _tableView.scrollsToTop = NO;
+        webViewController.webView.scrollView.scrollsToTop = YES;
+    }
 }
 
 - (void)webViewPopupClosed {

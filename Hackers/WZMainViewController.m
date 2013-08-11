@@ -354,8 +354,8 @@
     
     if (!post.cellHeight) {
         CGFloat width = 275; //iphone width
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            width = self.view.frame.size.width;
+        if (IS_IPAD()) {
+            width = 461;
         }
         
         CGSize size = [post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
@@ -378,7 +378,7 @@
             UINavigationController *commentsNavController = [self.storyboard instantiateViewControllerWithIdentifier:@"CommentsNavigationController"];
             WZCommentsViewController *commentsViewController = commentsNavController.viewControllers[0];
             commentsViewController.post = [self activeNews][[self.tableView indexPathForCell:sender].row];
-            [self.cascadeNavigationController addViewController:commentsNavController sender:self animated:YES];
+            [[self cascadeNavigationController] addViewController:commentsNavController sender:self.navigationController animated:YES viewSize:CLViewSizeNormal];
             return NO;
         }
     }

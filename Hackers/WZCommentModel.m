@@ -13,7 +13,6 @@
 #import "NSString+AttributedStringForHTML.h"
 
 #define kCellWidth 320
-#define kCellWidthiPad 480
 #define kCellPadding IS_IPAD() ? 44 : 39
 #define kReplyButtonHeightWithMargin 40
 #define kDefaultTrailingMargin 10
@@ -39,7 +38,8 @@
         _comments = newComments;
     }
     
-    self.cellHeight = [self heightForComment:self];
+    self.cellHeight = [self heightForComment:self orientation:UIDeviceOrientationPortrait];
+    self.cellHeightLandscape = [self heightForComment:self orientation:UIDeviceOrientationLandscapeLeft];
 }
 
 - (NSAttributedString *)attributedStringForHTML:(NSString *)html {
@@ -71,11 +71,13 @@
     }
     
     return @(height);
-
 }
 
-- (NSNumber *)heightForComment:(WZCommentModel *)comment {
-    CGFloat cellWidth = IS_IPAD() ? kCellWidthiPad : kCellWidth;
+- (NSNumber *)heightForComment:(WZCommentModel *)comment orientation:(UIDeviceOrientation)orientation {
+    CGFloat cellWidth = IS_IPAD() ? 492 : kCellWidth;
+//    if (UIDeviceOrientationIsLandscape(orientation)) {
+//        cellWidth = IS_IPAD() ? 864 : 0;
+//    }
     return [self heightForComment:comment constrainedToSize:CGSizeMake(cellWidth, CGFLOAT_MAX)];
 }
 
