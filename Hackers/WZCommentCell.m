@@ -24,20 +24,22 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    [_showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateNormal];
-    [_showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateHighlighted];
-    [_showRepliesButton setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
-    [_commentLabel setLinkColor:[WZTheme subtitleTextColor]];
-    _commentLabel.delegate = self;
+    [self.showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateNormal];
+    [self.showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateHighlighted];
+    [self.showRepliesButton setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
+}
+
+- (void)awakeFromNib {
+    [self.commentLabel setLinkColor:[WZTheme subtitleTextColor]];
+    self.commentLabel.delegate = self;
     
     [self setTheme];
 }
 
 - (void)setTheme {
-    _userLabel.textColor = [WZTheme userTextColor];
-    _commentLabel.textColor = [WZTheme mainTextColor];
-    _dateLabel.textColor = [WZTheme detailTextColor];
+    self.userLabel.textColor = [WZTheme userTextColor];
+    self.commentLabel.textColor = [WZTheme mainTextColor];
+    self.dateLabel.textColor = [WZTheme detailTextColor];
     self.backgroundColor = [WZTheme backgroundColor];
 }
 

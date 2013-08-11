@@ -8,6 +8,7 @@
 
 #import "WZMenuViewController.h"
 #import "WZNavigationController.h"
+#import "WZSettingsViewController.h"
 #import "WZAccountManager.h"
 #import "WZNavigationBar.h"
 
@@ -17,10 +18,11 @@
 #import <SSKeychain.h>
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory.h>
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory+iOS.h>
+#import "UIViewController+CLCascade.h"
 
 @interface WZMenuViewController ()
 @property (nonatomic, strong) WZNavigationController *settingsNavController;
-@property (nonatomic, strong) IASKAppSettingsViewController *settingsViewController;
+@property (nonatomic, strong) WZSettingsViewController *settingsViewController;
 @property (weak, nonatomic) IBOutlet UITableViewCell *settingsCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *askCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *showNewCell;
@@ -34,6 +36,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutTableView];
+    
+    if (IS_IPAD()) {
+        double delayInSeconds = 0.1;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            dispatch_async(dispatch_get_main_queue(), ^{
+               [self showMainNavViewControllerWithNewsType:WZNewsTypeTop];
+            });
+        });
+
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -86,7 +99,8 @@
 
 - (WZNavigationController *)mainNavViewController {
     if (!_mainNavViewController) {
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+        NSString *storyboardName = IS_IPAD() ? @"MainStoryboard_ipad" : @"MainStoryboard";
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:nil];
         _mainNavViewController = [storyboard instantiateViewControllerWithIdentifier:@"MainNavigationController"];
     }
     
@@ -95,7 +109,7 @@
 
 - (IASKAppSettingsViewController *)settingsViewController {
     if (!_settingsViewController) {
-        _settingsViewController = [[IASKAppSettingsViewController alloc] init];
+        _settingsViewController = [[WZSettingsViewController alloc] init];
         _settingsViewController.delegate = self;
         _settingsViewController.showDoneButton = NO;
         _settingsViewController.showCreditsFooter = NO;
@@ -131,38 +145,51 @@
     _settingsViewController = nil;
 }
 
+
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([indexPath isEqual:[tableView indexPathForCell:_settingsCell]]) {
-        if (![[[WZDefaults appDelegate] viewController].frontViewController isEqual:self.settingsNavController]) {
-            [[[WZDefaults appDelegate] viewController] setFrontViewController:self.settingsNavController animated:YES completion:nil];
+        if (IS_IPAD()) {
+            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
+//            navController.modalPresentationStyle = UIModalPresentationPageSheet;
+//            [self presentViewController:navController animated:YES completion:nil];
+            [self.cascadeNavigationController setRootViewController:navController animated:YES];
+        } else {
+            if (![[[WZDefaults appDelegate] phoneViewController].frontViewController isEqual:self.settingsNavController]) {
+                [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.settingsNavController animated:YES completion:nil];
+            }
         }
         [self toggleSlider];
     } else if ([indexPath isEqual:[tableView indexPathForCell:_topCell]]) {
-        [self showMainNavViewController];
-        [self.mainNavViewController setNewsType:WZNewsTypeTop];
+        [self showMainNavViewControllerWithNewsType:WZNewsTypeTop];
         [self toggleSlider];
     } else if ([indexPath isEqual:[tableView indexPathForCell:_showNewCell]]) {
-        [self showMainNavViewController];
-        [self.mainNavViewController setNewsType:WZNewsTypeNew];
+        [self showMainNavViewControllerWithNewsType:WZNewsTypeNew];
         [self toggleSlider];
     } else if ([indexPath isEqual:[tableView indexPathForCell:_askCell]]) {
-        [self showMainNavViewController];
-        [self.mainNavViewController setNewsType:WZNewsTypeAsk];
+        [self showMainNavViewControllerWithNewsType:WZNewsTypeAsk];
         [self toggleSlider];
     }
 }
 
-- (void)showMainNavViewController {
-    if (![[[[WZDefaults appDelegate] viewController] frontViewController ] isEqual:self.mainNavViewController]) {
-        [[[WZDefaults appDelegate] viewController] setFrontViewController:self.mainNavViewController animated:YES completion:nil];
+- (void)showMainNavViewControllerWithNewsType:(WZNewsType)newsType {
+    [self.mainNavViewController setNewsType:newsType];
+    if (IS_IPAD()) {
+        if (self.cascadeNavigationController.rootViewController != self.mainNavViewController) {
+            [self.cascadeNavigationController setRootViewController:self.mainNavViewController animated:YES];
+        }
+    } else {
+        if (![[[[WZDefaults appDelegate] phoneViewController] frontViewController ] isEqual:self.mainNavViewController]) {
+            [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.mainNavViewController animated:YES completion:nil];
+        }
     }
 }
 
 - (void)toggleSlider {
-    if ([[[WZDefaults appDelegate] viewController] isOpen]) {
-        [[[WZDefaults appDelegate] viewController] closeSlider:YES completion:nil];
+    if ([[[WZDefaults appDelegate] phoneViewController] isOpen]) {
+        [[[WZDefaults appDelegate] phoneViewController] closeSlider:YES completion:nil];
     } else {
-        [[[WZDefaults appDelegate] viewController] openSlider:YES completion:nil];
+        [[[WZDefaults appDelegate] phoneViewController] openSlider:YES completion:nil];
     }
 }
 
@@ -170,7 +197,6 @@
 
 - (void)settingsViewControllerDidEnd:(IASKAppSettingsViewController*)sender {
     //[self dismissModalViewControllerAnimated:YES];
-    
 }
 
 #pragma mark kIASKAppSettingChanged notification
@@ -185,8 +211,6 @@
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:kSettingsTheme]) {
         self.mainNavViewController = nil;
-        self.settingsNavController.navigationBar.tintColor = [WZTheme navigationColor];
-        self.settingsNavController.navigationBar.titleTextAttributes = @{ UITextAttributeTextColor: [WZTheme titleTextColor] };
     }
 }
 
