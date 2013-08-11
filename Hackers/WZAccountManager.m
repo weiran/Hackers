@@ -65,12 +65,6 @@
 }
 
 - (void)showAuthenticateAlertFromWrongPassword:(BOOL)wrongPassword forService:(NSString *)service {
-    
-//    NSString *incorrectCredentialsMessage = [NSString stringWithFormat:@"Your existing %@ credentials are wrong", service];
-//    NSString *enterCredentialsMessage = [NSString stringWithFormat:@"Enter your %@ credentials", service];
-//    
-//    NSString *message = wrongPassword ? incorrectCredentialsMessage : enterCredentialsMessage;
-    
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Login to %@", service]
                                                         message:nil
                                                        delegate:self

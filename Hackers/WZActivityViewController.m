@@ -13,8 +13,11 @@
 #import <ARKippsterActivity/ARKippsteractivity.h>
 #import "WZInstapaperActivity.h"
 #import "WZPinboardActivity.h"
+#import "NNNetwork/NNNetwork.h"
+#import "NNNetwork/NNOAuth1Credential.h"
+#import "WZNotify.h"
 
-@interface WZActivityViewController () {
+@interface WZActivityViewController () <NNReadLaterActivityDelegate> {
     UITapGestureRecognizer *_tapGestureRecognizer;
 }
 @end
@@ -60,12 +63,88 @@
     ARKippsterActivity *kippsterActivity = [[ARKippsterActivity alloc] init];
     kippsterActivity.activityTitle = @"Send to Kippster";
     
-    NSArray *activities = @[safariActivity, chromeActivity, kippsterActivity, instapaperActivity, pinboardActivity];
+    NNOAuthCredential *pocketCredentails = [NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:[[NNPocketClient sharedClient] name]];
+    NNPocketActivity *pocketActivity = [[NNPocketActivity alloc] initWithCredential:pocketCredentails];
+    
+    NNReadabilityActivity *readabilityActivity = [[NNReadabilityActivity alloc] initWithCredential:[NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:[[NNReadabilityClient sharedClient] name]]];
+    
+    NSArray *activities = @[safariActivity, chromeActivity, instapaperActivity, pinboardActivity, pocketActivity, readabilityActivity, kippsterActivity];
     NSArray *activityItems = @[text, url];
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];
+    pocketActivity.delegate = activityViewController;
+    readabilityActivity.delegate = activityViewController;
+    activityViewController.url = url;
     
     return activityViewController;
 }
+
+#pragma mark NNReadLaterActivityDelegate
+
+- (void)readLaterActivityNeedsCredential:(NNReadLaterActivity *)activity {
+    id<NNReadLaterClient> client = activity.client;
+    if ([client isKindOfClass:[NNPocketClient class]]) {
+        NNPocketClient *pocketClient = (NNPocketClient *)client;
+        [pocketClient authorizeWithSuccess:^(AFHTTPRequestOperation *operation, NSString *username, NNOAuth2Credential *credential) {
+            NNOAuth2Credential *newCredential = [[NNOAuth2Credential alloc] initWithAccessToken:credential.accessToken userInfo:@{ @"AccountName" : username }];
+            [newCredential saveToKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:pocketClient.name];
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            [WZNotify showMessage:NSLocalizedString(@"Couldn't log into Pocket", nil) inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
+        }];
+    } else {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Login to %@", activity.client.name]
+                                                            message:nil
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Cancel"
+                                                  otherButtonTitles:@"Login", nil];
+        alertView.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
+        [[alertView textFieldAtIndex:0] setKeyboardType:UIKeyboardTypeEmailAddress];
+        
+        [alertView show];
+    }
+}
+
+- (void)readLaterActivity:(NNReadLaterActivity *)activity didFinishWithURL:(NSURL *)url operation:(AFHTTPRequestOperation *)operation error:(NSError *)error {
+    if (!error) {
+        [WZNotify showMessage:[NSString stringWithFormat:@"Sent to %@", activity.client.name]
+                       inView:[WZDefaults appDelegate].window.rootViewController.view
+                     duration:2.0f];
+    } else {
+        NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Error Sending to %@", nil), activity.client.name];
+        [WZNotify showMessage:title inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
+
+    }
+}
+
+#pragma mark UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        NSString *username = [alertView textFieldAtIndex:0].text;
+        NSString *password = [alertView textFieldAtIndex:1].text;
+        
+        NNReadabilityClient *client = [NNReadabilityClient sharedClient];
+        [client credentialWithUsername:username password:password
+            success:^(AFHTTPRequestOperation *operation, NNOAuthCredential *credential) {
+                NNOAuth1Credential *newCredential = [NNOAuth1Credential credentialWithAccessToken:credential.accessToken
+                                                                                    accessSecret:((NNOAuth1Credential *)credential).accessSecret
+                                                                                        userInfo:@{ @"AccountName" : client.name }];
+                [newCredential saveToKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:client.name];
+                [client addURL:self.url withCredential:newCredential success:^(AFHTTPRequestOperation *operation) {
+                    [WZNotify showMessage:[NSString stringWithFormat:@"Sent to %@", @"Readability"]
+                                   inView:[WZDefaults appDelegate].window.rootViewController.view
+                                 duration:2.0f];
+                } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                    NSString *title = [NSString stringWithFormat:@"Error Sending to %@", @"Readability"];
+                    [WZNotify showMessage:title inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
+                }];
+                
+            } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+               [WZNotify showMessage:[NSString stringWithFormat:@"Couldn't log into %@", client.name]
+                              inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
+            }];
+    }
+}
+
 
 @end

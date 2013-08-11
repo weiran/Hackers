@@ -18,6 +18,7 @@
 #import "JSSlidingViewController.h"
 #import "TSTapstream.h"
 #import "Cascade.h"
+#import "NNNetwork.h"
 
 @interface WZAppDelegate()
 @property (readwrite, nonatomic) JSSlidingViewController *phoneViewController;
@@ -26,8 +27,8 @@
 @implementation WZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
     [WZTheme defaults];
+    [WZDefaults setServiceCredentials];
     
     // initilise storyboard with JSSlidingViewController
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -78,6 +79,13 @@
     // Saves changes in the application's managed object context before the application terminates.
 }
 
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    if ([[NNPocketClient sharedClient] handleRedirectionURL:url]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
 
 - (JSSlidingViewController *)phoneViewController {
     return (JSSlidingViewController *)self.viewController;

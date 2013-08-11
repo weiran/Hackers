@@ -51,5 +51,6 @@
 @interface WZDefaults : NSObject
 
 + (WZAppDelegate *)appDelegate;
++ (void)setServiceCredentials;
 
 @end

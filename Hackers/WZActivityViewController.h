@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NNNetwork.h"
 
-@interface WZActivityViewController : UIActivityViewController
+@interface WZActivityViewController : UIActivityViewController <UIAlertViewDelegate>
+
+@property (nonatomic, copy) NSURL *url;
 
 + (WZActivityViewController *)activityViewControllerWithUrl:(NSURL *)url text:(NSString *)text;
 
