@@ -67,7 +67,6 @@
 @implementation WZCommentsViewController
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
     
     [self setupOrientationNotifications];
     [self setupActivityIndicatorView];
@@ -83,6 +82,8 @@
     
     _webViewController.webView.scrollView.scrollsToTop = NO;
     _tableView.scrollsToTop = YES;
+    
+    [super viewDidLoad];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

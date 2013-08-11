@@ -198,11 +198,8 @@
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vWs-h5-qXe" userLabel="Details View">
                                             <subviews>
-                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="News Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="461" translatesAutoresizingMaskIntoConstraints="NO" id="Id7-HX-F73" userLabel="Title">
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="News Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="460" translatesAutoresizingMaskIntoConstraints="NO" id="Id7-HX-F73" userLabel="Title">
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="25" type="user" id="4TC-mS-ciA"/>
-                                                    </constraints>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="18"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -246,37 +243,37 @@
                                                     </subviews>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     <constraints>
-                                                        <constraint firstItem="qSR-oi-e0H" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="9RB-jy-R7S"/>
+                                                        <constraint firstItem="qSR-oi-e0H" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="user" id="9RB-jy-R7S"/>
                                                         <constraint firstItem="is6-MS-yNN" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="Jei-pz-WzB"/>
-                                                        <constraint firstItem="qSR-oi-e0H" firstAttribute="top" secondItem="tbw-87-toH" secondAttribute="top" constant="20" symbolic="YES" type="default" id="OwU-6N-DuU"/>
-                                                        <constraint firstItem="cGR-KB-5u7" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="default" id="auL-Xy-KS0"/>
+                                                        <constraint firstItem="qSR-oi-e0H" firstAttribute="top" secondItem="tbw-87-toH" secondAttribute="top" constant="20" symbolic="YES" type="user" id="OwU-6N-DuU"/>
+                                                        <constraint firstItem="cGR-KB-5u7" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="user" id="auL-Xy-KS0"/>
                                                         <constraint firstItem="is6-MS-yNN" firstAttribute="top" secondItem="tbw-87-toH" secondAttribute="top" constant="1" id="bYO-to-NDy"/>
-                                                        <constraint firstItem="cGR-KB-5u7" firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" type="user" id="fBj-GB-AhH"/>
+                                                        <constraint firstItem="qSR-oi-e0H" firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" type="user" id="fYp-av-NzI"/>
                                                         <constraint firstItem="cGR-KB-5u7" firstAttribute="width" secondItem="qSR-oi-e0H" secondAttribute="width" type="user" id="kB6-nz-wOm"/>
+                                                        <constraint firstItem="cGR-KB-5u7" firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" type="user" id="pO1-2P-5jS"/>
                                                         <constraint firstItem="cGR-KB-5u7" firstAttribute="top" secondItem="tbw-87-toH" secondAttribute="top" constant="20" symbolic="YES" type="user" id="qhf-9T-ygi"/>
+                                                        <constraint firstItem="cGR-KB-5u7" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="user" id="rl0-35-BPZ"/>
+                                                        <constraint firstAttribute="height" constant="41" type="user" id="u3p-CC-YMR"/>
                                                     </constraints>
                                                 </view>
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                             <gestureRecognizers/>
                                             <constraints>
+                                                <constraint firstItem="tbw-87-toH" firstAttribute="top" relation="greaterThanOrEqual" secondItem="vWs-h5-qXe" secondAttribute="top" constant="40" type="user" id="2Wo-YE-Npc"/>
+                                                <constraint firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" constant="18" type="user" id="Dnm-eh-I2a"/>
                                                 <constraint firstItem="Id7-HX-F73" firstAttribute="top" secondItem="vWs-h5-qXe" secondAttribute="top" constant="16" type="user" id="FeH-Q7-nLh"/>
                                                 <constraint firstAttribute="bottom" secondItem="Id7-HX-F73" secondAttribute="bottom" constant="58" type="user" id="Hdt-Tm-YWg"/>
-                                                <constraint firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" constant="9" type="user" id="M8s-Db-FTU"/>
-                                                <constraint firstItem="tbw-87-toH" firstAttribute="leading" secondItem="vWs-h5-qXe" secondAttribute="leading" constant="10" type="user" id="Oqe-Uk-ITc"/>
-                                                <constraint firstItem="Id7-HX-F73" firstAttribute="trailing" secondItem="tbw-87-toH" secondAttribute="trailing" type="default" id="QdJ-SE-9VR"/>
-                                                <constraint firstItem="Id7-HX-F73" firstAttribute="leading" secondItem="tbw-87-toH" secondAttribute="leading" type="default" id="R3Z-At-54B"/>
-                                                <constraint firstItem="tbw-87-toH" firstAttribute="top" relation="greaterThanOrEqual" secondItem="vWs-h5-qXe" secondAttribute="top" constant="42" type="user" id="c0e-wf-YnL"/>
-                                                <constraint firstAttribute="bottom" secondItem="tbw-87-toH" secondAttribute="bottom" constant="16" type="user" id="u3L-1f-qoJ"/>
+                                                <constraint firstItem="tbw-87-toH" firstAttribute="leading" secondItem="Id7-HX-F73" secondAttribute="leading" type="default" id="IdC-tW-5Dl"/>
+                                                <constraint firstItem="Id7-HX-F73" firstAttribute="leading" secondItem="vWs-h5-qXe" secondAttribute="leading" constant="10" type="user" id="OKG-ut-4yY"/>
+                                                <constraint firstAttribute="trailing" secondItem="Id7-HX-F73" secondAttribute="trailing" constant="10" type="user" id="d9i-5n-FiY"/>
+                                                <constraint firstItem="tbw-87-toH" firstAttribute="trailing" secondItem="Id7-HX-F73" secondAttribute="trailing" type="default" id="kfh-UH-KKK"/>
                                             </constraints>
                                             <connections>
                                                 <outletCollection property="gestureRecognizers" destination="uUo-zy-6jh" appends="YES" id="che-yB-Ppt"/>
                                             </connections>
                                         </view>
                                         <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OCr-CW-KLR" userLabel="Text Label" customClass="OHAttributedLabel">
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="460" id="o87-sg-7wh"/>
-                                            </constraints>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
@@ -286,13 +283,13 @@
                                     <gestureRecognizers/>
                                     <constraints>
                                         <constraint firstAttribute="bottom" secondItem="vWs-h5-qXe" secondAttribute="bottom" constant="90" type="user" id="1xg-4R-Yfl"/>
-                                        <constraint firstItem="vWs-h5-qXe" firstAttribute="trailing" secondItem="byi-Ju-oOe" secondAttribute="trailing" type="user" id="3t1-Vg-xzT"/>
-                                        <constraint firstItem="vWs-h5-qXe" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" type="user" id="6OC-lJ-T4e"/>
-                                        <constraint firstItem="vWs-h5-qXe" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" type="user" id="a9j-sz-q7r"/>
+                                        <constraint firstItem="OCr-CW-KLR" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" constant="10" type="user" id="CMW-uB-Tdp"/>
+                                        <constraint firstAttribute="trailing" secondItem="OCr-CW-KLR" secondAttribute="trailing" constant="10" type="user" id="GgH-zG-JYD"/>
+                                        <constraint firstItem="vWs-h5-qXe" firstAttribute="leading" secondItem="byi-Ju-oOe" secondAttribute="leading" type="user" id="IdB-DX-lmZ"/>
                                         <constraint firstItem="vWs-h5-qXe" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" type="user" id="s7A-Zf-RFb"/>
                                         <constraint firstAttribute="bottom" secondItem="OCr-CW-KLR" secondAttribute="bottom" constant="20" type="user" id="taN-r5-y0U"/>
-                                        <constraint firstItem="OCr-CW-KLR" firstAttribute="centerX" secondItem="vWs-h5-qXe" secondAttribute="centerX" type="default" id="uGt-p0-Wh3"/>
                                         <constraint firstItem="OCr-CW-KLR" firstAttribute="top" secondItem="byi-Ju-oOe" secondAttribute="top" constant="99" type="user" id="vTK-7c-HEr"/>
+                                        <constraint firstItem="vWs-h5-qXe" firstAttribute="trailing" secondItem="byi-Ju-oOe" secondAttribute="trailing" type="user" id="w35-yc-0Ms"/>
                                     </constraints>
                                 </view>
                                 <prototypes>
