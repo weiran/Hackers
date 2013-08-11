@@ -17,7 +17,6 @@
     self.titleLabel.font = [UIFont fontWithName:kBodyFontName size:kBodyFontSize];
 }
 
-
 - (void)drawRect:(CGRect)rect {
     if ([WZTheme lightTheme]) {
         [self drawLightTheme];

@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import <IASKAppSettingsViewController.h>
+#import "CLCategoriesViewController.h"
 
 @class WZNavigationController;
 

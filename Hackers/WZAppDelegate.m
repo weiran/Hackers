@@ -8,14 +8,20 @@
 
 
 #import "WZAppDelegate.h"
-#import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 
 #import "WZNavigationController.h"
 #import "WZMenuViewController.h"
-#import "JSSlidingViewController.h"
 #import "WZTheme.h"
+#import "WZSplitCascadeViewController.h"
 
+#import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
+#import "JSSlidingViewController.h"
 #import "TSTapstream.h"
+#import "Cascade.h"
+
+@interface WZAppDelegate()
+@property (readwrite, nonatomic) JSSlidingViewController *phoneViewController;
+@end
 
 @implementation WZAppDelegate
 
@@ -26,17 +32,24 @@
     // initilise storyboard with JSSlidingViewController
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     UIStoryboard *storyboard;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    
+    if (IS_IPAD()) {
         storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard_ipad" bundle:nil];
-        self.viewController = [storyboard instantiateInitialViewController];
+        CLCascadeNavigationController *navController = [[CLCascadeNavigationController alloc] init];
+        CLCategoriesViewController *menuViewController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+        
+        self.splitCascadeViewController = [[WZSplitCascadeViewController alloc] initWithNavigationController:navController];
+        self.splitCascadeViewController.categoriesViewController = menuViewController;
+        
+        self.window.rootViewController = self.splitCascadeViewController;
     } else {
         storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
         WZMenuViewController *menuController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
         self.viewController = [[JSSlidingViewController alloc] initWithFrontViewController:menuController.mainNavViewController backViewController:menuController];
-        self.viewController.useBouncyAnimations = NO;
+        self.phoneViewController.useBouncyAnimations = NO;
+        self.window.rootViewController = self.viewController;
     }
     
-    self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     
     return YES;
@@ -63,6 +76,11 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Saves changes in the application's managed object context before the application terminates.
+}
+
+
+- (JSSlidingViewController *)phoneViewController {
+    return (JSSlidingViewController *)self.viewController;
 }
 
 @end

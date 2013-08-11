@@ -11,6 +11,9 @@
 
 #import "WZWebViewController.h"
 #import "WZActivityViewController.h"
+#import "UIViewController+CLCascade.h"
+#import "CLCascadeNavigationController.h"
+
 #define kNavigationBarHeight 44
 #define kToolbarBarHeight 44
 #define kToolBarHeight 44
@@ -37,6 +40,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewTopSpacingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewBottomSpacingConstraint;
 @property (nonatomic, strong) NSURL *defaultURL;
+@property (strong, nonatomic) UIPopoverController *activityPopoverController;
 
 @end
 
@@ -105,7 +109,11 @@
 //    UIBarButtonItem *activityIndicatorButton = [[UIBarButtonItem alloc] initWithCustomView:_activityIndicatorView];
     
     UINavigationItem *navigationItem = [[UINavigationItem alloc] initWithTitle:@""];
-    [navigationItem setLeftBarButtonItem:closeBarButton];
+    if (!IS_IPAD()) {
+        [navigationItem setLeftBarButtonItem:closeBarButton];
+    } else {
+        navigationItem.hidesBackButton = YES;
+    }
     [navigationItem setRightBarButtonItem:shareBarButton];
     
     [_navigationBar pushNavigationItem:navigationItem animated:NO];
@@ -230,7 +238,17 @@
     WZActivityViewController *activityViewController =
         [WZActivityViewController activityViewControllerWithUrl:_defaultURL
                                                            text:[_webView stringByEvaluatingJavaScriptFromString:@"document.title" ]];
-    [self presentViewController:activityViewController animated:YES completion:nil];
+    
+    if (IS_IPAD()) {
+        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        UIButton *shareButton = (UIButton *)sender;
+        [self.activityPopoverController presentPopoverFromRect:CGRectMake(shareButton.frame.origin.x, shareButton.frame.origin.y, shareButton.frame.size.width / 2, shareButton.frame.size.height / 2)
+                                                        inView:self.view
+                                      permittedArrowDirections:UIPopoverArrowDirectionUp
+                                                      animated:YES];
+    } else {
+        [self presentViewController:activityViewController animated:YES completion:nil];
+    }
 }
 
 #pragma mark - Toolbar Buttons

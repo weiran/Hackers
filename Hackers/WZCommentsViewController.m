@@ -9,6 +9,8 @@
 #import <OHAttributedLabel/OHAttributedLabel.h>
 #import <QuartzCore/QuartzCore.h>
 #import "JSSlidingViewController.h"
+#import "UIViewController+CLCascade.h"
+#import "CLCascadeNavigationController.h"
 
 #import "WZCommentsViewController.h"
 #import "WZMainViewController.h"
@@ -21,6 +23,7 @@
 #import "WZWebViewController.h"
 #import "WZNavigationController.h"
 #import "WZNotify.h"
+#import "NSString+AttributedStringForHTML.h"
 
 #define kHeaderTitleTopMargin 10
 #define kHeaderTitleBottomMargin 44
@@ -40,6 +43,7 @@
 @property (strong, nonatomic) IBOutlet UISwipeGestureRecognizer *swipeBackGestureRecognizer;
 @property (weak, nonatomic) UIView *webView;
 @property (strong, nonatomic) WZWebViewController *webViewController;
+@property (strong, nonatomic) UIPopoverController *activityPopoverController;
 
 @property (weak, nonatomic) IBOutlet UIView *activityIndicatorView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *activityIndicatorViewTopSpacing;
@@ -63,7 +67,6 @@
 @implementation WZCommentsViewController
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
     
     [self setupOrientationNotifications];
     [self setupActivityIndicatorView];
@@ -73,8 +76,14 @@
     [self fetchComments];
     [self showDefaultView];
     
+    if (IS_IPAD()) {
+        self.backButton.hidden = YES;
+    }
+    
     _webViewController.webView.scrollView.scrollsToTop = NO;
     _tableView.scrollsToTop = YES;
+    
+    [super viewDidLoad];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -86,7 +95,9 @@
         [self segmentDidChange:_segmentedControl];
     });
     
-    [[[WZDefaults appDelegate] viewController] setLocked:YES];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        [[[WZDefaults appDelegate] phoneViewController] setLocked:YES];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -100,7 +111,7 @@
         [self removeOrientationNotifications];
         _isNavigatingBack = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-        [[[WZDefaults appDelegate] viewController] setLocked:NO];
+        [[[WZDefaults appDelegate] phoneViewController] setLocked:NO];
     }
 }
 
@@ -163,6 +174,7 @@
 //    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 //    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
 //    BOOL webViewVisible = _segmentedControl.selectedSegmentIndex == 1;
+    [self.tableView reloadData];
 }
 
 - (void)showDefaultView {
@@ -189,19 +201,21 @@
 }
 
 - (void)setupSegmentedController {
-    if ([self postIsAskOrJob]) { // hide if post is ASK HN
-        _segmentedControl.hidden = YES;
-    }
+    if (!IS_IPAD()) {
+        if ([self postIsAskOrJob]) { // hide if post is ASK HN
+            _segmentedControl.hidden = YES;
+        }
 
-    NSDictionary *textAttributes =  @{
-                                      UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
-                                      UITextAttributeTextColor: [WZTheme titleTextColor],
-                                      UITextAttributeTextShadowColor: [UIColor clearColor]
-                                    };
-    _segmentedControl.tintColor = [UIColor blackColor];
-    [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
-    
-    [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
+        NSDictionary *textAttributes =  @{
+                                          UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
+                                          UITextAttributeTextColor: [WZTheme titleTextColor],
+                                          UITextAttributeTextShadowColor: [UIColor clearColor]
+                                        };
+        _segmentedControl.tintColor = [UIColor blackColor];
+        [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
+        
+        [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
+    }
 }
 
 - (void)setupTableView {
@@ -234,11 +248,14 @@
     
     NSDictionary *viewDictionary = @{ @"webView": _webView };
     
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[webView(<=504)]"
+    NSInteger width = IS_IPAD() ? 480 : 320;
+    NSInteger height = IS_IPAD() ? 1000 : 504;
+    
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[webView(<=%d)]", height]
                                                                                      options:0
                                                                                      metrics:nil
                                                                                        views:viewDictionary][0];
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"[webView(>=320)]"
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[webView(>=%d)]", width]
                                                                                        options:0
                                                                                        metrics:nil
                                                                                          views:viewDictionary][0];
@@ -301,15 +318,17 @@
     }
     
     // calculate heights
+    CGFloat labelWidth = IS_IPAD() ? 473 : 300;
     CGSize titleLabelSize = [_post.title sizeWithFont:[UIFont fontWithName:kTitleFontName size:kTitleFontSize]
-                                    constrainedToSize:CGSizeMake(300, CGFLOAT_MAX)
+                                    constrainedToSize:CGSizeMake(labelWidth, CGFLOAT_MAX)
                                         lineBreakMode:NSLineBreakByWordWrapping];
     CGFloat titleHeight = titleLabelSize.height;
     
     CGFloat contentHeight = 0; // total height
     // set header details container frame to match contents height
     CGRect headerDetailsContainerViewFrame = _headerDetailsContainerView.frame;
-    contentHeight = kHeaderTitleTopMargin + titleHeight + kHeaderTitleBottomMargin; // add details
+    NSInteger cellPadding = IS_IPAD() ? 72 : 53;
+    contentHeight = titleHeight + cellPadding; // add details
     headerDetailsContainerViewFrame.size.height = contentHeight;
     
     CGFloat headerTextViewHeight = 0;
@@ -317,11 +336,12 @@
     // set the post content (AskHN or Job)
     CGFloat headerTextViewBottomSpacingConstant = 0;
     if (_post.content) {
-        headerTextViewBottomSpacingConstant = kHeaderTextBottomMargin;
+        NSInteger bottomMargin = IS_IPAD() ? 20 : kHeaderTextBottomMargin;
+        headerTextViewBottomSpacingConstant = bottomMargin;
         _headerTextView.hidden = NO;
         _headerTextView.delegate = self;
         _headerTextView.attributedText = _post.attributedContent;
-        headerTextViewHeight = [_post contentHeightForWidth:kHeaderTextWidth] + kHeaderTextBottomMargin;
+        headerTextViewHeight = [_post contentHeightForWidth:labelWidth] + bottomMargin;
         contentHeight += headerTextViewHeight;
     }
     
@@ -344,7 +364,7 @@
 }
 
 - (void)layoutTableViewBackgrounds {
-    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
+    UIView *topView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, self.view.frame.size.width, 480)];
     topView.backgroundColor = [WZTheme navigationColor];
     [_tableView addSubview:topView];
 }
@@ -422,7 +442,13 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     WZCommentModel *comment = _comments[indexPath.row];
-    return comment.cellHeight.floatValue;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
+    if (isLandscape) {
+        return comment.cellHeightLandscape.floatValue;
+    } else {
+        return comment.cellHeight.floatValue;
+    }
 }
 
 #pragma mark - WZCommentURLTappedDelegate & HeaderTextView link delegate
@@ -441,11 +467,17 @@
     }
     
     WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
-    [self presentViewController:webViewController animated:YES completion:nil];
     
-    _tableView.scrollsToTop = NO;
-    webViewController.webView.scrollView.scrollsToTop = YES;
+    if (IS_IPAD()) {
+        [self.cascadeNavigationController addViewController:webViewController sender:self.navigationController animated:YES viewSize:CLViewSizeWider];
+    } else {
+        WZWebViewController *webViewController = [[WZWebViewController alloc] initWithURL:url];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webViewPopupClosed) name:WZWebViewControllerDismissed object:nil];
+        [self presentViewController:webViewController animated:YES completion:nil];
+        
+        _tableView.scrollsToTop = NO;
+        webViewController.webView.scrollView.scrollsToTop = YES;
+    }
 }
 
 - (void)webViewPopupClosed {
@@ -518,13 +550,25 @@
 
 - (IBAction)showActivityView:(id)sender {
     WZActivityViewController *activityViewController = [WZActivityViewController activityViewControllerWithUrl:[NSURL URLWithString:_post.url] text:_post.title];
-    [self presentViewController:activityViewController animated:YES completion:nil];
+    if (IS_IPAD()) {
+        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        [self.activityPopoverController presentPopoverFromRect:CGRectMake(self.shareButton.frame.origin.x, self.shareButton.frame.origin.y, 0, 0)
+                                                        inView:self.view
+                                      permittedArrowDirections:UIPopoverArrowDirectionUp
+                                                      animated:YES];
+    } else {
+        [self presentViewController:activityViewController animated:YES completion:nil];
+    }
 }
 
 - (IBAction)headerViewTapped:(id)sender {
     if (![self postIsAskOrJob]) {
-        [_segmentedControl setSelectedSegmentIndex:1];
-        [self segmentDidChange:_segmentedControl];
+        if (IS_IPAD()) {
+            [self tappedLink:[NSURL URLWithString:_post.url]];
+        } else {
+            [_segmentedControl setSelectedSegmentIndex:1];
+            [self segmentDidChange:_segmentedControl];
+        }
     }
 }
 

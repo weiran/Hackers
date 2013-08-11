@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSString* user;
 @property (nonatomic, strong) NSArray* comments;
 @property (nonatomic, strong) NSNumber *cellHeight;
+@property (nonatomic, strong) NSNumber *cellHeightLandscape;
 @property (nonatomic) BOOL expanded;
 
 - (void)updateAttributes:(NSDictionary *)attributes;
