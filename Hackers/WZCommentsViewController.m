@@ -201,19 +201,21 @@
 }
 
 - (void)setupSegmentedController {
-    if ([self postIsAskOrJob]) { // hide if post is ASK HN
-        _segmentedControl.hidden = YES;
-    }
+    if (!IS_IPAD()) {
+        if ([self postIsAskOrJob]) { // hide if post is ASK HN
+            _segmentedControl.hidden = YES;
+        }
 
-    NSDictionary *textAttributes =  @{
-                                      UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
-                                      UITextAttributeTextColor: [WZTheme titleTextColor],
-                                      UITextAttributeTextShadowColor: [UIColor clearColor]
-                                    };
-    _segmentedControl.tintColor = [UIColor blackColor];
-    [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
-    
-    [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
+        NSDictionary *textAttributes =  @{
+                                          UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
+                                          UITextAttributeTextColor: [WZTheme titleTextColor],
+                                          UITextAttributeTextShadowColor: [UIColor clearColor]
+                                        };
+        _segmentedControl.tintColor = [UIColor blackColor];
+        [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
+        
+        [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
+    }
 }
 
 - (void)setupTableView {
@@ -561,8 +563,12 @@
 
 - (IBAction)headerViewTapped:(id)sender {
     if (![self postIsAskOrJob]) {
-        [_segmentedControl setSelectedSegmentIndex:1];
-        [self segmentDidChange:_segmentedControl];
+        if (IS_IPAD()) {
+            [self tappedLink:[NSURL URLWithString:_post.url]];
+        } else {
+            [_segmentedControl setSelectedSegmentIndex:1];
+            [self segmentDidChange:_segmentedControl];
+        }
     }
 }
 

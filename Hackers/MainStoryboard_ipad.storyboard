@@ -412,17 +412,6 @@
                                 </connections>
                             </button>
                         </barButtonItem>
-                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="Zko-nc-fi0">
-                            <rect key="frame" x="154" y="7" width="171" height="30"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="171" type="user" id="1g9-Ff-MVF"/>
-                            </constraints>
-                            <segments>
-                                <segment title="Comments"/>
-                                <segment title="Link"/>
-                            </segments>
-                            <color key="tintColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
-                        </segmentedControl>
                         <barButtonItem key="rightBarButtonItem" style="plain" id="td4-45-Pfw">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Okv-mq-4RQ">
                                 <rect key="frame" x="429" y="0.0" width="44" height="44"/>
@@ -455,7 +444,6 @@
                         <outlet property="headerTextViewTopConstraint" destination="vTK-7c-HEr" id="6tL-TY-Nvc"/>
                         <outlet property="headerTitleLabel" destination="Id7-HX-F73" id="cbv-GW-Pae"/>
                         <outlet property="headerView" destination="byi-Ju-oOe" id="9aZ-Zg-Qq5"/>
-                        <outlet property="segmentedControl" destination="Zko-nc-fi0" id="FxY-5h-deS"/>
                         <outlet property="shareButton" destination="Okv-mq-4RQ" id="oIQ-u2-dwy"/>
                         <outlet property="swipeBackGestureRecognizer" destination="cFH-gD-048" id="DaK-gJ-iQn"/>
                         <outlet property="tableView" destination="Smx-0F-YVN" id="Heb-nU-0s9"/>
@@ -632,100 +620,6 @@
         <image name="share-icon.png" width="23" height="18"/>
         <image name="unread-badge.png" width="12" height="12"/>
     </resources>
-    <classes>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="OHAttributedLabel" superclassName="UILabel">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
-            <relationships>
-                <relationship kind="outlet" name="delegate"/>
-            </relationships>
-        </class>
-        <class className="WZButton" superclassName="UIButton">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZButton.h"/>
-        </class>
-        <class className="WZCommentCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
-            <relationships>
-                <relationship kind="action" name="showReplies:"/>
-                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
-                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="WZCommentsViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="backButtonTapped:"/>
-                <relationship kind="action" name="headerViewTapped:"/>
-                <relationship kind="action" name="showActivityView:"/>
-                <relationship kind="action" name="swipedBack:"/>
-                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="headerDetailViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerDetailsContainerView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerTextView" candidateClass="OHAttributedLabel"/>
-                <relationship kind="outlet" name="headerTextViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerTextViewTopConstraint" candidateClass="NSLayoutConstraint"/>
-                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="segmentedControl" candidateClass="UISegmentedControl"/>
-                <relationship kind="outlet" name="shareButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="swipeBackGestureRecognizer" candidateClass="UISwipeGestureRecognizer"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="WZMainViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="menuButtonPressed:"/>
-                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-                <relationship kind="outlet" name="menuButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="WZMenuCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
-        </class>
-        <class className="WZMenuHeaderView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuHeaderView.h"/>
-        </class>
-        <class className="WZMenuViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="askCell" candidateClass="UITableViewCell"/>
-                <relationship kind="outlet" name="creditsCell" candidateClass="UITableViewCell"/>
-                <relationship kind="outlet" name="settingsCell" candidateClass="UITableViewCell"/>
-                <relationship kind="outlet" name="showNewCell" candidateClass="UITableViewCell"/>
-                <relationship kind="outlet" name="topCell" candidateClass="UITableViewCell"/>
-            </relationships>
-        </class>
-        <class className="WZNavigationBar" superclassName="UINavigationBar">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
-        </class>
-        <class className="WZNavigationController" superclassName="UINavigationController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
-        </class>
-        <class className="WZPostCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
-            <relationships>
-                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="readBadgeImageView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
