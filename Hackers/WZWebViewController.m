@@ -219,13 +219,15 @@
 - (void)didRotate:(NSNotification *)notification {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     BOOL isLandscape = UIInterfaceOrientationIsLandscape(orientation);
-
-    _navigationBar.hidden = _navigationBarHidden || isLandscape;
-    _toolbar.hidden = _toolbarHidden || isLandscape;
-    _navigationBarCurrentlyHidden = _navigationBarHidden || isLandscape;
-    _toolbarCurrentlyHidden = _toolbarHidden || isLandscape;
     
-    [self layoutWebViewConstraints];
+    if (!IS_IPAD()) {
+        _navigationBar.hidden = _navigationBarHidden || isLandscape;
+        _toolbar.hidden = _toolbarHidden || isLandscape;
+        _navigationBarCurrentlyHidden = _navigationBarHidden || isLandscape;
+        _toolbarCurrentlyHidden = _toolbarHidden || isLandscape;
+        [self layoutWebViewConstraints];
+    }
+
 }
 
 #pragma mark - Navigation Bar Buttons
