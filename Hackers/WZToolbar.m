@@ -18,10 +18,10 @@
 }
 
 - (void)setTheme {
-    self.layer.shadowColor = [[UIColor blackColor] CGColor];
-    self.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
-    self.layer.shadowRadius = 2.0f;
-    self.layer.shadowOpacity = 1.0f;
+//    self.layer.shadowColor = [[UIColor blackColor] CGColor];
+//    self.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
+//    self.layer.shadowRadius = 2.0f;
+//    self.layer.shadowOpacity = 1.0f;
 }
 
 - (void)drawRect:(CGRect)rect {
