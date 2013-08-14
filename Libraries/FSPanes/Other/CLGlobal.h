@@ -8,7 +8,7 @@
 
 
 // here you can change categories view with
-#define CATEGORIES_VIEW_WIDTH 289.0f
+#define CATEGORIES_VIEW_WIDTH 260
 
 // enums
 typedef enum {
