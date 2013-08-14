@@ -40,6 +40,7 @@
                                    (id)baseGradientBottomColor.CGColor, nil];
     CGFloat baseGradientLocations[] = {0, 1};
     CGGradientRef baseGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)baseGradientColors, baseGradientLocations);
+    CGColorSpaceRelease(colorSpace);
     
     //// Shadow Declarations
 //    UIColor* buttonShadow = iconShadow;
@@ -65,7 +66,7 @@
                                     0);
         CGContextEndTransparencyLayer(context);
         CGContextRestoreGState(context);
-        
+        CGGradientRelease(baseGradient);
     }
 }
 
