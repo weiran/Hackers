@@ -27,9 +27,10 @@ static NSString* const modelName = @"HackersDataModel";
 
 + (id)shared {
     static WZHackersData *__instance = nil;
-    if (__instance == nil) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         __instance = [WZHackersData new];
-    }
+    });
     return __instance;
 }
 
@@ -37,7 +38,7 @@ static NSString* const modelName = @"HackersDataModel";
 
 - (NSManagedObjectContext *)context {
     if (_context == nil) {
-        _context = [NSManagedObjectContext new];
+        _context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
         _context.persistentStoreCoordinator = [self persistentStoreCoordinator];
     }
     return _context;
@@ -196,9 +197,9 @@ static NSString* const modelName = @"HackersDataModel";
 #pragma mark - Modify data
 
 - (void)addRead:(NSNumber *)id {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSManagedObjectContext *context = [self context];
-
+    NSManagedObjectContext *context = [self context];
+    
+    [context performBlock:^{
         WZRead *read = [WZRead insertInManagedObjectContext:context];
         read.id = id;
         
@@ -215,16 +216,18 @@ static NSString* const modelName = @"HackersDataModel";
                 NSLog(@"  %@", [error userInfo]);
             }
         }
-    });
+    }];
 }
 
 - (void)updatePost:(NSInteger)postID withContent:(NSString *)content {
     NSManagedObjectContext *context = [self context];
-    WZPost *post = [self fetchPostWithID:postID];
-    if (post) {
-        post.content = content;
-        [context save:nil];
-    }
+    [context performBlock:^{
+        WZPost *post = [self fetchPostWithID:postID];
+        if (post) {
+            post.content = content;
+            [context save:nil];
+        }
+    }];
 }
 
 @end

@@ -125,33 +125,41 @@
             [WZNotify showMessage:@"Failed getting comments" inView:self.navigationController.view duration:2];
         }
         
-        // update post model if content exists
-        id content = items[@"content"];
-        if (content != [NSNull null]) {
-            [[WZHackersData shared] updatePost:_post.id withContent:content];
-            _post.content = content;
-            [self layoutTableViewHeader];
-        }
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(queue, ^{
+            // update post model if content exists
+            id content = items[@"content"];
+            if (content != [NSNull null]) {
+                [[WZHackersData shared] updatePost:_post.id withContent:content];
+                _post.content = content;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self layoutTableViewHeader];
+                });
+            }
+        });
         
-        // fetch comments into array
-        NSDictionary *comments = items[@"comments"];
-        
-        NSMutableArray *newComments = [NSMutableArray array];
-        for (NSDictionary *commentDictionary in comments) {
-            WZCommentModel *comment = [[WZCommentModel alloc] init];
-            [comment updateAttributes:commentDictionary];
-            [newComments addObject:comment];
-        }
-        _comments = newComments;
-        _activityIndicatorView.hidden = YES;
-        
-        if (_segmentedControl.selectedSegmentIndex == 0) {
-            _tableView.hidden = NO;
-        }
-        
-        _tableView.scrollEnabled = YES;
-        
-        [_tableView reloadData];
+        dispatch_async(queue, ^{
+            // fetch comments into array
+            NSDictionary *comments = items[@"comments"];
+            
+            NSMutableArray *newComments = [NSMutableArray array];
+            for (NSDictionary *commentDictionary in comments) {
+                WZCommentModel *comment = [[WZCommentModel alloc] init];
+                [comment updateAttributes:commentDictionary];
+                [newComments addObject:comment];
+            }
+            _comments = newComments;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _activityIndicatorView.hidden = YES;
+                if (_segmentedControl.selectedSegmentIndex == 0) {
+                    _tableView.hidden = NO;
+                }
+                
+                _tableView.scrollEnabled = YES;
+                [_tableView reloadData];
+            });
+        });
     }];
 }
 
