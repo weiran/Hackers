@@ -146,4 +146,14 @@
     });
 }
 
+#pragma mark - NNNetwork Handling
+
+- (void)sendToPocketUrl:(NSString *)url {
+    
+}
+
+- (void)sendToReadabilityUrl:(NSString *)url {
+    
+}
+
 @end

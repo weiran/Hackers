@@ -1,17 +1,16 @@
 //
-//  WZInstapaperActivity.m
+//  WZReadabilityActivity.m
 //  Hackers
 //
-//  Created by Weiran Zhang on 27/04/2013.
+//  Created by Weiran Zhang on 17/08/2013.
 //  Copyright (c) 2013 Weiran Zhang. All rights reserved.
 //
 
-#import "WZInstapaperActivity.h"
-#import "WZHackersDataAPI.h"
+#import "WZReadabilityActivity.h"
+
 #import "WZAccountManager.h"
 
-
-@implementation WZInstapaperActivity
+@implementation WZReadabilityActivity
 
 
 - (NSString *)activityType {
@@ -31,7 +30,6 @@
     [[WZAccountManager shared] sendURL:self.URL.absoluteString toService:kSettingsInstapaper];
     [self activityDidFinish:YES];
 }
-
 
 
 @end

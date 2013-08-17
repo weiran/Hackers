@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WZPinboardActivity : UIActivity
+#import "WZActivity.h"
+
+@interface WZPinboardActivity : WZActivity
 
 @end

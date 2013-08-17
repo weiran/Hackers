@@ -16,7 +16,6 @@
 
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 #import "JSSlidingViewController.h"
-#import "TSTapstream.h"
 #import "Cascade.h"
 #import "NNNetwork.h"
 

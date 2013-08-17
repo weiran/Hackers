@@ -11,7 +11,6 @@
 #import "WZAccountManager.h"
 
 @interface WZPinboardActivity ()
-@property (nonatomic, strong) NSURL *URL;
 @property (nonatomic, strong) NSString *title;
 @end
 
@@ -30,28 +29,8 @@
     return [UIImage imageNamed:@"pinboard-icon"];
 }
 
-- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
-	for (id activityItem in activityItems) {
-		if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:activityItem]) {
-			return YES;
-		}
-	}
-	
-	return NO;
-}
-
-- (void)prepareWithActivityItems:(NSArray *)activityItems {
-	for (id activityItem in activityItems) {
-		if ([activityItem isKindOfClass:[NSURL class]]) {
-			_URL = activityItem;
-		} else if ([activityItem isKindOfClass:[NSString class]]) {
-            _title = activityItem;
-        }
-	}
-}
-
 - (void)performActivity {
-    [[WZAccountManager shared] sendURL:_URL.absoluteString title:_title toService:kSettingsPinboard];
+    [[WZAccountManager shared] sendURL:self.URL.absoluteString title:self.title toService:kSettingsPinboard];
     [self activityDidFinish:YES];
 }
 

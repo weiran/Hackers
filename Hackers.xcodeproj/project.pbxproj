@@ -89,6 +89,9 @@
 		247A2D6816AC57DB00534229 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6516AC57DB00534229 /* ImageIO.framework */; };
 		247A2D6916AC57DB00534229 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6616AC57DB00534229 /* libxml2.dylib */; };
 		247A2D6A16AC57DB00534229 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 247A2D6716AC57DB00534229 /* MobileCoreServices.framework */; };
+		2481933917BFB47800FB3EC8 /* WZPocketActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 2481933817BFB47800FB3EC8 /* WZPocketActivity.m */; };
+		2481933C17BFB48600FB3EC8 /* WZReadabilityActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 2481933B17BFB48600FB3EC8 /* WZReadabilityActivity.m */; };
+		2481933F17BFB4F400FB3EC8 /* WZActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 2481933E17BFB4F400FB3EC8 /* WZActivity.m */; };
 		2484385216C11B4F001D2AA0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484384F16C11B4F001D2AA0 /* Default-568h@2x.png */; };
 		2484385316C11B4F001D2AA0 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385016C11B4F001D2AA0 /* Default.png */; };
 		2484385416C11B4F001D2AA0 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2484385116C11B4F001D2AA0 /* Default@2x.png */; };
@@ -270,6 +273,12 @@
 		247A2D6516AC57DB00534229 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		247A2D6616AC57DB00534229 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		247A2D6716AC57DB00534229 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		2481933717BFB47800FB3EC8 /* WZPocketActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZPocketActivity.h; sourceTree = "<group>"; };
+		2481933817BFB47800FB3EC8 /* WZPocketActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZPocketActivity.m; sourceTree = "<group>"; };
+		2481933A17BFB48500FB3EC8 /* WZReadabilityActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZReadabilityActivity.h; sourceTree = "<group>"; };
+		2481933B17BFB48600FB3EC8 /* WZReadabilityActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZReadabilityActivity.m; sourceTree = "<group>"; };
+		2481933D17BFB4F300FB3EC8 /* WZActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = WZActivity.h; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
+		2481933E17BFB4F400FB3EC8 /* WZActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = WZActivity.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		2484384F16C11B4F001D2AA0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		2484385016C11B4F001D2AA0 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		2484385116C11B4F001D2AA0 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -689,10 +698,16 @@
 		24374A24172C19F6007762FC /* Activities */ = {
 			isa = PBXGroup;
 			children = (
+				2481933D17BFB4F300FB3EC8 /* WZActivity.h */,
+				2481933E17BFB4F400FB3EC8 /* WZActivity.m */,
 				24374A25172C1A13007762FC /* WZInstapaperActivity.h */,
 				24374A26172C1A13007762FC /* WZInstapaperActivity.m */,
 				243D1F3D1732D0930033BC0F /* WZPinboardActivity.h */,
 				243D1F3E1732D0930033BC0F /* WZPinboardActivity.m */,
+				2481933717BFB47800FB3EC8 /* WZPocketActivity.h */,
+				2481933817BFB47800FB3EC8 /* WZPocketActivity.m */,
+				2481933A17BFB48500FB3EC8 /* WZReadabilityActivity.h */,
+				2481933B17BFB48600FB3EC8 /* WZReadabilityActivity.m */,
 			);
 			name = Activities;
 			sourceTree = "<group>";
@@ -1128,6 +1143,9 @@
 				2428FE4017A525070063C4C3 /* UIViewController+CLCascade.m in Sources */,
 				2428FE4117A525070063C4C3 /* UIViewController+CLSegmentedView.m in Sources */,
 				2428FE4617A5271C0063C4C3 /* WZSplitCascadeViewController.m in Sources */,
+				2481933917BFB47800FB3EC8 /* WZPocketActivity.m in Sources */,
+				2481933C17BFB48600FB3EC8 /* WZReadabilityActivity.m in Sources */,
+				2481933F17BFB4F400FB3EC8 /* WZActivity.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
