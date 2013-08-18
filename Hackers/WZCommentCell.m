@@ -25,7 +25,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self.showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateNormal];
-    [self.showRepliesButton setTitleColor:[WZTheme mainTextColor] forState:UIControlStateHighlighted];
+    [self.showRepliesButton setTitleColor:[WZTheme mainTextColorInverted] forState:UIControlStateHighlighted];
     [self.showRepliesButton setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
 }
 

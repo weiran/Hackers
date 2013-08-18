@@ -21,6 +21,7 @@
 + (UIColor *)subtitleTextColor;
 + (UIColor *)detailTextColor;
 + (UIColor *)mainTextColor;
++ (UIColor *)mainTextColorInverted;
 + (UIColor *)userTextColor;
 
 + (UIColor *)backgroundColor;
@@ -31,7 +32,6 @@
 + (UIColor *)navigationColor;
 
 + (UIColor *)segmentBackgroundColor;
-+ (UIColor *)segmentSelectedBackgroundColor;
 
 + (UIColor *)buttonTitleShadowColor;
 

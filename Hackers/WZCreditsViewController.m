@@ -29,6 +29,8 @@
     NIKFontAwesomeIconFactory *factory = [NIKFontAwesomeIconFactory buttonIconFactory];
     [self.rateButton setImage:[factory createImageForIcon:NIKFontAwesomeIconStar] forState:UIControlStateNormal];
     [self.feedbackButton setImage:[factory createImageForIcon:NIKFontAwesomeIconEnvelope] forState:UIControlStateNormal];
+    [self.rateButton setTitleColor:[WZTheme titleTextColor] forState:UIControlStateNormal];
+    [self.feedbackButton setTitleColor:[WZTheme titleTextColor] forState:UIControlStateNormal];
 }
 
 - (IBAction)rate:(id)sender {

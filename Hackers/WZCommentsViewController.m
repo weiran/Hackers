@@ -215,13 +215,19 @@
         }
 
         NSDictionary *textAttributes =  @{
-                                          UITextAttributeFont: [UIFont fontWithName:kTitleFontName size:13],
-                                          UITextAttributeTextColor: [WZTheme titleTextColor],
-                                          UITextAttributeTextShadowColor: [UIColor clearColor]
-                                        };
-        _segmentedControl.tintColor = [UIColor blackColor];
-        [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
+            UITextAttributeFont: [UIFont fontWithName:kBodyFontName size:13],
+            UITextAttributeTextColor: [WZTheme titleTextColor],
+            UITextAttributeTextShadowColor: [UIColor clearColor]
+        };
         
+        NSDictionary *selectedTextAttributes =  @{
+            UITextAttributeFont: [UIFont fontWithName:kBodyFontName size:13],
+            UITextAttributeTextColor: [WZTheme navigationColor],
+            UITextAttributeTextShadowColor: [UIColor clearColor]
+        };
+        
+        [_segmentedControl setTitleTextAttributes:textAttributes forState:UIControlStateNormal];
+        [_segmentedControl setTitleTextAttributes:selectedTextAttributes forState:UIControlStateHighlighted];
         [_segmentedControl addTarget:self action:@selector(segmentDidChange:) forControlEvents:UIControlEventValueChanged];
     }
 }
@@ -406,15 +412,6 @@
             navigationController.allowsRotation = YES;
         }
         break;
-    }
-    
-    for (int i = 0; i < segmentedControl.subviews.count; i++) {
-        id segment = segmentedControl.subviews[i];
-        if ([segment isSelected]) {
-            [segment setTintColor:[WZTheme segmentSelectedBackgroundColor]];
-        } else {
-            [segment setTintColor:[WZTheme segmentBackgroundColor]];
-        }
     }
 }
 

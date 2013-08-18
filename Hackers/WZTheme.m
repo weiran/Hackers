@@ -102,6 +102,16 @@
     }
 }
 
++ (UIColor *)mainTextColorInverted {
+    if ([self lightTheme]) {
+        return [UIColor colorWithWhite:1 alpha:1.0];
+    } else {
+        static UIColor *color = nil;
+        if (!color) color = [UIColor colorWithWhite:0 alpha:1.0];
+        return color;
+    }
+}
+
 + (UIColor *)userTextColor {
     if ([self lightTheme]) {
         static UIColor *lightUserTextColor = nil;
@@ -176,23 +186,11 @@
 + (UIColor *)segmentBackgroundColor {
     if ([self lightTheme]) {
         static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.95 alpha:1];
+        if (!color) color = [UIColor colorWithWhite:0.6 alpha:1];
         return color;
     } else {
         static UIColor *color = nil;
         if (!color) color = [UIColor colorWithWhite:0.3 alpha:1];
-        return color;
-    }
-}
-
-+ (UIColor *)segmentSelectedBackgroundColor {
-    if ([self lightTheme]) {
-        static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.82 alpha:1];
-        return color;
-    } else {
-        static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.0 alpha:1];
         return color;
     }
 }
