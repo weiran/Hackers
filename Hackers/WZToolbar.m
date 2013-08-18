@@ -36,6 +36,14 @@
     [rectanglePath closePath];
     [fillColor setFill];
     [rectanglePath fill];
+    
+    UIBezierPath *bottomBorderPath = [UIBezierPath bezierPath];
+    [bottomBorderPath moveToPoint:CGPointMake(0, 0)];
+    [bottomBorderPath addLineToPoint:CGPointMake(frame.size.width, 0)];
+    [bottomBorderPath closePath];
+    [[WZTheme separatorColor] setStroke];
+    [bottomBorderPath stroke];
+
 }
 
 @end

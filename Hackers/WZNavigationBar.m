@@ -26,12 +26,11 @@
 //    self.layer.shadowRadius = 2.0f;
 //    self.layer.shadowOpacity = 1.0f;
     
-    
     self.titleTextAttributes = @{
-                                 UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
-                                 UITextAttributeTextColor : [WZTheme titleTextColor],
-                                 UITextAttributeTextShadowColor  : [UIColor clearColor]
-                                 };
+        UITextAttributeFont : [UIFont fontWithName:kNavigationFontName size:kNavigationFontSize],
+        UITextAttributeTextColor : [WZTheme titleTextColor],
+        UITextAttributeTextShadowColor  : [UIColor clearColor]
+    };
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -42,10 +41,17 @@
     CGRect frame = self.bounds;
     
     //// Rectangle Drawing
-    UIBezierPath* rectanglePath = [UIBezierPath bezierPathWithRoundedRect: CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(frame), CGRectGetHeight(frame)) byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii: CGSizeMake(3, 3)];
+    UIBezierPath *rectanglePath = [UIBezierPath bezierPathWithRoundedRect: CGRectMake(CGRectGetMinX(frame), CGRectGetMinY(frame), CGRectGetWidth(frame), CGRectGetHeight(frame)) byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii: CGSizeMake(3, 3)];
     [rectanglePath closePath];
     [fillColor setFill];
     [rectanglePath fill];
+    
+    UIBezierPath *bottomBorderPath = [UIBezierPath bezierPath];
+    [bottomBorderPath moveToPoint:CGPointMake(0, frame.size.height)];
+    [bottomBorderPath addLineToPoint:CGPointMake(frame.size.width, frame.size.height)];
+    [bottomBorderPath closePath];
+    [[WZTheme separatorColor] setStroke];
+    [bottomBorderPath stroke];
 }
 
 @end
