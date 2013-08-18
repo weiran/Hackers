@@ -157,6 +157,7 @@
 		24EAA5F6164807E200105FE1 /* WZPostCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24EAA5F5164807E200105FE1 /* WZPostCell.m */; };
 		24EAA60F1649647B00105FE1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24EAA60E1649647B00105FE1 /* QuartzCore.framework */; };
 		24EAA61C164967DF00105FE1 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24EAA61B164967DF00105FE1 /* MessageUI.framework */; };
+		24FBEF9E17C11AE800B8B670 /* WZCreditsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24FBEF9D17C11AE800B8B670 /* WZCreditsViewController.m */; };
 		DFCC5074B30047A392BC2180 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECD4604DC1E846869F39B01C /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -387,6 +388,8 @@
 		24EAA5F5164807E200105FE1 /* WZPostCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZPostCell.m; sourceTree = "<group>"; };
 		24EAA60E1649647B00105FE1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		24EAA61B164967DF00105FE1 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		24FBEF9C17C11AE800B8B670 /* WZCreditsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZCreditsViewController.h; sourceTree = "<group>"; };
+		24FBEF9D17C11AE800B8B670 /* WZCreditsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZCreditsViewController.m; sourceTree = "<group>"; };
 		ECD4604DC1E846869F39B01C /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -848,6 +851,8 @@
 			children = (
 				24DF0C8B171D99380095491D /* WZMenuViewController.h */,
 				24DF0C8C171D99380095491D /* WZMenuViewController.m */,
+				24FBEF9C17C11AE800B8B670 /* WZCreditsViewController.h */,
+				24FBEF9D17C11AE800B8B670 /* WZCreditsViewController.m */,
 			);
 			name = Menu;
 			sourceTree = "<group>";
@@ -1146,6 +1151,7 @@
 				2481933917BFB47800FB3EC8 /* WZPocketActivity.m in Sources */,
 				2481933C17BFB48600FB3EC8 /* WZReadabilityActivity.m in Sources */,
 				2481933F17BFB4F400FB3EC8 /* WZActivity.m in Sources */,
+				24FBEF9E17C11AE800B8B670 /* WZCreditsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

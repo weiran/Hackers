@@ -471,16 +471,11 @@
                         <rect key="frame" x="0.0" y="20" width="300" height="1004"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="Eoe-Kl-ilE" customClass="WZMenuHeaderView">
-                            <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        </view>
                         <sections>
                             <tableViewSection id="QCf-lk-6hq">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="ZD3-xT-C2A" style="IBUITableViewCellStyleDefault" id="I3W-a7-8RF" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="33" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -496,7 +491,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="21H-q6-j0M" style="IBUITableViewCellStyleDefault" id="gVA-YC-Ria" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="77" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="44" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -512,7 +507,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="7RY-SO-Vc8" style="IBUITableViewCellStyleDefault" id="YnB-gE-mx6" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="121" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="88" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -528,7 +523,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="mvb-TW-QXj" style="IBUITableViewCellStyleDefault" id="VUe-uC-auU" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="165" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="132" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -545,7 +540,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="yhH-ab-FHA" style="IBUITableViewCellStyleDefault" id="2rq-xJ-icx" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="209" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="176" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -562,7 +557,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="sDI-2d-DBm" style="IBUITableViewCellStyleDefault" id="WDA-o0-anc" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="253" width="300" height="44"/>
+                                        <rect key="frame" x="0.0" y="220" width="300" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
@@ -614,6 +609,125 @@
             </objects>
             <point key="canvasLocation" x="702" y="-938"/>
         </scene>
+        <!--Credits View Controller - Credits-->
+        <scene sceneID="YAb-6y-zsv">
+            <objects>
+                <viewController storyboardIdentifier="CreditsViewController" title="Credits" id="FVk-aP-pus" customClass="WZCreditsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="75t-Q2-spR">
+                        <rect key="frame" x="0.0" y="20" width="768" height="1004"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="HACKERS" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HXs-cF-pSy">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="53" id="gul-AR-i4J"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="64"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="by Weiran Zhang" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PJ5-Tg-3dp">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="8Pe-as-Uuk"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wAe-2T-fYU">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="116" id="0Vu-nU-PBB"/>
+                                    <constraint firstAttribute="height" constant="36" id="wrC-ex-nu9"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
+                                <state key="normal" title="weiranzhang.com">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="viewWebsite:" destination="FVk-aP-pus" eventType="touchUpInside" id="3nA-OK-IWs"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3zX-xo-fZL" customClass="WZButton">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43" type="user" id="jDA-Hb-tnK"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="14"/>
+                                <state key="normal" title="Rate Hackers">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="rate:" destination="FVk-aP-pus" eventType="touchUpInside" id="wna-WP-u3j"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PXf-T9-obh">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="65" id="DyS-Ey-tYT"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
+                                <state key="normal" title="@weiran">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="viewTwitter:" destination="FVk-aP-pus" eventType="touchUpInside" id="Bz6-cc-vHw"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8mk-iV-ARG" customClass="WZButton">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43" type="user" id="4Oz-o4-WyR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="14"/>
+                                <state key="normal" title="Send Feedback">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendFeedback:" destination="FVk-aP-pus" eventType="touchUpInside" id="QHW-Tg-6Bf"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="PXf-T9-obh" firstAttribute="trailing" secondItem="3zX-xo-fZL" secondAttribute="trailing" type="default" id="2G9-pL-DDd"/>
+                            <constraint firstItem="3zX-xo-fZL" firstAttribute="leading" secondItem="wAe-2T-fYU" secondAttribute="leading" type="default" id="80X-Hr-eZG"/>
+                            <constraint firstItem="PJ5-Tg-3dp" firstAttribute="centerX" secondItem="3zX-xo-fZL" secondAttribute="centerX" type="default" id="CLB-W8-7LJ"/>
+                            <constraint firstItem="8mk-iV-ARG" firstAttribute="trailing" secondItem="3zX-xo-fZL" secondAttribute="trailing" type="default" id="Cz8-5g-Mxq"/>
+                            <constraint firstItem="PXf-T9-obh" firstAttribute="bottom" secondItem="wAe-2T-fYU" secondAttribute="bottom" type="default" id="Fg5-eB-sqh"/>
+                            <constraint firstItem="HXs-cF-pSy" firstAttribute="centerX" secondItem="PJ5-Tg-3dp" secondAttribute="centerX" type="default" id="IOa-AI-P2g"/>
+                            <constraint firstItem="3zX-xo-fZL" firstAttribute="top" secondItem="75t-Q2-spR" secondAttribute="top" constant="464" id="Oqn-gz-f8G"/>
+                            <constraint firstItem="HXs-cF-pSy" firstAttribute="top" secondItem="75t-Q2-spR" secondAttribute="top" constant="171" id="VRa-eZ-0dQ"/>
+                            <constraint firstItem="HXs-cF-pSy" firstAttribute="centerX" secondItem="75t-Q2-spR" secondAttribute="centerX" type="default" id="Whb-DI-Lbm"/>
+                            <constraint firstItem="8mk-iV-ARG" firstAttribute="leading" secondItem="3zX-xo-fZL" secondAttribute="leading" type="default" id="aN2-DT-Ekf"/>
+                            <constraint firstAttribute="bottom" secondItem="8mk-iV-ARG" secondAttribute="bottom" constant="438" id="cJp-yO-9Yc"/>
+                            <constraint firstItem="wAe-2T-fYU" firstAttribute="top" secondItem="PXf-T9-obh" secondAttribute="top" type="default" id="d34-kG-YA2"/>
+                            <constraint firstItem="PXf-T9-obh" firstAttribute="leading" secondItem="wAe-2T-fYU" secondAttribute="trailing" constant="8" symbolic="YES" type="default" id="det-XQ-caO"/>
+                            <constraint firstItem="wAe-2T-fYU" firstAttribute="top" secondItem="75t-Q2-spR" secondAttribute="top" constant="401" id="gon-oM-n1W"/>
+                            <constraint firstItem="PJ5-Tg-3dp" firstAttribute="top" secondItem="75t-Q2-spR" secondAttribute="top" constant="381" id="ucK-bV-qmG"/>
+                        </constraints>
+                    </view>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <connections>
+                        <outlet property="feedbackButton" destination="8mk-iV-ARG" id="ddv-xz-n5w"/>
+                        <outlet property="rateButton" destination="3zX-xo-fZL" id="IhB-4O-TJR"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tIe-AC-nru" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1311" y="1476"/>
+        </scene>
     </scenes>
     <resources>
         <image name="back-arrow.png" width="19" height="16"/>
@@ -621,6 +735,104 @@
         <image name="share-icon.png" width="23" height="18"/>
         <image name="unread-badge.png" width="12" height="12"/>
     </resources>
+    <classes>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="OHAttributedLabel" superclassName="UILabel">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/OHAttributedLabel.h"/>
+            <relationships>
+                <relationship kind="outlet" name="delegate"/>
+            </relationships>
+        </class>
+        <class className="WZButton" superclassName="UIButton">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZButton.h"/>
+        </class>
+        <class className="WZCommentCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentCell.h"/>
+            <relationships>
+                <relationship kind="action" name="showReplies:"/>
+                <relationship kind="outlet" name="bodyConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="commentLabel" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="dateLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="repliesConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="showRepliesButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="userConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="userLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WZCommentsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCommentsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="backButtonTapped:"/>
+                <relationship kind="action" name="headerViewTapped:"/>
+                <relationship kind="action" name="showActivityView:"/>
+                <relationship kind="action" name="swipedBack:"/>
+                <relationship kind="outlet" name="activityIndicatorView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="activityIndicatorViewTopSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="backButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="headerDetailViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerDetailsContainerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="headerDomainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata1Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerMetadata2Label" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerTextView" candidateClass="OHAttributedLabel"/>
+                <relationship kind="outlet" name="headerTextViewBottomSpacing" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerTextViewTopConstraint" candidateClass="NSLayoutConstraint"/>
+                <relationship kind="outlet" name="headerTitleLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="headerView" candidateClass="UIView"/>
+                <relationship kind="outlet" name="segmentedControl" candidateClass="UISegmentedControl"/>
+                <relationship kind="outlet" name="shareButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="swipeBackGestureRecognizer" candidateClass="UISwipeGestureRecognizer"/>
+                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
+            </relationships>
+        </class>
+        <class className="WZCreditsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCreditsViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="feedbackButton" candidateClass="WZButton"/>
+                <relationship kind="outlet" name="rateButton" candidateClass="WZButton"/>
+            </relationships>
+        </class>
+        <class className="WZMainViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="menuButtonPressed:"/>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="menuButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="WZMenuCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
+        </class>
+        <class className="WZMenuViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="askCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="creditsCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="settingsCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="showNewCell" candidateClass="UITableViewCell"/>
+                <relationship kind="outlet" name="topCell" candidateClass="UITableViewCell"/>
+            </relationships>
+        </class>
+        <class className="WZNavigationBar" superclassName="UINavigationBar">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationBar.h"/>
+        </class>
+        <class className="WZNavigationController" superclassName="UINavigationController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZNavigationController.h"/>
+        </class>
+        <class className="WZPostCell" superclassName="UITableViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZPostCell.h"/>
+            <relationships>
+                <relationship kind="outlet" name="detailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="domainLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="moreDetailLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="rankLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="readBadgeImageView" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="titleLabel" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

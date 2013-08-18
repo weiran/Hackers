@@ -12,6 +12,8 @@
 
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory.h>
 #import <FontAwesomeIconFactory/NIKFontAwesomeIconFactory+iOS.h>
+#import "JSSlidingViewController.h"
+
 #import "WZNotify.h"
 #import "WZButton.h"
 
@@ -87,4 +89,13 @@ NSString* machineName() {
     [self.mailer dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (IBAction)menuButtonPressed:(id)sender {
+    if (!IS_IPAD()) {
+        if ([[[WZDefaults appDelegate] phoneViewController] isOpen]) {
+            [[[WZDefaults appDelegate] phoneViewController] closeSlider:YES completion:nil];
+        } else {
+            [[[WZDefaults appDelegate] phoneViewController] openSlider:YES completion:nil];
+        }
+    }
+}
 @end

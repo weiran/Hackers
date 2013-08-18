@@ -488,16 +488,11 @@
                         <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="Eoe-Kl-ilE" customClass="WZMenuHeaderView">
-                            <rect key="frame" x="0.0" y="0.0" width="320" height="33"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        </view>
                         <sections>
                             <tableViewSection id="QCf-lk-6hq">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="ZD3-xT-C2A" style="IBUITableViewCellStyleDefault" id="I3W-a7-8RF" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="33" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -513,7 +508,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="21H-q6-j0M" style="IBUITableViewCellStyleDefault" id="gVA-YC-Ria" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="77" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="44" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -529,7 +524,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="7RY-SO-Vc8" style="IBUITableViewCellStyleDefault" id="YnB-gE-mx6" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="121" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="88" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -545,7 +540,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="mvb-TW-QXj" style="IBUITableViewCellStyleDefault" id="VUe-uC-auU" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="165" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="132" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -562,7 +557,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="yhH-ab-FHA" style="IBUITableViewCellStyleDefault" id="2rq-xJ-icx" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="209" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="176" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -579,7 +574,7 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="sDI-2d-DBm" style="IBUITableViewCellStyleDefault" id="WDA-o0-anc" customClass="WZMenuCell">
-                                        <rect key="frame" x="0.0" y="253" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="220" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -614,6 +609,143 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WgD-sW-hhm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-816" y="1046"/>
+        </scene>
+        <!--Credits View Controller - Credits-->
+        <scene sceneID="yEE-Ah-fK5">
+            <objects>
+                <viewController storyboardIdentifier="CreditsViewController" title="Credits" id="4Vp-4H-Fv2" customClass="WZCreditsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Iw1-Y3-FNS">
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="HACKERS" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4ln-zl-upu">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="38" id="Msv-21-9ww"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="30"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="by Weiran Zhang" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6od-Vb-EqJ">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="cw9-Cp-JKm"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qLw-C4-QaX">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="36" id="Bqm-Fw-4Lc"/>
+                                    <constraint firstAttribute="width" constant="116" id="dbx-jn-4WY"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
+                                <state key="normal" title="weiranzhang.com">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="viewWebsite:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="piB-nm-lOW"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="myY-Jg-Wad" customClass="WZButton">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43" type="user" id="tJ3-TP-RGS"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="14"/>
+                                <state key="normal" title="Rate Hackers">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="rate:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="WpH-Dm-Ehr"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Ij-lU-qES">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="65" id="SE1-Yw-2MR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
+                                <state key="normal" title="@weiran">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="viewTwitter:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="TRl-vn-vCd"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sbu-Z2-cM9" customClass="WZButton">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43" type="user" id="vnO-1S-jpF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="14"/>
+                                <state key="normal" title="Send Feedback">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendFeedback:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="sOg-sk-exW"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eYt-rc-2RP">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="QhH-g4-Gnz"/>
+                                    <constraint firstAttribute="width" constant="44" id="enV-Yf-5fN"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" image="menu-icon.png">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="menuButtonPressed:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="wjz-v2-vH1"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.94901960780000005" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="eYt-rc-2RP" firstAttribute="leading" secondItem="Iw1-Y3-FNS" secondAttribute="leading" constant="5" id="1CO-0y-C5w"/>
+                            <constraint firstItem="myY-Jg-Wad" firstAttribute="leading" secondItem="qLw-C4-QaX" secondAttribute="leading" type="default" id="1Ri-wu-Zg4"/>
+                            <constraint firstItem="2Ij-lU-qES" firstAttribute="bottom" secondItem="qLw-C4-QaX" secondAttribute="bottom" type="default" id="1nM-PZ-cg1"/>
+                            <constraint firstItem="myY-Jg-Wad" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" constant="299" type="user" id="6O8-lg-Peh"/>
+                            <constraint firstItem="Sbu-Z2-cM9" firstAttribute="trailing" secondItem="myY-Jg-Wad" secondAttribute="trailing" type="default" id="6cL-II-uWX"/>
+                            <constraint firstItem="6od-Vb-EqJ" firstAttribute="centerX" secondItem="myY-Jg-Wad" secondAttribute="centerX" type="default" id="AX8-Yk-hFt"/>
+                            <constraint firstItem="2Ij-lU-qES" firstAttribute="trailing" secondItem="myY-Jg-Wad" secondAttribute="trailing" type="default" id="DMv-my-iq4"/>
+                            <constraint firstItem="4ln-zl-upu" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" constant="93" id="KdV-2o-3ae"/>
+                            <constraint firstItem="4ln-zl-upu" firstAttribute="centerX" secondItem="Iw1-Y3-FNS" secondAttribute="centerX" type="default" id="LKh-L1-i3T"/>
+                            <constraint firstItem="qLw-C4-QaX" firstAttribute="top" secondItem="2Ij-lU-qES" secondAttribute="top" type="default" id="WFd-2y-npZ"/>
+                            <constraint firstItem="6od-Vb-EqJ" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" constant="216" id="bVI-3W-bdz"/>
+                            <constraint firstItem="6od-Vb-EqJ" firstAttribute="centerX" secondItem="4ln-zl-upu" secondAttribute="centerX" type="default" id="d4O-wP-5mf"/>
+                            <constraint firstItem="Sbu-Z2-cM9" firstAttribute="leading" secondItem="myY-Jg-Wad" secondAttribute="leading" type="default" id="hDu-XD-sHA"/>
+                            <constraint firstItem="qLw-C4-QaX" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" constant="236" id="lIH-FZ-IPb"/>
+                            <constraint firstItem="Sbu-Z2-cM9" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" constant="358" type="user" id="lfg-ur-zGw"/>
+                            <constraint firstItem="eYt-rc-2RP" firstAttribute="top" secondItem="Iw1-Y3-FNS" secondAttribute="top" type="default" id="sfm-fV-xnR"/>
+                            <constraint firstItem="2Ij-lU-qES" firstAttribute="leading" secondItem="qLw-C4-QaX" secondAttribute="trailing" constant="8" symbolic="YES" type="default" id="wa7-7m-yXE"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="feedbackButton" destination="Sbu-Z2-cM9" id="i4w-xQ-ToW"/>
+                        <outlet property="rateButton" destination="myY-Jg-Wad" id="9Di-I2-6GX"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="k36-VG-yHh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-344" y="1042"/>
         </scene>
     </scenes>
     <resources>
@@ -674,6 +806,18 @@
                 <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
             </relationships>
         </class>
+        <class className="WZCreditsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZCreditsViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="menuButtonPressed:"/>
+                <relationship kind="action" name="rate:"/>
+                <relationship kind="action" name="sendFeedback:"/>
+                <relationship kind="action" name="viewTwitter:"/>
+                <relationship kind="action" name="viewWebsite:"/>
+                <relationship kind="outlet" name="feedbackButton" candidateClass="WZButton"/>
+                <relationship kind="outlet" name="rateButton" candidateClass="WZButton"/>
+            </relationships>
+        </class>
         <class className="WZMainViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMainViewController.h"/>
             <relationships>
@@ -684,9 +828,6 @@
         </class>
         <class className="WZMenuCell" superclassName="UITableViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuCell.h"/>
-        </class>
-        <class className="WZMenuHeaderView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuHeaderView.h"/>
         </class>
         <class className="WZMenuViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WZMenuViewController.h"/>

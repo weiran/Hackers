@@ -23,6 +23,7 @@
 @interface WZMenuViewController ()
 @property (nonatomic, strong) WZNavigationController *settingsNavController;
 @property (nonatomic, strong) WZSettingsViewController *settingsViewController;
+@property (nonatomic, strong) UIViewController *creditsViewController;
 @property (weak, nonatomic) IBOutlet UITableViewCell *settingsCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *askCell;
 @property (weak, nonatomic) IBOutlet UITableViewCell *showNewCell;
@@ -38,7 +39,7 @@
     [self layoutTableView];
     
     if (IS_IPAD()) {
-        double delayInSeconds = 0.1;
+        double delayInSeconds = 0.05;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -151,8 +152,6 @@
     if ([indexPath isEqual:[tableView indexPathForCell:_settingsCell]]) {
         if (IS_IPAD()) {
             UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
-//            navController.modalPresentationStyle = UIModalPresentationPageSheet;
-//            [self presentViewController:navController animated:YES completion:nil];
             [self.cascadeNavigationController setRootViewController:navController animated:YES];
         } else {
             if (![[[WZDefaults appDelegate] phoneViewController].frontViewController isEqual:self.settingsNavController]) {
@@ -169,6 +168,19 @@
     } else if ([indexPath isEqual:[tableView indexPathForCell:_askCell]]) {
         [self showMainNavViewControllerWithNewsType:WZNewsTypeAsk];
         [self toggleSlider];
+    } else if ([indexPath isEqual:[tableView indexPathForCell:self.creditsCell]]) {
+        if (!self.creditsViewController) {
+            self.creditsViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"CreditsViewController"];
+        }
+        
+        if (IS_IPAD()) {
+            [self.cascadeNavigationController setRootViewController:self.creditsViewController animated:YES];
+        } else {
+            if (![[[WZDefaults appDelegate] phoneViewController].frontViewController isEqual:self.creditsViewController]) {
+                [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.creditsViewController animated:YES completion:nil];
+                [self toggleSlider];
+            }
+        }
     }
 }
 
@@ -179,7 +191,7 @@
             [self.cascadeNavigationController setRootViewController:self.mainNavViewController animated:YES];
         }
     } else {
-        if (![[[[WZDefaults appDelegate] phoneViewController] frontViewController ] isEqual:self.mainNavViewController]) {
+        if (![[[[WZDefaults appDelegate] phoneViewController] frontViewController] isEqual:self.mainNavViewController]) {
             [[[WZDefaults appDelegate] phoneViewController] setFrontViewController:self.mainNavViewController animated:YES completion:nil];
         }
     }
