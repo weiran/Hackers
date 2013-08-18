@@ -11,9 +11,8 @@
 @implementation WZButton
 
 - (void)awakeFromNib {
-    [self setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    self.titleLabel.textColor = [WZTheme titleTextColor];
-    self.titleLabel.shadowColor = [UIColor clearColor];
+    [self setTitleColor:[WZTheme titleTextColor] forState:UIControlStateNormal];
+    [self setTitleShadowColor:[UIColor clearColor] forState:UIControlStateNormal];
     self.titleLabel.font = [UIFont fontWithName:kBodyFontName size:kBodyFontSize];
 }
 
@@ -41,12 +40,7 @@
     CGFloat baseGradientLocations[] = {0, 1};
     CGGradientRef baseGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)baseGradientColors, baseGradientLocations);
     CGColorSpaceRelease(colorSpace);
-    
-    //// Shadow Declarations
-//    UIColor* buttonShadow = iconShadow;
-//    CGSize buttonShadowOffset = CGSizeMake(0.1, -0.1);
-//    CGFloat buttonShadowBlurRadius = 2;
-    
+
     //// Frames
     CGRect frame = self.bounds;
     
@@ -57,7 +51,6 @@
         CGRect buttonRectangleRect = CGRectMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 1, CGRectGetWidth(frame) - 4, CGRectGetHeight(frame) - 3);
         UIBezierPath* buttonRectanglePath = [UIBezierPath bezierPathWithRoundedRect: buttonRectangleRect cornerRadius: 3];
         CGContextSaveGState(context);
-//        CGContextSetShadowWithColor(context, buttonShadowOffset, buttonShadowBlurRadius, buttonShadow.CGColor);
         CGContextBeginTransparencyLayer(context, NULL);
         [buttonRectanglePath addClip];
         CGContextDrawLinearGradient(context, baseGradient,
