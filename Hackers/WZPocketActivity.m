@@ -8,28 +8,22 @@
 
 #import "WZPocketActivity.h"
 
-#import "WZAccountManager.h"
+#import "WZActivityManager.h"
 
 @implementation WZPocketActivity
 
-
-- (NSString *)activityType {
-	return NSStringFromClass([self class]);
-}
-
 - (NSString *)activityTitle {
-	return @"Send to Instapaper";
+	return @"Send to Pocket";
 }
-
 
 - (UIImage *)activityImage {
-    return [UIImage imageNamed:@"NNInstapaperActivity"];
+    return [UIImage imageNamed:@"NNPocketActivity"];
 }
 
 - (void)performActivity {
-    [[WZAccountManager shared] sendURL:self.URL.absoluteString toService:kSettingsInstapaper];
+    WZActivityManager *activityManager = [[WZActivityManager alloc] init];
+    [activityManager sendURL:self.URLArray[0] toService:kSettingsPocket];
     [self activityDidFinish:YES];
 }
-
 
 @end

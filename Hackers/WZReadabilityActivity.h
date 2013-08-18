@@ -8,8 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "WZActivity.h"
+#import "NNNetwork/NNNetwork.h"
 
-@interface WZReadabilityActivity : WZActivity
+@interface WZReadabilityActivity : NNReadabilityActivity
+
+
 
 @end

@@ -49,7 +49,7 @@
 		24374A22172C16A5007762FC /* NNReadabilityActivity~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A16172C16A5007762FC /* NNReadabilityActivity~ipad.png */; };
 		24374A23172C16A5007762FC /* NNReadabilityActivity~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 24374A17172C16A5007762FC /* NNReadabilityActivity~iphone.png */; };
 		24374A27172C1A13007762FC /* WZInstapaperActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 24374A26172C1A13007762FC /* WZInstapaperActivity.m */; };
-		24374A2A172C44B8007762FC /* WZAccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 24374A29172C44B8007762FC /* WZAccountManager.m */; };
+		24374A2A172C44B8007762FC /* WZActivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 24374A29172C44B8007762FC /* WZActivityManager.m */; };
 		243D1F3A1732C3F70033BC0F /* WZTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 243D1F391732C3F70033BC0F /* WZTheme.m */; };
 		243D1F3C1732CA1C0033BC0F /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 243D1F3B1732CA1C0033BC0F /* InAppSettings.bundle */; };
 		243D1F3F1732D0940033BC0F /* WZPinboardActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 243D1F3E1732D0930033BC0F /* WZPinboardActivity.m */; };
@@ -222,8 +222,8 @@
 		24374A17172C16A5007762FC /* NNReadabilityActivity~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NNReadabilityActivity~iphone.png"; sourceTree = "<group>"; };
 		24374A25172C1A13007762FC /* WZInstapaperActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZInstapaperActivity.h; sourceTree = "<group>"; };
 		24374A26172C1A13007762FC /* WZInstapaperActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZInstapaperActivity.m; sourceTree = "<group>"; };
-		24374A28172C44B8007762FC /* WZAccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZAccountManager.h; sourceTree = "<group>"; };
-		24374A29172C44B8007762FC /* WZAccountManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZAccountManager.m; sourceTree = "<group>"; };
+		24374A28172C44B8007762FC /* WZActivityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZActivityManager.h; sourceTree = "<group>"; };
+		24374A29172C44B8007762FC /* WZActivityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZActivityManager.m; sourceTree = "<group>"; };
 		243D1F381732C3F70033BC0F /* WZTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WZTheme.h; sourceTree = "<group>"; };
 		243D1F391732C3F70033BC0F /* WZTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WZTheme.m; sourceTree = "<group>"; };
 		243D1F3B1732CA1C0033BC0F /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = InAppSettings.bundle; path = Hackers/InAppSettings.bundle; sourceTree = "<group>"; };
@@ -670,8 +670,8 @@
 		2434A19E16BD640300C383CA /* Misc */ = {
 			isa = PBXGroup;
 			children = (
-				24374A28172C44B8007762FC /* WZAccountManager.h */,
-				24374A29172C44B8007762FC /* WZAccountManager.m */,
+				24374A28172C44B8007762FC /* WZActivityManager.h */,
+				24374A29172C44B8007762FC /* WZActivityManager.m */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -1121,7 +1121,7 @@
 				24DF0C8D171D99380095491D /* WZMenuViewController.m in Sources */,
 				243749B0172BE942007762FC /* WZSettingsViewController.m in Sources */,
 				24374A27172C1A13007762FC /* WZInstapaperActivity.m in Sources */,
-				24374A2A172C44B8007762FC /* WZAccountManager.m in Sources */,
+				24374A2A172C44B8007762FC /* WZActivityManager.m in Sources */,
 				243D1F3A1732C3F70033BC0F /* WZTheme.m in Sources */,
 				243D1F3F1732D0940033BC0F /* WZPinboardActivity.m in Sources */,
 				243D1F4E1732FB8B0033BC0F /* WZButton.m in Sources */,

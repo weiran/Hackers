@@ -8,13 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WZAccountManager : NSObject <UIAlertViewDelegate>
+@interface WZActivityManager : NSObject <UIAlertViewDelegate>
 
-+ (WZAccountManager *)shared;
 + (void)setPassword:(NSString *)password forService:(NSString *)service;
 + (NSString *)passwordForService:(NSString *)service;
 
-- (void)sendURL:(NSString *)url toService:(NSString *)service;
-- (void)sendURL:(NSString *)url title:(NSString *)title toService:(NSString *)service;
+- (void)sendURL:(NSURL *)url toService:(NSString *)service;
+- (void)sendURL:(NSURL *)url title:(NSString *)title toService:(NSString *)service;
 
 @end

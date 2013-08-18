@@ -9,7 +9,7 @@
 #import "WZMenuViewController.h"
 #import "WZNavigationController.h"
 #import "WZSettingsViewController.h"
-#import "WZAccountManager.h"
+#import "WZActivityManager.h"
 #import "WZNavigationBar.h"
 
 #import "JSSlidingViewController.h"
@@ -203,7 +203,7 @@
 - (void)settingDidChange:(NSNotification*)notification {
 	if ([notification.object isEqual:kSettingsInstapaperPassword]) {
         NSString *password = notification.userInfo[kSettingsInstapaperPassword];
-        [WZAccountManager setPassword:password forService:kSettingsInstapaper];
+        [WZActivityManager setPassword:password forService:kSettingsInstapaper];
 	}
 }
 

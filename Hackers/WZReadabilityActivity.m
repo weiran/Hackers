@@ -8,28 +8,21 @@
 
 #import "WZReadabilityActivity.h"
 
-#import "WZAccountManager.h"
+#import "WZActivityManager.h"
 
 @implementation WZReadabilityActivity
 
-
-- (NSString *)activityType {
-	return NSStringFromClass([self class]);
-}
-
 - (NSString *)activityTitle {
-	return @"Send to Instapaper";
+	return @"Send to Readability";
 }
-
 
 - (UIImage *)activityImage {
-    return [UIImage imageNamed:@"NNInstapaperActivity"];
+    return [UIImage imageNamed:@"NNReadabilityActivity"];
 }
 
 - (void)performActivity {
-    [[WZAccountManager shared] sendURL:self.URL.absoluteString toService:kSettingsInstapaper];
+    WZActivityManager *activityManager = [[WZActivityManager alloc] init];
+    [activityManager sendURL:self.URLArray[0] toService:kSettingsReadability];
     [self activityDidFinish:YES];
 }
-
-
 @end

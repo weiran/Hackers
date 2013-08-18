@@ -8,7 +8,7 @@
 
 #import "WZInstapaperActivity.h"
 #import "WZHackersDataAPI.h"
-#import "WZAccountManager.h"
+#import "WZActivityManager.h"
 
 
 @implementation WZInstapaperActivity
@@ -28,7 +28,8 @@
 }
 
 - (void)performActivity {
-    [[WZAccountManager shared] sendURL:self.URL.absoluteString toService:kSettingsInstapaper];
+    WZActivityManager *activityManager = [[WZActivityManager alloc] init];
+    [activityManager sendURL:self.URL toService:kSettingsInstapaper];
     [self activityDidFinish:YES];
 }
 

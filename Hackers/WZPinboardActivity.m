@@ -8,7 +8,7 @@
 
 #import "WZPinboardActivity.h"
 #import "WZHackersDataAPI.h"
-#import "WZAccountManager.h"
+#import "WZActivityManager.h"
 
 @interface WZPinboardActivity ()
 @property (nonatomic, strong) NSString *title;
@@ -30,7 +30,8 @@
 }
 
 - (void)performActivity {
-    [[WZAccountManager shared] sendURL:self.URL.absoluteString title:self.title toService:kSettingsPinboard];
+    WZActivityManager *accountManager = [[WZActivityManager alloc] init];
+    [accountManager sendURL:self.URL title:self.title toService:kSettingsPinboard];
     [self activityDidFinish:YES];
 }
 

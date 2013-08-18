@@ -37,6 +37,9 @@
 #define kSettingsPinboardUsername @"PinboardUsername"
 #define kSettingsPinboardPassword @"PinboardPassword"
 
+#define kSettingsPocket @"Pocket"
+#define kSettingsReadability @"Readability"
+
 #define kSettingsDefaultReadingView @"DefaultReadingView"
 #define kSettingsDefaultReadingViewComments @"comments"
 #define kSettingsDefaultReadingViewLink @"link"
