@@ -10,6 +10,11 @@
 
 #import "WZActivityManager.h"
 
+@interface WZReadabilityActivity ()
+@property (nonatomic, copy) NSURL *URL;
+@property (nonatomic, copy) NSString *title;
+@end
+
 @implementation WZReadabilityActivity
 
 - (NSString *)activityTitle {
@@ -22,7 +27,18 @@
 
 - (void)performActivity {
     WZActivityManager *activityManager = [[WZActivityManager alloc] init];
-    [activityManager sendURL:self.URLArray[0] toService:kSettingsReadability];
+    [activityManager sendURL:self.URL toService:kSettingsReadability];
     [self activityDidFinish:YES];
 }
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+	for (id activityItem in activityItems) {
+		if ([activityItem isKindOfClass:[NSURL class]]) {
+			self.URL = activityItem;
+		} else if ([activityItem isKindOfClass:[NSString class]]) {
+            self.title = activityItem;
+        }
+	}
+}
+
 @end

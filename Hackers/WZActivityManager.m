@@ -71,7 +71,7 @@
         NNOAuthCredential *pocketCredentails = [NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier]
                                                                                            account:[[NNPocketClient sharedClient] name]];
         if (!pocketCredentails) {
-
+            [self authorisePocket];
         } else {
             [self sendToPocket];
         }
@@ -212,8 +212,9 @@
         [WZNotify showMessage:@"Sent to Pocket" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if (operation.response.statusCode == 401) { // unauthorised
-            [WZNotify showMessage:@"Failed sending to Pocket" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
             [self authorisePocket];
+        } else {
+            [WZNotify showMessage:@"Failed sending to Pocket" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
         }
     }];
 }

@@ -68,11 +68,8 @@
     chromeActivity.activityTitle = @"Open in Chrome";
     ARKippsterActivity *kippsterActivity = [[ARKippsterActivity alloc] init];
     kippsterActivity.activityTitle = @"Send to Kippster";
-    
-    NNOAuthCredential *pocketCredentails = [NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:[[NNPocketClient sharedClient] name]];
-    WZPocketActivity *pocketActivity = [[WZPocketActivity alloc] initWithCredential:pocketCredentails];
-    
-    WZReadabilityActivity *readabilityActivity = [[WZReadabilityActivity alloc] initWithCredential:[NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:[[NNReadabilityClient sharedClient] name]]];
+    WZPocketActivity *pocketActivity = [[WZPocketActivity alloc] init];
+    WZReadabilityActivity *readabilityActivity = [[WZReadabilityActivity alloc] init];
     
     NSArray *activities = @[safariActivity, chromeActivity, instapaperActivity, pinboardActivity, pocketActivity, readabilityActivity, kippsterActivity];
     NSArray *activityItems = @[text, url];

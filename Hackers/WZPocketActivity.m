@@ -10,6 +10,11 @@
 
 #import "WZActivityManager.h"
 
+@interface WZPocketActivity ()
+@property (nonatomic, copy) NSURL *URL;
+@property (nonatomic, copy) NSString *title;
+@end
+
 @implementation WZPocketActivity
 
 - (NSString *)activityTitle {
@@ -22,8 +27,28 @@
 
 - (void)performActivity {
     WZActivityManager *activityManager = [[WZActivityManager alloc] init];
-    [activityManager sendURL:self.URLArray[0] toService:kSettingsPocket];
+    [activityManager sendURL:self.URL toService:kSettingsPocket];
     [self activityDidFinish:YES];
 }
+
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+    for (id object in activityItems) {
+        if ([object isKindOfClass:[NSURL class]]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+	for (id activityItem in activityItems) {
+		if ([activityItem isKindOfClass:[NSURL class]]) {
+			self.URL = activityItem;
+		} else if ([activityItem isKindOfClass:[NSString class]]) {
+            self.title = activityItem;
+        }
+	}
+}
+
 
 @end
