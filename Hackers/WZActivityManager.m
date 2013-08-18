@@ -148,7 +148,7 @@
         NNPocketClient *client = [NNPocketClient sharedClient];
         [client authorizeWithSuccess:^(AFHTTPRequestOperation *operation, NSString *username, NNOAuth2Credential *credential) {
             [self saveCredential:credential withUsername:username];
-            [self sendToPinboard];
+            [self sendToPocket];
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             [WZNotify showMessage:NSLocalizedString(@"Couldn't login to Pocket", nil) inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
         }];
@@ -160,12 +160,12 @@
         NNOAuth2Credential *newCredential;
         if (username) {
             newCredential = [[NNOAuth2Credential alloc] initWithAccessToken:credential.accessToken userInfo:@{ @"AccountName" : username }];
-            [newCredential saveToKeychainForService:self.service account:self.service];
+            [newCredential saveToKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:self.service];
         } else {
-            [credential saveToKeychainForService:self.service account:self.service];
+            [credential saveToKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:self.service];
         }
     } else if ([self.service isEqualToString:kSettingsReadability]) {
-        [credential saveToKeychainForService:self.service account:self.service];
+        [credential saveToKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:self.service];
     }
 }
 
@@ -207,7 +207,7 @@
 
 - (void)sendToPocket {
     NNPocketClient *client = [NNPocketClient sharedClient];
-    NNOAuthCredential *credential = [NNOAuthCredential credentialFromKeychainForService:self.service account:client.name];
+    NNOAuthCredential *credential = [NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:client.name];
     [client addURL:self.url title:nil withCredential:credential success:^(AFHTTPRequestOperation *operation) {
         [WZNotify showMessage:@"Sent to Pocket" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -221,7 +221,7 @@
 
 - (void)sendToReadability {
     NNReadabilityClient *client = [NNReadabilityClient sharedClient];
-    NNOAuthCredential *credential = [NNOAuthCredential credentialFromKeychainForService:self.service account:client.name];
+    NNOAuthCredential *credential = [NNOAuthCredential credentialFromKeychainForService:[[NSBundle mainBundle] bundleIdentifier] account:client.name];
     [client addURL:self.url withCredential:credential success:^(AFHTTPRequestOperation *operation) {
         [WZNotify showMessage:@"Sent to Readability" inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0f];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
