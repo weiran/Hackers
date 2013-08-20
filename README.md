@@ -17,7 +17,7 @@ Hackers is open source and licenced under the MIT licence. Feel free to build an
 
 [![Buy in App Store][2]][1]
 
-[1]: https://itunes.apple.com/us/app/hackers-hacker-news-reading/id603503901
+[1]: https://itunes.apple.com/gb/app/hackers-hacker-news-reading/id603503901?mt=8&uo=4&at=11l4G8
 [2]: http://i.imgur.com/oRdf2WM.png
 
 ## Links
@@ -42,11 +42,13 @@ I use several open source projects in Hackers, in no particular order:
 
 * [node-hnapi](https://github.com/cheeaun/node-hnapi/) by cheeaun
 * [AFNetworking](https://github.com/AFNetworking/AFNetworking) by Mattt
+* [DTCoreText](https://github.com/Cocoanetics/DTCoreText) by Cocoanetics
 * [OHAttributedLabel](https://github.com/AliSoftware/OHAttributedLabel) by AliSoftware
+* [OHAlertView](https://github.com/AliSoftware/OHAlertView) by AliSoftware
 * [GCOLaunchImageTransition](https://github.com/gonecoding/GCOLaunchImageTransition) by gonecoding
 * [MBProgressHUD](https://github.com/jdg/MBProgressHUD) by Jonathan George
-* [DTCoreText](https://github.com/Cocoanetics/DTCoreText) by Cocoanetics
 * [InAppSettingsKit](https://github.com/futuretap/InAppSettingsKit) by FutureTap
 * [SSKeychain](https://github.com/soffes/sskeychain) by Sam Soffes
+* [NNNetwork](https://github.com/tomazsh/NNNetwork) by Tomaz Nedeljko
 * [ARChromeActivity](https://github.com/alextrob/ARChromeActivity) by Alex Robinson
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
