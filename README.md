@@ -17,7 +17,7 @@ Hackers is open source and licenced under the MIT licence. Feel free to build an
 
 [![Buy in App Store][2]][1]
 
-[1]: https://itunes.apple.com/gb/app/hackers-hacker-news-reading/id603503901?mt=8&uo=4&at=11l4G8
+[1]: https://itunes.apple.com/gb/app/hackers-hacker-news-reading/id603503901?at=11l4G8&ct=github
 [2]: http://i.imgur.com/oRdf2WM.png
 
 ## Links
