@@ -13,12 +13,13 @@
 #import "WZMenuViewController.h"
 #import "WZTheme.h"
 #import "WZSplitCascadeViewController.h"
+#import "WZActivityManager.h"
 
 #import <GCOLaunchImageTransition/GCOLaunchImageTransition.h>
 #import "JSSlidingViewController.h"
 #import "Cascade.h"
-#import "NNNetwork.h"
-#import "PBFlatSettings.h"
+#import <NNNetwork/NNNetwork.h>
+#import <PBFlatUI/PBFlatSettings.h>
 
 @interface WZAppDelegate()
 @property (readwrite, nonatomic) JSSlidingViewController *phoneViewController;
@@ -82,6 +83,8 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     if ([[NNPocketClient sharedClient] handleRedirectionURL:url]) {
+        WZActivityManager *activityManager = [[WZActivityManager alloc] init];
+        [activityManager sendURL:url toService:kSettingsPocket];
         return YES;
     } else {
         return NO;
