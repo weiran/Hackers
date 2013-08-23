@@ -31,6 +31,15 @@
     [self activityDidFinish:YES];
 }
 
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+    for (id object in activityItems) {
+        if ([object isKindOfClass:[NSURL class]]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)prepareWithActivityItems:(NSArray *)activityItems {
 	for (id activityItem in activityItems) {
 		if ([activityItem isKindOfClass:[NSURL class]]) {
