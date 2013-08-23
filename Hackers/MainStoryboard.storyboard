@@ -336,7 +336,7 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUV-CZ-R1S" customClass="PBFlatButton">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUV-CZ-R1S" customClass="WZButton">
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="QMt-zI-CEz"/>
                                                     </constraints>
@@ -651,7 +651,7 @@
                                     <action selector="viewWebsite:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="piB-nm-lOW"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="myY-Jg-Wad" customClass="PBFlatButton">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="myY-Jg-Wad" customClass="WZButton">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="43" type="user" id="tJ3-TP-RGS"/>
                                 </constraints>
@@ -683,7 +683,7 @@
                                     <action selector="viewTwitter:" destination="4Vp-4H-Fv2" eventType="touchUpInside" id="TRl-vn-vCd"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sbu-Z2-cM9" customClass="PBFlatButton">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sbu-Z2-cM9" customClass="WZButton">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="43" type="user" id="vnO-1S-jpF"/>
                                 </constraints>
@@ -763,9 +763,6 @@
             <relationships>
                 <relationship kind="outlet" name="delegate"/>
             </relationships>
-        </class>
-        <class className="PBFlatButton" superclassName="UIButton">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PBFlatButton.h"/>
         </class>
         <class className="PBFlatSegmentedControl" superclassName="UISegmentedControl">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/PBFlatSegmentedControl.h"/>
