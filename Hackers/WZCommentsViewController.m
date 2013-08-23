@@ -67,7 +67,7 @@
 @implementation WZCommentsViewController
 
 - (void)viewDidLoad {
-    
+    [self setupButtons];
     [self setupOrientationNotifications];
     [self setupActivityIndicatorView];
     [self setupTableView];
@@ -199,6 +199,11 @@
 }
 
 #pragma mark - Setup Views
+
+- (void)setupButtons {
+    [self.backButton setImage:[UIImage themeImageNamed:@"back-arrow"] forState:UIControlStateNormal];
+    [self.shareButton setImage:[UIImage themeImageNamed:@"share-icon"] forState:UIControlStateNormal];
+}
 
 - (void)setupActivityIndicatorView {
     [self.view bringSubviewToFront:_activityIndicatorView];
