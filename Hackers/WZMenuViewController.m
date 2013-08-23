@@ -221,6 +221,7 @@
 
 #pragma Settings Changed
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    [WZTheme defaults];
     if ([keyPath isEqualToString:kSettingsTheme]) {
         self.mainNavViewController = nil;
     }

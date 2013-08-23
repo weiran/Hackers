@@ -19,7 +19,6 @@
 #import "JSSlidingViewController.h"
 #import "Cascade.h"
 #import <NNNetwork/NNNetwork.h>
-#import <PBFlatUI/PBFlatSettings.h>
 
 @interface WZAppDelegate()
 @property (readwrite, nonatomic) JSSlidingViewController *phoneViewController;
@@ -30,7 +29,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [WZTheme defaults];
     [WZDefaults setServiceCredentials];
-    [PBFlatSettings sharedInstance].mainColor = [WZTheme segmentBackgroundColor];
     
     // initilise storyboard with JSSlidingViewController
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

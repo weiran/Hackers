@@ -42,7 +42,7 @@
     [self.backgroundColor setFill];
     [roundedRectanglePath fill];
     [self.mainColor setStroke];
-    roundedRectanglePath.lineWidth = 2;
+    roundedRectanglePath.lineWidth = 1;
     [roundedRectanglePath stroke];
 }
 

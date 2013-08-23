@@ -8,6 +8,7 @@
 
 #import "WZTheme.h"
 #import "WZNavigationController.h"
+#import <PBFlatUI/PBFlatSettings.h>
 
 @implementation WZTheme
 
@@ -34,6 +35,7 @@
     } else {
         [self setDarkTheme];
     }
+    [PBFlatSettings sharedInstance].mainColor = [self segmentBackgroundColor];
 }
 
 + (void)setLightTheme {
@@ -186,11 +188,11 @@
 + (UIColor *)segmentBackgroundColor {
     if ([self lightTheme]) {
         static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.6 alpha:1];
+        if (!color) color = [UIColor colorWithWhite:0.3 alpha:1];
         return color;
     } else {
         static UIColor *color = nil;
-        if (!color) color = [UIColor colorWithWhite:0.3 alpha:1];
+        if (!color) color = [UIColor colorWithWhite:0.6 alpha:1];
         return color;
     }
 }
