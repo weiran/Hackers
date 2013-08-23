@@ -11,6 +11,7 @@
 
 #import "WZWebViewController.h"
 #import "WZActivityViewController.h"
+#import "WZNotify.h"
 #import "UIViewController+CLCascade.h"
 #import "CLCascadeNavigationController.h"
 
@@ -328,10 +329,7 @@
     _activityIndicatorView.hidden = YES;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [MBProgressHUD hideHUDForView:self.webView animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading page"
-                                                    message:error.localizedDescription
-                                                   delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
-    [alert show];
+    [WZNotify showMessage:error.localizedDescription inView:[WZDefaults appDelegate].window.rootViewController.view duration:2.0];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
