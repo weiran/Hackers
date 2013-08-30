@@ -16,6 +16,8 @@
 			<array>
 				<string>Icon.png</string>
 				<string>Icon@2x.png</string>
+				<string>Icon-iPad.png</string>
+				<string>Icon-iPad@2x.png</string>
 			</array>
 			<key>UIPrerenderedIcon</key>
 			<true/>
@@ -45,7 +47,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>18</string>
+	<string>19</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIMainStoryboardFile</key>
