@@ -22,15 +22,15 @@ Hackers is open source and licenced under the MIT licence. Feel free to build an
 
 ## Links
 
-* I wrote [a blog post introducing Hackers](http://weiranzhang.com/blog/2013/3/hackers-a-hacker-news-app-for-iphone). 
-* You can follow [Hackers' progress on my blogs tagged Hackers](http://weiranzhang.com/?tag=hackers).
+* I wrote [a blog post introducing Hackers](http://weiran.co/blog/2013/3/hackers-a-hacker-news-app-for-iphone). 
+* You can follow [Hackers' progress on my blogs tagged Hackers](http://weiran.co/?tag=hackers).
 * You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
 ## How to build
 
 1. Install [cocoapods](http://cocoapods.org/), you can use RubyGems: `gem install cocoapods`.
 2. Install pods, in the project root folder, run `pod install`.
-3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 4.6.3 or later, and build.
+3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 6.0 or later, and build.
 
 ## About
 
@@ -40,15 +40,6 @@ Hackers is an open source project by [Weiran Zhang](http://weiranzhang.com) lice
 
 I use several open source projects in Hackers, in no particular order:
 
-* [node-hnapi](https://github.com/cheeaun/node-hnapi/) by cheeaun
-* [AFNetworking](https://github.com/AFNetworking/AFNetworking) by Mattt
-* [DTCoreText](https://github.com/Cocoanetics/DTCoreText) by Cocoanetics
-* [OHAttributedLabel](https://github.com/AliSoftware/OHAttributedLabel) by AliSoftware
-* [OHAlertView](https://github.com/AliSoftware/OHAlertView) by AliSoftware
-* [GCOLaunchImageTransition](https://github.com/gonecoding/GCOLaunchImageTransition) by gonecoding
-* [MBProgressHUD](https://github.com/jdg/MBProgressHUD) by Jonathan George
-* [InAppSettingsKit](https://github.com/futuretap/InAppSettingsKit) by FutureTap
-* [SSKeychain](https://github.com/soffes/sskeychain) by Sam Soffes
-* [NNNetwork](https://github.com/tomazsh/NNNetwork) by Tomaz Nedeljko
-* [ARChromeActivity](https://github.com/alextrob/ARChromeActivity) by Alex Robinson
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
+* [libHN](https://github.com/bennyguitar/libHN) by Ben Gordon
+* [OvershareKit](https://github.com/overshare/overshare-kit)

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		19E775F93F40479F9A26884B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24CDDB5EB0724421AE42BE05 /* libPods.a */; };
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
+		241387A61945A6E100D71220 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 241387A51945A6E100D71220 /* README.md */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		2444F5C11943652F00829D12 /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2444F5C01943652F00829D12 /* PostViewController.swift */; };
@@ -26,6 +27,7 @@
 
 /* Begin PBXFileReference section */
 		240C5BDF18D267C70011177A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
+		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		2444F5C01943652F00829D12 /* PostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostViewController.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 				24F39F8718AFB1150055F8DC /* Frameworks */,
 				24F39F8618AFB1150055F8DC /* Products */,
 				ECA3D4DD24034EAB9507312B /* Pods.xcconfig */,
+				241387A51945A6E100D71220 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -261,6 +264,7 @@
 				2444F5C11943652F00829D12 /* PostViewController.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
+				241387A61945A6E100D71220 /* README.md in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 			);
