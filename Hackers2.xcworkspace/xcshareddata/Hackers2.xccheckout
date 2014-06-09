@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>168E3D6D-0CAE-44C5-86B9-493AF1E1C15C</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Hackers2</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</key>
+		<string>ssh://bitbucket.org/weiran/hackers2.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Hackers2.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://bitbucket.org/weiran/hackers2.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Hackers2</string>
+		</dict>
+	</array>
+</dict>
+</plist>
