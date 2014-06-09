@@ -1,0 +1,19 @@
+PODS:
+  - ADNLogin (2.1.0)
+  - libHN (1.1.1)
+  - OvershareKit (1.0.7):
+    - ADNLogin
+    - PocketAPI
+  - PocketAPI (1.0.2)
+
+DEPENDENCIES:
+  - libHN (~> 1.x)
+  - OvershareKit (~> 1.0.7)
+
+SPEC CHECKSUMS:
+  ADNLogin: 3828c000fa246c7340b331ed5c336fca8dfe6a1d
+  libHN: d29d1e67be4ff186c4441e0a6b5f0af0c6c15b97
+  OvershareKit: cd1d8bf90fef93e0713aa6b58dd42a38bd3e8628
+  PocketAPI: 801df1a3cdd094e5477add10c80dceb533c98a66
+
+COCOAPODS: 0.33.1
