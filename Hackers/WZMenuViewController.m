@@ -85,10 +85,10 @@
     
     NIKFontAwesomeIconFactory *factory = [NIKFontAwesomeIconFactory tabBarItemIconFactory];
     [_settingsCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconCog]];
-    [_askCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconQuestionSign]];
-    [_showNewCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconTime]];
+    [_askCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconQuestion]];
+    [_showNewCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconTimes]];
     [_topCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconStar]];
-    [_creditsCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconInfoSign]];
+    [_creditsCell.imageView setImage:[factory createImageForIcon:NIKFontAwesomeIconInfo]];
 }
 
 - (void)layoutCell:(UITableViewCell *)cell {

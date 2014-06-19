@@ -76,7 +76,8 @@
     
     WZActivityViewController *activityViewController = [[WZActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:activities];
     activityViewController.url = url;
-    
+    [activityViewController setValue:text forKey:@"subject"];
+
     return activityViewController;
 }
 
