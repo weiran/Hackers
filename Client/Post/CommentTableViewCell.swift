@@ -37,10 +37,10 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
         }
     }
     
-    @IBOutlet var commentTextView: UITextView?
-    @IBOutlet var authorLabel : UILabel
-    @IBOutlet var datePostedLabel : UILabel
-    @IBOutlet var leftPaddingConstraint : NSLayoutConstraint
+    @IBOutlet var commentTextView: UITextView!
+    @IBOutlet var authorLabel : UILabel!
+    @IBOutlet var datePostedLabel : UILabel!
+    @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
     
     override func awakeFromNib() {
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("cellTapped:")))

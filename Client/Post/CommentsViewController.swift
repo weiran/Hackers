@@ -12,7 +12,7 @@ import UIKit
 class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var post: HNPost = HNPost()
-    var comments: CommentModel[] = CommentModel[]() {
+    var comments: [CommentModel] = [CommentModel]() {
         didSet {
             commentsController.commentsSource = comments
         }
@@ -20,7 +20,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     var commentsController = CommentsController()
     
-    @IBOutlet var tableView: UITableView
+    @IBOutlet var tableView: UITableView!
     
     override func viewDidLoad() {
         tableView.estimatedRowHeight = 44.0
@@ -33,8 +33,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     func loadComments() {
         HNManager.sharedManager().loadCommentsFromPost(post, completion: {
-            (_comments: AnyObject[]!) in
-            if let downcastedArray = _comments as? HNComment[] {
+            (_comments: [AnyObject]!) in
+            if let downcastedArray = _comments as? [HNComment] {
                 let mappedComments = downcastedArray.map { CommentModel(source: $0) }
                 self.comments = mappedComments
                 self.tableView.reloadData()

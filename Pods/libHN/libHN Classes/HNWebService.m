@@ -60,6 +60,9 @@
         case PostFilterTypeNew:
             pathAddition = @"newest";
             break;
+        case PostFilterTypeShowHN:
+            pathAddition = @"show";
+            break;
         default:
             break;
     }
@@ -464,15 +467,15 @@
         if (blockOperation.responseData) {
             NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
             if ([html rangeOfString:@"textarea"].location != NSNotFound) {
-                NSString *trash = @"", *fnid = @"";
+                NSString *trash = @"", *hmac = @"";
                 NSScanner *scanner = [NSScanner scannerWithString:html];
-                [scanner scanUpToString:@"name=\"fnid\" value=\"" intoString:&trash];
-                [scanner scanString:@"name=\"fnid\" value=\"" intoString:&trash];
-                [scanner scanUpToString:@"\"" intoString:&fnid];
+                [scanner scanUpToString:@"name=\"hmac\" value=\"" intoString:&trash];
+                [scanner scanString:@"name=\"hmac\" value=\"" intoString:&trash];
+                [scanner scanUpToString:@"\"" intoString:&hmac];
                 
-                if (fnid.length > 0) {
+                if (hmac.length > 0) {
                     // Create BodyData
-                    NSString *bodyString = [[NSString stringWithFormat:@"fnid=%@&text=%@", fnid, text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                    NSString *bodyString = [[NSString stringWithFormat:@"hmac=%@&text=%@", hmac, text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                     NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
                     
                     // Create next Request

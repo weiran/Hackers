@@ -10,18 +10,18 @@ import Foundation
 
 class PostViewController : UIViewController, UIWebViewDelegate {
     var post: HNPost = HNPost()
-    var comments: HNComment[] = HNComment[]()
+    var comments: [HNComment] = [HNComment]()
 
-    @IBOutlet var webView: UIWebView
-    @IBOutlet var backButton: UIBarButtonItem
-    @IBOutlet var forwardButton: UIBarButtonItem
+    @IBOutlet var webView: UIWebView!
+    @IBOutlet var backButton: UIBarButtonItem!
+    @IBOutlet var forwardButton: UIBarButtonItem!
     
 
     override func viewDidLoad() {
         self.webView.loadRequest(NSURLRequest(URL: NSURL(string: self.post.UrlString)))
         HNManager.sharedManager().loadCommentsFromPost(self.post, completion: {
-            (comments: AnyObject[]!) in
-            if let downcastedArray = comments as? HNComment[] {
+            (comments: [AnyObject]!) in
+            if let downcastedArray = comments as? [HNComment] {
                 self.comments = downcastedArray
             }
         })

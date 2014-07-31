@@ -11,7 +11,7 @@ import UIKit
 
 class NewsViewController : UITableViewController {
     
-    var posts: HNPost[] = HNPost[]()
+    var posts: [HNPost] = [HNPost]()
     
     override func viewDidLoad() {
         self.tableView.estimatedRowHeight = 66.0
@@ -36,8 +36,8 @@ class NewsViewController : UITableViewController {
         }
         
         HNManager.sharedManager().loadPostsWithFilter(PostFilterType.Top, completion: {
-            (posts: AnyObject[]!) in
-            if let downcastedArray = posts as? HNPost[] {
+            (posts: [AnyObject]!) in
+            if let downcastedArray = posts as? [HNPost] {
                 self.posts = downcastedArray
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()

@@ -10,22 +10,22 @@ import Foundation
 import UIKit
 
 class CommentsController {
-    var comments: CommentModel[] = CommentModel[]()
-    var commentsSource: CommentModel[] {
-        didSet { comments = commentsSource.copy() }
+    var comments: [CommentModel]
+    var commentsSource: [CommentModel] {
+        didSet { comments = commentsSource }
     }
     
     init() {
-        commentsSource = CommentModel[]()
+        commentsSource = [CommentModel]()
         comments = commentsSource
     }
     
-    init(source: CommentModel[]) {
-        comments = CommentModel[]()
+    init(source: [CommentModel]) {
+        comments = [CommentModel]()
         commentsSource = source
     }
 
-    func toggleCommentChildrenVisibility(commentIndexPath: NSIndexPath) -> (NSIndexPath[], CommentVisibilityType) {
+    func toggleCommentChildrenVisibility(commentIndexPath: NSIndexPath) -> ([NSIndexPath], CommentVisibilityType) {
         let comment = comments[commentIndexPath.row]
         switch comment.visibility {
             case .Visible:
@@ -33,16 +33,16 @@ class CommentsController {
             case .Compact:
                 return (showCommentChildren(commentIndexPath), .Visible)
             default:
-                return (NSIndexPath[](), .Visible)
+                return ([NSIndexPath](), .Visible)
         }
     }
 
-    func showCommentChildren(commentIndexPath: NSIndexPath) -> NSIndexPath[] {
+    func showCommentChildren(commentIndexPath: NSIndexPath) -> [NSIndexPath] {
         let comment = comments[commentIndexPath.row]
         let (children, childrenIndexes) = childrenOfComment(comment)
         comment.visibility = .Visible
         
-        var indexPaths = NSIndexPath[]()
+        var indexPaths = [NSIndexPath]()
         
         for (index, currentComment) in enumerate(children) {
             currentComment.visibility = .Visible
@@ -56,12 +56,12 @@ class CommentsController {
         return indexPaths
     }
 
-    func hideCommentChildren(commentIndexPath: NSIndexPath) -> NSIndexPath[] {
+    func hideCommentChildren(commentIndexPath: NSIndexPath) -> [NSIndexPath] {
         let comment = comments[commentIndexPath.row]
         let (children, childrenIndexes) = childrenOfComment(comment)
         comment.visibility = .Compact
         
-        var indexPaths = NSIndexPath[]()
+        var indexPaths = [NSIndexPath]()
         
         for (index, currentComment) in enumerate(children) {
             currentComment.visibility = .Hidden
@@ -74,7 +74,7 @@ class CommentsController {
         return indexPaths
     }
     
-    func indexOfComment(comment: CommentModel, source: CommentModel[]) -> Int? {
+    func indexOfComment(comment: CommentModel, source: [CommentModel]) -> Int? {
         var indexPathInSource: Int?
         for (index, value) in enumerate(source) {
             if comment.commentID == value.commentID {
@@ -85,9 +85,9 @@ class CommentsController {
         return indexPathInSource
     }
     
-    func childrenOfComment(comment: CommentModel) -> (CommentModel[], Int[]) {
-        var indexes = Int[]()
-        var commentModels = CommentModel[]()
+    func childrenOfComment(comment: CommentModel) -> ([CommentModel], [Int]) {
+        var indexes = [Int]()
+        var commentModels = [CommentModel]()
         
         if var i = indexOfComment(comment, source: commentsSource) {
             for i = i + 1; i < commentsSource.count; i++ {
