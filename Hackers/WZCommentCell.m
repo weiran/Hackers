@@ -95,6 +95,10 @@
 
 - (IBAction)showReplies:(id)sender {
     UITableView *tableView = (UITableView *)self.superview;
+    
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+        tableView = (UITableView *)self.superview.superview;
+    }
     NSIndexPath *indexPath = [tableView indexPathForCell:self];
     
     if ([_delegate respondsToSelector:@selector(selectedCommentAtIndexPath:)]) {
