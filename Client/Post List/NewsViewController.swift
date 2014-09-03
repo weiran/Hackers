@@ -16,7 +16,7 @@ class NewsViewController : UITableViewController {
     override func viewDidLoad() {
         self.tableView.estimatedRowHeight = 66.0
         self.tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
-        self.refreshControl.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
         
         loadPosts()
         
@@ -24,15 +24,17 @@ class NewsViewController : UITableViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-        self.navigationController .setToolbarHidden(true, animated: true)
-        self.tableView .deselectRowAtIndexPath(self.tableView.indexPathForSelectedRow(), animated: true)
+        self.navigationController!.setToolbarHidden(true, animated: true)
+        if (self.tableView.indexPathForSelectedRow() != nil) {
+            self.tableView .deselectRowAtIndexPath(self.tableView.indexPathForSelectedRow()!, animated: true)
+        }
         
         super.viewWillAppear(animated)
     }
     
     func loadPosts() {
-        if !refreshControl.refreshing {
-            refreshControl.beginRefreshing()
+        if !refreshControl!.refreshing {
+            refreshControl!.beginRefreshing()
         }
         
         HNManager.sharedManager().loadPostsWithFilter(PostFilterType.Top, completion: {
@@ -40,7 +42,7 @@ class NewsViewController : UITableViewController {
             if let downcastedArray = posts as? [HNPost] {
                 self.posts = downcastedArray
                 self.tableView.reloadData()
-                self.refreshControl.endRefreshing()
+                self.refreshControl!.endRefreshing()
             }
         })
     }
@@ -48,11 +50,11 @@ class NewsViewController : UITableViewController {
     
     // MARK: UITableViewDataSource
     
-    override func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
     }
     
-    override func tableView(tableView: UITableView!, cellForRowAtIndexPath indexPath: NSIndexPath!) -> UITableViewCell! {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellIdentifier = "PostCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as PostCell
         let post = self.posts[indexPath.row]
@@ -70,11 +72,11 @@ class NewsViewController : UITableViewController {
     
     // MARK: UISegueDelegate
     
-    override func prepareForSegue(segue: UIStoryboardSegue!, sender: AnyObject!) {
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
         if segue.identifier == "ShowPostSegue" {
             let postViewController = segue.destinationViewController as PostViewController
             let selectedIndexPath = self.tableView.indexPathForSelectedRow()
-            let post = self.posts[selectedIndexPath.row]
+            let post = self.posts[selectedIndexPath!.row]
             postViewController.post = post
         }
     }

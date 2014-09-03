@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
+class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate {
     
     var post: HNPost = HNPost()
     var comments: [CommentModel] = [CommentModel]() {
@@ -44,31 +44,35 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     // MARK - UITableViewDataSource
     
-    func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.comments.count
     }
     
-    func tableView(tableView: UITableView!, cellForRowAtIndexPath indexPath: NSIndexPath!) -> UITableViewCell! {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let comment = commentsController.comments[indexPath.row]
         assert(comment.visibility != .Hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.Visible ? "OpenCommentCell" : "ClosedCommentCell"
 
         let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as CommentTableViewCell
         
-        cell.authorLabel.text = comment.authorUsername
-        cell.datePostedLabel.text = comment.dateCreatedString
-        cell.commentString = comment.text
-        cell.level = comment.level
+        cell.comment = comment
+        cell.delegate = self
+        
         return cell
     }
     
-    func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
-        NSLog("cell selected")
-        toggleCellVisibilityForCell(indexPath)
-    }
+//    func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
+//        NSLog("cell selected")
+//        toggleCellVisibilityForCell(indexPath)
+//    }
+//    
+//    func tableView(tableView: UITableView!, didDeselectRowAtIndexPath indexPath: NSIndexPath!) {
+//        NSLog("cell deselected")
+//        toggleCellVisibilityForCell(indexPath)
+//    }1
     
-    func tableView(tableView: UITableView!, didDeselectRowAtIndexPath indexPath: NSIndexPath!) {
-        NSLog("cell deselected")
+    func commentTapped(sender: UITableViewCell) {
+        let indexPath = tableView.indexPathForCell(sender)
         toggleCellVisibilityForCell(indexPath)
     }
     
@@ -80,14 +84,12 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         if visibility == CommentVisibilityType.Hidden {
             tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .Middle)
         } else {
-            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Bottom)
+            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Middle)
         }
         tableView.endUpdates()
     }
     
     @IBAction func close(sender : AnyObject) {
-        //dismissModalViewControllerAnimated(true)
-        tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: UITableViewScrollPosition.None)
-        toggleCellVisibilityForCell(NSIndexPath(forRow: 0, inSection: 0))
+        dismissViewControllerAnimated(true, completion: nil)
     }
 }

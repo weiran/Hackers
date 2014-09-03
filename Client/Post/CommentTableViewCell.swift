@@ -9,20 +9,27 @@
 import Foundation
 import UIKit
 
+
 class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
+    
+    var delegate: CommentDelegate?
     
     var level: Int = 0 {
         didSet { updateIndentPadding() }
     }
     
-    var commentString: String? {
+    var comment: CommentModel? {
         didSet {
+            level = comment!.level
+            datePostedLabel.text = comment?.dateCreatedString
+            authorLabel.text = comment?.authorUsername
+            
             if let textView = commentTextView {
                 let commentFont = UIFont(name: "HelveticaNeue-Light", size: 15)
                 let commentTextColor = UIColor.darkGrayColor()
                 let lineSpacing = 4 as CGFloat
                 
-                var commentAttributedString = NSMutableAttributedString(string: commentString)
+                var commentAttributedString = NSMutableAttributedString(string: comment!.text)
                 var paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as NSMutableParagraphStyle
                 paragraphStyle.lineSpacing = lineSpacing
                 
@@ -37,6 +44,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
         }
     }
     
+    
     @IBOutlet var commentTextView: UITextView!
     @IBOutlet var authorLabel : UILabel!
     @IBOutlet var datePostedLabel : UILabel!
@@ -47,6 +55,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     }
     
     func cellTapped(gestureRecognizer: UITapGestureRecognizer) {
+        delegate?.commentTapped(self)
         setSelected(!selected, animated: false)
     }
     

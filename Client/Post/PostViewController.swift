@@ -30,7 +30,7 @@ class PostViewController : UIViewController, UIWebViewDelegate {
     }
     
     override func viewWillAppear(animated: Bool) {
-        self.navigationController.setToolbarHidden(false, animated: true)
+        self.navigationController?.setToolbarHidden(false, animated: true)
         
         super.viewWillAppear(animated)
     }
@@ -61,7 +61,7 @@ class PostViewController : UIViewController, UIWebViewDelegate {
     
     // MARK - UISegueDelegate
     
-    override func prepareForSegue(segue: UIStoryboardSegue!, sender: AnyObject!) {
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
         if segue.identifier == "ShowCommentsSegue" {
             let navigationController = segue.destinationViewController as UINavigationController
             let commentsViewController = navigationController.viewControllers[0] as CommentsViewController
