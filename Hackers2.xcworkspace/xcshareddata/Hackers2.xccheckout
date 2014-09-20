@@ -5,13 +5,11 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>168E3D6D-0CAE-44C5-86B9-493AF1E1C15C</string>
+	<string>562C2014-E37D-48CD-A73E-0E9A4D975240</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Hackers2</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</key>
-		<string>ssh://bitbucket.org/weiran/hackers2.git</string>
 		<key>7E2F1E70F3D4B52C467EA8BC5F035A540FCD5E88</key>
 		<string>https://github.com/weiran/Hackers.git</string>
 	</dict>
@@ -19,8 +17,6 @@
 	<string>Hackers2.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</key>
-		<string>..2</string>
 		<key>7E2F1E70F3D4B52C467EA8BC5F035A540FCD5E88</key>
 		<string>..</string>
 	</dict>
@@ -39,14 +35,6 @@
 			<string>7E2F1E70F3D4B52C467EA8BC5F035A540FCD5E88</string>
 			<key>IDESourceControlWCCName</key>
 			<string>Hackers</string>
-		</dict>
-		<dict>
-			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
-			<string>public.vcs.git</string>
-			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>42DDE952-0511-4FB7-8D6F-8DF49E14C5DB</string>
-			<key>IDESourceControlWCCName</key>
-			<string>Hackers2</string>
 		</dict>
 	</array>
 </dict>
