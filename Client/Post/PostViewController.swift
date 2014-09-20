@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class PostViewController : UIViewController, UIWebViewDelegate {
     var post: HNPost = HNPost()
@@ -38,9 +39,7 @@ class PostViewController : UIViewController, UIWebViewDelegate {
     // MARK - Button actions
     
     @IBAction func share(sender: UIView) {
-        let content = OSKShareableContent(fromURL: NSURL(string: self.post.UrlString))
-        let presentationManager = OSKPresentationManager.sharedInstance()
-        presentationManager.presentActivitySheetForContent(content, presentingViewController: self.navigationController, options: nil)
+        //self.post.UrlString
     }
     
     // MARK - UIWebViewDelegate

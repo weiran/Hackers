@@ -75,14 +75,12 @@ class CommentsController {
     }
     
     func indexOfComment(comment: CommentModel, source: [CommentModel]) -> Int? {
-        var indexPathInSource: Int?
         for (index, value) in enumerate(source) {
             if comment.commentID == value.commentID {
-                indexPathInSource = index
-                break
+                return index
             }
         }
-        return indexPathInSource
+        return nil
     }
     
     func childrenOfComment(comment: CommentModel) -> ([CommentModel], [Int]) {
@@ -100,6 +98,7 @@ class CommentsController {
                 }
             }
         }
+        
         return (commentModels, indexes)
     }
 }

@@ -61,16 +61,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         return cell
     }
     
-//    func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
-//        NSLog("cell selected")
-//        toggleCellVisibilityForCell(indexPath)
-//    }
-//    
-//    func tableView(tableView: UITableView!, didDeselectRowAtIndexPath indexPath: NSIndexPath!) {
-//        NSLog("cell deselected")
-//        toggleCellVisibilityForCell(indexPath)
-//    }1
-    
     func commentTapped(sender: UITableViewCell) {
         let indexPath = tableView.indexPathForCell(sender)
         toggleCellVisibilityForCell(indexPath)
@@ -79,12 +69,14 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     func toggleCellVisibilityForCell(indexPath: NSIndexPath!) {
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(indexPath)
         
+        var thePaths = modifiedIndexPaths
+        
         tableView.beginUpdates()
-        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         if visibility == CommentVisibilityType.Hidden {
-            tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .Middle)
+            tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .None)
         } else {
-            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Middle)
+            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.None)
         }
         tableView.endUpdates()
     }
