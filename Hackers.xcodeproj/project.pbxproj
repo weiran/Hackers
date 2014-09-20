@@ -40,11 +40,11 @@
 		24CE5FF719435A90009D2677 /* PostCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
 		24DFD28B19436E51007F61E7 /* CommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsViewController.swift; sourceTree = "<group>"; };
 		24E4F26019B4DA9900574B52 /* CommentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentDelegate.swift; sourceTree = "<group>"; };
-		24F39F8518AFB1150055F8DC /* Hackers2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		24F39F8518AFB1150055F8DC /* Hackers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F39F8818AFB1150055F8DC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		24F39F8C18AFB1150055F8DC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		24F39F9018AFB1150055F8DC /* Hackers2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Hackers2-Info.plist"; sourceTree = "<group>"; };
+		24F39F9018AFB1150055F8DC /* Hackers-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Hackers-Info.plist"; sourceTree = "<group>"; };
 		24F39F9A18AFB1150055F8DC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		24F39FB718AFB2AF0055F8DC /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		ECA3D4DD24034EAB9507312B /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
@@ -126,7 +126,7 @@
 		24F39F8618AFB1150055F8DC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				24F39F8518AFB1150055F8DC /* Hackers2.app */,
+				24F39F8518AFB1150055F8DC /* Hackers.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -159,7 +159,7 @@
 			children = (
 				24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */,
 				24CE5FEC19434BDC009D2677 /* AppDelegate.swift */,
-				24F39F9018AFB1150055F8DC /* Hackers2-Info.plist */,
+				24F39F9018AFB1150055F8DC /* Hackers-Info.plist */,
 			);
 			path = "Supporting Files";
 			sourceTree = "<group>";
@@ -167,9 +167,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		24F39F8418AFB1150055F8DC /* Hackers2 */ = {
+		24F39F8418AFB1150055F8DC /* Hackers */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers2" */;
+			buildConfigurationList = 24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers" */;
 			buildPhases = (
 				E3AD65B8D2B647F18A01259D /* Check Pods Manifest.lock */,
 				24F39F8118AFB1150055F8DC /* Sources */,
@@ -181,9 +181,9 @@
 			);
 			dependencies = (
 			);
-			name = Hackers2;
+			name = Hackers;
 			productName = Hackers2;
-			productReference = 24F39F8518AFB1150055F8DC /* Hackers2.app */;
+			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -201,7 +201,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 24F39F8018AFB1150055F8DC /* Build configuration list for PBXProject "Hackers2" */;
+			buildConfigurationList = 24F39F8018AFB1150055F8DC /* Build configuration list for PBXProject "Hackers" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -213,7 +213,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				24F39F8418AFB1150055F8DC /* Hackers2 */,
+				24F39F8418AFB1150055F8DC /* Hackers */,
 			);
 		};
 /* End PBXProject section */
@@ -369,13 +369,14 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
-				INFOPLIST_FILE = "Client/Supporting Files/Hackers2-Info.plist";
+				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -394,12 +395,13 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
-				INFOPLIST_FILE = "Client/Supporting Files/Hackers2-Info.plist";
+				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -407,7 +409,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		24F39F8018AFB1150055F8DC /* Build configuration list for PBXProject "Hackers2" */ = {
+		24F39F8018AFB1150055F8DC /* Build configuration list for PBXProject "Hackers" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				24F39FAF18AFB1150055F8DC /* Debug */,
@@ -416,7 +418,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers2" */ = {
+		24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				24F39FB218AFB1150055F8DC /* Debug */,
