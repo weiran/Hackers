@@ -11,67 +11,40 @@ import UIKit
 
 class CommentsController {
     var comments: [CommentModel]
-    var commentsSource: [CommentModel] {
-        didSet { comments = commentsSource }
+    
+    var visibleComments: [CommentModel] {
+        get {
+            return comments.filter { $0.visibility != CommentVisibilityType.Hidden }
+        }
     }
     
     init() {
-        commentsSource = [CommentModel]()
-        comments = commentsSource
+        comments = [CommentModel]()
     }
     
     init(source: [CommentModel]) {
-        comments = [CommentModel]()
-        commentsSource = source
+        comments = source
     }
-
-    func toggleCommentChildrenVisibility(commentIndexPath: NSIndexPath) -> ([NSIndexPath], CommentVisibilityType) {
-        let comment = comments[commentIndexPath.row]
-        switch comment.visibility {
-            case .Visible:
-                return (hideCommentChildren(commentIndexPath), .Hidden)
-            case .Compact:
-                return (showCommentChildren(commentIndexPath), .Visible)
-            default:
-                return ([NSIndexPath](), .Visible)
-        }
-    }
-
-    func showCommentChildren(commentIndexPath: NSIndexPath) -> [NSIndexPath] {
-        let comment = comments[commentIndexPath.row]
-        let (children, childrenIndexes) = childrenOfComment(comment)
-        comment.visibility = .Visible
+    
+    func toggleCommentChildrenVisibility(comment: CommentModel) -> ([NSIndexPath], CommentVisibilityType) {
+        let visible = comment.visibility == .Visible
         
-        var indexPaths = [NSIndexPath]()
+        comment.visibility = visible ? .Compact : .Visible
+        let (children, childrenIndexes) = childrenOfComment(comment)
+        let originalIndex = indexOfComment(comment, source: comments)
+        
+        var modifiedIndexPaths = [NSIndexPath]()
         
         for (index, currentComment) in enumerate(children) {
-            currentComment.visibility = .Visible
-            if let sourceCommentIndex = indexOfComment(currentComment, source: commentsSource) {
-                let viewIndex = index + commentIndexPath.row + 1
-                comments.insert(currentComment, atIndex: viewIndex)
-                indexPaths.append(NSIndexPath(forRow: viewIndex, inSection: 0))
+            currentComment.visibility = visible ? .Hidden : .Visible
+            if (visible) {
+                modifiedIndexPaths.append(NSIndexPath(forRow: childrenIndexes[index], inSection: 0))
+            } else {
+                modifiedIndexPaths.append(NSIndexPath(forRow: originalIndex! + index, inSection: 0))
             }
         }
         
-        return indexPaths
-    }
-
-    func hideCommentChildren(commentIndexPath: NSIndexPath) -> [NSIndexPath] {
-        let comment = comments[commentIndexPath.row]
-        let (children, childrenIndexes) = childrenOfComment(comment)
-        comment.visibility = .Compact
-        
-        var indexPaths = [NSIndexPath]()
-        
-        for (index, currentComment) in enumerate(children) {
-            currentComment.visibility = .Hidden
-            if let displayedCommentIndex = indexOfComment(currentComment, source: comments) {
-                comments.removeAtIndex(displayedCommentIndex)
-                indexPaths.append(NSIndexPath(forRow: displayedCommentIndex, inSection: 0))
-            }
-        }
-        
-        return indexPaths
+        return (modifiedIndexPaths, visible ? .Hidden : .Visible)
     }
     
     func indexOfComment(comment: CommentModel, source: [CommentModel]) -> Int? {
@@ -87,9 +60,9 @@ class CommentsController {
         var indexes = [Int]()
         var commentModels = [CommentModel]()
         
-        if var i = indexOfComment(comment, source: commentsSource) {
-            for i = i + 1; i < commentsSource.count; i++ {
-                let currentComment = commentsSource[i]
+        if var i = indexOfComment(comment, source: comments) {
+            for i = i + 1; i < comments.count; i++ {
+                let currentComment = comments[i]
                 if currentComment.level > comment.level {
                     indexes.append(i)
                     commentModels.append(currentComment)

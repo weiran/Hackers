@@ -14,7 +14,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     var post: HNPost = HNPost()
     var comments: [CommentModel] = [CommentModel]() {
         didSet {
-            commentsController.commentsSource = comments
+            commentsController.comments = comments
         }
     }
     
@@ -45,11 +45,11 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     // MARK - UITableViewDataSource
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return commentsController.comments.count
+        return commentsController.visibleComments.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let comment = commentsController.comments[indexPath.row]
+        let comment = commentsController.visibleComments[indexPath.row]
         assert(comment.visibility != .Hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.Visible ? "OpenCommentCell" : "ClosedCommentCell"
 
@@ -67,16 +67,16 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func toggleCellVisibilityForCell(indexPath: NSIndexPath!) {
-        let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(indexPath)
+        let comment = self.commentsController.visibleComments[indexPath.row]
         
-        var thePaths = modifiedIndexPaths
-        
+        let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
+                
         tableView.beginUpdates()
-        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         if visibility == CommentVisibilityType.Hidden {
-            tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .None)
+            tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .Middle)
         } else {
-            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.None)
+            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Middle)
         }
         tableView.endUpdates()
     }
