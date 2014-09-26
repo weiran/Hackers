@@ -68,7 +68,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     func toggleCellVisibilityForCell(indexPath: NSIndexPath!) {
         let comment = self.commentsController.visibleComments[indexPath.row]
-        
+        let cellRectInTableView = self.tableView.rectForRowAtIndexPath(indexPath)
+        let cellRectInSuperview = self.tableView.convertRect(cellRectInTableView, toView: self.tableView.superview)
+
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
                 
         tableView.beginUpdates()
@@ -79,6 +81,10 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Middle)
         }
         tableView.endUpdates()
+        
+        if cellRectInSuperview.origin.y < 0 {
+            self.tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
+        }
     }
     
     @IBAction func close(sender : AnyObject) {
