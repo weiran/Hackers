@@ -14,7 +14,7 @@ class NewsViewController : UITableViewController {
     var posts: [HNPost] = [HNPost]()
     
     override func viewDidLoad() {
-        self.tableView.estimatedRowHeight = 66.0
+        self.tableView.estimatedRowHeight = 80
         self.tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
         self.refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
         
