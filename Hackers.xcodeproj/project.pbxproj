@@ -13,6 +13,7 @@
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		2444F5C11943652F00829D12 /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2444F5C01943652F00829D12 /* PostViewController.swift */; };
+		2495A8BA19E8217B00A908BB /* HackerNewsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2495A8B919E8217B00A908BB /* HackerNewsAPI.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FEC19434BDC009D2677 /* AppDelegate.swift */; };
 		24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF319435061009D2677 /* NewsViewController.swift */; };
@@ -32,6 +33,7 @@
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		2444F5C01943652F00829D12 /* PostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostViewController.swift; sourceTree = "<group>"; };
+		2495A8B919E8217B00A908BB /* HackerNewsAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HackerNewsAPI.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers2-Bridging-Header.h"; sourceTree = "<group>"; };
 		24CDDB5EB0724421AE42BE05 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,7 +49,8 @@
 		24F39F9018AFB1150055F8DC /* Hackers-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Hackers-Info.plist"; sourceTree = "<group>"; };
 		24F39F9A18AFB1150055F8DC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		24F39FB718AFB2AF0055F8DC /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
-		ECA3D4DD24034EAB9507312B /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		8442730C441D191CADBB7E89 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		BB8494397A769287AFF579F0 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,14 @@
 			children = (
 			);
 			name = HackerSwifter;
+			sourceTree = "<group>";
+		};
+		2495A8B819E8147D00A908BB /* API */ = {
+			isa = PBXGroup;
+			children = (
+				2495A8B919E8217B00A908BB /* HackerNewsAPI.swift */,
+			);
+			name = API;
 			sourceTree = "<group>";
 		};
 		24CE5FEE19434DC0009D2677 /* Post List */ = {
@@ -113,13 +124,14 @@
 		24F39F7C18AFB1150055F8DC = {
 			isa = PBXGroup;
 			children = (
+				2495A8B819E8147D00A908BB /* API */,
 				24F39F8E18AFB1150055F8DC /* Client */,
 				24CE5FF219434E20009D2677 /* Models */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
 				24F39F8618AFB1150055F8DC /* Products */,
-				ECA3D4DD24034EAB9507312B /* Pods.xcconfig */,
 				241387A51945A6E100D71220 /* README.md */,
+				787AA7324028CCD246204D6D /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -162,6 +174,15 @@
 				24F39F9018AFB1150055F8DC /* Hackers-Info.plist */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		787AA7324028CCD246204D6D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8442730C441D191CADBB7E89 /* Pods.debug.xcconfig */,
+				BB8494397A769287AFF579F0 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,7 +265,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E3AD65B8D2B647F18A01259D /* Check Pods Manifest.lock */ = {
@@ -274,6 +295,7 @@
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				2444F5C11943652F00829D12 /* PostViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
+				2495A8BA19E8217B00A908BB /* HackerNewsAPI.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				241387A61945A6E100D71220 /* README.md in Sources */,
@@ -357,7 +379,7 @@
 		};
 		24F39FB218AFB1150055F8DC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ECA3D4DD24034EAB9507312B /* Pods.xcconfig */;
+			baseConfigurationReference = 8442730C441D191CADBB7E89 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -383,7 +405,7 @@
 		};
 		24F39FB318AFB1150055F8DC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ECA3D4DD24034EAB9507312B /* Pods.xcconfig */;
+			baseConfigurationReference = BB8494397A769287AFF579F0 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
