@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 
-class PostViewController : UIViewController, UIWebViewDelegate {
-    var post: HNPost = HNPost()
+class PostViewController: UIViewController, UIWebViewDelegate {
+    
+    var post: HNPost?
     var comments: [HNComment] = [HNComment]()
 
     @IBOutlet var webView: UIWebView!
@@ -19,13 +20,15 @@ class PostViewController : UIViewController, UIWebViewDelegate {
     
 
     override func viewDidLoad() {
-        self.webView.loadRequest(NSURLRequest(URL: NSURL(string: self.post.UrlString)!))
-        HNManager.sharedManager().loadCommentsFromPost(self.post, completion: {
-            (comments: [AnyObject]!) in
-            if let downcastedArray = comments as? [HNComment] {
-                self.comments = downcastedArray
-            }
-        })
+        if let currentPost = self.post {
+            self.webView.loadRequest(NSURLRequest(URL: NSURL(string: String(currentPost.UrlString))!))
+            HNManager.sharedManager().loadCommentsFromPost(self.post, completion: {
+                (comments: [AnyObject]!) in
+                if let downcastedArray = comments as? [HNComment] {
+                    self.comments = downcastedArray
+                }
+            })
+        }
         
         super.viewDidLoad()
     }
@@ -64,7 +67,7 @@ class PostViewController : UIViewController, UIWebViewDelegate {
         if segue.identifier == "ShowCommentsSegue" {
             let navigationController = segue.destinationViewController as UINavigationController
             let commentsViewController = navigationController.viewControllers[0] as CommentsViewController
-            commentsViewController.post = self.post
+            commentsViewController.post = self.post!
         }
     }
     

@@ -9,14 +9,17 @@
 import Foundation
 import UIKit
 
-class NewsViewController : UITableViewController {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate {
     
     var posts: [HNPost] = [HNPost]()
+    private var collapseDetailViewController = true
     
     override func viewDidLoad() {
-        self.tableView.estimatedRowHeight = 80
-        self.tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
-        self.refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
+        tableView.estimatedRowHeight = 80
+        tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
+        refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
+        
+        splitViewController?.delegate = self
         
         loadPosts()
         
@@ -24,9 +27,9 @@ class NewsViewController : UITableViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-        self.navigationController!.setToolbarHidden(true, animated: true)
-        if (self.tableView.indexPathForSelectedRow() != nil) {
-            self.tableView .deselectRowAtIndexPath(self.tableView.indexPathForSelectedRow()!, animated: true)
+        navigationController!.setToolbarHidden(true, animated: true)
+        if (tableView.indexPathForSelectedRow() != nil) {
+            tableView .deselectRowAtIndexPath(tableView.indexPathForSelectedRow()!, animated: true)
         }
         
         super.viewWillAppear(animated)
@@ -47,16 +50,16 @@ class NewsViewController : UITableViewController {
     }
     
     
-    // MARK: UITableViewDataSource
+    // MARK: - UITableViewDataSource
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.posts.count
+        return posts.count
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellIdentifier = "PostCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as PostCell
-        let post = self.posts[indexPath.row]
+        let post = posts[indexPath.row]
         
         cell.titleLabel.text = post.Title
         cell.metadataLabel.text = post.UrlDomain
@@ -68,15 +71,21 @@ class NewsViewController : UITableViewController {
         return cell
     }
     
+    // MARK: - UITableViewDelegate
     
-    // MARK: UISegueDelegate
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
-        if segue.identifier == "ShowPostSegue" {
-            let postViewController = segue.destinationViewController as PostViewController
-            let selectedIndexPath = self.tableView.indexPathForSelectedRow()
-            let post = self.posts[selectedIndexPath!.row]
-            postViewController.post = post
-        }
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        collapseDetailViewController = false
+        let post = posts[indexPath.row]
+        let postViewNavigationController = UIStoryboard(name: "Storyboard", bundle: nil).instantiateViewControllerWithIdentifier("PostViewNavigationController") as UINavigationController
+        let postViewController = postViewNavigationController.topViewController as PostViewController
+        postViewController.post = post
+        self.showDetailViewController(postViewNavigationController, sender: self)
     }
+    
+    // MARK: - UISplitViewControllerDelegate
+    
+    func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
+        return collapseDetailViewController
+    }
+
 }

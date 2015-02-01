@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="eMm-uf-LLm">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="qCu-jm-yAB">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
         <!--Hacker News-->
@@ -13,20 +13,20 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="65" id="Rrm-i5-OHp" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="65" id="Rrm-i5-OHp" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="86" width="320" height="65"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Rrm-i5-OHp" id="14V-09-SDx">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="295" translatesAutoresizingMaskIntoConstraints="NO" id="aE4-uh-lta" userLabel="Title Label">
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="295" translatesAutoresizingMaskIntoConstraints="NO" id="aE4-uh-lta" userLabel="Title Label">
                                             <rect key="frame" x="15" y="10" width="295" height="28"/>
                                             <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="16"/>
                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmL-jW-eiY" userLabel="Comments Label">
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmL-jW-eiY" userLabel="Comments Label">
                                             <rect key="frame" x="189" y="38" width="121" height="16"/>
                                             <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="13"/>
                                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -59,7 +59,6 @@
                                     <outlet property="commentsLabel" destination="zmL-jW-eiY" id="5M9-YE-i6i"/>
                                     <outlet property="metadataLabel" destination="t0S-kq-sBG" id="KCC-49-LqJ"/>
                                     <outlet property="titleLabel" destination="aE4-uh-lta" id="Kg2-ea-6Ym"/>
-                                    <segue destination="xYT-nh-Y9b" kind="push" identifier="ShowPostSegue" id="NW4-TM-FYh"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -72,7 +71,36 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rq4-Wu-zQR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="570" y="58"/>
+            <point key="canvasLocation" x="1072" y="735"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="9YC-Dl-luH">
+            <objects>
+                <navigationController id="RSP-6D-F3G" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="gJK-9r-szA">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="rez-OX-M9N" kind="relationship" relationship="rootViewController" id="d9f-24-lvC"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eha-hO-KX9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="570" y="735"/>
+        </scene>
+        <!--Main Split View Controller-->
+        <scene sceneID="UDs-CZ-r0a">
+            <objects>
+                <splitViewController id="qCu-jm-yAB" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="RSP-6D-F3G" kind="relationship" relationship="masterViewController" id="X5W-iR-EIh"/>
+                        <segue destination="eIj-eX-YuX" kind="relationship" relationship="detailViewController" id="hhM-z2-sK7"/>
+                    </connections>
+                </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CXr-al-2cl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="30" y="1050"/>
         </scene>
         <!--Comments View Controller-->
         <scene sceneID="mLS-Wn-pXA">
@@ -241,7 +269,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vcn-3b-TpK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1912" y="58"/>
+            <point key="canvasLocation" x="1973" y="1403"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="mPh-Ba-HRr">
@@ -256,7 +284,27 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yag-bs-UsF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1489" y="58"/>
+            <point key="canvasLocation" x="1535" y="1403"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="N7T-fw-zna">
+            <objects>
+                <navigationController storyboardIdentifier="PostViewNavigationController" toolbarHidden="NO" id="eIj-eX-YuX" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="GCP-JH-btW"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="T7A-bH-qPa">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="MCt-Nd-rPQ">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="xYT-nh-Y9b" kind="relationship" relationship="rootViewController" id="es5-Po-VnO"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="odo-kT-GlM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="570" y="1403"/>
         </scene>
         <!--Post View Controller-->
         <scene sceneID="iq1-e0-TdL">
@@ -313,7 +361,6 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="backButton" destination="IBl-89-bTg" id="j2r-oZ-SUc"/>
                         <outlet property="forwardButton" destination="VKX-5A-aJY" id="Oux-RY-NmW"/>
@@ -322,26 +369,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HbG-WF-Vvr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1038" y="58"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="EVf-0b-5Yd">
-            <objects>
-                <navigationController definesPresentationContext="YES" toolbarHidden="NO" id="eMm-uf-LLm" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="XrM-0u-YG4">
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="u6g-hI-F1x">
-                        <rect key="frame" x="0.0" y="524" width="320" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </toolbar>
-                    <connections>
-                        <segue destination="rez-OX-M9N" kind="relationship" relationship="rootViewController" id="gBj-qK-I7w"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="504-Np-aeJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="36" y="58"/>
+            <point key="canvasLocation" x="1072" y="1403"/>
         </scene>
     </scenes>
     <resources>
