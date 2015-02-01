@@ -53,7 +53,12 @@ static HNManager * _sharedManager = nil;
         self.Service = [[HNWebService alloc] init];
         
         // Set up Voted On Dictionary
-        self.VotedOnDictionary = [NSMutableDictionary dictionary];
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"HN-VotedOn"]) {
+            self.VotedOnDictionary = [[[NSUserDefaults standardUserDefaults] objectForKey:@"HN-VotedOn"] mutableCopy];
+        }
+        else {
+            self.VotedOnDictionary = [NSMutableDictionary dictionary];
+        }
         
         // Set Mark As Read
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"HN-MarkAsRead"]) {
@@ -184,15 +189,15 @@ static HNManager * _sharedManager = nil;
     [self.Service voteOnHNObject:hnObject direction:direction completion:completion];
 }
 
-- (void)fetchSubmissionsForUser:(NSString *)user completion:(GetPostsCompletion)completion {
+- (void)fetchSubmissionsForUser:(NSString *)user urlAddition:(NSString *)urlAddition completion:(GetPostsCompletion)completion {
     if (!user) {
         // Need a username to get their submissions!
-        completion(nil);
+        completion(nil, nil);
         return;
     }
     
     // Make the webservice call
-    [self.Service fetchSubmissionsForUser:user completion:completion];
+    [self.Service fetchSubmissionsForUser:user urlAddition:urlAddition completion:completion];
 }
 
 
@@ -240,6 +245,7 @@ static HNManager * _sharedManager = nil;
 - (void)addHNObjectToVotedOnDictionary:(id)hnObject direction:(VoteDirection)direction {
     NSString *votedOnId = [hnObject isKindOfClass:[HNPost class]] ? [(HNPost *)hnObject PostId] : [(HNComment *)hnObject CommentId];
     [self.VotedOnDictionary setObject:@(direction) forKey:votedOnId];
+    [[NSUserDefaults standardUserDefaults] setObject:self.VotedOnDictionary forKey:@"HN-VotedOn"];
 }
 
 #pragma mark - Cancel Requests

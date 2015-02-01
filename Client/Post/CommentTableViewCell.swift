@@ -35,7 +35,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)
                 
-                commentAttributedString.addAttribute(NSFontAttributeName, value: commentFont, range: commentRange)
+                commentAttributedString.addAttribute(NSFontAttributeName, value: commentFont!, range: commentRange)
                 commentAttributedString.addAttribute(NSForegroundColorAttributeName, value: commentTextColor, range: commentRange)
                 commentAttributedString.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: commentRange)
                 

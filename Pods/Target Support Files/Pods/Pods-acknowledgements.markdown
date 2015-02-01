@@ -1,10 +1,6 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## Firebase
-
-https://www.firebase.com/terms/terms-of-service.html
-
 ## libHN
 
 Copyright (C) 2013 by Benjamin Gordon

@@ -34,7 +34,7 @@ class CommentModel {
         //parentCommentID = source.ParentID
         parentCommentID = ""
         dateCreatedString = source.TimeCreatedString
-        replyURL = NSURL(string: source.ReplyURLString)
+        replyURL = NSURL(string: source.ReplyURLString)!
         level = Int(source.Level)
         text = source.Text
     }

@@ -37,8 +37,7 @@ class NewsViewController : UITableViewController {
             refreshControl!.beginRefreshing()
         }
         
-        HNManager.sharedManager().loadPostsWithFilter(PostFilterType.Top, completion: {
-            (posts: [AnyObject]!) in
+        HNManager.sharedManager().loadPostsWithFilter(.Top, completion: { (posts: [AnyObject]!, nextPageIdentifier: String!) -> Void in
             if let downcastedArray = posts as? [HNPost] {
                 self.posts = downcastedArray
                 self.tableView.reloadData()

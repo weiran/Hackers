@@ -19,7 +19,7 @@ class PostViewController : UIViewController, UIWebViewDelegate {
     
 
     override func viewDidLoad() {
-        self.webView.loadRequest(NSURLRequest(URL: NSURL(string: self.post.UrlString)))
+        self.webView.loadRequest(NSURLRequest(URL: NSURL(string: self.post.UrlString)!))
         HNManager.sharedManager().loadCommentsFromPost(self.post, completion: {
             (comments: [AnyObject]!) in
             if let downcastedArray = comments as? [HNComment] {
