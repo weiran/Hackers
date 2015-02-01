@@ -20,9 +20,9 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     
 
     override func viewDidLoad() {
-        if let currentPost = self.post {
-            self.webView.loadRequest(NSURLRequest(URL: NSURL(string: String(currentPost.UrlString))!))
-            HNManager.sharedManager().loadCommentsFromPost(self.post, completion: {
+        if let currentPost = post {
+            webView.loadRequest(NSURLRequest(URL: NSURL(string: String(currentPost.UrlString))!))
+            HNManager.sharedManager().loadCommentsFromPost(post, completion: {
                 (comments: [AnyObject]!) in
                 if let downcastedArray = comments as? [HNComment] {
                     self.comments = downcastedArray
@@ -34,7 +34,7 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     }
     
     override func viewWillAppear(animated: Bool) {
-        self.navigationController?.setToolbarHidden(false, animated: true)
+        navigationController?.setToolbarHidden(false, animated: true)
         
         super.viewWillAppear(animated)
     }
@@ -42,7 +42,7 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     // MARK - Button actions
     
     @IBAction func share(sender: UIView) {
-        //self.post.UrlString
+        //post.UrlString
     }
     
     // MARK - UIWebViewDelegate
@@ -56,8 +56,8 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     }
     
     func updateNavigationButtonsStateForWebView(_webView: UIWebView) {
-        self.backButton.enabled = _webView.canGoBack
-        self.forwardButton.enabled = _webView.canGoForward
+        backButton.enabled = _webView.canGoBack
+        forwardButton.enabled = _webView.canGoForward
     }
     
     
@@ -67,7 +67,7 @@ class PostViewController: UIViewController, UIWebViewDelegate {
         if segue.identifier == "ShowCommentsSegue" {
             let navigationController = segue.destinationViewController as UINavigationController
             let commentsViewController = navigationController.viewControllers[0] as CommentsViewController
-            commentsViewController.post = self.post!
+            commentsViewController.post = post!
         }
     }
     

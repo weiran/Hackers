@@ -79,7 +79,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
         let postViewNavigationController = UIStoryboard(name: "Storyboard", bundle: nil).instantiateViewControllerWithIdentifier("PostViewNavigationController") as UINavigationController
         let postViewController = postViewNavigationController.topViewController as PostViewController
         postViewController.post = post
-        self.showDetailViewController(postViewNavigationController, sender: self)
+        
+        showDetailViewController(postViewNavigationController, sender: self)
     }
     
     // MARK: - UISplitViewControllerDelegate
