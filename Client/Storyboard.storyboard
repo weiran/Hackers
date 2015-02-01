@@ -354,7 +354,6 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="5Wx-jY-x4V">
-                        <barButtonItem key="backBarButtonItem" title="Back" id="mDF-Lk-8iV"/>
                         <barButtonItem key="rightBarButtonItem" title="Comments" id="VuN-Rn-1Ne">
                             <connections>
                                 <segue destination="Bud-aM-3wf" kind="modal" identifier="ShowCommentsSegue" id="WbB-K2-B3P"/>

@@ -14,12 +14,17 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     var post: HNPost?
     var comments: [HNComment] = [HNComment]()
 
-    @IBOutlet var webView: UIWebView!
-    @IBOutlet var backButton: UIBarButtonItem!
-    @IBOutlet var forwardButton: UIBarButtonItem!
+    @IBOutlet weak var webView: UIWebView!
+    @IBOutlet weak var forwardButton: UIBarButtonItem!
+    @IBOutlet weak var backButton: UIBarButtonItem!
     
-
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
+        navigationItem.leftItemsSupplementBackButton = true
+        splitViewController?.preferredDisplayMode = .PrimaryOverlay
+        
         if let currentPost = post {
             webView.loadRequest(NSURLRequest(URL: NSURL(string: String(currentPost.UrlString))!))
             HNManager.sharedManager().loadCommentsFromPost(post, completion: {
@@ -29,14 +34,11 @@ class PostViewController: UIViewController, UIWebViewDelegate {
                 }
             })
         }
-        
-        super.viewDidLoad()
     }
     
     override func viewWillAppear(animated: Bool) {
-        navigationController?.setToolbarHidden(false, animated: true)
-        
         super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(false, animated: true)
     }
     
     // MARK - Button actions
