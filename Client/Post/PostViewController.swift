@@ -43,8 +43,14 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     
     // MARK - Button actions
     
-    @IBAction func share(sender: UIView) {
-        //post.UrlString
+    @IBAction func share(sender: UIBarButtonItem) {
+        let url = NSURL(string: String(post!.UrlString))
+        let title = String(post!.Title)
+        let objectsToShare: Array<AnyObject!> = [title, url]
+        let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+        activityViewController.popoverPresentationController?.barButtonItem = sender
+
+        presentViewController(activityViewController, animated: true, completion: nil)
     }
     
     // MARK - UIWebViewDelegate
