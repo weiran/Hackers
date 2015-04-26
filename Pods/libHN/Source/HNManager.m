@@ -22,6 +22,9 @@
 
 #import "HNManager.h"
 
+NSString * const kHNJSONConfigurationKey = @"kHNJSONConfigurationKey";
+NSString * const kHNShouldReloadDataFromConfiguration = @"kHNShouldReloadDataFromConfiguration";
+
 @implementation HNManager
 
 // Build the static manager object
@@ -75,6 +78,7 @@ static HNManager * _sharedManager = nil;
 - (void)startSession {
     // Set Values from Defaults
     self.SessionCookie = [HNManager getHNCookie];
+    [self downloadAndSetConfiguration];
     
     // Validate User/Cookie
     __weak typeof(self) wSelf = self;
@@ -251,6 +255,41 @@ static HNManager * _sharedManager = nil;
 #pragma mark - Cancel Requests
 - (void)cancelAllRequests {
     [self.Service cancelAllRequests];
+}
+
+
+#pragma mark - Download Configuration
+- (void)downloadAndSetConfiguration {
+    NSURL *url = [NSURL URLWithString:@"https://raw.githubusercontent.com/bennyguitar/libHN/master/Source/hn.json"];
+    NSMutableURLRequest *request = [[NSURLRequest requestWithURL:url] mutableCopy];
+    NSOperationQueue *queue = [NSOperationQueue new];
+    NSData *jsonData;
+    if (![[NSUserDefaults standardUserDefaults] stringForKey:kHNJSONConfigurationKey]) {
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"hn" ofType:@"json"];
+        NSString *string = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+        [[NSUserDefaults standardUserDefaults] setValue:string forKey:kHNJSONConfigurationKey];
+        jsonData = [NSData dataWithContentsOfFile:filePath];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    else {
+        NSString *jsonString = [[NSUserDefaults standardUserDefaults] stringForKey:kHNJSONConfigurationKey];
+        jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    }
+    
+    if (jsonData) {
+        self.JSONConfiguration = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
+    }
+    
+    request.cachePolicy = NSURLCacheStorageNotAllowed;
+    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        if (![data isEqualToData:jsonData]) {
+            NSString *newData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            [[NSUserDefaults standardUserDefaults] setValue:newData forKey:kHNJSONConfigurationKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            self.JSONConfiguration = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kHNShouldReloadDataFromConfiguration object:nil];
+        }
+    }];
 }
 
 @end

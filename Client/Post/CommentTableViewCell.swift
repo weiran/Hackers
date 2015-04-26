@@ -30,7 +30,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 let lineSpacing = 4 as CGFloat
                 
                 var commentAttributedString = NSMutableAttributedString(string: comment!.text)
-                var paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as NSMutableParagraphStyle
+                var paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as! NSMutableParagraphStyle
                 paragraphStyle.lineSpacing = lineSpacing
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)
@@ -39,7 +39,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 commentAttributedString.addAttribute(NSForegroundColorAttributeName, value: commentTextColor, range: commentRange)
                 commentAttributedString.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: commentRange)
                 
-                textView.attributedText = commentAttributedString.copy() as NSAttributedString
+                textView.attributedText = commentAttributedString.copy() as! NSAttributedString
             }
         }
     }

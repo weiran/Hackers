@@ -23,6 +23,7 @@
 #import "HNComment.h"
 #import "HNCommentLink.h"
 #import "HNUtilities.h"
+#import "HNManager.h"
 
 @implementation HNComment
 
@@ -30,62 +31,68 @@
 + (NSArray *)parsedCommentsFromHTML:(NSString *)html forPost:(HNPost *)post {
     // Set Up
     NSMutableArray *comments = [@[] mutableCopy];
-    NSString *trash = @"";
-    NSArray *htmlComponents = [html componentsSeparatedByString:@"<td><img src=\"s.gif\""];
+    NSString *trash = @"", *upvoteUrl = @"";
+    NSDictionary *jsonDict = [[HNManager sharedManager] JSONConfiguration];
+    NSDictionary *commentDict = jsonDict && jsonDict[@"Comment"] ? jsonDict[@"Comment"] : nil;
+    if (!commentDict) {
+        return @[];
+    }
+    NSArray *htmlComponents = [html componentsSeparatedByString:commentDict[@"CS"] ? commentDict[@"CS"] : @""];
+    if (!htmlComponents) {
+        return @[];
+    }
     
     if (post.Type == PostTypeAskHN) {
         // Grab AskHN Post
         NSScanner *scanner = [NSScanner scannerWithString:htmlComponents[0]];
-        NSString *text = @"", *user = @"", *timeAgo = @"", *commentId = @"", *upvoteUrl = @"";
+        NSMutableDictionary *cDict = [NSMutableDictionary new];
         
         // Check for Upvote
-        if ([htmlComponents[0] rangeOfString:@"dir=\"up"].location != NSNotFound) {
-            [scanner scanBetweenString:@"<center><a " andString:@"href" intoString:&trash];
-            [scanner scanBetweenString:@"href=\"" andString:@"whence" intoString:&upvoteUrl];
+        if ([htmlComponents[0] rangeOfString:commentDict[@"Upvote"][@"R"]].location != NSNotFound) {
+            [scanner scanBetweenString:commentDict[@"Upvote"][@"S"] andString:commentDict[@"Upvote"][@"S"] intoString:&upvoteUrl];
             upvoteUrl = [upvoteUrl stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
         }
         
-        // Get Id
-        [scanner scanBetweenString:@"<span id=\"score_" andString:@">" intoString:&commentId];
-        
-        // Get User
-        [scanner scanBetweenString:@"by <a href=\"user?id=" andString:@"\">" intoString:&user];
-        
-        // Get Time Created String
-        [scanner scanBetweenString:@"</a> " andString:@"ago" intoString:&timeAgo];
-        timeAgo = [timeAgo stringByAppendingString:@"ago"];
-        
-        // Get Text
-        [scanner scanBetweenString:@"</tr><tr><td></td><td>" andString:@"</td>" intoString:&text];
-        
-        // Get rid of special text crap
-        if ([text rangeOfString:@"<form method=\"post"].location != NSNotFound) {
-            text = @"";
+        for (NSDictionary *dict in commentDict[@"ASK"]) {
+            NSString *new = @"";
+            BOOL isTrash = [dict[@"I"] isEqualToString:@"TRASH"];
+            [scanner scanBetweenString:dict[@"S"] andString:dict[@"E"] intoString:isTrash ? &trash : &new];
+            if (new.length > 0) {
+                [cDict setObject:new forKey:dict[@"I"]];
+            }
         }
         
         // Create special comment for it
         HNComment *newComment = [[HNComment alloc] init];
         newComment.Level = 0;
-        newComment.Username = user;
-        newComment.TimeCreatedString = timeAgo;
-        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:text];
+        newComment.Username = cDict[@"Username"] ? cDict[@"Username"] : @"";
+        newComment.TimeCreatedString = cDict[@"Time"] ? cDict[@"Time"] : @"";
+        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:(cDict[@"Text"] ? cDict[@"Text"] : @"")];
         newComment.Links = [HNCommentLink linksFromCommentText:newComment.Text];
         newComment.Type = HNCommentTypeAskHN;
         newComment.UpvoteURLAddition = upvoteUrl.length>0 ? upvoteUrl : nil;
-        newComment.CommentId = commentId;
+        newComment.CommentId = cDict[@"CommentId"] ? cDict[@"CommentId"] : @"";
         [comments addObject:newComment];
     }
     
     if (post.Type == PostTypeJobs) {
         // Grab Jobs Post
         NSScanner *scanner = [NSScanner scannerWithString:htmlComponents[0]];
-        NSString *text = @"";
-        [scanner scanBetweenString:@"</tr><tr><td></td><td>" andString:@"</td>" intoString:&text];
+        NSMutableDictionary *cDict = [NSMutableDictionary new];
+        
+        for (NSDictionary *dict in commentDict[@"JOBS"]) {
+            NSString *new = @"";
+            BOOL isTrash = [dict[@"I"] isEqualToString:@"TRASH"];
+            [scanner scanBetweenString:dict[@"S"] andString:dict[@"E"] intoString:isTrash ? &trash : &new];
+            if (new.length > 0) {
+                [cDict setObject:new forKey:dict[@"I"]];
+            }
+        }
         
         // Create special comment for it
         HNComment *newComment = [[HNComment alloc] init];
         newComment.Level = 0;
-        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:text];
+        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:(cDict[@"Text"] ? cDict[@"Text"] : @"")];
         newComment.Links = [HNCommentLink linksFromCommentText:newComment.Text];
         newComment.Type = HNCommentTypeJobs;
         [comments addObject:newComment];
@@ -100,54 +107,41 @@
         // Set Up
         NSScanner *scanner = [NSScanner scannerWithString:htmlComponents[xx]];
         HNComment *newComment = [[HNComment alloc] init];
-        NSString *level = @"";
-        NSString *user = @"";
-        NSString *text = @"";
-        NSString *timeAgo = @"";
-        NSString *reply = @"";
-        NSString *commentId = @"";
         NSString *upvoteString = @"";
         NSString *downvoteString = @"";
-        
-        
-        
+        NSString *level = @"";
+        NSMutableDictionary *cDict = [NSMutableDictionary new];
         // Get Comment Level
-        [scanner scanBetweenString:@"height=\"1\" width=\"" andString:@">" intoString:&level];
+        [scanner scanBetweenString:commentDict[@"Level"][@"S"] andString:commentDict[@"Level"][@"E"] intoString:&level];
         newComment.Level = [level intValue] / 40;
         
         // If Logged In - Grab Voting Strings
-        if ([htmlComponents[xx] rangeOfString:@"dir=up"].location != NSNotFound) {
+        if ([htmlComponents[xx] rangeOfString:commentDict[@"Upvote"][@"R"]].location != NSNotFound) {
             // Scan Upvote String
-            [scanner scanBetweenString:@"href=\"" andString:@"whence" intoString:&upvoteString];
+            [scanner scanBetweenString:commentDict[@"Upvote"][@"S"] andString:commentDict[@"Upvote"][@"E"] intoString:&upvoteString];
             newComment.UpvoteURLAddition = [upvoteString stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
             
             // Check for downvote String
-            if ([htmlComponents[xx] rangeOfString:@"dir=down"].location != NSNotFound) {
-                [scanner scanBetweenString:@"href=\"" andString:@"whence" intoString:&downvoteString];
+            if ([htmlComponents[xx] rangeOfString:commentDict[@"Downvote"][@"R"]].location != NSNotFound) {
+                [scanner scanBetweenString:commentDict[@"Downvote"][@"S"] andString:commentDict[@"Downvote"][@"E"] intoString:&downvoteString];
                 newComment.DownvoteURLAddition = [downvoteString stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
             }
         }
         
-        // Get Username
-        [scanner scanBetweenString:@"<a href=\"user?id=" andString:@"\">" intoString:&user];
-        newComment.Username = user.length > 0 ? user : @"[deleted]";
+        for (NSDictionary *dict in commentDict[@"REG"]) {
+            NSString *new = @"";
+            BOOL isTrash = [dict[@"I"] isEqualToString:@"TRASH"];
+            [scanner scanBetweenString:dict[@"S"] andString:dict[@"E"] intoString:isTrash ? &trash : &new];
+            if (new.length > 0) {
+                [cDict setObject:new forKey:dict[@"I"]];
+            }
+        }
         
-        // Get Date/Time Label
-        [scanner scanBetweenString:@"</a> " andString:@" |" intoString:&timeAgo];
-        newComment.TimeCreatedString = timeAgo;
-        
-        // Get Comment Text
-        [scanner scanBetweenString:@"<font color=" andString:@">" intoString:&trash];
-        [scanner scanBetweenString:@">" andString:@"</font>" intoString:&text];
-        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:text];
-        
-        // Get CommentId
-        [scanner scanBetweenString:@"reply?id=" andString:@"&" intoString:&commentId];
-        newComment.CommentId = commentId;
-        
-        // Get Reply URL Addition
-        [scanner scanBetweenString:@"<font size=1><u><a href=\"" andString:@"\">reply" intoString:&reply];
-        newComment.ReplyURLString = reply;
+        newComment.CommentId = cDict[@"CommentId"] ? cDict[@"CommentId"] : @"";
+        newComment.Username = cDict[@"Username"] ? cDict[@"Username"] : @"";
+        newComment.Text = [HNUtilities stringByReplacingHTMLEntitiesInText:(cDict[@"Text"] ? cDict[@"Text"] : @"")];
+        newComment.TimeCreatedString = cDict[@"Time"] ? cDict[@"Time"] : @"";
+        newComment.ReplyURLString = cDict[@"ReplyUrl"] ? cDict[@"ReplyUrl"] : @"";
         
         // Get Links
         newComment.Links = [HNCommentLink linksFromCommentText:newComment.Text];

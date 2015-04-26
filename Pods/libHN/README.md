@@ -7,6 +7,7 @@ The definitive Cocoa framework for adding HackerNews to your iOS/Mac app. This m
 ## Table of Contents
 
 * [Installing](#getting-started)
+* [JSON Configuration](#json-configuration)
 * [HNManager](#hnmanager)
 * HN Web Calls
   * [Fetching Posts](#fetching-posts)
@@ -42,6 +43,81 @@ If CocoaPods suits your flavor of dependency management, then there is a .podspe
 ```ruby
 pod 'libHN'
 ```
+
+---------------------
+
+## JSON Configuration
+
+*Available in 4.0.1+*
+
+[`hn.json`](/Source/hn.json) is the culmination of 2 large annoyances that it hopes to solve. The first is that HN tends to change its markup fairly frequently now, which is no good because this library is a scraper. So the old way of doing things was updating what text to look for in the scanner to serialize into properties for posts, comments, etc. The other major annoyance is that after a change, it still takes Apple on average about 1 week to get that update live. This means that it took 1 week to get an update out to the store that handled one silly markup change. That's unmaintainable. So here's the fix.
+
+**Enter the JSON Configuration!**
+
+The JSON Configuration is a json file that describes how to build a post and comment object from the HTML markup, as well as how to handle replying and submitting new posts as far as the extra info that those web calls need. This JSON file is prebundled with the library, but is also fetched from the internet each time `HNManager` gets initialized. This means that whenever HN changes markup, a simple pull-request to the `hn.json` file should fix the problem across all apps that use this library - without an update to the App Store.
+
+**Notification on Change**
+
+When a new JSON Configuration is fetched from the internet, and it's different than the current one in use by the app, it will save the new configuration and send out an `NSNotification` that anything that uses Posts or Comments should reload itself to use the new configuration. The name of the notification is `kHNShouldReloadDataFromConfiguration`.
+
+```objc
+[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(someSelector) name:kHNShouldReloadDataFromConfiguration object:nil];
+```
+
+**Breakdown**
+
+The `hn.json` configuration contains 4 top-level key/value pairs:
+
+* Posts
+* Comment
+* Reply
+* Submit
+
+**Posts** handles how to build the array of `HNPost` objects. Here's what each key/value pair inside this object represents:
+
+* `CS`: the string that separates post objects from the total HTML (**c**omponents **s**eparated)
+* `Vote`:
+  * `R`: what the scanner is looking for if a vote arrow is present
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+* `Parts`: an array of objects that contain all of the parts necessary to build a post, in order.
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+  * `I`: what to put the result into. If it's TRASH, then it doesn't get saved. Use TRASH to get garbage in between necessary properties.
+
+**Comments** handles how to build the array of `HNComment` objects, but is a little more robust in what it's looking for:
+
+* `CS`: the string that separates post objects from the total HTML (**c**omponents **s**eparated)
+* `Upvote` and `Downvote`:
+  * `R`: what the scanner is looking for if a vote arrow is present
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+* `Level`: the way to figure out how nested this comment object is
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+* `ASK`, `JOBS`, and `REG` determine which order to find the parts necessary for a comment of its type:
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+  * `I`: what to put the result into. If it's TRASH, then it doesn't get saved. Use TRASH to get garbage in between necessary properties.
+
+**Reply** handles how to build the POSTed action to HN signifying a reply to a submission or another comment.
+
+* `Action`: the path to the form action for replying
+* `Parts`: the extra form values that are hidden from user-input but necessary for building the reply object.
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+  * `I`: what to put the result into. If it's TRASH, then it doesn't get saved. Use TRASH to get garbage in between necessary properties.
+
+**Submit** handles how to build the POSTed action to HN signifying a new submission.
+
+* `Action`: the path to the form action for submitting
+* `Parts`: the extra form values that are hidden from user-input but necessary for building the reply object.
+  * `S`: where to start scanning
+  * `E`: where to end scanning
+  * `I`: what to put the result into. If it's TRASH, then it doesn't get saved. Use TRASH to get garbage in between necessary properties.
+* `Url`: the POST property name for the submission's url.
+* `Title`: the POST property name for the submission's title.
+* `Text`: the POST property name for the submission's body text.
 
 ---------------------
 

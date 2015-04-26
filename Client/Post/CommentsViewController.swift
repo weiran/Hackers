@@ -53,7 +53,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         assert(comment.visibility != .Hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.Visible ? "OpenCommentCell" : "ClosedCommentCell"
 
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as CommentTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! CommentTableViewCell
         
         cell.comment = comment
         cell.delegate = self
