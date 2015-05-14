@@ -1,1 +1,1 @@
-../../../libHN/libHN Classes/HNManager.h
+../../../libHN/Source/HNManager.h

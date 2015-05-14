@@ -1,1 +1,1 @@
-../../../libHN/libHN Classes/HNWebService.h
+../../../libHN/Source/HNWebService.h

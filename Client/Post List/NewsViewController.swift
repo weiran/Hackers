@@ -58,7 +58,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellIdentifier = "PostCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as PostCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCell
         let post = posts[indexPath.row]
         
         cell.titleLabel.text = post.Title
@@ -76,8 +76,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         collapseDetailViewController = false
         let post = posts[indexPath.row]
-        let postViewNavigationController = UIStoryboard(name: "Storyboard", bundle: nil).instantiateViewControllerWithIdentifier("PostViewNavigationController") as UINavigationController
-        let postViewController = postViewNavigationController.topViewController as PostViewController
+        let postViewNavigationController = UIStoryboard(name: "Storyboard", bundle: nil).instantiateViewControllerWithIdentifier("PostViewNavigationController") as! UINavigationController
+        let postViewController = postViewNavigationController.topViewController as! PostViewController
         postViewController.post = post
         
         showDetailViewController(postViewNavigationController, sender: self)

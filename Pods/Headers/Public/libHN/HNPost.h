@@ -1,1 +1,1 @@
-../../../libHN/libHN Classes/HNPost.h
+../../../libHN/Source/HNPost.h

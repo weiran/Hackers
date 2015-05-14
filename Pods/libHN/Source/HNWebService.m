@@ -22,6 +22,7 @@
 
 #import "HNWebService.h"
 #import "HNManager.h"
+#import "HNUtilities.h"
 
 #define kBaseURLAddress @"https://news.ycombinator.com/"
 #define kCookieDomain @"news.ycombinator.com"
@@ -348,26 +349,42 @@
         if (blockOperation.responseData) {
             NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
             if ([html rangeOfString:@"login"].location == NSNotFound) {
-                NSString *trash = @"", *fnid = @"";
+                NSString *trash = @"";
                 NSScanner *scanner = [NSScanner scannerWithString:html];
-                [scanner scanUpToString:@"name=\"fnid\" value=\"" intoString:&trash];
-                [scanner scanString:@"name=\"fnid\" value=\"" intoString:&trash];
-                [scanner scanUpToString:@"\"" intoString:&fnid];
+                NSDictionary *json = [[HNManager sharedManager] JSONConfiguration];
+                NSDictionary *submitDict = json && json[@"Submit"] ? json[@"Submit"] : nil;
+                if (!submitDict) {
+                    completion(NO);
+                    return;
+                }
                 
-                if (fnid.length > 0) {
+                NSMutableString *partString = [NSMutableString new];
+                for (NSDictionary *part in submitDict[@"Parts"]) {
+                    NSString *new = @"";
+                    BOOL isTrash = [part[@"I"] isEqualToString:@"TRASH"];
+                    [scanner scanBetweenString:part[@"S"] andString:part[@"E"] intoString:isTrash ? &trash : &new];
+                    if (new && new.length > 0) {
+                        [partString appendFormat:@"%@=%@&", part[@"I"], new];
+                    }
+                }
+                
+                if (partString.length > 0) {
                     // Create BodyData
                     NSString *bodyString;
+                    NSString *u = submitDict[@"Url"];
+                    NSString *t = submitDict[@"Title"];
+                    NSString *x = submitDict[@"Text"];
                     if (link.length > 0) {
-                        bodyString = [[NSString stringWithFormat:@"fnid=%@&u=%@&t=%@&x=", fnid, link, title] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                        bodyString = [[NSString stringWithFormat:@"%@%@=%@&%@=%@&%@=", partString, u, link, t, title, text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                     }
                     else {
-                        bodyString = [[NSString stringWithFormat:@"fnid=%@&u=&t=%@&x=%@", fnid, title, text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                        bodyString = [[NSString stringWithFormat:@"%@%@=&%@=%@&%@=%@", partString, u, t, title, x, text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                     }
                     NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
                     
                     // Create next Request
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [self part2SubmitPostOrCommentWithData:bodyData pathComponent:@"r" completion:completion];
+                        [self part2SubmitPostOrCommentWithData:bodyData pathComponent:submitDict[@"Action"] completion:completion];
                     });
                 }
                 else {
@@ -422,29 +439,34 @@
         if (blockOperation.responseData) {
             NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
             if ([html rangeOfString:@"textarea"].location != NSNotFound) {
-                NSString *trash = @"", *hmac = @"", *parent, *whence;
+                NSString *trash = @"";
                 NSScanner *scanner = [NSScanner scannerWithString:html];
+                NSDictionary *json = [[HNManager sharedManager] JSONConfiguration];
+                NSDictionary *replyDict = json && json[@"Reply"] ? json[@"Reply"] : nil;
+                if (!replyDict) {
+                    completion(NO);
+                    return;
+                }
                 
-                [scanner scanUpToString:@"name=\"parent\" value=\"" intoString:&trash];
-                [scanner scanString:@"name=\"parent\" value=\"" intoString:&trash];
-                [scanner scanUpToString:@"\"" intoString:&parent];
+                NSMutableString *partString = [NSMutableString new];
+                for (NSDictionary *part in replyDict[@"Parts"]) {
+                    NSString *new = @"";
+                    BOOL isTrash = [part[@"I"] isEqualToString:@"TRASH"];
+                    [scanner scanBetweenString:part[@"S"] andString:part[@"E"] intoString:isTrash ? &trash : &new];
+                    if (new && new.length > 0) {
+                        [partString appendFormat:@"%@=%@&", part[@"I"], new];
+                    }
+                }
                 
-                [scanner scanUpToString:@"name=\"whence\" value=\"" intoString:&trash];
-                [scanner scanString:@"name=\"whence\" value=\"" intoString:&trash];
-                [scanner scanUpToString:@"\"" intoString:&whence];
-                
-                [scanner scanUpToString:@"name=\"hmac\" value=\"" intoString:&trash];
-                [scanner scanString:@"name=\"hmac\" value=\"" intoString:&trash];
-                [scanner scanUpToString:@"\"" intoString:&hmac];
-                
-                if (hmac.length > 0) {
+                if (partString.length > 0) {
                     // Create BodyData
-                    NSString *bodyString = [[NSString stringWithFormat:@"hmac=%@&text=%@&parent=%@&whence=%@", hmac, text, parent, whence] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                    [partString appendFormat:@"text=%@", text];
+                    NSString *bodyString = [partString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                     NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
                     
                     // Create next Request
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [self part2SubmitPostOrCommentWithData:bodyData pathComponent:@"comment" completion:completion];
+                        [self part2SubmitPostOrCommentWithData:bodyData pathComponent:replyDict[@"Action"] completion:completion];
                     });
                 }
                 else {
@@ -480,7 +502,7 @@
     [operation setUrlPath:urlPath data:bodyData cookie:[[HNManager sharedManager] SessionCookie] completion:^{
         if (blockOperation.responseData) {
             NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
-            if ([html rangeOfString:@"logout?whence=%6e%65%77%65%73%74"].location != NSNotFound || [html rangeOfString:@"logout?whence=%6e%65%77%73"].location != NSNotFound) {
+            if ([html rangeOfString:@"logout?goto"].location != NSNotFound) {
                 // It worked!
                 dispatch_async(dispatch_get_main_queue(), ^{
                     completion(YES);

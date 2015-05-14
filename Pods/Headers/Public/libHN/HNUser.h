@@ -1,1 +1,1 @@
-../../../libHN/libHN Classes/HNUser.h
+../../../libHN/Source/HNUser.h

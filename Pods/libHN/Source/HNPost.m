@@ -22,14 +22,24 @@
 
 #import "HNPost.h"
 #import "HNUtilities.h"
+#import "HNManager.h"
 
 @implementation HNPost
 
 #pragma mark - Parse Posts
 + (NSArray *)parsedPostsFromHTML:(NSString *)html FNID:(NSString *__autoreleasing *)fnid {
     // Set up
-    NSArray *htmlComponents = [html componentsSeparatedByString:@"<td align=\"right\" valign=\"top\" class=\"title\">"];
+    NSArray *htmlComponents;
     NSMutableArray *postArray = [NSMutableArray array];
+    NSDictionary *jsonDict = [[HNManager sharedManager] JSONConfiguration];
+    NSDictionary *posts = jsonDict && jsonDict[@"Post"] ? jsonDict[@"Post"] : nil;
+    if (posts) {
+        htmlComponents = posts[@"CS"] ? [html componentsSeparatedByString:posts[@"CS"]] : nil;
+    }
+    else {
+        return @[];
+    }
+    
     
     // Scan through components and build posts
     for (int xx = 1; xx < htmlComponents.count; xx++) {
@@ -42,53 +52,41 @@
         HNPost *newPost = [[HNPost alloc] init];
         
         // Set Up for Scanning
+        NSMutableDictionary *postDict = [NSMutableDictionary new];
         NSScanner *scanner = [[NSScanner alloc] initWithString:htmlComponents[xx]];
         NSString *trash = @"";
-        NSString *urlString = @"";
-        NSString *title = @"";
-        NSString *hoursAgo = @"";
-        NSString *comments = @"";
-        NSString *author = @"";
-        NSString *points = @"";
-        NSString *postId = @"";
         NSString *upvoteString = @"";
         
         // Scan for Upvotes
-        if ([htmlComponents[xx] rangeOfString:@"votearrow"].location != NSNotFound) {
-            [scanner scanBetweenString:@"href=\"" andString:@"whence" intoString:&upvoteString];
+        if ([htmlComponents[xx] rangeOfString:posts[@"Vote"][@"R"]].location != NSNotFound) {
+            [scanner scanBetweenString:posts[@"Vote"][@"S"] andString:posts[@"Vote"][@"E"] intoString:&upvoteString];
             newPost.UpvoteURLAddition = upvoteString;
         }
         
-        // Scan URL
-        [scanner scanBetweenString:@"<a href=\"" andString:@"\"" intoString:&urlString];
-        newPost.UrlString = urlString;
+        // Scan from JSON Configuration
+        for (NSDictionary *part in posts[@"Parts"]) {
+            NSString *new = @"";
+            BOOL isTrash = [part[@"I"] isEqualToString:@"TRASH"];
+            [scanner scanBetweenString:part[@"S"] andString:part[@"E"] intoString:isTrash ? &trash : &new];
+            if (new.length > 0) {
+                [postDict setObject:new forKey:part[@"I"]];
+            }
+        }
         
-        // Scan Title
-        [scanner scanBetweenString:@">" andString:@"</a>" intoString:&title];
-        newPost.Title = title;
+        // Set Values
+        newPost.UrlString = postDict[@"UrlString"] ? postDict[@"UrlString"] : @"";
+        newPost.Title = postDict[@"Title"] ? postDict[@"Title"] : @"";
+        newPost.Points = postDict[@"Points"] ? [postDict[@"Points"] intValue] : 0;
+        newPost.Username = postDict[@"Username"] ? postDict[@"Username"] : @"";
+        newPost.PostId = postDict[@"PostId"] ? postDict[@"PostId"] : @"";
+        newPost.TimeCreatedString = postDict[@"Time"] ? postDict[@"Time"] : @"";
         
-        // Scan Points
-        [scanner scanBetweenString:@"id=\"score_" andString:@">" intoString:&trash];
-        [scanner scanBetweenString:@">" andString:@" " intoString:&points];
-        newPost.Points = [points intValue];
         
-        // Scan Author
-        [scanner scanBetweenString:@"<a href=\"user?id=" andString:@"\"" intoString:&author];
-        newPost.Username = author;
-        
-        // Scan Time Ago
-        [scanner scanBetweenString:@"</a> " andString:@"ago" intoString:&hoursAgo];
-        newPost.TimeCreatedString = [hoursAgo stringByAppendingString:@"ago"];
-        
-        // Scan Number of Comments
-        [scanner scanBetweenString:@"<a href=\"item?id=" andString:@"\">" intoString:&postId];
-        [scanner scanBetweenString:@"\">" andString:@"</a>" intoString:&comments];
-        newPost.PostId = postId;
-        if ([comments isEqualToString:@"discuss"]) {
+        if (postDict[@"Comments"] && [postDict[@"Comments"] isEqualToString:@"discuss"]) {
             newPost.CommentCount = 0;
         }
-        else {
-            NSScanner *cScan = [[NSScanner alloc] initWithString:comments];
+        else if (postDict[@"Comments"]) {
+            NSScanner *cScan = [[NSScanner alloc] initWithString:postDict[@"Comments"] ];
             NSString *cCount = @"";
             [cScan scanUpToString:@" " intoString:&cCount];
             newPost.CommentCount = [cCount intValue];
@@ -97,15 +95,15 @@
         // Check if Jobs Post
         if (newPost.PostId.length == 0 && newPost.Points == 0 && newPost.Username.length == 0) {
             newPost.Type = PostTypeJobs;
-            if ([urlString rangeOfString:@"http"].location == NSNotFound) {
-                newPost.PostId = [urlString stringByReplacingOccurrencesOfString:@"item?id=" withString:@""];
+            if ([newPost.UrlString rangeOfString:@"http"].location == NSNotFound) {
+                newPost.PostId = [newPost.UrlString stringByReplacingOccurrencesOfString:@"item?id=" withString:@""];
             }
         }
         else {
             // Check if AskHN
-            if ([urlString rangeOfString:@"http"].location == NSNotFound && newPost.PostId.length > 0) {
+            if ([newPost.UrlString rangeOfString:@"http"].location == NSNotFound && newPost.PostId.length > 0) {
                 newPost.Type = PostTypeAskHN;
-                urlString = [@"https://news.ycombinator.com/" stringByAppendingString:urlString];
+                newPost.UrlString = [@"https://news.ycombinator.com/" stringByAppendingString:newPost.UrlString];
             }
             else {
                 newPost.Type = PostTypeDefault;

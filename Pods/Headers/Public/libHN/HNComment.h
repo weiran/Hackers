@@ -1,1 +1,1 @@
-../../../libHN/libHN Classes/HNComment.h
+../../../libHN/Source/HNComment.h
