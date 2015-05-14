@@ -1,10 +1,43 @@
 PODS:
+  - ARChromeActivity (1.0.0)
+  - ARSafariActivity (0.0.1)
+  - DKNightVersion (0.6.1):
+    - DKNightVersion/Controller (= 0.6.1)
+    - DKNightVersion/Core (= 0.6.1)
+    - DKNightVersion/Generator (= 0.6.1)
+    - DKNightVersion/Helper (= 0.6.1)
+    - DKNightVersion/UIKit (= 0.6.1)
+  - DKNightVersion/Controller (0.6.1):
+    - DKNightVersion/Core
+    - DKNightVersion/UIKit
+  - DKNightVersion/Core (0.6.1)
+  - DKNightVersion/Generator (0.6.1)
+  - DKNightVersion/Helper (0.6.1)
+  - DKNightVersion/UIKit (0.6.1):
+    - DKNightVersion/Core
+    - DKNightVersion/Helper
+  - JBWebViewController (1.0.7):
+    - ARChromeActivity (= 1.0)
+    - ARSafariActivity (= 0.0.1)
+    - NJKWebViewProgress (= 0.2.3)
   - libHN (3.0.2)
+  - NJKWebViewProgress (0.2.3):
+    - NJKWebViewProgress/Core (= 0.2.3)
+    - NJKWebViewProgress/ProgressView (= 0.2.3)
+  - NJKWebViewProgress/Core (0.2.3)
+  - NJKWebViewProgress/ProgressView (0.2.3)
 
 DEPENDENCIES:
+  - DKNightVersion
+  - JBWebViewController
   - libHN
 
 SPEC CHECKSUMS:
-  libHN: 0c5ec22bf8480fee669efffa9f348752218c886e
+  ARChromeActivity: 40d77445498fded9d32cbf4a41e8585766feffd6
+  ARSafariActivity: f2d5fb199772bc6dd78fcb2b5ea068d70f040847
+  DKNightVersion: dc69180edd385290c2993f42d3c0244be86eb4e0
+  JBWebViewController: 55d636542efeb1c8597851f72c8edf3478683652
+  libHN: 4bb4159570e2a5f2b5f3281cc934cc6e0fb4cde4
+  NJKWebViewProgress: f481fd424cb5ecc27eacae11b5397db92fba9a4d
 
-COCOAPODS: 0.35.0
+COCOAPODS: 0.37.1
