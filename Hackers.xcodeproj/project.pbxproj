@@ -206,6 +206,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = GU;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Glass Umbrella";
 				TargetAttributes = {

@@ -29,8 +29,8 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 let commentTextColor = UIColor.darkGrayColor()
                 let lineSpacing = 4 as CGFloat
                 
-                var commentAttributedString = NSMutableAttributedString(string: comment!.text)
-                var paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as! NSMutableParagraphStyle
+                let commentAttributedString = NSMutableAttributedString(string: comment!.text)
+                let paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as! NSMutableParagraphStyle
                 paragraphStyle.lineSpacing = lineSpacing
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)

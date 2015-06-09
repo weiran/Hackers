@@ -28,8 +28,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     
     override func viewWillAppear(animated: Bool) {
         navigationController!.setToolbarHidden(true, animated: true)
-        if (tableView.indexPathForSelectedRow() != nil) {
-            tableView .deselectRowAtIndexPath(tableView.indexPathForSelectedRow()!, animated: true)
+        if (tableView.indexPathForSelectedRow != nil) {
+            tableView .deselectRowAtIndexPath(tableView.indexPathForSelectedRow!, animated: true)
         }
         
         super.viewWillAppear(animated)
@@ -85,7 +85,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     
     // MARK: - UISplitViewControllerDelegate
     
-    func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
+    func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController, ontoPrimaryViewController primaryViewController: UIViewController) -> Bool {
         return collapseDetailViewController
     }
 
