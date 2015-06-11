@@ -1,0 +1,181 @@
+-x
+objective-c
+-arch
+x86_64
+-std=gnu99
+-fobjc-arc
+-fpascal-strings
+-O0
+-DDEBUG=1
+-isysroot
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator8.3.sdk
+-fexceptions
+-fasm-blocks
+-g
+-fobjc-abi-version=2
+-fobjc-legacy-dispatch
+-mios-simulator-version-min=6.1
+-iquote
+-iquote
+-iquote.
+-iquoteApp Store Resources
+-iquoteDerivedData
+-iquoteHackers
+-iquoteHackers.xcworkspace
+-iquoteHackers2.xcworkspace
+-iquoteLibraries
+-iquotePods
+-iquoteApp Store Resources/iOS 7
+-iquoteApp Store Resources/iPad
+-iquoteApp Store Resources/iPhone 3.5
+-iquoteApp Store Resources/iPhone 4
+-iquoteDerivedData/Hackers
+-iquoteHackers/Hackers.xcdatamodeld
+-iquoteHackers/HackersDataModel.xcdatamodeld
+-iquoteHackers/Images
+-iquoteHackers/InAppSettings.bundle
+-iquoteHackers.xcworkspace/xcshareddata
+-iquoteHackers.xcworkspace/xcuserdata
+-iquoteHackers2.xcworkspace/xcuserdata
+-iquoteLibraries/FSPanes
+-iquoteLibraries/JSSlidingViewController
+-iquoteLibraries/TUSafariActivity
+-iquotePods/AFNetworking
+-iquotePods/ARChromeActivity
+-iquotePods/ARKippsterActivity
+-iquotePods/DTCoreText
+-iquotePods/DTFoundation
+-iquotePods/FontAwesomeIconFactory
+-iquotePods/Headers
+-iquotePods/InAppSettingsKit
+-iquotePods/Local Podspecs
+-iquotePods/MBProgressHUD
+-iquotePods/NNNetwork
+-iquotePods/OHAlertView
+-iquotePods/OHAttributedLabel
+-iquotePods/PBFlatUI
+-iquotePods/SSKeychain
+-iquotePods/Target Support Files
+-iquoteDerivedData/Hackers/Build
+-iquoteDerivedData/Hackers/Index
+-iquoteDerivedData/Hackers/Logs
+-iquoteDerivedData/Hackers/TextIndex
+-iquoteHackers/HackersDataModel.xcdatamodeld/HackersDataModel 1.1.xcdatamodel
+-iquoteHackers/HackersDataModel.xcdatamodeld/HackersDataModel.xcdatamodel
+-iquoteHackers.xcworkspace/xcuserdata/weiran.xcuserdatad
+-iquoteHackers2.xcworkspace/xcuserdata/weiran.xcuserdatad
+-iquoteLibraries/FSPanes/CLCascadeNavigationController
+-iquoteLibraries/FSPanes/CLCategories
+-iquoteLibraries/FSPanes/CLSplitViewController
+-iquoteLibraries/FSPanes/Other
+-iquotePods/AFNetworking/AFNetworking
+-iquotePods/ARChromeActivity/ARChromeActivity
+-iquotePods/ARKippsterActivity/ARKippsterActivity
+-iquotePods/DTCoreText/Core
+-iquotePods/DTFoundation/Core
+-iquotePods/FontAwesomeIconFactory/Font-Awesome
+-iquotePods/Headers/Build
+-iquotePods/Headers/Public
+-iquotePods/InAppSettingsKit/InAppSettingsKit
+-iquotePods/NNNetwork/NNNetwork
+-iquotePods/NNNetwork/Resources
+-iquotePods/OHAlertView/OHAlertView
+-iquotePods/OHAttributedLabel/OHAttributedLabel
+-iquotePods/PBFlatUI/FlatUI
+-iquotePods/SSKeychain/SSKeychain
+-iquotePods/Target Support Files/Pods
+-iquotePods/Target Support Files/Pods-AFNetworking
+-iquotePods/Target Support Files/Pods-ARChromeActivity
+-iquotePods/Target Support Files/Pods-ARKippsterActivity
+-iquotePods/Target Support Files/Pods-DTCoreText
+-iquotePods/Target Support Files/Pods-DTFoundation
+-iquotePods/Target Support Files/Pods-FontAwesomeIconFactory
+-iquotePods/Target Support Files/Pods-InAppSettingsKit
+-iquotePods/Target Support Files/Pods-MBProgressHUD
+-iquotePods/Target Support Files/Pods-NNNetwork
+-iquotePods/Target Support Files/Pods-OHAlertView
+-iquotePods/Target Support Files/Pods-OHAttributedLabel
+-iquotePods/Target Support Files/Pods-PBFlatUI
+-iquotePods/Target Support Files/Pods-SSKeychain
+-iquoteDerivedData/Hackers/Index/Debug
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders
+-iquoteDerivedData/Hackers/Logs/Build
+-iquoteDerivedData/Hackers/Logs/Issues
+-iquoteHackers.xcworkspace/xcuserdata/weiran.xcuserdatad/xcdebugger
+-iquoteHackers2.xcworkspace/xcuserdata/weiran.xcuserdatad/xcdebugger
+-iquotePods/DTCoreText/Core/Source
+-iquotePods/DTFoundation/Core/Source
+-iquotePods/FontAwesomeIconFactory/Font-Awesome/fonts
+-iquotePods/Headers/Build/AFNetworking
+-iquotePods/Headers/Build/ARChromeActivity
+-iquotePods/Headers/Build/ARKippsterActivity
+-iquotePods/Headers/Build/DTCoreText
+-iquotePods/Headers/Build/DTFoundation
+-iquotePods/Headers/Build/FontAwesomeIconFactory
+-iquotePods/Headers/Build/InAppSettingsKit
+-iquotePods/Headers/Build/MBProgressHUD
+-iquotePods/Headers/Build/NNNetwork
+-iquotePods/Headers/Build/OHAlertView
+-iquotePods/Headers/Build/OHAttributedLabel
+-iquotePods/Headers/Build/PBFlatUI
+-iquotePods/Headers/Build/SSKeychain
+-iquotePods/Headers/Public/AFNetworking
+-iquotePods/Headers/Public/ARChromeActivity
+-iquotePods/Headers/Public/ARKippsterActivity
+-iquotePods/Headers/Public/DTCoreText
+-iquotePods/Headers/Public/DTFoundation
+-iquotePods/Headers/Public/FontAwesomeIconFactory
+-iquotePods/Headers/Public/InAppSettingsKit
+-iquotePods/Headers/Public/MBProgressHUD
+-iquotePods/Headers/Public/NNNetwork
+-iquotePods/Headers/Public/OHAlertView
+-iquotePods/Headers/Public/OHAttributedLabel
+-iquotePods/Headers/Public/PBFlatUI
+-iquotePods/Headers/Public/SSKeychain
+-iquotePods/InAppSettingsKit/InAppSettingsKit/Controllers
+-iquotePods/InAppSettingsKit/InAppSettingsKit/Models
+-iquotePods/InAppSettingsKit/InAppSettingsKit/Views
+-iquotePods/OHAttributedLabel/OHAttributedLabel/PrivateUtils
+-iquotePods/OHAttributedLabel/OHAttributedLabel/Source
+-iquotePods/OHAttributedLabel/OHAttributedLabel/TagParsers
+-iquotePods/PBFlatUI/FlatUI/Classess
+-iquoteDerivedData/Hackers/Index/Debug/iphonesimulator8.3-x86_64
+-iquoteDerivedData/Hackers/Index/Debug/iphonesimulator9.0-x86_64
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Hackers-Prefix-aoxwtzuveguurjfiprbsmjmhinyx_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Hackers-Prefix-dqjikwbhulizlzecztyhflaprmzy_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Hackers-Prefix-erdtnyulozqeoqfebsduzftbagov_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Hackers-Prefix-fnvnbvmzohufnpftwqwdysmonuup_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-AFNetworking-prefix-awfloglrrjwerngaedejeqejkkab_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-AFNetworking-prefix-dfzqceqaqthykwebtzlolzsdnkei_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-ARChromeActivity-prefix-djubdzuefunvjjgjdpyrsxojvcsg_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-ARChromeActivity-prefix-eaoncnlcjvbulseirmefieovqyaf_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-ARKippsterActivity-prefix-gcpdrlobzilkwjfvtadtffnxdvec_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-DTFoundation-prefix-euzkekznljufahbtgrvcpwpkhvev_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-DTFoundation-prefix-gyhdawsshvikbeepkdoiczlbulfd_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-FontAwesomeIconFactory-prefix-balcnivytyrveebdnbblqzccklwe_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-FontAwesomeIconFactory-prefix-fenbatixvuhojwdfzffbzsmdddcd_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-InAppSettingsKit-prefix-fmipwlkbwsgqjdbpvtoaktftrcpe_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-InAppSettingsKit-prefix-gwijkqqfqpakhudaxtdabwaotcwt_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-MBProgressHUD-prefix-brwmebliqgozqxccnqbkzmboegjg_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-MBProgressHUD-prefix-gerhzrqsvtgywlezysdiwsnibpcq_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-NNNetwork-prefix-ddtzypahppkgybecvyzggvdjzejm_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-NNNetwork-prefix-epiqlagkfzsfzcbwkpjejmersiko_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-OHAlertView-prefix-crskvbvdtmoyjlamqxsyxyflfumm_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-OHAlertView-prefix-dexwekrcdewwazbhtmedatafarsx_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-OHAttributedLabel-prefix-giugqmsjpprvxhdfxlglhcctiymi_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-OHAttributedLabel-prefix-gstcdmkvstwrbxfbvofsbzoqwyxa_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-SSKeychain-prefix-aoxxpgbbuwnjagfnwpjwxegyhync_ast
+-iquoteDerivedData/Hackers/Index/PrecompiledHeaders/Pods-SSKeychain-prefix-dejglvajtlkgxxfluavkudrkwjzo_ast
+-iquotePods/DTFoundation/Core/Source/DTHTMLParser
+-iquotePods/DTFoundation/Core/Source/iOS
+-iquoteDerivedData/Hackers/Index/Debug/iphonesimulator8.3-x86_64/Hackers.xcindex
+-iquoteDerivedData/Hackers/Index/Debug/iphonesimulator9.0-x86_64/Hackers.xcindex
+-iquotePods/DTFoundation/Core/Source/iOS/DTAnimatedGIF
+-I/Users/weiran/Documents/git/Glass Umbrella/Hackers/DerivedData/Hackers/Build/Products/Debug-iphonesimulator/include
+-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+-F/Users/weiran/Documents/git/Glass Umbrella/Hackers/DerivedData/Hackers/Build/Products/Debug-iphonesimulator
+-F/Users/weiran/Documents/git/Glass Umbrella/Hackers
+x86_64-apple-darwin15.0.0
+"4.2.1 Compatible Apple LLVM 6.1.0 (clang-602.0.53)"
+SDK_PRODUCT_BUILD_VERSION=12F69
+12F69
