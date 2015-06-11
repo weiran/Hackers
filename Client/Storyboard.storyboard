@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="qCu-jm-yAB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="qCu-jm-yAB">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
     </dependencies>
     <scenes>
         <!--Hacker News-->
@@ -272,21 +272,6 @@
             <point key="canvasLocation" x="1973" y="1403"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="mPh-Ba-HRr">
-            <objects>
-                <navigationController definesPresentationContext="YES" id="Bud-aM-3wf" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="U6W-LM-fKO">
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="gkj-Tg-B9Y" kind="relationship" relationship="rootViewController" id="FeW-U4-UXU"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="yag-bs-UsF" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1535" y="1403"/>
-        </scene>
-        <!--Navigation Controller-->
         <scene sceneID="N7T-fw-zna">
             <objects>
                 <navigationController storyboardIdentifier="PostViewNavigationController" toolbarHidden="NO" id="eIj-eX-YuX" sceneMemberID="viewController">
@@ -356,7 +341,7 @@
                     <navigationItem key="navigationItem" id="5Wx-jY-x4V">
                         <barButtonItem key="rightBarButtonItem" title="Comments" id="VuN-Rn-1Ne">
                             <connections>
-                                <segue destination="Bud-aM-3wf" kind="modal" identifier="ShowCommentsSegue" id="WbB-K2-B3P"/>
+                                <segue destination="gkj-Tg-B9Y" kind="push" identifier="ShowCommentsSegue" id="dxC-DH-Bq8"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
