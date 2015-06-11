@@ -73,8 +73,7 @@ class PostViewController: UIViewController, UIWebViewDelegate {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
         if segue.identifier == "ShowCommentsSegue" {
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let commentsViewController = navigationController.viewControllers[0] as! CommentsViewController
+            let commentsViewController = segue.destinationViewController as! CommentsViewController
             commentsViewController.post = post!
         }
     }
