@@ -28,8 +28,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     
     override func viewWillAppear(animated: Bool) {
         navigationController!.setToolbarHidden(true, animated: true)
-        if (tableView.indexPathForSelectedRow() != nil) {
-            tableView .deselectRowAtIndexPath(tableView.indexPathForSelectedRow()!, animated: true)
+        if let indexPath = tableView.indexPathForSelectedRow {
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
         
         super.viewWillAppear(animated)
