@@ -161,6 +161,7 @@
                                                         <constraint firstAttribute="width" constant="145" id="wrB-l0-zM1"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                                    <color key="textColor" red="0.39732018113136292" green="0.0" blue="0.91323655843734741" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2h ago" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mqP-h7-8O8">
@@ -287,6 +288,7 @@
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="MCt-Nd-rPQ">
                         <rect key="frame" x="0.0" y="524" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" red="0.39732018113136292" green="0.0" blue="0.91323655843734741" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </toolbar>
                     <connections>
                         <segue destination="xYT-nh-Y9b" kind="relationship" relationship="rootViewController" id="es5-Po-VnO"/>
@@ -366,4 +368,5 @@
         <image name="ForwardIcon" width="14" height="28"/>
         <image name="ShareIcon" width="21" height="28"/>
     </resources>
+    <color key="tintColor" red="0.39732018113136292" green="0.0" blue="0.91323655843734741" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>
