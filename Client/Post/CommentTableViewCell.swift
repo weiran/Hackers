@@ -67,7 +67,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     // MARK - UITextViewDelegate
     
-    func textView(textView: UITextView!, shouldInteractWithURL URL: NSURL!, inRange characterRange: NSRange) -> Bool {
+    func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
         return true
     }
     
