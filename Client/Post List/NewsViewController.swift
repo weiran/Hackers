@@ -19,7 +19,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
         refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
         
-        splitViewController?.delegate = self
+        splitViewController!.delegate = self
         
         loadPosts()
         
