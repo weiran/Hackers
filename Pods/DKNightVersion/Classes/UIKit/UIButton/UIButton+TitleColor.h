@@ -22,5 +22,4 @@
  */
 @property (nonatomic, strong, readonly) UIColor *normalTitleColor;
 
-
 @end

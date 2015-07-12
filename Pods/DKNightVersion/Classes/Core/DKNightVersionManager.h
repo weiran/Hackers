@@ -42,19 +42,31 @@ extern CGFloat const DKNightVersionAnimationDuration;
 
 + (void)changeColor:(id)object;
 
-/**
- *  Use default night color or not, default is YES, set it use setUseDefaultNightColor: method
- *
- *  @return Use default night color or not, default is YES
- */
-+ (BOOL)useDefaultNightColor;
+@end
+
+@interface DKNightVersionManager (RespondClasses)
 
 /**
- *  Set whether or not use default night color
+ *  Add Class to respond classes set to make class can change
+ *  color when switch theme
  *
- *  @param use Bool value to set whether to use default color
+ *  @param klass Klass which are supposed to change color
  */
-+ (void)setUseDefaultNightColor:(BOOL)use;
++ (void)addClassToSet:(Class)klass;
 
+/**
+ *  Remove Class from respond classes set to make class cannot change
+ *  color when switch theme
+ *
+ *  @param klass Klass which are not supposed to change color
+ */
++ (void)removeClassFromSet:(Class)klass;
+
+/**
+ *  All klasses will change color when switch themes
+ *
+ *  @return A bunch of string for class which will change color when switch theme
+ */
++ (NSSet *)respondClasseses;
 
 @end

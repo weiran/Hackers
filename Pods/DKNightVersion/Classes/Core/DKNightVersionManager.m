@@ -28,7 +28,7 @@ CGFloat const DKNightVersionAnimationDuration = 0.3f;
  */
 @property (nonatomic, assign) DKThemeVersion themeVersion;
 
-@property (nonatomic, assign) BOOL useDefaultNightColor;
+@property (nonatomic, strong) NSMutableSet *respondClasseses;
 
 @end
 
@@ -39,7 +39,8 @@ CGFloat const DKNightVersionAnimationDuration = 0.3f;
     static DKNightVersionManager *instance;
     dispatch_once(&once, ^{
         instance = [self new];
-        instance.useDefaultNightColor = YES;
+        instance.respondClasseses = [[NSMutableSet alloc] init];
+
     });
     return instance;
 }
@@ -47,13 +48,11 @@ CGFloat const DKNightVersionAnimationDuration = 0.3f;
 + (void)nightFalling {
     self.sharedNightVersionManager.themeVersion = DKThemeVersionNight;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    [[NSNotificationCenter defaultCenter] postNotificationName:DKNightVersionNightFallingNotification object:nil];
 }
 
 + (void)dawnComing {
     self.sharedNightVersionManager.themeVersion = DKThemeVersionNormal;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    [[NSNotificationCenter defaultCenter] postNotificationName:DKNightVersionDawnComingNotification object:nil];
 }
 
 + (DKThemeVersion)currentThemeVersion {
@@ -68,6 +67,11 @@ CGFloat const DKNightVersionAnimationDuration = 0.3f;
     _themeVersion = themeVersion;
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [self.class changeColor:window.subviews.lastObject withDuration:DKNightVersionAnimationDuration];
+    if (themeVersion == DKThemeVersionNight) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:DKNightVersionNightFallingNotification object:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:DKNightVersionDawnComingNotification object:nil];
+    }
 }
 
 + (void)changeColor:(id <DKNightVersionChangeColorProtocol>)object {
@@ -110,13 +114,21 @@ CGFloat const DKNightVersionAnimationDuration = 0.3f;
     }
 }
 
+@end
 
-+ (BOOL)useDefaultNightColor {
-    return self.sharedNightVersionManager.useDefaultNightColor;
+@implementation DKNightVersionManager (RespondClasses)
+
+
++ (void)addClassToSet:(Class)klass {
+    [self.sharedNightVersionManager.respondClasseses addObject:NSStringFromClass(klass)];
 }
 
-+ (void)setUseDefaultNightColor:(BOOL)use {
-    [self.sharedNightVersionManager setUseDefaultNightColor:use];
++ (void)removeClassFromSet:(Class)klass {
+    [self.sharedNightVersionManager.respondClasseses removeObject:NSStringFromClass(klass)];
+}
+
++ (NSSet *)respondClasseses {
+    return [self.sharedNightVersionManager.respondClasseses copy];
 }
 
 @end

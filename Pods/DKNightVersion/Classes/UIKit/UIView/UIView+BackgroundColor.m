@@ -18,9 +18,6 @@
 
 @end
 
-static char *nightBackgroundColorKey;
-static char *normalBackgroundColorKey;
-
 @implementation UIView (BackgroundColor)
 
 + (void)load {
@@ -39,42 +36,39 @@ static char *normalBackgroundColorKey;
             method_exchangeImplementations(originalMethod, swizzledMethod);        
         }
     });
+    [DKNightVersionManager addClassToSet:self.class];
 }
 
 - (void)hook_setBackgroundColor:(UIColor*)backgroundColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) {
-        [self setNormalBackgroundColor:backgroundColor];
-    }
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) [self setNormalBackgroundColor:backgroundColor];
     [self hook_setBackgroundColor:backgroundColor];
 }
 
+- (void)saveNormalColor {
+    self.normalBackgroundColor = self.backgroundColor;
+}
+
 - (UIColor *)nightBackgroundColor {
-    return objc_getAssociatedObject(self, &nightBackgroundColorKey) ? : ([DKNightVersionManager useDefaultNightColor] ? self.defaultNightBackgroundColor : self.backgroundColor);
-}
-
-- (void)setNightBackgroundColor:(UIColor *)nightBackgroundColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) {
-        [self setBackgroundColor:nightBackgroundColor];
-    }
-    objc_setAssociatedObject(self, &nightBackgroundColorKey, nightBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)normalBackgroundColor {
-    return objc_getAssociatedObject(self, &normalBackgroundColorKey);
-}
-
-- (void)setNormalBackgroundColor:(UIColor *)normalBackgroundColor {
-    objc_setAssociatedObject(self, &normalBackgroundColorKey, normalBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)defaultNightBackgroundColor {
-    BOOL notUIKitSubclass = [self isKindOfClass:[UIView class]] && ![NSStringFromClass(self.class) containsString:@"UI"];
-    if ([self isMemberOfClass:[UIView class]] || notUIKitSubclass) {
-        return UIColorFromRGB(0x343434);
+    UIColor *nightColor = objc_getAssociatedObject(self, @selector(nightBackgroundColor));
+    if (nightColor) {
+        return nightColor;
     } else {
         UIColor *resultColor = self.normalBackgroundColor ?: [UIColor clearColor];
         return resultColor;
     }
+}
+
+- (void)setNightBackgroundColor:(UIColor *)nightBackgroundColor {
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) [self setBackgroundColor:nightBackgroundColor];
+    objc_setAssociatedObject(self, @selector(nightBackgroundColor), nightBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIColor *)normalBackgroundColor {
+    return objc_getAssociatedObject(self, @selector(normalBackgroundColor));
+}
+
+- (void)setNormalBackgroundColor:(UIColor *)normalBackgroundColor {
+    objc_setAssociatedObject(self, @selector(normalBackgroundColor), normalBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

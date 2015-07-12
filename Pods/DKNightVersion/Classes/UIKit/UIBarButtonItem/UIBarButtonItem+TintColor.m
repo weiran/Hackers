@@ -18,9 +18,6 @@
 
 @end
 
-static char *nightTintColorKey;
-static char *normalTintColorKey;
-
 @implementation UIBarButtonItem (TintColor)
 
 + (void)load {
@@ -39,42 +36,39 @@ static char *normalTintColorKey;
             method_exchangeImplementations(originalMethod, swizzledMethod);        
         }
     });
+    [DKNightVersionManager addClassToSet:self.class];
 }
 
 - (void)hook_setTintColor:(UIColor*)tintColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) {
-        [self setNormalTintColor:tintColor];
-    }
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) [self setNormalTintColor:tintColor];
     [self hook_setTintColor:tintColor];
 }
 
+- (void)saveNormalColor {
+    self.normalTintColor = self.tintColor;
+}
+
 - (UIColor *)nightTintColor {
-    return objc_getAssociatedObject(self, &nightTintColorKey) ? : ([DKNightVersionManager useDefaultNightColor] ? self.defaultNightTintColor : self.tintColor);
-}
-
-- (void)setNightTintColor:(UIColor *)nightTintColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) {
-        [self setTintColor:nightTintColor];
-    }
-    objc_setAssociatedObject(self, &nightTintColorKey, nightTintColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)normalTintColor {
-    return objc_getAssociatedObject(self, &normalTintColorKey)?: [UIColor blueColor];
-}
-
-- (void)setNormalTintColor:(UIColor *)normalTintColor {
-    objc_setAssociatedObject(self, &normalTintColorKey, normalTintColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)defaultNightTintColor {
-    BOOL notUIKitSubclass = [self isKindOfClass:[UIBarButtonItem class]] && ![NSStringFromClass(self.class) containsString:@"UI"];
-    if ([self isMemberOfClass:[UIBarButtonItem class]] || notUIKitSubclass) {
-        return UIColorFromRGB(0xffffff);
+    UIColor *nightColor = objc_getAssociatedObject(self, @selector(nightTintColor));
+    if (nightColor) {
+        return nightColor;
     } else {
         UIColor *resultColor = self.normalTintColor ?: [UIColor whiteColor];
         return resultColor;
     }
+}
+
+- (void)setNightTintColor:(UIColor *)nightTintColor {
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) [self setTintColor:nightTintColor];
+    objc_setAssociatedObject(self, @selector(nightTintColor), nightTintColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIColor *)normalTintColor {
+    return objc_getAssociatedObject(self, @selector(normalTintColor))?: [UIColor blueColor];
+}
+
+- (void)setNormalTintColor:(UIColor *)normalTintColor {
+    objc_setAssociatedObject(self, @selector(normalTintColor), normalTintColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

@@ -18,9 +18,6 @@
 
 @end
 
-static char *nightTextColorKey;
-static char *normalTextColorKey;
-
 @implementation UILabel (TextColor)
 
 + (void)load {
@@ -39,42 +36,39 @@ static char *normalTextColorKey;
             method_exchangeImplementations(originalMethod, swizzledMethod);        
         }
     });
+    [DKNightVersionManager addClassToSet:self.class];
 }
 
 - (void)hook_setTextColor:(UIColor*)textColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) {
-        [self setNormalTextColor:textColor];
-    }
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) [self setNormalTextColor:textColor];
     [self hook_setTextColor:textColor];
 }
 
+- (void)saveNormalColor {
+    self.normalTextColor = self.textColor;
+}
+
 - (UIColor *)nightTextColor {
-    return objc_getAssociatedObject(self, &nightTextColorKey) ? : ([DKNightVersionManager useDefaultNightColor] ? self.defaultNightTextColor : self.textColor);
-}
-
-- (void)setNightTextColor:(UIColor *)nightTextColor {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) {
-        [self setTextColor:nightTextColor];
-    }
-    objc_setAssociatedObject(self, &nightTextColorKey, nightTextColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)normalTextColor {
-    return objc_getAssociatedObject(self, &normalTextColorKey);
-}
-
-- (void)setNormalTextColor:(UIColor *)normalTextColor {
-    objc_setAssociatedObject(self, &normalTextColorKey, normalTextColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)defaultNightTextColor {
-    BOOL notUIKitSubclass = [self isKindOfClass:[UILabel class]] && ![NSStringFromClass(self.class) containsString:@"UI"];
-    if ([self isMemberOfClass:[UILabel class]] || notUIKitSubclass) {
-        return UIColorFromRGB(0x5d5d5d);
+    UIColor *nightColor = objc_getAssociatedObject(self, @selector(nightTextColor));
+    if (nightColor) {
+        return nightColor;
     } else {
         UIColor *resultColor = self.normalTextColor ?: [UIColor clearColor];
         return resultColor;
     }
+}
+
+- (void)setNightTextColor:(UIColor *)nightTextColor {
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) [self setTextColor:nightTextColor];
+    objc_setAssociatedObject(self, @selector(nightTextColor), nightTextColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIColor *)normalTextColor {
+    return objc_getAssociatedObject(self, @selector(normalTextColor));
+}
+
+- (void)setNormalTextColor:(UIColor *)normalTextColor {
+    objc_setAssociatedObject(self, @selector(normalTextColor), normalTextColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

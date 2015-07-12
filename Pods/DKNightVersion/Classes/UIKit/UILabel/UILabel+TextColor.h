@@ -22,5 +22,4 @@
  */
 @property (nonatomic, strong, readonly) UIColor *normalTextColor;
 
-
 @end

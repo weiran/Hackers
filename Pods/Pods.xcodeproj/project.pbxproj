@@ -7,230 +7,927 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A78F125588B1DB7627C2C8A /* Pods-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = EF6999D75EF9B9731B2B3664 /* Pods-dummy.m */; };
-		2BF625C444DA352AECEB6EFB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCA312DB09FE9A52A19DFCB9 /* Foundation.framework */; };
-		2F6379FB3AD45957C2306919 /* HNComment.h in Headers */ = {isa = PBXBuildFile; fileRef = E15F039F35748F3A8CA3950A /* HNComment.h */; };
-		3650EA8578F7F88B1C300951 /* HNWebService.h in Headers */ = {isa = PBXBuildFile; fileRef = E34720EE36A5C83A464A9358 /* HNWebService.h */; };
-		38C58A3E5919359E067E786C /* HNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA14E42C20D303E6AA7EB8D /* HNManager.m */; };
-		3C37AF8F090C9C415A02D58B /* HNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EEA12E988EE3298C9E50EFA /* HNUtilities.m */; };
-		5A351A96BBD1B63F95DAA8D4 /* libHN.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D474C8D116A48E131D71D0C /* libHN.h */; };
-		89CE6A97FB98B2780199431C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCA312DB09FE9A52A19DFCB9 /* Foundation.framework */; };
-		9D1AA069E087036AF78D521B /* HNUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EA80E12F38C29ECCF59F3F9 /* HNUser.m */; };
-		A29E99026501A912D86B35EE /* HNComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DEBF436932630146C6BBE68 /* HNComment.m */; };
-		BF54C7AA1D70AD3B083A53DB /* HNCommentLink.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FDEDD31AD9F5F8E5E02BA9 /* HNCommentLink.m */; };
-		C2D3FE9560F708A81363872F /* HNWebService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B6BE601740602517B30FA79 /* HNWebService.m */; };
-		C3284C0EBF226C6BAC1DAADA /* HNPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C510ED01179D8ECA4DE8D /* HNPost.m */; };
-		D4C0013F1AE0698C408A70EC /* HNCommentLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 909075045B5A6CDAD2F6F042 /* HNCommentLink.h */; };
-		DA89978BCCCE122E534C4242 /* HNUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BE028B91B0C059B26F6159C /* HNUtilities.h */; };
-		E4CDC2B4662F677CE3CC05B2 /* HNManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 90708521D38F2DAD7EFEBDB1 /* HNManager.h */; };
-		ECC1F46B5B630E6425288981 /* HNPost.h in Headers */ = {isa = PBXBuildFile; fileRef = 4FCFF7BFC4D7ED6E5425E965 /* HNPost.h */; };
-		EE24CEBDC37104A956E21294 /* HNUser.h in Headers */ = {isa = PBXBuildFile; fileRef = B99B99653BC113D747BA335A /* HNUser.h */; };
-		F107083FD7E6B8FE346076C7 /* Pods-libHN-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 81540369612BCAF720FD0B91 /* Pods-libHN-dummy.m */; };
+		0009686E586121D48B40A943 /* UINavigationBar+TintColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4302CA4A62E93F7E54E81619 /* UINavigationBar+TintColor.m */; };
+		045E669F8C30A5ADCB1A2EB1 /* UITabBar+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 195465084DB4933231CA76C2 /* UITabBar+NightVersion.m */; };
+		05AE51CCFD762B8890978060 /* UINavigationBar+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB2A89877C8BAC73ECC4815 /* UINavigationBar+NightVersion.h */; };
+		0722115EBA4718717491EB6C /* UIView+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5A6BE9C8DFE49004199A21 /* UIView+NightVersion.m */; };
+		0FB7F165BB34BCC882C51F79 /* Pods-ARSafariActivity-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 315CF9B68F0A4B2C30D04F35 /* Pods-ARSafariActivity-dummy.m */; };
+		160150A53E4D3A19534C8784 /* HNUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = E9692F9D1CB35112954D400B /* HNUtilities.h */; };
+		1C21EA9272E42A835D773C75 /* NJKWebViewProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD29F63A0193740A49E70F /* NJKWebViewProgressView.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		1D6F22C067200BD6D5DB33D6 /* NJKWebViewProgressView.h in Headers */ = {isa = PBXBuildFile; fileRef = 42502E1E82D546FF754FAB07 /* NJKWebViewProgressView.h */; };
+		244219962474E0CC8D6A3320 /* ARSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = DA5D01FE3D6D9A170A799D24 /* ARSafariActivity.m */; };
+		27C9C76EA1AA251192D6E35F /* UIButton+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 7473A019C54A6B31284CB1A9 /* UIButton+NightVersion.h */; };
+		2BAF0F39668C207288E88301 /* NJKWebViewProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 87D23EBBB8D6EC813547D6EC /* NJKWebViewProgress.h */; };
+		2F6799AE9A6EBE1D34A20764 /* UITabBar+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C77ADAB9D4C61108F0ED2DC /* UITabBar+NightVersion.h */; };
+		35D2F3491125B2C415990A8F /* Pods-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C2ECD48702A48AB34A0FEDCD /* Pods-dummy.m */; };
+		39840BF655C4AF7A6C54B2D6 /* Pods-ARChromeActivity-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E8C0CBE2135D1672D93E6EBF /* Pods-ARChromeActivity-dummy.m */; };
+		3ADC6FE2F04D09F7F1B6DE2F /* DKNightVersionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B893C047B525031874383C /* DKNightVersionManager.m */; };
+		3D96EA7AB96468635BEF6AA8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		3F91C5689E15EAF59F70252F /* UILabel+TextColor.m in Sources */ = {isa = PBXBuildFile; fileRef = EED9A9C351E8D145D16E8161 /* UILabel+TextColor.m */; };
+		407514644C68A370EC040604 /* HNUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 13BAEBEC750106514735EFA8 /* HNUser.m */; };
+		41150A99BF24FD68AD9CF105 /* HNWebService.m in Sources */ = {isa = PBXBuildFile; fileRef = 98CE9438DBE1C4AD26C29E03 /* HNWebService.m */; };
+		41BA8DF027B0B9110285B10F /* UINavigationBar+Animation.h in Headers */ = {isa = PBXBuildFile; fileRef = 184DC992E4224F54CDF7637F /* UINavigationBar+Animation.h */; };
+		4542FA078B03B12F9E4F8AE5 /* UITableView+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = B4EDC33A6F8FC9F1AB760B82 /* UITableView+NightVersion.m */; };
+		46774BE289005B45537BA90C /* UIBarButtonItem+TintColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 594755DC509F1BE14E46C631 /* UIBarButtonItem+TintColor.h */; };
+		4C31B301CFD58600CC93D720 /* UINavigationBar+TintColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 5826096053A6B12567E7B989 /* UINavigationBar+TintColor.h */; };
+		56A6257D1F4848ADD6832A75 /* JBWebViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FF1FC96FD5ABAF610C651B1 /* JBWebViewController.h */; };
+		572519A436C193FCEDE53AB8 /* HNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B88B0A4750B25627B7F7FB83 /* HNManager.m */; };
+		5971B1260474F6425E65189A /* UINavigationBar+BarTintColor.h in Headers */ = {isa = PBXBuildFile; fileRef = DBBE482BD316A41AFCA68892 /* UINavigationBar+BarTintColor.h */; };
+		5AB7398203485DDC5A439BED /* DKNightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 4357FA77B13826D73C6A1085 /* DKNightVersion.h */; };
+		5CA637379E55B3EB86D929D3 /* DKNightVersionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = E08AE66F1538F77734116BD0 /* DKNightVersionUtility.h */; };
+		5F28EE1644035E6D863C1A9D /* UIButton+TitleColor.m in Sources */ = {isa = PBXBuildFile; fileRef = D3783D265AF6EF57D36C212A /* UIButton+TitleColor.m */; };
+		639E839FD12AAD7D25397A3B /* UIView+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D1E11971FC8D6BE80BD1890 /* UIView+NightVersion.h */; };
+		6C4E65258EC9BDED7D7902B9 /* UITabBar+BarTintColor.m in Sources */ = {isa = PBXBuildFile; fileRef = F2079841D202FCCA1A3BBFB7 /* UITabBar+BarTintColor.m */; };
+		72F638B7088F253AE868BFB9 /* ARChromeActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = A94B9497F1A3A8DDB32B7EFF /* ARChromeActivity.m */; };
+		735476F0F86C58291C3B0C33 /* HNPost.h in Headers */ = {isa = PBXBuildFile; fileRef = 90D5339C2872BEFAAEB56780 /* HNPost.h */; };
+		736ADD33D9A1470E84E9C795 /* UIButton+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = BD772BDE59CBACF77CEDFAFB /* UIButton+NightVersion.m */; };
+		74EF75436E4DEC32B61ED2BB /* HNCommentLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 915358F999FC3EA0B8743D73 /* HNCommentLink.h */; };
+		77C5F7F8DAECF4D1227AF122 /* UIBarButtonItem+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 59EA13A404E77803780F5A99 /* UIBarButtonItem+NightVersion.h */; };
+		798D6EA63D69A88B1D3510A2 /* ARChromeActivity.h in Headers */ = {isa = PBXBuildFile; fileRef = E76948F38D9D45D701F618D0 /* ARChromeActivity.h */; };
+		7DE8F02C465939B89A4063B5 /* HNComment.h in Headers */ = {isa = PBXBuildFile; fileRef = 073CA32A0D83EBAD3E3AB42C /* HNComment.h */; };
+		826DAE347B2A2CE3BE8856D4 /* UITabBar+BarTintColor.h in Headers */ = {isa = PBXBuildFile; fileRef = A3093D8C5F5B6C9D806B1FE6 /* UITabBar+BarTintColor.h */; };
+		837110F2ED9AC7D7DF9352DC /* UITableView+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 626A44D3945F95C0D9849C94 /* UITableView+NightVersion.h */; };
+		84872EB1A8148A3AC838BF6E /* HNManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E9E7A3578AAB026CE8B2B0B /* HNManager.h */; };
+		89F0DE4C173990E0CD4CAC62 /* HNWebService.h in Headers */ = {isa = PBXBuildFile; fileRef = DB450F8F53F826B112AB03DC /* HNWebService.h */; };
+		8A25FD82C629D1F9BC320177 /* ARSafariActivity.h in Headers */ = {isa = PBXBuildFile; fileRef = 0059B0478509AFA047CB702F /* ARSafariActivity.h */; };
+		8D3C4E95D043D0BC06B916AE /* UITableView+SeparatorColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 857AF00CC54DE658C1DA618E /* UITableView+SeparatorColor.h */; };
+		8DE8A74B584B2B50C0A2C445 /* UIButton+TitleColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9FE43C0AF9B2FF4A0176C1A6 /* UIButton+TitleColor.h */; };
+		8E08C6A1E05957F17A82283A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		8EA694EA49E85B760028B158 /* Pods-DKNightVersion-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C46E39F26862D76B4B5380D1 /* Pods-DKNightVersion-dummy.m */; };
+		8F4B86BE14C522CAEF5E9FE0 /* DKNightVersionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB66BA0291046E77E92E457 /* DKNightVersionManager.h */; };
+		9152336010A7544F504BEC41 /* DKNightVersionUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 32A3C5474DD8A1B006C17454 /* DKNightVersionUtility.m */; };
+		9A47F02F77730FDF10EE4D28 /* UIViewController+ChangeColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4E5E791BAD7510574DB7842E /* UIViewController+ChangeColor.h */; };
+		9DE83F6092961076123F3674 /* HNComment.m in Sources */ = {isa = PBXBuildFile; fileRef = D2EB94DAB23A9215DEBD2535 /* HNComment.m */; };
+		A452B1CAC7E86668C70DBA2D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		AD04C7B98D684BC49A311E91 /* UIView+BackgroundColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 88BF5DACFE0467A25B9560FF /* UIView+BackgroundColor.h */; };
+		B2AFE74F0C2A47536F62BE5F /* UILabel+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E67258C55CB59E92E8898DF /* UILabel+NightVersion.m */; };
+		B35756BF0902D14B3A8F8304 /* UINavigationBar+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = BFFDBC2A0A313E3E8BCF3EF1 /* UINavigationBar+NightVersion.m */; };
+		BD52E08B7A378B0B4E9A89DF /* Pods-NJKWebViewProgress-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = B7F07B91B09AAF103B50DF52 /* Pods-NJKWebViewProgress-dummy.m */; };
+		BE4D93BE676F1A206A239574 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		C10CD04815B226F98254ECDF /* Pods-libHN-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 2409C9DF6D479D34A8A9BA84 /* Pods-libHN-dummy.m */; };
+		C1F9C099B025D4A42F612A31 /* UINavigationBar+Animation.m in Sources */ = {isa = PBXBuildFile; fileRef = 90E757D20F6CE2A2090BAE87 /* UINavigationBar+Animation.m */; };
+		C48949F35FB6B13AE732B387 /* libHN.h in Headers */ = {isa = PBXBuildFile; fileRef = A8C137AA15F439A930F7D86A /* libHN.h */; };
+		C49EC5DC066B82A9FB4B1A6D /* HNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 32C92267F7AF0661EDE04FA2 /* HNUtilities.m */; };
+		C6BDCBBAFF3E042FB982D869 /* Pods-JBWebViewController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A85A8C4D0959C505BA0D1A /* Pods-JBWebViewController-dummy.m */; };
+		CAEB9CA39ED3AA7DA2F32FAC /* UILabel+TextColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CDEDCF96F2C2A2BBEB66405 /* UILabel+TextColor.h */; };
+		CCD5167B7FD3155C889FEAF0 /* UIViewController+ChangeColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 56D4FB6A80858988E79A917B /* UIViewController+ChangeColor.m */; };
+		CD616234FF7612A84431646F /* JBWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C02D7C74486B98ED59EE6B0 /* JBWebViewController.m */; };
+		CF5B660447BD67D9E5D9D84C /* UINavigationBar+BarTintColor.m in Sources */ = {isa = PBXBuildFile; fileRef = FEE7AA9480A995DD4F72800F /* UINavigationBar+BarTintColor.m */; };
+		D00204C13268B50BBDC15483 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		D4E2513100363CA56E5BB97D /* UIBarButtonItem+TintColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6098577607EF45E666D99212 /* UIBarButtonItem+TintColor.m */; };
+		DD36D910827F5F6335DEEAA3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
+		DF934C6E9C2D74688136D7C2 /* UITableView+SeparatorColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BAC10ED71A2A2F1E3B9172E /* UITableView+SeparatorColor.m */; };
+		E19DF68BE0DEBE1FA6D225C2 /* NJKWebViewProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CDE4F9A844B9BD208A3FB58 /* NJKWebViewProgress.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		E994CD2A3F95F51C308A725F /* UIView+BackgroundColor.m in Sources */ = {isa = PBXBuildFile; fileRef = C03DBA45FA9A8CAE7404BAC6 /* UIView+BackgroundColor.m */; };
+		EA65311AE6EF3164B2487FF1 /* HNPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 9205831B72656A41EA4E5AB1 /* HNPost.m */; };
+		EA8C3581A69968BEA307168C /* UILabel+NightVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C95EE1C7D1C04554E888A0 /* UILabel+NightVersion.h */; };
+		EB069B0D5F45FC52980B7BDF /* HNUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 27E10C2558DA77F59621A1CD /* HNUser.h */; };
+		F114BFB5B551EEF78BF75D25 /* HNCommentLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 690A79916DE64B0ED0534404 /* HNCommentLink.m */; };
+		F2DD9577F3E3870329B6AD03 /* UIBarButtonItem+NightVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3320664146E1F81E5E080B63 /* UIBarButtonItem+NightVersion.m */; };
+		F3913BD3B8280EE63AB225EA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE22DE064DD7566F408D6A9D /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7396DBA60FBBB70FE5A47398 /* PBXContainerItemProxy */ = {
+		022B4B386608A8B5541A7F59 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = A34D25E3ED6E2612516DD68A /* Project object */;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 670F7AB9827093EA5AB222B3;
+			remoteGlobalIDString = D02BC6D8D8E6D6461BD12641;
+			remoteInfo = "Pods-ARChromeActivity";
+		};
+		190171FDFC3326EC7BC87C6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E40072E14681D6FFED69A4BC;
+			remoteInfo = "Pods-ARSafariActivity";
+		};
+		49791CA29736EF6A6F7E7AF8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ADA849540978FB27C8507A17;
+			remoteInfo = "Pods-NJKWebViewProgress";
+		};
+		5C2C3E4D677EF4BF67415F60 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D02BC6D8D8E6D6461BD12641;
+			remoteInfo = "Pods-ARChromeActivity";
+		};
+		5F15E5D67E0D595F6EF6309F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B4A8436DCB30DE116B8A7F08;
+			remoteInfo = "Pods-JBWebViewController";
+		};
+		8408F8C38A7A1CB924DF8258 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ADA849540978FB27C8507A17;
+			remoteInfo = "Pods-NJKWebViewProgress";
+		};
+		96C20F261BB7B5BD89F6D49A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC1B9863859A2D53A675874A;
 			remoteInfo = "Pods-libHN";
+		};
+		A1E00BBC3EEBB70C5C7C4A6F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 88987E67D68E9F58A1681A7F;
+			remoteInfo = "Pods-DKNightVersion";
+		};
+		F6693E1CEBDD5DB3613DE59E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27674989705C216C731321A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E40072E14681D6FFED69A4BC;
+			remoteInfo = "Pods-ARSafariActivity";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		002C0E15DD909EEA3A9D71D3 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		08BC925A7819556374E67B07 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.release.xcconfig; sourceTree = "<group>"; };
-		0DEBF436932630146C6BBE68 /* HNComment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNComment.m; path = Source/HNComment.m; sourceTree = "<group>"; };
-		1B6BE601740602517B30FA79 /* HNWebService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNWebService.m; path = Source/HNWebService.m; sourceTree = "<group>"; };
-		1E0C510ED01179D8ECA4DE8D /* HNPost.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNPost.m; path = Source/HNPost.m; sourceTree = "<group>"; };
-		2BE028B91B0C059B26F6159C /* HNUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUtilities.h; path = Source/HNUtilities.h; sourceTree = "<group>"; };
-		2D474C8D116A48E131D71D0C /* libHN.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = libHN.h; path = Source/libHN.h; sourceTree = "<group>"; };
-		2DD0DFB4506AB9101A668EFD /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		2EA80E12F38C29ECCF59F3F9 /* HNUser.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUser.m; path = Source/HNUser.m; sourceTree = "<group>"; };
-		4797701172A7309470A35302 /* Pods-libHN-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-libHN-Private.xcconfig"; sourceTree = "<group>"; };
-		4FCFF7BFC4D7ED6E5425E965 /* HNPost.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNPost.h; path = Source/HNPost.h; sourceTree = "<group>"; };
-		57D884BF07B49C9841571E0D /* Pods-libHN.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-libHN.xcconfig"; sourceTree = "<group>"; };
-		5BB4F1F2F618AF4EF0D2FB6C /* libPods-libHN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-libHN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C47C0344ED5A2CF4CC974DE /* Pods-environment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-environment.h"; sourceTree = "<group>"; };
-		5EEA12E988EE3298C9E50EFA /* HNUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUtilities.m; path = Source/HNUtilities.m; sourceTree = "<group>"; };
-		63E026832E1FD18D092C67E8 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.debug.xcconfig; sourceTree = "<group>"; };
-		7A72FB56EFD91966E379E71F /* Pods-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-acknowledgements.markdown"; sourceTree = "<group>"; };
-		81540369612BCAF720FD0B91 /* Pods-libHN-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-libHN-dummy.m"; sourceTree = "<group>"; };
-		90708521D38F2DAD7EFEBDB1 /* HNManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNManager.h; path = Source/HNManager.h; sourceTree = "<group>"; };
-		909075045B5A6CDAD2F6F042 /* HNCommentLink.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNCommentLink.h; path = Source/HNCommentLink.h; sourceTree = "<group>"; };
-		A2FDEDD31AD9F5F8E5E02BA9 /* HNCommentLink.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNCommentLink.m; path = Source/HNCommentLink.m; sourceTree = "<group>"; };
-		ACCDE5C7E768C4B0EC12BBC4 /* Pods-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-acknowledgements.plist"; sourceTree = "<group>"; };
-		B1B7ABDE14A41AD60F96220B /* hn.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = hn.json; path = Source/hn.json; sourceTree = "<group>"; };
-		B99B99653BC113D747BA335A /* HNUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUser.h; path = Source/HNUser.h; sourceTree = "<group>"; };
-		BCA312DB09FE9A52A19DFCB9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		D2794D997FA463CA22C3BB12 /* Pods-libHN-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-libHN-prefix.pch"; sourceTree = "<group>"; };
-		E15F039F35748F3A8CA3950A /* HNComment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNComment.h; path = Source/HNComment.h; sourceTree = "<group>"; };
-		E34720EE36A5C83A464A9358 /* HNWebService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNWebService.h; path = Source/HNWebService.h; sourceTree = "<group>"; };
-		E3D93F66294F0C9EB7F00B71 /* Pods-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-resources.sh"; sourceTree = "<group>"; };
-		EF6999D75EF9B9731B2B3664 /* Pods-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-dummy.m"; sourceTree = "<group>"; };
-		FCA14E42C20D303E6AA7EB8D /* HNManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNManager.m; path = Source/HNManager.m; sourceTree = "<group>"; };
+		0059B0478509AFA047CB702F /* ARSafariActivity.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ARSafariActivity.h; path = ARSafariActivity/ARSafariActivity.h; sourceTree = "<group>"; };
+		013476E3E1598BAB43124A8D /* zh-Hant.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = "zh-Hant.lproj"; path = "ARSafariActivity/zh-Hant.lproj"; sourceTree = "<group>"; };
+		01F9D881DF05CB5C03E25EB1 /* Rakefile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = Rakefile; sourceTree = "<group>"; };
+		0330189AECB3886F877889C6 /* sk.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = sk.lproj; path = ARSafariActivity/sk.lproj; sourceTree = "<group>"; };
+		073CA32A0D83EBAD3E3AB42C /* HNComment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNComment.h; path = Source/HNComment.h; sourceTree = "<group>"; };
+		08C95EE1C7D1C04554E888A0 /* UILabel+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UILabel+NightVersion.h"; path = "Classes/UIKit/UILabel/UILabel+NightVersion.h"; sourceTree = "<group>"; };
+		0CDE4F9A844B9BD208A3FB58 /* NJKWebViewProgress.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = NJKWebViewProgress.m; path = NJKWebViewProgress/NJKWebViewProgress.m; sourceTree = "<group>"; };
+		0D2344AEEA82A6F3A85091E0 /* Pods-ARSafariActivity-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ARSafariActivity-Private.xcconfig"; sourceTree = "<group>"; };
+		13BAEBEC750106514735EFA8 /* HNUser.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUser.m; path = Source/HNUser.m; sourceTree = "<group>"; };
+		14583D9F9D6967E4B198AFB8 /* sv.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = sv.lproj; path = ARSafariActivity/sv.lproj; sourceTree = "<group>"; };
+		184DC992E4224F54CDF7637F /* UINavigationBar+Animation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+Animation.h"; path = "Classes/Helper/UINavigationBar+Animation.h"; sourceTree = "<group>"; };
+		195465084DB4933231CA76C2 /* UITabBar+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UITabBar+NightVersion.m"; path = "Classes/UIKit/UITabBar/UITabBar+NightVersion.m"; sourceTree = "<group>"; };
+		1BB66BA0291046E77E92E457 /* DKNightVersionManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DKNightVersionManager.h; path = Classes/Core/DKNightVersionManager.h; sourceTree = "<group>"; };
+		1E40F57514A013D83A75A095 /* cs.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = cs.lproj; path = ARSafariActivity/cs.lproj; sourceTree = "<group>"; };
+		237C14924D7D15880D2B0375 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.release.xcconfig; sourceTree = "<group>"; };
+		23EC573E660929C0A99B22EF /* Pods-ARSafariActivity-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ARSafariActivity-prefix.pch"; sourceTree = "<group>"; };
+		2409C9DF6D479D34A8A9BA84 /* Pods-libHN-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-libHN-dummy.m"; sourceTree = "<group>"; };
+		244C0D80A4219A6FCA307361 /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		2605AB34504F27E6324502E1 /* Icons.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Icons.xcassets; path = JBWebViewController/Icons.xcassets; sourceTree = "<group>"; };
+		27E10C2558DA77F59621A1CD /* HNUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUser.h; path = Source/HNUser.h; sourceTree = "<group>"; };
+		2C77ADAB9D4C61108F0ED2DC /* UITabBar+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UITabBar+NightVersion.h"; path = "Classes/UIKit/UITabBar/UITabBar+NightVersion.h"; sourceTree = "<group>"; };
+		2C88B485D0FD9629AE80BD6F /* Pods-ARChromeActivity-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ARChromeActivity-Private.xcconfig"; sourceTree = "<group>"; };
+		309EDDAC32EE782019B412AE /* Pods-ARChromeActivity-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ARChromeActivity-prefix.pch"; sourceTree = "<group>"; };
+		315CF9B68F0A4B2C30D04F35 /* Pods-ARSafariActivity-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ARSafariActivity-dummy.m"; sourceTree = "<group>"; };
+		32A3C5474DD8A1B006C17454 /* DKNightVersionUtility.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DKNightVersionUtility.m; path = Classes/Helper/DKNightVersionUtility.m; sourceTree = "<group>"; };
+		32C92267F7AF0661EDE04FA2 /* HNUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUtilities.m; path = Source/HNUtilities.m; sourceTree = "<group>"; };
+		3320664146E1F81E5E080B63 /* UIBarButtonItem+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIBarButtonItem+NightVersion.m"; path = "Classes/UIKit/UIBarButtonItem/UIBarButtonItem+NightVersion.m"; sourceTree = "<group>"; };
+		3B7C4BAE6C08C47F80B3B0E7 /* libPods-ARSafariActivity.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ARSafariActivity.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CDEDCF96F2C2A2BBEB66405 /* UILabel+TextColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UILabel+TextColor.h"; path = "Classes/UIKit/UILabel/UILabel+TextColor.h"; sourceTree = "<group>"; };
+		3E9E7A3578AAB026CE8B2B0B /* HNManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNManager.h; path = Source/HNManager.h; sourceTree = "<group>"; };
+		3EEF031DF727A3606DD1B0FE /* es-ES.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = "es-ES.lproj"; path = "ARSafariActivity/es-ES.lproj"; sourceTree = "<group>"; };
+		3F2A72D9085F879FBC05EFD6 /* ja.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ja.lproj; path = ARSafariActivity/ja.lproj; sourceTree = "<group>"; };
+		3FF1FC96FD5ABAF610C651B1 /* JBWebViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JBWebViewController.h; path = JBWebViewController/JBWebViewController.h; sourceTree = "<group>"; };
+		42502E1E82D546FF754FAB07 /* NJKWebViewProgressView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NJKWebViewProgressView.h; path = NJKWebViewProgress/NJKWebViewProgressView.h; sourceTree = "<group>"; };
+		42796F150570963C9204CECB /* Pods-libHN.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-libHN.xcconfig"; sourceTree = "<group>"; };
+		4302CA4A62E93F7E54E81619 /* UINavigationBar+TintColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+TintColor.m"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+TintColor.m"; sourceTree = "<group>"; };
+		4357FA77B13826D73C6A1085 /* DKNightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DKNightVersion.h; path = Classes/DKNightVersion.h; sourceTree = "<group>"; };
+		4539872E7B63879930DA4942 /* Pods-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-acknowledgements.markdown"; sourceTree = "<group>"; };
+		470A646F168BE970689D9630 /* ru.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ru.lproj; path = ARSafariActivity/ru.lproj; sourceTree = "<group>"; };
+		4D06374BF47505BC599CCB42 /* da.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = da.lproj; path = ARSafariActivity/da.lproj; sourceTree = "<group>"; };
+		4DA46310E1CDD3EF12DCA9FE /* ARChromeActivity@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARChromeActivity@2x~ipad.png"; path = "ARChromeActivity/ARChromeActivity@2x~ipad.png"; sourceTree = "<group>"; };
+		4DB2A89877C8BAC73ECC4815 /* UINavigationBar+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+NightVersion.h"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+NightVersion.h"; sourceTree = "<group>"; };
+		4E5E791BAD7510574DB7842E /* UIViewController+ChangeColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIViewController+ChangeColor.h"; path = "Classes/Controller/UIViewController+ChangeColor.h"; sourceTree = "<group>"; };
+		4F1787EE77467C95092B3A04 /* ARChromeActivity.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = ARChromeActivity.png; path = ARChromeActivity/ARChromeActivity.png; sourceTree = "<group>"; };
+		55C3552322D0BCBF5F580737 /* en.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = en.lproj; path = ARSafariActivity/en.lproj; sourceTree = "<group>"; };
+		5624AC6CAFC85CF08FF17CC5 /* de.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = de.lproj; path = ARSafariActivity/de.lproj; sourceTree = "<group>"; };
+		56D4FB6A80858988E79A917B /* UIViewController+ChangeColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+ChangeColor.m"; path = "Classes/Controller/UIViewController+ChangeColor.m"; sourceTree = "<group>"; };
+		5826096053A6B12567E7B989 /* UINavigationBar+TintColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+TintColor.h"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+TintColor.h"; sourceTree = "<group>"; };
+		594755DC509F1BE14E46C631 /* UIBarButtonItem+TintColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIBarButtonItem+TintColor.h"; path = "Classes/UIKit/UIBarButtonItem/UIBarButtonItem+TintColor.h"; sourceTree = "<group>"; };
+		59EA13A404E77803780F5A99 /* UIBarButtonItem+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIBarButtonItem+NightVersion.h"; path = "Classes/UIKit/UIBarButtonItem/UIBarButtonItem+NightVersion.h"; sourceTree = "<group>"; };
+		6098577607EF45E666D99212 /* UIBarButtonItem+TintColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIBarButtonItem+TintColor.m"; path = "Classes/UIKit/UIBarButtonItem/UIBarButtonItem+TintColor.m"; sourceTree = "<group>"; };
+		626A44D3945F95C0D9849C94 /* UITableView+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UITableView+NightVersion.h"; path = "Classes/UIKit/UITableView/UITableView+NightVersion.h"; sourceTree = "<group>"; };
+		689752BD95D648ABC2952E6B /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		690A79916DE64B0ED0534404 /* HNCommentLink.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNCommentLink.m; path = Source/HNCommentLink.m; sourceTree = "<group>"; };
+		6968E6385C72EDA1FC263C20 /* Pods-ARSafariActivity.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ARSafariActivity.xcconfig"; sourceTree = "<group>"; };
+		72081E09ED31951352B07C48 /* it.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = it.lproj; path = ARSafariActivity/it.lproj; sourceTree = "<group>"; };
+		7473A019C54A6B31284CB1A9 /* UIButton+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIButton+NightVersion.h"; path = "Classes/UIKit/UIButton/UIButton+NightVersion.h"; sourceTree = "<group>"; };
+		7492B1338E679A1BE81A75A2 /* ko.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ko.lproj; path = ARSafariActivity/ko.lproj; sourceTree = "<group>"; };
+		7722A3C068B5C028352E46C9 /* ARChromeActivity~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARChromeActivity~ipad.png"; path = "ARChromeActivity/ARChromeActivity~ipad.png"; sourceTree = "<group>"; };
+		773918D59C7237986C6AD417 /* Gemfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = Gemfile; sourceTree = "<group>"; };
+		7BAC10ED71A2A2F1E3B9172E /* UITableView+SeparatorColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UITableView+SeparatorColor.m"; path = "Classes/UIKit/UITableView/UITableView+SeparatorColor.m"; sourceTree = "<group>"; };
+		7D01E8EF197F7D5EF09E1785 /* lib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = lib; path = generator/lib; sourceTree = "<group>"; };
+		7E67258C55CB59E92E8898DF /* UILabel+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UILabel+NightVersion.m"; path = "Classes/UIKit/UILabel/UILabel+NightVersion.m"; sourceTree = "<group>"; };
+		80261505E2967BA50744EE39 /* libPods-ARChromeActivity.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ARChromeActivity.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		802F02FE9C07A0E4E2C00BD6 /* libPods-NJKWebViewProgress.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NJKWebViewProgress.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		827FF3C818205BE627227F07 /* es.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = es.lproj; path = ARSafariActivity/es.lproj; sourceTree = "<group>"; };
+		84A85A8C4D0959C505BA0D1A /* Pods-JBWebViewController-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-JBWebViewController-dummy.m"; sourceTree = "<group>"; };
+		84B893C047B525031874383C /* DKNightVersionManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = DKNightVersionManager.m; path = Classes/Core/DKNightVersionManager.m; sourceTree = "<group>"; };
+		857AF00CC54DE658C1DA618E /* UITableView+SeparatorColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UITableView+SeparatorColor.h"; path = "Classes/UIKit/UITableView/UITableView+SeparatorColor.h"; sourceTree = "<group>"; };
+		8797C0F0386F79DB3EB951B8 /* libPods-DKNightVersion.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DKNightVersion.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		87D23EBBB8D6EC813547D6EC /* NJKWebViewProgress.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NJKWebViewProgress.h; path = NJKWebViewProgress/NJKWebViewProgress.h; sourceTree = "<group>"; };
+		88BF5DACFE0467A25B9560FF /* UIView+BackgroundColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIView+BackgroundColor.h"; path = "Classes/UIKit/UIView/UIView+BackgroundColor.h"; sourceTree = "<group>"; };
+		89DCEDCEA92821FB98A2E138 /* Pods-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-acknowledgements.plist"; sourceTree = "<group>"; };
+		8C02D7C74486B98ED59EE6B0 /* JBWebViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = JBWebViewController.m; path = JBWebViewController/JBWebViewController.m; sourceTree = "<group>"; };
+		8FD02B5AC220DE52FA8EFD42 /* property.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = property.json; sourceTree = "<group>"; };
+		909C4AFC3A18EA729732406B /* ARSafariActivity-iPad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARSafariActivity-iPad.png"; path = "ARSafariActivity/ARSafariActivity-iPad.png"; sourceTree = "<group>"; };
+		90D5339C2872BEFAAEB56780 /* HNPost.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNPost.h; path = Source/HNPost.h; sourceTree = "<group>"; };
+		90E757D20F6CE2A2090BAE87 /* UINavigationBar+Animation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+Animation.m"; path = "Classes/Helper/UINavigationBar+Animation.m"; sourceTree = "<group>"; };
+		915358F999FC3EA0B8743D73 /* HNCommentLink.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNCommentLink.h; path = Source/HNCommentLink.h; sourceTree = "<group>"; };
+		9205831B72656A41EA4E5AB1 /* HNPost.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNPost.m; path = Source/HNPost.m; sourceTree = "<group>"; };
+		98CE9438DBE1C4AD26C29E03 /* HNWebService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNWebService.m; path = Source/HNWebService.m; sourceTree = "<group>"; };
+		99469D3039E684375CEC5462 /* fr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = fr.lproj; path = ARSafariActivity/fr.lproj; sourceTree = "<group>"; };
+		9D1E11971FC8D6BE80BD1890 /* UIView+NightVersion.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIView+NightVersion.h"; path = "Classes/UIKit/UIView/UIView+NightVersion.h"; sourceTree = "<group>"; };
+		9D61099B67BB8A55FE7CC2C8 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.debug.xcconfig; sourceTree = "<group>"; };
+		9F1E10EC3CE0F99544489945 /* libPods-JBWebViewController.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-JBWebViewController.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9FE43C0AF9B2FF4A0176C1A6 /* UIButton+TitleColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIButton+TitleColor.h"; path = "Classes/UIKit/UIButton/UIButton+TitleColor.h"; sourceTree = "<group>"; };
+		A3093D8C5F5B6C9D806B1FE6 /* UITabBar+BarTintColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UITabBar+BarTintColor.h"; path = "Classes/UIKit/UITabBar/UITabBar+BarTintColor.h"; sourceTree = "<group>"; };
+		A3EC57400E1C3A8C057C2906 /* Pods-NJKWebViewProgress-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-NJKWebViewProgress-Private.xcconfig"; sourceTree = "<group>"; };
+		A8C137AA15F439A930F7D86A /* libHN.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = libHN.h; path = Source/libHN.h; sourceTree = "<group>"; };
+		A94B9497F1A3A8DDB32B7EFF /* ARChromeActivity.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ARChromeActivity.m; path = ARChromeActivity/ARChromeActivity.m; sourceTree = "<group>"; };
+		A9EA713714D44B61B0700D46 /* Pods-environment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-environment.h"; sourceTree = "<group>"; };
+		AD2724A4EB456B175AD30749 /* Pods-NJKWebViewProgress-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-NJKWebViewProgress-prefix.pch"; sourceTree = "<group>"; };
+		ADA53CD655AB6F8028B0C3B2 /* ARSafariActivity-iPad@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARSafariActivity-iPad@2x.png"; path = "ARSafariActivity/ARSafariActivity-iPad@2x.png"; sourceTree = "<group>"; };
+		AE22DE064DD7566F408D6A9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AED24D478103D4A3816FF002 /* nb.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = nb.lproj; path = ARSafariActivity/nb.lproj; sourceTree = "<group>"; };
+		B0CB0A544F15C27E33B3A0A9 /* Pods-JBWebViewController.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-JBWebViewController.xcconfig"; sourceTree = "<group>"; };
+		B4EDC33A6F8FC9F1AB760B82 /* UITableView+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UITableView+NightVersion.m"; path = "Classes/UIKit/UITableView/UITableView+NightVersion.m"; sourceTree = "<group>"; };
+		B7F07B91B09AAF103B50DF52 /* Pods-NJKWebViewProgress-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-NJKWebViewProgress-dummy.m"; sourceTree = "<group>"; };
+		B88B0A4750B25627B7F7FB83 /* HNManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNManager.m; path = Source/HNManager.m; sourceTree = "<group>"; };
+		BD772BDE59CBACF77CEDFAFB /* UIButton+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIButton+NightVersion.m"; path = "Classes/UIKit/UIButton/UIButton+NightVersion.m"; sourceTree = "<group>"; };
+		BF7F977A60A59CAF02D1AE26 /* Pods-libHN-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-libHN-Private.xcconfig"; sourceTree = "<group>"; };
+		BFFDBC2A0A313E3E8BCF3EF1 /* UINavigationBar+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+NightVersion.m"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+NightVersion.m"; sourceTree = "<group>"; };
+		C03DBA45FA9A8CAE7404BAC6 /* UIView+BackgroundColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIView+BackgroundColor.m"; path = "Classes/UIKit/UIView/UIView+BackgroundColor.m"; sourceTree = "<group>"; };
+		C2ECD48702A48AB34A0FEDCD /* Pods-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-dummy.m"; sourceTree = "<group>"; };
+		C46E39F26862D76B4B5380D1 /* Pods-DKNightVersion-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-DKNightVersion-dummy.m"; sourceTree = "<group>"; };
+		C4FDF4461629D774133CE920 /* Pods-DKNightVersion-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DKNightVersion-Private.xcconfig"; sourceTree = "<group>"; };
+		CBA7A1B796B196AC174DD3CC /* ARSafariActivity@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARSafariActivity@2x.png"; path = "ARSafariActivity/ARSafariActivity@2x.png"; sourceTree = "<group>"; };
+		CC5A6BE9C8DFE49004199A21 /* UIView+NightVersion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIView+NightVersion.m"; path = "Classes/UIKit/UIView/UIView+NightVersion.m"; sourceTree = "<group>"; };
+		D0CD29F63A0193740A49E70F /* NJKWebViewProgressView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = NJKWebViewProgressView.m; path = NJKWebViewProgress/NJKWebViewProgressView.m; sourceTree = "<group>"; };
+		D2EB94DAB23A9215DEBD2535 /* HNComment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNComment.m; path = Source/HNComment.m; sourceTree = "<group>"; };
+		D3783D265AF6EF57D36C212A /* UIButton+TitleColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIButton+TitleColor.m"; path = "Classes/UIKit/UIButton/UIButton+TitleColor.m"; sourceTree = "<group>"; };
+		D722FD02FA2D1EADBF9447D0 /* Pods-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-resources.sh"; sourceTree = "<group>"; };
+		D8ED89765D5DC2D584438C28 /* Pods-DKNightVersion.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-DKNightVersion.xcconfig"; sourceTree = "<group>"; };
+		D963C2558844D92CE8E877C2 /* hn.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = hn.json; path = Source/hn.json; sourceTree = "<group>"; };
+		D9718D361B8901E5E7D72A9B /* Pods-libHN-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-libHN-prefix.pch"; sourceTree = "<group>"; };
+		DA3D9706037EFEC0978ED441 /* Pods-JBWebViewController-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-JBWebViewController-prefix.pch"; sourceTree = "<group>"; };
+		DA5D01FE3D6D9A170A799D24 /* ARSafariActivity.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ARSafariActivity.m; path = ARSafariActivity/ARSafariActivity.m; sourceTree = "<group>"; };
+		DA68FFED321DA033B682BA0B /* libPods-libHN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-libHN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB450F8F53F826B112AB03DC /* HNWebService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNWebService.h; path = Source/HNWebService.h; sourceTree = "<group>"; };
+		DB7CE9866286BB9D2A6AF657 /* zh-Hans.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = "zh-Hans.lproj"; path = "ARSafariActivity/zh-Hans.lproj"; sourceTree = "<group>"; };
+		DBBE482BD316A41AFCA68892 /* UINavigationBar+BarTintColor.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UINavigationBar+BarTintColor.h"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+BarTintColor.h"; sourceTree = "<group>"; };
+		E08AE66F1538F77734116BD0 /* DKNightVersionUtility.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = DKNightVersionUtility.h; path = Classes/Helper/DKNightVersionUtility.h; sourceTree = "<group>"; };
+		E76948F38D9D45D701F618D0 /* ARChromeActivity.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ARChromeActivity.h; path = ARChromeActivity/ARChromeActivity.h; sourceTree = "<group>"; };
+		E8C0CBE2135D1672D93E6EBF /* Pods-ARChromeActivity-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ARChromeActivity-dummy.m"; sourceTree = "<group>"; };
+		E9692F9D1CB35112954D400B /* HNUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUtilities.h; path = Source/HNUtilities.h; sourceTree = "<group>"; };
+		E9840CFCE309C977681CBC72 /* Pods-JBWebViewController-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-JBWebViewController-Private.xcconfig"; sourceTree = "<group>"; };
+		ED6004C830E68D9336F3C282 /* Pods-DKNightVersion-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-DKNightVersion-prefix.pch"; sourceTree = "<group>"; };
+		EED9A9C351E8D145D16E8161 /* UILabel+TextColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UILabel+TextColor.m"; path = "Classes/UIKit/UILabel/UILabel+TextColor.m"; sourceTree = "<group>"; };
+		F2079841D202FCCA1A3BBFB7 /* UITabBar+BarTintColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UITabBar+BarTintColor.m"; path = "Classes/UIKit/UITabBar/UITabBar+BarTintColor.m"; sourceTree = "<group>"; };
+		F2A36C9766932CFC0523CB9C /* ARChromeActivity@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "ARChromeActivity@2x.png"; path = "ARChromeActivity/ARChromeActivity@2x.png"; sourceTree = "<group>"; };
+		F2D211A6DB7FE6D498672FB8 /* vi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = vi.lproj; path = ARSafariActivity/vi.lproj; sourceTree = "<group>"; };
+		F7AA650CCE7DAE566962F3B8 /* nl.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = nl.lproj; path = ARSafariActivity/nl.lproj; sourceTree = "<group>"; };
+		F809617B247697DAB4511706 /* Pods-ARChromeActivity.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ARChromeActivity.xcconfig"; sourceTree = "<group>"; };
+		FEE7AA9480A995DD4F72800F /* UINavigationBar+BarTintColor.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UINavigationBar+BarTintColor.m"; path = "Classes/UIKit/UINavigationBar/UINavigationBar+BarTintColor.m"; sourceTree = "<group>"; };
+		FFDCB78483C7849D595406A3 /* Pods-NJKWebViewProgress.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-NJKWebViewProgress.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		63C175BA2EE768E8AC922EC3 /* Frameworks */ = {
+		110C7C3EBE26D6250FCBA68E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BF625C444DA352AECEB6EFB /* Foundation.framework in Frameworks */,
+				3D96EA7AB96468635BEF6AA8 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A55765D9A92FDF16206CFDB9 /* Frameworks */ = {
+		2671E6EC84AEC94338E28E06 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89CE6A97FB98B2780199431C /* Foundation.framework in Frameworks */,
+				BE4D93BE676F1A206A239574 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52F62293DBD0699CC222B7F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D00204C13268B50BBDC15483 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6E836593125E9164779BE455 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD36D910827F5F6335DEEAA3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		735A0C4E36FE9970EAE4D5FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E08C6A1E05957F17A82283A /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9DDB531C6B687FB333C445BD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A452B1CAC7E86668C70DBA2D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F2E4A20DC436B034A6E20D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F3913BD3B8280EE63AB225EA /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		211E88C4FBCEEA969213A66B /* iOS */ = {
+		040723CE85FEC26FDFDFC746 /* DKNightVersion */ = {
 			isa = PBXGroup;
 			children = (
-				BCA312DB09FE9A52A19DFCB9 /* Foundation.framework */,
+				4357FA77B13826D73C6A1085 /* DKNightVersion.h */,
+				6A7BD6B3580D6EE4ED0FB055 /* Controller */,
+				0EF3EE84C99F9C43E66FABBB /* Core */,
+				35499549141E667F5EA9620A /* Generator */,
+				1A207F53AAD7243F77767B14 /* Helper */,
+				B6E840EB908051B02504FB9C /* Resources */,
+				7711266EBEDE79DC7E6889D5 /* Support Files */,
+				48BF8ABD5E7128077EA7EA02 /* UIKit */,
 			);
-			name = iOS;
+			path = DKNightVersion;
 			sourceTree = "<group>";
 		};
-		2179F3A65ACF21D247DE8550 /* Support Files */ = {
+		0EF3EE84C99F9C43E66FABBB /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				57D884BF07B49C9841571E0D /* Pods-libHN.xcconfig */,
-				4797701172A7309470A35302 /* Pods-libHN-Private.xcconfig */,
-				81540369612BCAF720FD0B91 /* Pods-libHN-dummy.m */,
-				D2794D997FA463CA22C3BB12 /* Pods-libHN-prefix.pch */,
+				1BB66BA0291046E77E92E457 /* DKNightVersionManager.h */,
+				84B893C047B525031874383C /* DKNightVersionManager.m */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		17D1B5C1DD06D45E1EE2003D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				909C4AFC3A18EA729732406B /* ARSafariActivity-iPad.png */,
+				ADA53CD655AB6F8028B0C3B2 /* ARSafariActivity-iPad@2x.png */,
+				CBA7A1B796B196AC174DD3CC /* ARSafariActivity@2x.png */,
+				1E40F57514A013D83A75A095 /* cs.lproj */,
+				4D06374BF47505BC599CCB42 /* da.lproj */,
+				5624AC6CAFC85CF08FF17CC5 /* de.lproj */,
+				55C3552322D0BCBF5F580737 /* en.lproj */,
+				827FF3C818205BE627227F07 /* es.lproj */,
+				3EEF031DF727A3606DD1B0FE /* es-ES.lproj */,
+				99469D3039E684375CEC5462 /* fr.lproj */,
+				72081E09ED31951352B07C48 /* it.lproj */,
+				3F2A72D9085F879FBC05EFD6 /* ja.lproj */,
+				7492B1338E679A1BE81A75A2 /* ko.lproj */,
+				AED24D478103D4A3816FF002 /* nb.lproj */,
+				F7AA650CCE7DAE566962F3B8 /* nl.lproj */,
+				470A646F168BE970689D9630 /* ru.lproj */,
+				0330189AECB3886F877889C6 /* sk.lproj */,
+				14583D9F9D6967E4B198AFB8 /* sv.lproj */,
+				F2D211A6DB7FE6D498672FB8 /* vi.lproj */,
+				DB7CE9866286BB9D2A6AF657 /* zh-Hans.lproj */,
+				013476E3E1598BAB43124A8D /* zh-Hant.lproj */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		1A207F53AAD7243F77767B14 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				E08AE66F1538F77734116BD0 /* DKNightVersionUtility.h */,
+				32A3C5474DD8A1B006C17454 /* DKNightVersionUtility.m */,
+				184DC992E4224F54CDF7637F /* UINavigationBar+Animation.h */,
+				90E757D20F6CE2A2090BAE87 /* UINavigationBar+Animation.m */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
+		2AF3A98A252A39149EA4AD77 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7D01E8EF197F7D5EF09E1785 /* lib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		2E310EEB0C846329F2D4C562 = {
+			isa = PBXGroup;
+			children = (
+				244C0D80A4219A6FCA307361 /* Podfile */,
+				6104ABD0F999C73DA6556812 /* Frameworks */,
+				B610878539CD8A8DCA3991C9 /* Pods */,
+				3BA9AE65512B5501B364EA0A /* Products */,
+				DDFCC7B48B788B5373EDAB64 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		35499549141E667F5EA9620A /* Generator */ = {
+			isa = PBXGroup;
+			children = (
+				2AF3A98A252A39149EA4AD77 /* Resources */,
+			);
+			name = Generator;
+			sourceTree = "<group>";
+		};
+		36581A296CAD508D0B6E9B19 /* libHN */ = {
+			isa = PBXGroup;
+			children = (
+				073CA32A0D83EBAD3E3AB42C /* HNComment.h */,
+				D2EB94DAB23A9215DEBD2535 /* HNComment.m */,
+				915358F999FC3EA0B8743D73 /* HNCommentLink.h */,
+				690A79916DE64B0ED0534404 /* HNCommentLink.m */,
+				3E9E7A3578AAB026CE8B2B0B /* HNManager.h */,
+				B88B0A4750B25627B7F7FB83 /* HNManager.m */,
+				90D5339C2872BEFAAEB56780 /* HNPost.h */,
+				9205831B72656A41EA4E5AB1 /* HNPost.m */,
+				27E10C2558DA77F59621A1CD /* HNUser.h */,
+				13BAEBEC750106514735EFA8 /* HNUser.m */,
+				E9692F9D1CB35112954D400B /* HNUtilities.h */,
+				32C92267F7AF0661EDE04FA2 /* HNUtilities.m */,
+				DB450F8F53F826B112AB03DC /* HNWebService.h */,
+				98CE9438DBE1C4AD26C29E03 /* HNWebService.m */,
+				A8C137AA15F439A930F7D86A /* libHN.h */,
+				F3DB362B8D89ADDC0CBA7FA2 /* Resources */,
+				70FA2DCFC6208AF301BAD48A /* Support Files */,
+			);
+			path = libHN;
+			sourceTree = "<group>";
+		};
+		3BA9AE65512B5501B364EA0A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				689752BD95D648ABC2952E6B /* libPods.a */,
+				80261505E2967BA50744EE39 /* libPods-ARChromeActivity.a */,
+				3B7C4BAE6C08C47F80B3B0E7 /* libPods-ARSafariActivity.a */,
+				8797C0F0386F79DB3EB951B8 /* libPods-DKNightVersion.a */,
+				9F1E10EC3CE0F99544489945 /* libPods-JBWebViewController.a */,
+				802F02FE9C07A0E4E2C00BD6 /* libPods-NJKWebViewProgress.a */,
+				DA68FFED321DA033B682BA0B /* libPods-libHN.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		48BF8ABD5E7128077EA7EA02 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				59EA13A404E77803780F5A99 /* UIBarButtonItem+NightVersion.h */,
+				3320664146E1F81E5E080B63 /* UIBarButtonItem+NightVersion.m */,
+				594755DC509F1BE14E46C631 /* UIBarButtonItem+TintColor.h */,
+				6098577607EF45E666D99212 /* UIBarButtonItem+TintColor.m */,
+				7473A019C54A6B31284CB1A9 /* UIButton+NightVersion.h */,
+				BD772BDE59CBACF77CEDFAFB /* UIButton+NightVersion.m */,
+				9FE43C0AF9B2FF4A0176C1A6 /* UIButton+TitleColor.h */,
+				D3783D265AF6EF57D36C212A /* UIButton+TitleColor.m */,
+				08C95EE1C7D1C04554E888A0 /* UILabel+NightVersion.h */,
+				7E67258C55CB59E92E8898DF /* UILabel+NightVersion.m */,
+				3CDEDCF96F2C2A2BBEB66405 /* UILabel+TextColor.h */,
+				EED9A9C351E8D145D16E8161 /* UILabel+TextColor.m */,
+				DBBE482BD316A41AFCA68892 /* UINavigationBar+BarTintColor.h */,
+				FEE7AA9480A995DD4F72800F /* UINavigationBar+BarTintColor.m */,
+				4DB2A89877C8BAC73ECC4815 /* UINavigationBar+NightVersion.h */,
+				BFFDBC2A0A313E3E8BCF3EF1 /* UINavigationBar+NightVersion.m */,
+				5826096053A6B12567E7B989 /* UINavigationBar+TintColor.h */,
+				4302CA4A62E93F7E54E81619 /* UINavigationBar+TintColor.m */,
+				A3093D8C5F5B6C9D806B1FE6 /* UITabBar+BarTintColor.h */,
+				F2079841D202FCCA1A3BBFB7 /* UITabBar+BarTintColor.m */,
+				2C77ADAB9D4C61108F0ED2DC /* UITabBar+NightVersion.h */,
+				195465084DB4933231CA76C2 /* UITabBar+NightVersion.m */,
+				626A44D3945F95C0D9849C94 /* UITableView+NightVersion.h */,
+				B4EDC33A6F8FC9F1AB760B82 /* UITableView+NightVersion.m */,
+				857AF00CC54DE658C1DA618E /* UITableView+SeparatorColor.h */,
+				7BAC10ED71A2A2F1E3B9172E /* UITableView+SeparatorColor.m */,
+				88BF5DACFE0467A25B9560FF /* UIView+BackgroundColor.h */,
+				C03DBA45FA9A8CAE7404BAC6 /* UIView+BackgroundColor.m */,
+				9D1E11971FC8D6BE80BD1890 /* UIView+NightVersion.h */,
+				CC5A6BE9C8DFE49004199A21 /* UIView+NightVersion.m */,
+			);
+			name = UIKit;
+			sourceTree = "<group>";
+		};
+		5052F9B830AA7CF6B204DC36 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				87D23EBBB8D6EC813547D6EC /* NJKWebViewProgress.h */,
+				0CDE4F9A844B9BD208A3FB58 /* NJKWebViewProgress.m */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		6104ABD0F999C73DA6556812 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BAEC798C4E8B80B99A51B0EE /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6A7BD6B3580D6EE4ED0FB055 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				4E5E791BAD7510574DB7842E /* UIViewController+ChangeColor.h */,
+				56D4FB6A80858988E79A917B /* UIViewController+ChangeColor.m */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		70FA2DCFC6208AF301BAD48A /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				42796F150570963C9204CECB /* Pods-libHN.xcconfig */,
+				BF7F977A60A59CAF02D1AE26 /* Pods-libHN-Private.xcconfig */,
+				2409C9DF6D479D34A8A9BA84 /* Pods-libHN-dummy.m */,
+				D9718D361B8901E5E7D72A9B /* Pods-libHN-prefix.pch */,
 			);
 			name = "Support Files";
 			path = "../Target Support Files/Pods-libHN";
 			sourceTree = "<group>";
 		};
-		5D59A10633A667C12E0D80C1 /* Pods */ = {
+		7711266EBEDE79DC7E6889D5 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				6A04D6F8EC2B3036A790F8D3 /* libHN */,
+				D8ED89765D5DC2D584438C28 /* Pods-DKNightVersion.xcconfig */,
+				C4FDF4461629D774133CE920 /* Pods-DKNightVersion-Private.xcconfig */,
+				C46E39F26862D76B4B5380D1 /* Pods-DKNightVersion-dummy.m */,
+				ED6004C830E68D9336F3C282 /* Pods-DKNightVersion-prefix.pch */,
 			);
-			name = Pods;
+			name = "Support Files";
+			path = "../Target Support Files/Pods-DKNightVersion";
 			sourceTree = "<group>";
 		};
-		5D828856D352721604EB1BD2 /* Products */ = {
+		7EF675C08947CBD9BA4FEAAA /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				002C0E15DD909EEA3A9D71D3 /* libPods.a */,
-				5BB4F1F2F618AF4EF0D2FB6C /* libPods-libHN.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		6A04D6F8EC2B3036A790F8D3 /* libHN */ = {
-			isa = PBXGroup;
-			children = (
-				E15F039F35748F3A8CA3950A /* HNComment.h */,
-				0DEBF436932630146C6BBE68 /* HNComment.m */,
-				909075045B5A6CDAD2F6F042 /* HNCommentLink.h */,
-				A2FDEDD31AD9F5F8E5E02BA9 /* HNCommentLink.m */,
-				90708521D38F2DAD7EFEBDB1 /* HNManager.h */,
-				FCA14E42C20D303E6AA7EB8D /* HNManager.m */,
-				4FCFF7BFC4D7ED6E5425E965 /* HNPost.h */,
-				1E0C510ED01179D8ECA4DE8D /* HNPost.m */,
-				B99B99653BC113D747BA335A /* HNUser.h */,
-				2EA80E12F38C29ECCF59F3F9 /* HNUser.m */,
-				2BE028B91B0C059B26F6159C /* HNUtilities.h */,
-				5EEA12E988EE3298C9E50EFA /* HNUtilities.m */,
-				E34720EE36A5C83A464A9358 /* HNWebService.h */,
-				1B6BE601740602517B30FA79 /* HNWebService.m */,
-				2D474C8D116A48E131D71D0C /* libHN.h */,
-				F6D0703BC77F098355F42041 /* Resources */,
-				2179F3A65ACF21D247DE8550 /* Support Files */,
-			);
-			path = libHN;
-			sourceTree = "<group>";
-		};
-		6A4E2C2723A975832578FA0B = {
-			isa = PBXGroup;
-			children = (
-				2DD0DFB4506AB9101A668EFD /* Podfile */,
-				C940BA2C38216A7FE1DAD1F6 /* Frameworks */,
-				5D59A10633A667C12E0D80C1 /* Pods */,
-				5D828856D352721604EB1BD2 /* Products */,
-				7C9DE95AAF9A2F6BD96E3E06 /* Targets Support Files */,
-			);
-			sourceTree = "<group>";
-		};
-		7C9DE95AAF9A2F6BD96E3E06 /* Targets Support Files */ = {
-			isa = PBXGroup;
-			children = (
-				CAF1FE27AA72E7B03E4A8D87 /* Pods */,
-			);
-			name = "Targets Support Files";
-			sourceTree = "<group>";
-		};
-		C940BA2C38216A7FE1DAD1F6 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				211E88C4FBCEEA969213A66B /* iOS */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		CAF1FE27AA72E7B03E4A8D87 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				7A72FB56EFD91966E379E71F /* Pods-acknowledgements.markdown */,
-				ACCDE5C7E768C4B0EC12BBC4 /* Pods-acknowledgements.plist */,
-				EF6999D75EF9B9731B2B3664 /* Pods-dummy.m */,
-				5C47C0344ED5A2CF4CC974DE /* Pods-environment.h */,
-				E3D93F66294F0C9EB7F00B71 /* Pods-resources.sh */,
-				63E026832E1FD18D092C67E8 /* Pods.debug.xcconfig */,
-				08BC925A7819556374E67B07 /* Pods.release.xcconfig */,
+				4539872E7B63879930DA4942 /* Pods-acknowledgements.markdown */,
+				89DCEDCEA92821FB98A2E138 /* Pods-acknowledgements.plist */,
+				C2ECD48702A48AB34A0FEDCD /* Pods-dummy.m */,
+				A9EA713714D44B61B0700D46 /* Pods-environment.h */,
+				D722FD02FA2D1EADBF9447D0 /* Pods-resources.sh */,
+				9D61099B67BB8A55FE7CC2C8 /* Pods.debug.xcconfig */,
+				237C14924D7D15880D2B0375 /* Pods.release.xcconfig */,
 			);
 			name = Pods;
 			path = "Target Support Files/Pods";
 			sourceTree = "<group>";
 		};
-		F6D0703BC77F098355F42041 /* Resources */ = {
+		9116E32F447B072627AAFBEF /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B1B7ABDE14A41AD60F96220B /* hn.json */,
+				2605AB34504F27E6324502E1 /* Icons.xcassets */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		91ED7665225032AF8A23C62C /* ARChromeActivity */ = {
+			isa = PBXGroup;
+			children = (
+				E76948F38D9D45D701F618D0 /* ARChromeActivity.h */,
+				A94B9497F1A3A8DDB32B7EFF /* ARChromeActivity.m */,
+				BB41BC5514AE199F79C47BC7 /* Resources */,
+				B6B479D03C4D5EF22A55D6C2 /* Support Files */,
+			);
+			path = ARChromeActivity;
+			sourceTree = "<group>";
+		};
+		A052FA743F1BAC8656C44BC3 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				6968E6385C72EDA1FC263C20 /* Pods-ARSafariActivity.xcconfig */,
+				0D2344AEEA82A6F3A85091E0 /* Pods-ARSafariActivity-Private.xcconfig */,
+				315CF9B68F0A4B2C30D04F35 /* Pods-ARSafariActivity-dummy.m */,
+				23EC573E660929C0A99B22EF /* Pods-ARSafariActivity-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Pods-ARSafariActivity";
+			sourceTree = "<group>";
+		};
+		B610878539CD8A8DCA3991C9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				91ED7665225032AF8A23C62C /* ARChromeActivity */,
+				E036721AD9A4F6ECFB6640CC /* ARSafariActivity */,
+				040723CE85FEC26FDFDFC746 /* DKNightVersion */,
+				E9CAF831E1F87D105D40A437 /* JBWebViewController */,
+				D1D3EF632FB21A89EECABC20 /* NJKWebViewProgress */,
+				36581A296CAD508D0B6E9B19 /* libHN */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		B6B479D03C4D5EF22A55D6C2 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				F809617B247697DAB4511706 /* Pods-ARChromeActivity.xcconfig */,
+				2C88B485D0FD9629AE80BD6F /* Pods-ARChromeActivity-Private.xcconfig */,
+				E8C0CBE2135D1672D93E6EBF /* Pods-ARChromeActivity-dummy.m */,
+				309EDDAC32EE782019B412AE /* Pods-ARChromeActivity-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Pods-ARChromeActivity";
+			sourceTree = "<group>";
+		};
+		B6E840EB908051B02504FB9C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				773918D59C7237986C6AD417 /* Gemfile */,
+				01F9D881DF05CB5C03E25EB1 /* Rakefile */,
+				8FD02B5AC220DE52FA8EFD42 /* property.json */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		BAEC798C4E8B80B99A51B0EE /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				AE22DE064DD7566F408D6A9D /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		BB41BC5514AE199F79C47BC7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4F1787EE77467C95092B3A04 /* ARChromeActivity.png */,
+				F2A36C9766932CFC0523CB9C /* ARChromeActivity@2x.png */,
+				4DA46310E1CDD3EF12DCA9FE /* ARChromeActivity@2x~ipad.png */,
+				7722A3C068B5C028352E46C9 /* ARChromeActivity~ipad.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		C7366EC673607078C8D02919 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				FFDCB78483C7849D595406A3 /* Pods-NJKWebViewProgress.xcconfig */,
+				A3EC57400E1C3A8C057C2906 /* Pods-NJKWebViewProgress-Private.xcconfig */,
+				B7F07B91B09AAF103B50DF52 /* Pods-NJKWebViewProgress-dummy.m */,
+				AD2724A4EB456B175AD30749 /* Pods-NJKWebViewProgress-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Pods-NJKWebViewProgress";
+			sourceTree = "<group>";
+		};
+		C83EC06985B8E484D5E15EFB /* ProgressView */ = {
+			isa = PBXGroup;
+			children = (
+				42502E1E82D546FF754FAB07 /* NJKWebViewProgressView.h */,
+				D0CD29F63A0193740A49E70F /* NJKWebViewProgressView.m */,
+			);
+			name = ProgressView;
+			sourceTree = "<group>";
+		};
+		D1D3EF632FB21A89EECABC20 /* NJKWebViewProgress */ = {
+			isa = PBXGroup;
+			children = (
+				5052F9B830AA7CF6B204DC36 /* Core */,
+				C83EC06985B8E484D5E15EFB /* ProgressView */,
+				C7366EC673607078C8D02919 /* Support Files */,
+			);
+			path = NJKWebViewProgress;
+			sourceTree = "<group>";
+		};
+		DDFCC7B48B788B5373EDAB64 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				7EF675C08947CBD9BA4FEAAA /* Pods */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		E036721AD9A4F6ECFB6640CC /* ARSafariActivity */ = {
+			isa = PBXGroup;
+			children = (
+				0059B0478509AFA047CB702F /* ARSafariActivity.h */,
+				DA5D01FE3D6D9A170A799D24 /* ARSafariActivity.m */,
+				17D1B5C1DD06D45E1EE2003D /* Resources */,
+				A052FA743F1BAC8656C44BC3 /* Support Files */,
+			);
+			path = ARSafariActivity;
+			sourceTree = "<group>";
+		};
+		E9CAF831E1F87D105D40A437 /* JBWebViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3FF1FC96FD5ABAF610C651B1 /* JBWebViewController.h */,
+				8C02D7C74486B98ED59EE6B0 /* JBWebViewController.m */,
+				9116E32F447B072627AAFBEF /* Resources */,
+				F706128B0BD20A7D78E2F275 /* Support Files */,
+			);
+			path = JBWebViewController;
+			sourceTree = "<group>";
+		};
+		F3DB362B8D89ADDC0CBA7FA2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D963C2558844D92CE8E877C2 /* hn.json */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		F706128B0BD20A7D78E2F275 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				B0CB0A544F15C27E33B3A0A9 /* Pods-JBWebViewController.xcconfig */,
+				E9840CFCE309C977681CBC72 /* Pods-JBWebViewController-Private.xcconfig */,
+				84A85A8C4D0959C505BA0D1A /* Pods-JBWebViewController-dummy.m */,
+				DA3D9706037EFEC0978ED441 /* Pods-JBWebViewController-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/Pods-JBWebViewController";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		E29DF0F6AD2859E7D2D3A686 /* Headers */ = {
+		333650BCBCCB51FD846F114D /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F6379FB3AD45957C2306919 /* HNComment.h in Headers */,
-				D4C0013F1AE0698C408A70EC /* HNCommentLink.h in Headers */,
-				E4CDC2B4662F677CE3CC05B2 /* HNManager.h in Headers */,
-				ECC1F46B5B630E6425288981 /* HNPost.h in Headers */,
-				EE24CEBDC37104A956E21294 /* HNUser.h in Headers */,
-				DA89978BCCCE122E534C4242 /* HNUtilities.h in Headers */,
-				3650EA8578F7F88B1C300951 /* HNWebService.h in Headers */,
-				5A351A96BBD1B63F95DAA8D4 /* libHN.h in Headers */,
+				56A6257D1F4848ADD6832A75 /* JBWebViewController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D3B061C0EA5CBCC62828004 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2BAF0F39668C207288E88301 /* NJKWebViewProgress.h in Headers */,
+				1D6F22C067200BD6D5DB33D6 /* NJKWebViewProgressView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		88A4FD2FD1DE0D76AA4BE408 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A25FD82C629D1F9BC320177 /* ARSafariActivity.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF305B7FD1923B0E503BBF56 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7DE8F02C465939B89A4063B5 /* HNComment.h in Headers */,
+				74EF75436E4DEC32B61ED2BB /* HNCommentLink.h in Headers */,
+				84872EB1A8148A3AC838BF6E /* HNManager.h in Headers */,
+				735476F0F86C58291C3B0C33 /* HNPost.h in Headers */,
+				EB069B0D5F45FC52980B7BDF /* HNUser.h in Headers */,
+				160150A53E4D3A19534C8784 /* HNUtilities.h in Headers */,
+				89F0DE4C173990E0CD4CAC62 /* HNWebService.h in Headers */,
+				C48949F35FB6B13AE732B387 /* libHN.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2DA68EBE902B85A6EAC0E0B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AB7398203485DDC5A439BED /* DKNightVersion.h in Headers */,
+				8F4B86BE14C522CAEF5E9FE0 /* DKNightVersionManager.h in Headers */,
+				5CA637379E55B3EB86D929D3 /* DKNightVersionUtility.h in Headers */,
+				77C5F7F8DAECF4D1227AF122 /* UIBarButtonItem+NightVersion.h in Headers */,
+				46774BE289005B45537BA90C /* UIBarButtonItem+TintColor.h in Headers */,
+				27C9C76EA1AA251192D6E35F /* UIButton+NightVersion.h in Headers */,
+				8DE8A74B584B2B50C0A2C445 /* UIButton+TitleColor.h in Headers */,
+				EA8C3581A69968BEA307168C /* UILabel+NightVersion.h in Headers */,
+				CAEB9CA39ED3AA7DA2F32FAC /* UILabel+TextColor.h in Headers */,
+				41BA8DF027B0B9110285B10F /* UINavigationBar+Animation.h in Headers */,
+				5971B1260474F6425E65189A /* UINavigationBar+BarTintColor.h in Headers */,
+				05AE51CCFD762B8890978060 /* UINavigationBar+NightVersion.h in Headers */,
+				4C31B301CFD58600CC93D720 /* UINavigationBar+TintColor.h in Headers */,
+				826DAE347B2A2CE3BE8856D4 /* UITabBar+BarTintColor.h in Headers */,
+				2F6799AE9A6EBE1D34A20764 /* UITabBar+NightVersion.h in Headers */,
+				837110F2ED9AC7D7DF9352DC /* UITableView+NightVersion.h in Headers */,
+				8D3C4E95D043D0BC06B916AE /* UITableView+SeparatorColor.h in Headers */,
+				AD04C7B98D684BC49A311E91 /* UIView+BackgroundColor.h in Headers */,
+				639E839FD12AAD7D25397A3B /* UIView+NightVersion.h in Headers */,
+				9A47F02F77730FDF10EE4D28 /* UIViewController+ChangeColor.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8AC6453FEBB25903FAF9B6D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				798D6EA63D69A88B1D3510A2 /* ARChromeActivity.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		670F7AB9827093EA5AB222B3 /* Pods-libHN */ = {
+		37638424C3384417EBB43B80 /* Pods */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BD2D1DAE6B36EAAE80792B7E /* Build configuration list for PBXNativeTarget "Pods-libHN" */;
+			buildConfigurationList = 18CFF714AD28B66EE5FAA27E /* Build configuration list for PBXNativeTarget "Pods" */;
 			buildPhases = (
-				79E219AF18AE9F3079723D20 /* Sources */,
-				63C175BA2EE768E8AC922EC3 /* Frameworks */,
-				E29DF0F6AD2859E7D2D3A686 /* Headers */,
+				A9658B3035523118F7939BA0 /* Sources */,
+				735A0C4E36FE9970EAE4D5FD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2C230AD6D48489B86886B160 /* PBXTargetDependency */,
+				99BD58F8C6067B024954D8DA /* PBXTargetDependency */,
+				04970279A67C8BA287014CB4 /* PBXTargetDependency */,
+				E875F00C5AE12BD75241D6B2 /* PBXTargetDependency */,
+				8501F8F4423D798038A2A0C3 /* PBXTargetDependency */,
+				5D86C5DB8FB17D02295B67A0 /* PBXTargetDependency */,
+			);
+			name = Pods;
+			productName = Pods;
+			productReference = 689752BD95D648ABC2952E6B /* libPods.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		88987E67D68E9F58A1681A7F /* Pods-DKNightVersion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 06B7089C37E53EC705CC6CAB /* Build configuration list for PBXNativeTarget "Pods-DKNightVersion" */;
+			buildPhases = (
+				E4FA8F159626CED84A3243C3 /* Sources */,
+				9F2E4A20DC436B034A6E20D7 /* Frameworks */,
+				C2DA68EBE902B85A6EAC0E0B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-DKNightVersion";
+			productName = "Pods-DKNightVersion";
+			productReference = 8797C0F0386F79DB3EB951B8 /* libPods-DKNightVersion.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		ADA849540978FB27C8507A17 /* Pods-NJKWebViewProgress */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82391467624271580BBB6DC8 /* Build configuration list for PBXNativeTarget "Pods-NJKWebViewProgress" */;
+			buildPhases = (
+				12C9C0BF9735068DBAC7A943 /* Sources */,
+				52F62293DBD0699CC222B7F7 /* Frameworks */,
+				4D3B061C0EA5CBCC62828004 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-NJKWebViewProgress";
+			productName = "Pods-NJKWebViewProgress";
+			productReference = 802F02FE9C07A0E4E2C00BD6 /* libPods-NJKWebViewProgress.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		B4A8436DCB30DE116B8A7F08 /* Pods-JBWebViewController */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700DD7D1261AB879D4AE5F31 /* Build configuration list for PBXNativeTarget "Pods-JBWebViewController" */;
+			buildPhases = (
+				E8256CEE4F0DEEB92B040301 /* Sources */,
+				2671E6EC84AEC94338E28E06 /* Frameworks */,
+				333650BCBCCB51FD846F114D /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0E6E7AB3885027AEAD04DA33 /* PBXTargetDependency */,
+				7493CC160FE493144D165811 /* PBXTargetDependency */,
+				DEC8EF2CC3BF9720D118348A /* PBXTargetDependency */,
+			);
+			name = "Pods-JBWebViewController";
+			productName = "Pods-JBWebViewController";
+			productReference = 9F1E10EC3CE0F99544489945 /* libPods-JBWebViewController.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		D02BC6D8D8E6D6461BD12641 /* Pods-ARChromeActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E696F8B7D7BEBA1CC67C740F /* Build configuration list for PBXNativeTarget "Pods-ARChromeActivity" */;
+			buildPhases = (
+				BD79D9FB8252CDD16E7CB306 /* Sources */,
+				110C7C3EBE26D6250FCBA68E /* Frameworks */,
+				C8AC6453FEBB25903FAF9B6D /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pods-ARChromeActivity";
+			productName = "Pods-ARChromeActivity";
+			productReference = 80261505E2967BA50744EE39 /* libPods-ARChromeActivity.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		DC1B9863859A2D53A675874A /* Pods-libHN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B384D8AC36AF48C2DC32471E /* Build configuration list for PBXNativeTarget "Pods-libHN" */;
+			buildPhases = (
+				7621DF6C8E64DE65D295AADB /* Sources */,
+				9DDB531C6B687FB333C445BD /* Frameworks */,
+				AF305B7FD1923B0E503BBF56 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -238,91 +935,240 @@
 			);
 			name = "Pods-libHN";
 			productName = "Pods-libHN";
-			productReference = 5BB4F1F2F618AF4EF0D2FB6C /* libPods-libHN.a */;
+			productReference = DA68FFED321DA033B682BA0B /* libPods-libHN.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		DE0531D02C8CB06406FA82F2 /* Pods */ = {
+		E40072E14681D6FFED69A4BC /* Pods-ARSafariActivity */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C3C8D225F5B80B3239BDE1C8 /* Build configuration list for PBXNativeTarget "Pods" */;
+			buildConfigurationList = 752EBF8CF13579EBB30ACEEA /* Build configuration list for PBXNativeTarget "Pods-ARSafariActivity" */;
 			buildPhases = (
-				665796C3FB573D2277B2AEBB /* Sources */,
-				A55765D9A92FDF16206CFDB9 /* Frameworks */,
+				4B79732BC39389AC370E92D4 /* Sources */,
+				6E836593125E9164779BE455 /* Frameworks */,
+				88A4FD2FD1DE0D76AA4BE408 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				F64EF1D87FD1D9EE2771ECBD /* PBXTargetDependency */,
 			);
-			name = Pods;
-			productName = Pods;
-			productReference = 002C0E15DD909EEA3A9D71D3 /* libPods.a */;
+			name = "Pods-ARSafariActivity";
+			productName = "Pods-ARSafariActivity";
+			productReference = 3B7C4BAE6C08C47F80B3B0E7 /* libPods-ARSafariActivity.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A34D25E3ED6E2612516DD68A /* Project object */ = {
+		27674989705C216C731321A2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0640;
 			};
-			buildConfigurationList = B77A1EF19718237B1FA6E209 /* Build configuration list for PBXProject "Pods" */;
+			buildConfigurationList = 9E65C3E35E49FC0D3F12CDF1 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 6A4E2C2723A975832578FA0B;
-			productRefGroup = 5D828856D352721604EB1BD2 /* Products */;
+			mainGroup = 2E310EEB0C846329F2D4C562;
+			productRefGroup = 3BA9AE65512B5501B364EA0A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DE0531D02C8CB06406FA82F2 /* Pods */,
-				670F7AB9827093EA5AB222B3 /* Pods-libHN */,
+				37638424C3384417EBB43B80 /* Pods */,
+				D02BC6D8D8E6D6461BD12641 /* Pods-ARChromeActivity */,
+				E40072E14681D6FFED69A4BC /* Pods-ARSafariActivity */,
+				88987E67D68E9F58A1681A7F /* Pods-DKNightVersion */,
+				B4A8436DCB30DE116B8A7F08 /* Pods-JBWebViewController */,
+				ADA849540978FB27C8507A17 /* Pods-NJKWebViewProgress */,
+				DC1B9863859A2D53A675874A /* Pods-libHN */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		665796C3FB573D2277B2AEBB /* Sources */ = {
+		12C9C0BF9735068DBAC7A943 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A78F125588B1DB7627C2C8A /* Pods-dummy.m in Sources */,
+				E19DF68BE0DEBE1FA6D225C2 /* NJKWebViewProgress.m in Sources */,
+				1C21EA9272E42A835D773C75 /* NJKWebViewProgressView.m in Sources */,
+				BD52E08B7A378B0B4E9A89DF /* Pods-NJKWebViewProgress-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		79E219AF18AE9F3079723D20 /* Sources */ = {
+		4B79732BC39389AC370E92D4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A29E99026501A912D86B35EE /* HNComment.m in Sources */,
-				BF54C7AA1D70AD3B083A53DB /* HNCommentLink.m in Sources */,
-				38C58A3E5919359E067E786C /* HNManager.m in Sources */,
-				C3284C0EBF226C6BAC1DAADA /* HNPost.m in Sources */,
-				9D1AA069E087036AF78D521B /* HNUser.m in Sources */,
-				3C37AF8F090C9C415A02D58B /* HNUtilities.m in Sources */,
-				C2D3FE9560F708A81363872F /* HNWebService.m in Sources */,
-				F107083FD7E6B8FE346076C7 /* Pods-libHN-dummy.m in Sources */,
+				244219962474E0CC8D6A3320 /* ARSafariActivity.m in Sources */,
+				0FB7F165BB34BCC882C51F79 /* Pods-ARSafariActivity-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7621DF6C8E64DE65D295AADB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9DE83F6092961076123F3674 /* HNComment.m in Sources */,
+				F114BFB5B551EEF78BF75D25 /* HNCommentLink.m in Sources */,
+				572519A436C193FCEDE53AB8 /* HNManager.m in Sources */,
+				EA65311AE6EF3164B2487FF1 /* HNPost.m in Sources */,
+				407514644C68A370EC040604 /* HNUser.m in Sources */,
+				C49EC5DC066B82A9FB4B1A6D /* HNUtilities.m in Sources */,
+				41150A99BF24FD68AD9CF105 /* HNWebService.m in Sources */,
+				C10CD04815B226F98254ECDF /* Pods-libHN-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9658B3035523118F7939BA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35D2F3491125B2C415990A8F /* Pods-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD79D9FB8252CDD16E7CB306 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72F638B7088F253AE868BFB9 /* ARChromeActivity.m in Sources */,
+				39840BF655C4AF7A6C54B2D6 /* Pods-ARChromeActivity-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4FA8F159626CED84A3243C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3ADC6FE2F04D09F7F1B6DE2F /* DKNightVersionManager.m in Sources */,
+				9152336010A7544F504BEC41 /* DKNightVersionUtility.m in Sources */,
+				8EA694EA49E85B760028B158 /* Pods-DKNightVersion-dummy.m in Sources */,
+				F2DD9577F3E3870329B6AD03 /* UIBarButtonItem+NightVersion.m in Sources */,
+				D4E2513100363CA56E5BB97D /* UIBarButtonItem+TintColor.m in Sources */,
+				736ADD33D9A1470E84E9C795 /* UIButton+NightVersion.m in Sources */,
+				5F28EE1644035E6D863C1A9D /* UIButton+TitleColor.m in Sources */,
+				B2AFE74F0C2A47536F62BE5F /* UILabel+NightVersion.m in Sources */,
+				3F91C5689E15EAF59F70252F /* UILabel+TextColor.m in Sources */,
+				C1F9C099B025D4A42F612A31 /* UINavigationBar+Animation.m in Sources */,
+				CF5B660447BD67D9E5D9D84C /* UINavigationBar+BarTintColor.m in Sources */,
+				B35756BF0902D14B3A8F8304 /* UINavigationBar+NightVersion.m in Sources */,
+				0009686E586121D48B40A943 /* UINavigationBar+TintColor.m in Sources */,
+				6C4E65258EC9BDED7D7902B9 /* UITabBar+BarTintColor.m in Sources */,
+				045E669F8C30A5ADCB1A2EB1 /* UITabBar+NightVersion.m in Sources */,
+				4542FA078B03B12F9E4F8AE5 /* UITableView+NightVersion.m in Sources */,
+				DF934C6E9C2D74688136D7C2 /* UITableView+SeparatorColor.m in Sources */,
+				E994CD2A3F95F51C308A725F /* UIView+BackgroundColor.m in Sources */,
+				0722115EBA4718717491EB6C /* UIView+NightVersion.m in Sources */,
+				CCD5167B7FD3155C889FEAF0 /* UIViewController+ChangeColor.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8256CEE4F0DEEB92B040301 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD616234FF7612A84431646F /* JBWebViewController.m in Sources */,
+				C6BDCBBAFF3E042FB982D869 /* Pods-JBWebViewController-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F64EF1D87FD1D9EE2771ECBD /* PBXTargetDependency */ = {
+		04970279A67C8BA287014CB4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-DKNightVersion";
+			target = 88987E67D68E9F58A1681A7F /* Pods-DKNightVersion */;
+			targetProxy = A1E00BBC3EEBB70C5C7C4A6F /* PBXContainerItemProxy */;
+		};
+		0E6E7AB3885027AEAD04DA33 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-ARChromeActivity";
+			target = D02BC6D8D8E6D6461BD12641 /* Pods-ARChromeActivity */;
+			targetProxy = 5C2C3E4D677EF4BF67415F60 /* PBXContainerItemProxy */;
+		};
+		2C230AD6D48489B86886B160 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-ARChromeActivity";
+			target = D02BC6D8D8E6D6461BD12641 /* Pods-ARChromeActivity */;
+			targetProxy = 022B4B386608A8B5541A7F59 /* PBXContainerItemProxy */;
+		};
+		5D86C5DB8FB17D02295B67A0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Pods-libHN";
-			target = 670F7AB9827093EA5AB222B3 /* Pods-libHN */;
-			targetProxy = 7396DBA60FBBB70FE5A47398 /* PBXContainerItemProxy */;
+			target = DC1B9863859A2D53A675874A /* Pods-libHN */;
+			targetProxy = 96C20F261BB7B5BD89F6D49A /* PBXContainerItemProxy */;
+		};
+		7493CC160FE493144D165811 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-ARSafariActivity";
+			target = E40072E14681D6FFED69A4BC /* Pods-ARSafariActivity */;
+			targetProxy = F6693E1CEBDD5DB3613DE59E /* PBXContainerItemProxy */;
+		};
+		8501F8F4423D798038A2A0C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-NJKWebViewProgress";
+			target = ADA849540978FB27C8507A17 /* Pods-NJKWebViewProgress */;
+			targetProxy = 8408F8C38A7A1CB924DF8258 /* PBXContainerItemProxy */;
+		};
+		99BD58F8C6067B024954D8DA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-ARSafariActivity";
+			target = E40072E14681D6FFED69A4BC /* Pods-ARSafariActivity */;
+			targetProxy = 190171FDFC3326EC7BC87C6A /* PBXContainerItemProxy */;
+		};
+		DEC8EF2CC3BF9720D118348A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-NJKWebViewProgress";
+			target = ADA849540978FB27C8507A17 /* Pods-NJKWebViewProgress */;
+			targetProxy = 49791CA29736EF6A6F7E7AF8 /* PBXContainerItemProxy */;
+		};
+		E875F00C5AE12BD75241D6B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Pods-JBWebViewController";
+			target = B4A8436DCB30DE116B8A7F08 /* Pods-JBWebViewController */;
+			targetProxy = 5F15E5D67E0D595F6EF6309F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		0FF60777B8DF89B3FBEC78EA /* Release */ = {
+		01566370A5FB14039F7926F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4797701172A7309470A35302 /* Pods-libHN-Private.xcconfig */;
+			baseConfigurationReference = E9840CFCE309C977681CBC72 /* Pods-JBWebViewController-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-JBWebViewController/Pods-JBWebViewController-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		01D5EC64FFBB8A44C41C1957 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3EC57400E1C3A8C057C2906 /* Pods-NJKWebViewProgress-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-NJKWebViewProgress/Pods-NJKWebViewProgress-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		15EFC05A2F327A27812C516F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF7F977A60A59CAF02D1AE26 /* Pods-libHN-Private.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_PREFIX_HEADER = "Target Support Files/Pods-libHN/Pods-libHN-prefix.pch";
@@ -336,89 +1182,39 @@
 			};
 			name = Release;
 		};
-		765AE874D63F895C802416B7 /* Release */ = {
+		1C97435F98C1C77B0224E37B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 08BC925A7819556374E67B07 /* Pods.release.xcconfig */;
+			baseConfigurationReference = 0D2344AEEA82A6F3A85091E0 /* Pods-ARSafariActivity-Private.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-ARSafariActivity/Pods-ARSafariActivity-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		24C2437DDCE6AAFA70CAAAC0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C4FDF4461629D774133CE920 /* Pods-DKNightVersion-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-DKNightVersion/Pods-DKNightVersion-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
-		88F028F59F2A88B36B9BF5ED /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 63E026832E1FD18D092C67E8 /* Pods.debug.xcconfig */;
-			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		947A5B4BB92D0CBDB69B508A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE=1";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				STRIP_INSTALLED_PRODUCT = NO;
-				SYMROOT = "${SRCROOT}/../build";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		ADBD265D3EA8373C3F94B7A6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4797701172A7309470A35302 /* Pods-libHN-Private.xcconfig */;
-			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Pods-libHN/Pods-libHN-prefix.pch";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		CA48BBFAAB09105D0E748359 /* Debug */ = {
+		2E3A851AC8418AAB9A9C1614 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -457,37 +1253,260 @@
 			};
 			name = Debug;
 		};
+		489A78B1FD7A00D3825A3789 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A3EC57400E1C3A8C057C2906 /* Pods-NJKWebViewProgress-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-NJKWebViewProgress/Pods-NJKWebViewProgress-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		643880E06C3103F39B379BA1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C4FDF4461629D774133CE920 /* Pods-DKNightVersion-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-DKNightVersion/Pods-DKNightVersion-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		65F7A76A2D8EF4EB5534F461 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF7F977A60A59CAF02D1AE26 /* Pods-libHN-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-libHN/Pods-libHN-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		6D50C5C93E71AE71B0B87CF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E9840CFCE309C977681CBC72 /* Pods-JBWebViewController-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-JBWebViewController/Pods-JBWebViewController-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		979286F245917081498162BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9D61099B67BB8A55FE7CC2C8 /* Pods.debug.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		99F02E7C493E7E2033CE106B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = "RELEASE=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AEBE43DCD63DACF07E03C454 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D2344AEEA82A6F3A85091E0 /* Pods-ARSafariActivity-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-ARSafariActivity/Pods-ARSafariActivity-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		DAA8434B6CA3E358503EAED7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 237C14924D7D15880D2B0375 /* Pods.release.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		E95925E3F08E5AEF216C9FDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2C88B485D0FD9629AE80BD6F /* Pods-ARChromeActivity-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-ARChromeActivity/Pods-ARChromeActivity-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		FE5383BAB5017A0710ECC2AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2C88B485D0FD9629AE80BD6F /* Pods-ARChromeActivity-Private.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Pods-ARChromeActivity/Pods-ARChromeActivity-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B77A1EF19718237B1FA6E209 /* Build configuration list for PBXProject "Pods" */ = {
+		06B7089C37E53EC705CC6CAB /* Build configuration list for PBXNativeTarget "Pods-DKNightVersion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CA48BBFAAB09105D0E748359 /* Debug */,
-				947A5B4BB92D0CBDB69B508A /* Release */,
+				643880E06C3103F39B379BA1 /* Debug */,
+				24C2437DDCE6AAFA70CAAAC0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BD2D1DAE6B36EAAE80792B7E /* Build configuration list for PBXNativeTarget "Pods-libHN" */ = {
+		18CFF714AD28B66EE5FAA27E /* Build configuration list for PBXNativeTarget "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ADBD265D3EA8373C3F94B7A6 /* Debug */,
-				0FF60777B8DF89B3FBEC78EA /* Release */,
+				979286F245917081498162BC /* Debug */,
+				DAA8434B6CA3E358503EAED7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C3C8D225F5B80B3239BDE1C8 /* Build configuration list for PBXNativeTarget "Pods" */ = {
+		700DD7D1261AB879D4AE5F31 /* Build configuration list for PBXNativeTarget "Pods-JBWebViewController" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				88F028F59F2A88B36B9BF5ED /* Debug */,
-				765AE874D63F895C802416B7 /* Release */,
+				01566370A5FB14039F7926F0 /* Debug */,
+				6D50C5C93E71AE71B0B87CF9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		752EBF8CF13579EBB30ACEEA /* Build configuration list for PBXNativeTarget "Pods-ARSafariActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C97435F98C1C77B0224E37B /* Debug */,
+				AEBE43DCD63DACF07E03C454 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		82391467624271580BBB6DC8 /* Build configuration list for PBXNativeTarget "Pods-NJKWebViewProgress" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				489A78B1FD7A00D3825A3789 /* Debug */,
+				01D5EC64FFBB8A44C41C1957 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9E65C3E35E49FC0D3F12CDF1 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2E3A851AC8418AAB9A9C1614 /* Debug */,
+				99F02E7C493E7E2033CE106B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B384D8AC36AF48C2DC32471E /* Build configuration list for PBXNativeTarget "Pods-libHN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65F7A76A2D8EF4EB5534F461 /* Debug */,
+				15EFC05A2F327A27812C516F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E696F8B7D7BEBA1CC67C740F /* Build configuration list for PBXNativeTarget "Pods-ARChromeActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E95925E3F08E5AEF216C9FDC /* Debug */,
+				FE5383BAB5017A0710ECC2AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A34D25E3ED6E2612516DD68A /* Project object */;
+	rootObject = 27674989705C216C731321A2 /* Project object */;
 }

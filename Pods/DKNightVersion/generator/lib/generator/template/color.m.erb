@@ -18,9 +18,6 @@
 
 @end
 
-static char *night<%= property.cap_name %>Key;
-static char *normal<%= property.cap_name %>Key;
-
 @implementation <%= klass.name %> (<%= property.cap_name %>)
 
 + (void)load {
@@ -39,42 +36,35 @@ static char *normal<%= property.cap_name %>Key;
             method_exchangeImplementations(originalMethod, swizzledMethod);        
         }
     });
+    [DKNightVersionManager addClassToSet:self.class];
 }
 
 - (void)hook_<%= property.setter %> {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) {
-        [self setNormal<%= property.cap_name %>:<%= property.name %>];
-    }
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) [self setNormal<%= property.cap_name %>:<%= property.name %>];
     [self hook_<%= property.set_color_method(property.name) %>];
 }
 
 - (UIColor *)night<%= property.cap_name %> {
-    return objc_getAssociatedObject(self, &night<%= property.cap_name %>Key) ? : ([DKNightVersionManager useDefaultNightColor] ? self.defaultNight<%= property.cap_name %> : self.<%= property.getter %>);
-}
-
-- (void)setNight<%= property.cap_name %>:(UIColor *)night<%= property.cap_name %> {
-    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) {
-        [self <%= property.set_color_method("night" + property.cap_name) %>];
-    }
-    objc_setAssociatedObject(self, &night<%= property.cap_name %>Key, night<%= property.cap_name %>, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)normal<%= property.cap_name %> {
-    return objc_getAssociatedObject(self, &normal<%= property.cap_name %>Key)<% if klass.name == 'UIBarButtonItem' && property.name == 'tintColor' %><%= '?: [UIColor blueColor]' %><% end %>;
-}
-
-- (void)setNormal<%= property.cap_name %>:(UIColor *)normal<%= property.cap_name %> {
-    objc_setAssociatedObject(self, &normal<%= property.cap_name %>Key, normal<%= property.cap_name %>, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (UIColor *)defaultNight<%= property.cap_name %> {
-    BOOL notUIKitSubclass = [self isKindOfClass:[<%= klass.name %> class]] && ![NSStringFromClass(self.class) containsString:@"UI"];
-    if ([self isMemberOfClass:[<%= klass.name %> class]] || notUIKitSubclass) {
-        return <% if property.default_color %><%= "UIColorFromRGB(#{property.default_color})" %><% else %><%= 'self.normal' + property.cap_name %><% end %>;
+    UIColor *nightColor = objc_getAssociatedObject(self, @selector(night<%= property.cap_name %>));
+    if (nightColor) {
+        return nightColor;
     } else {
         UIColor *resultColor = self.normal<%= property.cap_name %> ?: <% if property.name == 'tintColor' || property.name == 'titleColor' %><%= '[UIColor whiteColor]' %><% else %><%= '[UIColor clearColor]' %><% end %>;
         return resultColor;
     }
+}
+
+- (void)setNight<%= property.cap_name %>:(UIColor *)night<%= property.cap_name %> {
+    if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNight) [self <%= property.set_color_method("night" + property.cap_name) %>];
+    objc_setAssociatedObject(self, @selector(night<%= property.cap_name %>), night<%= property.cap_name %>, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIColor *)normal<%= property.cap_name %> {
+    return objc_getAssociatedObject(self, @selector(normal<%= property.cap_name %>))<% if klass.name == 'UIBarButtonItem' && property.name == 'tintColor' %><%= '?: [UIColor blueColor]' %><% end %>;
+}
+
+- (void)setNormal<%= property.cap_name %>:(UIColor *)normal<%= property.cap_name %> {
+    objc_setAssociatedObject(self, @selector(normal<%= property.cap_name %>), normal<%= property.cap_name %>, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

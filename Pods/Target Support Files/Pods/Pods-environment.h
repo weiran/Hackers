@@ -21,37 +21,37 @@
 // DKNightVersion
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion 1
 
 // DKNightVersion/Controller
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion_Controller
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion_Controller 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion_Controller 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion_Controller 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion_Controller 1
 
 // DKNightVersion/Core
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion_Core
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion_Core 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion_Core 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion_Core 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion_Core 1
 
 // DKNightVersion/Generator
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion_Generator
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion_Generator 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion_Generator 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion_Generator 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion_Generator 1
 
 // DKNightVersion/Helper
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion_Helper
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion_Helper 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion_Helper 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion_Helper 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion_Helper 1
 
 // DKNightVersion/UIKit
 #define COCOAPODS_POD_AVAILABLE_DKNightVersion_UIKit
 #define COCOAPODS_VERSION_MAJOR_DKNightVersion_UIKit 0
-#define COCOAPODS_VERSION_MINOR_DKNightVersion_UIKit 6
+#define COCOAPODS_VERSION_MINOR_DKNightVersion_UIKit 8
 #define COCOAPODS_VERSION_PATCH_DKNightVersion_UIKit 1
 
 // JBWebViewController
@@ -82,5 +82,5 @@
 #define COCOAPODS_POD_AVAILABLE_libHN
 #define COCOAPODS_VERSION_MAJOR_libHN 4
 #define COCOAPODS_VERSION_MINOR_libHN 0
-#define COCOAPODS_VERSION_PATCH_libHN 3
+#define COCOAPODS_VERSION_PATCH_libHN 4
 

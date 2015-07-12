@@ -9,7 +9,6 @@
 //  test it. And finally open a pull request.
 
 #import <UIKit/UIKit.h>
-#import "UITableView+BackgroundColor.h"
 #import "UITableView+SeparatorColor.h"
 
 
@@ -17,6 +16,6 @@
 
 - (void)changeColor;
 
-- (void)changeColorWithDuration:(CGFloat)duratio;
+- (void)changeColorWithDuration:(CGFloat)duration;
 
 @end
