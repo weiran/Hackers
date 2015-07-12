@@ -266,13 +266,7 @@
                             <constraint firstAttribute="bottom" secondItem="QBD-8Q-H2S" secondAttribute="bottom" id="esn-R8-weM"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="GOU-tH-L31">
-                        <barButtonItem key="rightBarButtonItem" title="Close" id="G9Z-99-xdU">
-                            <connections>
-                                <action selector="close:" destination="gkj-Tg-B9Y" id="X0b-hn-i0r"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="GOU-tH-L31"/>
                     <connections>
                         <outlet property="tableView" destination="QBD-8Q-H2S" id="4vJ-qJ-PA1"/>
                     </connections>
