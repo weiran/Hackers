@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SafariServices
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostCellDelegate, SFSafariViewControllerDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate {
     
     var posts: [HNPost] = [HNPost]()
     private var collapseDetailViewController = true
@@ -60,8 +60,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("PostCell", forIndexPath: indexPath) as! PostCell
         let post = posts[indexPath.row]
-        cell.post = post
-        cell.delegate = self
+        cell.postTitleView.post = post
+        cell.postTitleView.delegate = self
         
         // todo: if not default post type, show ycombinator domain instead in metadataLabel
         // cant do it currently as Type is reserved keyword which libHN uses
