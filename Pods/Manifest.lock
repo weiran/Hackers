@@ -27,11 +27,13 @@ PODS:
     - NJKWebViewProgress/ProgressView (= 0.2.3)
   - NJKWebViewProgress/Core (0.2.3)
   - NJKWebViewProgress/ProgressView (0.2.3)
+  - SVProgressHUD (1.1.3)
 
 DEPENDENCIES:
   - DKNightVersion
   - JBWebViewController
   - libHN
+  - SVProgressHUD
 
 SPEC CHECKSUMS:
   ARChromeActivity: 40d77445498fded9d32cbf4a41e8585766feffd6
@@ -40,5 +42,6 @@ SPEC CHECKSUMS:
   JBWebViewController: 55d636542efeb1c8597851f72c8edf3478683652
   libHN: 3571ddc61a302b1f01213dd50c932c29a6f5b390
   NJKWebViewProgress: f481fd424cb5ecc27eacae11b5397db92fba9a4d
+  SVProgressHUD: 748080e4f36e603f6c02aec292664239df5279c1
 
 COCOAPODS: 0.37.2

@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import SafariServices
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostCellDelegate {
     
     var posts: [HNPost] = [HNPost]()
     private var collapseDetailViewController = true
@@ -57,13 +58,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cellIdentifier = "PostCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("PostCell", forIndexPath: indexPath) as! PostCell
         let post = posts[indexPath.row]
-        
-        cell.titleLabel.text = post.Title
-        cell.metadataLabel.text = post.UrlDomain
-        cell.commentsLabel.text = "\(post.CommentCount) comments"
+        cell.post = post
+        cell.delegate = self
         
         // todo: if not default post type, show ycombinator domain instead in metadataLabel
         // cant do it currently as Type is reserved keyword which libHN uses
@@ -76,17 +74,30 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         collapseDetailViewController = false
         let post = posts[indexPath.row]
-        let postViewNavigationController = UIStoryboard(name: "Storyboard", bundle: nil).instantiateViewControllerWithIdentifier("PostViewNavigationController") as! UINavigationController
-        let postViewController = postViewNavigationController.topViewController as! PostViewController
-        postViewController.post = post
         
-        showDetailViewController(postViewNavigationController, sender: self)
+        if (UIDevice.currentDevice().userInterfaceIdiom == .Phone) {
+            let commentsViewController = storyboard?.instantiateViewControllerWithIdentifier("CommentsViewController") as! CommentsViewController
+            commentsViewController.post = post
+            showDetailViewController(commentsViewController, sender: self)
+        } else {
+            let postViewNavigationController = storyboard?.instantiateViewControllerWithIdentifier("PostViewNavigationController") as! UINavigationController
+            let postViewController = postViewNavigationController.topViewController as! PostViewController
+            postViewController.post = post
+            showDetailViewController(postViewController, sender: self)
+        }
     }
     
     // MARK: - UISplitViewControllerDelegate
     
     func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController, ontoPrimaryViewController primaryViewController: UIViewController) -> Bool {
         return collapseDetailViewController
+    }
+    
+    // MARK: - PostCellDelegate
+    
+    func didPressLinkButton(post: HNPost) {
+        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
+        presentViewController(safariViewController, animated: true, completion: nil)
     }
 
 }

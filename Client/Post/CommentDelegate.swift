@@ -10,5 +10,5 @@ import Foundation
 import UIKit
 
 protocol CommentDelegate {
-    func commentTapped(sender: UITableViewCell) -> Void
+    func commentTapped(sender: UITableViewCell)
 }

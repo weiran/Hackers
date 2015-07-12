@@ -88,6 +88,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_resource "DKNightVersion/Gemfile"
   install_resource "DKNightVersion/generator/lib"
   install_resource "JBWebViewController/JBWebViewController/Icons.xcassets"
+  install_resource "SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle"
   install_resource "libHN/Source/hn.json"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
@@ -121,6 +122,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_resource "DKNightVersion/Gemfile"
   install_resource "DKNightVersion/generator/lib"
   install_resource "JBWebViewController/JBWebViewController/Icons.xcassets"
+  install_resource "SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle"
   install_resource "libHN/Source/hn.json"
 fi
 
