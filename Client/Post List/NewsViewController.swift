@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SafariServices
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostCellDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostCellDelegate, SFSafariViewControllerDelegate {
     
     var posts: [HNPost] = [HNPost]()
     private var collapseDetailViewController = true
@@ -97,7 +97,14 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func didPressLinkButton(post: HNPost) {
         let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
+        safariViewController.delegate = self
         presentViewController(safariViewController, animated: true, completion: nil)
+    }
+
+    // MARK: - SFSafariViewControllerDelegate
+    
+    func safariViewControllerDidFinish(controller: SFSafariViewController) {
+        controller.dismissViewControllerAnimated(true, completion: nil)
     }
 
 }
