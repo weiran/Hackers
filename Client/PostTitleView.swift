@@ -34,7 +34,6 @@ class PostTitleView: UIView {
         super.layoutSubviews()
         
         setupLinkButton()
-        setupLabels()
         
         titleLabel.preferredMaxLayoutWidth = titleLabel.bounds.size.width;
     }
@@ -43,13 +42,6 @@ class PostTitleView: UIView {
         linkButton.layer.borderWidth = 0.5
         linkButton.layer.borderColor = UIColor(white: 0.9, alpha: 1).CGColor
         linkButton.layer.cornerRadius = 3
-        linkButton.setTitleColor(UIColor.darkGrayColor(), forState: .Normal)
-    }
-    
-    func setupLabels() {
-        // TODO: manually setting font colours as they get lost when navigating back to view controller
-        metadataLabel.textColor = UIColor.lightGrayColor()
-        commentsLabel.textColor = UIColor.lightGrayColor()
     }
     
     @IBAction func didPressLinkButton(sender: UIButton) {

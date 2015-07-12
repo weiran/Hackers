@@ -73,18 +73,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         collapseDetailViewController = false
-        let post = posts[indexPath.row]
-        
-        if (UIDevice.currentDevice().userInterfaceIdiom == .Phone) {
-            let commentsViewController = storyboard?.instantiateViewControllerWithIdentifier("CommentsViewController") as! CommentsViewController
-            commentsViewController.post = post
-            showDetailViewController(commentsViewController, sender: self)
-        } else {
-            let postViewNavigationController = storyboard?.instantiateViewControllerWithIdentifier("PostViewNavigationController") as! UINavigationController
-            let postViewController = postViewNavigationController.topViewController as! PostViewController
-            postViewController.post = post
-            showDetailViewController(postViewController, sender: self)
-        }
+        let post = posts[indexPath.row]        
+        let commentsViewController = storyboard?.instantiateViewControllerWithIdentifier("CommentsViewController") as! CommentsViewController
+        commentsViewController.post = post
+        showDetailViewController(commentsViewController, sender: self)
     }
     
     // MARK: - UISplitViewControllerDelegate

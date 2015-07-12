@@ -166,7 +166,7 @@
                                     <rect key="frame" x="0.0" y="64" width="320" height="111"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="gLd-09-Uxm">
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="gLd-09-Uxm">
                                             <rect key="frame" x="15" y="10" width="300" height="91"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="QDf-f8-Ysd">
@@ -380,7 +380,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vcn-3b-TpK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1481" y="1403"/>
+            <point key="canvasLocation" x="1072" y="1403"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="N7T-fw-zna">
@@ -397,82 +397,13 @@
                         <color key="tintColor" red="0.39732018113136292" green="0.0" blue="0.91323655843734741" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </toolbar>
                     <connections>
-                        <segue destination="xYT-nh-Y9b" kind="relationship" relationship="rootViewController" id="es5-Po-VnO"/>
+                        <segue destination="gkj-Tg-B9Y" kind="relationship" relationship="rootViewController" id="p12-QV-X8u"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="odo-kT-GlM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="570" y="1403"/>
         </scene>
-        <!--Post View Controller-->
-        <scene sceneID="iq1-e0-TdL">
-            <objects>
-                <viewController id="xYT-nh-Y9b" customClass="PostViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="ErK-fi-xGb"/>
-                        <viewControllerLayoutGuide type="bottom" id="erv-SO-9ne"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="5JU-6F-AXm">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <webView contentMode="scaleToFill" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UpN-Mo-2VM">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <connections>
-                                    <outlet property="delegate" destination="xYT-nh-Y9b" id="kEt-a9-eRW"/>
-                                </connections>
-                            </webView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="UpN-Mo-2VM" secondAttribute="bottom" id="Nwz-7c-w8D"/>
-                            <constraint firstItem="UpN-Mo-2VM" firstAttribute="top" secondItem="5JU-6F-AXm" secondAttribute="top" id="Qj8-jF-ScQ"/>
-                            <constraint firstAttribute="trailing" secondItem="UpN-Mo-2VM" secondAttribute="trailing" id="loo-Ch-i81"/>
-                            <constraint firstItem="UpN-Mo-2VM" firstAttribute="leading" secondItem="5JU-6F-AXm" secondAttribute="leading" id="qyR-Ac-0Td"/>
-                        </constraints>
-                    </view>
-                    <toolbarItems>
-                        <barButtonItem image="BackIcon" id="IBl-89-bTg" userLabel="Back Button">
-                            <connections>
-                                <action selector="goBack" destination="UpN-Mo-2VM" id="M1c-i7-7fn"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem width="44" style="plain" systemItem="fixedSpace" id="VuS-J9-0Uc" userLabel="Space"/>
-                        <barButtonItem image="ForwardIcon" id="VKX-5A-aJY" userLabel="Forward Button">
-                            <connections>
-                                <action selector="goForward" destination="UpN-Mo-2VM" id="pOU-v0-c2I"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="Khc-vd-ZO1" userLabel="Space"/>
-                        <barButtonItem image="ShareIcon" id="VnY-lf-yoA" userLabel="Share Button">
-                            <connections>
-                                <action selector="share:" destination="xYT-nh-Y9b" id="VHo-0Q-0Hd"/>
-                            </connections>
-                        </barButtonItem>
-                    </toolbarItems>
-                    <navigationItem key="navigationItem" id="5Wx-jY-x4V">
-                        <barButtonItem key="rightBarButtonItem" title="Comments" id="VuN-Rn-1Ne">
-                            <connections>
-                                <segue destination="gkj-Tg-B9Y" kind="push" identifier="ShowCommentsSegue" id="dxC-DH-Bq8"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="backButton" destination="IBl-89-bTg" id="j2r-oZ-SUc"/>
-                        <outlet property="forwardButton" destination="VKX-5A-aJY" id="Oux-RY-NmW"/>
-                        <outlet property="webView" destination="UpN-Mo-2VM" id="90v-FN-VtX"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="HbG-WF-Vvr" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1072" y="1403"/>
-        </scene>
     </scenes>
-    <resources>
-        <image name="BackIcon" width="14" height="28"/>
-        <image name="ForwardIcon" width="14" height="28"/>
-        <image name="ShareIcon" width="21" height="28"/>
-    </resources>
     <color key="tintColor" red="0.39732018113136292" green="0.0" blue="0.91323655843734741" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

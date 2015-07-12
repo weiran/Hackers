@@ -1,6 +1,6 @@
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/ARChromeActivity" "${PODS_ROOT}/Headers/Public/ARSafariActivity" "${PODS_ROOT}/Headers/Public/DKNightVersion" "${PODS_ROOT}/Headers/Public/JBWebViewController" "${PODS_ROOT}/Headers/Public/NJKWebViewProgress" "${PODS_ROOT}/Headers/Public/SVProgressHUD" "${PODS_ROOT}/Headers/Public/libHN"
-OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/ARChromeActivity" -isystem "${PODS_ROOT}/Headers/Public/ARSafariActivity" -isystem "${PODS_ROOT}/Headers/Public/DKNightVersion" -isystem "${PODS_ROOT}/Headers/Public/JBWebViewController" -isystem "${PODS_ROOT}/Headers/Public/NJKWebViewProgress" -isystem "${PODS_ROOT}/Headers/Public/SVProgressHUD" -isystem "${PODS_ROOT}/Headers/Public/libHN"
-OTHER_LDFLAGS = $(inherited) -ObjC -l"Pods-ARChromeActivity" -l"Pods-ARSafariActivity" -l"Pods-DKNightVersion" -l"Pods-JBWebViewController" -l"Pods-NJKWebViewProgress" -l"Pods-SVProgressHUD" -l"Pods-libHN" -framework "QuartzCore" -weak_framework "WebKit"
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/libHN"
+OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/libHN"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"Pods-libHN"
 OTHER_LIBTOOLFLAGS = $(OTHER_LDFLAGS)
 PODS_ROOT = ${SRCROOT}/Pods
