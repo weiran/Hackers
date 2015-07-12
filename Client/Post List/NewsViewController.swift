@@ -18,6 +18,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func viewDidLoad() {
         tableView.estimatedRowHeight = 80
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
+        refreshControl?.backgroundColor = UIColor(red:0.937, green:0.937, blue:0.956, alpha:1)
         refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
         
         splitViewController!.delegate = self
