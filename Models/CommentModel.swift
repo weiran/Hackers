@@ -22,7 +22,7 @@ class CommentModel {
     var commentID: String
     var parentCommentID: String
     var dateCreatedString: String
-    var replyURL: NSURL
+    var replyURL: NSURL?
     var level: Int
     
     var visibility: CommentVisibilityType = .Visible
@@ -34,7 +34,9 @@ class CommentModel {
         //parentCommentID = source.ParentID
         parentCommentID = ""
         dateCreatedString = source.TimeCreatedString
-        replyURL = NSURL(string: source.ReplyURLString)!
+        if let _ = source.ReplyURLString {
+            replyURL = NSURL(string: source.ReplyURLString!)
+        }
         level = Int(source.Level)
         text = source.Text
     }
