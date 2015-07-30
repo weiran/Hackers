@@ -10,7 +10,5 @@ import Foundation
 import UIKit
 
 class PostCell : UITableViewCell {
-    @IBOutlet var titleLabel: UILabel!
-    @IBOutlet var metadataLabel: UILabel!
-    @IBOutlet var commentsLabel: UILabel!
+    @IBOutlet weak var postTitleView: PostTitleView!
 }

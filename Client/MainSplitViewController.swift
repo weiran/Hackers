@@ -15,8 +15,4 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         HNManager.sharedManager().startSession()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-
 }

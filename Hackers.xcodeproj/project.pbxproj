@@ -12,8 +12,8 @@
 		241387A61945A6E100D71220 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 241387A51945A6E100D71220 /* README.md */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
-		2444F5C11943652F00829D12 /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2444F5C01943652F00829D12 /* PostViewController.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
+		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
 		24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C20D381A7E42D5005B759B /* MainSplitViewController.swift */; };
 		24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FEC19434BDC009D2677 /* AppDelegate.swift */; };
 		24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF319435061009D2677 /* NewsViewController.swift */; };
@@ -32,8 +32,8 @@
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
-		2444F5C01943652F00829D12 /* PostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostViewController.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
+		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTitleView.swift; sourceTree = "<group>"; };
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
 		24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers2-Bridging-Header.h"; sourceTree = "<group>"; };
 		24CDDB5EB0724421AE42BE05 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,7 +87,6 @@
 		24CE5FEF19434DCB009D2677 /* Post */ = {
 			isa = PBXGroup;
 			children = (
-				2444F5C01943652F00829D12 /* PostViewController.swift */,
 				24DFD28B19436E51007F61E7 /* CommentsViewController.swift */,
 				249A7E31194374550059C079 /* CommentTableViewCell.swift */,
 				24E4F26019B4DA9900574B52 /* CommentDelegate.swift */,
@@ -154,6 +153,7 @@
 				24CE5FEE19434DC0009D2677 /* Post List */,
 				24CE5FEF19434DCB009D2677 /* Post */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
+				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -206,7 +206,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = GU;
-				LastUpgradeCheck = 0510;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Glass Umbrella";
 				TargetAttributes = {
 					24F39F8418AFB1150055F8DC = {
@@ -285,8 +286,8 @@
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
-				2444F5C11943652F00829D12 /* PostViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
+				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
@@ -317,6 +318,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -384,8 +386,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
@@ -410,8 +413,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";

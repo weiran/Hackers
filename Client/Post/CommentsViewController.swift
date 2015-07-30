@@ -8,10 +8,11 @@
 
 import Foundation
 import UIKit
+import SafariServices
 
-class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate {
+class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate {
+    var post: HNPost?
     
-    var post: HNPost = HNPost()
     var comments: [CommentModel] = [CommentModel]() {
         didSet {
             commentsController.comments = comments
@@ -23,12 +24,16 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     @IBOutlet var tableView: UITableView!
     
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
+        setupPostTitleView()
+        
+        commentsController = CommentsController()
         if comments.count == 0 {
             loadComments()
         }
-        commentsController = CommentsController()
     }
     
     func loadComments() {
@@ -42,10 +47,30 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         })
     }
     
+    func setupPostTitleView() {
+        if let postTitleView = tableView.tableHeaderView as? PostTitleView {
+            postTitleView.post = post
+            postTitleView.delegate = self
+            postTitleView.setNeedsLayout()
+            postTitleView.layoutIfNeeded()
+            
+            let height = postTitleView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
+            var frame = postTitleView.frame
+            frame.size.height = height;
+            postTitleView.frame = frame;
+            
+            tableView.tableHeaderView = postTitleView;
+        }
+    }
+    
     // MARK - UITableViewDataSource
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.visibleComments.count
+    }
+    
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Comments"
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -87,7 +112,17 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    @IBAction func close(sender : AnyObject) {
-        dismissViewControllerAnimated(true, completion: nil)
+    // MARK: - PostCellDelegate
+    
+    func didPressLinkButton(post: HNPost) {
+        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
+        safariViewController.delegate = self
+        presentViewController(safariViewController, animated: true, completion: nil)
+    }
+    
+    // MARK: - SFSafariViewControllerDelegate
+    
+    func safariViewControllerDidFinish(controller: SFSafariViewController) {
+        controller.dismissViewControllerAnimated(true, completion: nil)
     }
 }

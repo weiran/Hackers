@@ -52,7 +52,7 @@ class CommentsController {
     }
     
     func indexOfComment(comment: CommentModel, source: [CommentModel]) -> Int? {
-        for (index, value) in enumerate(source) {
+        for (index, value) in source.enumerate() {
             if comment.commentID == value.commentID { return index }
         }
         return nil
