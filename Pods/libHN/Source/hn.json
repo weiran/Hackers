@@ -61,6 +61,10 @@
     },
     "Comment":{
         "CS":"<tr><td class='ind'><img src=\"s.gif\"",
+        "Trash":{
+            "S":"<html",
+            "E":"<span class=\"rank\"></span>"
+        },
         "Upvote":{
             "R":"dir=up",
             "S":"href=\"",
@@ -76,30 +80,39 @@
             "E":"\">",
             "I":"Level"
         },
-        "ASK":[
+        "ASK":[{
+               "S":"<span class=\"deadmark\"></span>",
+               "E":"\"",
+               "I":"TRASH"
+               },
                {
-               "S":"user?id=",
+               "S":">",
+               "E":"</a>",
+               "I":"Title"
+               },
+               {
+               "S":"by <a href=\"user?id=",
                "E":"\"",
                "I":"Username"
                },
                {
-               "S":"<a href=\"item?id=",
+               "S":">",
+               "E":"\"",
+               "I":"TRASH"
+               },
+               {
+               "S":">",
+               "E":"</a>",
+               "I":"Time"
+               },
+               {
+               "S":"href=\"item?id=",
                "E":"\"",
                "I":"CommentId"
                },
                {
-               "S":"\">",
-               "E":"<",
-               "I":"Time"
-               },
-               {
-               "S":">",
-               "E":"<",
-               "I":"Title"
-               },
-               {
-               "S":"/tr><tr><td></td><td>",
-               "E":"</td>",
+               "S":"</td><td>",
+               "E":"</td></tr>",
                "I":"Text"
                }
                ],
@@ -127,13 +140,13 @@
                "I":"Time"
                },
                {
-               "S":"<font color=",
-               "E":"\"",
+               "S":"class=\"comment\">",
+               "E":"class=\"c",
                "I":"TRASH"
                },
                {
-               "S":">",
-               "E":"</font>",
+               "S":"\">",
+               "E":"<span>",
                "I":"Text"
                },
                {
