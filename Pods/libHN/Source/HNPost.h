@@ -42,6 +42,13 @@ typedef NS_ENUM(NSInteger, PostType) {
 @property (nonatomic, retain) NSString *TimeCreatedString;
 @property (nonatomic, retain) NSString *UpvoteURLAddition;
 
+// Reply to Post
+@property (nonatomic, retain) NSString *replyAction;
+@property (nonatomic, retain) NSString *replyParent;
+@property (nonatomic, retain) NSString *replyGoto;
+@property (nonatomic, retain) NSString *replyHmac;
+@property (nonatomic, retain) NSString *replyText;
+
 #pragma mark - Methods
 + (NSArray *)parsedPostsFromHTML:(NSString *)html FNID:(NSString **)fnid;
 

@@ -40,7 +40,6 @@
         return @[];
     }
     
-    
     // Scan through components and build posts
     for (int xx = 1; xx < htmlComponents.count; xx++) {
         // If it's Dead - move past it

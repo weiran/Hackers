@@ -61,6 +61,36 @@
     },
     "Comment":{
         "CS":"<tr><td class='ind'><img src=\"s.gif\"",
+        "Reply":{
+            "R":"<form method=\"post\"",
+            "Parts":[
+                     {
+                     "S":"action=\"",
+                     "E":"\"",
+                     "I":"action"
+                     },
+                     {
+                     "S":"name=\"parent\" value=\"",
+                     "E":"\"",
+                     "I":"parent"
+                     },
+                     {
+                     "S":"name=\"goto\" value=\"",
+                     "E":"\"",
+                     "I":"goto"
+                     },
+                     {
+                     "S":"name=\"hmac\" value=\"",
+                     "E":"\"",
+                     "I":"hmac"
+                     },
+                     {
+                     "S":"textarea name=\"",
+                     "E":"\"",
+                     "I":"replyText"
+                     }
+                     ]
+        },
         "Trash":{
             "S":"<html",
             "E":"<span class=\"rank\"></span>"
@@ -80,6 +110,7 @@
             "E":"\">",
             "I":"Level"
         },
+        
         "ASK":[{
                "S":"<span class=\"deadmark\"></span>",
                "E":"\"",
@@ -182,5 +213,29 @@
         "Url":"url",
         "Title":"title",
         "Text":"text"
+    },
+    "User":{
+        "Parts":[
+                 {
+                 "S":"<a href=\"user?id=",
+                 "E":"\">",
+                 "I":"user"
+                 },
+                 {
+                 "S":"created:</td><td>",
+                 "E":" ",
+                 "I":"age"
+                 },
+                 {
+                 "S":"karma:</td><td>",
+                 "E":"</td>",
+                 "I":"karma"
+                 },
+                 {
+                 "S":"name=\"about\">",
+                 "E":"</textarea>",
+                 "I":"about"
+                 },
+                ]
     }
 }

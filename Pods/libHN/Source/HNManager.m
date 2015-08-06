@@ -280,6 +280,7 @@ static HNManager * _sharedManager = nil;
         self.JSONConfiguration = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
     }
     
+    
     request.cachePolicy = NSURLCacheStorageNotAllowed;
     [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         if (![data isEqualToData:jsonData]) {

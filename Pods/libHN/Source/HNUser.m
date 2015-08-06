@@ -22,43 +22,42 @@
 
 #import "HNUser.h"
 #import "HNUtilities.h"
+#import "HNManager.h"
 
 @implementation HNUser
 
 #pragma mark - New User from an HTML response
 +(HNUser *)userFromHTML:(NSString *)html {
     // Make a new user
-    HNUser *newUser = [[HNUser alloc] init];
+    HNUser *newUser = [HNUser new];
+    newUser.Username = @"Unknown User";
+    newUser.Age = 0;
+    newUser.AboutInfo = @"N/A";
     
     // Scan HTML into strings
-    NSString *trash=@"", *age=@"", *karma=@"", *about=@"", *user=@"";
+    NSString *trash=@"";
+    NSDictionary *jsonDict = [[HNManager sharedManager] JSONConfiguration];
+    NSDictionary *userDict = jsonDict && jsonDict[@"User"] ? jsonDict[@"User"] : nil;
+    if (!userDict || !userDict[@"Parts"]) {
+        return newUser;
+    }
+    
+    NSMutableDictionary *uDict = [NSMutableDictionary new];
     NSScanner *scanner = [NSScanner scannerWithString:html];
-    [scanner scanUpToString:@"user:</td><td>" intoString:&trash];
-    [scanner scanString:@"user:</td><td>" intoString:&trash];
-    [scanner scanUpToString:@"</td>" intoString:&user];
-    [scanner scanUpToString:@"created:" intoString:&trash];
-    [scanner scanString:@"created:</td><td>" intoString:&trash];
-    [scanner scanUpToString:@" " intoString:&age];
-    [scanner scanUpToString:@"karma:" intoString:&trash];
-    [scanner scanString:@"karma:</td><td>" intoString:&trash];
-    [scanner scanUpToString:@"</td>" intoString:&karma];
-    [scanner scanUpToString:@"about:</td><td>" intoString:&trash];
-    [scanner scanString:@"about:</td><td>" intoString:&trash];
-    [scanner scanUpToString:@"</td>" intoString:&about];
-    
-    // Bad response
-    if (age.length == 0) {
-        return nil;
-    }
-    if (karma.length == 0) {
-        return nil;
+    for (NSDictionary *dict in userDict[@"Parts"]) {
+        NSString *new = @"";
+        BOOL isTrash = [dict[@"I"] isEqualToString:@"TRASH"];
+        [scanner scanBetweenString:dict[@"S"] andString:dict[@"E"] intoString:isTrash ? &trash : &new];
+        if (new.length > 0) {
+            [uDict setObject:new forKey:dict[@"I"]];
+        }
     }
     
-    // Set properties
-    newUser.Username = user;
-    newUser.Age = [age intValue];
-    newUser.Karma = [karma intValue];
-    newUser.AboutInfo = [HNUtilities stringByReplacingHTMLEntitiesInText:about];
+    // Set Values
+    newUser.Username = uDict[@"user"] ? uDict[@"user"] : newUser.Username;
+    newUser.Age = uDict[@"age"] ? [uDict[@"age"] intValue] : newUser.Age;
+    newUser.Karma = uDict[@"karma"] ? [uDict[@"karma"] intValue] : newUser.Karma;
+    newUser.AboutInfo = uDict[@"about"] ? uDict[@"about"] : newUser.AboutInfo;
     
     return newUser;
 }

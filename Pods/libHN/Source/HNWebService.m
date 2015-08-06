@@ -178,9 +178,10 @@
 - (void)loginWithUsername:(NSString *)user pass:(NSString *)pass completion:(LoginCompletion)completion {
     // Now let's attempt to login
     NSString *urlPath = [NSString stringWithFormat:@"%@login", kBaseURLAddress];
-    
+    NSString *encodedPass = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)pass, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
+
     // Build the body data
-    NSString *bodyString = [NSString stringWithFormat:@"acct=%@&pw=%@&whence=news",user,pass];
+    NSString *bodyString = [NSString stringWithFormat:@"acct=%@&pw=%@&whence=news",user,encodedPass];
     NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
     
     // Start the Operation
@@ -423,7 +424,12 @@
     // Get itemId
     NSString *itemId;
     if ([hnObject isKindOfClass:[HNPost class]]) {
-        itemId = [(HNPost *)hnObject PostId];
+        if (![(HNPost *)hnObject replyAction]) {
+            completion(NO);
+        }
+        NSMutableString *data = [[NSString stringWithFormat:@"goto=%@&parent=%@&hmac=%@&%@=", [(HNPost *)hnObject replyGoto], [(HNPost *)hnObject replyParent], [(HNPost *)hnObject replyHmac], [(HNPost *)hnObject replyText]] mutableCopy];
+        [data appendString:[text stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        [self part2SubmitPostOrCommentWithData:[data dataUsingEncoding:NSUTF8StringEncoding] pathComponent:[(HNPost *)hnObject replyAction] completion:completion];
     }
     else {
         itemId = [(HNComment *)hnObject CommentId];
