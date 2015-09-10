@@ -29,7 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		38E9FA8759B169E523C922D867B41391 /* PBXContainerItemProxy */ = {
+		7C598F3140F51DD765FFA4318E67F18F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
@@ -232,7 +232,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				553DA9EA196F553701D9F5E1E8D0E522 /* PBXTargetDependency */,
+				21503480AA3CE0AABAED0992F41C9832 /* PBXTargetDependency */,
 			);
 			name = Pods;
 			productName = Pods;
@@ -310,11 +310,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		553DA9EA196F553701D9F5E1E8D0E522 /* PBXTargetDependency */ = {
+		21503480AA3CE0AABAED0992F41C9832 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = libHN;
 			target = 99155D9F81F703B6E82A1EE688ABD81E /* libHN */;
-			targetProxy = 38E9FA8759B169E523C922D867B41391 /* PBXContainerItemProxy */;
+			targetProxy = 7C598F3140F51DD765FFA4318E67F18F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
