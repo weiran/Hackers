@@ -86,18 +86,22 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         return collapseDetailViewController
     }
     
-    // MARK: - PostCellDelegate
-    
     func didPressLinkButton(post: HNPost) {
-        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
-        safariViewController.delegate = self
-        presentViewController(safariViewController, animated: true, completion: nil)
+        self.showSafariViewController(post.UrlString)
     }
-
-    // MARK: - SFSafariViewControllerDelegate
     
-    func safariViewControllerDidFinish(controller: SFSafariViewController) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
-    }
+//    // MARK: - PostCellDelegate
+//    
+//    func didPressLinkButton(post: HNPost) {
+//        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
+//        safariViewController.delegate = self
+//        presentViewController(safariViewController, animated: true, completion: nil)
+//    }
+//
+//    // MARK: - SFSafariViewControllerDelegate
+//    
+//    func safariViewControllerDidFinish(controller: SFSafariViewController) {
+//        controller.dismissViewControllerAnimated(true, completion: nil)
+//    }
 
 }
