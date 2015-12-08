@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		19E775F93F40479F9A26884B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24CDDB5EB0724421AE42BE05 /* libPods.a */; };
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
-		2413C3ED1BD123EC00A73239 /* SCModalPushPopAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2413C3EB1BD123EC00A73239 /* SCModalPushPopAnimator.swift */; settings = {ASSET_TAGS = (); }; };
-		2413C3EE1BD123EC00A73239 /* SCSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2413C3EC1BD123EC00A73239 /* SCSafariViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		2413C3F01BD1242600A73239 /* SafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2413C3EF1BD1242600A73239 /* SafariViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
@@ -32,9 +29,6 @@
 /* Begin PBXFileReference section */
 		240C5BDF18D267C70011177A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		2413C3EB1BD123EC00A73239 /* SCModalPushPopAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCModalPushPopAnimator.swift; sourceTree = "<group>"; };
-		2413C3EC1BD123EC00A73239 /* SCSafariViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SCSafariViewController.swift; sourceTree = "<group>"; };
-		2413C3EF1BD1242600A73239 /* SafariViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafariViewController.swift; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
@@ -73,15 +67,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2413C3EA1BD123DE00A73239 /* SCSafariViewController */ = {
-			isa = PBXGroup;
-			children = (
-				2413C3EB1BD123EC00A73239 /* SCModalPushPopAnimator.swift */,
-				2413C3EC1BD123EC00A73239 /* SCSafariViewController.swift */,
-			);
-			name = SCSafariViewController;
-			sourceTree = "<group>";
-		};
 		2489068919B74CAC009F591E /* HackerSwifter */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,8 +153,6 @@
 				24CE5FEF19434DCB009D2677 /* Post */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
-				2413C3EA1BD123DE00A73239 /* SCSafariViewController */,
-				2413C3EF1BD1242600A73239 /* SafariViewController.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -315,18 +298,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2413C3F01BD1242600A73239 /* SafariViewController.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
-				2413C3ED1BD123EC00A73239 /* SCModalPushPopAnimator.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
-				2413C3EE1BD123EC00A73239 /* SCSafariViewController.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -74,7 +74,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         collapseDetailViewController = false
-        let post = posts[indexPath.row]        
+        let post = posts[indexPath.row]
         let commentsViewController = storyboard?.instantiateViewControllerWithIdentifier("CommentsViewController") as! CommentsViewController
         commentsViewController.post = post
         showDetailViewController(commentsViewController, sender: self)
@@ -86,22 +86,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         return collapseDetailViewController
     }
     
-    func didPressLinkButton(post: HNPost) {
-        self.showSafariViewController(post.UrlString)
-    }
+    // MARK: - PostCellDelegate
     
-//    // MARK: - PostCellDelegate
-//    
-//    func didPressLinkButton(post: HNPost) {
-//        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
-//        safariViewController.delegate = self
-//        presentViewController(safariViewController, animated: true, completion: nil)
-//    }
-//
-//    // MARK: - SFSafariViewControllerDelegate
-//    
-//    func safariViewControllerDidFinish(controller: SFSafariViewController) {
-//        controller.dismissViewControllerAnimated(true, completion: nil)
-//    }
-
+    func didPressLinkButton(post: HNPost) {
+        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
+        self.navigationController?.pushViewController(safariViewController, animated: true)
+    }
 }

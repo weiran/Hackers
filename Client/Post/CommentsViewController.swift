@@ -115,14 +115,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     // MARK: - PostCellDelegate
     
     func didPressLinkButton(post: HNPost) {
-        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!, entersReaderIfAvailable: false)
-        safariViewController.delegate = self
-        presentViewController(safariViewController, animated: true, completion: nil)
-    }
-    
-    // MARK: - SFSafariViewControllerDelegate
-    
-    func safariViewControllerDidFinish(controller: SFSafariViewController) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
+        self.navigationController?.pushViewController(safariViewController, animated: true)
     }
 }
