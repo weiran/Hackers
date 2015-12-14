@@ -51,15 +51,13 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         if let postTitleView = tableView.tableHeaderView as? PostTitleView {
             postTitleView.post = post
             postTitleView.delegate = self
-            postTitleView.setNeedsLayout()
-            postTitleView.layoutIfNeeded()
             
-            let height = postTitleView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
+            // have to manually adjust the height here otherwise text clips, not sure why
             var frame = postTitleView.frame
-            frame.size.height = height;
-            postTitleView.frame = frame;
+            frame.size.height += 2
+            postTitleView.frame = frame
             
-            tableView.tableHeaderView = postTitleView;
+            tableView.tableHeaderView = postTitleView
         }
     }
     
