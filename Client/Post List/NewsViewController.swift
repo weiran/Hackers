@@ -19,18 +19,19 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         tableView.estimatedRowHeight = 80
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
 
-        refreshControl?.backgroundColor = UIColor(red:0.937, green:0.937, blue:0.956, alpha:1)
+        refreshControl!.backgroundColor = Theme.backgroundGreyColour
+        refreshControl!.tintColor = Theme.orangeColour
         refreshControl!.addTarget(self, action: Selector("loadPosts"), forControlEvents: UIControlEvents.ValueChanged)
         
         splitViewController!.delegate = self
         
+        Theme.setNavigationBarBackgroundGradient(navigationController!.navigationBar)
         loadPosts()
         
         super.viewDidLoad()
     }
     
     override func viewWillAppear(animated: Bool) {
-        navigationController!.setToolbarHidden(true, animated: true)
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
@@ -51,7 +52,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             }
         })
     }
-    
     
     // MARK: - UITableViewDataSource
     
@@ -91,6 +91,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func didPressLinkButton(post: HNPost) {
         let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
-        self.navigationController?.pushViewController(safariViewController, animated: true)
+        self.navigationController?.presentViewController(safariViewController, animated: true, completion: nil)
     }
 }
