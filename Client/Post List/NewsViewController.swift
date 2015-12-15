@@ -38,6 +38,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
         
+        UIApplication.sharedApplication().statusBarStyle = .LightContent
     }
     
     func loadPosts() {
@@ -93,5 +94,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     func didPressLinkButton(post: HNPost) {
         let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
         self.navigationController?.presentViewController(safariViewController, animated: true, completion: nil)
+        UIApplication.sharedApplication().statusBarStyle = .Default
     }
 }

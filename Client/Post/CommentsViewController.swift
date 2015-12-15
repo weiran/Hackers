@@ -36,6 +36,11 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        UIApplication.sharedApplication().statusBarStyle = .LightContent
+    }
+    
     func loadComments() {
         HNManager.sharedManager().loadCommentsFromPost(post, completion: {
             (_comments: [AnyObject]!) in
@@ -117,6 +122,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     func didPressLinkButton(post: HNPost) {
         let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
-        self.navigationController?.pushViewController(safariViewController, animated: true)
+        self.navigationController!.presentViewController(safariViewController, animated: true, completion: nil)
+        UIApplication.sharedApplication().statusBarStyle = .Default
     }
 }
