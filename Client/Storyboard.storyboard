@@ -39,7 +39,7 @@
                                                                 </label>
                                                                 <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kll-kr-71g">
                                                                     <rect key="frame" x="0.0" y="31" width="297" height="34"/>
-                                                                    <color key="backgroundColor" white="0.97784703232578396" alpha="1" colorSpace="calibratedWhite"/>
+                                                                    <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="calibratedWhite"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="34" id="YfV-qg-R3I"/>
                                                                     </constraints>
@@ -48,11 +48,6 @@
                                                                     <state key="normal" title="link.com">
                                                                         <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                                     </state>
-                                                                    <userDefinedRuntimeAttributes>
-                                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
-                                                                            <real key="value" value="0.5"/>
-                                                                        </userDefinedRuntimeAttribute>
-                                                                    </userDefinedRuntimeAttributes>
                                                                     <connections>
                                                                         <action selector="didPressLinkButton:" destination="OKQ-By-TCF" eventType="touchUpInside" id="baL-Pq-4bY"/>
                                                                     </connections>
@@ -182,7 +177,7 @@
                                                         </label>
                                                         <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ayc-Oj-PTK">
                                                             <rect key="frame" x="0.0" y="32" width="297" height="34"/>
-                                                            <color key="backgroundColor" white="0.97784703230000003" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="calibratedWhite"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="34" id="No4-Cw-UGO"/>
                                                             </constraints>
@@ -191,11 +186,6 @@
                                                             <state key="normal" title="link.com">
                                                                 <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                             </state>
-                                                            <userDefinedRuntimeAttributes>
-                                                                <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
-                                                                    <real key="value" value="0.5"/>
-                                                                </userDefinedRuntimeAttribute>
-                                                            </userDefinedRuntimeAttributes>
                                                             <connections>
                                                                 <action selector="didPressLinkButton:" destination="ApK-ej-h7a" eventType="touchUpInside" id="1Yx-oy-IEG"/>
                                                             </connections>

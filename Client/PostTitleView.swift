@@ -36,9 +36,7 @@ class PostTitleView: UIView {
     }
     
     func setupLinkButton() {
-        linkButton.layer.borderWidth = 0.5
-        linkButton.layer.borderColor = UIColor(white: 0.9, alpha: 1).CGColor
-        linkButton.layer.cornerRadius = 3
+        linkButton.layer.cornerRadius = 7
     }
     
     @IBAction func didPressLinkButton(sender: UIButton) {
