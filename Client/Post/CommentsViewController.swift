@@ -26,9 +26,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupPostTitleView()
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
-        setupPostTitleView()
         
         commentsController = CommentsController()
         if comments.count == 0 {
@@ -52,9 +52,12 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             postTitleView.post = post
             postTitleView.delegate = self
             
-            // have to manually adjust the height here otherwise text clips, not sure why
+            postTitleView.setNeedsLayout()
+            postTitleView.layoutIfNeeded()
+            
+            let height = postTitleView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
             var frame = postTitleView.frame
-            frame.size.height += 2
+            frame.size.height = height
             postTitleView.frame = frame
             
             tableView.tableHeaderView = postTitleView
