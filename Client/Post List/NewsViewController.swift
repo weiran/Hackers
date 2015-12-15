@@ -16,6 +16,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var collapseDetailViewController = true
     
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
         tableView.estimatedRowHeight = 80
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
 
@@ -27,16 +29,15 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         Theme.setNavigationBarBackgroundGradient(navigationController!.navigationBar)
         loadPosts()
-        
-        super.viewDidLoad()
     }
     
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
         if let indexPath = tableView.indexPathForSelectedRow {
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
         
-        super.viewWillAppear(animated)
     }
     
     func loadPosts() {
