@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().titleTextAttributes = [
             NSForegroundColorAttributeName: UIColor.whiteColor()
         ]
+        
+        UITextView.appearance().tintColor = Theme.purpleColour
     }
     
     func applicationWillResignActive(application: UIApplication) {

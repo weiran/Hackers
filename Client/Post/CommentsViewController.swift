@@ -88,7 +88,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         cell.comment = comment
         cell.delegate = self
-        cell.commentTextView.tintColor = Theme.purpleColour
         
         return cell
     }
