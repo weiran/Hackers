@@ -68,6 +68,10 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     // MARK - UITextViewDelegate
     
     func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+        if let _ = delegate {
+            delegate!.linkTapped(URL, sender: textView)
+            return false
+        }
         return true
     }
     

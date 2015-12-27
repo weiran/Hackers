@@ -97,6 +97,12 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         toggleCellVisibilityForCell(indexPath)
     }
     
+    func linkTapped(URL: NSURL, sender: UITextView) {
+        let safariViewController = SFSafariViewController(URL: URL)
+        self.navigationController!.presentViewController(safariViewController, animated: true, completion: nil)
+        UIApplication.sharedApplication().statusBarStyle = .Default
+    }
+    
     func toggleCellVisibilityForCell(indexPath: NSIndexPath!) {
         let comment = commentsController.visibleComments[indexPath.row]
         let cellRectInTableView = tableView.rectForRowAtIndexPath(indexPath)
