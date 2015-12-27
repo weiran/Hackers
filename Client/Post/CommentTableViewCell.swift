@@ -25,7 +25,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
             authorLabel.text = comment?.authorUsername
             
             if let textView = commentTextView {
-                let commentFont = UIFont(name: "HelveticaNeue-Light", size: 15)
+                let commentFont = UIFont.systemFontOfSize(15) //UIFont(name: "HelveticaNeue-Light", size: 15)
                 let commentTextColor = UIColor.darkGrayColor()
                 let lineSpacing = 4 as CGFloat
                 
@@ -35,7 +35,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)
                 
-                commentAttributedString.addAttribute(NSFontAttributeName, value: commentFont!, range: commentRange)
+                commentAttributedString.addAttribute(NSFontAttributeName, value: commentFont, range: commentRange)
                 commentAttributedString.addAttribute(NSForegroundColorAttributeName, value: commentTextColor, range: commentRange)
                 commentAttributedString.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: commentRange)
                 
