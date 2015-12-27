@@ -131,4 +131,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         self.navigationController!.presentViewController(safariViewController, animated: true, completion: nil)
         UIApplication.sharedApplication().statusBarStyle = .Default
     }
+    
+    @IBAction func shareTapped(sender: AnyObject) {
+        let activityViewController = UIActivityViewController(activityItems: [post!.UrlString], applicationActivities: nil)
+        presentViewController(activityViewController, animated: true, completion: nil)
+    }
 }
