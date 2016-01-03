@@ -8,14 +8,18 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 * Full iPad multitasking support
 * Safari View Controllers
 
+![Hackers Screenshot][1]
+
+[1]: http://i.imgur.com/agzuetN.png
+
 ## Open Source
 
 Hackers is open source and licenced under the MIT licence.
 
-[![Buy in App Store][2]][1]
+[![Buy in App Store][3]][2]
 
-[1]: https://itunes.apple.com/gb/app/hackers-hacker-news-reading/id603503901?at=11l4G8&ct=github
-[2]: http://i.imgur.com/oRdf2WM.png
+[2]: https://itunes.apple.com/gb/app/hackers-hacker-news-reading/id603503901?at=11l4G8&ct=github
+[3]: http://i.imgur.com/oRdf2WM.png
 
 ## Links
 
