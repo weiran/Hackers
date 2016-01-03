@@ -89,6 +89,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         
         showDetailViewController(viewController, sender: self)
+        
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     // MARK: - UISplitViewControllerDelegate
