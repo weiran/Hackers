@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ]
         
         UITextView.appearance().tintColor = Theme.purpleColour
+        UIButton.appearance().tintColor = Theme.purpleColour
     }
     
     func applicationWillResignActive(application: UIApplication) {
