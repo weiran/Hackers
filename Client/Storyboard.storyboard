@@ -137,12 +137,47 @@
                 <splitViewController id="qCu-jm-yAB" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <connections>
                         <segue destination="RSP-6D-F3G" kind="relationship" relationship="masterViewController" id="X5W-iR-EIh"/>
-                        <segue destination="eIj-eX-YuX" kind="relationship" relationship="detailViewController" id="hhM-z2-sK7"/>
+                        <segue destination="Dmx-cb-tjr" kind="relationship" relationship="detailViewController" id="wxy-H5-zmg"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CXr-al-2cl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="30" y="1050"/>
+        </scene>
+        <!--Empty View Controller-->
+        <scene sceneID="Kpw-8x-zVV">
+            <objects>
+                <viewController storyboardIdentifier="EmptyPostViewController" id="Dmx-cb-tjr" userLabel="Empty View Controller" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="LtU-M6-GcF"/>
+                        <viewControllerLayoutGuide type="bottom" id="Y97-QA-50h"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="0dh-2t-neK">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No post selected" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iKl-RY-XMG">
+                                <rect key="frame" x="95" y="273" width="130" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="HackersIcon" translatesAutoresizingMaskIntoConstraints="NO" id="MbZ-qQ-6Zl">
+                                <rect key="frame" x="96" y="135" width="128" height="128"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="TTl-eC-j8M"/>
+                            <constraint firstItem="MbZ-qQ-6Zl" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="X5R-X4-tpK"/>
+                            <constraint firstItem="iKl-RY-XMG" firstAttribute="top" secondItem="MbZ-qQ-6Zl" secondAttribute="bottom" constant="10" id="gir-xn-63U"/>
+                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerY" secondItem="0dh-2t-neK" secondAttribute="centerY" id="hxI-ck-KXZ"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bjm-Zl-bvP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1072" y="2111"/>
         </scene>
         <!--Comments View Controller-->
         <scene sceneID="mLS-Wn-pXA">
@@ -405,6 +440,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="HackersIcon" width="128" height="128"/>
         <image name="ShareIcon" width="16" height="22"/>
     </resources>
     <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
