@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>7</string>
+	<string>9</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -30,7 +30,7 @@
 		<true/>
 	</dict>
 	<key>UILaunchStoryboardName</key>
-	<string>Storyboard</string>
+	<string>LaunchStoryboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
