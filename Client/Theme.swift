@@ -14,7 +14,7 @@ class Theme {
     static let orangeColour = UIColor(colorLiteralRed: 223/255.0, green: 111/255.0, blue: 4/255.0, alpha: 1)
     static let backgroundGreyColour = UIColor(red:0.937, green:0.937, blue:0.956, alpha:1)
     
-    static func setNavigationBarBackgroundGradient(navigationBar: UINavigationBar) {
+    static private func setNavigationBarBackgroundGradient(navigationBar: UINavigationBar) {
         var frame = navigationBar.frame
         frame.size.height += 20 // include status bar
         
@@ -31,5 +31,13 @@ class Theme {
         UIGraphicsEndImageContext()
         
         navigationBar.setBackgroundImage(image, forBarMetrics: UIBarMetrics.Default)
+    }
+    
+    static func setNavigationBarBackground(navigationBar: UINavigationBar) {
+        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+            setNavigationBarBackgroundGradient(navigationBar)
+        } else {
+            navigationBar.barTintColor = purpleColour
+        }
     }
 }

@@ -27,7 +27,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         splitViewController!.delegate = self
         
-        Theme.setNavigationBarBackgroundGradient(navigationController!.navigationBar)
+        Theme.setNavigationBarBackground(navigationController!.navigationBar)
         loadPosts()
     }
     
