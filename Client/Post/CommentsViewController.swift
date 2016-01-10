@@ -96,7 +96,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     // MARK: - DZNEmptyDataSet
     
     func titleForEmptyDataSet(scrollView: UIScrollView!) -> NSAttributedString! {
-        return comments == nil ? NSAttributedString(string: "Loading comments") : NSAttributedString(string: "No comments")
+        let attributes = [NSFontAttributeName: UIFont.systemFontOfSize(15.0)]
+        return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
     
     // MARK: - Cell Actions
