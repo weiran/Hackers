@@ -10,13 +10,14 @@ import Foundation
 import UIKit
 import SafariServices
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
     private var collapseDetailViewController = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        registerForPreviewingWithDelegate(self, sourceView: tableView)
         
         tableView.estimatedRowHeight = 80
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
@@ -101,9 +102,27 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     // MARK: - PostCellDelegate
     
+    func getSafariViewController(URL: String) -> SFSafariViewController {
+        return SFSafariViewController(URL: NSURL(string: URL)!)
+    }
+    
     func didPressLinkButton(post: HNPost) {
-        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
-        self.navigationController?.presentViewController(safariViewController, animated: true, completion: nil)
+        self.navigationController?.presentViewController(getSafariViewController(post.UrlString), animated: true, completion: nil)
         UIApplication.sharedApplication().statusBarStyle = .Default
+    }
+    
+    // MARK: - UIViewControllerPreviewingDelegate
+    
+    func previewingContext(previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        if let indexPath = tableView.indexPathForRowAtPoint(location) {
+            previewingContext.sourceRect = tableView.rectForRowAtIndexPath(indexPath)
+            let post = posts[indexPath.row]
+            return getSafariViewController(post.UrlString)
+        }
+        return nil
+    }
+    
+    func previewingContext(previewingContext: UIViewControllerPreviewing, commitViewController viewControllerToCommit: UIViewController) {
+        presentViewController(viewControllerToCommit, animated: true, completion: nil)
     }
 }
