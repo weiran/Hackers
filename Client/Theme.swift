@@ -23,7 +23,12 @@ class Theme {
         gradientLayer.frame = frame
         gradientLayer.colors = [purpleColour, orangeColour].map { $0.CGColor }
         gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
+        
+        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+            gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
+        } else {
+            gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
+        }
         
         // render the gradient to a UIImage
         UIGraphicsBeginImageContext(frame.size)
@@ -35,10 +40,6 @@ class Theme {
     }
     
     static func setNavigationBarBackground(navigationBar: UINavigationBar) {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            setNavigationBarBackgroundGradient(navigationBar)
-        } else {
-            navigationBar.barTintColor = purpleColour
-        }
+        setNavigationBarBackgroundGradient(navigationBar)
     }
 }
