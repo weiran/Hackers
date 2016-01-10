@@ -7,71 +7,99 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A1455CA7C2B37A40BC8F559887084C0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E4E89230EF59BC255123B67864ACF77 /* Foundation.framework */; };
-		128C6EA7CE0987AD49625E130690C011 /* HNComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 82D6304FDDE39B1E5B22BA18A5539FBC /* HNComment.m */; };
-		20EA2911FB8F18A887E7C2CA0FF7EC96 /* HNComment.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FF99C8BBE786C91AE7FB2E22D81B206 /* HNComment.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2B32D3E3D3641DC48F52D44885FACB08 /* HNCommentLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 117E9554165D018FCD5505DCC42501C4 /* HNCommentLink.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2E206107F8110B8AD982BD140DF636DB /* HNUser.m in Sources */ = {isa = PBXBuildFile; fileRef = C1FC5192F9C4E7F5AED19AB325E1EE4B /* HNUser.m */; };
-		3095D7347599D39873B2CA59D305F71B /* libHN-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DB89F0698BBA762F3CBD4B896CEA43 /* libHN-dummy.m */; };
-		33F54CD61CC9B91191B94EAAF46F1317 /* HNWebService.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A775848C54686DAAB1B3B08976B2775 /* HNWebService.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		431AD0FF10EA5C16C67A2628AFF5AC01 /* libHN.h in Headers */ = {isa = PBXBuildFile; fileRef = E1238C2A2FA0FAE13F9801D3E2ABD2EB /* libHN.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4DDD9FBDBFA1DEA3487C18D2FD18DDC8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E4E89230EF59BC255123B67864ACF77 /* Foundation.framework */; };
-		520CF1A510645D28E9793126AD63303E /* HNUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = CD2DB05F10F23A625421DFA9850162A6 /* HNUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		54C58A32DBC47B98DE5AD74E3A868DD5 /* Pods-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 272643F56613CA0D336AE3DBF19DC404 /* Pods-dummy.m */; };
-		72DE44123290D5A7A3DF809636C2E9CE /* HNPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D60379DAF1D65A0D622A3875FF6656A /* HNPost.m */; };
-		98BF35DDB2FF7ED8245E59987E2E44E7 /* HNUser.h in Headers */ = {isa = PBXBuildFile; fileRef = C298BD292F41D91F701264F34C79E051 /* HNUser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9A5B9DFE62816B3B6E6E964F037ED97A /* HNWebService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6150E92EE4277C6F9DC82580122F2BF9 /* HNWebService.m */; };
-		A4ECB79A707B44A9BBEF7F5B115BB153 /* HNManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C37275078D79EB069935CD6E13A490CD /* HNManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D4AE25F871F7D29EE3F797CBFD318BEB /* HNPost.h in Headers */ = {isa = PBXBuildFile; fileRef = CB9EB5AD0A613BDB36A8EB78E919D0F7 /* HNPost.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D947978ED1D96FF0C69DF1FD8933C50F /* HNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 55B066906C16DAC8EA9B0F188CB232D8 /* HNUtilities.m */; };
-		EF6C8C97D1E45CAC0FF5142415DFFD2E /* HNCommentLink.m in Sources */ = {isa = PBXBuildFile; fileRef = B98918467BF27A1F1F59399EBC88FFB3 /* HNCommentLink.m */; };
-		FE4807151E19E8F2F1D8FE4058BF217C /* HNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 616BD178E275C0CAE07DECBA54CB8F01 /* HNManager.m */; };
+		03D652F245EC57406662001A771FC85F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3B7BDF5CE5CB8F095FE12DA55D9A9BB /* UIKit.framework */; };
+		0A1455CA7C2B37A40BC8F559887084C0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E7E5AF37923BFA48D6994B9BFC6535F /* Foundation.framework */; };
+		128C6EA7CE0987AD49625E130690C011 /* HNComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 2720AE3B78B10EECDDA4D5ED637B66D0 /* HNComment.m */; };
+		20EA2911FB8F18A887E7C2CA0FF7EC96 /* HNComment.h in Headers */ = {isa = PBXBuildFile; fileRef = 463BA67764AA92916279EC6335F0DD9D /* HNComment.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2B32D3E3D3641DC48F52D44885FACB08 /* HNCommentLink.h in Headers */ = {isa = PBXBuildFile; fileRef = B8F6F323709014283AF9B65EE2830B4A /* HNCommentLink.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2E206107F8110B8AD982BD140DF636DB /* HNUser.m in Sources */ = {isa = PBXBuildFile; fileRef = D97D8C097EB866B7D30E67B4ABE6A894 /* HNUser.m */; };
+		3095D7347599D39873B2CA59D305F71B /* libHN-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A474E09C7819CCE815B47273DED8F8CF /* libHN-dummy.m */; };
+		31D310EAFEAE2031A6FD01DA61A1F22A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E7E5AF37923BFA48D6994B9BFC6535F /* Foundation.framework */; };
+		33F54CD61CC9B91191B94EAAF46F1317 /* HNWebService.h in Headers */ = {isa = PBXBuildFile; fileRef = 13039025AF32233A57D12F30D34327ED /* HNWebService.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		431AD0FF10EA5C16C67A2628AFF5AC01 /* libHN.h in Headers */ = {isa = PBXBuildFile; fileRef = AC53FE7948C14CE9035C69F23AC6B2BE /* libHN.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		520CF1A510645D28E9793126AD63303E /* HNUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 4E10228F2E34AB26762D8E30105A877B /* HNUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7061E40C2C09C3ED7E3C9F42780FE7AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E7E5AF37923BFA48D6994B9BFC6535F /* Foundation.framework */; };
+		72DE44123290D5A7A3DF809636C2E9CE /* HNPost.m in Sources */ = {isa = PBXBuildFile; fileRef = FF31854F7D8ED346DC17DCA5B15FC2F7 /* HNPost.m */; };
+		7F941B43E1B7FCF40736767DCE194D90 /* UIScrollView+EmptyDataSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 03B153813D5AE42E05BD0C00D0D98FD5 /* UIScrollView+EmptyDataSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		98BF35DDB2FF7ED8245E59987E2E44E7 /* HNUser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2AA9AFC295CBB62F8083F351AA8F1F3 /* HNUser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9A5B9DFE62816B3B6E6E964F037ED97A /* HNWebService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F9F1C0DF3869A700BAFB734C2BFD8F3 /* HNWebService.m */; };
+		A4ECB79A707B44A9BBEF7F5B115BB153 /* HNManager.h in Headers */ = {isa = PBXBuildFile; fileRef = B43ECAC16A2DB9BFA9713A2F5CF6FE54 /* HNManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D2914FEBF2C3D2F2E3F442C5506689E9 /* DZNEmptyDataSet-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1DF96ACEF87BF3D6686E8CE104FA18 /* DZNEmptyDataSet-dummy.m */; };
+		D4AE25F871F7D29EE3F797CBFD318BEB /* HNPost.h in Headers */ = {isa = PBXBuildFile; fileRef = 7ED6F4315CDECD8B29C3052D98DA83E2 /* HNPost.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D947978ED1D96FF0C69DF1FD8933C50F /* HNUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 07279783965BDD28D0A47C44A3B38771 /* HNUtilities.m */; };
+		EF6C8C97D1E45CAC0FF5142415DFFD2E /* HNCommentLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 20D224619A3F1095AE7BC6BF3B076FB0 /* HNCommentLink.m */; };
+		EF75BC735D336A3DF6DEB90F29DF5FAE /* UIScrollView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 69F7AC03EB4DE94957454AB7E45A4EC0 /* UIScrollView+EmptyDataSet.m */; };
+		FB711D588B335F14679F4E416500E8CA /* Pods-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 272643F56613CA0D336AE3DBF19DC404 /* Pods-dummy.m */; };
+		FE4807151E19E8F2F1D8FE4058BF217C /* HNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 25F4D7A439231EA1AD84DE27909172A0 /* HNManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3F316A9BFA06992D7E97B1DD75610DF1 /* PBXContainerItemProxy */ = {
+		1E68D33FF28AFC3E9BF76A727B827A13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 99155D9F81F703B6E82A1EE688ABD81E;
 			remoteInfo = libHN;
 		};
+		501A441D641B0FCEC464135DFD662E46 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 736E57AD5AEFAAF68D47AE4E8FCB8F68;
+			remoteInfo = DZNEmptyDataSet;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		019E9D3A160E960D73641C19B3F55756 /* libHN.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = libHN.xcconfig; sourceTree = "<group>"; };
+		03B153813D5AE42E05BD0C00D0D98FD5 /* UIScrollView+EmptyDataSet.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIScrollView+EmptyDataSet.h"; path = "Source/UIScrollView+EmptyDataSet.h"; sourceTree = "<group>"; };
+		07279783965BDD28D0A47C44A3B38771 /* HNUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUtilities.m; path = Source/HNUtilities.m; sourceTree = "<group>"; };
 		10834806BD7B412BC24F347361FA2C8E /* Pods-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-acknowledgements.plist"; sourceTree = "<group>"; };
-		117E9554165D018FCD5505DCC42501C4 /* HNCommentLink.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNCommentLink.h; path = Source/HNCommentLink.h; sourceTree = "<group>"; };
-		188CACC543D7D075DFB18FB95B0EE73D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		13039025AF32233A57D12F30D34327ED /* HNWebService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNWebService.h; path = Source/HNWebService.h; sourceTree = "<group>"; };
+		133FC786348063C9ADAD2A7FC7921217 /* liblibHN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibHN.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		20D224619A3F1095AE7BC6BF3B076FB0 /* HNCommentLink.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNCommentLink.m; path = Source/HNCommentLink.m; sourceTree = "<group>"; };
+		22EAE51184023CF2076548CF114D0166 /* libHN-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "libHN-prefix.pch"; sourceTree = "<group>"; };
+		25F4D7A439231EA1AD84DE27909172A0 /* HNManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNManager.m; path = Source/HNManager.m; sourceTree = "<group>"; };
+		2720AE3B78B10EECDDA4D5ED637B66D0 /* HNComment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNComment.m; path = Source/HNComment.m; sourceTree = "<group>"; };
 		272643F56613CA0D336AE3DBF19DC404 /* Pods-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-dummy.m"; sourceTree = "<group>"; };
 		37DB56D75062CC75FCB0966E1C6E8A8E /* Pods-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-acknowledgements.markdown"; sourceTree = "<group>"; };
-		3E4E89230EF59BC255123B67864ACF77 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		454960FC4ED831325F9FFC0956F7EF58 /* liblibHN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibHN.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4A709E8066E14B59247BC8271016ACBD /* libHN-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "libHN-prefix.pch"; sourceTree = "<group>"; };
-		4A775848C54686DAAB1B3B08976B2775 /* HNWebService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNWebService.h; path = Source/HNWebService.h; sourceTree = "<group>"; };
+		463BA67764AA92916279EC6335F0DD9D /* HNComment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNComment.h; path = Source/HNComment.h; sourceTree = "<group>"; };
+		4E10228F2E34AB26762D8E30105A877B /* HNUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUtilities.h; path = Source/HNUtilities.h; sourceTree = "<group>"; };
 		4E762F23EC34ED4A6FF3312D84E33A40 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.debug.xcconfig; sourceTree = "<group>"; };
-		55B066906C16DAC8EA9B0F188CB232D8 /* HNUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUtilities.m; path = Source/HNUtilities.m; sourceTree = "<group>"; };
-		6150E92EE4277C6F9DC82580122F2BF9 /* HNWebService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNWebService.m; path = Source/HNWebService.m; sourceTree = "<group>"; };
-		616BD178E275C0CAE07DECBA54CB8F01 /* HNManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNManager.m; path = Source/HNManager.m; sourceTree = "<group>"; };
+		5F3D2B7B8C1573F20E2FAD2717D860A6 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		62B30281AE9C568BBA08C0625060CDE9 /* libDZNEmptyDataSet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDZNEmptyDataSet.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6911BECA35E7518D864239B7E898EEF3 /* Pods-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-frameworks.sh"; sourceTree = "<group>"; };
-		7C2FE9159B36043E6FC1AFDCB55F9410 /* libHN.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = libHN.xcconfig; sourceTree = "<group>"; };
-		7D60379DAF1D65A0D622A3875FF6656A /* HNPost.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNPost.m; path = Source/HNPost.m; sourceTree = "<group>"; };
-		7FF99C8BBE786C91AE7FB2E22D81B206 /* HNComment.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNComment.h; path = Source/HNComment.h; sourceTree = "<group>"; };
-		82D6304FDDE39B1E5B22BA18A5539FBC /* HNComment.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNComment.m; path = Source/HNComment.m; sourceTree = "<group>"; };
-		904FB304147849C2668933D22BEE9177 /* hn.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = hn.json; path = Source/hn.json; sourceTree = "<group>"; };
+		69F7AC03EB4DE94957454AB7E45A4EC0 /* UIScrollView+EmptyDataSet.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIScrollView+EmptyDataSet.m"; path = "Source/UIScrollView+EmptyDataSet.m"; sourceTree = "<group>"; };
+		6E7E5AF37923BFA48D6994B9BFC6535F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		7ED6F4315CDECD8B29C3052D98DA83E2 /* HNPost.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNPost.h; path = Source/HNPost.h; sourceTree = "<group>"; };
 		98C98CDFB3F20F2925F6CD1F141BB14F /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pods.release.xcconfig; sourceTree = "<group>"; };
+		9F9F1C0DF3869A700BAFB734C2BFD8F3 /* HNWebService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNWebService.m; path = Source/HNWebService.m; sourceTree = "<group>"; };
 		A1A36D34413696BE466E2CA0AFF194DA /* Pods-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-resources.sh"; sourceTree = "<group>"; };
-		B5DB89F0698BBA762F3CBD4B896CEA43 /* libHN-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "libHN-dummy.m"; sourceTree = "<group>"; };
-		B98918467BF27A1F1F59399EBC88FFB3 /* HNCommentLink.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNCommentLink.m; path = Source/HNCommentLink.m; sourceTree = "<group>"; };
+		A474E09C7819CCE815B47273DED8F8CF /* libHN-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "libHN-dummy.m"; sourceTree = "<group>"; };
+		AC53FE7948C14CE9035C69F23AC6B2BE /* libHN.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = libHN.h; path = Source/libHN.h; sourceTree = "<group>"; };
+		B2AA9AFC295CBB62F8083F351AA8F1F3 /* HNUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUser.h; path = Source/HNUser.h; sourceTree = "<group>"; };
+		B43ECAC16A2DB9BFA9713A2F5CF6FE54 /* HNManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNManager.h; path = Source/HNManager.h; sourceTree = "<group>"; };
+		B8F6F323709014283AF9B65EE2830B4A /* HNCommentLink.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNCommentLink.h; path = Source/HNCommentLink.h; sourceTree = "<group>"; };
 		BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		C1FC5192F9C4E7F5AED19AB325E1EE4B /* HNUser.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUser.m; path = Source/HNUser.m; sourceTree = "<group>"; };
-		C298BD292F41D91F701264F34C79E051 /* HNUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUser.h; path = Source/HNUser.h; sourceTree = "<group>"; };
-		C37275078D79EB069935CD6E13A490CD /* HNManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNManager.h; path = Source/HNManager.h; sourceTree = "<group>"; };
-		CB9EB5AD0A613BDB36A8EB78E919D0F7 /* HNPost.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNPost.h; path = Source/HNPost.h; sourceTree = "<group>"; };
-		CD2DB05F10F23A625421DFA9850162A6 /* HNUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = HNUtilities.h; path = Source/HNUtilities.h; sourceTree = "<group>"; };
-		E1238C2A2FA0FAE13F9801D3E2ABD2EB /* libHN.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = libHN.h; path = Source/libHN.h; sourceTree = "<group>"; };
+		BB1DF96ACEF87BF3D6686E8CE104FA18 /* DZNEmptyDataSet-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "DZNEmptyDataSet-dummy.m"; sourceTree = "<group>"; };
+		C3B7BDF5CE5CB8F095FE12DA55D9A9BB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		CA2B4F3F91048338563455811D345BA1 /* DZNEmptyDataSet-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "DZNEmptyDataSet-prefix.pch"; sourceTree = "<group>"; };
+		D97D8C097EB866B7D30E67B4ABE6A894 /* HNUser.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNUser.m; path = Source/HNUser.m; sourceTree = "<group>"; };
+		E5F89E86B982AE3098E63F8F248B04EC /* hn.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; name = hn.json; path = Source/hn.json; sourceTree = "<group>"; };
+		FBDFB8AB28539A8C7EA14BFD1858DA0A /* DZNEmptyDataSet.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = DZNEmptyDataSet.xcconfig; sourceTree = "<group>"; };
+		FF31854F7D8ED346DC17DCA5B15FC2F7 /* HNPost.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = HNPost.m; path = Source/HNPost.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		360EEE3FA0C21A0399944F45FF502501 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31D310EAFEAE2031A6FD01DA61A1F22A /* Foundation.framework in Frameworks */,
+				03D652F245EC57406662001A771FC85F /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		68814E213384E0D976A9641003E823F6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -80,26 +108,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7C2573F4105AB4548EF2F7A3B990E226 /* Frameworks */ = {
+		B03B44883A3D9F48230654F3A997011D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DDD9FBDBFA1DEA3487C18D2FD18DDC8 /* Foundation.framework in Frameworks */,
+				7061E40C2C09C3ED7E3C9F42780FE7AD /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		008C646F64C91A8D0D271EE503570661 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				454960FC4ED831325F9FFC0956F7EF58 /* liblibHN.a */,
-				188CACC543D7D075DFB18FB95B0EE73D /* libPods.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		037C0CA694176A3C0915F62C9D20B3E6 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -108,66 +127,96 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
-		0A1EE31F639032879DA633AF071C945C /* Resources */ = {
+		0D45B8BF566FECE19123702877DD4340 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				904FB304147849C2668933D22BEE9177 /* hn.json */,
+				E5F89E86B982AE3098E63F8F248B04EC /* hn.json */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		2752B358B2C61C8BDB2C39A61C419D1B /* libHN */ = {
+		18340F12838DEE43507667CC74401EB1 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				7FF99C8BBE786C91AE7FB2E22D81B206 /* HNComment.h */,
-				82D6304FDDE39B1E5B22BA18A5539FBC /* HNComment.m */,
-				117E9554165D018FCD5505DCC42501C4 /* HNCommentLink.h */,
-				B98918467BF27A1F1F59399EBC88FFB3 /* HNCommentLink.m */,
-				C37275078D79EB069935CD6E13A490CD /* HNManager.h */,
-				616BD178E275C0CAE07DECBA54CB8F01 /* HNManager.m */,
-				CB9EB5AD0A613BDB36A8EB78E919D0F7 /* HNPost.h */,
-				7D60379DAF1D65A0D622A3875FF6656A /* HNPost.m */,
-				C298BD292F41D91F701264F34C79E051 /* HNUser.h */,
-				C1FC5192F9C4E7F5AED19AB325E1EE4B /* HNUser.m */,
-				CD2DB05F10F23A625421DFA9850162A6 /* HNUtilities.h */,
-				55B066906C16DAC8EA9B0F188CB232D8 /* HNUtilities.m */,
-				4A775848C54686DAAB1B3B08976B2775 /* HNWebService.h */,
-				6150E92EE4277C6F9DC82580122F2BF9 /* HNWebService.m */,
-				E1238C2A2FA0FAE13F9801D3E2ABD2EB /* libHN.h */,
-				0A1EE31F639032879DA633AF071C945C /* Resources */,
-				592579A067023F54C937AB6BD584D3E9 /* Support Files */,
+				6E7E5AF37923BFA48D6994B9BFC6535F /* Foundation.framework */,
+				C3B7BDF5CE5CB8F095FE12DA55D9A9BB /* UIKit.framework */,
 			);
-			path = libHN;
+			name = iOS;
 			sourceTree = "<group>";
 		};
-		283804C60BD006C08BA7BC4C15729C29 /* Pods */ = {
+		38EF22D6AB9C5165A37472F9C23477BA /* DZNEmptyDataSet */ = {
 			isa = PBXGroup;
 			children = (
-				2752B358B2C61C8BDB2C39A61C419D1B /* libHN */,
+				03B153813D5AE42E05BD0C00D0D98FD5 /* UIScrollView+EmptyDataSet.h */,
+				69F7AC03EB4DE94957454AB7E45A4EC0 /* UIScrollView+EmptyDataSet.m */,
+				47DE6A7BF709F4B45D4335FDB444C055 /* Support Files */,
 			);
-			name = Pods;
+			path = DZNEmptyDataSet;
 			sourceTree = "<group>";
 		};
-		592579A067023F54C937AB6BD584D3E9 /* Support Files */ = {
+		433CD3331B6C3787F473C941B61FC68F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7C2FE9159B36043E6FC1AFDCB55F9410 /* libHN.xcconfig */,
-				B5DB89F0698BBA762F3CBD4B896CEA43 /* libHN-dummy.m */,
-				4A709E8066E14B59247BC8271016ACBD /* libHN-prefix.pch */,
+				18340F12838DEE43507667CC74401EB1 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		47DE6A7BF709F4B45D4335FDB444C055 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				FBDFB8AB28539A8C7EA14BFD1858DA0A /* DZNEmptyDataSet.xcconfig */,
+				BB1DF96ACEF87BF3D6686E8CE104FA18 /* DZNEmptyDataSet-dummy.m */,
+				CA2B4F3F91048338563455811D345BA1 /* DZNEmptyDataSet-prefix.pch */,
 			);
 			name = "Support Files";
-			path = "../Target Support Files/libHN";
+			path = "../Target Support Files/DZNEmptyDataSet";
 			sourceTree = "<group>";
 		};
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
 				BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */,
-				BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */,
-				283804C60BD006C08BA7BC4C15729C29 /* Pods */,
-				008C646F64C91A8D0D271EE503570661 /* Products */,
+				433CD3331B6C3787F473C941B61FC68F /* Frameworks */,
+				BD498721420688DF27729F370EF08144 /* Pods */,
+				DF91DF9358B34BEF4757BD96D33C4091 /* Products */,
 				037C0CA694176A3C0915F62C9D20B3E6 /* Targets Support Files */,
 			);
+			sourceTree = "<group>";
+		};
+		A9CD40193A20F4653DB873E9E8B6645B /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				019E9D3A160E960D73641C19B3F55756 /* libHN.xcconfig */,
+				A474E09C7819CCE815B47273DED8F8CF /* libHN-dummy.m */,
+				22EAE51184023CF2076548CF114D0166 /* libHN-prefix.pch */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/libHN";
+			sourceTree = "<group>";
+		};
+		B174CCF964F15757B67F1C0409A48569 /* libHN */ = {
+			isa = PBXGroup;
+			children = (
+				463BA67764AA92916279EC6335F0DD9D /* HNComment.h */,
+				2720AE3B78B10EECDDA4D5ED637B66D0 /* HNComment.m */,
+				B8F6F323709014283AF9B65EE2830B4A /* HNCommentLink.h */,
+				20D224619A3F1095AE7BC6BF3B076FB0 /* HNCommentLink.m */,
+				B43ECAC16A2DB9BFA9713A2F5CF6FE54 /* HNManager.h */,
+				25F4D7A439231EA1AD84DE27909172A0 /* HNManager.m */,
+				7ED6F4315CDECD8B29C3052D98DA83E2 /* HNPost.h */,
+				FF31854F7D8ED346DC17DCA5B15FC2F7 /* HNPost.m */,
+				B2AA9AFC295CBB62F8083F351AA8F1F3 /* HNUser.h */,
+				D97D8C097EB866B7D30E67B4ABE6A894 /* HNUser.m */,
+				4E10228F2E34AB26762D8E30105A877B /* HNUtilities.h */,
+				07279783965BDD28D0A47C44A3B38771 /* HNUtilities.m */,
+				13039025AF32233A57D12F30D34327ED /* HNWebService.h */,
+				9F9F1C0DF3869A700BAFB734C2BFD8F3 /* HNWebService.m */,
+				AC53FE7948C14CE9035C69F23AC6B2BE /* libHN.h */,
+				0D45B8BF566FECE19123702877DD4340 /* Resources */,
+				A9CD40193A20F4653DB873E9E8B6645B /* Support Files */,
+			);
+			path = libHN;
 			sourceTree = "<group>";
 		};
 		B3D1D13E0C6553800746CB8FD61CF946 /* Pods */ = {
@@ -185,25 +234,36 @@
 			path = "Target Support Files/Pods";
 			sourceTree = "<group>";
 		};
-		BC3CA7F9E30CC8F7E2DD044DD34432FC /* Frameworks */ = {
+		BD498721420688DF27729F370EF08144 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				BF6342C8B29F4CEEA088EFF7AB4DE362 /* iOS */,
+				38EF22D6AB9C5165A37472F9C23477BA /* DZNEmptyDataSet */,
+				B174CCF964F15757B67F1C0409A48569 /* libHN */,
 			);
-			name = Frameworks;
+			name = Pods;
 			sourceTree = "<group>";
 		};
-		BF6342C8B29F4CEEA088EFF7AB4DE362 /* iOS */ = {
+		DF91DF9358B34BEF4757BD96D33C4091 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3E4E89230EF59BC255123B67864ACF77 /* Foundation.framework */,
+				62B30281AE9C568BBA08C0625060CDE9 /* libDZNEmptyDataSet.a */,
+				133FC786348063C9ADAD2A7FC7921217 /* liblibHN.a */,
+				5F3D2B7B8C1573F20E2FAD2717D860A6 /* libPods.a */,
 			);
-			name = iOS;
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		48B2BA5F3935DE22852A7EFF05B89EE6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F941B43E1B7FCF40736767DCE194D90 /* UIScrollView+EmptyDataSet.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		91FB26A9D034F02D585FAEB940176CC5 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -222,21 +282,39 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		77403CEAAF5AD7C5040A9F5398132D4C /* Pods */ = {
+		736E57AD5AEFAAF68D47AE4E8FCB8F68 /* DZNEmptyDataSet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E56AD2A9B5636488836AE14F14A5CAA8 /* Build configuration list for PBXNativeTarget "Pods" */;
+			buildConfigurationList = C1C847BA639995C48B89DF3C96C3A6FB /* Build configuration list for PBXNativeTarget "DZNEmptyDataSet" */;
 			buildPhases = (
-				287183916AE23959881BBA05B8F2B6C1 /* Sources */,
-				7C2573F4105AB4548EF2F7A3B990E226 /* Frameworks */,
+				B6C2166CDEB842A61247B874390A5673 /* Sources */,
+				360EEE3FA0C21A0399944F45FF502501 /* Frameworks */,
+				48B2BA5F3935DE22852A7EFF05B89EE6 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A82C18CB32FD896BB84FCDE57DC854C6 /* PBXTargetDependency */,
+			);
+			name = DZNEmptyDataSet;
+			productName = DZNEmptyDataSet;
+			productReference = 62B30281AE9C568BBA08C0625060CDE9 /* libDZNEmptyDataSet.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8C76A15214DD2259389EA8C32F29DF36 /* Pods */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 028E952339CB7378D87B7A92F64A16BA /* Build configuration list for PBXNativeTarget "Pods" */;
+			buildPhases = (
+				635093A0568CD647C1459D97180E931E /* Sources */,
+				B03B44883A3D9F48230654F3A997011D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEBF15561B1798BCB22EA47E3A094667 /* PBXTargetDependency */,
+				482EC9C79693DA2BD402FD805709322C /* PBXTargetDependency */,
 			);
 			name = Pods;
 			productName = Pods;
-			productReference = 188CACC543D7D075DFB18FB95B0EE73D /* libPods.a */;
+			productReference = 5F3D2B7B8C1573F20E2FAD2717D860A6 /* libPods.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		99155D9F81F703B6E82A1EE688ABD81E /* libHN */ = {
@@ -253,7 +331,7 @@
 			);
 			name = libHN;
 			productName = libHN;
-			productReference = 454960FC4ED831325F9FFC0956F7EF58 /* liblibHN.a */;
+			productReference = 133FC786348063C9ADAD2A7FC7921217 /* liblibHN.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -273,22 +351,23 @@
 				en,
 			);
 			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
-			productRefGroup = 008C646F64C91A8D0D271EE503570661 /* Products */;
+			productRefGroup = DF91DF9358B34BEF4757BD96D33C4091 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				736E57AD5AEFAAF68D47AE4E8FCB8F68 /* DZNEmptyDataSet */,
 				99155D9F81F703B6E82A1EE688ABD81E /* libHN */,
-				77403CEAAF5AD7C5040A9F5398132D4C /* Pods */,
+				8C76A15214DD2259389EA8C32F29DF36 /* Pods */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		287183916AE23959881BBA05B8F2B6C1 /* Sources */ = {
+		635093A0568CD647C1459D97180E931E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				54C58A32DBC47B98DE5AD74E3A868DD5 /* Pods-dummy.m in Sources */,
+				FB711D588B335F14679F4E416500E8CA /* Pods-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,36 +386,52 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B6C2166CDEB842A61247B874390A5673 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D2914FEBF2C3D2F2E3F442C5506689E9 /* DZNEmptyDataSet-dummy.m in Sources */,
+				EF75BC735D336A3DF6DEB90F29DF5FAE /* UIScrollView+EmptyDataSet.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A82C18CB32FD896BB84FCDE57DC854C6 /* PBXTargetDependency */ = {
+		482EC9C79693DA2BD402FD805709322C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = libHN;
 			target = 99155D9F81F703B6E82A1EE688ABD81E /* libHN */;
-			targetProxy = 3F316A9BFA06992D7E97B1DD75610DF1 /* PBXContainerItemProxy */;
+			targetProxy = 1E68D33FF28AFC3E9BF76A727B827A13 /* PBXContainerItemProxy */;
+		};
+		CEBF15561B1798BCB22EA47E3A094667 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = DZNEmptyDataSet;
+			target = 736E57AD5AEFAAF68D47AE4E8FCB8F68 /* DZNEmptyDataSet */;
+			targetProxy = 501A441D641B0FCEC464135DFD662E46 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		1E000825439518A8B4732DA4A188777C /* Release */ = {
+		36804B93D48F23E760D41E5B802CE136 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 98C98CDFB3F20F2925F6CD1F141BB14F /* Pods.release.xcconfig */;
+			baseConfigurationReference = FBDFB8AB28539A8C7EA14BFD1858DA0A /* DZNEmptyDataSet.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/DZNEmptyDataSet/DZNEmptyDataSet-prefix.pch";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				MACH_O_TYPE = staticlib;
-				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
-			name = Release;
+			name = Debug;
 		};
-		3EEEE913290514ED06A5453AA01BAEC9 /* Debug */ = {
+		4117EB303B7A6F13FFAD9A4B16F18E58 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4E762F23EC34ED4A6FF3312D84E33A40 /* Pods.debug.xcconfig */;
 			buildSettings = {
@@ -353,9 +448,26 @@
 			};
 			name = Debug;
 		};
+		598F63D7F7535B0036D5EE2A907E3B5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 98C98CDFB3F20F2925F6CD1F141BB14F /* Pods.release.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACH_O_TYPE = staticlib;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		5D875B5B839BCAC977DC773CA34CEA39 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7C2FE9159B36043E6FC1AFDCB55F9410 /* libHN.xcconfig */;
+			baseConfigurationReference = 019E9D3A160E960D73641C19B3F55756 /* libHN.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_PREFIX_HEADER = "Target Support Files/libHN/libHN-prefix.pch";
@@ -370,6 +482,24 @@
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
+		};
+		886852914387348075CA5AC71E477064 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FBDFB8AB28539A8C7EA14BFD1858DA0A /* DZNEmptyDataSet.xcconfig */;
+			buildSettings = {
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/DZNEmptyDataSet/DZNEmptyDataSet-prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
 		};
 		A70CDAD61F90AC503C7D04CC22DA2923 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -412,7 +542,7 @@
 		};
 		D32F871822E954F6BB2AD0A46890DC79 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7C2FE9159B36043E6FC1AFDCB55F9410 /* libHN.xcconfig */;
+			baseConfigurationReference = 019E9D3A160E960D73641C19B3F55756 /* libHN.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_PREFIX_HEADER = "Target Support Files/libHN/libHN-prefix.pch";
@@ -465,6 +595,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		028E952339CB7378D87B7A92F64A16BA /* Build configuration list for PBXNativeTarget "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4117EB303B7A6F13FFAD9A4B16F18E58 /* Debug */,
+				598F63D7F7535B0036D5EE2A907E3B5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		135F0EA3F3EC0438B1A53104E252B77E /* Build configuration list for PBXNativeTarget "libHN" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -483,11 +622,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E56AD2A9B5636488836AE14F14A5CAA8 /* Build configuration list for PBXNativeTarget "Pods" */ = {
+		C1C847BA639995C48B89DF3C96C3A6FB /* Build configuration list for PBXNativeTarget "DZNEmptyDataSet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3EEEE913290514ED06A5453AA01BAEC9 /* Debug */,
-				1E000825439518A8B4732DA4A188777C /* Release */,
+				36804B93D48F23E760D41E5B802CE136 /* Debug */,
+				886852914387348075CA5AC71E477064 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

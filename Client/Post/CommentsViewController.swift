@@ -10,12 +10,12 @@ import Foundation
 import UIKit
 import SafariServices
 
-class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate {
+class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     var post: HNPost?
     
-    var comments: [CommentModel] = [CommentModel]() {
+    var comments: [CommentModel]? {
         didSet {
-            commentsController.comments = comments
+            commentsController.comments = comments!
         }
     }
     
@@ -30,11 +30,11 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         setupPostTitleView()
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.emptyDataSetSource = self;
+        tableView.emptyDataSetDelegate = self;
         
         commentsController = CommentsController()
-        if comments.count == 0 {
-            loadComments()
-        }
+        loadComments()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -70,7 +70,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    // MARK - UITableViewDataSource
+    // MARK: - UITableViewDataSource
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.visibleComments.count
@@ -92,6 +92,14 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         return cell
     }
+    
+    // MARK: - DZNEmptyDataSet
+    
+    func titleForEmptyDataSet(scrollView: UIScrollView!) -> NSAttributedString! {
+        return comments == nil ? NSAttributedString(string: "Loading comments") : NSAttributedString(string: "No comments")
+    }
+    
+    // MARK: - Cell Actions
     
     func commentTapped(sender: UITableViewCell) {
         let indexPath = tableView.indexPathForCell(sender)
