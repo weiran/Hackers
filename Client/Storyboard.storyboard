@@ -422,8 +422,9 @@
         <!--Navigation Controller-->
         <scene sceneID="N7T-fw-zna">
             <objects>
-                <navigationController storyboardIdentifier="PostViewNavigationController" toolbarHidden="NO" id="eIj-eX-YuX" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="PostViewNavigationController" id="eIj-eX-YuX" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="GCP-JH-btW"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="T7A-bH-qPa">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
