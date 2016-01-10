@@ -34,11 +34,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        }
-        
         UIApplication.sharedApplication().statusBarStyle = .LightContent
     }
     
@@ -90,8 +85,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         
         showDetailViewController(viewController, sender: self)
-        
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     // MARK: - UISplitViewControllerDelegate

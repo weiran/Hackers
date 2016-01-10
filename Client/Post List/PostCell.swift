@@ -11,4 +11,24 @@ import UIKit
 
 class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
+    var backgroundLayer: CAGradientLayer?
+    
+    override func setSelected(selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        selected ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    override func setHighlighted(highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        highlighted ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    func setSelectedBackground() {
+        backgroundColor = Theme.backgroundOrangeColour
+    }
+    
+    func setUnselectedBackground() {
+        backgroundColor = UIColor.clearColor()
+    }
+    
 }

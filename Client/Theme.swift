@@ -13,6 +13,7 @@ class Theme {
     static let purpleColour = UIColor(colorLiteralRed: 101/255.0, green: 19/255.0, blue: 229/255.0, alpha: 1)
     static let orangeColour = UIColor(colorLiteralRed: 223/255.0, green: 111/255.0, blue: 4/255.0, alpha: 1)
     static let backgroundGreyColour = UIColor(red:0.937, green:0.937, blue:0.956, alpha:1)
+    static let backgroundOrangeColour = UIColor(red:0.783, green:0.701, blue:0.847, alpha:1)
     
     static private func setNavigationBarBackgroundGradient(navigationBar: UINavigationBar) {
         var frame = navigationBar.frame
