@@ -24,7 +24,7 @@ class PostCell : UITableViewCell {
     }
     
     func setSelectedBackground() {
-        backgroundColor = Theme.backgroundOrangeColour
+        backgroundColor = Theme.backgroundPurpleColour
     }
     
     func setUnselectedBackground() {
