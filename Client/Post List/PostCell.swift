@@ -11,7 +11,6 @@ import UIKit
 
 class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
-    var backgroundLayer: CAGradientLayer?
     
     override func setSelected(selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

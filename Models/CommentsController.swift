@@ -18,8 +18,8 @@ class CommentsController {
         }
     }
     
-    init() {
-        comments = [CommentModel]()
+    convenience init() {
+        self.init(source: [CommentModel]())
     }
     
     init(source: [CommentModel]) {

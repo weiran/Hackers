@@ -19,7 +19,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    var commentsController = CommentsController()
+    let commentsController = CommentsController()
     
     @IBOutlet var tableView: UITableView!
     
@@ -33,7 +33,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         tableView.emptyDataSetSource = self;
         tableView.emptyDataSetDelegate = self;
         
-        commentsController = CommentsController()
         loadComments()
     }
     
