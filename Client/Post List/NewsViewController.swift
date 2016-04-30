@@ -10,10 +10,11 @@ import Foundation
 import UIKit
 import SafariServices
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, UIViewControllerPreviewingDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
     private var collapseDetailViewController = true
+    private var peekedIndexPath: NSIndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,7 +97,9 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     // MARK: - PostCellDelegate
     
     func getSafariViewController(URL: String) -> SFSafariViewController {
-        return SFSafariViewController(URL: NSURL(string: URL)!)
+        let safariViewController = SFSafariViewController(URL: NSURL(string: URL)!)
+        safariViewController.previewActionItemsDelegate = self
+        return safariViewController
     }
     
     func didPressLinkButton(post: HNPost) {
@@ -108,6 +111,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func previewingContext(previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = tableView.indexPathForRowAtPoint(location) {
+            peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRowAtIndexPath(indexPath)
             let post = posts[indexPath.row]
             return getSafariViewController(post.UrlString)
@@ -117,5 +121,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func previewingContext(previewingContext: UIViewControllerPreviewing, commitViewController viewControllerToCommit: UIViewController) {
         presentViewController(viewControllerToCommit, animated: true, completion: nil)
+    }
+    
+    func safariViewControllerPreviewActionItems(controller: SFSafariViewController) -> [UIPreviewActionItem] {
+        let indexPath = self.peekedIndexPath!
+        let post = posts[indexPath.row]
+        let commentsPreviewActionTitle = post.CommentCount > 0 ? "View \(post.CommentCount) comments" : "View comments"
+        
+        let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .Default) {
+            [unowned self, indexPath = indexPath] (action, viewController) -> Void in
+            self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
+            self.tableView(self.tableView, didSelectRowAtIndexPath: indexPath)
+        }
+        return [viewCommentsPreviewAction]
     }
 }
