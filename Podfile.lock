@@ -1,5 +1,5 @@
 PODS:
-  - DZNEmptyDataSet (1.7.3)
+  - DZNEmptyDataSet (1.8)
   - libHN (4.1.0)
 
 DEPENDENCIES:
@@ -7,7 +7,7 @@ DEPENDENCIES:
   - libHN
 
 SPEC CHECKSUMS:
-  DZNEmptyDataSet: dd7cca17c1d07dfa78956859b1e70a52505678ef
+  DZNEmptyDataSet: d2351b2e8daefa40433ef292e246e21f6be31a7b
   libHN: ec0205556a35d760b5b6a7804699f67276d6633a
 
 COCOAPODS: 0.39.0
