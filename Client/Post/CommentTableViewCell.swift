@@ -52,6 +52,8 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     override func awakeFromNib() {
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
+        exclusiveTouch = true
+        contentView.exclusiveTouch = true
     }
     
     func cellTapped(gestureRecognizer: UITapGestureRecognizer) {
