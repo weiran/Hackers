@@ -39,13 +39,16 @@ class CommentsController {
         
         var currentIndex = visibleIndex + 1;
         
-        for var i = 1; i <= childrenCount; i++ {
-            let currentComment = comments[commentIndex + i]
-            
-            if (visible && currentComment.visibility == .Hidden) { continue }
-            
-            currentComment.visibility = visible ? .Hidden : .Visible
-            modifiedIndexPaths.append(NSIndexPath(forRow: currentIndex++, inSection: 0))
+        if childrenCount > 0 {
+            for i in 1...childrenCount {
+                let currentComment = comments[commentIndex + i]
+                
+                if visible && currentComment.visibility == .Hidden { continue }
+                
+                currentComment.visibility = visible ? .Hidden : .Visible
+                modifiedIndexPaths.append(NSIndexPath(forRow: currentIndex, inSection: 0))
+                currentIndex += 1
+            }
         }
         
         return (modifiedIndexPaths, visible ? .Hidden : .Visible)
@@ -59,12 +62,12 @@ class CommentsController {
     }
     
     func countChildren(comment: CommentModel) -> Int {
-        var i = indexOfComment(comment, source: comments)!
+        let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
         
-        for i++; i < comments.count; i++ {
+        for i in startIndex...comments.count {
             let currentComment = comments[i]
-            if (currentComment.level > comment.level) { count++ }
+            if (currentComment.level > comment.level) { count += 1 }
             else { break }
         }
         

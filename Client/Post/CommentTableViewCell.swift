@@ -51,7 +51,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
     
     override func awakeFromNib() {
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: Selector("cellTapped:")))
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
     }
     
     func cellTapped(gestureRecognizer: UITapGestureRecognizer) {
