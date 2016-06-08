@@ -36,6 +36,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         UIApplication.sharedApplication().statusBarStyle = .LightContent
+        rz_smoothlyDeselectRows(tableView: tableView)
     }
     
     func loadPosts() {

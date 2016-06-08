@@ -10,6 +10,7 @@
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
+		242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */; };
 		245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
@@ -35,6 +36,7 @@
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
+		242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewControllerSmoothlyDeselectCellExtension.swift; sourceTree = "<group>"; };
 		245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SFSafariViewController+PreviewActionItems.swift"; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTitleView.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				24D6B8C91C1EDBFC00618422 /* Theme.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */,
+				242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
+				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
