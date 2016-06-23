@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import libHN
 
 protocol PostTitleViewDelegate {
     func didPressLinkButton(post: HNPost)

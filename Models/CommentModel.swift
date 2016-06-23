@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import libHN
 
 enum CommentVisibilityType: Int {
     case Visible = 3

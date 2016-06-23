@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 import SafariServices
+import libHN
+import DZNEmptyDataSet
 
 class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     var post: HNPost?

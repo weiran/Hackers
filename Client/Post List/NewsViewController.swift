@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SafariServices
+import libHN
 
 class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
