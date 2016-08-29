@@ -15,17 +15,17 @@ private struct AssociatedKeys {
 }
 
 extension SFSafariViewController {
-    private(set) public var initialURL: NSURL? {
+    private(set) public var initialURL: URL? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.InitialURL, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.InitialURL) as? NSURL
+            return objc_getAssociatedObject(self, &AssociatedKeys.InitialURL) as? URL
         }
     }
     
-    public convenience init(initialURL: NSURL, entersReaderIfAvailable: Bool) {
-        self.init(URL: initialURL, entersReaderIfAvailable: entersReaderIfAvailable)
+    public convenience init(initialURL: URL, entersReaderIfAvailable: Bool) {
+        self.init(url: initialURL, entersReaderIfAvailable: entersReaderIfAvailable)
         self.initialURL = initialURL
     }
 }
@@ -42,11 +42,11 @@ extension SFSafariViewController {
         }
     }
     
-    public override func previewActionItems() -> [UIPreviewActionItem] {
+    open override var previewActionItems: [UIPreviewActionItem] {
         return previewActionItemsDelegate?.safariViewControllerPreviewActionItems(self) ?? []
     }
 }
 
 public protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
-    func safariViewControllerPreviewActionItems(controller: SFSafariViewController) -> [UIPreviewActionItem]
+    func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }

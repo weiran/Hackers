@@ -12,12 +12,12 @@ import UIKit
 class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
     
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         selected ? setSelectedBackground() : setUnselectedBackground()
     }
     
-    override func setHighlighted(highlighted: Bool, animated: Bool) {
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
         highlighted ? setSelectedBackground() : setUnselectedBackground()
     }
@@ -27,7 +27,7 @@ class PostCell : UITableViewCell {
     }
     
     func setUnselectedBackground() {
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
     }
     
 }

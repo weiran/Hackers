@@ -38,20 +38,19 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         loadComments()
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        UIApplication.sharedApplication().statusBarStyle = .LightContent
+        UIApplication.shared.statusBarStyle = .lightContent
     }
     
     func loadComments() {
-        HNManager.sharedManager().loadCommentsFromPost(post, completion: {
-            (_comments: [AnyObject]!) in
-            if let downcastedArray = _comments as? [HNComment] {
+        HNManager.shared().loadComments(from: post) { (comments) in
+            if let downcastedArray = comments as? [HNComment] {
                 let mappedComments = downcastedArray.map { CommentModel(source: $0) }
                 self.comments = mappedComments
                 self.tableView.reloadData()
             }
-        })
+        }
     }
     
     func setupPostTitleView() {
@@ -62,7 +61,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             postTitleView.setNeedsLayout()
             postTitleView.layoutIfNeeded()
             
-            let height = postTitleView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize).height
+            let height = postTitleView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
             var frame = postTitleView.frame
             frame.size.height = height
             postTitleView.frame = frame
@@ -73,20 +72,20 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     // MARK: - UITableViewDataSource
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.visibleComments.count
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return "Comments"
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let comment = commentsController.visibleComments[indexPath.row]
-        assert(comment.visibility != .Hidden, "Cell cannot be hidden and in the array of visible cells")
-        let cellIdentifier = comment.visibility == CommentVisibilityType.Visible ? "OpenCommentCell" : "ClosedCommentCell"
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let comment = commentsController.visibleComments[(indexPath as NSIndexPath).row]
+        assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
+        let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
 
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! CommentTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
         cell.comment = comment
         cell.delegate = self
@@ -96,56 +95,56 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     // MARK: - DZNEmptyDataSet
     
-    func titleForEmptyDataSet(scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSFontAttributeName: UIFont.systemFontOfSize(15.0)]
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
     
     // MARK: - Cell Actions
     
-    func commentTapped(sender: UITableViewCell) {
-        let indexPath = tableView.indexPathForCell(sender)
+    func commentTapped(_ sender: UITableViewCell) {
+        let indexPath = tableView.indexPath(for: sender)
         toggleCellVisibilityForCell(indexPath)
     }
     
-    func linkTapped(URL: NSURL, sender: UITextView) {
-        let safariViewController = SFSafariViewController(URL: URL)
-        self.navigationController!.presentViewController(safariViewController, animated: true, completion: nil)
-        UIApplication.sharedApplication().statusBarStyle = .Default
+    func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
+        let safariViewController = SFSafariViewController(url: URL)
+        self.navigationController!.present(safariViewController, animated: true, completion: nil)
+        UIApplication.shared.statusBarStyle = .default
     }
     
-    func toggleCellVisibilityForCell(indexPath: NSIndexPath!) {
+    func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {
         let comment = commentsController.visibleComments[indexPath.row]
-        let cellRectInTableView = tableView.rectForRowAtIndexPath(indexPath)
-        let cellRectInSuperview = tableView.convertRect(cellRectInTableView, toView: tableView.superview)
+        let cellRectInTableView = tableView.rectForRow(at: indexPath)
+        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
 
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
                 
         tableView.beginUpdates()
-        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        if visibility == CommentVisibilityType.Hidden {
-            tableView.deleteRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: .Middle)
+        tableView.reloadRows(at: [indexPath], with: .fade)
+        if visibility == CommentVisibilityType.hidden {
+            tableView.deleteRows(at: modifiedIndexPaths, with: .middle)
         } else {
-            tableView.insertRowsAtIndexPaths(modifiedIndexPaths, withRowAnimation: UITableViewRowAnimation.Middle)
+            tableView.insertRows(at: modifiedIndexPaths, with: UITableViewRowAnimation.middle)
         }
         tableView.endUpdates()
         
         if cellRectInSuperview.origin.y < 0 {
-            tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: .Top, animated: true)
+            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
     
     // MARK: - PostCellDelegate
     
-    func didPressLinkButton(post: HNPost) {
-        let safariViewController = SFSafariViewController(URL: NSURL(string: post.UrlString)!)
-        self.navigationController!.presentViewController(safariViewController, animated: true, completion: nil)
-        UIApplication.sharedApplication().statusBarStyle = .Default
+    func didPressLinkButton(_ post: HNPost) {
+        let safariViewController = SFSafariViewController(url: URL(string: post.urlString)!)
+        self.navigationController!.present(safariViewController, animated: true, completion: nil)
+        UIApplication.shared.statusBarStyle = .default
     }
     
-    @IBAction func shareTapped(sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.Title, NSURL(string: post!.UrlString)!], applicationActivities: nil)
+    @IBAction func shareTapped(_ sender: AnyObject) {
+        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-        presentViewController(activityViewController, animated: true, completion: nil)
+        present(activityViewController, animated: true, completion: nil)
     }
 }

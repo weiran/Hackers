@@ -25,12 +25,12 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
             authorLabel.text = comment?.authorUsername
             
             if let textView = commentTextView {
-                let commentFont = UIFont.systemFontOfSize(15) //UIFont(name: "HelveticaNeue-Light", size: 15)
-                let commentTextColor = UIColor.darkGrayColor()
+                let commentFont = UIFont.systemFont(ofSize: 15) //UIFont(name: "HelveticaNeue-Light", size: 15)
+                let commentTextColor = UIColor.darkGray
                 let lineSpacing = 4 as CGFloat
                 
                 let commentAttributedString = NSMutableAttributedString(string: comment!.text)
-                let paragraphStyle = NSMutableParagraphStyle.defaultParagraphStyle().mutableCopy() as! NSMutableParagraphStyle
+                let paragraphStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
                 paragraphStyle.lineSpacing = lineSpacing
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)
@@ -52,13 +52,13 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     override func awakeFromNib() {
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
-        exclusiveTouch = true
-        contentView.exclusiveTouch = true
+        isExclusiveTouch = true
+        contentView.isExclusiveTouch = true
     }
     
-    func cellTapped(gestureRecognizer: UITapGestureRecognizer) {
+    func cellTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         delegate?.commentTapped(self)
-        setSelected(!selected, animated: false)
+        setSelected(!isSelected, animated: false)
     }
     
     func updateIndentPadding() {
@@ -69,7 +69,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     // MARK - UITextViewDelegate
     
-    func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         if let _ = delegate {
             delegate!.linkTapped(URL, sender: textView)
             return false

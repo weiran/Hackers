@@ -10,6 +10,6 @@ import Foundation
 import UIKit
 
 protocol CommentDelegate {
-    func commentTapped(sender: UITableViewCell)
-    func linkTapped(URL: NSURL, sender: UITextView)
+    func commentTapped(_ sender: UITableViewCell)
+    func linkTapped(_ URL: URL, sender: UITextView)
 }

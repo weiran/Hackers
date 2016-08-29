@@ -14,9 +14,9 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
-        preferredDisplayMode = .AllVisible
+        preferredDisplayMode = .allVisible
         
-        HNManager.sharedManager().startSession()
+        HNManager.shared().startSession()
     }
     
 }
