@@ -66,6 +66,7 @@ class CommentsController {
         var count = 0
         
         for i in startIndex...comments.count {
+        for i in startIndex...comments.count - 1 {
             let currentComment = comments[i]
             if (currentComment.level > comment.level) { count += 1 }
             else { break }
