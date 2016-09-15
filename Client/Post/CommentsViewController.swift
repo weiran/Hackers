@@ -16,9 +16,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     var post: HNPost?
     
     var comments: [CommentModel]? {
-        didSet {
-            commentsController.comments = comments!
-        }
+        didSet { commentsController.comments = comments! }
     }
     
     let commentsController = CommentsController()
@@ -32,8 +30,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         setupPostTitleView()
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.emptyDataSetSource = self;
-        tableView.emptyDataSetDelegate = self;
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
         
         loadComments()
     }
