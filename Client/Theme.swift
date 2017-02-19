@@ -16,8 +16,12 @@ class Theme {
     static let backgroundOrangeColour = UIColor(red:1, green:0.849, blue:0.684, alpha:1)
     static let backgroundPurpleColour = UIColor(red:0.879, green:0.816, blue:0.951, alpha:1)
     
-    static fileprivate func setNavigationBarBackgroundGradient(_ navigationBar: UINavigationBar) {
-        var frame = navigationBar.frame
+    static fileprivate func setNavigationBarBackgroundGradient(_ navigationBar: UINavigationBar?) {
+        guard navigationBar != nil else {
+            return
+        }
+        
+        var frame = navigationBar!.frame
         frame.size.height += 20 // include status bar
         
         let gradientLayer = CAGradientLayer()
@@ -37,10 +41,10 @@ class Theme {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        navigationBar.setBackgroundImage(image, for: UIBarMetrics.default)
+        navigationBar!.setBackgroundImage(image, for: UIBarMetrics.default)
     }
     
-    static func setNavigationBarBackground(_ navigationBar: UINavigationBar) {
+    static func setNavigationBarBackground(_ navigationBar: UINavigationBar?) {
         setNavigationBarBackgroundGradient(navigationBar)
     }
 }

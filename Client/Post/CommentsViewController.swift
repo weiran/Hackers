@@ -26,7 +26,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Theme.setNavigationBarBackground(navigationController!.navigationBar)
+        Theme.setNavigationBarBackground(navigationController?.navigationBar)
         setupPostTitleView()
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
@@ -136,7 +136,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     func didPressLinkButton(_ post: HNPost) {
         let safariViewController = SFSafariViewController(url: URL(string: post.urlString)!)
-        self.navigationController!.present(safariViewController, animated: true, completion: nil)
+        self.present(safariViewController, animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
     }
     
