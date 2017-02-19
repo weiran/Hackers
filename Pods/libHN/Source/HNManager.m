@@ -287,7 +287,7 @@ static HNManager * _sharedManager = nil;
             NSString *newData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [[NSUserDefaults standardUserDefaults] setValue:newData forKey:kHNJSONConfigurationKey];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            self.JSONConfiguration = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
+            self.JSONConfiguration = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:kHNShouldReloadDataFromConfiguration object:nil];
         }
     }];

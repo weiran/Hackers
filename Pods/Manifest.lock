@@ -1,15 +1,24 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
-  - libHN (4.2.0)
+  - libHN (4.1.0)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
-  - libHN
+  - libHN (from `https://github.com/weiran/libHN`)
+
+EXTERNAL SOURCES:
+  libHN:
+    :git: https://github.com/weiran/libHN
+
+CHECKOUT OPTIONS:
+  libHN:
+    :commit: 7261ab7b1dcf797c750b0efd59b349f3296346b8
+    :git: https://github.com/weiran/libHN
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  libHN: f0833967c6d6234deeb08962222d9e5b671fc4fb
+  libHN: fe671e9d39466235239b793f1f0181baadb327b2
 
-PODFILE CHECKSUM: 9c546d5099756ee542d62fe8eccf250ad4f3cf88
+PODFILE CHECKSUM: f2caad51a1d1b448878754f5c17e4a24e2fcb25b
 
 COCOAPODS: 1.2.0
