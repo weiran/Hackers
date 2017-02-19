@@ -15,8 +15,6 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         super.viewDidLoad()
         delegate = self
         preferredDisplayMode = .allVisible
-        
-        HNManager.shared().startSession()
     }
     
 }
