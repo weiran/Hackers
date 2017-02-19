@@ -107,7 +107,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
         let safariViewController = SFSafariViewController(url: URL)
-        self.navigationController!.present(safariViewController, animated: true, completion: nil)
+        self.present(safariViewController, animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
     }
     
