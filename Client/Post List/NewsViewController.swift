@@ -40,10 +40,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         rz_smoothlyDeselectRows(tableView: tableView)
     }
     
-    func test(completion: GetPostsCompletion) {
-        
-    }
-    
     func loadPosts() {
         if !refreshControl!.isRefreshing {
             refreshControl!.beginRefreshing()
