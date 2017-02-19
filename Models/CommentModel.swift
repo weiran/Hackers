@@ -10,9 +10,9 @@ import Foundation
 import libHN
 
 enum CommentVisibilityType: Int {
-    case Visible = 3
-    case Compact = 2
-    case Hidden = 1
+    case visible = 3
+    case compact = 2
+    case hidden = 1
 }
 
 class CommentModel {
@@ -23,23 +23,23 @@ class CommentModel {
     var commentID: String
     var parentCommentID: String
     var dateCreatedString: String
-    var replyURL: NSURL?
+    var replyURL: URL?
     var level: Int
     
-    var visibility: CommentVisibilityType = .Visible
+    var visibility: CommentVisibilityType = .visible
     
     init(source: HNComment) {
-        type = HNCommentType.Default
-        authorUsername = source.Username
-        commentID = source.CommentId
+        type = HNCommentType.default
+        authorUsername = source.username
+        commentID = source.commentId
         //parentCommentID = source.ParentID
         parentCommentID = ""
-        dateCreatedString = source.TimeCreatedString
-        if let _ = source.ReplyURLString {
-            replyURL = NSURL(string: source.ReplyURLString!)
+        dateCreatedString = source.timeCreatedString
+        if let _ = source.replyURLString {
+            replyURL = URL(string: source.replyURLString!)
         }
-        level = Int(source.Level)
-        text = source.Text
+        level = Int(source.level)
+        text = source.text
     }
     
 }

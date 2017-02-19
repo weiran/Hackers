@@ -10,7 +10,7 @@ import UIKit
 import libHN
 
 protocol PostTitleViewDelegate {
-    func didPressLinkButton(post: HNPost)
+    func didPressLinkButton(_ post: HNPost)
 }
 
 class PostTitleView: UIView {
@@ -23,10 +23,10 @@ class PostTitleView: UIView {
     var post: HNPost? {
         didSet {
             if let post = post {
-                titleLabel.text = post.Title
-                metadataLabel.text = "\(post.Points) points"
-                commentsLabel.text = "\(post.CommentCount) comments"
-                linkButton.setTitle(post.UrlDomain, forState: .Normal)
+                titleLabel.text = post.title
+                metadataLabel.text = "\(post.points) points"
+                commentsLabel.text = "\(post.commentCount) comments"
+                linkButton.setTitle(post.urlDomain, for: UIControlState())
             }
         }
     }
@@ -40,7 +40,7 @@ class PostTitleView: UIView {
         linkButton.layer.cornerRadius = 7
     }
     
-    @IBAction func didPressLinkButton(sender: UIButton) {
+    @IBAction func didPressLinkButton(_ sender: UIButton) {
         if let delegate = delegate {
             delegate.didPressLinkButton(post!)
         }

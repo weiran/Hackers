@@ -14,7 +14,7 @@ class CommentsController {
     
     var visibleComments: [CommentModel] {
         get {
-            return comments.filter { $0.visibility != CommentVisibilityType.Hidden }
+            return comments.filter { $0.visibility != CommentVisibilityType.hidden }
         }
     }
     
@@ -26,16 +26,16 @@ class CommentsController {
         comments = source
     }
     
-    func toggleCommentChildrenVisibility(comment: CommentModel) -> ([NSIndexPath], CommentVisibilityType) {
-        let visible = comment.visibility == .Visible
+    func toggleCommentChildrenVisibility(_ comment: CommentModel) -> ([IndexPath], CommentVisibilityType) {
+        let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
 
         let childrenCount = countChildren(comment)
         
-        var modifiedIndexPaths = [NSIndexPath]()
+        var modifiedIndexPaths = [IndexPath]()
         
-        comment.visibility = visible ? .Compact : .Visible
+        comment.visibility = visible ? .compact : .visible
         
         var currentIndex = visibleIndex + 1;
         
@@ -43,25 +43,25 @@ class CommentsController {
             for i in 1...childrenCount {
                 let currentComment = comments[commentIndex + i]
                 
-                if visible && currentComment.visibility == .Hidden { continue }
+                if visible && currentComment.visibility == .hidden { continue }
                 
-                currentComment.visibility = visible ? .Hidden : .Visible
-                modifiedIndexPaths.append(NSIndexPath(forRow: currentIndex, inSection: 0))
+                currentComment.visibility = visible ? .hidden : .visible
+                modifiedIndexPaths.append(IndexPath(row: currentIndex, section: 0))
                 currentIndex += 1
             }
         }
         
-        return (modifiedIndexPaths, visible ? .Hidden : .Visible)
+        return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
     
-    func indexOfComment(comment: CommentModel, source: [CommentModel]) -> Int? {
-        for (index, value) in source.enumerate() {
+    func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
+        for (index, value) in source.enumerated() {
             if comment.commentID == value.commentID { return index }
         }
         return nil
     }
     
-    func countChildren(comment: CommentModel) -> Int {
+    func countChildren(_ comment: CommentModel) -> Int {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
         

@@ -16,16 +16,16 @@ class Theme {
     static let backgroundOrangeColour = UIColor(red:1, green:0.849, blue:0.684, alpha:1)
     static let backgroundPurpleColour = UIColor(red:0.879, green:0.816, blue:0.951, alpha:1)
     
-    static private func setNavigationBarBackgroundGradient(navigationBar: UINavigationBar) {
+    static fileprivate func setNavigationBarBackgroundGradient(_ navigationBar: UINavigationBar) {
         var frame = navigationBar.frame
         frame.size.height += 20 // include status bar
         
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = frame
-        gradientLayer.colors = [purpleColour, orangeColour].map { $0.CGColor }
+        gradientLayer.colors = [purpleColour, orangeColour].map { $0.cgColor }
         gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
         
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+        if UIDevice.current.userInterfaceIdiom == .phone {
             gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
         } else {
             gradientLayer.endPoint = CGPoint(x: 0.0, y: 1.0)
@@ -33,14 +33,14 @@ class Theme {
         
         // render the gradient to a UIImage
         UIGraphicsBeginImageContext(frame.size)
-        gradientLayer.renderInContext(UIGraphicsGetCurrentContext()!)
+        gradientLayer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        navigationBar.setBackgroundImage(image, forBarMetrics: UIBarMetrics.Default)
+        navigationBar.setBackgroundImage(image, for: UIBarMetrics.default)
     }
     
-    static func setNavigationBarBackground(navigationBar: UINavigationBar) {
+    static func setNavigationBarBackground(_ navigationBar: UINavigationBar) {
         setNavigationBarBackgroundGradient(navigationBar)
     }
 }
