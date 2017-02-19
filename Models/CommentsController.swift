@@ -30,9 +30,7 @@ class CommentsController {
         let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
-
         let childrenCount = countChildren(comment)
-        
         var modifiedIndexPaths = [IndexPath]()
         
         comment.visibility = visible ? .compact : .visible
@@ -65,10 +63,13 @@ class CommentsController {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
         
-        for i in startIndex...comments.count {
+        for i in startIndex...comments.count - 1 {
             let currentComment = comments[i]
-            if (currentComment.level > comment.level) { count += 1 }
-            else { break }
+            if currentComment.level > comment.level {
+                count += 1
+            } else {
+                break
+            }
         }
         
         return count

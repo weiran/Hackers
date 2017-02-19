@@ -42,7 +42,7 @@ extension SFSafariViewController {
         }
     }
     
-    open override var previewActionItems : [UIPreviewActionItem] {
+    open override var previewActionItems: [UIPreviewActionItem] {
         return previewActionItemsDelegate?.safariViewControllerPreviewActionItems(self) ?? []
     }
 }

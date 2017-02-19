@@ -16,9 +16,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     var post: HNPost?
     
     var comments: [CommentModel]? {
-        didSet {
-            commentsController.comments = comments!
-        }
+        didSet { commentsController.comments = comments! }
     }
     
     let commentsController = CommentsController()
@@ -32,8 +30,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         setupPostTitleView()
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.emptyDataSetSource = self;
-        tableView.emptyDataSetDelegate = self;
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
         
         loadComments()
     }
@@ -44,13 +42,13 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func loadComments() {
-        HNManager.shared().loadComments(from: post, completion: { comments in
+        HNManager.shared().loadComments(from: post) { comments in
             if let downcastedArray = comments as? [HNComment] {
                 let mappedComments = downcastedArray.map { CommentModel(source: $0) }
                 self.comments = mappedComments
                 self.tableView.reloadData()
             }
-        })
+        }
     }
     
     func setupPostTitleView() {

@@ -49,13 +49,13 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             refreshControl!.beginRefreshing()
         }
         
-        HNManager.shared().loadPosts(with: .top, completion: { posts, nextPageIdentifier in
+        HNManager.shared().loadPosts(with: .top) { posts, nextPageIdentifier in
             if let downcastedArray = posts as? [HNPost] {
                 self.posts = downcastedArray
                 self.tableView.reloadData()
                 self.refreshControl!.endRefreshing()
             }
-        })
+        }
     }
     
     // MARK: - UITableViewDataSource

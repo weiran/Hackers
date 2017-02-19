@@ -19,14 +19,14 @@ extension UIViewController {
                 selectedIndexPaths.forEach {
                     tableView?.deselectRow(at: $0, animated: context.isAnimated)
                 }
-                }, completion: { context in
-                    // If the transition was cancel, reselect the rows that were selected before,
-                    // so they are still selected the next time the same animation is triggered
-                    if context.isCancelled {
-                        selectedIndexPaths.forEach {
-                            tableView?.selectRow(at: $0, animated: false, scrollPosition: .none)
-                        }
+            }, completion: { context in
+                // If the transition was cancel, reselect the rows that were selected before,
+                // so they are still selected the next time the same animation is triggered
+                if context.isCancelled {
+                    selectedIndexPaths.forEach {
+                        tableView?.selectRow(at: $0, animated: false, scrollPosition: .none)
                     }
+                }
             })
         }
         else { // If this isn't a transition coordinator, just deselect the rows without animating
