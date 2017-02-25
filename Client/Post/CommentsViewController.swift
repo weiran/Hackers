@@ -41,6 +41,23 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         UIApplication.shared.statusBarStyle = .lightContent
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let headerView = tableView.tableHeaderView {
+            let height = headerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+            var headerFrame = headerView.frame
+            
+            // If we don't have this check, viewDidLayoutSubviews() will get called
+            // repeatedly, causing the app to hang.
+            if height != headerFrame.size.height {
+                headerFrame.size.height = height
+                headerView.frame = headerFrame
+                tableView.tableHeaderView = headerView
+            }
+        }
+    }
+    
     func loadComments() {
         HNManager.shared().loadComments(from: post) { comments in
             if let downcastedArray = comments as? [HNComment] {
@@ -55,16 +72,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         if let postTitleView = tableView.tableHeaderView as? PostTitleView {
             postTitleView.post = post
             postTitleView.delegate = self
-            
-            postTitleView.setNeedsLayout()
-            postTitleView.layoutIfNeeded()
-            
-            let height = postTitleView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
-            var frame = postTitleView.frame
-            frame.size.height = height
-            postTitleView.frame = frame
-            
-            tableView.tableHeaderView = postTitleView
         }
     }
     
