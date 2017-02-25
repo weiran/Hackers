@@ -32,8 +32,9 @@ class PostTitleView: UIView {
     }
 
     override func layoutSubviews() {
+        super.layoutSubviews()
+        
         setupLinkButton()
-        titleLabel.preferredMaxLayoutWidth = titleLabel.bounds.size.width;
     }
     
     func setupLinkButton() {
