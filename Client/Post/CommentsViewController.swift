@@ -26,14 +26,21 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Theme.setNavigationBarBackground(navigationController?.navigationBar)
         setupPostTitleView()
+        
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         
+        Theme.setNavigationBarBackground(navigationController?.navigationBar)
+        NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.viewDidRotate), name: .UIDeviceOrientationDidChange, object: nil)
+        
         loadComments()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,6 +63,10 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
                 tableView.tableHeaderView = headerView
             }
         }
+    }
+    
+    func viewDidRotate() {
+        Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
     func loadComments() {

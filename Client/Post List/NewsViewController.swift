@@ -31,13 +31,23 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         splitViewController!.delegate = self
         
         Theme.setNavigationBarBackground(navigationController!.navigationBar)
+        NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.viewDidRotate), name: .UIDeviceOrientationDidChange, object: nil)
+        
         loadPosts()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UIApplication.shared.statusBarStyle = .lightContent
         rz_smoothlyDeselectRows(tableView: tableView)
+    }
+    
+    func viewDidRotate() {
+        Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
     func loadPosts() {
