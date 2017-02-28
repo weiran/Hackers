@@ -63,6 +63,11 @@ class CommentsController {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
         
+        // if last comment, there are no children
+        guard startIndex < comments.count else {
+            return 0
+        }
+        
         for i in startIndex...comments.count - 1 {
             let currentComment = comments[i]
             if currentComment.level > comment.level {
