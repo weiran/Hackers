@@ -16,7 +16,7 @@ class PostCell : UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        thumbnailImageView.layer.cornerRadius = 5
+        thumbnailImageView.layer.cornerRadius = 7
         thumbnailImageView.layer.masksToBounds = true
     }
     
