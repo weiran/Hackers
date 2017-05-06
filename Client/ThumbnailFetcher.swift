@@ -7,10 +7,30 @@
 //
 
 import ReadabilityKit
+import AwesomeCache
 
 class ThumbnailFetcher {
+    
+    static func getThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
+        guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else {
+            return
+        }
+        
+        if let cachedImage = cache[url.absoluteString] {
+            completion(cachedImage)
+        } else {
+            fetchThumbnail(url: url) { image in
+                if let image = image {
+                    cache[url.absoluteString] = image
+                    completion(image)
+                } else {
+                    completion(nil)
+                }
+            }
+        }
+    }
 
-    static func fetchThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
+    private static func fetchThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
         Readability.parse(url: url) { data in
             if let imageUrlString = data?.topImage, let imageUrl = URL(string: imageUrlString) {
                 self.shouldFetchImage(url: imageUrl) { shouldFetch in

@@ -1,4 +1,5 @@
 PODS:
+  - AwesomeCache (5.0)
   - DZNEmptyDataSet (1.8.1)
   - Ji (2.0.1):
     - Ji/Ji (= 2.0.1)
@@ -10,6 +11,7 @@ PODS:
     - Ji (~> 2.0.1)
 
 DEPENDENCIES:
+  - AwesomeCache
   - DZNEmptyDataSet
   - libHN (from `https://github.com/weiran/libHN`)
   - ReadabilityKit
@@ -24,11 +26,12 @@ CHECKOUT OPTIONS:
     :git: https://github.com/weiran/libHN
 
 SPEC CHECKSUMS:
+  AwesomeCache: d8906955242173357caa0be0214d5e77dec32cc5
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   Ji: 6bb602a28dd08b804158f64990e6051ed5de0110
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   ReadabilityKit: 49c26a2da9708ae3b355854d5bee6a7edee2dfee
 
-PODFILE CHECKSUM: cacb8f4b0d2a114f5c069624ee5b3cf100bad38b
+PODFILE CHECKSUM: 48cbd0e5c981cd67047bd89b1f5fc6b39273ea8d
 
 COCOAPODS: 1.2.0

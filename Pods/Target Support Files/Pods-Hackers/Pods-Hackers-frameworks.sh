@@ -89,12 +89,14 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "$BUILT_PRODUCTS_DIR/AwesomeCache/AwesomeCache.framework"
   install_framework "$BUILT_PRODUCTS_DIR/DZNEmptyDataSet/DZNEmptyDataSet.framework"
   install_framework "$BUILT_PRODUCTS_DIR/Ji/Ji.framework"
   install_framework "$BUILT_PRODUCTS_DIR/ReadabilityKit/ReadabilityKit.framework"
   install_framework "$BUILT_PRODUCTS_DIR/libHN/libHN.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "$BUILT_PRODUCTS_DIR/AwesomeCache/AwesomeCache.framework"
   install_framework "$BUILT_PRODUCTS_DIR/DZNEmptyDataSet/DZNEmptyDataSet.framework"
   install_framework "$BUILT_PRODUCTS_DIR/Ji/Ji.framework"
   install_framework "$BUILT_PRODUCTS_DIR/ReadabilityKit/ReadabilityKit.framework"

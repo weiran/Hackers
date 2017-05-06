@@ -79,7 +79,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         cell.postTitleView.delegate = self
         
         if let url = URL(string: post.urlString) {
-            ThumbnailFetcher.fetchThumbnail(url: url) { image in
+            ThumbnailFetcher.getThumbnail(url: url) { image in
                 if let image = image {
                     DispatchQueue.main.async {
                         cell.setImage(image: image)
