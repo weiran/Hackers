@@ -11,6 +11,14 @@ import AwesomeCache
 
 class ThumbnailFetcher {
     
+    static func getThumbnailFromCache(url: URL) -> UIImage? {
+        guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else {
+            return nil
+        }
+
+        return cache[url.absoluteString]
+    }
+    
     static func getThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
         guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else {
             return

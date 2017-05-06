@@ -21,7 +21,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 80
+        tableView.estimatedRowHeight = 150
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
 
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
@@ -79,10 +79,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         cell.postTitleView.delegate = self
         
         if let url = URL(string: post.urlString) {
-            ThumbnailFetcher.getThumbnail(url: url) { image in
-                if let image = image {
-                    DispatchQueue.main.async {
-                        cell.setImage(image: image)
+            if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
+                cell.setImage(image: image)
+            } else {
+                ThumbnailFetcher.getThumbnail(url: url) { [weak self] image in
+                    if let image = image {
+                        DispatchQueue.main.async {
+                            cell.setImage(image: image)
+                            UIView.performWithoutAnimation {
+                                self?.tableView.beginUpdates()
+                                self?.tableView.endUpdates()
+                            }
+                        }
                     }
                 }
             }
