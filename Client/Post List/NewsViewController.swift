@@ -72,7 +72,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
-        cell.thumbnailImageView.image = nil
+        cell.clearImage()
         
         let post = posts[indexPath.row]
         cell.postTitleView.post = post
@@ -82,7 +82,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             ThumbnailFetcher.fetchThumbnail(url: url) { image in
                 if let image = image {
                     DispatchQueue.main.async {
-                        cell.thumbnailImageView.image = image
+                        cell.setImage(image: image)
                     }
                 }
             }

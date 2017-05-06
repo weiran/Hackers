@@ -12,6 +12,13 @@ import UIKit
 class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        thumbnailImageView.layer.cornerRadius = 5
+        thumbnailImageView.layer.masksToBounds = true
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -31,4 +38,12 @@ class PostCell : UITableViewCell {
         backgroundColor = UIColor.clear
     }
     
+    func setImage(image: UIImage) {
+        thumbnailImageView.image = image
+        thumbnailImageViewWidthConstraint.constant = 80
+    }
+    
+    func clearImage() {
+        thumbnailImageViewWidthConstraint.constant = 0
+    }
 }
