@@ -1,0 +1,6 @@
+framework module ReadabilityKit {
+  umbrella header "ReadabilityKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

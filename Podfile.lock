@@ -1,10 +1,18 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
+  - Ji (2.0.1):
+    - Ji/Ji (= 2.0.1)
+  - Ji/Ji (2.0.1):
+    - Ji/Ji-libxml
+  - Ji/Ji-libxml (2.0.1)
   - libHN (4.1.0)
+  - ReadabilityKit (0.6.1):
+    - Ji (~> 2.0.1)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
   - libHN (from `https://github.com/weiran/libHN`)
+  - ReadabilityKit
 
 EXTERNAL SOURCES:
   libHN:
@@ -17,8 +25,10 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
+  Ji: 6bb602a28dd08b804158f64990e6051ed5de0110
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
+  ReadabilityKit: 49c26a2da9708ae3b355854d5bee6a7edee2dfee
 
-PODFILE CHECKSUM: f2caad51a1d1b448878754f5c17e4a24e2fcb25b
+PODFILE CHECKSUM: cacb8f4b0d2a114f5c069624ee5b3cf100bad38b
 
 COCOAPODS: 1.2.0

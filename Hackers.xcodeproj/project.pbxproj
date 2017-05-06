@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
+		240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */; };
@@ -32,6 +33,7 @@
 
 /* Begin PBXFileReference section */
 		240C5BDF18D267C70011177A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
+		240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailFetcher.swift; sourceTree = "<group>"; };
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 				24D6B8C91C1EDBFC00618422 /* Theme.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */,
 				242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */,
+				240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
+				240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
 				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,

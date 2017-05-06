@@ -72,9 +72,21 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+        cell.thumbnailImageView.image = nil
+        
         let post = posts[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
+        
+        if let url = URL(string: post.urlString) {
+            ThumbnailFetcher.fetchThumbnail(url: url) { image in
+                if let image = image {
+                    DispatchQueue.main.async {
+                        cell.thumbnailImageView.image = image
+                    }
+                }
+            }
+        }
         
         // TODO: if not default post type, show ycombinator domain instead in metadataLabel
         // cant do it currently as Type is reserved keyword which libHN uses

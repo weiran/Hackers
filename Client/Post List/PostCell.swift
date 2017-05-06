@@ -11,6 +11,7 @@ import UIKit
 
 class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
+    @IBOutlet weak var thumbnailImageView: UIImageView!
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
