@@ -11,7 +11,7 @@ import UIKit
 import SafariServices
 import libHN
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
     fileprivate var collapseDetailViewController = true
@@ -72,6 +72,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+        cell.delegate = self
         cell.clearImage()
         
         let post = posts[indexPath.row]
@@ -126,7 +127,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         return collapseDetailViewController
     }
     
-    // MARK: - PostCellDelegate
+    // MARK: - PostTitleViewDelegate
     
     func getSafariViewController(_ URL: String) -> SFSafariViewController {
         let safariViewController = SFSafariViewController(url: Foundation.URL(string: URL)!)
@@ -137,6 +138,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     func didPressLinkButton(_ post: HNPost) {
         self.navigationController?.present(getSafariViewController(post.urlString), animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
+    }
+    
+    // MARK: - PostCellDelegate
+    
+    func didTapThumbnail(_ sender: Any) {
+        if let tapGestureRecognizer = sender as? UITapGestureRecognizer {
+            let point = tapGestureRecognizer.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: point) {
+                let post = posts[indexPath.row]
+                didPressLinkButton(post)
+            }
+        }
     }
     
     // MARK: - UIViewControllerPreviewingDelegate

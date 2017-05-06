@@ -98,8 +98,9 @@
                                                         <outlet property="titleLabel" destination="Bsb-hN-3l1" id="zDn-eK-K0i"/>
                                                     </connections>
                                                 </view>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y6x-lo-dQ2">
+                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y6x-lo-dQ2">
                                                     <rect key="frame" x="272" y="5.5" width="80" height="80"/>
+                                                    <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="74a-e0-Bfl"/>
                                                         <constraint firstAttribute="width" secondItem="Y6x-lo-dQ2" secondAttribute="height" multiplier="1:1" id="S8s-pV-J6g"/>
@@ -116,6 +117,7 @@
                                     </constraints>
                                     <edgeInsets key="layoutMargins" top="8" left="15" bottom="8" right="8"/>
                                 </tableViewCellContentView>
+                                <gestureRecognizers/>
                                 <connections>
                                     <outlet property="postTitleView" destination="OKQ-By-TCF" id="VG3-YE-bnw"/>
                                     <outlet property="thumbnailImageView" destination="Y6x-lo-dQ2" id="e3C-th-Zgy"/>
@@ -289,12 +291,16 @@
                                                         <outlet property="titleLabel" destination="vZQ-Cv-XXl" id="x51-VA-mEC"/>
                                                     </connections>
                                                 </view>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
+                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
                                                     <rect key="frame" x="272" y="8" width="80" height="79.5"/>
+                                                    <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="5tV-mV-Ekf"/>
                                                         <constraint firstAttribute="width" secondItem="iAv-PR-2eT" secondAttribute="height" multiplier="1:1" id="Rxu-5d-Fu3"/>
                                                     </constraints>
+                                                    <connections>
+                                                        <outletCollection property="gestureRecognizers" destination="Dsc-cG-qQn" appends="YES" id="iQA-Y8-Xf2"/>
+                                                    </connections>
                                                 </imageView>
                                             </subviews>
                                         </stackView>
@@ -466,6 +472,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vcn-3b-TpK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Dsc-cG-qQn">
+                    <connections>
+                        <action selector="didTapThumbnail:" destination="gkj-Tg-B9Y" id="u5E-m1-Kda"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="1072" y="1403"/>
         </scene>

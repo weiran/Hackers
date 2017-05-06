@@ -167,12 +167,16 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    // MARK: - PostCellDelegate
+    // MARK: - PostTitleViewDelegate
     
     func didPressLinkButton(_ post: HNPost) {
         let safariViewController = SFSafariViewController(url: URL(string: post.urlString)!)
         self.present(safariViewController, animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
+    }
+    
+    @IBAction func didTapThumbnail(_ sender: Any) {
+        didPressLinkButton(post!)
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {
