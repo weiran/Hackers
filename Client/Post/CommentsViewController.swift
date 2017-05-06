@@ -74,8 +74,10 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             if let downcastedArray = comments as? [HNComment] {
                 let mappedComments = downcastedArray.map { CommentModel(source: $0) }
                 self.comments = mappedComments
-                self.tableView.reloadData()
+            } else {
+                self.comments = [CommentModel]()
             }
+            self.tableView.reloadData()
         }
     }
     
