@@ -143,6 +143,12 @@
 
 #pragma mark - Load Comments from Post
 - (void)loadCommentsFromPost:(HNPost *)post completion:(GetCommentsCompletion)completion {
+    // Job posts don't have any comments
+    if (post.Type == HNCommentTypeJobs) {
+        completion(nil);
+        return;
+    }
+
     // Create URL Path
     NSString *urlPath = [NSString stringWithFormat:@"%@item?id=%@", kBaseURLAddress, post.PostId];
     

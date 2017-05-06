@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   libHN:
-    :commit: 7261ab7b1dcf797c750b0efd59b349f3296346b8
+    :commit: ca79b491f594a851825db9bf0e99235b2863b71c
     :git: https://github.com/weiran/libHN
 
 SPEC CHECKSUMS:
