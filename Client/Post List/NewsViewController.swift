@@ -14,8 +14,9 @@ import libHN
 class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
-    fileprivate var collapseDetailViewController = true
-    fileprivate var peekedIndexPath: IndexPath?
+    private var collapseDetailViewController = true
+    private var peekedIndexPath: IndexPath?
+    private var thumbnailProcessedUrls = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,15 +83,14 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         if let url = URL(string: post.urlString) {
             if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
                 cell.setImage(image: image)
-            } else {
+            } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
                 ThumbnailFetcher.getThumbnail(url: url) { [weak self] image in
-                    if let image = image {
+                    if image != nil {
                         DispatchQueue.main.async {
-                            cell.setImage(image: image)
-                            UIView.performWithoutAnimation {
-                                self?.tableView.beginUpdates()
-                                self?.tableView.endUpdates()
-                            }
+                            self?.thumbnailProcessedUrls.append(url.absoluteString)
+                            self?.tableView.beginUpdates()
+                            self?.tableView.reloadRows(at: [indexPath], with: .none)
+                            self?.tableView.endUpdates()
                         }
                     }
                 }
