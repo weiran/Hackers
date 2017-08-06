@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
+		240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */; };
@@ -21,6 +22,8 @@
 		24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* Theme.swift */; };
 		24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DFD28B19436E51007F61E7 /* CommentsViewController.swift */; };
 		24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E4F26019B4DA9900574B52 /* CommentDelegate.swift */; };
+		24E51E571F375A6500C1233D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E51E561F375A6500C1233D /* SettingsViewController.swift */; };
+		24E51E5A1F375C3400C1233D /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E51E591F375C3400C1233D /* SettingsModel.swift */; };
 		24EF5BF41C393D110012AA8A /* LaunchStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -32,13 +35,14 @@
 
 /* Begin PBXFileReference section */
 		240C5BDF18D267C70011177A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
+		240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ThumbnailFetcher.swift; path = ../ThumbnailFetcher.swift; sourceTree = "<group>"; };
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
-		242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewControllerSmoothlyDeselectCellExtension.swift; sourceTree = "<group>"; };
+		242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewControllerSmoothlyDeselectCellExtension.swift; path = ../UIViewControllerSmoothlyDeselectCellExtension.swift; sourceTree = "<group>"; };
 		245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SFSafariViewController+PreviewActionItems.swift"; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
-		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTitleView.swift; sourceTree = "<group>"; };
+		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
 		24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers2-Bridging-Header.h"; sourceTree = "<group>"; };
 		24CE5FEC19434BDC009D2677 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -47,6 +51,8 @@
 		24D6B8C91C1EDBFC00618422 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		24DFD28B19436E51007F61E7 /* CommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsViewController.swift; sourceTree = "<group>"; };
 		24E4F26019B4DA9900574B52 /* CommentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentDelegate.swift; sourceTree = "<group>"; };
+		24E51E561F375A6500C1233D /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		24E51E591F375C3400C1233D /* SettingsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchStoryboard.storyboard; sourceTree = "<group>"; };
 		24F39F8518AFB1150055F8DC /* Hackers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F39F8818AFB1150055F8DC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -87,6 +93,8 @@
 			children = (
 				24CE5FF319435061009D2677 /* NewsViewController.swift */,
 				24CE5FF719435A90009D2677 /* PostCell.swift */,
+				240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */,
+				242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */,
 			);
 			path = "Post List";
 			sourceTree = "<group>";
@@ -97,6 +105,7 @@
 				24DFD28B19436E51007F61E7 /* CommentsViewController.swift */,
 				249A7E31194374550059C079 /* CommentTableViewCell.swift */,
 				24E4F26019B4DA9900574B52 /* CommentDelegate.swift */,
+				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -117,6 +126,15 @@
 				24191F8C1944C991003C0D98 /* CommentsController.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		24E51E581F375C1800C1233D /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				24E51E561F375A6500C1233D /* SettingsViewController.swift */,
+				24E51E591F375C3400C1233D /* SettingsModel.swift */,
+			);
+			name = Settings;
 			sourceTree = "<group>";
 		};
 		24F39F7C18AFB1150055F8DC = {
@@ -160,11 +178,10 @@
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
 				24CE5FEE19434DC0009D2677 /* Post List */,
 				24CE5FEF19434DCB009D2677 /* Post */,
+				24E51E581F375C1800C1233D /* Settings */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
-				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				24D6B8C91C1EDBFC00618422 /* Theme.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */,
-				242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -281,13 +298,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Hackers-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		46C1D99CBFD349F8D40A6170 /* [CP] Embed Pods Frameworks */ = {
@@ -296,9 +316,20 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/AwesomeCache/AwesomeCache.framework",
+				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/Ji/Ji.framework",
+				"${BUILT_PRODUCTS_DIR}/ReadabilityKit/ReadabilityKit.framework",
+				"${BUILT_PRODUCTS_DIR}/libHN/libHN.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AwesomeCache.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Ji.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReadabilityKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libHN.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -327,12 +358,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24E51E5A1F375C3400C1233D /* SettingsModel.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
+				240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
+				24E51E571F375A6500C1233D /* SettingsViewController.swift in Sources */,
 				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,

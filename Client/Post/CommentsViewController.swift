@@ -23,6 +23,10 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     @IBOutlet var tableView: UITableView!
     
+    @IBOutlet weak var postTitleView: PostTitleView!
+    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -82,9 +86,20 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func setupPostTitleView() {
-        if let postTitleView = tableView.tableHeaderView as? PostTitleView {
-            postTitleView.post = post
-            postTitleView.delegate = self
+        postTitleView.post = post
+        postTitleView.delegate = self
+        
+        thumbnailImageViewWidthConstraint.constant = 0
+        thumbnailImageView.layer.cornerRadius = 7
+        thumbnailImageView.layer.masksToBounds = true
+        
+        if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
+            ThumbnailFetcher.getThumbnail(url: imageUrl) { [weak self] image in
+                DispatchQueue.main.async {
+                    self?.thumbnailImageView.image = image
+                    self?.thumbnailImageViewWidthConstraint.constant = 80                    
+                }
+            }
         }
     }
     
@@ -152,12 +167,16 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    // MARK: - PostCellDelegate
+    // MARK: - PostTitleViewDelegate
     
     func didPressLinkButton(_ post: HNPost) {
         let safariViewController = SFSafariViewController(url: URL(string: post.urlString)!)
         self.present(safariViewController, animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
+    }
+    
+    @IBAction func didTapThumbnail(_ sender: Any) {
+        didPressLinkButton(post!)
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {

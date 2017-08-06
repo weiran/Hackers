@@ -11,17 +11,18 @@ import UIKit
 import SafariServices
 import libHN
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
-    fileprivate var collapseDetailViewController = true
-    fileprivate var peekedIndexPath: IndexPath?
+    private var collapseDetailViewController = true
+    private var peekedIndexPath: IndexPath?
+    private var thumbnailProcessedUrls = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 80
+        tableView.estimatedRowHeight = 150
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
 
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
@@ -72,9 +73,29 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+        cell.delegate = self
+        cell.clearImage()
+        
         let post = posts[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
+        
+        if let url = URL(string: post.urlString), !SettingsModel.shared.hideThumbnails {
+            if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
+                cell.setImage(image: image)
+            } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
+                ThumbnailFetcher.getThumbnail(url: url) { [weak self] image in
+                    if image != nil {
+                        DispatchQueue.main.async {
+                            self?.thumbnailProcessedUrls.append(url.absoluteString)
+                            self?.tableView.beginUpdates()
+                            self?.tableView.reloadRows(at: [indexPath], with: .none)
+                            self?.tableView.endUpdates()
+                        }
+                    }
+                }
+            }
+        }
         
         // TODO: if not default post type, show ycombinator domain instead in metadataLabel
         // cant do it currently as Type is reserved keyword which libHN uses
@@ -106,7 +127,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         return collapseDetailViewController
     }
     
-    // MARK: - PostCellDelegate
+    // MARK: - PostTitleViewDelegate
     
     func getSafariViewController(_ URL: String) -> SFSafariViewController {
         let safariViewController = SFSafariViewController(url: Foundation.URL(string: URL)!)
@@ -117,6 +138,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     func didPressLinkButton(_ post: HNPost) {
         self.navigationController?.present(getSafariViewController(post.urlString), animated: true, completion: nil)
         UIApplication.shared.statusBarStyle = .default
+    }
+    
+    // MARK: - PostCellDelegate
+    
+    func didTapThumbnail(_ sender: Any) {
+        if let tapGestureRecognizer = sender as? UITapGestureRecognizer {
+            let point = tapGestureRecognizer.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: point) {
+                let post = posts[indexPath.row]
+                didPressLinkButton(post)
+            }
+        }
     }
     
     // MARK: - UIViewControllerPreviewingDelegate

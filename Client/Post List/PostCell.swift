@@ -9,8 +9,29 @@
 import Foundation
 import UIKit
 
+protocol PostCellDelegate {
+    func didTapThumbnail(_ sender: Any)
+}
+
 class PostCell : UITableViewCell {
+    var delegate: PostCellDelegate?
+    
     @IBOutlet weak var postTitleView: PostTitleView!
+    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        setupThumbnailGesture()
+        thumbnailImageView.layer.cornerRadius = 7
+        thumbnailImageView.layer.masksToBounds = true
+    }
+    
+    private func setupThumbnailGesture() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapThumbnail(_:)))
+        thumbnailImageView.addGestureRecognizer(tapGestureRecognizer)
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -30,4 +51,16 @@ class PostCell : UITableViewCell {
         backgroundColor = UIColor.clear
     }
     
+    func setImage(image: UIImage) {
+        thumbnailImageView.image = image
+        thumbnailImageViewWidthConstraint.constant = 80
+    }
+    
+    func clearImage() {
+        thumbnailImageViewWidthConstraint.constant = 0
+    }
+    
+    func didTapThumbnail(_ sender: Any) {
+        delegate?.didTapThumbnail(sender)
+    }
 }

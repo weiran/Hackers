@@ -1,0 +1,6 @@
+framework module AwesomeCache {
+  umbrella header "AwesomeCache-umbrella.h"
+
+  export *
+  module * { export * }
+}
