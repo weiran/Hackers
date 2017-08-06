@@ -80,7 +80,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
         
-        if let url = URL(string: post.urlString) {
+        if let url = URL(string: post.urlString), !SettingsModel.shared.hideThumbnails {
             if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {

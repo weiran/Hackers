@@ -10,19 +10,18 @@ import UIKit
 
 class SettingsViewController: UITableViewController {
 
-    let showThumbnailSetting = "showThumbnails"
-    @IBOutlet weak var showThumbnailsSwitch: UISwitch!
+    var settingsModel: SettingsModel!
+    
+    @IBOutlet weak var hideThumbnailsSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let showThumbnails = UserDefaults.standard.bool(forKey: showThumbnailSetting)
-        showThumbnailsSwitch.isOn = showThumbnails
+        hideThumbnailsSwitch.isOn = SettingsModel.shared.hideThumbnails
     }
 
     @IBAction func showThumbnailsChanged(_ sender: Any) {
-        let showThumbnails = showThumbnailsSwitch.isOn
-        UserDefaults.standard.set(showThumbnails, forKey: showThumbnailSetting)
+        SettingsModel.shared.hideThumbnails = hideThumbnailsSwitch.isOn
     }
     
 }
