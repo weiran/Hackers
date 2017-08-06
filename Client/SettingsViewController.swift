@@ -14,6 +14,11 @@ class SettingsViewController: UITableViewController {
     
     @IBOutlet weak var hideThumbnailsSwitch: UISwitch!
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        navigationController?.navigationBar.barTintColor = Theme.purpleColour
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
