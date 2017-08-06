@@ -192,7 +192,13 @@
                             <outlet property="delegate" destination="TVM-wo-EOS" id="Z8X-5N-CA1"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Settings" id="Zc7-X4-D32"/>
+                    <navigationItem key="navigationItem" title="Settings" id="Zc7-X4-D32">
+                        <barButtonItem key="rightBarButtonItem" title="Done" style="done" id="Zga-7V-Qq3">
+                            <connections>
+                                <action selector="didPressDone:" destination="TVM-wo-EOS" id="f0b-ax-RxE"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="hideThumbnailsSwitch" destination="sXM-rW-6iX" id="NvT-EO-ndy"/>
                     </connections>

@@ -29,4 +29,8 @@ class SettingsViewController: UITableViewController {
         SettingsModel.shared.hideThumbnails = hideThumbnailsSwitch.isOn
     }
     
+    @IBAction func didPressDone(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
 }
