@@ -163,8 +163,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Thumbnails" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qay-0g-WUk">
-                                                    <rect key="frame" x="18" y="11" width="135.5" height="21"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hide Thumbnails" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qay-0g-WUk">
+                                                    <rect key="frame" x="18" y="11" width="129" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -172,7 +172,7 @@
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sXM-rW-6iX">
                                                     <rect key="frame" x="308" y="6" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="showThumbnailsChanged:" destination="TVM-wo-EOS" eventType="valueChanged" id="udN-c8-A9P"/>
+                                                        <action selector="showThumbnailsChanged:" destination="TVM-wo-EOS" eventType="valueChanged" id="zqi-oa-PzQ"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -194,7 +194,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="Zc7-X4-D32"/>
                     <connections>
-                        <outlet property="showThumbnailsSwitch" destination="sXM-rW-6iX" id="y1O-4z-HL3"/>
+                        <outlet property="hideThumbnailsSwitch" destination="sXM-rW-6iX" id="NvT-EO-ndy"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f4o-L1-Mwh" userLabel="First Responder" sceneMemberID="firstResponder"/>
