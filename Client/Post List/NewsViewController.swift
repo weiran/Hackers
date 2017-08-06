@@ -17,6 +17,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var collapseDetailViewController = true
     private var peekedIndexPath: IndexPath?
     private var thumbnailProcessedUrls = [String]()
+    private var nextPageIdentifier: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,9 +59,23 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         HNManager.shared().loadPosts(with: .top) { posts, nextPageIdentifier in
             if let downcastedArray = posts as? [HNPost] {
+                self.nextPageIdentifier = nextPageIdentifier
                 self.posts = downcastedArray
                 self.tableView.reloadData()
                 self.refreshControl!.endRefreshing()
+            }
+        }
+    }
+    
+    func loadMorePosts() {
+        if let nextPageIdentifier = nextPageIdentifier {
+            self.nextPageIdentifier = nil
+            HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
+                if let downcastedArray = posts as? [HNPost] {
+                    self.nextPageIdentifier = nextPageIdentifier
+                    self.posts.append(contentsOf: downcastedArray)
+                    self.tableView.reloadData()
+                }
             }
         }
     }
@@ -119,6 +134,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         
         showDetailViewController(viewController, sender: self)
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == posts.count - 5 {
+            loadMorePosts()
+        }
     }
     
     // MARK: - UISplitViewControllerDelegate
