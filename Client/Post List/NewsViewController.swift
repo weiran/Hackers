@@ -14,10 +14,14 @@ import libHN
 class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
     
     var posts: [HNPost] = [HNPost]()
+    
+    private var selectedPostType: PostFilterType! = .top
     private var collapseDetailViewController = true
     private var peekedIndexPath: IndexPath?
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
+    
+    @IBOutlet weak var postTypeSegmentedControl: UISegmentedControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,8 +31,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
 
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
-        refreshControl!.tintColor = Theme.orangeColour
+        refreshControl!.tintColor = Theme.purpleColour
         refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        
+        postTypeSegmentedControl.tintColor = Theme.purpleColour
         
         splitViewController!.delegate = self
         
@@ -57,7 +63,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             refreshControl!.beginRefreshing()
         }
         
-        HNManager.shared().loadPosts(with: .top) { posts, nextPageIdentifier in
+        HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
             if let downcastedArray = posts as? [HNPost] {
                 self.nextPageIdentifier = nextPageIdentifier
                 self.posts = downcastedArray
@@ -141,6 +147,35 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             loadMorePosts()
         }
     }
+    
+    // MARK: - PostTypeSegmentedControl
+    
+    @IBAction func postTypeChanged(_ sender: Any) {
+        switch postTypeSegmentedControl.selectedSegmentIndex {
+        case 0:
+            selectedPostType = .top
+            break
+            
+        case 1:
+            selectedPostType = .ask
+            break
+            
+        case 2:
+            selectedPostType = .jobs
+            break
+            
+        case 3:
+            selectedPostType = .new
+            break
+            
+            
+        default:
+            selectedPostType = .top
+        }
+        
+        loadPosts()
+    }
+    
     
     // MARK: - UISplitViewControllerDelegate
     
