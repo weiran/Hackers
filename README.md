@@ -12,7 +12,7 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 
 ![Screenshots][1]
 
-[1]: https://image.ibb.co/cWUqbv/Simulator_Screen_Shot_2_Sep_2017_11_23_26.png
+[1]: http://i.imgur.com/agzuetN.png
 
 ## Open Source
 
