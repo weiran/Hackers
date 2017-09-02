@@ -19,9 +19,34 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="cEm-Hi-ai5" userLabel="Post Type Header">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Sl2-sT-BtX">
+                                    <rect key="frame" x="8" y="8" width="359" height="29"/>
+                                    <segments>
+                                        <segment title="Top"/>
+                                        <segment title="Ask"/>
+                                        <segment title="Jobs"/>
+                                        <segment title="New"/>
+                                    </segments>
+                                    <connections>
+                                        <action selector="postTypeChanged:" destination="rez-OX-M9N" eventType="valueChanged" id="B1m-N5-Vpj"/>
+                                    </connections>
+                                </segmentedControl>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="leading" secondItem="cEm-Hi-ai5" secondAttribute="leadingMargin" id="1IY-8P-MB1"/>
+                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="centerY" secondItem="cEm-Hi-ai5" secondAttribute="centerY" id="XRz-7n-hkz"/>
+                                <constraint firstAttribute="trailingMargin" secondItem="Sl2-sT-BtX" secondAttribute="trailing" id="XZ6-TT-y2r"/>
+                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="centerX" secondItem="cEm-Hi-ai5" secondAttribute="centerX" id="tCX-my-HNj"/>
+                            </constraints>
+                        </view>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="107" id="Rrm-i5-OHp" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="22" width="375" height="107"/>
+                                <rect key="frame" x="0.0" y="66" width="375" height="107"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Rrm-i5-OHp" id="14V-09-SDx">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="106.5"/>
@@ -140,6 +165,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
+                    <connections>
+                        <outlet property="postTypeSegmentedControl" destination="Sl2-sT-BtX" id="SCs-8R-LfL"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rq4-Wu-zQR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
