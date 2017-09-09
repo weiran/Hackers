@@ -26,7 +26,10 @@ class PostTitleView: UIView {
                 titleLabel.text = post.title
                 metadataLabel.text = "\(post.points) points"
                 commentsLabel.text = "\(post.commentCount) comments"
-                linkButton.setTitle(post.urlDomain, for: UIControlState())
+                linkButton.setTitle(post.urlDomain, for: .normal)
+                if post.urlDomain.count == 0, post.type != .default {
+                    linkButton.setTitle("news.ycombinator.com", for: .normal)
+                }
             }
         }
     }

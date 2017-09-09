@@ -172,9 +172,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             }
         }
         
-        // TODO: if not default post type, show ycombinator domain instead in metadataLabel
-        // cant do it currently as Type is reserved keyword which libHN uses
-        
         return cell
     }
     
