@@ -23,6 +23,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
+    
     private var cancelFetch: (() -> Void)?
     private var cancelThumbnailFetchTasks = [() -> Void]()
     
@@ -65,7 +66,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
-    @objc func loadPosts() {
+    @objc func loadPosts(_ clear: Bool = false) {
         isProcessing = true
         
         // cancel existing fetches
@@ -80,9 +81,11 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         cancelThumbnailFetchTasks = [() -> Void]()
         
-        // clear data and show loading state
-        posts = [HNPost]()
-        tableView.reloadData()
+        if (clear) {
+            // clear data and show loading state
+            posts = [HNPost]()
+            tableView.reloadData()
+        }
         
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
@@ -94,6 +97,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         .always {
             self.isProcessing = false
+            self.refreshControl?.endRefreshing()
         }
         
         cancelFetch = cancel
@@ -140,7 +144,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
-    
+  
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
@@ -155,14 +159,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
-                _ = promise.then { [weak self] image -> Void in
+                _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
-                        DispatchQueue.main.async {
-                            self?.thumbnailProcessedUrls.append(url.absoluteString)
-                            self?.tableView.beginUpdates()
-                            self?.tableView.reloadRows(at: [indexPath], with: .none)
-                            self?.tableView.endUpdates()
-                        }
+                        self.thumbnailProcessedUrls.append(url.absoluteString)
+                        self.tableView.beginUpdates()
+                        self.tableView.reloadRows(at: [indexPath], with: .none)
+                        self.tableView.endUpdates()
                     }
                 }
                 cancelThumbnailFetchTasks.append(cancel)
@@ -224,7 +226,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             selectedPostType = .top
         }
         
-        loadPosts()
+        loadPosts(true)
     }
     
     
