@@ -159,6 +159,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
+                // TODO: resolve pending promise deallocated warning (may or may not be a bug)
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
                         self.thumbnailProcessedUrls.append(url.absoluteString)
