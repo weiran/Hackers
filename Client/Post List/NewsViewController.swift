@@ -10,8 +10,10 @@ import Foundation
 import UIKit
 import SafariServices
 import libHN
+import DZNEmptyDataSet
+import PromiseKit
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
     var posts: [HNPost] = [HNPost]()
     
@@ -20,6 +22,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var peekedIndexPath: IndexPath?
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
+    private var isProcessing: Bool = false
+    private var cancelFetch: (() -> Void)?
     
     @IBOutlet weak var postTypeSegmentedControl: UISegmentedControl!
     
@@ -29,6 +33,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         tableView.estimatedRowHeight = 150
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
 
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
         refreshControl!.tintColor = Theme.purpleColour
@@ -59,18 +65,49 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     @objc func loadPosts() {
-        if !refreshControl!.isRefreshing {
-            refreshControl!.beginRefreshing()
+        isProcessing = true
+        posts = [HNPost]()
+        tableView.reloadData()
+        
+        if let cancelFetch = cancelFetch {
+            cancelFetch()
         }
         
-        HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
-            if let downcastedArray = posts as? [HNPost] {
-                self.nextPageIdentifier = nextPageIdentifier
-                self.posts = downcastedArray
-                self.tableView.reloadData()
-                self.refreshControl!.endRefreshing()
+        let (fetchPromise, cancel) = fetch()
+        fetchPromise
+        .then { (posts, nextPageIdentifier) -> Void in
+            self.posts = posts ?? [HNPost]()
+            self.nextPageIdentifier = nextPageIdentifier
+            self.tableView.reloadData()
+        }
+        .always {
+            self.isProcessing = false
+        }
+        
+        cancelFetch = cancel
+    }
+    
+    func fetch() -> (Promise<([HNPost]?, String?)>, cancel: () -> Void) {
+        var cancelMe = false
+        var cancel: () -> Void = { }
+        
+        let promise = Promise<([HNPost]?, String?)> { fulfill, reject in
+            cancel = {
+                cancelMe = true
+                reject(NSError.cancelledError())
+            }
+            HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
+                guard !cancelMe else {
+                    reject(NSError.cancelledError())
+                    return
+                }
+                if let posts = posts as? [HNPost] {
+                    fulfill((posts, nextPageIdentifier))
+                }
             }
         }
+        
+        return (promise, cancel)
     }
     
     func loadMorePosts() {
@@ -235,5 +272,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             self.tableView(self.tableView, didSelectRowAt: indexPath)
         }
         return [viewCommentsPreviewAction]
+    }
+    
+    // MARK: - DZN
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 24.0)]
+        return isProcessing ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
     }
 }
