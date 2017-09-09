@@ -58,7 +58,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
-    func loadPosts() {
+    @objc func loadPosts() {
         if !refreshControl!.isRefreshing {
             refreshControl!.beginRefreshing()
         }

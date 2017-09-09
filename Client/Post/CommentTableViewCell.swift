@@ -35,9 +35,9 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
                 
                 let commentRange = NSMakeRange(0, commentAttributedString.length)
                 
-                commentAttributedString.addAttribute(NSFontAttributeName, value: commentFont, range: commentRange)
-                commentAttributedString.addAttribute(NSForegroundColorAttributeName, value: commentTextColor, range: commentRange)
-                commentAttributedString.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: commentRange)
+                commentAttributedString.addAttribute(NSAttributedStringKey.font, value: commentFont, range: commentRange)
+                commentAttributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: commentTextColor, range: commentRange)
+                commentAttributedString.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: commentRange)
                 
                 textView.attributedText = commentAttributedString.copy() as! NSAttributedString
             }
@@ -56,7 +56,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
         contentView.isExclusiveTouch = true
     }
     
-    func cellTapped(_ gestureRecognizer: UITapGestureRecognizer) {
+    @objc func cellTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         delegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }

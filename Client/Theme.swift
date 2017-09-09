@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 
 class Theme {
-    static let purpleColour = UIColor(colorLiteralRed: 101/255.0, green: 19/255.0, blue: 229/255.0, alpha: 1)
-    static let orangeColour = UIColor(colorLiteralRed: 223/255.0, green: 111/255.0, blue: 4/255.0, alpha: 1)
+    static let purpleColour = UIColor(red: 101/255.0, green: 19/255.0, blue: 229/255.0, alpha: 1)
+    static let orangeColour = UIColor(red: 223/255.0, green: 111/255.0, blue: 4/255.0, alpha: 1)
     static let backgroundGreyColour = UIColor(red:0.937, green:0.937, blue:0.956, alpha:1)
     static let backgroundOrangeColour = UIColor(red:1, green:0.849, blue:0.684, alpha:1)
     static let backgroundPurpleColour = UIColor(red:0.879, green:0.816, blue:0.951, alpha:1)

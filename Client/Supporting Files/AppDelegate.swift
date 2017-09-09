@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         HNManager.shared().startSession()
         
         UINavigationBar.appearance().titleTextAttributes = [
-            NSForegroundColorAttributeName: UIColor.white
+            NSAttributedStringKey.foregroundColor: UIColor.white
         ]
         
         UITextView.appearance().tintColor = Theme.purpleColour
