@@ -24,6 +24,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
     private var cancelFetch: (() -> Void)?
+    private var cancelThumbnailFetchTasks = [() -> Void]()
     
     @IBOutlet weak var postTypeSegmentedControl: UISegmentedControl!
     
@@ -66,13 +67,24 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     @objc func loadPosts() {
         isProcessing = true
+        
+        // cancel existing fetches
+        if let cancelFetch = cancelFetch {
+            cancelFetch()
+            self.cancelFetch = nil
+        }
+        
+        // cancel existing thumbnail fetches
+        cancelThumbnailFetchTasks.forEach { cancel in
+            cancel()
+        }
+        cancelThumbnailFetchTasks = [() -> Void]()
+        
+        // clear data and show loading state
         posts = [HNPost]()
         tableView.reloadData()
         
-        if let cancelFetch = cancelFetch {
-            cancelFetch()
-        }
-        
+        // fetch new posts
         let (fetchPromise, cancel) = fetch()
         fetchPromise
         .then { (posts, nextPageIdentifier) -> Void in
@@ -142,7 +154,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
-                ThumbnailFetcher.getThumbnail(url: url) { [weak self] image in
+                let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
+                _ = promise.then { [weak self] image -> Void in
                     if image != nil {
                         DispatchQueue.main.async {
                             self?.thumbnailProcessedUrls.append(url.absoluteString)
@@ -152,6 +165,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                         }
                     }
                 }
+                cancelThumbnailFetchTasks.append(cancel)
             }
         }
         

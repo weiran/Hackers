@@ -94,7 +94,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         thumbnailImageView.layer.masksToBounds = true
         
         if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
-            ThumbnailFetcher.getThumbnail(url: imageUrl) { [weak self] image in
+            let (promise, _) = ThumbnailFetcher.getThumbnail(url: imageUrl)
+            _ = promise.then { [weak self] image in
                 DispatchQueue.main.async {
                     self?.thumbnailImageView.image = image
                     self?.thumbnailImageViewWidthConstraint.constant = 80                    
