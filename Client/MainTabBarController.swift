@@ -12,7 +12,9 @@ import libHN
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         guard let viewControllers = self.viewControllers else { return }
+        
         for (index, viewController) in viewControllers.enumerated() {
             if let newsVC = viewController as? NewsViewController {
                 var postType: PostFilterType?
@@ -46,5 +48,8 @@ class MainTabBarController: UITabBarController {
                 newsVC.tabBarItem.image = UIImage(named: iconName!)
             }
         }
+        
+        Theme.setupNavigationBar(self.navigationController!.navigationBar)
+        tabBar.clipsToBounds = true
     }
 }

@@ -37,17 +37,15 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
 
-        refreshControl!.backgroundColor = Theme.backgroundGreyColour
         refreshControl!.tintColor = Theme.purpleColour
         refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         
         splitViewController!.delegate = self
         
-        Theme.setNavigationBarBackground(navigationController!.navigationBar)
-        NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.viewDidRotate), name: .UIDeviceOrientationDidChange, object: nil)
-        
         loadPosts()
         SVProgressHUD.show()
+        
+        navigationItem.largeTitleDisplayMode = .always
     }
     
     deinit {
@@ -56,12 +54,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        UIApplication.shared.statusBarStyle = .lightContent
         rz_smoothlyDeselectRows(tableView: tableView)
-    }
-    
-    @objc func viewDidRotate() {
-        Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
     @objc func loadPosts(_ clear: Bool = false) {
@@ -216,7 +209,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         guard verifyLink(post.urlString) else { return }
         if let url = URL(string: post.urlString) {
             self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
-            UIApplication.shared.statusBarStyle = .default
         }
     }
     
