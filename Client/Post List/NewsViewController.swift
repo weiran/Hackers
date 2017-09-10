@@ -12,6 +12,7 @@ import SafariServices
 import libHN
 import DZNEmptyDataSet
 import PromiseKit
+import SVProgressHUD
 
 class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
@@ -46,6 +47,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.viewDidRotate), name: .UIDeviceOrientationDidChange, object: nil)
         
         loadPosts()
+        SVProgressHUD.show()
     }
     
     deinit {
@@ -94,6 +96,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         .always {
             self.isProcessing = false
             self.refreshControl?.endRefreshing()
+            SVProgressHUD.dismiss()
         }
         
         cancelFetch = cancel
@@ -268,9 +271,9 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     // MARK: - DZN
-    
+
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
         let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 24.0)]
-        return isProcessing ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
+        return isProcessing ? NSAttributedString(string: "", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
     }
 }

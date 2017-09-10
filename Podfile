@@ -9,4 +9,5 @@ target 'Hackers' do
     pod 'AwesomeCache'
     pod 'Ji', :git=> 'https://github.com/honghaoz/Ji.git', :branch => 'swift4' # required to work with Swift 4
     pod 'PromiseKit'
+    pod 'SVProgressHUD'
 end
