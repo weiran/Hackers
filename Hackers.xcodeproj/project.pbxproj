@@ -12,6 +12,8 @@
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */; };
+		2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9011F654DB2005A98C7 /* MainTabBarController.swift */; };
+		2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9031F655426005A98C7 /* EmptyViewController.swift */; };
 		245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
@@ -40,6 +42,8 @@
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewControllerSmoothlyDeselectCellExtension.swift; path = ../UIViewControllerSmoothlyDeselectCellExtension.swift; sourceTree = "<group>"; };
+		2454B9011F654DB2005A98C7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		2454B9031F655426005A98C7 /* EmptyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyViewController.swift; sourceTree = "<group>"; };
 		245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SFSafariViewController+PreviewActionItems.swift"; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
@@ -106,6 +110,7 @@
 				249A7E31194374550059C079 /* CommentTableViewCell.swift */,
 				24E4F26019B4DA9900574B52 /* CommentDelegate.swift */,
 				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
+				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -176,6 +181,7 @@
 				24F39FB718AFB2AF0055F8DC /* Storyboard.storyboard */,
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
+				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
 				24CE5FEE19434DC0009D2677 /* Post List */,
 				24CE5FEF19434DCB009D2677 /* Post */,
 				24E51E581F375C1800C1233D /* Settings */,
@@ -366,6 +372,7 @@
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */,
+				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
 				24E51E571F375A6500C1233D /* SettingsViewController.swift in Sources */,
@@ -376,6 +383,7 @@
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
+				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
