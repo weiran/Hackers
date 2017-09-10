@@ -206,24 +206,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         case 0:
             selectedPostType = .top
             break
-            
         case 1:
             selectedPostType = .ask
             break
-            
         case 2:
             selectedPostType = .jobs
             break
-            
         case 3:
             selectedPostType = .new
             break
-            
-            
         default:
             selectedPostType = .top
         }
-        
         loadPosts(true)
     }
     
@@ -236,15 +230,25 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     // MARK: - PostTitleViewDelegate
     
-    func getSafariViewController(_ URL: String) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: Foundation.URL(string: URL)!)
+    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+        let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }
     
     func didPressLinkButton(_ post: HNPost) {
-        self.navigationController?.present(getSafariViewController(post.urlString), animated: true, completion: nil)
-        UIApplication.shared.statusBarStyle = .default
+        guard verifyLink(post.urlString) else { return }
+        if let url = URL(string: post.urlString) {
+            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
+            UIApplication.shared.statusBarStyle = .default
+        }
+    }
+    
+    func verifyLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return false
+        }
+        return UIApplication.shared.canOpenURL(url)
     }
     
     // MARK: - PostCellDelegate
@@ -263,10 +267,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = tableView.indexPathForRow(at: location) {
-            peekedIndexPath = indexPath
-            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
             let post = posts[indexPath.row]
-            return getSafariViewController(post.urlString)
+            if let url = URL(string: post.urlString), verifyLink(post.urlString) {
+                peekedIndexPath = indexPath
+                previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+                return getSafariViewController(url)
+            }
         }
         return nil
     }
