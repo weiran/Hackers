@@ -1,4 +1,4 @@
-platform :ios, '8.0'
+platform :ios, '10.0'
 use_frameworks!
 inhibit_all_warnings!
 
@@ -7,4 +7,5 @@ target 'Hackers' do
 	pod 'DZNEmptyDataSet'
     pod 'ReadabilityKit'
     pod 'AwesomeCache'
+    pod 'Ji', :git=> 'https://github.com/honghaoz/Ji.git', :branch => 'swift4' # required to work with Swift 4
 end

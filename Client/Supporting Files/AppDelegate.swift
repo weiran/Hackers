@@ -16,13 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
         HNManager.shared().startSession()
-        
-        UINavigationBar.appearance().titleTextAttributes = [
-            NSForegroundColorAttributeName: UIColor.white
-        ]
-        
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         UITextView.appearance().tintColor = Theme.purpleColour
-        UIButton.appearance().tintColor = Theme.purpleColour
     }
     
     func applicationWillResignActive(_ application: UIApplication) {

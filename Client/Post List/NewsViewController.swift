@@ -54,11 +54,11 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         rz_smoothlyDeselectRows(tableView: tableView)
     }
     
-    func viewDidRotate() {
+    @objc func viewDidRotate() {
         Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
-    func loadPosts() {
+    @objc func loadPosts() {
         if !refreshControl!.isRefreshing {
             refreshControl!.beginRefreshing()
         }

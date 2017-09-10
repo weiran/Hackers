@@ -136,6 +136,12 @@
       "scale" : "2x"
     },
     {
+      "size" : "1024x1024",
+      "idiom" : "ios-marketing",
+      "filename" : "iTunesArtwork@2x.png",
+      "scale" : "1x"
+    },
+    {
       "idiom" : "car",
       "size" : "60x60",
       "scale" : "2x"
@@ -200,6 +206,12 @@
       "scale" : "2x",
       "role" : "quickLook",
       "subtype" : "42mm"
+    },
+    {
+      "size" : "1024x1024",
+      "idiom" : "watch-marketing",
+      "filename" : "iTunesArtwork@2x.png",
+      "scale" : "1x"
     },
     {
       "idiom" : "mac",

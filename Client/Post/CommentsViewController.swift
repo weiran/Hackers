@@ -69,7 +69,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func viewDidRotate() {
+    @objc func viewDidRotate() {
         Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
@@ -129,7 +129,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     // MARK: - DZNEmptyDataSet
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSFontAttributeName: UIFont.systemFont(ofSize: 15.0)]
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
     

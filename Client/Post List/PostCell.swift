@@ -60,7 +60,7 @@ class PostCell : UITableViewCell {
         thumbnailImageViewWidthConstraint.constant = 0
     }
     
-    func didTapThumbnail(_ sender: Any) {
+    @objc func didTapThumbnail(_ sender: Any) {
         delegate?.didTapThumbnail(sender)
     }
 }
