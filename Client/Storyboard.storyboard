@@ -19,39 +19,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="cEm-Hi-ai5" userLabel="Post Type Header">
-                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <subviews>
-                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Sl2-sT-BtX">
-                                    <rect key="frame" x="0.0" y="8" width="375" height="29"/>
-                                    <segments>
-                                        <segment title="Top"/>
-                                        <segment title="Ask"/>
-                                        <segment title="Jobs"/>
-                                        <segment title="New"/>
-                                    </segments>
-                                    <connections>
-                                        <action selector="postTypeChanged:" destination="rez-OX-M9N" eventType="valueChanged" id="B1m-N5-Vpj"/>
-                                    </connections>
-                                </segmentedControl>
-                            </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <constraints>
-                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="leading" secondItem="cEm-Hi-ai5" secondAttribute="leadingMargin" id="1IY-8P-MB1"/>
-                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="centerY" secondItem="cEm-Hi-ai5" secondAttribute="centerY" id="XRz-7n-hkz"/>
-                                <constraint firstAttribute="trailingMargin" secondItem="Sl2-sT-BtX" secondAttribute="trailing" id="XZ6-TT-y2r"/>
-                                <constraint firstItem="Sl2-sT-BtX" firstAttribute="centerX" secondItem="cEm-Hi-ai5" secondAttribute="centerX" id="tCX-my-HNj"/>
-                            </constraints>
-                        </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="ygr-qF-bfh">
-                            <rect key="frame" x="0.0" y="173" width="375" height="0.0"/>
+                            <rect key="frame" x="0.0" y="129" width="375" height="0.0"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </view>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="107" id="Rrm-i5-OHp" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="66" width="375" height="107"/>
+                                <rect key="frame" x="0.0" y="22" width="375" height="107"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Rrm-i5-OHp" id="14V-09-SDx">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="106.5"/>
@@ -157,26 +132,19 @@
                             </tableViewCell>
                         </prototypes>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Item" id="hxO-aa-wYe"/>
                     <navigationItem key="navigationItem" title="Hacker News" id="jcb-Cb-kWP">
                         <barButtonItem key="backBarButtonItem" title="Back" id="0nQ-oU-2e9"/>
-                        <barButtonItem key="rightBarButtonItem" title="Settings" id="dGT-7u-bRj">
-                            <connections>
-                                <segue destination="ZON-Cv-cSI" kind="modal" id="biV-S4-9eA"/>
-                            </connections>
-                        </barButtonItem>
                     </navigationItem>
                     <nil key="simulatedBottomBarMetrics"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="AZy-MO-kud">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
-                    <connections>
-                        <outlet property="postTypeSegmentedControl" destination="Sl2-sT-BtX" id="SCs-8R-LfL"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rq4-Wu-zQR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1072" y="549"/>
+            <point key="canvasLocation" x="1704" y="549"/>
         </scene>
         <!--Settings-->
         <scene sceneID="cDO-me-92H">
@@ -225,6 +193,7 @@
                             <outlet property="delegate" destination="TVM-wo-EOS" id="Z8X-5N-CA1"/>
                         </connections>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Settings" id="Yjn-yB-Q7D"/>
                     <navigationItem key="navigationItem" title="Settings" id="Zc7-X4-D32">
                         <barButtonItem key="rightBarButtonItem" title="Done" style="done" id="Zga-7V-Qq3">
                             <connections>
@@ -238,23 +207,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f4o-L1-Mwh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2093.5" y="548.5"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="JI2-hB-y2Z">
-            <objects>
-                <navigationController id="ZON-Cv-cSI" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="dVW-Ba-GOa">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="TVM-wo-EOS" kind="relationship" relationship="rootViewController" id="bzU-nU-WLV"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="I5E-JC-fl9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1583" y="549"/>
+            <point key="canvasLocation" x="2254" y="549"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="9YC-Dl-luH">
@@ -265,12 +218,34 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="rez-OX-M9N" kind="relationship" relationship="rootViewController" id="d9f-24-lvC"/>
+                        <segue destination="SH3-c7-1Qf" kind="relationship" relationship="rootViewController" id="kLW-WL-NFm"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eha-hO-KX9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="570" y="549"/>
+        </scene>
+        <!--Hacker News-->
+        <scene sceneID="aVV-0y-KCU">
+            <objects>
+                <tabBarController id="SH3-c7-1Qf" customClass="MainTabBarController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Hacker News" id="JKk-fv-gH7"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="gQk-hf-Llh">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="rez-OX-M9N" kind="relationship" relationship="viewControllers" id="Qxo-UF-4Eo"/>
+                        <segue destination="rez-OX-M9N" kind="relationship" relationship="viewControllers" id="Yg7-IN-Jeb"/>
+                        <segue destination="rez-OX-M9N" kind="relationship" relationship="viewControllers" id="beh-nf-M99"/>
+                        <segue destination="rez-OX-M9N" kind="relationship" relationship="viewControllers" id="WuK-N7-TRx"/>
+                        <segue destination="TVM-wo-EOS" kind="relationship" relationship="viewControllers" id="sDl-Oe-l9c"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="98K-Av-OUm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1127" y="549"/>
         </scene>
         <!--Main Split View Controller-->
         <scene sceneID="UDs-CZ-r0a">
@@ -288,7 +263,7 @@
         <!--Empty View Controller-->
         <scene sceneID="Kpw-8x-zVV">
             <objects>
-                <viewController storyboardIdentifier="EmptyPostViewController" id="Dmx-cb-tjr" userLabel="Empty View Controller" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="EmptyPostViewController" id="Dmx-cb-tjr" userLabel="Empty View Controller" customClass="EmptyViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="LtU-M6-GcF"/>
                         <viewControllerLayoutGuide type="bottom" id="Y97-QA-50h"/>
@@ -340,25 +315,25 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-jh-8Aa">
-                                            <rect key="frame" x="15" y="8" width="0.0" height="95"/>
+                                            <rect key="frame" x="15" y="8" width="352" height="95"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wlf-9m-RN9" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="0.0" height="95"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="264" height="95"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="gLd-09-Uxm">
-                                                            <rect key="frame" x="0.0" y="0.0" width="0.0" height="95"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="264" height="95"/>
                                                             <subviews>
                                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="QDf-f8-Ysd">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="0.0" height="70"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="264" height="70"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vZQ-Cv-XXl">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="0.0" height="28"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="264" height="28"/>
                                                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
                                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ayc-Oj-PTK">
-                                                                            <rect key="frame" x="0.0" y="36" width="0.0" height="34"/>
+                                                                            <rect key="frame" x="0.0" y="36" width="264" height="34"/>
                                                                             <color key="backgroundColor" red="0.94999998807907104" green="0.94999998807907104" blue="0.94999998807907104" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="34" id="No4-Cw-UGO"/>
@@ -375,16 +350,16 @@
                                                                     </subviews>
                                                                 </stackView>
                                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Y5F-pV-MCz">
-                                                                    <rect key="frame" x="0.0" y="78" width="0.0" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="78" width="264" height="17"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7CH-AU-Mow">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="0.0" height="17"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="132" height="17"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                             <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 comment" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n32-d7-rYr">
-                                                                            <rect key="frame" x="-15" y="0.0" width="0.0" height="17"/>
+                                                                            <rect key="frame" x="132" y="0.0" width="132" height="17"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                             <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
@@ -409,7 +384,7 @@
                                                     </connections>
                                                 </view>
                                                 <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
-                                                    <rect key="frame" x="-15" y="8" width="80" height="79.5"/>
+                                                    <rect key="frame" x="272" y="8" width="80" height="79.5"/>
                                                     <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="5tV-mV-Ekf"/>
@@ -624,5 +599,8 @@
         <image name="HackersIcon" width="128" height="128"/>
         <image name="ShareIcon" width="16" height="22"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="Qxo-UF-4Eo"/>
+    </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

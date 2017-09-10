@@ -16,8 +16,8 @@ import PromiseKit
 class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
     var posts: [HNPost] = [HNPost]()
+    var postType: PostFilterType! = .top
     
-    private var selectedPostType: PostFilterType! = .top
     private var collapseDetailViewController = true
     private var peekedIndexPath: IndexPath?
     private var thumbnailProcessedUrls = [String]()
@@ -26,8 +26,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     private var cancelFetch: (() -> Void)?
     private var cancelThumbnailFetchTasks = [() -> Void]()
-    
-    @IBOutlet weak var postTypeSegmentedControl: UISegmentedControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,8 +39,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
         refreshControl!.tintColor = Theme.purpleColour
         refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
-        
-        postTypeSegmentedControl.tintColor = Theme.purpleColour
         
         splitViewController!.delegate = self
         
@@ -112,7 +108,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                 cancelMe = true
                 reject(NSError.cancelledError())
             }
-            HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
+            HNManager.shared().loadPosts(with: postType) { posts, nextPageIdentifier in
                 guard !cancelMe else {
                     reject(NSError.cancelledError())
                     return
@@ -198,29 +194,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             loadMorePosts()
         }
     }
-    
-    // MARK: - PostTypeSegmentedControl
-    
-    @IBAction func postTypeChanged(_ sender: Any) {
-        switch postTypeSegmentedControl.selectedSegmentIndex {
-        case 0:
-            selectedPostType = .top
-            break
-        case 1:
-            selectedPostType = .ask
-            break
-        case 2:
-            selectedPostType = .jobs
-            break
-        case 3:
-            selectedPostType = .new
-            break
-        default:
-            selectedPostType = .top
-        }
-        loadPosts(true)
-    }
-    
     
     // MARK: - UISplitViewControllerDelegate
     
