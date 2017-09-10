@@ -10,8 +10,10 @@ import Foundation
 import UIKit
 import SafariServices
 import libHN
+import DZNEmptyDataSet
+import PromiseKit
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate {
+class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
     var posts: [HNPost] = [HNPost]()
     
@@ -20,6 +22,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     private var peekedIndexPath: IndexPath?
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
+    private var isProcessing: Bool = false
+    
+    private var cancelFetch: (() -> Void)?
+    private var cancelThumbnailFetchTasks = [() -> Void]()
     
     @IBOutlet weak var postTypeSegmentedControl: UISegmentedControl!
     
@@ -29,6 +35,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         tableView.estimatedRowHeight = 150
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
 
         refreshControl!.backgroundColor = Theme.backgroundGreyColour
         refreshControl!.tintColor = Theme.purpleColour
@@ -58,19 +66,64 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
-    @objc func loadPosts() {
-        if !refreshControl!.isRefreshing {
-            refreshControl!.beginRefreshing()
+    @objc func loadPosts(_ clear: Bool = false) {
+        isProcessing = true
+        
+        // cancel existing fetches
+        if let cancelFetch = cancelFetch {
+            cancelFetch()
+            self.cancelFetch = nil
         }
         
-        HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
-            if let downcastedArray = posts as? [HNPost] {
-                self.nextPageIdentifier = nextPageIdentifier
-                self.posts = downcastedArray
-                self.tableView.reloadData()
-                self.refreshControl!.endRefreshing()
+        // cancel existing thumbnail fetches
+        cancelThumbnailFetchTasks.forEach { cancel in
+            cancel()
+        }
+        cancelThumbnailFetchTasks = [() -> Void]()
+        
+        if (clear) {
+            // clear data and show loading state
+            posts = [HNPost]()
+            tableView.reloadData()
+        }
+        
+        // fetch new posts
+        let (fetchPromise, cancel) = fetch()
+        fetchPromise
+        .then { (posts, nextPageIdentifier) -> Void in
+            self.posts = posts ?? [HNPost]()
+            self.nextPageIdentifier = nextPageIdentifier
+            self.tableView.reloadData()
+        }
+        .always {
+            self.isProcessing = false
+            self.refreshControl?.endRefreshing()
+        }
+        
+        cancelFetch = cancel
+    }
+    
+    func fetch() -> (Promise<([HNPost]?, String?)>, cancel: () -> Void) {
+        var cancelMe = false
+        var cancel: () -> Void = { }
+        
+        let promise = Promise<([HNPost]?, String?)> { fulfill, reject in
+            cancel = {
+                cancelMe = true
+                reject(NSError.cancelledError())
+            }
+            HNManager.shared().loadPosts(with: selectedPostType) { posts, nextPageIdentifier in
+                guard !cancelMe else {
+                    reject(NSError.cancelledError())
+                    return
+                }
+                if let posts = posts as? [HNPost] {
+                    fulfill((posts, nextPageIdentifier))
+                }
             }
         }
+        
+        return (promise, cancel)
     }
     
     func loadMorePosts() {
@@ -91,7 +144,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
-    
+  
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
@@ -105,21 +158,19 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
-                ThumbnailFetcher.getThumbnail(url: url) { [weak self] image in
+                let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
+                // TODO: resolve pending promise deallocated warning (may or may not be a bug)
+                _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
-                        DispatchQueue.main.async {
-                            self?.thumbnailProcessedUrls.append(url.absoluteString)
-                            self?.tableView.beginUpdates()
-                            self?.tableView.reloadRows(at: [indexPath], with: .none)
-                            self?.tableView.endUpdates()
-                        }
+                        self.thumbnailProcessedUrls.append(url.absoluteString)
+                        self.tableView.beginUpdates()
+                        self.tableView.reloadRows(at: [indexPath], with: .none)
+                        self.tableView.endUpdates()
                     }
                 }
+                cancelThumbnailFetchTasks.append(cancel)
             }
         }
-        
-        // TODO: if not default post type, show ycombinator domain instead in metadataLabel
-        // cant do it currently as Type is reserved keyword which libHN uses
         
         return cell
     }
@@ -155,25 +206,19 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         case 0:
             selectedPostType = .top
             break
-            
         case 1:
             selectedPostType = .ask
             break
-            
         case 2:
             selectedPostType = .jobs
             break
-            
         case 3:
             selectedPostType = .new
             break
-            
-            
         default:
             selectedPostType = .top
         }
-        
-        loadPosts()
+        loadPosts(true)
     }
     
     
@@ -185,15 +230,25 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     // MARK: - PostTitleViewDelegate
     
-    func getSafariViewController(_ URL: String) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: Foundation.URL(string: URL)!)
+    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+        let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }
     
     func didPressLinkButton(_ post: HNPost) {
-        self.navigationController?.present(getSafariViewController(post.urlString), animated: true, completion: nil)
-        UIApplication.shared.statusBarStyle = .default
+        guard verifyLink(post.urlString) else { return }
+        if let url = URL(string: post.urlString) {
+            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
+            UIApplication.shared.statusBarStyle = .default
+        }
+    }
+    
+    func verifyLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return false
+        }
+        return UIApplication.shared.canOpenURL(url)
     }
     
     // MARK: - PostCellDelegate
@@ -212,10 +267,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = tableView.indexPathForRow(at: location) {
-            peekedIndexPath = indexPath
-            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
             let post = posts[indexPath.row]
-            return getSafariViewController(post.urlString)
+            if let url = URL(string: post.urlString), verifyLink(post.urlString) {
+                peekedIndexPath = indexPath
+                previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+                return getSafariViewController(url)
+            }
         }
         return nil
     }
@@ -235,5 +292,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             self.tableView(self.tableView, didSelectRowAt: indexPath)
         }
         return [viewCommentsPreviewAction]
+    }
+    
+    // MARK: - DZN
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 24.0)]
+        return isProcessing ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
     }
 }

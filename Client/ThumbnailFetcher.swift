@@ -8,6 +8,7 @@
 
 import ReadabilityKit
 import AwesomeCache
+import PromiseKit
 
 class ThumbnailFetcher {
     
@@ -19,23 +20,32 @@ class ThumbnailFetcher {
         return cache[url.absoluteString]
     }
     
-    static func getThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
-        guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else {
-            return
-        }
+    static func getThumbnail(url: URL) -> (Promise<UIImage?>, () -> Void) {
+        var cancelMe = false
+        var cancel: () -> Void = { }
         
-        if let cachedImage = cache[url.absoluteString] {
-            completion(cachedImage)
-        } else {
-            fetchThumbnail(url: url) { image in
-                if let image = image {
-                    cache[url.absoluteString] = image
-                    completion(image)
-                } else {
-                    completion(nil)
+        let promise = Promise<UIImage?> { fulfill, reject in
+            cancel = {
+                cancelMe = true
+            }
+            
+            if let cachedImage = getThumbnailFromCache(url: url) {
+                fulfill(cachedImage)
+            } else {
+                fetchThumbnail(url: url) { image in
+                    if let image = image, !cancelMe {
+                        if let cache = try? Cache<UIImage>(name: "thumbnailCache") {
+                            cache[url.absoluteString] = image
+                        }
+                        fulfill(image)
+                    } else {
+                        fulfill(nil)
+                    }
                 }
             }
         }
+        
+        return (promise, cancel)
     }
 
     private static func fetchThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {

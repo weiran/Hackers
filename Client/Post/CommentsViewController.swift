@@ -94,7 +94,8 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         thumbnailImageView.layer.masksToBounds = true
         
         if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
-            ThumbnailFetcher.getThumbnail(url: imageUrl) { [weak self] image in
+            let (promise, _) = ThumbnailFetcher.getThumbnail(url: imageUrl)
+            _ = promise.then { [weak self] image in
                 DispatchQueue.main.async {
                     self?.thumbnailImageView.image = image
                     self?.thumbnailImageViewWidthConstraint.constant = 80                    
@@ -170,9 +171,19 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     // MARK: - PostTitleViewDelegate
     
     func didPressLinkButton(_ post: HNPost) {
-        let safariViewController = SFSafariViewController(url: URL(string: post.urlString)!)
-        self.present(safariViewController, animated: true, completion: nil)
-        UIApplication.shared.statusBarStyle = .default
+        guard verifyLink(post.urlString) else { return }
+        if let url = URL(string: post.urlString) {
+            let safariViewController = SFSafariViewController(url: url)
+            self.present(safariViewController, animated: true, completion: nil)
+            UIApplication.shared.statusBarStyle = .default
+        }
+    }
+    
+    func verifyLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return false
+        }
+        return UIApplication.shared.canOpenURL(url)
     }
     
     @IBAction func didTapThumbnail(_ sender: Any) {
