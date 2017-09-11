@@ -149,21 +149,21 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {
+        guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
-        let cellRectInTableView = tableView.rectForRow(at: indexPath)
-        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
-
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
                 
         tableView.beginUpdates()
         tableView.reloadRows(at: [indexPath], with: .fade)
         if visibility == CommentVisibilityType.hidden {
-            tableView.deleteRows(at: modifiedIndexPaths, with: .middle)
+            tableView.deleteRows(at: modifiedIndexPaths, with: .top)
         } else {
-            tableView.insertRows(at: modifiedIndexPaths, with: UITableViewRowAnimation.middle)
+            tableView.insertRows(at: modifiedIndexPaths, with: .middle)
         }
         tableView.endUpdates()
         
+        let cellRectInTableView = tableView.rectForRow(at: indexPath)
+        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
         if cellRectInSuperview.origin.y < 0 {
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
