@@ -85,11 +85,15 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
+            SVProgressHUD.dismiss()
+        }
+        .catch { error in
+            SVProgressHUD.showError(withStatus: "Failed")
+            SVProgressHUD.dismiss(withDelay: 1.0)
         }
         .always {
             self.isProcessing = false
             self.refreshControl?.endRefreshing()
-            SVProgressHUD.dismiss()
         }
         
         cancelFetch = cancel
