@@ -169,7 +169,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                     if image != nil {
                         self.thumbnailProcessedUrls.append(url.absoluteString)
                         self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .none)
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
                         self.tableView.endUpdates()
                     }
                 }
