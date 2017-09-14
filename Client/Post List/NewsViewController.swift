@@ -44,7 +44,16 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         loadPosts()
         SVProgressHUD.show()
-        
+    }
+    
+    override func awakeFromNib() {
+        // TODO: workaround for iOS 11 bug, remove when fixed
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         navigationItem.largeTitleDisplayMode = .always
     }
     
