@@ -1,0 +1,25 @@
+{
+    "device_frame_version": "latest",
+    "default": {
+        "title": {
+            "color": "#FFFFFF",
+            "font": "./SF-Pro-Display-Bold.otf"
+        },
+        "background": "./background.png",
+        "padding": 50
+    },
+    "data": [
+        {
+            "filter": "Ultimate",
+            "title": {
+                "text": "The ultimate Hacker News experience"
+            }
+        },
+        {
+            "filter": "Comments",
+            "title": {
+                "text": "Elegant threaded comments"
+            }
+        }
+    ]
+}
