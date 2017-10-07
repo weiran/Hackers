@@ -23,10 +23,7 @@ class PostCell : UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         setupThumbnailGesture()
-        thumbnailImageView.layer.cornerRadius = 7
-        thumbnailImageView.layer.masksToBounds = true
     }
     
     private func setupThumbnailGesture() {

@@ -112,6 +112,11 @@
                                                         <constraint firstAttribute="width" constant="80" id="74a-e0-Bfl"/>
                                                         <constraint firstAttribute="width" secondItem="Y6x-lo-dQ2" secondAttribute="height" multiplier="1:1" id="S8s-pV-J6g"/>
                                                     </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                            <real key="value" value="7"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
                                                 </imageView>
                                             </subviews>
                                         </stackView>
@@ -319,15 +324,20 @@
                                                         <outlet property="titleLabel" destination="vZQ-Cv-XXl" id="x51-VA-mEC"/>
                                                     </connections>
                                                 </view>
-                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
+                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
                                                     <rect key="frame" x="279" y="15.666666666666671" width="80" height="79.666666666666657"/>
                                                     <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="5tV-mV-Ekf"/>
                                                         <constraint firstAttribute="width" secondItem="iAv-PR-2eT" secondAttribute="height" multiplier="1:1" id="Rxu-5d-Fu3"/>
                                                     </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                            <real key="value" value="7"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <outletCollection property="gestureRecognizers" destination="Dsc-cG-qQn" appends="YES" id="iQA-Y8-Xf2"/>
                                                     </connections>

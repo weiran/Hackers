@@ -83,9 +83,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
-        thumbnailImageView.contentMode = .center
-        thumbnailImageView.layer.cornerRadius = 7
-        thumbnailImageView.layer.masksToBounds = true
         
         if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
             let (promise, _) = ThumbnailFetcher.getThumbnail(url: imageUrl)
