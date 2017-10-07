@@ -168,9 +168,11 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
                         self.thumbnailProcessedUrls.append(url.absoluteString)
-                        self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                        self.tableView.endUpdates()
+                        DispatchQueue.main.async {
+                            self.tableView.beginUpdates()
+                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                            self.tableView.endUpdates()
+                        }
                     }
                 }
                 cancelThumbnailFetchTasks.append(cancel)

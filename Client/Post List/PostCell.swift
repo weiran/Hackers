@@ -61,8 +61,6 @@ class PostCell : UITableViewCell {
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
         thumbnailImageView.contentMode = .center
-        thumbnailImageView.tintColor = UIColor.lightGray
-        thumbnailImageView.backgroundColor = UIColor.darkGray
     }
     
     @objc func didTapThumbnail(_ sender: Any) {
