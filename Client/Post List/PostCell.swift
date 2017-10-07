@@ -18,7 +18,6 @@ class PostCell : UITableViewCell {
     
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
-    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -53,11 +52,15 @@ class PostCell : UITableViewCell {
     
     func setImage(image: UIImage) {
         thumbnailImageView.image = image
-        thumbnailImageViewWidthConstraint.constant = 80
+        thumbnailImageView.contentMode = .scaleAspectFill
     }
     
     func clearImage() {
-        thumbnailImageViewWidthConstraint.constant = 0
+        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
+        thumbnailImageView.image = placeholder
+        thumbnailImageView.contentMode = .center
+        thumbnailImageView.tintColor = UIColor.lightGray
+        thumbnailImageView.backgroundColor = UIColor.darkGray
     }
     
     @objc func didTapThumbnail(_ sender: Any) {
