@@ -17,5 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         HNManager.shared().startSession()
         UITextView.appearance().tintColor = Theme.purpleColour
         UITabBar.appearance().tintColor = Theme.purpleColour
+        ReviewController.incrementLaunchCounter()
+        ReviewController.requestReview()
     }
 }
