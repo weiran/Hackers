@@ -24,8 +24,8 @@ extension SFSafariViewController {
         }
     }
     
-    public convenience init(initialURL: URL, entersReaderIfAvailable: Bool) {
-        self.init(url: initialURL, entersReaderIfAvailable: entersReaderIfAvailable)
+    public convenience init(initialURL: URL) {
+        self.init(url: initialURL)
         self.initialURL = initialURL
     }
 }
