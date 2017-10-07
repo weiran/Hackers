@@ -36,20 +36,17 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
+        tableView.backgroundView = nil
+        tableView.backgroundColor = .white
         
-        Theme.setNavigationBarBackground(navigationController?.navigationBar)
-        NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.viewDidRotate), name: .UIDeviceOrientationDidChange, object: nil)
-        
+        navigationItem.largeTitleDisplayMode = .never
+        Theme.setupNavigationBar(navigationController!.navigationBar)
+
         loadComments()
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        UIApplication.shared.statusBarStyle = .lightContent
     }
     
     override func viewDidLayoutSubviews() {
@@ -67,10 +64,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
                 tableView.tableHeaderView = headerView
             }
         }
-    }
-    
-    @objc func viewDidRotate() {
-        Theme.setNavigationBarBackground(navigationController?.navigationBar)
     }
     
     func loadComments() {
@@ -127,6 +120,15 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         return cell
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
+        return view
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 80
+    }
+    
     // MARK: - DZNEmptyDataSet
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
@@ -144,25 +146,24 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
         let safariViewController = SFSafariViewController(url: URL)
         self.present(safariViewController, animated: true, completion: nil)
-        UIApplication.shared.statusBarStyle = .default
     }
     
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {
+        guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
-        let cellRectInTableView = tableView.rectForRow(at: indexPath)
-        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
-
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
                 
         tableView.beginUpdates()
         tableView.reloadRows(at: [indexPath], with: .fade)
         if visibility == CommentVisibilityType.hidden {
-            tableView.deleteRows(at: modifiedIndexPaths, with: .middle)
+            tableView.deleteRows(at: modifiedIndexPaths, with: .top)
         } else {
-            tableView.insertRows(at: modifiedIndexPaths, with: UITableViewRowAnimation.middle)
+            tableView.insertRows(at: modifiedIndexPaths, with: .middle)
         }
         tableView.endUpdates()
         
+        let cellRectInTableView = tableView.rectForRow(at: indexPath)
+        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
         if cellRectInSuperview.origin.y < 0 {
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
@@ -175,7 +176,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         if let url = URL(string: post.urlString) {
             let safariViewController = SFSafariViewController(url: url)
             self.present(safariViewController, animated: true, completion: nil)
-            UIApplication.shared.statusBarStyle = .default
         }
     }
     

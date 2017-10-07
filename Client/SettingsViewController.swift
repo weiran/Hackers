@@ -9,20 +9,15 @@
 import UIKit
 
 class SettingsViewController: UITableViewController {
-
     var settingsModel: SettingsModel!
     
     @IBOutlet weak var hideThumbnailsSwitch: UISwitch!
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        navigationController?.navigationBar.barTintColor = Theme.purpleColour
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         hideThumbnailsSwitch.isOn = SettingsModel.shared.hideThumbnails
+        navigationItem.largeTitleDisplayMode = .always
     }
 
     @IBAction func showThumbnailsChanged(_ sender: Any) {
@@ -32,5 +27,4 @@ class SettingsViewController: UITableViewController {
     @IBAction func didPressDone(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
-    
 }

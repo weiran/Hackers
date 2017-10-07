@@ -15,7 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
         HNManager.shared().startSession()
-        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         UITextView.appearance().tintColor = Theme.purpleColour
         UITabBar.appearance().tintColor = Theme.purpleColour
     }
