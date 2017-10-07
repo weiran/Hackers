@@ -165,7 +165,6 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
                 cell.cancelThumbnailTask = cancel
-                // TODO: resolve pending promise deallocated warning (may or may not be a bug)
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
                         self.thumbnailProcessedUrls.append(url.absoluteString)
