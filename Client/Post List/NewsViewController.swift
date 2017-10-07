@@ -159,18 +159,20 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
         
-        if let url = URL(string: post.urlString), !SettingsModel.shared.hideThumbnails {
+        if let url = URL(string: post.urlString) {
             if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
                 cell.setImage(image: image)
             } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
-                // TODO: resolve pending promise deallocated warning (may or may not be a bug)
+                cell.cancelThumbnailTask = cancel
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
                     if image != nil {
                         self.thumbnailProcessedUrls.append(url.absoluteString)
-                        self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                        self.tableView.endUpdates()
+                        DispatchQueue.main.async {
+                            self.tableView.beginUpdates()
+                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                            self.tableView.endUpdates()
+                        }
                     }
                 }
                 cancelThumbnailFetchTasks.append(cancel)
@@ -201,6 +203,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? PostCell {
+            cell.cancelThumbnailTask?()
         }
     }
     

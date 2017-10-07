@@ -18,14 +18,12 @@ class PostCell : UITableViewCell {
     
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
-    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
+    
+    var cancelThumbnailTask: (() -> Void)?
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         setupThumbnailGesture()
-        thumbnailImageView.layer.cornerRadius = 7
-        thumbnailImageView.layer.masksToBounds = true
     }
     
     private func setupThumbnailGesture() {
@@ -53,11 +51,13 @@ class PostCell : UITableViewCell {
     
     func setImage(image: UIImage) {
         thumbnailImageView.image = image
-        thumbnailImageViewWidthConstraint.constant = 80
+        thumbnailImageView.contentMode = .scaleAspectFill
     }
     
     func clearImage() {
-        thumbnailImageViewWidthConstraint.constant = 0
+        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
+        thumbnailImageView.image = placeholder
+        thumbnailImageView.contentMode = .center
     }
     
     @objc func didTapThumbnail(_ sender: Any) {

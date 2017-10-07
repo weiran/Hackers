@@ -75,7 +75,7 @@ class ThumbnailFetcher {
         
         let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, _ -> Void in
             if let expectedContentLength = response?.expectedContentLength {
-                completion(expectedContentLength < 1000000)
+                completion(expectedContentLength < 1000000 && expectedContentLength > 0)
             } else {
                 completion(false)
             }

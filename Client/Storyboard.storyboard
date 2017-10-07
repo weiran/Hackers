@@ -103,13 +103,20 @@
                                                         <outlet property="titleLabel" destination="Bsb-hN-3l1" id="zDn-eK-K0i"/>
                                                     </connections>
                                                 </view>
-                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y6x-lo-dQ2">
+                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Y6x-lo-dQ2">
                                                     <rect key="frame" x="272" y="5" width="80" height="80"/>
+                                                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="74a-e0-Bfl"/>
                                                         <constraint firstAttribute="width" secondItem="Y6x-lo-dQ2" secondAttribute="height" multiplier="1:1" id="S8s-pV-J6g"/>
                                                     </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                            <real key="value" value="7"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
                                                 </imageView>
                                             </subviews>
                                         </stackView>
@@ -126,7 +133,6 @@
                                 <connections>
                                     <outlet property="postTitleView" destination="OKQ-By-TCF" id="VG3-YE-bnw"/>
                                     <outlet property="thumbnailImageView" destination="Y6x-lo-dQ2" id="e3C-th-Zgy"/>
-                                    <outlet property="thumbnailImageViewWidthConstraint" destination="74a-e0-Bfl" id="uN7-QT-vgJ"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -144,69 +150,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rq4-Wu-zQR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1704" y="549"/>
-        </scene>
-        <!--Settings-->
-        <scene sceneID="cDO-me-92H">
-            <objects>
-                <tableViewController id="TVM-wo-EOS" customClass="SettingsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="mAV-Jv-piB">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <sections>
-                            <tableViewSection headerTitle="Experimental Features" id="ToW-ou-fOu">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="CcR-Uu-m5z">
-                                        <rect key="frame" x="0.0" y="55.333333333333336" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CcR-Uu-m5z" id="bpg-0d-Pg0">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hide Thumbnails" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qay-0g-WUk">
-                                                    <rect key="frame" x="18" y="11" width="129" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sXM-rW-6iX">
-                                                    <rect key="frame" x="308" y="6" width="51" height="31"/>
-                                                    <connections>
-                                                        <action selector="showThumbnailsChanged:" destination="TVM-wo-EOS" eventType="valueChanged" id="zqi-oa-PzQ"/>
-                                                    </connections>
-                                                </switch>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailingMargin" secondItem="sXM-rW-6iX" secondAttribute="trailing" constant="10" id="9YL-Wj-qT1"/>
-                                                <constraint firstItem="Qay-0g-WUk" firstAttribute="centerY" secondItem="bpg-0d-Pg0" secondAttribute="centerY" id="kq8-uG-bV2"/>
-                                                <constraint firstItem="sXM-rW-6iX" firstAttribute="centerY" secondItem="bpg-0d-Pg0" secondAttribute="centerY" id="lGh-A2-UFJ"/>
-                                                <constraint firstItem="Qay-0g-WUk" firstAttribute="leading" secondItem="bpg-0d-Pg0" secondAttribute="leadingMargin" constant="10" id="lqy-Gk-qDU"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="TVM-wo-EOS" id="i3L-Bc-wuG"/>
-                            <outlet property="delegate" destination="TVM-wo-EOS" id="Z8X-5N-CA1"/>
-                        </connections>
-                    </tableView>
-                    <tabBarItem key="tabBarItem" title="Settings" image="SettingsIcon" id="Yjn-yB-Q7D"/>
-                    <navigationItem key="navigationItem" title="Settings" id="Zc7-X4-D32">
-                        <barButtonItem key="rightBarButtonItem" title="Done" style="done" id="Zga-7V-Qq3">
-                            <connections>
-                                <action selector="didPressDone:" destination="TVM-wo-EOS" id="f0b-ax-RxE"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="hideThumbnailsSwitch" destination="sXM-rW-6iX" id="NvT-EO-ndy"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="f4o-L1-Mwh" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2254" y="549"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="9YC-Dl-luH">
@@ -381,13 +324,20 @@
                                                         <outlet property="titleLabel" destination="vZQ-Cv-XXl" id="x51-VA-mEC"/>
                                                     </connections>
                                                 </view>
-                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
+                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
                                                     <rect key="frame" x="279" y="15.666666666666671" width="80" height="79.666666666666657"/>
+                                                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="80" id="5tV-mV-Ekf"/>
                                                         <constraint firstAttribute="width" secondItem="iAv-PR-2eT" secondAttribute="height" multiplier="1:1" id="Rxu-5d-Fu3"/>
                                                     </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                            <real key="value" value="7"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
                                                     <connections>
                                                         <outletCollection property="gestureRecognizers" destination="Dsc-cG-qQn" appends="YES" id="iQA-Y8-Xf2"/>
                                                     </connections>
@@ -558,7 +508,6 @@
                         <outlet property="postTitleView" destination="Wlf-9m-RN9" id="KMD-x8-svM"/>
                         <outlet property="tableView" destination="QBD-8Q-H2S" id="4vJ-qJ-PA1"/>
                         <outlet property="thumbnailImageView" destination="iAv-PR-2eT" id="DWA-8m-Ehq"/>
-                        <outlet property="thumbnailImageViewWidthConstraint" destination="5tV-mV-Ekf" id="yxE-Ot-baD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vcn-3b-TpK" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -595,8 +544,8 @@
     </scenes>
     <resources>
         <image name="HackersIcon" width="128" height="128"/>
-        <image name="SettingsIcon" width="28" height="28"/>
         <image name="ShareIcon" width="16" height="22"/>
+        <image name="ThumbnailPlaceholderIcon" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Qxo-UF-4Eo"/>

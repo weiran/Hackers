@@ -25,7 +25,6 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
-    @IBOutlet weak var thumbnailImageViewWidthConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,16 +81,15 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         postTitleView.post = post
         postTitleView.delegate = self
         
-        thumbnailImageViewWidthConstraint.constant = 0
-        thumbnailImageView.layer.cornerRadius = 7
-        thumbnailImageView.layer.masksToBounds = true
+        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
+        thumbnailImageView.image = placeholder
         
         if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
             let (promise, _) = ThumbnailFetcher.getThumbnail(url: imageUrl)
             _ = promise.then { [weak self] image in
                 DispatchQueue.main.async {
                     self?.thumbnailImageView.image = image
-                    self?.thumbnailImageViewWidthConstraint.constant = 80                    
+                    self?.thumbnailImageView.contentMode = .scaleAspectFill
                 }
             }
         }

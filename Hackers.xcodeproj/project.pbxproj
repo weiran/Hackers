@@ -22,11 +22,10 @@
 		24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FEC19434BDC009D2677 /* AppDelegate.swift */; };
 		24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF319435061009D2677 /* NewsViewController.swift */; };
 		24CE5FF819435A90009D2677 /* PostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF719435A90009D2677 /* PostCell.swift */; };
+		24CEAA9B1F8916970050DEDF /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9A1F8916970050DEDF /* UIView+Extensions.swift */; };
 		24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* Theme.swift */; };
 		24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DFD28B19436E51007F61E7 /* CommentsViewController.swift */; };
 		24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E4F26019B4DA9900574B52 /* CommentDelegate.swift */; };
-		24E51E571F375A6500C1233D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E51E561F375A6500C1233D /* SettingsViewController.swift */; };
-		24E51E5A1F375C3400C1233D /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E51E591F375C3400C1233D /* SettingsModel.swift */; };
 		24EF5BF41C393D110012AA8A /* LaunchStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -54,11 +53,10 @@
 		24CE5FEC19434BDC009D2677 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		24CE5FF319435061009D2677 /* NewsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
 		24CE5FF719435A90009D2677 /* PostCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
+		24CEAA9A1F8916970050DEDF /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		24D6B8C91C1EDBFC00618422 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		24DFD28B19436E51007F61E7 /* CommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsViewController.swift; sourceTree = "<group>"; };
 		24E4F26019B4DA9900574B52 /* CommentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentDelegate.swift; sourceTree = "<group>"; };
-		24E51E561F375A6500C1233D /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		24E51E591F375C3400C1233D /* SettingsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchStoryboard.storyboard; sourceTree = "<group>"; };
 		24F39F8518AFB1150055F8DC /* Hackers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F39F8818AFB1150055F8DC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -136,15 +134,6 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		24E51E581F375C1800C1233D /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				24E51E561F375A6500C1233D /* SettingsViewController.swift */,
-				24E51E591F375C3400C1233D /* SettingsModel.swift */,
-			);
-			name = Settings;
-			sourceTree = "<group>";
-		};
 		24F39F7C18AFB1150055F8DC = {
 			isa = PBXGroup;
 			children = (
@@ -187,10 +176,10 @@
 				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
 				24CE5FEE19434DC0009D2677 /* Post List */,
 				24CE5FEF19434DCB009D2677 /* Post */,
-				24E51E581F375C1800C1233D /* Settings */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 				24D6B8C91C1EDBFC00618422 /* Theme.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */,
+				24CEAA9A1F8916970050DEDF /* UIView+Extensions.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -372,16 +361,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24E51E5A1F375C3400C1233D /* SettingsModel.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				240E2C371EBDFBA9000B4A89 /* ThumbnailFetcher.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
+				24CEAA9B1F8916970050DEDF /* UIView+Extensions.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* Theme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
-				24E51E571F375A6500C1233D /* SettingsViewController.swift in Sources */,
 				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,

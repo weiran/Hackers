@@ -20,7 +20,7 @@ PODS:
     - PromiseKit/CorePromise
   - ReadabilityKit (0.6.1):
     - Ji (~> 2.0.1)
-  - SVProgressHUD (2.1.2)
+  - SVProgressHUD (2.2.1)
 
 DEPENDENCIES:
   - AwesomeCache
@@ -53,7 +53,7 @@ SPEC CHECKSUMS:
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
   ReadabilityKit: 49c26a2da9708ae3b355854d5bee6a7edee2dfee
-  SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
+  SVProgressHUD: db27c54e6e18bc903341661fc9feb55e04905cc4
 
 PODFILE CHECKSUM: 28d77b9c3b3d4f1dd3e2fb49204a2b0a15af750b
 
