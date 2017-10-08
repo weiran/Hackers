@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,21 +16,41 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comments" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WWj-L3-Z9U">
-                    <rect key="frame" x="15" y="40" width="133.5" height="20"/>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="26"/>
+                    <rect key="frame" x="15" y="40" width="113.5" height="20"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ggn-R0-s8v">
+                    <rect key="frame" x="15" y="79" width="360" height="1"/>
+                    <color key="backgroundColor" white="0.78000000000000003" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="o9r-v5-pdL"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BOh-QT-K6s">
+                    <rect key="frame" x="15" y="9" width="360" height="1"/>
+                    <color key="backgroundColor" white="0.78000000000000003" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="Iue-fF-VB6"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="WWj-L3-Z9U" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="40" id="1N0-is-lVa"/>
+                <constraint firstItem="ggn-R0-s8v" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="Em9-g2-w7m"/>
+                <constraint firstAttribute="trailing" secondItem="BOh-QT-K6s" secondAttribute="trailing" id="IJ0-ON-LB0"/>
+                <constraint firstItem="ggn-R0-s8v" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="JPh-4O-mb3"/>
                 <constraint firstItem="WWj-L3-Z9U" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="15" id="ZBK-hx-wSU"/>
+                <constraint firstItem="WWj-L3-Z9U" firstAttribute="leading" secondItem="BOh-QT-K6s" secondAttribute="leading" id="eZg-5F-t7D"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="WWj-L3-Z9U" secondAttribute="bottom" constant="20" id="i3e-Ed-fgp"/>
+                <constraint firstItem="ggn-R0-s8v" firstAttribute="leading" secondItem="WWj-L3-Z9U" secondAttribute="leading" id="s6t-kA-9kr"/>
+                <constraint firstItem="BOh-QT-K6s" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="9" id="vGQ-If-iJH"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <point key="canvasLocation" x="18.5" y="23.5"/>
+            <point key="canvasLocation" x="18.5" y="23"/>
         </view>
     </objects>
 </document>
