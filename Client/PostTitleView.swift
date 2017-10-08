@@ -33,16 +33,6 @@ class PostTitleView: UIView {
             }
         }
     }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        setupLinkButton()
-    }
-    
-    func setupLinkButton() {
-        linkButton.layer.cornerRadius = 7
-    }
     
     @IBAction func didPressLinkButton(_ sender: UIButton) {
         if let delegate = delegate {
