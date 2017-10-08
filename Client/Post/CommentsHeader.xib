@@ -16,7 +16,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comments" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WWj-L3-Z9U">
-                    <rect key="frame" x="15" y="40" width="113.5" height="20"/>
+                    <rect key="frame" x="15" y="40" width="113.5" height="26"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -25,14 +25,14 @@
                     <rect key="frame" x="15" y="79" width="360" height="1"/>
                     <color key="backgroundColor" white="0.78000000000000003" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="1" id="o9r-v5-pdL"/>
+                        <constraint firstAttribute="height" constant="0.5" id="o9r-v5-pdL"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BOh-QT-K6s">
                     <rect key="frame" x="15" y="9" width="360" height="1"/>
                     <color key="backgroundColor" white="0.78000000000000003" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="1" id="Iue-fF-VB6"/>
+                        <constraint firstAttribute="height" constant="0.5" id="Iue-fF-VB6"/>
                     </constraints>
                 </view>
             </subviews>
@@ -44,7 +44,7 @@
                 <constraint firstItem="ggn-R0-s8v" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="JPh-4O-mb3"/>
                 <constraint firstItem="WWj-L3-Z9U" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="15" id="ZBK-hx-wSU"/>
                 <constraint firstItem="WWj-L3-Z9U" firstAttribute="leading" secondItem="BOh-QT-K6s" secondAttribute="leading" id="eZg-5F-t7D"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="WWj-L3-Z9U" secondAttribute="bottom" constant="20" id="i3e-Ed-fgp"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="WWj-L3-Z9U" secondAttribute="bottom" constant="14" id="i3e-Ed-fgp"/>
                 <constraint firstItem="ggn-R0-s8v" firstAttribute="leading" secondItem="WWj-L3-Z9U" secondAttribute="leading" id="s6t-kA-9kr"/>
                 <constraint firstItem="BOh-QT-K6s" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="9" id="vGQ-If-iJH"/>
             </constraints>
