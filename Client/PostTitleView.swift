@@ -22,14 +22,13 @@ class PostTitleView: UIView {
     var delegate: PostTitleViewDelegate?
     var post: HNPost? {
         didSet {
-            if let post = post {
-                titleLabel.text = post.title
-                metadataLabel.text = "\(post.points) points"
-                commentsLabel.text = "\(post.commentCount) comments"
-                linkButton.setTitle(post.urlDomain, for: .normal)
-                if post.urlDomain == nil, post.type != .default {
-                    linkButton.setTitle("news.ycombinator.com", for: .normal)
-                }
+            guard let post = post else { return }
+            titleLabel.text = post.title
+            metadataLabel.text = "\(post.points) points"
+            commentsLabel.text = "\(post.commentCount) comments"
+            linkButton.setTitle(post.urlDomain, for: .normal)
+            if post.urlDomain == nil, post.type != .default {
+                linkButton.setTitle("news.ycombinator.com", for: .normal)
             }
         }
     }
