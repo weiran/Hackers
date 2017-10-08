@@ -132,14 +132,13 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     func loadMorePosts() {
-        if let nextPageIdentifier = nextPageIdentifier {
-            self.nextPageIdentifier = nil
-            HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
-                if let downcastedArray = posts as? [HNPost] {
-                    self.nextPageIdentifier = nextPageIdentifier
-                    self.posts.append(contentsOf: downcastedArray)
-                    self.tableView.reloadData()
-                }
+        guard let nextPageIdentifier = nextPageIdentifier else { return }
+        self.nextPageIdentifier = nil
+        HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
+            if let downcastedArray = posts as? [HNPost] {
+                self.nextPageIdentifier = nextPageIdentifier
+                self.posts.append(contentsOf: downcastedArray)
+                self.tableView.reloadData()
             }
         }
     }
@@ -233,34 +232,30 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return false
-        }
+        guard let urlString = urlString, let url = URL(string: urlString) else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
     
     // MARK: - PostCellDelegate
     
     func didTapThumbnail(_ sender: Any) {
-        if let tapGestureRecognizer = sender as? UITapGestureRecognizer {
-            let point = tapGestureRecognizer.location(in: tableView)
-            if let indexPath = tableView.indexPathForRow(at: point) {
-                let post = posts[indexPath.row]
-                didPressLinkButton(post)
-            }
+        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
+        let point = tapGestureRecognizer.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
+            didPressLinkButton(post)
         }
     }
     
     // MARK: - UIViewControllerPreviewingDelegate
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        if let indexPath = tableView.indexPathForRow(at: location) {
-            let post = posts[indexPath.row]
-            if let url = URL(string: post.urlString), verifyLink(post.urlString) {
-                peekedIndexPath = indexPath
-                previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-                return getSafariViewController(url)
-            }
+        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        let post = posts[indexPath.row]
+        if let url = URL(string: post.urlString), verifyLink(post.urlString) {
+            peekedIndexPath = indexPath
+            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+            return getSafariViewController(url)
         }
         return nil
     }
