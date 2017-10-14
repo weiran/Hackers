@@ -11,11 +11,8 @@ import AwesomeCache
 import PromiseKit
 
 class ThumbnailFetcher {
-    
     static func getThumbnailFromCache(url: URL) -> UIImage? {
-        guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else {
-            return nil
-        }
+        guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else { return nil }
 
         return cache[url.absoluteString]
     }
@@ -32,13 +29,19 @@ class ThumbnailFetcher {
             if let cachedImage = getThumbnailFromCache(url: url) {
                 fulfill(cachedImage)
             } else {
-                fetchThumbnail(url: url) { image in
-                    if let image = image, !cancelMe {
-                        if let cache = try? Cache<UIImage>(name: "thumbnailCache") {
-                            cache[url.absoluteString] = image
-                        }
+                fetchThumbnail(url: url) { image, error in
+                    guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else { return }
+                    
+                    if let image = image, !cancelMe, error == nil {
+                        // image fetched
+                        let cacheExpiry = Calendar.current.date(byAdding: .month, value: 1, to: Date())!
+                        cache.setObject(image, forKey: url.absoluteString, expires: .date(cacheExpiry))
                         fulfill(image)
+                    } else if let error = error {
+                        // error fetching image
+                        reject(error)
                     } else {
+                        // no image to fetch or cancelled
                         fulfill(nil)
                     }
                 }
@@ -48,39 +51,62 @@ class ThumbnailFetcher {
         return (promise, cancel)
     }
 
-    private static func fetchThumbnail(url: URL, completion:@escaping (UIImage?) -> Void) {
+    fileprivate static func fetchThumbnail(url: URL, completion:@escaping (UIImage?, Error?) -> Void) {
         Readability.parse(url: url) { data in
-            if let imageUrlString = data?.topImage, let imageUrl = URL(string: imageUrlString) {
+            if let imageUrlString = data?.topImage, let imageUrl = parseImageUrl(url, imageUrl: URL(string: imageUrlString)) {
                 self.shouldFetchImage(url: imageUrl) { shouldFetch in
                     if shouldFetch {
                         let task = URLSession.shared.dataTask(with: imageUrl) { data, response, error -> Void in
-                            if let data = data, let image = UIImage(data: data) {
-                                completion(image)
+                            if let data = data, let image = UIImage(data: data), error == nil {
+                                completion(image, nil)
+                            } else if let error = error {
+                                completion(nil, error)
                             } else {
-                                completion(nil)
+                                completion(nil, nil)
                             }
                         }
                         task.resume()
                     } else {
-                        completion(nil)
+                        completion(nil, nil)
                     }
                 }
             }
         }
     }
     
-    private static func shouldFetchImage(url: URL, completion:@escaping (Bool) -> Void) {
+    fileprivate static func shouldFetchImage(url: URL, completion:@escaping (Bool) -> Void) {
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
         
-        let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, _ -> Void in
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error -> Void in
             if let expectedContentLength = response?.expectedContentLength {
                 completion(expectedContentLength < 1000000 && expectedContentLength > 0)
             } else {
                 completion(false)
             }
+            if let error = error {
+                print(error.localizedDescription)
+            }
         })
         
         task.resume()
+    }
+    
+    fileprivate static func parseImageUrl(_ url: URL, imageUrl: URL?) -> URL? {
+        guard let imageUrl = imageUrl else { return nil }
+        
+        guard let urlComponents = NSURLComponents(url: imageUrl, resolvingAgainstBaseURL: true) else {
+            return url
+        }
+        
+        if urlComponents.scheme == nil {
+            urlComponents.scheme = url.scheme
+        }
+        
+        if urlComponents.host == nil {
+            urlComponents.host = url.host
+        }
+        
+        return urlComponents.url!
     }
 }
