@@ -80,6 +80,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     func setupPostTitleView() {
         postTitleView.post = post
         postTitleView.delegate = self
+        postTitleView.isTitleTapEnabled = true
         
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
