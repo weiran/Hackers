@@ -25,7 +25,6 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
-            //TODO colour this so numbers are darker than text
             metadataLabel.text = "\(post.points) points • \(post.commentCount) comments"
         }
     }
