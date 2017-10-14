@@ -94,7 +94,7 @@
 			name = HackerSwifter;
 			sourceTree = "<group>";
 		};
-		24CE5FEE19434DC0009D2677 /* Post List */ = {
+		24CE5FEE19434DC0009D2677 /* Posts List */ = {
 			isa = PBXGroup;
 			children = (
 				24CE5FF319435061009D2677 /* NewsViewController.swift */,
@@ -102,10 +102,10 @@
 				240E2C361EBDFBA9000B4A89 /* ThumbnailFetcher.swift */,
 				242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */,
 			);
-			path = "Post List";
+			path = "Posts List";
 			sourceTree = "<group>";
 		};
-		24CE5FEF19434DCB009D2677 /* Post */ = {
+		24CE5FEF19434DCB009D2677 /* Comments */ = {
 			isa = PBXGroup;
 			children = (
 				24DFD28B19436E51007F61E7 /* CommentsViewController.swift */,
@@ -115,7 +115,7 @@
 				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 				249B24741F659A5200028A92 /* CommentsHeader.xib */,
 			);
-			path = Post;
+			path = Comments;
 			sourceTree = "<group>";
 		};
 		24CE5FF119434E0B009D2677 /* Assets */ = {
@@ -176,8 +176,8 @@
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
 				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
-				24CE5FEE19434DC0009D2677 /* Post List */,
-				24CE5FEF19434DCB009D2677 /* Post */,
+				24CE5FEE19434DC0009D2677 /* Posts List */,
+				24CE5FEF19434DCB009D2677 /* Comments */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 				24D6B8C91C1EDBFC00618422 /* Theme.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift */,
