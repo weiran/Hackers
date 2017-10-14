@@ -32,7 +32,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 150
+        tableView.estimatedRowHeight = 77
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self

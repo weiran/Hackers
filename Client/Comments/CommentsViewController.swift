@@ -31,7 +31,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         setupPostTitleView()
         
-        tableView.estimatedRowHeight = 44.0
+        tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
