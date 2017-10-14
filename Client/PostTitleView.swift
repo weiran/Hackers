@@ -26,10 +26,4 @@ class PostTitleView: UIView {
             metadataLabel.text = "\(post.points) points • \(post.commentCount) comments"
         }
     }
-    
-    @IBAction func didPressLinkButton(_ sender: UIButton) {
-        if let delegate = delegate {
-            delegate.didPressLinkButton(post!)
-        }
-    }
 }
