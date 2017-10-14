@@ -81,7 +81,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         cancelThumbnailFetchTasks = [() -> Void]()
         
-        if (clear) {
+        if clear {
             // clear data and show loading state
             posts = [HNPost]()
             tableView.reloadData()

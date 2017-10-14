@@ -53,16 +53,16 @@
                                                     <rect key="frame" x="72" y="8.3333333333333321" width="280" height="43.666666666666671"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="EUR-zJ-itc">
-                                                            <rect key="frame" x="0.0" y="0.0" width="280" height="43.666666666666664"/>
+                                                            <rect key="frame" x="0.0" y="0.66666666666666785" width="280" height="43.666666666666671"/>
                                                             <subviews>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bsb-hN-3l1">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="280" height="21.666666666666664"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="280" height="21.666666666666668"/>
                                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
                                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xHa-jb-1St">
-                                                                    <rect key="frame" x="0.0" y="26.666666666666664" width="280" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="26.666666666666671" width="280" height="17"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                     <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                     <nil key="highlightedColor"/>
