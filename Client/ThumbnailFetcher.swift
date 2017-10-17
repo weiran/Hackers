@@ -107,6 +107,10 @@ class ThumbnailFetcher {
             urlComponents.host = url.host
         }
         
-        return urlComponents.url!
+        if let path = urlComponents.path, path.hasPrefix(".") {
+            urlComponents.path = String(path[1...])
+        }
+        
+        return urlComponents.url
     }
 }
