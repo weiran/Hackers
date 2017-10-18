@@ -25,7 +25,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
-            metadataLabel.text = "\(post.points) points • \(post.commentCount) comments"
+            metadataLabel.text = "\(post.points) p • \(post.commentCount) c • \(domainLabelText(for: post))"
         }
     }
     
@@ -40,5 +40,12 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         if isTitleTapEnabled, let delegate = delegate {
             delegate.didPressLinkButton(post!)
         }
+    }
+    
+    fileprivate func domainLabelText(for post: HNPost) -> String {
+        guard let urlComponents = URLComponents(string: post.urlString), let host = urlComponents.host else {
+            return "news.ycombinator.com"
+        }
+        return host
     }
 }
