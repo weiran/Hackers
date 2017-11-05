@@ -7,20 +7,20 @@ PODS:
     - Ji/Ji-libxml
   - Ji/Ji-libxml (2.0.1)
   - libHN (4.1.0)
-  - PromiseKit (4.4.0):
-    - PromiseKit/Foundation (= 4.4.0)
-    - PromiseKit/QuartzCore (= 4.4.0)
-    - PromiseKit/UIKit (= 4.4.0)
-  - PromiseKit/CorePromise (4.4.0)
-  - PromiseKit/Foundation (4.4.0):
+  - PromiseKit (4.4.4):
+    - PromiseKit/Foundation (= 4.4.4)
+    - PromiseKit/QuartzCore (= 4.4.4)
+    - PromiseKit/UIKit (= 4.4.4)
+  - PromiseKit/CorePromise (4.4.4)
+  - PromiseKit/Foundation (4.4.4):
     - PromiseKit/CorePromise
-  - PromiseKit/QuartzCore (4.4.0):
+  - PromiseKit/QuartzCore (4.4.4):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (4.4.0):
+  - PromiseKit/UIKit (4.4.4):
     - PromiseKit/CorePromise
-  - ReadabilityKit (0.6.1):
-    - Ji (~> 2.0.1)
-  - SVProgressHUD (2.2.1)
+  - ReadabilityKit (0.7.1):
+    - Ji
+  - SVProgressHUD (2.2.2)
 
 DEPENDENCIES:
   - AwesomeCache
@@ -51,9 +51,9 @@ SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   Ji: 6bb602a28dd08b804158f64990e6051ed5de0110
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
-  PromiseKit: ecf5fe92275d57ee77c9ede858af47a162e9b97e
-  ReadabilityKit: 49c26a2da9708ae3b355854d5bee6a7edee2dfee
-  SVProgressHUD: db27c54e6e18bc903341661fc9feb55e04905cc4
+  PromiseKit: 6178219c4c7457ae90d7d8b34b7ac5eb36916519
+  ReadabilityKit: 45e79725f6d0377c555f38d9df7a6d4435898c04
+  SVProgressHUD: 59b2d3dabacbd051576d21d32293ca7228dc18b0
 
 PODFILE CHECKSUM: 28d77b9c3b3d4f1dd3e2fb49204a2b0a15af750b
 
