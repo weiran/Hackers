@@ -25,7 +25,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
-            metadataLabel.text = "\(post.points) p • \(post.commentCount) c • \(domainLabelText(for: post))"
+//            metadataLabel.text = "\(post.points) p • \(post.commentCount) c • \(domainLabelText(for: post))"
+            metadataLabel.attributedText = metadataText(for: post)
         }
     }
     
@@ -47,5 +48,31 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
             return "news.ycombinator.com"
         }
         return host
+    }
+    
+    fileprivate func metadataText(for post: HNPost) -> NSAttributedString {
+        let string = NSMutableAttributedString()
+        
+        let pointsIconAttachment = NSTextAttachment()
+        pointsIconAttachment.image = templateImage(named: "PointsIcon")
+        let pointsIconAttributedString = NSAttributedString(attachment: pointsIconAttachment)
+        
+        let commentsIconAttachment = NSTextAttachment()
+        commentsIconAttachment.image = templateImage(named: "CommentsIcon")
+        let commentsIconAttributedString = NSAttributedString(attachment: commentsIconAttachment)
+        
+        string.append(NSAttributedString(string: "\(post.points) "))
+        string.append(pointsIconAttributedString)
+        string.append(NSAttributedString(string: " • \(post.commentCount) "))
+        string.append(commentsIconAttributedString)
+        string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
+        
+        return string
+    }
+    
+    fileprivate func templateImage(named: String) -> UIImage? {
+        let image = UIImage.init(named: named)
+        let templateImage = image?.withRenderingMode(.alwaysTemplate)
+        return templateImage
     }
 }
