@@ -6,13 +6,12 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 
 ## Features
 
+* Thumbnails generated for posts
 * Comments threads are collapsable
 * Full iPad multitasking support
-* Safari View Controllers
+* Safari View Controller
 
-![Screenshots][1]
-
-[1]: http://i.imgur.com/agzuetN.png
+<img src="https://github.com/weiran/Hackers/raw/master/Screenshots/iPhoneX_Ultimate_framed.png" width="500">
 
 ## Open Source
 
@@ -33,7 +32,7 @@ Hackers is open source and licenced under the MIT licence.
 
 1. Install [cocoapods](http://cocoapods.org/), you can use RubyGems: `gem install cocoapods`.
 2. Install pods, in the project root folder, run `pod install`.
-3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 8 or later, and build.
+3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 9 or later, and build.
 
 ## About
 
