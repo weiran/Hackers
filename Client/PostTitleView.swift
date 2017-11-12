@@ -61,7 +61,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         
         string.append(NSAttributedString(string: "\(post.points)"))
         string.append(pointsIconAttributedString)
-        string.append(NSAttributedString(string: " • \(post.commentCount)"))
+        string.append(NSAttributedString(string: "• \(post.commentCount)"))
         string.append(commentsIconAttributedString)
         string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
         
