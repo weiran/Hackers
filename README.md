@@ -32,7 +32,7 @@ Hackers is open source and licenced under the MIT licence.
 
 1. Install [cocoapods](http://cocoapods.org/), you can use RubyGems: `gem install cocoapods`.
 2. Install pods, in the project root folder, run `pod install`.
-3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 8 or later, and build.
+3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 9 or later, and build.
 
 ## About
 
