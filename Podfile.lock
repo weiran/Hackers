@@ -1,22 +1,22 @@
 PODS:
   - AwesomeCache (5.0)
   - DZNEmptyDataSet (1.8.1)
-  - Ji (2.0.1):
-    - Ji/Ji (= 2.0.1)
-  - Ji/Ji (2.0.1):
+  - Ji (2.1.0):
+    - Ji/Ji (= 2.1.0)
+  - Ji/Ji (2.1.0):
     - Ji/Ji-libxml
-  - Ji/Ji-libxml (2.0.1)
+  - Ji/Ji-libxml (2.1.0)
   - libHN (4.1.0)
-  - PromiseKit (4.4.4):
-    - PromiseKit/Foundation (= 4.4.4)
-    - PromiseKit/QuartzCore (= 4.4.4)
-    - PromiseKit/UIKit (= 4.4.4)
-  - PromiseKit/CorePromise (4.4.4)
-  - PromiseKit/Foundation (4.4.4):
+  - PromiseKit (4.5.0):
+    - PromiseKit/Foundation (= 4.5.0)
+    - PromiseKit/QuartzCore (= 4.5.0)
+    - PromiseKit/UIKit (= 4.5.0)
+  - PromiseKit/CorePromise (4.5.0)
+  - PromiseKit/Foundation (4.5.0):
     - PromiseKit/CorePromise
-  - PromiseKit/QuartzCore (4.4.4):
+  - PromiseKit/QuartzCore (4.5.0):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (4.4.4):
+  - PromiseKit/UIKit (4.5.0):
     - PromiseKit/CorePromise
   - ReadabilityKit (0.7.1):
     - Ji
@@ -25,7 +25,7 @@ PODS:
 DEPENDENCIES:
   - AwesomeCache
   - DZNEmptyDataSet
-  - Ji (from `https://github.com/honghaoz/Ji.git`, branch `swift4`)
+  - Ji (from `https://github.com/honghaoz/Ji.git`)
   - libHN (from `https://github.com/weiran/libHN`)
   - PromiseKit
   - ReadabilityKit
@@ -33,14 +33,13 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   Ji:
-    :branch: swift4
     :git: https://github.com/honghaoz/Ji.git
   libHN:
     :git: https://github.com/weiran/libHN
 
 CHECKOUT OPTIONS:
   Ji:
-    :commit: a2e4f13f972d719b2d7a36ed20cfaf5c5b76f7fa
+    :commit: 7f99606ca898080f4d34c31a1e579ea9c049d275
     :git: https://github.com/honghaoz/Ji.git
   libHN:
     :commit: ca79b491f594a851825db9bf0e99235b2863b71c
@@ -49,12 +48,12 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   AwesomeCache: d8906955242173357caa0be0214d5e77dec32cc5
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  Ji: 6bb602a28dd08b804158f64990e6051ed5de0110
+  Ji: 21946da4e13425485ddd424edfaeeced0d80ad28
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
-  PromiseKit: 6178219c4c7457ae90d7d8b34b7ac5eb36916519
+  PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   ReadabilityKit: 45e79725f6d0377c555f38d9df7a6d4435898c04
   SVProgressHUD: 59b2d3dabacbd051576d21d32293ca7228dc18b0
 
-PODFILE CHECKSUM: 28d77b9c3b3d4f1dd3e2fb49204a2b0a15af750b
+PODFILE CHECKSUM: dd775c1344014e35b74428e29d961d7bae3d7717
 
 COCOAPODS: 1.3.1
