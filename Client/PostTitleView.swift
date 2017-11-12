@@ -53,17 +53,15 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     fileprivate func metadataText(for post: HNPost) -> NSAttributedString {
         let string = NSMutableAttributedString()
         
-        let pointsIconAttachment = NSTextAttachment()
-        pointsIconAttachment.image = templateImage(named: "PointsIcon")
+        let pointsIconAttachment = textAttachment(for: "PointsIcon")
         let pointsIconAttributedString = NSAttributedString(attachment: pointsIconAttachment)
         
-        let commentsIconAttachment = NSTextAttachment()
-        commentsIconAttachment.image = templateImage(named: "CommentsIcon")
+        let commentsIconAttachment = textAttachment(for: "CommentsIcon")
         let commentsIconAttributedString = NSAttributedString(attachment: commentsIconAttachment)
         
-        string.append(NSAttributedString(string: "\(post.points) "))
+        string.append(NSAttributedString(string: "\(post.points)"))
         string.append(pointsIconAttributedString)
-        string.append(NSAttributedString(string: " • \(post.commentCount) "))
+        string.append(NSAttributedString(string: " • \(post.commentCount)"))
         string.append(commentsIconAttributedString)
         string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
         
@@ -74,5 +72,13 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         let image = UIImage.init(named: named)
         let templateImage = image?.withRenderingMode(.alwaysTemplate)
         return templateImage
+    }
+    
+    fileprivate func textAttachment(for imageNamed: String) -> NSTextAttachment {
+        let attachment = NSTextAttachment()
+        guard let image = templateImage(named: imageNamed) else { return attachment }
+        attachment.image = image
+        attachment.bounds = CGRect(x: 0, y: -2, width: image.size.width, height: image.size.height)
+        return attachment
     }
 }
