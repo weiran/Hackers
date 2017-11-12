@@ -47,8 +47,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     override func awakeFromNib() {
-        // TODO: workaround for iOS 11 bug, remove when fixed
-        navigationController?.navigationBar.prefersLargeTitles = false
+        /*
+         TODO: workaround for an iOS 11 bug: if prefersLargeTitles is set in storyboard,
+         it never shrinks with scroll. When fixed, remove from code and set in storyboard.
+        */
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
