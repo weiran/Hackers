@@ -169,7 +169,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                     self.thumbnailProcessedUrls.append(url.absoluteString)
                     DispatchQueue.main.async {
                         self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                        self.tableView.reloadRows(at: [indexPath], with: .fade)
                         self.tableView.endUpdates()
                     }
                 }
