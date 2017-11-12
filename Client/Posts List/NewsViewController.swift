@@ -184,18 +184,17 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         collapseDetailViewController = false
-        var viewController = storyboard!.instantiateViewController(withIdentifier: "PostViewNavigationController")
-        let commentsViewController = (viewController as! UINavigationController).viewControllers.first as! CommentsViewController
         
-        let post = posts[indexPath.row]
-        commentsViewController.post = post
+        guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
+        guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
+        commentsViewController.post = posts[indexPath.row]
         
         if UIDevice.current.userInterfaceIdiom == .phone {
-            // for iPhone we only want to push the view controller not navigation controller
-            viewController = commentsViewController
+            // for iPhone we want to push the view controller instead of presenting it as the detail
+            self.navigationController?.pushViewController(commentsViewController, animated: true)
+        } else {
+            showDetailViewController(navController, sender: self)
         }
-        
-        showDetailViewController(viewController, sender: self)
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
