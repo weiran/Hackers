@@ -10,9 +10,13 @@ import UIKit
 import libHN
 
 class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        delegate = self
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        delegate = self
         preferredDisplayMode = .allVisible
     }
     

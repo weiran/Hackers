@@ -16,7 +16,9 @@ class MainTabBarController: UITabBarController {
         guard let viewControllers = self.viewControllers else { return }
         
         for (index, viewController) in viewControllers.enumerated() {
-            if let newsVC = viewController as? NewsViewController {
+            guard let navController = viewController as? UINavigationController else { continue }
+            Theme.setupNavigationBar(navController.navigationBar)
+            if let newsVC = navController.viewControllers.first as? NewsViewController {
                 var postType: PostFilterType?
                 var typeName: String?
                 var iconName: String?
@@ -49,7 +51,6 @@ class MainTabBarController: UITabBarController {
             }
         }
         
-        Theme.setupNavigationBar(self.navigationController!.navigationBar)
         tabBar.clipsToBounds = true
     }
 }

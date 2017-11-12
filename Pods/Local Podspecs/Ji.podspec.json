@@ -1,6 +1,6 @@
 {
   "name": "Ji",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "summary": "Ji (戟) is a Swift XML/HTML parser.",
   "description": "Ji (戟) is a Swift wrapper on libxml2 for parsing XML/HTML.\n\nFeatures\n* Build an XML/HTML tree and navigate the tree\n* Evaluate XPath expression and get results nodes\n* Comprehensive Unit Test Coverage\n* Support Swift Package Manager (SPM). Linux compatible.",
   "homepage": "https://github.com/honghaoz/Ji",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/honghaoz/Ji.git",
-    "tag": "2.0.1"
+    "tag": "2.1.0"
   },
   "platforms": {
     "ios": "8.0",

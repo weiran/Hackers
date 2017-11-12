@@ -7,7 +7,7 @@ target 'Hackers' do
 	pod 'DZNEmptyDataSet'
     pod 'ReadabilityKit'
     pod 'AwesomeCache'
-    pod 'Ji', :git=> 'https://github.com/honghaoz/Ji.git', :branch => 'swift4' # required to work with Swift 4
+    pod 'Ji'
     pod 'PromiseKit'
     pod 'SVProgressHUD'
 end

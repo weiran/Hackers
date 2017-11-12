@@ -31,7 +31,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         setupPostTitleView()
         
-        tableView.estimatedRowHeight = 44.0
+        tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
@@ -80,6 +80,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     func setupPostTitleView() {
         postTitleView.post = post
         postTitleView.delegate = self
+        postTitleView.isTitleTapEnabled = true
         
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
@@ -124,7 +125,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 80
+        return 60
     }
     
     // MARK: - DZNEmptyDataSet

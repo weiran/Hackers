@@ -32,7 +32,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 150
+        tableView.estimatedRowHeight = 77
         tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
@@ -47,8 +47,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     override func awakeFromNib() {
-        // TODO: workaround for iOS 11 bug, remove when fixed
-        navigationController?.navigationBar.prefersLargeTitles = false
+        /*
+         TODO: workaround for an iOS 11 bug: if prefersLargeTitles is set in storyboard,
+         it never shrinks with scroll. When fixed, remove from code and set in storyboard.
+        */
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
@@ -81,7 +83,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         cancelThumbnailFetchTasks = [() -> Void]()
         
-        if (clear) {
+        if clear {
             // clear data and show loading state
             posts = [HNPost]()
             tableView.reloadData()
@@ -132,14 +134,13 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     func loadMorePosts() {
-        if let nextPageIdentifier = nextPageIdentifier {
-            self.nextPageIdentifier = nil
-            HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
-                if let downcastedArray = posts as? [HNPost] {
-                    self.nextPageIdentifier = nextPageIdentifier
-                    self.posts.append(contentsOf: downcastedArray)
-                    self.tableView.reloadData()
-                }
+        guard let nextPageIdentifier = nextPageIdentifier else { return }
+        self.nextPageIdentifier = nil
+        HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
+            if let downcastedArray = posts as? [HNPost] {
+                self.nextPageIdentifier = nextPageIdentifier
+                self.posts.append(contentsOf: downcastedArray)
+                self.tableView.reloadData()
             }
         }
     }
@@ -166,13 +167,12 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
                 cell.cancelThumbnailTask = cancel
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
-                    if image != nil {
-                        self.thumbnailProcessedUrls.append(url.absoluteString)
-                        DispatchQueue.main.async {
-                            self.tableView.beginUpdates()
-                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                            self.tableView.endUpdates()
-                        }
+                    guard let _ = image else { return }
+                    self.thumbnailProcessedUrls.append(url.absoluteString)
+                    DispatchQueue.main.async {
+                        self.tableView.beginUpdates()
+                        self.tableView.reloadRows(at: [indexPath], with: .fade)
+                        self.tableView.endUpdates()
                     }
                 }
                 cancelThumbnailFetchTasks.append(cancel)
@@ -186,18 +186,17 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         collapseDetailViewController = false
-        var viewController = storyboard!.instantiateViewController(withIdentifier: "PostViewNavigationController")
-        let commentsViewController = (viewController as! UINavigationController).viewControllers.first as! CommentsViewController
         
-        let post = posts[indexPath.row]
-        commentsViewController.post = post
+        guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
+        guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
+        commentsViewController.post = posts[indexPath.row]
         
         if UIDevice.current.userInterfaceIdiom == .phone {
-            // for iPhone we only want to push the view controller not navigation controller
-            viewController = commentsViewController
+            // for iPhone we want to push the view controller instead of presenting it as the detail
+            self.navigationController?.pushViewController(commentsViewController, animated: true)
+        } else {
+            showDetailViewController(navController, sender: self)
         }
-        
-        showDetailViewController(viewController, sender: self)
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -234,34 +233,30 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     }
     
     func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return false
-        }
+        guard let urlString = urlString, let url = URL(string: urlString) else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
     
     // MARK: - PostCellDelegate
     
     func didTapThumbnail(_ sender: Any) {
-        if let tapGestureRecognizer = sender as? UITapGestureRecognizer {
-            let point = tapGestureRecognizer.location(in: tableView)
-            if let indexPath = tableView.indexPathForRow(at: point) {
-                let post = posts[indexPath.row]
-                didPressLinkButton(post)
-            }
+        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
+        let point = tapGestureRecognizer.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
+            didPressLinkButton(post)
         }
     }
     
     // MARK: - UIViewControllerPreviewingDelegate
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        if let indexPath = tableView.indexPathForRow(at: location) {
-            let post = posts[indexPath.row]
-            if let url = URL(string: post.urlString), verifyLink(post.urlString) {
-                peekedIndexPath = indexPath
-                previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-                return getSafariViewController(url)
-            }
+        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        let post = posts[indexPath.row]
+        if let url = URL(string: post.urlString), verifyLink(post.urlString) {
+            peekedIndexPath = indexPath
+            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+            return getSafariViewController(url)
         }
         return nil
     }
