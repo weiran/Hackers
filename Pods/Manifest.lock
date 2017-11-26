@@ -20,27 +20,24 @@ PODS:
     - PromiseKit/CorePromise
   - ReadabilityKit (0.7.1):
     - Ji
+  - SkeletonView (1.0.4)
   - SVProgressHUD (2.2.2)
 
 DEPENDENCIES:
   - AwesomeCache
   - DZNEmptyDataSet
-  - Ji (from `https://github.com/honghaoz/Ji.git`)
+  - Ji
   - libHN (from `https://github.com/weiran/libHN`)
   - PromiseKit
   - ReadabilityKit
+  - SkeletonView
   - SVProgressHUD
 
 EXTERNAL SOURCES:
-  Ji:
-    :git: https://github.com/honghaoz/Ji.git
   libHN:
     :git: https://github.com/weiran/libHN
 
 CHECKOUT OPTIONS:
-  Ji:
-    :commit: 7f99606ca898080f4d34c31a1e579ea9c049d275
-    :git: https://github.com/honghaoz/Ji.git
   libHN:
     :commit: ca79b491f594a851825db9bf0e99235b2863b71c
     :git: https://github.com/weiran/libHN
@@ -52,8 +49,9 @@ SPEC CHECKSUMS:
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   ReadabilityKit: 45e79725f6d0377c555f38d9df7a6d4435898c04
+  SkeletonView: 933a9442b08c3550f61c2ae38a02456a74ad86f4
   SVProgressHUD: 59b2d3dabacbd051576d21d32293ca7228dc18b0
 
-PODFILE CHECKSUM: dd775c1344014e35b74428e29d961d7bae3d7717
+PODFILE CHECKSUM: f1d285711fe5912f04861701936da348fa8af78b
 
 COCOAPODS: 1.3.1
