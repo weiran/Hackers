@@ -15,7 +15,7 @@ import PromiseKit
 import SkeletonView
 import SVProgressHUD
 
-class NewsViewController : UIViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, SkeletonTableViewDataSource {
+class NewsViewController : UIViewController, UITableViewDataSource, UITableViewDelegate, UISplitViewControllerDelegate, SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, PostTitleViewDelegate, PostCellDelegate, SkeletonTableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     
     var posts: [HNPost] = [HNPost]()
@@ -90,17 +90,19 @@ class NewsViewController : UIViewController, UISplitViewControllerDelegate, Post
         .then { (posts, nextPageIdentifier) -> Void in
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
+            self.view.hideSkeleton()
             self.tableView.rowHeight = UITableViewAutomaticDimension
+            self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
             self.tableView.reloadData()
         }
         .catch { error in
+            self.view.hideSkeleton()
             SVProgressHUD.showError(withStatus: "Failed")
             SVProgressHUD.dismiss(withDelay: 1.0)
         }
         .always {
             self.isProcessing = false
             self.tableView.refreshControl?.endRefreshing()
-            self.view.hideSkeleton()
         }
         
         cancelFetch = cancel
