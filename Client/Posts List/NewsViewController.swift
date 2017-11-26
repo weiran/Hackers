@@ -12,9 +12,11 @@ import SafariServices
 import libHN
 import DZNEmptyDataSet
 import PromiseKit
+import SkeletonView
 import SVProgressHUD
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+class NewsViewController : UIViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, SkeletonTableViewDataSource {
+    @IBOutlet weak var tableView: UITableView!
     
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
@@ -30,20 +32,19 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 77
-        tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
-        tableView.emptyDataSetSource = self
-        tableView.emptyDataSetDelegate = self
+        registerForPreviewing(with: self, sourceView: tableView)
 
-        refreshControl!.tintColor = Theme.purpleColour
-        refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        tableView.refreshControl = UIRefreshControl()
+        tableView.refreshControl!.tintColor = Theme.purpleColour
+        tableView.refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         
         splitViewController!.delegate = self
         
         loadPosts()
-        SVProgressHUD.show()
+        
+        tableView.rowHeight = 77
+        view.showAnimatedSkeleton()
     }
     
     override func awakeFromNib() {
@@ -68,7 +69,7 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         rz_smoothlyDeselectRows(tableView: tableView)
     }
     
-    @objc func loadPosts(_ clear: Bool = false) {
+    @objc func loadPosts() {
         isProcessing = true
         
         // cancel existing fetches
@@ -83,20 +84,14 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         cancelThumbnailFetchTasks = [() -> Void]()
         
-        if clear {
-            // clear data and show loading state
-            posts = [HNPost]()
-            tableView.reloadData()
-        }
-        
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
         fetchPromise
         .then { (posts, nextPageIdentifier) -> Void in
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
+            self.tableView.rowHeight = UITableViewAutomaticDimension
             self.tableView.reloadData()
-            SVProgressHUD.dismiss()
         }
         .catch { error in
             SVProgressHUD.showError(withStatus: "Failed")
@@ -104,7 +99,8 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         .always {
             self.isProcessing = false
-            self.refreshControl?.endRefreshing()
+            self.tableView.refreshControl?.endRefreshing()
+            self.view.hideSkeleton()
         }
         
         cancelFetch = cancel
@@ -147,11 +143,11 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     // MARK: - UITableViewDataSource
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
   
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
         cell.clearImage()
@@ -182,9 +178,15 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         return cell
     }
     
+    // MARK: - SkeletonTableViewDataSource
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return "PostCell"
+    }
+    
     // MARK: - UITableViewDelegate
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         collapseDetailViewController = false
         
         guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
@@ -199,13 +201,13 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
     }
     
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
     }
     
-    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PostCell {
             cell.cancelThumbnailTask?()
         }
@@ -276,12 +278,5 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             self.tableView(self.tableView, didSelectRowAt: indexPath)
         }
         return [viewCommentsPreviewAction]
-    }
-    
-    // MARK: - DZN
-
-    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 24.0)]
-        return isProcessing ? NSAttributedString(string: "", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
     }
 }
