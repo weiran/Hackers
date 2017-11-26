@@ -54,7 +54,6 @@
                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                     <real key="value" value="9"/>
                                                                 </userDefinedRuntimeAttribute>
-                                                                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
                                                             </userDefinedRuntimeAttributes>
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="83f-Rp-OBU" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
@@ -68,23 +67,14 @@
                                                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
                                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
-                                                                            <userDefinedRuntimeAttributes>
-                                                                                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                                                            </userDefinedRuntimeAttributes>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pxp-Sn-WDt">
                                                                             <rect key="frame" x="0.0" y="26.5" width="273" height="17"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                             <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
-                                                                            <userDefinedRuntimeAttributes>
-                                                                                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                                                            </userDefinedRuntimeAttributes>
                                                                         </label>
                                                                     </subviews>
-                                                                    <userDefinedRuntimeAttributes>
-                                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                                                    </userDefinedRuntimeAttributes>
                                                                 </stackView>
                                                             </subviews>
                                                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -94,18 +84,12 @@
                                                                 <constraint firstAttribute="bottom" secondItem="cgB-hV-Qol" secondAttribute="bottom" id="QsM-7q-K7q"/>
                                                                 <constraint firstItem="cgB-hV-Qol" firstAttribute="top" secondItem="83f-Rp-OBU" secondAttribute="top" id="cFp-Lc-Pxi"/>
                                                             </constraints>
-                                                            <userDefinedRuntimeAttributes>
-                                                                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                                            </userDefinedRuntimeAttributes>
                                                             <connections>
                                                                 <outlet property="metadataLabel" destination="pxp-Sn-WDt" id="iCP-Iu-2iE"/>
                                                                 <outlet property="titleLabel" destination="7sv-5D-DDE" id="CYE-OL-N6o"/>
                                                             </connections>
                                                         </view>
                                                     </subviews>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                                    </userDefinedRuntimeAttributes>
                                                 </stackView>
                                             </subviews>
                                             <constraints>
@@ -115,15 +99,9 @@
                                                 <constraint firstItem="Jw8-Bv-Kjy" firstAttribute="leading" secondItem="DOg-MR-2gO" secondAttribute="leading" constant="15" id="mDw-0I-Y5Z"/>
                                             </constraints>
                                             <edgeInsets key="layoutMargins" top="8" left="15" bottom="8" right="8"/>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                            </userDefinedRuntimeAttributes>
                                         </tableViewCellContentView>
                                         <gestureRecognizers/>
                                         <inset key="separatorInset" minX="88" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
-                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <outlet property="postTitleView" destination="83f-Rp-OBU" id="mmT-Vv-694"/>
                                             <outlet property="thumbnailImageView" destination="4PS-aO-5AM" id="X1l-D8-yc4"/>
