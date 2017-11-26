@@ -25,7 +25,6 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
-//            metadataLabel.text = "\(post.points) p • \(post.commentCount) c • \(domainLabelText(for: post))"
             metadataLabel.attributedText = metadataText(for: post)
         }
     }
