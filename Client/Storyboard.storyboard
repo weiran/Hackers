@@ -275,10 +275,10 @@
             </objects>
             <point key="canvasLocation" x="30" y="1568"/>
         </scene>
-        <!--Empty Data Set Delegate-->
+        <!--Comments-->
         <scene sceneID="mLS-Wn-pXA">
             <objects>
-                <viewController storyboardIdentifier="CommentsViewController" id="gkj-Tg-B9Y" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="CommentsViewController" id="gkj-Tg-B9Y" userLabel="Comments" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="R7l-Nf-bSp"/>
                         <viewControllerLayoutGuide type="bottom" id="deh-OG-94C"/>
@@ -557,7 +557,7 @@
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <outlet property="dataSource" destination="gkj-Tg-B9Y" id="aUC-ZF-BbM"/>
-                                    <outlet property="delegate" destination="gkj-Tg-B9Y" id="pxW-pV-Y1M"/>
+                                    <outlet property="delegate" destination="gkj-Tg-B9Y" id="OqH-Ud-7ZF"/>
                                     <outlet property="emptyDataSetDelegate" destination="gkj-Tg-B9Y" id="gQ1-15-rPg"/>
                                     <outlet property="emptyDataSetSource" destination="gkj-Tg-B9Y" id="zly-yZ-M5I"/>
                                 </connections>

@@ -13,7 +13,7 @@ import libHN
 import DZNEmptyDataSet
 import SkeletonView
 
-class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+class CommentsViewController : UIViewController {
     var post: HNPost?
     
     var comments: [CommentModel]? {
@@ -97,21 +97,44 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    // MARK: - UITableViewDataSource
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return commentsController.visibleComments.count
+    @IBAction func didTapThumbnail(_ sender: Any) {
+        didPressLinkButton(post!)
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Comments"
+    @IBAction func shareTapped(_ sender: AnyObject) {
+        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+        present(activityViewController, animated: true, completion: nil)
+    }
+}
+
+extension CommentsViewController: PostTitleViewDelegate {
+    func didPressLinkButton(_ post: HNPost) {
+        guard verifyLink(post.urlString) else { return }
+        if let url = URL(string: post.urlString) {
+            let safariViewController = SFSafariViewController(url: url)
+            self.present(safariViewController, animated: true, completion: nil)
+        }
+    }
+    
+    func verifyLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return false
+        }
+        return UIApplication.shared.canOpenURL(url)
+    }
+}
+
+extension CommentsViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return commentsController.visibleComments.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let comment = commentsController.visibleComments[indexPath.row]
         assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
-
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
         cell.comment = comment
@@ -119,7 +142,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         return cell
     }
-    
+}
+
+extension CommentsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
         return view
@@ -128,16 +153,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60
     }
-    
-    // MARK: - DZNEmptyDataSet
-    
-    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15.0)]
-        return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
-    }
-    
-    // MARK: - Cell Actions
-    
+}
+
+extension CommentsViewController: CommentDelegate {
     func commentTapped(_ sender: UITableViewCell) {
         let indexPath = tableView.indexPath(for: sender)
         toggleCellVisibilityForCell(indexPath)
@@ -152,7 +170,7 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
-                
+        
         tableView.beginUpdates()
         tableView.reloadRows(at: [indexPath], with: .fade)
         if visibility == CommentVisibilityType.hidden {
@@ -168,32 +186,12 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
-    
-    // MARK: - PostTitleViewDelegate
-    
-    func didPressLinkButton(_ post: HNPost) {
-        guard verifyLink(post.urlString) else { return }
-        if let url = URL(string: post.urlString) {
-            let safariViewController = SFSafariViewController(url: url)
-            self.present(safariViewController, animated: true, completion: nil)
-        }
-    }
-    
-    func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return false
-        }
-        return UIApplication.shared.canOpenURL(url)
-    }
-    
-    @IBAction func didTapThumbnail(_ sender: Any) {
-        didPressLinkButton(post!)
-    }
-    
-    @IBAction func shareTapped(_ sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-        present(activityViewController, animated: true, completion: nil)
+}
+
+extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15.0)]
+        return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
 }
 
