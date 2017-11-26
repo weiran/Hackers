@@ -5,7 +5,7 @@ xcode_scheme: Hackers
 before_install:
 - gem install xcpretty
 - gem update cocoapods
-- pod repo update --silent
+- travis_wait pod repo update --silent
 install:
 - pod install --project-directory=$TRAVIS_BUILD_DIR
 script:
