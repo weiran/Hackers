@@ -35,16 +35,15 @@ class NewsViewController : UIViewController {
         
         registerForPreviewing(with: self, sourceView: tableView)
 
-        tableView.refreshControl = UIRefreshControl()
-        tableView.refreshControl!.tintColor = Theme.purpleColour
-        tableView.refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = Theme.purpleColour
+        refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        tableView.refreshControl = refreshControl
         
         splitViewController!.delegate = self
         
-        loadPosts()
-        
-        tableView.rowHeight = 77
         view.showAnimatedSkeleton()
+        loadPosts()
     }
     
     override func awakeFromNib() {
