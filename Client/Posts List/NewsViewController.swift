@@ -183,7 +183,7 @@ class NewsViewController : UIViewController, UITableViewDataSource, UITableViewD
     // MARK: - SkeletonTableViewDataSource
     
     func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return "PostCell"
+        return "SkeletonCell"
     }
     
     // MARK: - UITableViewDelegate
