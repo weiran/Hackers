@@ -187,7 +187,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="opS-An-teU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2163.5" y="548.5"/>
+            <point key="canvasLocation" x="1670" y="549"/>
         </scene>
         <!--Item-->
         <scene sceneID="jSy-vQ-3t4">
@@ -204,7 +204,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8BD-BV-p8p" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1668" y="549"/>
+            <point key="canvasLocation" x="1132" y="549"/>
         </scene>
         <!--Hacker News-->
         <scene sceneID="aVV-0y-KCU">
@@ -225,7 +225,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="98K-Av-OUm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1123" y="549"/>
+            <point key="canvasLocation" x="587" y="549"/>
         </scene>
         <!--Main Split View Controller-->
         <scene sceneID="UDs-CZ-r0a">
@@ -275,7 +275,7 @@
             </objects>
             <point key="canvasLocation" x="30" y="1568"/>
         </scene>
-        <!--Comments View Controller-->
+        <!--Empty Data Set Delegate-->
         <scene sceneID="mLS-Wn-pXA">
             <objects>
                 <viewController storyboardIdentifier="CommentsViewController" id="gkj-Tg-B9Y" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
@@ -287,7 +287,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="QBD-8Q-H2S">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="144" estimatedRowHeight="100" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="QBD-8Q-H2S">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <view key="tableHeaderView" contentMode="scaleToFill" id="ApK-ej-h7a">
@@ -360,10 +360,6 @@
                                         <constraint firstItem="t7J-jh-8Aa" firstAttribute="bottom" secondItem="ApK-ej-h7a" secondAttribute="bottomMargin" constant="8" id="vw8-su-JZu"/>
                                     </constraints>
                                 </view>
-                                <imageView key="tableFooterView" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="qmP-Qa-1z6">
-                                    <rect key="frame" x="0.0" y="364.5" width="375" height="44"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                </imageView>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="OpenCommentCell" rowHeight="144" id="Ku3-Ww-ybh" userLabel="Open Comment Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="166.5" width="375" height="144"/>
@@ -377,7 +373,7 @@
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <gestureRecognizers/>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
-                                                    <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                     <dataDetectorType key="dataDetectorTypes" link="YES"/>
                                                     <connections>
@@ -489,10 +485,81 @@
                                             <outlet property="leftPaddingConstraint" destination="LN8-MB-g3c" id="kKo-J7-37s"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="144" id="lP7-Ee-gTu" userLabel="Skeleton Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="354.5" width="375" height="144"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lP7-Ee-gTu" id="UVs-jZ-gsT">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="144"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UHj-0F-XKf">
+                                                    <rect key="frame" x="10" y="33" width="355" height="102"/>
+                                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <gestureRecognizers/>
+                                                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                    <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
+                                                    <connections>
+                                                        <outlet property="delegate" destination="lP7-Ee-gTu" id="5cq-lx-nPv"/>
+                                                    </connections>
+                                                </textView>
+                                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zjG-Gq-9pc" userLabel="Seperator View">
+                                                    <rect key="frame" x="10" y="143" width="365" height="1"/>
+                                                    <color key="backgroundColor" red="0.785933514" green="0.785933514" blue="0.785933514" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="0.5" id="c3K-LB-VzJ"/>
+                                                    </constraints>
+                                                </view>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Author" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zv7-Z6-1oC">
+                                                    <rect key="frame" x="10" y="10" width="145" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="145" id="D0C-YE-QpU"/>
+                                                        <constraint firstAttribute="height" constant="21" id="zAS-sR-wUN"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                                    <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
+                                                </label>
+                                            </subviews>
+                                            <gestureRecognizers/>
+                                            <constraints>
+                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="leading" secondItem="zjG-Gq-9pc" secondAttribute="leading" id="09P-P5-JHt"/>
+                                                <constraint firstAttribute="trailing" secondItem="UHj-0F-XKf" secondAttribute="trailing" constant="10" id="4gw-AF-Ohn"/>
+                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="top" secondItem="Zv7-Z6-1oC" secondAttribute="bottom" constant="2" id="5BL-AH-0gr"/>
+                                                <constraint firstAttribute="bottom" secondItem="UHj-0F-XKf" secondAttribute="bottom" constant="9" id="EFb-JU-End"/>
+                                                <constraint firstAttribute="trailing" secondItem="zjG-Gq-9pc" secondAttribute="trailing" id="gFo-NC-dtk"/>
+                                                <constraint firstItem="Zv7-Z6-1oC" firstAttribute="top" secondItem="UVs-jZ-gsT" secondAttribute="top" constant="10" id="hpe-Ms-Pea"/>
+                                                <constraint firstItem="Zv7-Z6-1oC" firstAttribute="leading" secondItem="zjG-Gq-9pc" secondAttribute="leading" id="k8r-6E-B0s"/>
+                                                <constraint firstAttribute="bottom" secondItem="zjG-Gq-9pc" secondAttribute="bottom" id="nyQ-IV-rGP"/>
+                                                <constraint firstItem="zjG-Gq-9pc" firstAttribute="leading" secondItem="UVs-jZ-gsT" secondAttribute="leading" constant="10" id="pwq-Wc-0Vh"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <gestureRecognizers/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <outlet property="authorLabel" destination="Zv7-Z6-1oC" id="B6b-6n-hbw"/>
+                                            <outlet property="commentTextView" destination="UHj-0F-XKf" id="ObQ-JT-Ojj"/>
+                                            <outlet property="leftPaddingConstraint" destination="pwq-Wc-0Vh" id="9Jb-si-SbS"/>
+                                        </connections>
+                                    </tableViewCell>
                                 </prototypes>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <outlet property="dataSource" destination="gkj-Tg-B9Y" id="aUC-ZF-BbM"/>
                                     <outlet property="delegate" destination="gkj-Tg-B9Y" id="pxW-pV-Y1M"/>
+                                    <outlet property="emptyDataSetDelegate" destination="gkj-Tg-B9Y" id="gQ1-15-rPg"/>
+                                    <outlet property="emptyDataSetSource" destination="gkj-Tg-B9Y" id="zly-yZ-M5I"/>
                                 </connections>
                             </tableView>
                         </subviews>
@@ -524,7 +591,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1668" y="1568"/>
+            <point key="canvasLocation" x="1132" y="1568"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="N7T-fw-zna">
@@ -546,7 +613,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="odo-kT-GlM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1115" y="1568"/>
+            <point key="canvasLocation" x="579" y="1568"/>
         </scene>
     </scenes>
     <resources>

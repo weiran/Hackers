@@ -11,6 +11,7 @@ import UIKit
 import SafariServices
 import libHN
 import DZNEmptyDataSet
+import SkeletonView
 
 class CommentsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, CommentDelegate, SFSafariViewControllerDelegate, PostTitleViewDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     var post: HNPost?
@@ -31,16 +32,13 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         
         setupPostTitleView()
         
-        tableView.estimatedRowHeight = 100
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.emptyDataSetSource = self
-        tableView.emptyDataSetDelegate = self
         tableView.backgroundView = nil
         tableView.backgroundColor = .white
         
         navigationItem.largeTitleDisplayMode = .never
         Theme.setupNavigationBar(navigationController!.navigationBar)
 
+        view.showAnimatedSkeleton()
         loadComments()
     }
     
@@ -73,6 +71,9 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
             } else {
                 self.comments = [CommentModel]()
             }
+            
+            self.view.hideSkeleton()
+            self.tableView.rowHeight = UITableViewAutomaticDimension
             self.tableView.reloadData()
         }
     }
@@ -193,5 +194,11 @@ class CommentsViewController : UIViewController, UITableViewDelegate, UITableVie
         let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
+    }
+}
+
+extension CommentsViewController: SkeletonTableViewDataSource {
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return "SkeletonCell"
     }
 }
