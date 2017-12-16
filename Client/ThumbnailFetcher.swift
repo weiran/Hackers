@@ -11,6 +11,8 @@ import AwesomeCache
 import PromiseKit
 
 class ThumbnailFetcher {
+    fileprivate static let MaxImageFetchSize = 1000000
+    
     static func getThumbnailFromCache(url: URL) -> UIImage? {
         guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else { return nil }
 
@@ -80,7 +82,7 @@ class ThumbnailFetcher {
         
         let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error -> Void in
             if let expectedContentLength = response?.expectedContentLength {
-                completion(expectedContentLength < 1000000 && expectedContentLength > 0)
+                completion(expectedContentLength < MaxImageFetchSize && expectedContentLength > 0)
             } else {
                 completion(false)
             }
