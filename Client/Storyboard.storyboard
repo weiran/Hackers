@@ -26,7 +26,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <view key="tableFooterView" contentMode="scaleToFill" id="XDA-kn-4Rw">
-                                    <rect key="frame" x="0.0" y="179" width="375" height="0.0"/>
+                                    <rect key="frame" x="0.0" y="189" width="375" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </view>
@@ -107,15 +107,15 @@
                                             <outlet property="thumbnailImageView" destination="4PS-aO-5AM" id="X1l-D8-yc4"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="80" id="vCE-2L-VVA" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="99" width="375" height="80"/>
+                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="90" id="vCE-2L-VVA" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="99" width="375" height="90"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vCE-2L-VVA" id="Os8-j0-rRI">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="89.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="bEJ-i4-YUp">
-                                                    <rect key="frame" x="15" y="10" width="60" height="60"/>
+                                                    <rect key="frame" x="15" y="15" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -131,7 +131,7 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Skeleton" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VPp-uV-FUC">
-                                                    <rect key="frame" x="87" y="11" width="273" height="58"/>
+                                                    <rect key="frame" x="87" y="11" width="273" height="68"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
