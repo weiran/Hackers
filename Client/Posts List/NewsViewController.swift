@@ -226,7 +226,7 @@ extension NewsViewController: SkeletonTableViewDataSource {
 
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        guard let indexPath = tableView.indexPathForRow(at: location), posts.count > indexPath.row else { return nil }
         let post = posts[indexPath.row]
         if let url = URL(string: post.urlString), verifyLink(post.urlString) {
             peekedIndexPath = indexPath
