@@ -12,9 +12,11 @@ import SafariServices
 import libHN
 import DZNEmptyDataSet
 import PromiseKit
+import SkeletonView
 import SVProgressHUD
 
-class NewsViewController : UITableViewController, UISplitViewControllerDelegate, PostTitleViewDelegate, PostCellDelegate,  SFSafariViewControllerDelegate, SFSafariViewControllerPreviewActionItemsDelegate, UIViewControllerPreviewingDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+class NewsViewController : UIViewController {
+    @IBOutlet weak var tableView: UITableView!
     
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
@@ -30,20 +32,18 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        registerForPreviewing(with: self, sourceView: tableView)
         
-        tableView.estimatedRowHeight = 77
-        tableView.rowHeight = UITableViewAutomaticDimension // auto cell size magic
-        tableView.emptyDataSetSource = self
-        tableView.emptyDataSetDelegate = self
+        registerForPreviewing(with: self, sourceView: tableView)
 
-        refreshControl!.tintColor = Theme.purpleColour
-        refreshControl!.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = Theme.purpleColour
+        refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        tableView.refreshControl = refreshControl
         
         splitViewController!.delegate = self
         
+        view.showAnimatedSkeleton()
         loadPosts()
-        SVProgressHUD.show()
     }
     
     override func awakeFromNib() {
@@ -67,8 +67,16 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
     }
-    
-    @objc func loadPosts(_ clear: Bool = false) {
+
+    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+        let safariViewController = SFSafariViewController(url: url)
+        safariViewController.previewActionItemsDelegate = self
+        return safariViewController
+    }
+}
+
+extension NewsViewController { // post fetching
+    @objc func loadPosts() {
         isProcessing = true
         
         // cancel existing fetches
@@ -83,28 +91,25 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         cancelThumbnailFetchTasks = [() -> Void]()
         
-        if clear {
-            // clear data and show loading state
-            posts = [HNPost]()
-            tableView.reloadData()
-        }
-        
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
         fetchPromise
-        .then { (posts, nextPageIdentifier) -> Void in
-            self.posts = posts ?? [HNPost]()
-            self.nextPageIdentifier = nextPageIdentifier
-            self.tableView.reloadData()
-            SVProgressHUD.dismiss()
-        }
-        .catch { error in
-            SVProgressHUD.showError(withStatus: "Failed")
-            SVProgressHUD.dismiss(withDelay: 1.0)
-        }
-        .always {
-            self.isProcessing = false
-            self.refreshControl?.endRefreshing()
+            .then { (posts, nextPageIdentifier) -> Void in
+                self.posts = posts ?? [HNPost]()
+                self.nextPageIdentifier = nextPageIdentifier
+                self.view.hideSkeleton()
+                self.tableView.rowHeight = UITableViewAutomaticDimension
+                self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
+                self.tableView.reloadData()
+            }
+            .catch { error in
+                self.view.hideSkeleton()
+                SVProgressHUD.showError(withStatus: "Failed")
+                SVProgressHUD.dismiss(withDelay: 1.0)
+            }
+            .always {
+                self.isProcessing = false
+                self.tableView.refreshControl?.endRefreshing()
         }
         
         cancelFetch = cancel
@@ -144,14 +149,14 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
             }
         }
     }
-    
-    // MARK: - UITableViewDataSource
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+}
+
+extension NewsViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
-  
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
         cell.clearImage()
@@ -181,10 +186,10 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         
         return cell
     }
-    
-    // MARK: - UITableViewDelegate
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+}
+
+extension NewsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         collapseDetailViewController = false
         
         guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
@@ -199,57 +204,26 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
     }
     
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
     }
     
-    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PostCell {
             cell.cancelThumbnailTask?()
         }
     }
-    
-    // MARK: - UISplitViewControllerDelegate
-    
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return collapseDetailViewController
+}
+
+extension NewsViewController: SkeletonTableViewDataSource {
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return "SkeletonCell"
     }
-    
-    // MARK: - PostTitleViewDelegate
-    
-    func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: url)
-        safariViewController.previewActionItemsDelegate = self
-        return safariViewController
-    }
-    
-    func didPressLinkButton(_ post: HNPost) {
-        guard verifyLink(post.urlString) else { return }
-        if let url = URL(string: post.urlString) {
-            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
-        }
-    }
-    
-    func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else { return false }
-        return UIApplication.shared.canOpenURL(url)
-    }
-    
-    // MARK: - PostCellDelegate
-    
-    func didTapThumbnail(_ sender: Any) {
-        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
-        let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point) {
-            let post = posts[indexPath.row]
-            didPressLinkButton(post)
-        }
-    }
-    
-    // MARK: - UIViewControllerPreviewingDelegate
-    
+}
+
+extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
         let post = posts[indexPath.row]
@@ -277,11 +251,36 @@ class NewsViewController : UITableViewController, UISplitViewControllerDelegate,
         }
         return [viewCommentsPreviewAction]
     }
-    
-    // MARK: - DZN
+}
 
-    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 24.0)]
-        return isProcessing ? NSAttributedString(string: "", attributes: attributes) : NSAttributedString(string: "Nothing found", attributes: attributes)
+extension NewsViewController: UISplitViewControllerDelegate {
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        return collapseDetailViewController
+    }
+}
+
+extension NewsViewController: PostTitleViewDelegate {
+    func didPressLinkButton(_ post: HNPost) {
+        guard verifyLink(post.urlString) else { return }
+        if let url = URL(string: post.urlString) {
+            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
+        }
+    }
+    
+    func verifyLink(_ urlString: String?) -> Bool {
+        guard let urlString = urlString, let url = URL(string: urlString) else { return false }
+        return UIApplication.shared.canOpenURL(url)
+    }
+}
+
+extension NewsViewController: PostCellDelegate {
+    
+    func didTapThumbnail(_ sender: Any) {
+        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
+        let point = tapGestureRecognizer.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
+            didPressLinkButton(post)
+        }
     }
 }

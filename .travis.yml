@@ -5,8 +5,7 @@ xcode_scheme: Hackers
 before_install:
 - gem install xcpretty
 - gem update cocoapods
-- pod repo update --silent
 install:
-- pod install --project-directory=$TRAVIS_BUILD_DIR
+- pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 script:
 - set -o pipefail && xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme ${TRAVIS_XCODE_SCHEME} -sdk iphonesimulator -configuration Release | xcpretty

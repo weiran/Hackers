@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 
-class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
+class CommentTableViewCell : UITableViewCell {
     
     var delegate: CommentDelegate?
     
@@ -20,30 +20,10 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     var comment: CommentModel? {
         didSet {
-            level = comment!.level
-            datePostedLabel.text = comment?.dateCreatedString
-            authorLabel.text = comment?.authorUsername
-            
-            if let textView = commentTextView {
-                let commentFont = UIFont.systemFont(ofSize: 15) //UIFont(name: "HelveticaNeue-Light", size: 15)
-                let commentTextColor = UIColor.darkGray
-                let lineSpacing = 4 as CGFloat
-                
-                let commentAttributedString = NSMutableAttributedString(string: comment!.text)
-                let paragraphStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
-                paragraphStyle.lineSpacing = lineSpacing
-                
-                let commentRange = NSMakeRange(0, commentAttributedString.length)
-                
-                commentAttributedString.addAttribute(NSAttributedStringKey.font, value: commentFont, range: commentRange)
-                commentAttributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: commentTextColor, range: commentRange)
-                commentAttributedString.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: commentRange)
-                
-                textView.attributedText = commentAttributedString.copy() as! NSAttributedString
-            }
+            guard let comment = comment else { return }
+            updateCommentContent(with: comment)
         }
     }
-    
     
     @IBOutlet var commentTextView: UITextView!
     @IBOutlet var authorLabel : UILabel!
@@ -52,8 +32,7 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
     
     override func awakeFromNib() {
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
-        isExclusiveTouch = true
-        contentView.isExclusiveTouch = true
+        commentTextView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
     }
     
     @objc func cellTapped(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -67,14 +46,38 @@ class CommentTableViewCell : UITableViewCell, UITextViewDelegate {
         leftPaddingConstraint.constant = padding
     }
     
-    // MARK - UITextViewDelegate
-    
+    func updateCommentContent(with comment: CommentModel) {
+        level = comment.level
+        datePostedLabel.text = comment.dateCreatedString
+        authorLabel.text = comment.authorUsername
+        
+        if let commentTextView = commentTextView {
+            // only for expanded comments
+            let commentFont = UIFont.systemFont(ofSize: 15)
+            let commentTextColor = UIColor.darkGray
+            let lineSpacing = 4 as CGFloat
+            
+            let commentAttributedString = NSMutableAttributedString(string: comment.text)
+            let paragraphStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
+            paragraphStyle.lineSpacing = lineSpacing
+            
+            let commentRange = NSMakeRange(0, commentAttributedString.length)
+            
+            commentAttributedString.addAttribute(NSAttributedStringKey.font, value: commentFont, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: commentTextColor, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: commentRange)
+            
+            commentTextView.attributedText = commentAttributedString
+        }
+    }
+}
+
+extension CommentTableViewCell: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
-        if let _ = delegate {
-            delegate!.linkTapped(URL, sender: textView)
+        if let delegate = delegate {
+            delegate.linkTapped(URL, sender: textView)
             return false
         }
         return true
     }
-    
 }
