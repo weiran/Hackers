@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="qCu-jm-yAB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="qCu-jm-yAB">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -7,6 +7,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -14,10 +15,6 @@
         <scene sceneID="tWd-H1-Sxi">
             <objects>
                 <viewController id="cUP-KB-tUq" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="qRr-Qb-dyl"/>
-                        <viewControllerLayoutGuide type="bottom" id="ZOH-Rq-ZtP"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="r0n-mx-XvO">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -174,11 +171,12 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="VEY-Xo-crR" firstAttribute="leading" secondItem="r0n-mx-XvO" secondAttribute="leading" id="Lly-nC-Cym"/>
+                            <constraint firstItem="VEY-Xo-crR" firstAttribute="leading" secondItem="xeY-ui-l8u" secondAttribute="leading" id="Lly-nC-Cym"/>
                             <constraint firstAttribute="bottom" secondItem="VEY-Xo-crR" secondAttribute="bottom" id="apI-CI-IPP"/>
                             <constraint firstItem="VEY-Xo-crR" firstAttribute="top" secondItem="r0n-mx-XvO" secondAttribute="top" id="sWu-i5-yrz"/>
-                            <constraint firstAttribute="trailing" secondItem="VEY-Xo-crR" secondAttribute="trailing" id="t4L-wm-vHt"/>
+                            <constraint firstItem="xeY-ui-l8u" firstAttribute="trailing" secondItem="VEY-Xo-crR" secondAttribute="trailing" id="t4L-wm-vHt"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="xeY-ui-l8u"/>
                     </view>
                     <navigationItem key="navigationItem" title="Hacker News" id="lEi-OB-1MD"/>
                     <connections>
@@ -244,10 +242,6 @@
         <scene sceneID="Kpw-8x-zVV">
             <objects>
                 <viewController storyboardIdentifier="EmptyPostViewController" id="Dmx-cb-tjr" userLabel="Empty View Controller" customClass="EmptyViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="LtU-M6-GcF"/>
-                        <viewControllerLayoutGuide type="bottom" id="Y97-QA-50h"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="0dh-2t-neK">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -264,11 +258,12 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="TTl-eC-j8M"/>
-                            <constraint firstItem="MbZ-qQ-6Zl" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="X5R-X4-tpK"/>
+                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerX" secondItem="t7S-HD-NSS" secondAttribute="centerX" id="TTl-eC-j8M"/>
+                            <constraint firstItem="MbZ-qQ-6Zl" firstAttribute="centerX" secondItem="t7S-HD-NSS" secondAttribute="centerX" id="X5R-X4-tpK"/>
                             <constraint firstItem="iKl-RY-XMG" firstAttribute="top" secondItem="MbZ-qQ-6Zl" secondAttribute="bottom" constant="10" id="gir-xn-63U"/>
                             <constraint firstItem="iKl-RY-XMG" firstAttribute="centerY" secondItem="0dh-2t-neK" secondAttribute="centerY" id="hxI-ck-KXZ"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="t7S-HD-NSS"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bjm-Zl-bvP" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -279,10 +274,6 @@
         <scene sceneID="mLS-Wn-pXA">
             <objects>
                 <viewController storyboardIdentifier="CommentsViewController" id="gkj-Tg-B9Y" userLabel="Comments" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="R7l-Nf-bSp"/>
-                        <viewControllerLayoutGuide type="bottom" id="deh-OG-94C"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="2S3-wX-NL4">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -549,10 +540,11 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="QBD-8Q-H2S" firstAttribute="top" secondItem="2S3-wX-NL4" secondAttribute="top" id="9oE-vC-aJ0"/>
-                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="leading" secondItem="2S3-wX-NL4" secondAttribute="leading" id="FSo-0t-ypF"/>
-                            <constraint firstAttribute="trailing" secondItem="QBD-8Q-H2S" secondAttribute="trailing" id="XDh-g5-8wW"/>
+                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="leading" secondItem="x2d-ID-isb" secondAttribute="leading" id="FSo-0t-ypF"/>
+                            <constraint firstItem="x2d-ID-isb" firstAttribute="trailing" secondItem="QBD-8Q-H2S" secondAttribute="trailing" id="XDh-g5-8wW"/>
                             <constraint firstAttribute="bottom" secondItem="QBD-8Q-H2S" secondAttribute="bottom" id="esn-R8-weM"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="x2d-ID-isb"/>
                     </view>
                     <navigationItem key="navigationItem" id="GOU-tH-L31">
                         <barButtonItem key="rightBarButtonItem" image="ShareIcon" id="dTK-WP-hRq">
