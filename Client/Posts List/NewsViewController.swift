@@ -41,6 +41,8 @@ class NewsViewController : UIViewController {
         
         splitViewController!.delegate = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(NewsViewController.viewDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        
         view.showAnimatedSkeleton()
         loadPosts()
     }
@@ -71,6 +73,13 @@ class NewsViewController : UIViewController {
         let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
+    }
+    
+    @objc func viewDidRotate() {
+        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
+        self.tableView.beginUpdates()
+        self.tableView.reloadRows(at: indexPaths, with: .automatic)
+        self.tableView.endUpdates()
     }
 }
 
