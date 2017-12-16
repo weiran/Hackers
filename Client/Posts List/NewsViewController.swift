@@ -25,6 +25,7 @@ class NewsViewController : UIViewController {
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
+    private var viewIsUnderTransition = false
     
     private var cancelFetch: (() -> Void)?
     private var cancelThumbnailFetchTasks = [() -> Void]()
@@ -75,11 +76,16 @@ class NewsViewController : UIViewController {
         return safariViewController
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        viewIsUnderTransition = true
+    }
+    
     @objc func viewDidRotate() {
-        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows, !isProcessing else { return }
+        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows, !isProcessing, viewIsUnderTransition else { return }
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
+        viewIsUnderTransition = false
     }
 }
 
