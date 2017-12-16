@@ -484,7 +484,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UHj-0F-XKf">
-                                                    <rect key="frame" x="15" y="11" width="345" height="103"/>
+                                                    <rect key="frame" x="15" y="16" width="345" height="98"/>
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <gestureRecognizers/>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
@@ -514,7 +514,7 @@
                                                 <constraint firstItem="zjG-Gq-9pc" firstAttribute="leading" secondItem="UVs-jZ-gsT" secondAttribute="leading" constant="15" id="WEn-8O-FCC"/>
                                                 <constraint firstItem="UHj-0F-XKf" firstAttribute="trailing" secondItem="UVs-jZ-gsT" secondAttribute="trailingMargin" id="a7U-mA-pKZ"/>
                                                 <constraint firstItem="zjG-Gq-9pc" firstAttribute="top" secondItem="UHj-0F-XKf" secondAttribute="bottom" id="hvA-7o-fap"/>
-                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="top" secondItem="UVs-jZ-gsT" secondAttribute="topMargin" id="oq4-Gq-Myg"/>
+                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="top" secondItem="UVs-jZ-gsT" secondAttribute="topMargin" constant="5" id="oq4-Gq-Myg"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <gestureRecognizers/>
