@@ -172,13 +172,10 @@ extension NewsViewController: UITableViewDataSource {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
                 cell.cancelThumbnailTask = cancel
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
-                    guard let _ = image else { return }
+                    guard let image = image else { return }
                     self.thumbnailProcessedUrls.append(url.absoluteString)
-                    DispatchQueue.main.async {
-                        self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .fade)
-                        self.tableView.endUpdates()
-                    }
+                    guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
+                    cell.setImage(image: image)
                 }
                 cancelThumbnailFetchTasks.append(cancel)
             }
