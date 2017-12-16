@@ -31,26 +31,51 @@ class ThumbnailFetcher {
             if let cachedImage = getThumbnailFromCache(url: url) {
                 fulfill(cachedImage)
             } else {
-                fetchThumbnail(url: url) { image, error in
-                    guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else { return }
-                    
-                    if let image = image, !cancelMe, error == nil {
-                        // image fetched
-                        let cacheExpiry = Calendar.current.date(byAdding: .month, value: 1, to: Date())!
-                        cache.setObject(image, forKey: url.absoluteString, expires: .date(cacheExpiry))
-                        fulfill(image)
-                    } else if let error = error {
-                        // error fetching image
-                        reject(error)
+                shouldFetchThumbnail(url: url, completion: { shouldFetchThumbnail in
+                    if shouldFetchThumbnail {
+                        fetchThumbnail(url: url) { image, error in
+                            guard let cache = try? Cache<UIImage>(name: "thumbnailCache") else { return }
+                            
+                            if let image = image, !cancelMe, error == nil {
+                                // image fetched
+                                let cacheExpiry = Calendar.current.date(byAdding: .month, value: 1, to: Date())!
+                                cache.setObject(image, forKey: url.absoluteString, expires: .date(cacheExpiry))
+                                fulfill(image)
+                            } else if let error = error {
+                                // error fetching image
+                                reject(error)
+                            } else {
+                                // no image to fetch or cancelled
+                                fulfill(nil)
+                            }
+                        }
                     } else {
-                        // no image to fetch or cancelled
                         fulfill(nil)
                     }
-                }
+                })
             }
         }
         
         return (promise, cancel)
+    }
+    
+    fileprivate static func shouldFetchThumbnail(url: URL, completion:@escaping (Bool) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        
+        let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error -> Void in
+            // ensure response is HTTP and content-type is text/html
+            guard let response = response as? HTTPURLResponse,
+                let contentType = response.allHeaderFields["Content-Type"] as? String,
+                contentType.contains("text/html") else {
+                completion(false)
+                return
+            }
+            
+            completion(true)
+        })
+        
+        task.resume()
     }
 
     fileprivate static func fetchThumbnail(url: URL, completion:@escaping (UIImage?, Error?) -> Void) {
