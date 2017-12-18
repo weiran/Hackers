@@ -11,4 +11,5 @@ target 'Hackers' do
     pod 'PromiseKit'
     pod 'SVProgressHUD'
     pod 'SkeletonView'
+    pod 'Kingfisher'
 end

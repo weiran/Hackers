@@ -79,22 +79,12 @@ class CommentsViewController : UIViewController {
     }
     
     func setupPostTitleView() {
+        guard let post = post else { return }
+        
         postTitleView.post = post
         postTitleView.delegate = self
         postTitleView.isTitleTapEnabled = true
-        
-        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
-        thumbnailImageView.image = placeholder
-        
-        if let imageUrlString = post?.urlString, let imageUrl = URL(string: imageUrlString) {
-            let (promise, _) = ThumbnailFetcher.getThumbnail(url: imageUrl)
-            _ = promise.then { [weak self] image in
-                DispatchQueue.main.async {
-                    self?.thumbnailImageView.image = image
-                    self?.thumbnailImageView.contentMode = .scaleAspectFill
-                }
-            }
-        }
+        thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
     }
     
     @IBAction func didTapThumbnail(_ sender: Any) {
