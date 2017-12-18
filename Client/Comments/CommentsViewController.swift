@@ -147,8 +147,9 @@ extension CommentsViewController: UITableViewDelegate {
 
 extension CommentsViewController: CommentDelegate {
     func commentTapped(_ sender: UITableViewCell) {
-        let indexPath = tableView.indexPath(for: sender)
-        toggleCellVisibilityForCell(indexPath)
+        if let indexPath = tableView.indexPath(for: sender) {
+            toggleCellVisibilityForCell(indexPath)
+        }
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
