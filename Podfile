@@ -6,7 +6,6 @@ target 'Hackers' do
 	pod 'libHN', :git => 'https://github.com/weiran/libHN'
 	pod 'DZNEmptyDataSet'
     pod 'PromiseKit'
-    pod 'SVProgressHUD'
     pod 'SkeletonView'
     pod 'Kingfisher'
 end

@@ -12,7 +12,6 @@ import SafariServices
 import libHN
 import PromiseKit
 import SkeletonView
-import SVProgressHUD
 import Kingfisher
 
 class NewsViewController : UIViewController {
@@ -29,7 +28,6 @@ class NewsViewController : UIViewController {
     private var viewIsUnderTransition = false
     
     private var cancelFetch: (() -> Void)?
-    private var cancelThumbnailFetchTasks = [() -> Void]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,12 +98,6 @@ extension NewsViewController { // post fetching
             self.cancelFetch = nil
         }
         
-        // cancel existing thumbnail fetches
-        cancelThumbnailFetchTasks.forEach { cancel in
-            cancel()
-        }
-        cancelThumbnailFetchTasks = [() -> Void]()
-        
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
         fetchPromise
@@ -117,12 +109,8 @@ extension NewsViewController { // post fetching
                 self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
                 self.tableView.reloadData()
             }
-            .catch { error in
-                self.view.hideSkeleton()
-                SVProgressHUD.showError(withStatus: "Failed")
-                SVProgressHUD.dismiss(withDelay: 1.0)
-            }
             .always {
+                self.view.hideSkeleton()
                 self.isProcessing = false
                 self.tableView.refreshControl?.endRefreshing()
         }

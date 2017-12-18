@@ -594,7 +594,7 @@
     <resources>
         <image name="HackersIcon" width="128" height="128"/>
         <image name="ShareIcon" width="16" height="22"/>
-        <image name="ThumbnailPlaceholderIcon" width="28" height="28"/>
+        <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="5Ke-QG-Zfe"/>
