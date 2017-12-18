@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 import SafariServices
 import libHN
-import DZNEmptyDataSet
 import PromiseKit
 import SkeletonView
 import SVProgressHUD
@@ -26,6 +25,7 @@ class NewsViewController : UIViewController {
     private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
+    private var viewIsUnderTransition = false
     
     private var cancelFetch: (() -> Void)?
     private var cancelThumbnailFetchTasks = [() -> Void]()
@@ -41,6 +41,8 @@ class NewsViewController : UIViewController {
         tableView.refreshControl = refreshControl
         
         splitViewController!.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(NewsViewController.viewDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
         view.showAnimatedSkeleton()
         loadPosts()
@@ -72,6 +74,18 @@ class NewsViewController : UIViewController {
         let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        viewIsUnderTransition = true
+    }
+    
+    @objc func viewDidRotate() {
+        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows, !isProcessing, viewIsUnderTransition else { return }
+        self.tableView.beginUpdates()
+        self.tableView.reloadRows(at: indexPaths, with: .automatic)
+        self.tableView.endUpdates()
+        viewIsUnderTransition = false
     }
 }
 
@@ -172,13 +186,10 @@ extension NewsViewController: UITableViewDataSource {
                 let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
                 cell.cancelThumbnailTask = cancel
                 _ = promise.then(on: DispatchQueue.main) { image -> Void in
-                    guard let _ = image else { return }
+                    guard let image = image else { return }
                     self.thumbnailProcessedUrls.append(url.absoluteString)
-                    DispatchQueue.main.async {
-                        self.tableView.beginUpdates()
-                        self.tableView.reloadRows(at: [indexPath], with: .fade)
-                        self.tableView.endUpdates()
-                    }
+                    guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
+                    cell.setImage(image: image)
                 }
                 cancelThumbnailFetchTasks.append(cancel)
             }
@@ -221,11 +232,15 @@ extension NewsViewController: SkeletonTableViewDataSource {
     func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
         return "SkeletonCell"
     }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 20
+    }
 }
 
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        guard let indexPath = tableView.indexPathForRow(at: location) else { return nil }
+        guard let indexPath = tableView.indexPathForRow(at: location), posts.count > indexPath.row else { return nil }
         let post = posts[indexPath.row]
         if let url = URL(string: post.urlString), verifyLink(post.urlString) {
             peekedIndexPath = indexPath

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="qCu-jm-yAB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="qCu-jm-yAB">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -14,19 +15,15 @@
         <scene sceneID="tWd-H1-Sxi">
             <objects>
                 <viewController id="cUP-KB-tUq" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="qRr-Qb-dyl"/>
-                        <viewControllerLayoutGuide type="bottom" id="ZOH-Rq-ZtP"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="r0n-mx-XvO">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="77" estimatedRowHeight="77" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="VEY-Xo-crR">
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="80" estimatedRowHeight="77" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="VEY-Xo-crR">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <view key="tableFooterView" contentMode="scaleToFill" id="XDA-kn-4Rw">
-                                    <rect key="frame" x="0.0" y="176" width="375" height="0.0"/>
+                                    <rect key="frame" x="0.0" y="189" width="375" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </view>
@@ -107,15 +104,15 @@
                                             <outlet property="thumbnailImageView" destination="4PS-aO-5AM" id="X1l-D8-yc4"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="77" id="vCE-2L-VVA" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="99" width="375" height="77"/>
+                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="90" id="vCE-2L-VVA" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="99" width="375" height="90"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vCE-2L-VVA" id="Os8-j0-rRI">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="76.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="89.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="bEJ-i4-YUp">
-                                                    <rect key="frame" x="15" y="8" width="60" height="60"/>
+                                                    <rect key="frame" x="15" y="15" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -131,7 +128,7 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Skeleton" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VPp-uV-FUC">
-                                                    <rect key="frame" x="87" y="11" width="273" height="55"/>
+                                                    <rect key="frame" x="87" y="11" width="273" height="68"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -174,11 +171,12 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="VEY-Xo-crR" firstAttribute="leading" secondItem="r0n-mx-XvO" secondAttribute="leading" id="Lly-nC-Cym"/>
+                            <constraint firstItem="VEY-Xo-crR" firstAttribute="leading" secondItem="xeY-ui-l8u" secondAttribute="leading" id="Lly-nC-Cym"/>
                             <constraint firstAttribute="bottom" secondItem="VEY-Xo-crR" secondAttribute="bottom" id="apI-CI-IPP"/>
                             <constraint firstItem="VEY-Xo-crR" firstAttribute="top" secondItem="r0n-mx-XvO" secondAttribute="top" id="sWu-i5-yrz"/>
-                            <constraint firstAttribute="trailing" secondItem="VEY-Xo-crR" secondAttribute="trailing" id="t4L-wm-vHt"/>
+                            <constraint firstItem="xeY-ui-l8u" firstAttribute="trailing" secondItem="VEY-Xo-crR" secondAttribute="trailing" id="t4L-wm-vHt"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="xeY-ui-l8u"/>
                     </view>
                     <navigationItem key="navigationItem" title="Hacker News" id="lEi-OB-1MD"/>
                     <connections>
@@ -244,10 +242,6 @@
         <scene sceneID="Kpw-8x-zVV">
             <objects>
                 <viewController storyboardIdentifier="EmptyPostViewController" id="Dmx-cb-tjr" userLabel="Empty View Controller" customClass="EmptyViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="LtU-M6-GcF"/>
-                        <viewControllerLayoutGuide type="bottom" id="Y97-QA-50h"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="0dh-2t-neK">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -264,11 +258,12 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="TTl-eC-j8M"/>
-                            <constraint firstItem="MbZ-qQ-6Zl" firstAttribute="centerX" secondItem="0dh-2t-neK" secondAttribute="centerX" id="X5R-X4-tpK"/>
+                            <constraint firstItem="iKl-RY-XMG" firstAttribute="centerX" secondItem="t7S-HD-NSS" secondAttribute="centerX" id="TTl-eC-j8M"/>
+                            <constraint firstItem="MbZ-qQ-6Zl" firstAttribute="centerX" secondItem="t7S-HD-NSS" secondAttribute="centerX" id="X5R-X4-tpK"/>
                             <constraint firstItem="iKl-RY-XMG" firstAttribute="top" secondItem="MbZ-qQ-6Zl" secondAttribute="bottom" constant="10" id="gir-xn-63U"/>
                             <constraint firstItem="iKl-RY-XMG" firstAttribute="centerY" secondItem="0dh-2t-neK" secondAttribute="centerY" id="hxI-ck-KXZ"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="t7S-HD-NSS"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bjm-Zl-bvP" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -279,10 +274,6 @@
         <scene sceneID="mLS-Wn-pXA">
             <objects>
                 <viewController storyboardIdentifier="CommentsViewController" id="gkj-Tg-B9Y" userLabel="Comments" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="R7l-Nf-bSp"/>
-                        <viewControllerLayoutGuide type="bottom" id="deh-OG-94C"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="2S3-wX-NL4">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -493,7 +484,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UHj-0F-XKf">
-                                                    <rect key="frame" x="15" y="11" width="345" height="103"/>
+                                                    <rect key="frame" x="15" y="16" width="345" height="98"/>
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <gestureRecognizers/>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
@@ -523,7 +514,7 @@
                                                 <constraint firstItem="zjG-Gq-9pc" firstAttribute="leading" secondItem="UVs-jZ-gsT" secondAttribute="leading" constant="15" id="WEn-8O-FCC"/>
                                                 <constraint firstItem="UHj-0F-XKf" firstAttribute="trailing" secondItem="UVs-jZ-gsT" secondAttribute="trailingMargin" id="a7U-mA-pKZ"/>
                                                 <constraint firstItem="zjG-Gq-9pc" firstAttribute="top" secondItem="UHj-0F-XKf" secondAttribute="bottom" id="hvA-7o-fap"/>
-                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="top" secondItem="UVs-jZ-gsT" secondAttribute="topMargin" id="oq4-Gq-Myg"/>
+                                                <constraint firstItem="UHj-0F-XKf" firstAttribute="top" secondItem="UVs-jZ-gsT" secondAttribute="topMargin" constant="5" id="oq4-Gq-Myg"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <gestureRecognizers/>
@@ -549,10 +540,11 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="QBD-8Q-H2S" firstAttribute="top" secondItem="2S3-wX-NL4" secondAttribute="top" id="9oE-vC-aJ0"/>
-                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="leading" secondItem="2S3-wX-NL4" secondAttribute="leading" id="FSo-0t-ypF"/>
-                            <constraint firstAttribute="trailing" secondItem="QBD-8Q-H2S" secondAttribute="trailing" id="XDh-g5-8wW"/>
+                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="leading" secondItem="x2d-ID-isb" secondAttribute="leading" id="FSo-0t-ypF"/>
+                            <constraint firstItem="x2d-ID-isb" firstAttribute="trailing" secondItem="QBD-8Q-H2S" secondAttribute="trailing" id="XDh-g5-8wW"/>
                             <constraint firstAttribute="bottom" secondItem="QBD-8Q-H2S" secondAttribute="bottom" id="esn-R8-weM"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="x2d-ID-isb"/>
                     </view>
                     <navigationItem key="navigationItem" id="GOU-tH-L31">
                         <barButtonItem key="rightBarButtonItem" image="ShareIcon" id="dTK-WP-hRq">
