@@ -144,10 +144,6 @@ extension CommentsViewController: UITableViewDelegate {
         let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
         return view
     }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 60
-    }
 }
 
 extension CommentsViewController: CommentDelegate {
