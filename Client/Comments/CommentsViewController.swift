@@ -167,7 +167,7 @@ extension CommentsViewController: CommentDelegate {
         if visibility == CommentVisibilityType.hidden {
             tableView.deleteRows(at: modifiedIndexPaths, with: .top)
         } else {
-            tableView.insertRows(at: modifiedIndexPaths, with: .middle)
+            tableView.insertRows(at: modifiedIndexPaths, with: .top)
         }
         tableView.endUpdates()
         
