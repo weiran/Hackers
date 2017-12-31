@@ -25,17 +25,16 @@ class CommentTableViewCell : UITableViewCell {
         }
     }
     
-    @IBOutlet var commentTextView: UITextView!
+    @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel : UILabel!
     @IBOutlet var datePostedLabel : UILabel!
     @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
     
     override func awakeFromNib() {
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
-        commentTextView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped(_:))))
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
     }
     
-    @objc func cellTapped(_ gestureRecognizer: UITapGestureRecognizer) {
+    @objc func cellTapped() {
         delegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }
