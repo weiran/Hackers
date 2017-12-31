@@ -48,13 +48,12 @@ class CommentsViewController : UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         if let headerView = tableView.tableHeaderView {
             let height = headerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
             var headerFrame = headerView.frame
-            
-            // If we don't have this check, viewDidLayoutSubviews() will get called
-            // repeatedly, causing the app to hang.
+
+            // If we don't have this check, viewDidLayoutSubviews() will get called infinitely
             if height != headerFrame.size.height {
                 headerFrame.size.height = height
                 headerView.frame = headerFrame
@@ -100,8 +99,14 @@ class CommentsViewController : UIViewController {
 
 extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        guard verifyLink(post.urlString) else { return }
-        if let url = URL(string: post.urlString) {
+        if verifyLink(post.urlString), let url = URL(string: post.urlString) {
+            // animate background colour for tap
+            self.tableView.tableHeaderView?.backgroundColor = Theme.backgroundPurpleColour
+            UIView.animate(withDuration: 0.3, animations: {
+                self.tableView.tableHeaderView?.backgroundColor = .white
+            })
+            
+            // show link
             let safariViewController = SFSafariViewController(url: url)
             self.present(safariViewController, animated: true, completion: nil)
         }

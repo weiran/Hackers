@@ -279,17 +279,17 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="115" estimatedRowHeight="100" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="QBD-8Q-H2S">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <view key="tableHeaderView" contentMode="scaleToFill" id="ApK-ej-h7a">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="111"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="120"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-jh-8Aa">
-                                            <rect key="frame" x="16" y="16" width="375" height="95"/>
+                                            <rect key="frame" x="16" y="8" width="375" height="104"/>
                                             <subviews>
                                                 <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
-                                                    <rect key="frame" x="0.0" y="17.5" width="60" height="60"/>
+                                                    <rect key="frame" x="0.0" y="22" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -307,10 +307,10 @@
                                                     </connections>
                                                 </imageView>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Riz-Wu-ppP" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="72" y="26" width="375" height="43.5"/>
+                                                    <rect key="frame" x="72" y="30.5" width="375" height="43.5"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="o2r-N1-LLh">
-                                                            <rect key="frame" x="0.0" y="0.5" width="375" height="43.5"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                                             <subviews>
                                                                 <label opaque="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Y8-mk-BA0">
                                                                     <rect key="frame" x="0.0" y="0.0" width="375" height="21.5"/>
@@ -347,13 +347,13 @@
                                     <constraints>
                                         <constraint firstItem="t7J-jh-8Aa" firstAttribute="leading" secondItem="ApK-ej-h7a" secondAttribute="leadingMargin" constant="8" id="35D-Gb-BxM"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="t7J-jh-8Aa" secondAttribute="trailing" constant="8" id="Rt1-OU-5MX"/>
-                                        <constraint firstItem="t7J-jh-8Aa" firstAttribute="top" secondItem="ApK-ej-h7a" secondAttribute="topMargin" constant="8" id="rnh-XN-ppm"/>
-                                        <constraint firstItem="t7J-jh-8Aa" firstAttribute="bottom" secondItem="ApK-ej-h7a" secondAttribute="bottomMargin" constant="8" id="vw8-su-JZu"/>
+                                        <constraint firstItem="t7J-jh-8Aa" firstAttribute="top" secondItem="ApK-ej-h7a" secondAttribute="topMargin" id="rnh-XN-ppm"/>
+                                        <constraint firstItem="t7J-jh-8Aa" firstAttribute="bottom" secondItem="ApK-ej-h7a" secondAttribute="bottomMargin" id="vw8-su-JZu"/>
                                     </constraints>
                                 </view>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="gray" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="OpenCommentCell" rowHeight="144" id="Ku3-Ww-ybh" userLabel="Open Comment Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="166.5" width="375" height="144"/>
+                                        <rect key="frame" x="0.0" y="175.5" width="375" height="144"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ku3-Ww-ybh" id="oE5-2d-406">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="144"/>
@@ -423,7 +423,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ClosedCommentCell" rowHeight="44" id="JRG-v5-Z5m" userLabel="Closed Comment Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="310.5" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="319.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="JRG-v5-Z5m" id="P7B-gi-IKd">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -477,7 +477,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="115" id="lP7-Ee-gTu" userLabel="Skeleton Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="354.5" width="375" height="115"/>
+                                        <rect key="frame" x="0.0" y="363.5" width="375" height="115"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lP7-Ee-gTu" id="UVs-jZ-gsT">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="115"/>
@@ -538,10 +538,10 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="top" secondItem="2S3-wX-NL4" secondAttribute="top" id="9oE-vC-aJ0"/>
+                            <constraint firstItem="QBD-8Q-H2S" firstAttribute="top" secondItem="x2d-ID-isb" secondAttribute="top" id="9oE-vC-aJ0"/>
                             <constraint firstItem="QBD-8Q-H2S" firstAttribute="leading" secondItem="x2d-ID-isb" secondAttribute="leading" id="FSo-0t-ypF"/>
                             <constraint firstItem="x2d-ID-isb" firstAttribute="trailing" secondItem="QBD-8Q-H2S" secondAttribute="trailing" id="XDh-g5-8wW"/>
-                            <constraint firstAttribute="bottom" secondItem="QBD-8Q-H2S" secondAttribute="bottom" id="esn-R8-weM"/>
+                            <constraint firstItem="x2d-ID-isb" firstAttribute="bottom" secondItem="QBD-8Q-H2S" secondAttribute="bottom" id="esn-R8-weM"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="x2d-ID-isb"/>
                     </view>
