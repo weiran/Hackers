@@ -234,16 +234,21 @@ open class ImageCache {
     - parameter key:               Key for the image.
     - parameter identifier:        The identifier of processor used. If you are using a processor for the image, pass the identifier of processor to it.
                                    This identifier will be used to generate a corresponding key for the combination of `key` and processor.
-    - parameter fromDisk:          Whether this image should be removed from disk or not. If false, the image will be only removed from memory.
+    - parameter fromMemory:        Whether this image should be removed from memory or not. If false, the image won't be removed from memory.
+    - parameter fromDisk:          Whether this image should be removed from disk or not. If false, the image won't be removed from disk.
     - parameter completionHandler: Called when removal operation completes.
     */
     open func removeImage(forKey key: String,
                           processorIdentifier identifier: String = "",
+                          fromMemory: Bool = true,
                           fromDisk: Bool = true,
                           completionHandler: (() -> Void)? = nil)
     {
         let computedKey = key.computedKey(with: identifier)
-        memoryCache.removeObject(forKey: computedKey as NSString)
+
+        if fromMemory {
+            memoryCache.removeObject(forKey: computedKey as NSString)
+        }
         
         func callHandlerInMainQueue() {
             if let handler = completionHandler {
@@ -281,7 +286,7 @@ open class ImageCache {
     @discardableResult
     open func retrieveImage(forKey key: String,
                                options: KingfisherOptionsInfo?,
-                     completionHandler: ((Image?, CacheType) -> ())?) -> RetrieveImageDiskTask?
+                     completionHandler: ((Image?, CacheType) -> Void)?) -> RetrieveImageDiskTask?
     {
         // No completion handler. Not start working and early return.
         guard let completionHandler = completionHandler else {
@@ -600,7 +605,7 @@ open class ImageCache {
     
     - parameter completionHandler: Called with the calculated size when finishes.
     */
-    open func calculateDiskCacheSize(completion handler: @escaping ((_ size: UInt) -> ())) {
+    open func calculateDiskCacheSize(completion handler: @escaping ((_ size: UInt) -> Void)) {
         ioQueue.async {
             let (_, diskCacheSize, _) = self.travelCachedFiles(onlyForCacheSize: true)
             DispatchQueue.main.async {
