@@ -12,7 +12,7 @@ import SafariServices
 import libHN
 import PromiseKit
 import SkeletonView
-import SVProgressHUD
+import Kingfisher
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
@@ -28,7 +28,6 @@ class NewsViewController : UIViewController {
     private var viewIsUnderTransition = false
     
     private var cancelFetch: (() -> Void)?
-    private var cancelThumbnailFetchTasks = [() -> Void]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,12 +98,6 @@ extension NewsViewController { // post fetching
             self.cancelFetch = nil
         }
         
-        // cancel existing thumbnail fetches
-        cancelThumbnailFetchTasks.forEach { cancel in
-            cancel()
-        }
-        cancelThumbnailFetchTasks = [() -> Void]()
-        
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
         fetchPromise
@@ -116,12 +109,8 @@ extension NewsViewController { // post fetching
                 self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
                 self.tableView.reloadData()
             }
-            .catch { error in
-                self.view.hideSkeleton()
-                SVProgressHUD.showError(withStatus: "Failed")
-                SVProgressHUD.dismiss(withDelay: 1.0)
-            }
             .always {
+                self.view.hideSkeleton()
                 self.isProcessing = false
                 self.tableView.refreshControl?.endRefreshing()
         }
@@ -178,22 +167,7 @@ extension NewsViewController: UITableViewDataSource {
         let post = posts[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        
-        if let url = URL(string: post.urlString) {
-            if let image = ThumbnailFetcher.getThumbnailFromCache(url: url) {
-                cell.setImage(image: image)
-            } else if !thumbnailProcessedUrls.contains(url.absoluteString) {
-                let (promise, cancel) = ThumbnailFetcher.getThumbnail(url: url)
-                cell.cancelThumbnailTask = cancel
-                _ = promise.then(on: DispatchQueue.main) { image -> Void in
-                    guard let image = image else { return }
-                    self.thumbnailProcessedUrls.append(url.absoluteString)
-                    guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
-                    cell.setImage(image: image)
-                }
-                cancelThumbnailFetchTasks.append(cancel)
-            }
-        }
+        cell.thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
         
         return cell
     }

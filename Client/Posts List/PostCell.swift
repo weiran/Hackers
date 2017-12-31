@@ -49,11 +49,6 @@ class PostCell : UITableViewCell {
         backgroundColor = UIColor.clear
     }
     
-    func setImage(image: UIImage) {
-        thumbnailImageView.image = image
-        thumbnailImageView.contentMode = .scaleAspectFill
-    }
-    
     func clearImage() {
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
