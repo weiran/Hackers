@@ -38,7 +38,7 @@
                                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Jw8-Bv-Kjy">
                                                     <rect key="frame" x="15" y="8.5" width="345" height="60"/>
                                                     <subviews>
-                                                        <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="4PS-aO-5AM">
+                                                        <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="4PS-aO-5AM">
                                                             <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                                                             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -288,7 +288,7 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-jh-8Aa">
                                             <rect key="frame" x="16" y="16" width="375" height="95"/>
                                             <subviews>
-                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
+                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="iAv-PR-2eT">
                                                     <rect key="frame" x="0.0" y="17.5" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
