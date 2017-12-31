@@ -43,9 +43,14 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func domainLabelText(for post: HNPost) -> String {
-        guard let urlComponents = URLComponents(string: post.urlString), let host = urlComponents.host else {
+        guard let urlComponents = URLComponents(string: post.urlString), var host = urlComponents.host else {
             return "news.ycombinator.com"
         }
+        
+        if host.starts(with: "www.") {
+            host = String(host[4...])
+        }
+        
         return host
     }
     
