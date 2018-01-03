@@ -156,6 +156,11 @@ static HNManager * _sharedManager = nil;
     [self.Service loadPostsWithUrlAddition:urlAddition completion:completion];
 }
 
+- (void)loadPostWithPostUrl:(NSString *)url completion:(GetPostCompletion)completion {
+    [self.Service loadPostWithPostUrl:url completion:completion];
+}
+
+
 - (void)loadCommentsFromPost:(HNPost *)post completion:(GetCommentsCompletion)completion {
     [self.Service loadCommentsFromPost:post completion:completion];
 }

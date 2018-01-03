@@ -154,8 +154,26 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = SFSafariViewController(url: URL)
-        self.present(safariViewController, animated: true, completion: nil)
+        if URL.absoluteString.range(of:"news.ycombinator.com/item?id=") != nil {
+            let url = URL.absoluteString
+            HNManager.shared().loadPost(withPostUrl:url) { post in
+                if post != nil{
+                    guard let navController = self.storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
+                    guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
+                    commentsViewController.post = post
+                    
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        // for iPhone we want to push the view controller instead of presenting it as the detail
+                        self.navigationController?.pushViewController(commentsViewController, animated: true)
+                    } else {
+                        self.showDetailViewController(navController, sender: self)
+                    }
+                }
+            }
+        }else{
+            let safariViewController = SFSafariViewController(url: URL)
+            self.present(safariViewController, animated: true, completion: nil)
+        }
     }
     
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {

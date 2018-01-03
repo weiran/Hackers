@@ -18,18 +18,18 @@ PODS:
 DEPENDENCIES:
   - DZNEmptyDataSet
   - Kingfisher
-  - libHN (from `https://github.com/weiran/libHN`)
+  - libHN (from `https://github.com/RichardD012/libHN`)
   - PromiseKit
   - SkeletonView
 
 EXTERNAL SOURCES:
   libHN:
-    :git: https://github.com/weiran/libHN
+    :git: https://github.com/RichardD012/libHN
 
 CHECKOUT OPTIONS:
   libHN:
-    :commit: ca79b491f594a851825db9bf0e99235b2863b71c
-    :git: https://github.com/weiran/libHN
+    :commit: b0d5e9206a8229b274998dca2fa688aa6131e79d
+    :git: https://github.com/RichardD012/libHN
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
@@ -38,6 +38,6 @@ SPEC CHECKSUMS:
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   SkeletonView: 933a9442b08c3550f61c2ae38a02456a74ad86f4
 
-PODFILE CHECKSUM: 2caddf4fa884d04ccbe24705972e2409e25e53a4
+PODFILE CHECKSUM: f658ee8ec6424eecd8ae74a965b7e8c438f582e6
 
 COCOAPODS: 1.3.1

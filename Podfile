@@ -3,7 +3,7 @@ use_frameworks!
 inhibit_all_warnings!
 
 target 'Hackers' do
-	pod 'libHN', :git => 'https://github.com/weiran/libHN'
+	pod 'libHN', :git => 'https://github.com/RichardD012/libHN'
 	pod 'DZNEmptyDataSet'
     pod 'PromiseKit'
     pod 'SkeletonView'

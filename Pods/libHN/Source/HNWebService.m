@@ -140,6 +140,36 @@
     [self.HNQueue addOperation:operation];
 }
 
+#pragma mark - Load Comments from Post
+- (void)loadPostWithPostUrl:(NSString *)urlPath completion:(GetPostCompletion)completion {
+
+    // Load the Comments
+    HNOperation *operation = [[HNOperation alloc] init];
+    __block HNOperation *blockOperation = operation;
+    [operation setUrlPath:urlPath data:nil cookie:[HNManager sharedManager].SessionCookie completion:^{
+        if (blockOperation.responseData) {
+            NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
+            HNPost *post = [HNPost parsedPostFromHTML:html];
+            if (post) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(post);
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(nil);
+                });
+            }
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(nil);
+            });
+        }
+    }];
+    [self.HNQueue addOperation:operation];
+}
+
 
 #pragma mark - Load Comments from Post
 - (void)loadCommentsFromPost:(HNPost *)post completion:(GetCommentsCompletion)completion {

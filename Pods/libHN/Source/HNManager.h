@@ -88,6 +88,13 @@ typedef void (^SuccessfulLoginBlock) (HNUser *user);
 - (void)loadPostsWithUrlAddition:(NSString *)urlAddition completion:(GetPostsCompletion)completion;
 
 /**
+ Loads post from HN using a post URL.
+ @param url   - NSString of the post url.
+ @return   HNPost object
+ */
+- (void)loadPostWithPostUrl:(NSString *)url completion:(GetPostCompletion)completion;
+
+/**
  Loads comments for a given HNPost object.
  @param post   - HNPost object.
  @return    NSArray of HNComment objects

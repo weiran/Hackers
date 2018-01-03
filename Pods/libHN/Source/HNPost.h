@@ -51,5 +51,5 @@ typedef NS_ENUM(NSInteger, PostType) {
 
 #pragma mark - Methods
 + (NSArray *)parsedPostsFromHTML:(NSString *)html FNID:(NSString **)fnid;
-
++ (HNPost *)parsedPostFromHTML:(NSString *)html;
 @end

@@ -44,6 +44,7 @@ typedef NS_ENUM(NSInteger, VoteDirection) {
 
 #pragma mark - Blocks
 typedef void (^GetPostsCompletion) (NSArray *posts, NSString *nextPageIdentifier);
+typedef void (^GetPostCompletion) (HNPost *post);
 typedef void (^GetCommentsCompletion) (NSArray *comments);
 typedef void (^LoginCompletion) (HNUser *user, NSHTTPCookie *cookie);
 typedef void (^BooleanSuccessBlock) (BOOL success);
@@ -61,6 +62,7 @@ typedef void (^SubmitCommentSuccessBlock) (BOOL success);
 // Get Posts
 - (void)loadPostsWithFilter:(PostFilterType)filter completion:(GetPostsCompletion)completion;
 - (void)loadPostsWithUrlAddition:(NSString *)urlAddition completion:(GetPostsCompletion)completion;
+- (void)loadPostWithPostUrl:(NSString *)url completion:(GetPostCompletion)completion;
 // Get Comments
 - (void)loadCommentsFromPost:(HNPost *)post completion:(GetCommentsCompletion)completion;
 // Login/Out
