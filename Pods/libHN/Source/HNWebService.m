@@ -151,19 +151,20 @@
             NSString *html = [[NSString alloc] initWithData:blockOperation.responseData encoding:NSUTF8StringEncoding];
             HNPost *post = [HNPost parsedPostFromHTML:html];
             if (post) {
+                NSArray *comments = [HNComment parsedCommentsFromHTML:html forPost:post];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(post);
+                    completion(post,comments);
                 });
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(nil);
+                    completion(nil,nil);
                 });
             }
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                completion(nil);
+                completion(nil,nil);
             });
         }
     }];

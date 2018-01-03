@@ -40,6 +40,7 @@ class CommentsViewController : UIViewController {
 
         view.showAnimatedSkeleton()
         loadComments()
+        
     }
     
     deinit {
@@ -63,14 +64,20 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        HNManager.shared().loadComments(from: post) { comments in
-            if let downcastedArray = comments as? [HNComment] {
-                let mappedComments = downcastedArray.map { CommentModel(source: $0) }
-                self.comments = mappedComments
-            } else {
-                self.comments = [CommentModel]()
+        if(self.comments == nil){
+            HNManager.shared().loadComments(from: post) { comments in
+                if let downcastedArray = comments as? [HNComment] {
+                    let mappedComments = downcastedArray.map { CommentModel(source: $0) }
+                    self.comments = mappedComments
+                } else {
+                    self.comments = [CommentModel]()
+                }
+                
+                self.view.hideSkeleton()
+                self.tableView.rowHeight = UITableViewAutomaticDimension
+                self.tableView.reloadData()
             }
-            
+        }else{
             self.view.hideSkeleton()
             self.tableView.rowHeight = UITableViewAutomaticDimension
             self.tableView.reloadData()
@@ -156,12 +163,17 @@ extension CommentsViewController: CommentDelegate {
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
         if URL.absoluteString.range(of:"news.ycombinator.com/item?id=") != nil {
             let url = URL.absoluteString
-            HNManager.shared().loadPost(withPostUrl:url) { post in
+            HNManager.shared().loadPost(withPostUrl:url) { post, comments in
                 if post != nil{
                     guard let navController = self.storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
                     guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
                     commentsViewController.post = post
-                    
+                    if let downcastedArray = comments as? [HNComment] {
+                        let mappedComments = downcastedArray.map { CommentModel(source: $0) }
+                        commentsViewController.comments = mappedComments
+                    } else {
+                        commentsViewController.comments = [CommentModel]()
+                    }
                     if UIDevice.current.userInterfaceIdiom == .phone {
                         // for iPhone we want to push the view controller instead of presenting it as the detail
                         self.navigationController?.pushViewController(commentsViewController, animated: true)
