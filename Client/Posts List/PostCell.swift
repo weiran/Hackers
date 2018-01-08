@@ -52,7 +52,6 @@ class PostCell : UITableViewCell {
     func clearImage() {
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
-        thumbnailImageView.contentMode = .center
     }
     
     @objc func didTapThumbnail(_ sender: Any) {

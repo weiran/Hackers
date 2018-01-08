@@ -1,6 +1,6 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
-  - Kingfisher (4.5.0)
+  - Kingfisher (4.6.1)
   - libHN (4.1.0)
   - PromiseKit (4.5.0):
     - PromiseKit/Foundation (= 4.5.0)
@@ -33,7 +33,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  Kingfisher: 26ae0473102b77b575da51960c932431e3745407
+  Kingfisher: 1f9157d9c02b380cbd0b7cc890161195164eb634
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
   SkeletonView: 933a9442b08c3550f61c2ae38a02456a74ad86f4
