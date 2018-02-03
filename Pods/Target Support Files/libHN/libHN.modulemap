@@ -1,6 +1,0 @@
-framework module libHN {
-  umbrella header "libHN-umbrella.h"
-
-  export *
-  module * { export * }
-}
