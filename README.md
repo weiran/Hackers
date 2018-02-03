@@ -44,3 +44,6 @@ I use several open source projects in Hackers, in no particular order:
 
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
 * [libHN](https://github.com/bennyguitar/libHN) by Ben Gordon
+* [SkeletonView](https://github.com/Juanpe/SkeletonView) by [Juanpe Catalán](https://github.com/Juanpe)
+* [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl)
+* [Kingfisher](https://github.com/mxcl/PromiseKit) by [Wei Wang](https://github.com/onevcat)
