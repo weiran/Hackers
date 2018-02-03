@@ -2,18 +2,18 @@ PODS:
   - DZNEmptyDataSet (1.8.1)
   - Kingfisher (4.6.1)
   - libHN (4.1.0)
-  - PromiseKit (4.5.0):
-    - PromiseKit/Foundation (= 4.5.0)
-    - PromiseKit/QuartzCore (= 4.5.0)
-    - PromiseKit/UIKit (= 4.5.0)
-  - PromiseKit/CorePromise (4.5.0)
-  - PromiseKit/Foundation (4.5.0):
+  - PromiseKit (4.5.2):
+    - PromiseKit/Foundation (= 4.5.2)
+    - PromiseKit/QuartzCore (= 4.5.2)
+    - PromiseKit/UIKit (= 4.5.2)
+  - PromiseKit/CorePromise (4.5.2)
+  - PromiseKit/Foundation (4.5.2):
     - PromiseKit/CorePromise
-  - PromiseKit/QuartzCore (4.5.0):
+  - PromiseKit/QuartzCore (4.5.2):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (4.5.0):
+  - PromiseKit/UIKit (4.5.2):
     - PromiseKit/CorePromise
-  - SkeletonView (1.0.4)
+  - SkeletonView (1.0.5)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
@@ -35,9 +35,9 @@ SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   Kingfisher: 1f9157d9c02b380cbd0b7cc890161195164eb634
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
-  PromiseKit: 9c1d9f6d7b65e3951a90bea7f407c56972be5d8e
-  SkeletonView: 933a9442b08c3550f61c2ae38a02456a74ad86f4
+  PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
+  SkeletonView: a601f98b51087aa475f324cc26792b9cd9d46770
 
 PODFILE CHECKSUM: 2caddf4fa884d04ccbe24705972e2409e25e53a4
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.4.0
