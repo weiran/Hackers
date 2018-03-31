@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ZFp-qn-rMO">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="506-JC-FDt">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -28,15 +28,15 @@
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </view>
                                 <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="77" id="Kis-WD-Vya" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="77" id="Kis-WD-Vya" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="22" width="375" height="77"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Kis-WD-Vya" id="SsN-9i-oXV">
-                                            <rect key="frame" x="0.0" y="0.0" width="342" height="76.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="76.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="ykC-xf-BNO">
-                                                    <rect key="frame" x="15" y="8.5" width="312" height="60"/>
+                                                    <rect key="frame" x="15" y="8.5" width="345" height="60"/>
                                                     <subviews>
                                                         <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="nll-fe-bGd">
                                                             <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -54,19 +54,19 @@
                                                             </userDefinedRuntimeAttributes>
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FIH-FV-HqO" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                            <rect key="frame" x="72" y="8.5" width="240" height="43.5"/>
+                                                            <rect key="frame" x="72" y="8.5" width="273" height="43.5"/>
                                                             <subviews>
                                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="AjF-9G-O07">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="240" height="43.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="273" height="43.5"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hh7-EL-SMI">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="240" height="21.5"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="273" height="21.5"/>
                                                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
                                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mfd-le-5lC">
-                                                                            <rect key="frame" x="0.0" y="26.5" width="240" height="17"/>
+                                                                            <rect key="frame" x="0.0" y="26.5" width="273" height="17"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                             <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
@@ -102,7 +102,7 @@
                                         <connections>
                                             <outlet property="postTitleView" destination="FIH-FV-HqO" id="Ft4-Qa-Ory"/>
                                             <outlet property="thumbnailImageView" destination="nll-fe-bGd" id="dMo-8J-QBg"/>
-                                            <segue destination="PXZ-r3-pvU" kind="showDetail" id="cCV-A1-rr5"/>
+                                            <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowComments" id="cCV-A1-rr5"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="90" id="qhe-sx-ztl" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
@@ -205,6 +205,19 @@
             </objects>
             <point key="canvasLocation" x="1460" y="549"/>
         </scene>
+        <!--Main Split View Controller-->
+        <scene sceneID="z9h-ZJ-BPa">
+            <objects>
+                <splitViewController id="506-JC-FDt" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="jsb-Cl-SCJ" kind="relationship" relationship="masterViewController" id="ISk-rg-7mM"/>
+                        <segue destination="PXZ-r3-pvU" kind="relationship" relationship="detailViewController" id="7bm-wR-rxr"/>
+                    </connections>
+                </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-396" y="548"/>
+        </scene>
         <!--Hacker News-->
         <scene sceneID="hn1-7Q-wdl">
             <objects>
@@ -225,19 +238,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Txu-0A-weJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="534" y="546"/>
-        </scene>
-        <!--Main Split View Controller-->
-        <scene sceneID="Znc-R9-4Eu">
-            <objects>
-                <splitViewController id="ZFp-qn-rMO" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <connections>
-                        <segue destination="jsb-Cl-SCJ" kind="relationship" relationship="masterViewController" id="ZSi-iF-TTb"/>
-                        <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="hgJ-uO-9jf"/>
-                    </connections>
-                </splitViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="oSB-FI-Inu" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-396" y="548"/>
         </scene>
         <!--Empty View Controller-->
         <scene sceneID="Nno-Vm-zTE">
@@ -597,6 +597,7 @@
         <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
     </resources>
     <inferredMetricsTieBreakers>
+        <segue reference="cCV-A1-rr5"/>
         <segue reference="lAj-M9-GP6"/>
     </inferredMetricsTieBreakers>
 </document>

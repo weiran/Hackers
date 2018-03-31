@@ -20,9 +20,7 @@ class NewsViewController : UIViewController {
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
     
-    private var collapseDetailViewController = true
     private var peekedIndexPath: IndexPath?
-    private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
     private var viewIsUnderTransition = false
@@ -38,8 +36,6 @@ class NewsViewController : UIViewController {
         refreshControl.tintColor = Theme.purpleColour
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
-        
-        splitViewController!.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(NewsViewController.viewDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
@@ -174,21 +170,6 @@ extension NewsViewController: UITableViewDataSource {
 }
 
 extension NewsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        collapseDetailViewController = false
-        
-        guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
-        guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
-        commentsViewController.post = posts[indexPath.row]
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            // for iPhone we want to push the view controller instead of presenting it as the detail
-            self.navigationController?.pushViewController(commentsViewController, animated: true)
-        } else {
-            showDetailViewController(navController, sender: self)
-        }
-    }
-    
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
@@ -209,6 +190,18 @@ extension NewsViewController: SkeletonTableViewDataSource {
     
     func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
+    }
+}
+
+extension NewsViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowComments" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let post = posts[indexPath.row]
+                let commentsViewController = (segue.destination as! UINavigationController).topViewController as! CommentsViewController
+                commentsViewController.post = post
+            }
+        }
     }
 }
 
@@ -236,15 +229,9 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
             [unowned self, indexPath = indexPath] (action, viewController) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self.tableView(self.tableView, didSelectRowAt: indexPath)
+            self.performSegue(withIdentifier: "ShowComments", sender: nil)
         }
         return [viewCommentsPreviewAction]
-    }
-}
-
-extension NewsViewController: UISplitViewControllerDelegate {
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return collapseDetailViewController
     }
 }
 
@@ -263,7 +250,6 @@ extension NewsViewController: PostTitleViewDelegate {
 }
 
 extension NewsViewController: PostCellDelegate {
-    
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
