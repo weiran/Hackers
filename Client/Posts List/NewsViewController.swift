@@ -61,7 +61,7 @@ class NewsViewController : UIViewController {
     public func viewDidRotate() {
         guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
         self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: indexPaths, with: .none)
+        self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
     }
 }
