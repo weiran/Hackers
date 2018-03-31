@@ -24,6 +24,7 @@ class NewsViewController : UIViewController {
     private var nextPageIdentifier: String?
     private var isProcessing: Bool = false
     private var viewIsUnderTransition = false
+    private var collapseDetailViewController = true
     
     private var cancelFetch: (() -> Void)?
     
@@ -65,7 +66,12 @@ class NewsViewController : UIViewController {
     }
     
     @objc func viewDidRotate() {
-        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows, !isProcessing, viewIsUnderTransition else { return }
+        guard let tableView = self.tableView,
+            let indexPaths = tableView.indexPathsForVisibleRows,
+            !isProcessing,
+            viewIsUnderTransition else {
+                return
+        }
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
@@ -85,16 +91,15 @@ extension NewsViewController { // post fetching
         
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
-        fetchPromise
-            .then { (posts, nextPageIdentifier) -> Void in
+        fetchPromise.then {
+            (posts, nextPageIdentifier) -> Void in
                 self.posts = posts ?? [HNPost]()
                 self.nextPageIdentifier = nextPageIdentifier
                 self.view.hideSkeleton()
                 self.tableView.rowHeight = UITableViewAutomaticDimension
                 self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
                 self.tableView.reloadData()
-            }
-            .always {
+            }.always {
                 self.view.hideSkeleton()
                 self.isProcessing = false
                 self.tableView.refreshControl?.endRefreshing()
@@ -134,6 +139,16 @@ extension NewsViewController { // post fetching
                 self.nextPageIdentifier = nextPageIdentifier
                 self.posts.append(contentsOf: downcastedArray)
                 self.tableView.reloadData()
+            }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowComments" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let post = posts[indexPath.row]
+                let commentsViewController = (segue.destination as! UINavigationController).topViewController as! CommentsViewController
+                commentsViewController.post = post
             }
         }
     }
@@ -182,15 +197,9 @@ extension NewsViewController: SkeletonTableViewDataSource {
     }
 }
 
-extension NewsViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowComments" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let post = posts[indexPath.row]
-                let commentsViewController = (segue.destination as! UINavigationController).topViewController as! CommentsViewController
-                commentsViewController.post = post
-            }
-        }
+extension NewsViewController: UISplitViewControllerDelegate {
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        return collapseDetailViewController
     }
 }
 
