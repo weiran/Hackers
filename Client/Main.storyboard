@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="506-JC-FDt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jsb-Cl-SCJ">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -205,18 +205,19 @@
             </objects>
             <point key="canvasLocation" x="1460" y="549"/>
         </scene>
-        <!--Main Split View Controller-->
+        <!--Item-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
                 <splitViewController id="506-JC-FDt" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
-                        <segue destination="jsb-Cl-SCJ" kind="relationship" relationship="masterViewController" id="ISk-rg-7mM"/>
                         <segue destination="PXZ-r3-pvU" kind="relationship" relationship="detailViewController" id="7bm-wR-rxr"/>
+                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="BNY-4g-r0C"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-396" y="548"/>
+            <point key="canvasLocation" x="534" y="548"/>
         </scene>
         <!--Hacker News-->
         <scene sceneID="hn1-7Q-wdl">
@@ -229,15 +230,15 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="viewControllers" id="ZVg-gU-w88"/>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="viewControllers" id="lAj-M9-GP6"/>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="viewControllers" id="saK-cn-B4F"/>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="viewControllers" id="lFe-l9-3MO"/>
+                        <segue destination="506-JC-FDt" kind="relationship" relationship="viewControllers" id="vbE-ZV-SDt"/>
+                        <segue destination="506-JC-FDt" kind="relationship" relationship="viewControllers" id="bLc-ih-bk0"/>
+                        <segue destination="506-JC-FDt" kind="relationship" relationship="viewControllers" id="sIH-Ru-uKh"/>
+                        <segue destination="506-JC-FDt" kind="relationship" relationship="viewControllers" id="N2W-56-WNc"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Txu-0A-weJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="534" y="546"/>
+            <point key="canvasLocation" x="-396" y="548"/>
         </scene>
         <!--Empty View Controller-->
         <scene sceneID="Nno-Vm-zTE">
@@ -598,6 +599,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="7bm-wR-rxr"/>
-        <segue reference="lAj-M9-GP6"/>
+        <segue reference="vbE-ZV-SDt"/>
     </inferredMetricsTieBreakers>
 </document>

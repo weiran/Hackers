@@ -16,13 +16,20 @@ class MainTabBarController: UITabBarController {
         guard let viewControllers = self.viewControllers else { return }
         
         for (index, viewController) in viewControllers.enumerated() {
-            guard let navController = viewController as? UINavigationController else { continue }
-            Theme.setupNavigationBar(navController.navigationBar)
-            if let newsVC = navController.viewControllers.first as? NewsViewController {
-                var postType: PostFilterType?
-                var typeName: String?
-                var iconName: String?
-                switch index {
+            guard let splitViewController = viewController as? UISplitViewController,
+                let navigationController = splitViewController.viewControllers.first as? UINavigationController,
+                let newsViewController = navigationController.viewControllers.first as? NewsViewController
+                else {
+                    return
+            }
+            
+            Theme.setupNavigationBar(navigationController.navigationBar)
+            
+            var postType: PostFilterType?
+            var typeName: String?
+            var iconName: String?
+            
+            switch index {
                 case 1:
                     postType = .ask
                     typeName = "Ask"
@@ -44,11 +51,11 @@ class MainTabBarController: UITabBarController {
                     postType = .top
                     typeName = "Top"
                     iconName = "TopIcon"
-                }
-                newsVC.postType = postType
-                newsVC.tabBarItem.title = typeName
-                newsVC.tabBarItem.image = UIImage(named: iconName!)
             }
+            
+            newsViewController.postType = postType
+            splitViewController.tabBarItem.title = typeName
+            splitViewController.tabBarItem.image = UIImage(named: iconName!)
         }
         
         tabBar.clipsToBounds = true
