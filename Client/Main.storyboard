@@ -211,13 +211,13 @@
                 <splitViewController id="506-JC-FDt" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
-                        <segue destination="PXZ-r3-pvU" kind="relationship" relationship="detailViewController" id="7bm-wR-rxr"/>
                         <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="BNY-4g-r0C"/>
+                        <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="AJJ-Nm-u6A"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="534" y="548"/>
+            <point key="canvasLocation" x="534" y="547"/>
         </scene>
         <!--Hacker News-->
         <scene sceneID="hn1-7Q-wdl">
@@ -598,7 +598,6 @@
         <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="cCV-A1-rr5"/>
         <segue reference="vbE-ZV-SDt"/>
     </inferredMetricsTieBreakers>
 </document>
