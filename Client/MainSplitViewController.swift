@@ -21,7 +21,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        guard let _ = secondaryViewController as? EmptyViewController else { return false }
-        return true
+        // only collapse the secondary onto the primary when it's the placeholder view
+        return secondaryViewController is EmptyViewController
     }
 }

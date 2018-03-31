@@ -22,9 +22,6 @@ class NewsViewController : UIViewController {
     
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
-    private var isProcessing: Bool = false
-    private var viewIsUnderTransition = false
-    private var collapseDetailViewController = true
     
     private var cancelFetch: (() -> Void)?
     
@@ -40,8 +37,6 @@ class NewsViewController : UIViewController {
         
         view.showAnimatedSkeleton()
         loadPosts()
-        
-        splitViewController?.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,11 +45,11 @@ class NewsViewController : UIViewController {
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        let delayMilliseconds = 350 // delay to resize after the SplitViewController has resized so the sizes are correct
-        let dispatchTime = DispatchTime.now() + .milliseconds(delayMilliseconds)
-        DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-            self.viewDidRotate()
-        }
+        DispatchQueue.global().async(execute: {
+            DispatchQueue.main.sync {
+                self.viewDidRotate()
+            }
+        })
     }
 
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
@@ -64,21 +59,15 @@ class NewsViewController : UIViewController {
     }
     
     public func viewDidRotate() {
-        guard let tableView = self.tableView,
-            let indexPaths = tableView.indexPathsForVisibleRows,
-            !isProcessing else { return }
-        viewIsUnderTransition = true
+        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
         self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: indexPaths, with: .automatic)
+        self.tableView.reloadRows(at: indexPaths, with: .none)
         self.tableView.endUpdates()
-        viewIsUnderTransition = false
     }
 }
 
 extension NewsViewController { // post fetching
     @objc func loadPosts() {
-        isProcessing = true
-        
         // cancel existing fetches
         if let cancelFetch = cancelFetch {
             cancelFetch()
@@ -97,7 +86,6 @@ extension NewsViewController { // post fetching
                 self.tableView.reloadData()
             }.always {
                 self.view.hideSkeleton()
-                self.isProcessing = false
                 self.tableView.refreshControl?.endRefreshing()
         }
         
@@ -190,12 +178,6 @@ extension NewsViewController: SkeletonTableViewDataSource {
     
     func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
-    }
-}
-
-extension NewsViewController: UISplitViewControllerDelegate {
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return collapseDetailViewController
     }
 }
 
