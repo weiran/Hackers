@@ -38,21 +38,23 @@ class NewsViewController : UIViewController {
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
         
-        NotificationCenter.default.addObserver(self, selector: #selector(NewsViewController.viewDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        
         view.showAnimatedSkeleton()
         loadPosts()
         
         splitViewController?.delegate = self
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let delayMilliseconds = 350 // delay to resize after the SplitViewController has resized so the sizes are correct
+        let dispatchTime = DispatchTime.now() + .milliseconds(delayMilliseconds)
+        DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
+            self.viewDidRotate()
+        }
     }
 
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
@@ -61,17 +63,11 @@ class NewsViewController : UIViewController {
         return safariViewController
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        viewIsUnderTransition = true
-    }
-    
-    @objc func viewDidRotate() {
+    public func viewDidRotate() {
         guard let tableView = self.tableView,
             let indexPaths = tableView.indexPathsForVisibleRows,
-            !isProcessing,
-            viewIsUnderTransition else {
-                return
-        }
+            !isProcessing else { return }
+        viewIsUnderTransition = true
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
