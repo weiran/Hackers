@@ -41,19 +41,8 @@ class NewsViewController : UIViewController {
         
         view.showAnimatedSkeleton()
         loadPosts()
-    }
-    
-    override func awakeFromNib() {
-        /*
-         TODO: workaround for an iOS 11 bug: if prefersLargeTitles is set in storyboard,
-         it never shrinks with scroll. When fixed, remove from code and set in storyboard.
-        */
-        navigationController?.navigationBar.prefersLargeTitles = true
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationItem.largeTitleDisplayMode = .always
+        
+        splitViewController?.delegate = self
     }
     
     deinit {
