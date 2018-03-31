@@ -35,11 +35,14 @@ class CommentsViewController : UIViewController {
         tableView.backgroundView = nil
         tableView.backgroundColor = .white
         
-        navigationItem.largeTitleDisplayMode = .never
         Theme.setupNavigationBar(navigationController!.navigationBar)
 
         view.showAnimatedSkeleton()
         loadComments()
+    }
+    
+    override func awakeFromNib() {
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     deinit {
