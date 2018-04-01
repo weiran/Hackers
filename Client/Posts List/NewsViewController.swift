@@ -42,6 +42,7 @@ class NewsViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
+        Theme.setupNavigationBar(navigationController?.navigationBar)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -130,9 +131,10 @@ extension NewsViewController { // post fetching
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowComments" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let post = posts[indexPath.row]
-                let commentsViewController = (segue.destination as! UINavigationController).topViewController as! CommentsViewController
-                commentsViewController.post = post
+                if let commentsViewController = (segue.destination as? UINavigationController)?.topViewController as? CommentsViewController {
+                    let post = posts[indexPath.row]
+                    commentsViewController.post = post
+                }
             }
         }
     }

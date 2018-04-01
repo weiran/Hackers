@@ -35,7 +35,7 @@ class CommentsViewController : UIViewController {
         tableView.backgroundView = nil
         tableView.backgroundColor = .white
         
-        Theme.setupNavigationBar(navigationController!.navigationBar)
+        Theme.setupNavigationBar(navigationController?.navigationBar)
 
         view.showAnimatedSkeleton()
         loadComments()

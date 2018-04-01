@@ -23,8 +23,6 @@ class MainTabBarController: UITabBarController {
                     return
             }
             
-            Theme.setupNavigationBar(navigationController.navigationBar)
-            
             var postType: PostFilterType?
             var typeName: String?
             var iconName: String?
