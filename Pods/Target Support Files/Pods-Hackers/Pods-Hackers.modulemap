@@ -1,6 +1,0 @@
-framework module Pods_Hackers {
-  umbrella header "Pods-Hackers-umbrella.h"
-
-  export *
-  module * { export * }
-}

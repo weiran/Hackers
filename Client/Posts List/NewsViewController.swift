@@ -20,12 +20,8 @@ class NewsViewController : UIViewController {
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
     
-    private var collapseDetailViewController = true
     private var peekedIndexPath: IndexPath?
-    private var thumbnailProcessedUrls = [String]()
     private var nextPageIdentifier: String?
-    private var isProcessing: Bool = false
-    private var viewIsUnderTransition = false
     
     private var cancelFetch: (() -> Void)?
     
@@ -39,34 +35,22 @@ class NewsViewController : UIViewController {
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
         
-        splitViewController!.delegate = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(NewsViewController.viewDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        
         view.showAnimatedSkeleton()
         loadPosts()
-    }
-    
-    override func awakeFromNib() {
-        /*
-         TODO: workaround for an iOS 11 bug: if prefersLargeTitles is set in storyboard,
-         it never shrinks with scroll. When fixed, remove from code and set in storyboard.
-        */
-        navigationController?.navigationBar.prefersLargeTitles = true
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationItem.largeTitleDisplayMode = .always
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
+        Theme.setupNavigationBar(navigationController?.navigationBar)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        DispatchQueue.global().async(execute: {
+            DispatchQueue.main.sync {
+                self.viewDidRotate()
+            }
+        })
     }
 
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
@@ -75,23 +59,16 @@ class NewsViewController : UIViewController {
         return safariViewController
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        viewIsUnderTransition = true
-    }
-    
-    @objc func viewDidRotate() {
-        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows, !isProcessing, viewIsUnderTransition else { return }
+    public func viewDidRotate() {
+        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
-        viewIsUnderTransition = false
     }
 }
 
 extension NewsViewController { // post fetching
     @objc func loadPosts() {
-        isProcessing = true
-        
         // cancel existing fetches
         if let cancelFetch = cancelFetch {
             cancelFetch()
@@ -100,18 +77,16 @@ extension NewsViewController { // post fetching
         
         // fetch new posts
         let (fetchPromise, cancel) = fetch()
-        fetchPromise
-            .then { (posts, nextPageIdentifier) -> Void in
+        fetchPromise.then {
+            (posts, nextPageIdentifier) -> Void in
                 self.posts = posts ?? [HNPost]()
                 self.nextPageIdentifier = nextPageIdentifier
                 self.view.hideSkeleton()
                 self.tableView.rowHeight = UITableViewAutomaticDimension
                 self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
                 self.tableView.reloadData()
-            }
-            .always {
+            }.always {
                 self.view.hideSkeleton()
-                self.isProcessing = false
                 self.tableView.refreshControl?.endRefreshing()
         }
         
@@ -152,6 +127,17 @@ extension NewsViewController { // post fetching
             }
         }
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowComments" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                if let commentsViewController = (segue.destination as? UINavigationController)?.topViewController as? CommentsViewController {
+                    let post = posts[indexPath.row]
+                    commentsViewController.post = post
+                }
+            }
+        }
+    }
 }
 
 extension NewsViewController: UITableViewDataSource {
@@ -174,21 +160,6 @@ extension NewsViewController: UITableViewDataSource {
 }
 
 extension NewsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        collapseDetailViewController = false
-        
-        guard let navController = storyboard?.instantiateViewController(withIdentifier: "PostViewNavigationController") as? UINavigationController else { return }
-        guard let commentsViewController = navController.viewControllers.first as? CommentsViewController else { return }
-        commentsViewController.post = posts[indexPath.row]
-        
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            // for iPhone we want to push the view controller instead of presenting it as the detail
-            self.navigationController?.pushViewController(commentsViewController, animated: true)
-        } else {
-            showDetailViewController(navController, sender: self)
-        }
-    }
-    
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
@@ -236,15 +207,9 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
             [unowned self, indexPath = indexPath] (action, viewController) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self.tableView(self.tableView, didSelectRowAt: indexPath)
+            self.performSegue(withIdentifier: "ShowComments", sender: nil)
         }
         return [viewCommentsPreviewAction]
-    }
-}
-
-extension NewsViewController: UISplitViewControllerDelegate {
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return collapseDetailViewController
     }
 }
 
@@ -263,7 +228,6 @@ extension NewsViewController: PostTitleViewDelegate {
 }
 
 extension NewsViewController: PostCellDelegate {
-    
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
