@@ -11,7 +11,6 @@ import UIKit
 
 
 class CommentTableViewCell : UITableViewCell {
-    
     var delegate: CommentDelegate?
     
     var level: Int = 0 {
@@ -24,8 +23,6 @@ class CommentTableViewCell : UITableViewCell {
             updateCommentContent(with: comment)
         }
     }
-    
-    private var currentTextColor: UIColor = .darkGray
     
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel : UILabel!
@@ -58,7 +55,7 @@ class CommentTableViewCell : UITableViewCell {
         if let commentTextView = commentTextView {
             // only for expanded comments
             let commentFont = UIFont.systemFont(ofSize: 15)
-            let commentTextColor = currentTextColor
+            let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
             let lineSpacing = 4 as CGFloat
             
             let commentAttributedString = NSMutableAttributedString(string: comment.text)
@@ -86,6 +83,26 @@ extension CommentTableViewCell: UITextViewDelegate {
     }
 }
 
+extension CommentTableViewCell {
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        selected ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        highlighted ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    func setSelectedBackground() {
+        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
+    }
+    
+    func setUnselectedBackground() {
+        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
+    }
+}
+
 extension CommentTableViewCell: Themed {
     func applyTheme(_ theme: AppTheme) {
         backgroundColor = theme.backgroundColor
@@ -101,6 +118,5 @@ extension CommentTableViewCell: Themed {
         if separatorView != nil {
             separatorView.backgroundColor = theme.separatorColor
         }
-        currentTextColor = theme.textColor
     }
 }

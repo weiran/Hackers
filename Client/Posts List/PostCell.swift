@@ -41,11 +41,11 @@ class PostCell : UITableViewCell {
     }
     
     func setSelectedBackground() {
-        backgroundColor = OldTheme.backgroundPurpleColour
+        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
     }
     
     func setUnselectedBackground() {
-        backgroundColor = UIColor.clear
+        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }
     
     func clearImage() {
