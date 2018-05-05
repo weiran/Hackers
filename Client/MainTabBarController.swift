@@ -12,6 +12,7 @@ import libHN
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTheming()
         
         guard let viewControllers = self.viewControllers else { return }
         
@@ -57,5 +58,12 @@ class MainTabBarController: UITabBarController {
         }
         
         tabBar.clipsToBounds = true
+    }
+}
+
+extension MainTabBarController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        tabBar.barTintColor = theme.barBackgroundColor
+        tabBar.tintColor = theme.barForegroundColor
     }
 }

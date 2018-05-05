@@ -27,6 +27,7 @@ class NewsViewController : UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTheming()
         
         registerForPreviewing(with: self, sourceView: tableView)
 
@@ -37,6 +38,10 @@ class NewsViewController : UIViewController {
         
         view.showAnimatedSkeleton()
         loadPosts()
+    }
+    
+    @IBAction func changeTheme(_ sender: Any) {
+        AppThemeProvider.shared.nextTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {

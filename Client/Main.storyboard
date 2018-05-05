@@ -179,7 +179,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="QiA-1a-N44"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Hacker News" id="On9-n6-9Yb"/>
+                    <navigationItem key="navigationItem" title="Hacker News" id="On9-n6-9Yb">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="2id-E8-XJT">
+                            <connections>
+                                <action selector="changeTheme:" destination="7mJ-zT-gNh" id="05T-5z-dbG"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="sTU-Jc-dof" id="9Rr-YT-r8B"/>
                     </connections>
@@ -191,7 +197,7 @@
         <!--Item-->
         <scene sceneID="1am-tW-4v5">
             <objects>
-                <navigationController id="2FT-kg-cd5" sceneMemberID="viewController">
+                <navigationController id="2FT-kg-cd5" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="aiG-Km-7Il"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="o2Y-R6-LxE">
                         <rect key="frame" x="0.0" y="20" width="375" height="96"/>
@@ -569,10 +575,10 @@
             </objects>
             <point key="canvasLocation" x="1460" y="1397"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--App Navigation Controller-->
         <scene sceneID="1UW-sd-Ilr">
             <objects>
-                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="nrG-IN-2HV"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Zkc-Rr-CEM">

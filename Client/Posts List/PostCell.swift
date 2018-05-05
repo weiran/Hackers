@@ -21,6 +21,7 @@ class PostCell : UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        setupTheming()
         setupThumbnailGesture()
     }
     

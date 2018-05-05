@@ -31,6 +31,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        setupTheming()
         
         let titleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.didPressTitleText(_:)))
         titleLabel.addGestureRecognizer(titleTapGestureRecognizer)

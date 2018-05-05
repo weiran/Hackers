@@ -40,7 +40,7 @@ extension Themed where Self: AnyObject {
     /// This is to be called once when Self wants to start listening for
     /// theme changes. This immediately triggers `applyTheme()` with the
     /// current theme.
-    func setUpTheming() {
+    func setupTheming() {
         applyTheme(themeProvider.currentTheme)
         themeProvider.subscribeToChanges(self) { [weak self] newTheme in
             self?.applyTheme(newTheme)

@@ -24,7 +24,6 @@ struct AppTheme {
     
     var barBackgroundColor: UIColor
     var barForegroundColor: UIColor
-    var barStyle: UIBarStyle
     var backgroundColor: UIColor
     
     var titleTextColor: UIColor
@@ -36,12 +35,14 @@ struct AppTheme {
 }
 
 extension AppTheme {
+    static let appColor = UIColor(rgb: 0x6513E5)
+    static let appColorDark = UIColor(rgb: 0xA06FED)
+    
     static let light = AppTheme(
         statusBarStyle: .default,
         
-        barBackgroundColor: .black,
-        barForegroundColor: .white,
-        barStyle: .default,
+        barBackgroundColor: .white,
+        barForegroundColor: appColor,
         backgroundColor: .white,
         
         titleTextColor: .black,
@@ -51,22 +52,19 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
         separatorColor: UIColor(rgb: 0xCACACA)
     )
-}
-
-extension UIColor {
-    convenience init(red: Int, green: Int, blue: Int) {
-        assert(red >= 0 && red <= 255, "Invalid red component")
-        assert(green >= 0 && green <= 255, "Invalid green component")
-        assert(blue >= 0 && blue <= 255, "Invalid blue component")
-        
-        self.init(red: CGFloat(red) / 255.0, green: CGFloat(green) / 255.0, blue: CGFloat(blue) / 255.0, alpha: 1.0)
-    }
     
-    convenience init(rgb: Int) {
-        self.init(
-            red: (rgb >> 16) & 0xFF,
-            green: (rgb >> 8) & 0xFF,
-            blue: rgb & 0xFF
-        )
-    }
+    static let dark = AppTheme(
+        statusBarStyle: .lightContent,
+        
+        barBackgroundColor: .black,
+        barForegroundColor: appColorDark,
+        backgroundColor: .black,
+        
+        titleTextColor: UIColor(rgb: 0xDDDDDD),
+        textColor: UIColor(rgb: 0xAAAAAA),
+        lightTextColor: UIColor(rgb: 0x555555),
+        
+        cellHighlightColor: UIColor(rgb: 0xF4D1F2),
+        separatorColor: UIColor(rgb: 0x353535)
+    )
 }

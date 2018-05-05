@@ -21,6 +21,8 @@
 		2464D20D209DD8F400C7F8FC /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D20A209DD8F400C7F8FC /* ArrayExtensions.swift */; };
 		2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D20B209DD8F400C7F8FC /* SubscribableValue.swift */; };
 		2464D20F209DD8F400C7F8FC /* Weak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D20C209DD8F400C7F8FC /* Weak.swift */; };
+		2464D211209DE7B100C7F8FC /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */; };
+		2464D213209DEFB100C7F8FC /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D212209DEFB100C7F8FC /* AppNavigationController.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		249B24751F659A5200028A92 /* CommentsHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B24741F659A5200028A92 /* CommentsHeader.xib */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
@@ -59,6 +61,8 @@
 		2464D20A209DD8F400C7F8FC /* ArrayExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		2464D20B209DD8F400C7F8FC /* SubscribableValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscribableValue.swift; sourceTree = "<group>"; };
 		2464D20C209DD8F400C7F8FC /* Weak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Weak.swift; sourceTree = "<group>"; };
+		2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		2464D212209DEFB100C7F8FC /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		249B24741F659A5200028A92 /* CommentsHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommentsHeader.xib; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -123,6 +127,7 @@
 				2464D20A209DD8F400C7F8FC /* ArrayExtensions.swift */,
 				2464D20B209DD8F400C7F8FC /* SubscribableValue.swift */,
 				2464D20C209DD8F400C7F8FC /* Weak.swift */,
+				2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -215,6 +220,7 @@
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
 				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
+				2464D212209DEFB100C7F8FC /* AppNavigationController.swift */,
 				24CE5FEE19434DC0009D2677 /* Posts List */,
 				24CE5FEF19434DCB009D2677 /* Comments */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
@@ -384,6 +390,7 @@
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
+				2464D211209DE7B100C7F8FC /* UIColor+Extensions.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2464D20D209DD8F400C7F8FC /* ArrayExtensions.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
@@ -398,6 +405,7 @@
 				2464D208209DD7B100C7F8FC /* AppThemeProvider.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
+				2464D213209DEFB100C7F8FC /* AppNavigationController.swift in Sources */,
 				2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
