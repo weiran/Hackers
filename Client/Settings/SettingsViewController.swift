@@ -30,6 +30,7 @@ class SettingsViewController: UITableViewController {
 extension SettingsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.barBackgroundColor
-        tableView.backgroundColor = theme.backgroundColor
+        tableView.backgroundColor = theme.barBackgroundColor
+        tableView.separatorColor = theme.separatorColor
     }
 }

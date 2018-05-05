@@ -182,7 +182,7 @@
                     <navigationItem key="navigationItem" title="Hacker News" id="On9-n6-9Yb">
                         <barButtonItem key="rightBarButtonItem" title="Item" image="SettingsIcon" id="2id-E8-XJT">
                             <connections>
-                                <segue destination="9fT-2D-AhL" kind="presentation" id="3L9-P8-OTk"/>
+                                <segue destination="9fT-2D-AhL" kind="presentation" modalPresentationStyle="formSheet" id="3L9-P8-OTk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -584,8 +584,8 @@
         <scene sceneID="CQx-j9-MSt">
             <objects>
                 <navigationController id="9fT-2D-AhL" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="W1w-PO-Odu">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="W1w-PO-Odu">
+                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
