@@ -16,5 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         HNManager.shared().startSession()
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
+        setAppTheme()
+    }
+    
+    private func setAppTheme() {
+        AppThemeProvider.shared.currentTheme = UserDefaults.standard.darkModeEnabled ? .dark : .light
     }
 }
