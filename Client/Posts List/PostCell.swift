@@ -19,8 +19,6 @@ class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
     
-    var cancelThumbnailTask: (() -> Void)?
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         setupThumbnailGesture()

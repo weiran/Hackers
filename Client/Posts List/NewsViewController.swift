@@ -165,12 +165,6 @@ extension NewsViewController: UITableViewDelegate {
             loadMorePosts()
         }
     }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? PostCell {
-            cell.cancelThumbnailTask?()
-        }
-    }
 }
 
 extension NewsViewController: SkeletonTableViewDataSource {
