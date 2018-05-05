@@ -19,5 +19,6 @@ extension ThemedSafariViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         preferredBarTintColor = theme.barBackgroundColor
         preferredControlTintColor = theme.appTintColor
+        view.backgroundColor = theme.backgroundColor
     }
 }
