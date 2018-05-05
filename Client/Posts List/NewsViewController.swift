@@ -120,21 +120,21 @@ extension NewsViewController { // post fetching
         guard let nextPageIdentifier = nextPageIdentifier else { return }
         self.nextPageIdentifier = nil
         HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
-            if let downcastedArray = posts as? [HNPost] {
-                self.nextPageIdentifier = nextPageIdentifier
-                self.posts.append(contentsOf: downcastedArray)
-                self.tableView.reloadData()
-            }
+            guard let downcastedArray = posts as? [HNPost] else { return }
+            self.nextPageIdentifier = nextPageIdentifier
+            self.posts.append(contentsOf: downcastedArray)
+            self.tableView.reloadData()
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowComments" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                if let commentsViewController = (segue.destination as? UINavigationController)?.topViewController as? CommentsViewController {
-                    let post = posts[indexPath.row]
-                    commentsViewController.post = post
-                }
+            if let indexPath = tableView.indexPathForSelectedRow,
+                let segueNavigationController = segue.destination as? UINavigationController,
+                let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
+        
+                let post = posts[indexPath.row]
+                commentsViewController.post = post
             }
         }
     }
