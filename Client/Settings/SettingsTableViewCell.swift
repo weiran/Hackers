@@ -20,5 +20,6 @@ class SettingsTableViewCell: UITableViewCell {
 extension SettingsTableViewCell: Themed {
     func applyTheme(_ theme: AppTheme) {
         titleLabel.textColor = theme.titleTextColor
+        backgroundColor = theme.barBackgroundColor
     }
 }
