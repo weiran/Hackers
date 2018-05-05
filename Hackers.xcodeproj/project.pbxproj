@@ -27,6 +27,7 @@
 		2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */; };
 		2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */; };
 		2464D21F209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */; };
+		2464D221209E2CDF00C7F8FC /* ThemedSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		249B24751F659A5200028A92 /* CommentsHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B24741F659A5200028A92 /* CommentsHeader.xib */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
@@ -71,6 +72,7 @@
 		2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+UserDefaultsExtensions.swift"; sourceTree = "<group>"; };
+		2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemedSafariViewController.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		249B24741F659A5200028A92 /* CommentsHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommentsHeader.xib; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				2464D20B209DD8F400C7F8FC /* SubscribableValue.swift */,
 				2464D20C209DD8F400C7F8FC /* Weak.swift */,
 				2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */,
+				2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -421,6 +424,7 @@
 				24CEAA9B1F8916970050DEDF /* UIView+Extensions.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
+				2464D221209E2CDF00C7F8FC /* ThemedSafariViewController.swift in Sources */,
 				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,

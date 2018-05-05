@@ -59,7 +59,7 @@ class NewsViewController : UIViewController {
     }
 
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: url)
+        let safariViewController = ThemedSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }

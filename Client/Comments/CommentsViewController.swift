@@ -106,7 +106,7 @@ extension CommentsViewController: PostTitleViewDelegate {
             })
             
             // show link
-            let safariViewController = SFSafariViewController(url: url)
+            let safariViewController = ThemedSafariViewController(url: url)
             self.present(safariViewController, animated: true, completion: nil)
         }
     }
@@ -162,7 +162,7 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = SFSafariViewController(url: URL)
+        let safariViewController = ThemedSafariViewController(url: URL)
         self.present(safariViewController, animated: true, completion: nil)
     }
     
