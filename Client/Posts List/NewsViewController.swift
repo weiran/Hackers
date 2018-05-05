@@ -31,7 +31,7 @@ class NewsViewController : UIViewController {
         registerForPreviewing(with: self, sourceView: tableView)
 
         let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = Theme.purpleColour
+        refreshControl.tintColor = OldTheme.purpleColour
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
         
@@ -42,7 +42,7 @@ class NewsViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
-        Theme.setupNavigationBar(navigationController?.navigationBar)
+        OldTheme.setupNavigationBar(navigationController?.navigationBar)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -164,6 +164,12 @@ extension NewsViewController: UITableViewDelegate {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
+    }
+}
+
+extension NewsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        tableView.backgroundColor = theme.backgroundColor
     }
 }
 

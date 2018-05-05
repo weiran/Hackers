@@ -40,7 +40,7 @@ class PostCell : UITableViewCell {
     }
     
     func setSelectedBackground() {
-        backgroundColor = Theme.backgroundPurpleColour
+        backgroundColor = OldTheme.backgroundPurpleColour
     }
     
     func setUnselectedBackground() {
@@ -54,5 +54,11 @@ class PostCell : UITableViewCell {
     
     @objc func didTapThumbnail(_ sender: Any) {
         delegate?.didTapThumbnail(sender)
+    }
+}
+
+extension PostCell: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        backgroundColor = theme.backgroundColor
     }
 }

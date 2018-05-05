@@ -86,3 +86,10 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return attachment
     }
 }
+
+extension PostTitleView: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        titleLabel.textColor = theme.titleTextColor
+        metadataLabel.textColor = theme.textColor
+    }
+}
