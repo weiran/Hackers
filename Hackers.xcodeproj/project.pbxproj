@@ -224,7 +224,6 @@
 				24F39F8218AFB1150055F8DC /* Frameworks */,
 				24F39F8318AFB1150055F8DC /* Resources */,
 				46C1D99CBFD349F8D40A6170 /* [CP] Embed Pods Frameworks */,
-				7A077761A7AF115EF80F5950 /* [CP] Copy Pods Resources */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 			);
 			buildRules = (
@@ -342,21 +341,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7A077761A7AF115EF80F5950 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hackers/Pods-Hackers-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
