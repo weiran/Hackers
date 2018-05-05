@@ -25,12 +25,17 @@ class CommentTableViewCell : UITableViewCell {
         }
     }
     
+    private var currentTextColor: UIColor = .darkGray
+    
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel : UILabel!
     @IBOutlet var datePostedLabel : UILabel!
     @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
+    @IBOutlet weak var separatorView: UIView!
     
     override func awakeFromNib() {
+        super.awakeFromNib()
+        setupTheming()
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
     }
     
@@ -53,7 +58,7 @@ class CommentTableViewCell : UITableViewCell {
         if let commentTextView = commentTextView {
             // only for expanded comments
             let commentFont = UIFont.systemFont(ofSize: 15)
-            let commentTextColor = UIColor.darkGray
+            let commentTextColor = currentTextColor
             let lineSpacing = 4 as CGFloat
             
             let commentAttributedString = NSMutableAttributedString(string: comment.text)
@@ -78,5 +83,24 @@ extension CommentTableViewCell: UITextViewDelegate {
             return false
         }
         return true
+    }
+}
+
+extension CommentTableViewCell: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        backgroundColor = theme.backgroundColor
+        if commentTextView != nil {
+            commentTextView.tintColor = theme.appTintColor
+        }
+        if authorLabel != nil {
+            authorLabel.textColor = theme.textColor
+        }
+        if datePostedLabel != nil {
+            datePostedLabel.textColor = theme.lightTextColor
+        }
+        if separatorView != nil {
+            separatorView.backgroundColor = theme.separatorColor
+        }
+        currentTextColor = theme.textColor
     }
 }

@@ -24,11 +24,13 @@ class CommentsViewController : UIViewController {
     
     @IBOutlet var tableView: UITableView!
     
+    @IBOutlet weak var postTitleContainerView: UIView!
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTheming()
         
         setupPostTitleView()
         
@@ -42,6 +44,7 @@ class CommentsViewController : UIViewController {
     }
     
     override func awakeFromNib() {
+        super.awakeFromNib()
         navigationItem.largeTitleDisplayMode = .never
     }
     
@@ -146,6 +149,14 @@ extension CommentsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
         return view
+    }
+}
+
+extension CommentsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        postTitleContainerView.backgroundColor = theme.backgroundColor
     }
 }
 

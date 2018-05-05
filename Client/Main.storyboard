@@ -273,6 +273,9 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="dlp-BO-OJX"/>
                     </view>
+                    <connections>
+                        <outlet property="descriptionLabel" destination="ein-MP-Pvn" id="YUY-eD-ggj"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X9u-DC-PJL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -351,7 +354,7 @@
                                             </subviews>
                                         </stackView>
                                     </subviews>
-                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="trailingMargin" secondItem="HPy-1s-dHi" secondAttribute="trailing" constant="8" id="1jq-zG-2B8"/>
                                         <constraint firstItem="HPy-1s-dHi" firstAttribute="leading" secondItem="oQf-bd-JX5" secondAttribute="leadingMargin" constant="8" id="EAe-Mc-4uA"/>
@@ -369,7 +372,7 @@
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VKY-Ue-Nin" customClass="TouchableTextView" customModule="Hackers" customModuleProvider="target">
                                                     <rect key="frame" x="5" y="33" width="360" height="102"/>
-                                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <gestureRecognizers/>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -428,6 +431,7 @@
                                             <outlet property="commentTextView" destination="VKY-Ue-Nin" id="fEy-fA-WQC"/>
                                             <outlet property="datePostedLabel" destination="XII-Xj-vK5" id="kwW-Ye-1me"/>
                                             <outlet property="leftPaddingConstraint" destination="LZE-py-3vB" id="3ON-IK-CL1"/>
+                                            <outlet property="separatorView" destination="bB8-hK-Ppo" id="p4t-uG-Dye"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ClosedCommentCell" rowHeight="44" id="wum-oq-Sxv" userLabel="Closed Comment Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
@@ -482,6 +486,7 @@
                                             <outlet property="authorLabel" destination="VQU-D7-PW2" id="0J6-e2-2SR"/>
                                             <outlet property="datePostedLabel" destination="jhO-xY-HGw" id="G8Y-Gp-cbS"/>
                                             <outlet property="leftPaddingConstraint" destination="25y-uT-1Vw" id="K9Q-LB-gUz"/>
+                                            <outlet property="separatorView" destination="mSf-dk-3Dt" id="lxx-C2-NQY"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="115" id="MXo-y0-JGn" userLabel="Skeleton Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
@@ -493,7 +498,7 @@
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dvM-Za-txm">
                                                     <rect key="frame" x="15" y="16" width="345" height="98"/>
-                                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <gestureRecognizers/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -528,9 +533,6 @@
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
                                         </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <outlet property="commentTextView" destination="dvM-Za-txm" id="zii-7q-TWj"/>
-                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <userDefinedRuntimeAttributes>
@@ -561,6 +563,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="postTitleContainerView" destination="oQf-bd-JX5" id="evZ-gr-kOZ"/>
                         <outlet property="postTitleView" destination="3Eh-yp-NQt" id="dKO-u1-fmk"/>
                         <outlet property="tableView" destination="iN8-we-FRa" id="gnY-66-9vc"/>
                         <outlet property="thumbnailImageView" destination="OAG-fN-haY" id="mHu-tM-w1p"/>

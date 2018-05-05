@@ -23,6 +23,7 @@
 		2464D20F209DD8F400C7F8FC /* Weak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D20C209DD8F400C7F8FC /* Weak.swift */; };
 		2464D211209DE7B100C7F8FC /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */; };
 		2464D213209DEFB100C7F8FC /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D212209DEFB100C7F8FC /* AppNavigationController.swift */; };
+		2464D216209DFF6D00C7F8FC /* CommentsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D215209DFF6D00C7F8FC /* CommentsHeaderView.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		249B24751F659A5200028A92 /* CommentsHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B24741F659A5200028A92 /* CommentsHeader.xib */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
@@ -63,6 +64,7 @@
 		2464D20C209DD8F400C7F8FC /* Weak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Weak.swift; sourceTree = "<group>"; };
 		2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		2464D212209DEFB100C7F8FC /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
+		2464D215209DFF6D00C7F8FC /* CommentsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsHeaderView.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		249B24741F659A5200028A92 /* CommentsHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommentsHeader.xib; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 				249B24741F659A5200028A92 /* CommentsHeader.xib */,
+				2464D215209DFF6D00C7F8FC /* CommentsHeaderView.swift */,
 			);
 			path = Comments;
 			sourceTree = "<group>";
@@ -388,6 +391,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
+				2464D216209DFF6D00C7F8FC /* CommentsHeaderView.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				2464D211209DE7B100C7F8FC /* UIColor+Extensions.swift in Sources */,

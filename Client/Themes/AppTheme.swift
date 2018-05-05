@@ -20,6 +20,8 @@ struct OldTheme {
 }
 
 struct AppTheme {
+    var appTintColor: UIColor
+    
     var statusBarStyle: UIStatusBarStyle
     
     var barBackgroundColor: UIColor
@@ -35,14 +37,16 @@ struct AppTheme {
 }
 
 extension AppTheme {
-    static let appColor = UIColor(rgb: 0x6513E5)
-    static let appColorDark = UIColor(rgb: 0xA06FED)
+    private static let appTintColorLight = UIColor(rgb: 0x6513E5)
+    private static let appTintColorDark = UIColor(rgb: 0xA06FED)
     
     static let light = AppTheme(
+        appTintColor: appTintColorLight,
+        
         statusBarStyle: .default,
         
         barBackgroundColor: .white,
-        barForegroundColor: appColor,
+        barForegroundColor: appTintColorLight,
         backgroundColor: .white,
         
         titleTextColor: .black,
@@ -54,10 +58,12 @@ extension AppTheme {
     )
     
     static let dark = AppTheme(
+        appTintColor: appTintColorDark,
+        
         statusBarStyle: .lightContent,
         
         barBackgroundColor: UIColor(rgb: 0x111111),
-        barForegroundColor: appColorDark,
+        barForegroundColor: appTintColorDark,
         backgroundColor: .black,
         
         titleTextColor: UIColor(rgb: 0xDDDDDD),
