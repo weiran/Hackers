@@ -13,14 +13,14 @@ PODS:
     - PromiseKit/CorePromise
   - PromiseKit/UIKit (4.5.2):
     - PromiseKit/CorePromise
-  - SkeletonView (1.2)
+  - SkeletonView (1.1.1)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
   - Kingfisher
   - libHN (from `https://github.com/weiran/libHN`)
   - PromiseKit (~> 4.x)
-  - SkeletonView
+  - SkeletonView (= 1.1.1)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -43,8 +43,8 @@ SPEC CHECKSUMS:
   Kingfisher: da6b005aa96d37698e3e4f1ccfe96a5b9bbf27d6
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
-  SkeletonView: d68962d45d1af038f6a110d2274b183df8f82752
+  SkeletonView: 041053e904504e7d8db83df166e599be75659fe1
 
-PODFILE CHECKSUM: 3b9af0db4414bd1d472012123af49c8f3ad7f31e
+PODFILE CHECKSUM: 13a0aafd3c0db0e0f72962c5acd58c1283b5b815
 
 COCOAPODS: 1.5.0
