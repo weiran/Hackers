@@ -9,23 +9,17 @@
 import UIKit
 
 class AppNavigationController: UINavigationController {
-    private var themedStatusBarStyle: UIStatusBarStyle?
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return themedStatusBarStyle ?? super.preferredStatusBarStyle
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
     }
-
 }
 
 extension AppNavigationController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        themedStatusBarStyle = theme.statusBarStyle
-        setNeedsStatusBarAppearanceUpdate()
+        /// It's not ideal to use UIApplication.shared but overriding
+        /// preferredStatusBarStyle doesn't work with a UITabBar
+        UIApplication.shared.statusBarStyle = theme.statusBarStyle
         
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
