@@ -56,7 +56,7 @@ extension AppTheme {
     static let dark = AppTheme(
         statusBarStyle: .lightContent,
         
-        barBackgroundColor: .black,
+        barBackgroundColor: UIColor(rgb: 0x111111),
         barForegroundColor: appColorDark,
         backgroundColor: .black,
         
