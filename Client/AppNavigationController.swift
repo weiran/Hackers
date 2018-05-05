@@ -12,6 +12,7 @@ class AppNavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
+        navigationBar.setValue(true, forKey: "hidesShadow")
     }
 }
 
