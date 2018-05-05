@@ -16,6 +16,7 @@ import Kingfisher
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
+    private var refreshControl: UIRefreshControl!
     
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
@@ -27,14 +28,14 @@ class NewsViewController : UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTheming()
         
         registerForPreviewing(with: self, sourceView: tableView)
 
-        let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = OldTheme.purpleColour
+        refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
+        
+        setupTheming()
         
         view.showAnimatedSkeleton()
         loadPosts()
@@ -47,7 +48,6 @@ class NewsViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
-        OldTheme.setupNavigationBar(navigationController?.navigationBar)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -177,6 +177,7 @@ extension NewsViewController: Themed {
         view.backgroundColor = theme.backgroundColor
         tableView.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
+        refreshControl.tintColor = theme.appTintColor
     }
 }
 

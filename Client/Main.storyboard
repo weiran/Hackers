@@ -558,7 +558,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="X5f-lA-ZG1"/>
                     </view>
-                    <navigationItem key="navigationItem" id="01k-mx-Gzk">
+                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="01k-mx-Gzk">
                         <barButtonItem key="rightBarButtonItem" image="ShareIcon" id="jRl-bC-fZG">
                             <connections>
                                 <action selector="shareTapped:" destination="sfd-t6-bG7" id="V6S-UC-iAf"/>

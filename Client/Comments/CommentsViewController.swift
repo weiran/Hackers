@@ -31,14 +31,7 @@ class CommentsViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        
         setupPostTitleView()
-        
-        tableView.backgroundView = nil
-        tableView.backgroundColor = .white
-        
-        OldTheme.setupNavigationBar(navigationController?.navigationBar)
-
         view.showAnimatedSkeleton()
         loadComments()
     }
@@ -107,9 +100,9 @@ extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
         if verifyLink(post.urlString), let url = URL(string: post.urlString) {
             // animate background colour for tap
-            self.tableView.tableHeaderView?.backgroundColor = OldTheme.backgroundPurpleColour
+            self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
-                self.tableView.tableHeaderView?.backgroundColor = .white
+                self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
             })
             
             // show link

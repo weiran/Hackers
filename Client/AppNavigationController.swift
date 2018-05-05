@@ -17,11 +17,7 @@ class AppNavigationController: UINavigationController {
 }
 
 extension AppNavigationController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        /// It's not ideal to use UIApplication.shared but overriding
-        /// preferredStatusBarStyle doesn't work with a UITabBar
-        UIApplication.shared.statusBarStyle = theme.statusBarStyle
-        
+    func applyTheme(_ theme: AppTheme) {        
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
         let titleTextAttributes = [
