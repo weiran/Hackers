@@ -65,6 +65,6 @@ extension AppTheme {
         lightTextColor: UIColor(rgb: 0x555555),
         
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
-        separatorColor: UIColor(rgb: 0x353535)
+        separatorColor: UIColor(rgb: 0x757575)
     )
 }

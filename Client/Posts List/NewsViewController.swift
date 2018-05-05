@@ -175,6 +175,7 @@ extension NewsViewController: UITableViewDelegate {
 extension NewsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         tableView.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
     }
 }
 
