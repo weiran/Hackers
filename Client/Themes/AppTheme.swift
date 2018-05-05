@@ -23,6 +23,8 @@ struct AppTheme {
     
     var cellHighlightColor: UIColor
     var separatorColor: UIColor
+    
+    var skeletonColor: UIColor
 }
 
 extension AppTheme {
@@ -43,7 +45,9 @@ extension AppTheme {
         lightTextColor: UIColor(rgb: 0xAAAAAA),
         
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
-        separatorColor: UIColor(rgb: 0xCACACA)
+        separatorColor: UIColor(rgb: 0xCACACA),
+        
+        skeletonColor: UIColor(rgb: 0xAAAAAA)
     )
     
     static let dark = AppTheme(
@@ -60,6 +64,8 @@ extension AppTheme {
         lightTextColor: UIColor(rgb: 0x555555),
         
         cellHighlightColor: UIColor(rgb: 0x34363D),
-        separatorColor: UIColor(rgb: 0x757575)
+        separatorColor: UIColor(rgb: 0x757575),
+        
+        skeletonColor: UIColor(rgb: 0x555555)
     )
 }

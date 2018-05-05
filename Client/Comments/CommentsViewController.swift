@@ -32,7 +32,7 @@ class CommentsViewController : UIViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        view.showAnimatedSkeleton()
+        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
         loadComments()
     }
     
