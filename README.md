@@ -30,9 +30,14 @@ Hackers is open source and licenced under the MIT licence.
 
 ## How to build
 
-1. Install [CocoaPods](https://cocoapods.org/), you can use RubyGems: `gem install cocoapods`.
+1. Install [CocoaPods](https://cocoapods.org), you can use RubyGems: `gem install cocoapods`.
 2. Install pods, in the project root folder, run `pod install`.
 3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 9 or later, and build.
+
+## Generate screenshots
+
+1. Install [fastlane](https://fastlane.tools).
+2. Run `fastlane frameit` in `/Screenshots`
 
 ## About
 
@@ -46,4 +51,4 @@ I use several open source projects in Hackers, in no particular order:
 * [libHN](https://github.com/bennyguitar/libHN) by Ben Gordon
 * [SkeletonView](https://github.com/Juanpe/SkeletonView) by [Juanpe Catalán](https://github.com/Juanpe)
 * [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl)
-* [Kingfisher](https://github.com/mxcl/PromiseKit) by [Wei Wang](https://github.com/onevcat)
+* [Kingfisher](https://github.com/onevcat/Kingfisher) by [Wei Wang](https://github.com/onevcat)
