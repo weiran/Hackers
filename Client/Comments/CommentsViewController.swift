@@ -24,24 +24,20 @@ class CommentsViewController : UIViewController {
     
     @IBOutlet var tableView: UITableView!
     
+    @IBOutlet weak var postTitleContainerView: UIView!
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setupTheming()
         setupPostTitleView()
-        
-        tableView.backgroundView = nil
-        tableView.backgroundColor = .white
-        
-        Theme.setupNavigationBar(navigationController?.navigationBar)
-
-        view.showAnimatedSkeleton()
+        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
         loadComments()
     }
     
     override func awakeFromNib() {
+        super.awakeFromNib()
         navigationItem.largeTitleDisplayMode = .never
     }
     
@@ -104,13 +100,13 @@ extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
         if verifyLink(post.urlString), let url = URL(string: post.urlString) {
             // animate background colour for tap
-            self.tableView.tableHeaderView?.backgroundColor = Theme.backgroundPurpleColour
+            self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
-                self.tableView.tableHeaderView?.backgroundColor = .white
+                self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
             })
             
             // show link
-            let safariViewController = SFSafariViewController(url: url)
+            let safariViewController = ThemedSafariViewController(url: url)
             self.present(safariViewController, animated: true, completion: nil)
         }
     }
@@ -149,6 +145,15 @@ extension CommentsViewController: UITableViewDelegate {
     }
 }
 
+extension CommentsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        postTitleContainerView.backgroundColor = theme.backgroundColor
+    }
+}
+
 extension CommentsViewController: CommentDelegate {
     func commentTapped(_ sender: UITableViewCell) {
         if let indexPath = tableView.indexPath(for: sender) {
@@ -157,7 +162,7 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = SFSafariViewController(url: URL)
+        let safariViewController = ThemedSafariViewController(url: URL)
         self.present(safariViewController, animated: true, completion: nil)
     }
     

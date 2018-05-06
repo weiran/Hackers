@@ -12,6 +12,7 @@ import libHN
 class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        setupTheming()
         delegate = self
     }
     
@@ -23,5 +24,17 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
+    }
+}
+
+extension MainSplitViewController: Themed {
+    // Using the MainSplitViewController as a place to handle global theme changes
+    func applyTheme(_ theme: AppTheme) {
+        UITextView.appearance().tintColor = theme.appTintColor
+        UITabBar.appearance().tintColor = theme.appTintColor
+        
+        /// It's not ideal to use UIApplication.shared but overriding preferredStatusBarStyle
+        /// doesn't work with a UITabBarController and UISplitViewController
+        UIApplication.shared.statusBarStyle = theme.statusBarStyle
     }
 }

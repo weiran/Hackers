@@ -31,6 +31,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        setupTheming()
         
         let titleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.didPressTitleText(_:)))
         titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
@@ -84,5 +85,12 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         attachment.image = image
         attachment.bounds = CGRect(x: 0, y: -2, width: image.size.width, height: image.size.height)
         return attachment
+    }
+}
+
+extension PostTitleView: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        titleLabel.textColor = theme.titleTextColor
+        metadataLabel.textColor = theme.textColor
     }
 }

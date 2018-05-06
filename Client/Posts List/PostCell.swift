@@ -19,10 +19,9 @@ class PostCell : UITableViewCell {
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
     
-    var cancelThumbnailTask: (() -> Void)?
-    
     override func layoutSubviews() {
         super.layoutSubviews()
+        setupTheming()
         setupThumbnailGesture()
     }
     
@@ -42,11 +41,11 @@ class PostCell : UITableViewCell {
     }
     
     func setSelectedBackground() {
-        backgroundColor = Theme.backgroundPurpleColour
+        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
     }
     
     func setUnselectedBackground() {
-        backgroundColor = UIColor.clear
+        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }
     
     func clearImage() {
@@ -56,5 +55,11 @@ class PostCell : UITableViewCell {
     
     @objc func didTapThumbnail(_ sender: Any) {
         delegate?.didTapThumbnail(sender)
+    }
+}
+
+extension PostCell: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        backgroundColor = theme.backgroundColor
     }
 }

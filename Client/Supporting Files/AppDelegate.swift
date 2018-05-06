@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Glass Umbrella. All rights reserved.
 //
 
-import UIKit
 import libHN
 
 @UIApplicationMain
@@ -15,9 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
         HNManager.shared().startSession()
-        UITextView.appearance().tintColor = Theme.purpleColour
-        UITabBar.appearance().tintColor = Theme.purpleColour
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
+        setAppTheme()
+    }
+    
+    private func setAppTheme() {
+        AppThemeProvider.shared.currentTheme = UserDefaults.standard.darkModeEnabled ? .dark : .light
     }
 }

@@ -11,7 +11,6 @@ import UIKit
 
 
 class CommentTableViewCell : UITableViewCell {
-    
     var delegate: CommentDelegate?
     
     var level: Int = 0 {
@@ -29,8 +28,11 @@ class CommentTableViewCell : UITableViewCell {
     @IBOutlet var authorLabel : UILabel!
     @IBOutlet var datePostedLabel : UILabel!
     @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
+    @IBOutlet weak var separatorView: UIView!
     
     override func awakeFromNib() {
+        super.awakeFromNib()
+        setupTheming()
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
     }
     
@@ -53,7 +55,7 @@ class CommentTableViewCell : UITableViewCell {
         if let commentTextView = commentTextView {
             // only for expanded comments
             let commentFont = UIFont.systemFont(ofSize: 15)
-            let commentTextColor = UIColor.darkGray
+            let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
             let lineSpacing = 4 as CGFloat
             
             let commentAttributedString = NSMutableAttributedString(string: comment.text)
@@ -78,5 +80,43 @@ extension CommentTableViewCell: UITextViewDelegate {
             return false
         }
         return true
+    }
+}
+
+extension CommentTableViewCell {
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        selected ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        highlighted ? setSelectedBackground() : setUnselectedBackground()
+    }
+    
+    func setSelectedBackground() {
+        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
+    }
+    
+    func setUnselectedBackground() {
+        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
+    }
+}
+
+extension CommentTableViewCell: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        backgroundColor = theme.backgroundColor
+        if commentTextView != nil {
+            commentTextView.tintColor = theme.appTintColor
+        }
+        if authorLabel != nil {
+            authorLabel.textColor = theme.textColor
+        }
+        if datePostedLabel != nil {
+            datePostedLabel.textColor = theme.lightTextColor
+        }
+        if separatorView != nil {
+            separatorView.backgroundColor = theme.separatorColor
+        }
     }
 }

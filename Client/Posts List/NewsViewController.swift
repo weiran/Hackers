@@ -16,6 +16,7 @@ import Kingfisher
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
+    private var refreshControl: UIRefreshControl!
     
     var posts: [HNPost] = [HNPost]()
     var postType: PostFilterType! = .top
@@ -30,19 +31,23 @@ class NewsViewController : UIViewController {
         
         registerForPreviewing(with: self, sourceView: tableView)
 
-        let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = Theme.purpleColour
+        refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
         tableView.refreshControl = refreshControl
         
-        view.showAnimatedSkeleton()
+        setupTheming()
+        
+        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
         loadPosts()
+    }
+    
+    @IBAction func changeTheme(_ sender: Any) {
+        AppThemeProvider.shared.nextTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
-        Theme.setupNavigationBar(navigationController?.navigationBar)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -54,7 +59,7 @@ class NewsViewController : UIViewController {
     }
 
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: url)
+        let safariViewController = ThemedSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }
@@ -120,21 +125,21 @@ extension NewsViewController { // post fetching
         guard let nextPageIdentifier = nextPageIdentifier else { return }
         self.nextPageIdentifier = nil
         HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
-            if let downcastedArray = posts as? [HNPost] {
-                self.nextPageIdentifier = nextPageIdentifier
-                self.posts.append(contentsOf: downcastedArray)
-                self.tableView.reloadData()
-            }
+            guard let downcastedArray = posts as? [HNPost] else { return }
+            self.nextPageIdentifier = nextPageIdentifier
+            self.posts.append(contentsOf: downcastedArray)
+            self.tableView.reloadData()
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowComments" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                if let commentsViewController = (segue.destination as? UINavigationController)?.topViewController as? CommentsViewController {
-                    let post = posts[indexPath.row]
-                    commentsViewController.post = post
-                }
+            if let indexPath = tableView.indexPathForSelectedRow,
+                let segueNavigationController = segue.destination as? UINavigationController,
+                let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
+        
+                let post = posts[indexPath.row]
+                commentsViewController.post = post
             }
         }
     }
@@ -165,11 +170,14 @@ extension NewsViewController: UITableViewDelegate {
             loadMorePosts()
         }
     }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? PostCell {
-            cell.cancelThumbnailTask?()
-        }
+}
+
+extension NewsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        refreshControl.tintColor = theme.appTintColor
     }
 }
 
