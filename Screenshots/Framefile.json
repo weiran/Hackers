@@ -20,6 +20,12 @@
             "title": {
                 "text": "Elegant threaded comments"
             }
+        },
+        {
+            "filter": "Dark",
+            "title": {
+                "text": "True black dark mode"
+            }  
         }
     ]
 }
