@@ -49,7 +49,7 @@ class CommentsViewController : UIViewController {
         super.viewDidLayoutSubviews()
 
         if let headerView = tableView.tableHeaderView {
-            let height = headerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+            let height = headerView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
             var headerFrame = headerView.frame
 
             // If we don't have this check, viewDidLayoutSubviews() will get called infinitely
@@ -71,7 +71,7 @@ class CommentsViewController : UIViewController {
             }
             
             self.view.hideSkeleton()
-            self.tableView.rowHeight = UITableViewAutomaticDimension
+            self.tableView.rowHeight = UITableView.automaticDimension
             self.tableView.reloadData()
         }
     }
@@ -190,7 +190,7 @@ extension CommentsViewController: CommentDelegate {
 
 extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15.0)]
+        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
 }

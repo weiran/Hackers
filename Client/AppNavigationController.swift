@@ -21,7 +21,7 @@ extension AppNavigationController: Themed {
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
         let titleTextAttributes = [
-            NSAttributedStringKey.foregroundColor: theme.titleTextColor
+            NSAttributedString.Key.foregroundColor: theme.titleTextColor
         ]
         navigationBar.titleTextAttributes = titleTextAttributes
         navigationBar.largeTitleTextAttributes = titleTextAttributes

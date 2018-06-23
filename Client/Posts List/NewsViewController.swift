@@ -32,7 +32,7 @@ class NewsViewController : UIViewController {
         registerForPreviewing(with: self, sourceView: tableView)
 
         refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControl.Event.valueChanged)
         tableView.refreshControl = refreshControl
         
         setupTheming()
@@ -87,8 +87,8 @@ extension NewsViewController { // post fetching
                 self.posts = posts ?? [HNPost]()
                 self.nextPageIdentifier = nextPageIdentifier
                 self.view.hideSkeleton()
-                self.tableView.rowHeight = UITableViewAutomaticDimension
-                self.tableView.estimatedRowHeight = UITableViewAutomaticDimension
+                self.tableView.rowHeight = UITableView.automaticDimension
+                self.tableView.estimatedRowHeight = UITableView.automaticDimension
                 self.tableView.reloadData()
             }.always {
                 self.view.hideSkeleton()
