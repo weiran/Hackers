@@ -43,7 +43,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    fileprivate func domainLabelText(for post: HNPost) -> String {
+    private func domainLabelText(for post: HNPost) -> String {
         guard let urlComponents = URLComponents(string: post.urlString), var host = urlComponents.host else {
             return "news.ycombinator.com"
         }
@@ -55,7 +55,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return host
     }
     
-    fileprivate func metadataText(for post: HNPost) -> NSAttributedString {
+    private func metadataText(for post: HNPost) -> NSAttributedString {
         let string = NSMutableAttributedString()
         
         let pointsIconAttachment = textAttachment(for: "PointsIcon")
@@ -73,13 +73,13 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return string
     }
     
-    fileprivate func templateImage(named: String) -> UIImage? {
+    private func templateImage(named: String) -> UIImage? {
         let image = UIImage.init(named: named)
         let templateImage = image?.withRenderingMode(.alwaysTemplate)
         return templateImage
     }
     
-    fileprivate func textAttachment(for imageNamed: String) -> NSTextAttachment {
+    private func textAttachment(for imageNamed: String) -> NSTextAttachment {
         let attachment = NSTextAttachment()
         guard let image = templateImage(named: imageNamed) else { return attachment }
         attachment.image = image

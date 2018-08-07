@@ -9,8 +9,8 @@
 import StoreKit
 
 class ReviewController {
-    fileprivate static let showPromptIncrements = [5, 10, 15]
-    fileprivate static let LaunchCounter = "Launch Counter"
+    private static let showPromptIncrements = [5, 10, 15]
+    private static let LaunchCounter = "Launch Counter"
     
     static func incrementLaunchCounter() {
         let counter = launchCounter()

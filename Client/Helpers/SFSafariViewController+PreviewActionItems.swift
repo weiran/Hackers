@@ -15,7 +15,7 @@ private struct AssociatedKeys {
 }
 
 extension SFSafariViewController {
-    fileprivate(set) public var initialURL: URL? {
+    private(set) public var initialURL: URL? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.InitialURL, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
