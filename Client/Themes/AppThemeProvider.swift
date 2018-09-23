@@ -32,7 +32,7 @@ final class AppThemeProvider: ThemeProvider {
         UIView.transition(
             with: window,
             duration: 0.3,
-            options: [.transitionCrossDissolve],
+            options: [UIView.AnimationOptions.transitionCrossDissolve],
             animations: {
                 self.theme.value = newTheme
         },
