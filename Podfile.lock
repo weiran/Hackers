@@ -20,7 +20,7 @@ DEPENDENCIES:
   - Kingfisher
   - libHN (from `https://github.com/weiran/libHN`)
   - PromiseKit (~> 4.x)
-  - SkeletonView (= 1.1.1)
+  - SkeletonView
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -45,6 +45,6 @@ SPEC CHECKSUMS:
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   SkeletonView: 041053e904504e7d8db83df166e599be75659fe1
 
-PODFILE CHECKSUM: 13a0aafd3c0db0e0f72962c5acd58c1283b5b815
+PODFILE CHECKSUM: 8dd039a397498324bdf6b5891dab89e56172bce4
 
 COCOAPODS: 1.5.3
