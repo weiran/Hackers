@@ -11,12 +11,24 @@ extension UserDefaults {
         let themeSetting = string(forKey: UserDefaultsKeys.Theme.rawValue)
         return themeSetting == "dark"
     }
-    
+
+    public var jobsEnabled: Bool {
+        let jobsEnabled = string(forKey:
+            UserDefaultsKeys.Jobs.rawValue)
+        return jobsEnabled == "enabled"
+    }
+
     public func setDarkMode(_ enabled: Bool) {
         set(enabled ? "dark" : "light", forKey: UserDefaultsKeys.Theme.rawValue)
     }
+
+    public func setJobsEnabled(_ enabled: Bool) {
+        set(enabled ? "enabled" : "disabled", forKey: UserDefaultsKeys.Jobs.rawValue)
+    }
+
 }
 
 enum UserDefaultsKeys: String {
     case Theme
+    case Jobs
 }

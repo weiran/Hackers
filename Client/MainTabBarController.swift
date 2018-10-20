@@ -10,11 +10,15 @@ import UIKit
 import libHN
 
 class MainTabBarController: UITabBarController {
+    private var defaultTabs : [UIViewController]?
+    private let jobsTabIndex : Int = 2
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         
         guard let viewControllers = self.viewControllers else { return }
+        if (self.defaultTabs == nil) { self.defaultTabs = viewControllers }
         
         for (index, viewController) in viewControllers.enumerated() {
             guard let splitViewController = viewController as? UISplitViewController,
@@ -33,6 +37,16 @@ class MainTabBarController: UITabBarController {
         tabBar.clipsToBounds = true
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if (UserDefaults.standard.jobsEnabled) {
+            setViewControllers(defaultTabs, animated: false)
+        } else {
+            var updatedTabs = self.defaultTabs
+            updatedTabs?.remove(at: jobsTabIndex)
+            setViewControllers(updatedTabs, animated: false)
+        }
+    }
+
     private func tabItems(for index: Int) -> (PostFilterType, String, String) {
         var postType = PostFilterType.top
         var typeName = "Top"
@@ -48,7 +62,7 @@ class MainTabBarController: UITabBarController {
             typeName = "Ask"
             iconName = "AskIcon"
             break
-        case 2:
+        case jobsTabIndex:
             postType = .jobs
             typeName = "Jobs"
             iconName = "JobsIcon"

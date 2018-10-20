@@ -9,12 +9,14 @@
 import UIKit
 
 class SettingsViewController: UITableViewController {
+    @IBOutlet weak var jobsSwitch: UISwitch!
     @IBOutlet weak var darkModeSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
+        jobsSwitch.setOn(UserDefaults.standard.jobsEnabled, animated: false)
     }
     
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
@@ -22,6 +24,10 @@ class SettingsViewController: UITableViewController {
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
     }
     
+    @IBAction func jobsValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setJobsEnabled(sender.isOn)
+    }
+
     @IBAction func didPressDone(_ sender: Any) {
         dismiss(animated: true)
     }
