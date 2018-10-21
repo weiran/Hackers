@@ -150,6 +150,7 @@ extension NewsViewController: UITableViewDataSource {
         cell.clearImage()
         
         let post = posts[indexPath.row]
+        cell.post = post
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
         cell.thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
