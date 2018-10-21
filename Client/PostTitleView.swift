@@ -43,9 +43,9 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    private func domainLabelText(for post: HNPost) -> String {
+    private func domainLabelText(for post: HNPost) -> String? {
         guard let urlComponents = URLComponents(string: post.urlString), var host = urlComponents.host else {
-            return "news.ycombinator.com"
+            return nil
         }
         
         if host.starts(with: "www.") {
@@ -68,7 +68,9 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         string.append(pointsIconAttributedString)
         string.append(NSAttributedString(string: "• \(post.commentCount)"))
         string.append(commentsIconAttributedString)
-        string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
+        if let domainText = domainLabelText(for: post), domainText != "news.ycombinator.com" {
+            string.append(NSAttributedString(string: " • \(domainText)"))
+        }
         
         return string
     }
