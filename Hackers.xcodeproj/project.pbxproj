@@ -48,6 +48,7 @@
 		24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F39F9A18AFB1150055F8DC /* Images.xcassets */; };
 		B63E78C4217C1C6300750131 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */; };
 		B6ECEB57217C5A4E00755239 /* HNPost+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ECEB56217C5A4E00755239 /* HNPost+Extensions.swift */; };
+		B6ECEB59217CC4EA00755239 /* OpenInChromeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ECEB58217CC4EA00755239 /* OpenInChromeController.swift */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +100,7 @@
 		9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.release.xcconfig"; sourceTree = "<group>"; };
 		B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		B6ECEB56217C5A4E00755239 /* HNPost+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HNPost+Extensions.swift"; sourceTree = "<group>"; };
+		B6ECEB58217CC4EA00755239 /* OpenInChromeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenInChromeController.swift; sourceTree = "<group>"; };
 		F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hackers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -143,6 +145,7 @@
 				2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */,
 				B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */,
 				B6ECEB56217C5A4E00755239 /* HNPost+Extensions.swift */,
+				B6ECEB58217CC4EA00755239 /* OpenInChromeController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -441,6 +444,7 @@
 				2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				2464D21F209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift in Sources */,
+				B6ECEB59217CC4EA00755239 /* OpenInChromeController.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,

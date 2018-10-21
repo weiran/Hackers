@@ -14,6 +14,14 @@ class SettingsViewController: FormViewController {
         super.viewDidLoad()
         setupTheming()
 
+        PickerInlineRow<String>.defaultCellUpdate = { cell, row in
+            let activeTheme = UserDefaults.standard.enabledTheme
+            cell.textLabel?.textColor = activeTheme.textColor
+            cell.detailTextLabel?.textColor = activeTheme.lightTextColor
+            cell.backgroundColor = activeTheme.barBackgroundColor
+            row.inlineRow?.cell.pickerTextAttributes = [.foregroundColor: activeTheme.titleTextColor]
+        }
+
         form
             +++ PickerInlineRow<String>("theme") {
                 $0.title = "Theme"
@@ -24,17 +32,26 @@ class SettingsViewController: FormViewController {
                     UserDefaults.standard.setTheme(rowVal)
                     AppThemeProvider.shared.currentTheme = UserDefaults.standard.enabledTheme
                 }
-            }.cellUpdate { cell, row in
-                let activeTheme = UserDefaults.standard.enabledTheme
-                cell.textLabel?.textColor = activeTheme.textColor
-                cell.detailTextLabel?.textColor = activeTheme.lightTextColor
-                cell.backgroundColor = activeTheme.barBackgroundColor
-                row.inlineRow?.cell.pickerTextAttributes = [.foregroundColor: activeTheme.titleTextColor]
             }
+
+            +++ PickerInlineRow<String>() {
+                $0.title = "Open Links In"
+                $0.options = ["In-app browser", "In-app browser (Reader mode)", "Safari", "Google Chrome"]
+                $0.value = "In-app browser"
+                $0.value = UserDefaults.standard.string(forKey: UserDefaultsKeys.OpenInBrowser.rawValue)
+            }.onChange {
+                if let rowVal = $0.value {
+                    UserDefaults.standard.setOpenLinksIn(rowVal)
+                }
+        }
     }
     
     @IBAction func didPressDone(_ sender: Any) {
         dismiss(animated: true)
+    }
+
+    @objc func multipleSelectorDone(_ item:UIBarButtonItem) {
+        _ = navigationController?.popViewController(animated: true)
     }
 }
 

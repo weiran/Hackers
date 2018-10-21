@@ -8,15 +8,15 @@
 
 import SafariServices
 
-class ThemedSafariViewController: SFSafariViewController {
+public class ThemedSafariViewController: SFSafariViewController {
     var onDoneBlock : ((Bool) -> Void)?
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         if let block = onDoneBlock {

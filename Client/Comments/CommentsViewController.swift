@@ -127,18 +127,19 @@ extension CommentsViewController: PostTitleViewDelegate {
             })
             
             // show link
-            let safariViewController = ThemedSafariViewController(url: url)
             let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
             activity.isEligibleForHandoff = true
             activity.webpageURL = url
             activity.title = post.title
             self.userActivity = activity
 
-            safariViewController.onDoneBlock = { _ in
-                self.userActivity = nil
-            }
+            if let safariViewController = UserDefaults.standard.openInBrowser(url) {
+                safariViewController.onDoneBlock = { _ in
+                    self.userActivity = nil
+                }
 
-            self.present(safariViewController, animated: true, completion: nil)
+                self.present(safariViewController, animated: true, completion: nil)
+            }
         }
     }
     
@@ -194,19 +195,19 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = ThemedSafariViewController(url: URL)
-
         let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
         activity.isEligibleForHandoff = true
         activity.webpageURL = URL
         activity.title = post!.title
         self.userActivity = activity
-        
-        safariViewController.onDoneBlock = { _ in
-            self.userActivity = nil
-        }
 
-        self.navigationController?.present(safariViewController, animated: true, completion: nil)
+        if let safariViewController = UserDefaults.standard.openInBrowser(URL) {
+            safariViewController.onDoneBlock = { _ in
+                self.userActivity = nil
+            }
+
+            self.present(safariViewController, animated: true, completion: nil)
+        }
     }
     
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {

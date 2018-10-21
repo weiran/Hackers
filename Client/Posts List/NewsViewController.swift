@@ -58,12 +58,6 @@ class NewsViewController : UIViewController {
         })
     }
 
-    func getSafariViewController(_ url: URL) -> ThemedSafariViewController {
-        let safariViewController = ThemedSafariViewController(url: url)
-        safariViewController.previewActionItemsDelegate = self
-        return safariViewController
-    }
-    
     public func viewDidRotate() {
         guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
         self.tableView.beginUpdates()
@@ -194,13 +188,23 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         if let url = URL(string: post.urlString), verifyLink(post.urlString) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return getSafariViewController(url)
+            let safariViewController = ThemedSafariViewController(url: url)
+            safariViewController.previewActionItemsDelegate = self
+            return safariViewController
         }
         return nil
     }
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
-        present(viewControllerToCommit, animated: true, completion: nil)
+
+        let post = posts[self.peekedIndexPath!.row]
+        if let safariViewController = UserDefaults.standard.openInBrowser(URL(string: post.urlString)!) {
+            safariViewController.onDoneBlock = { _ in
+                self.userActivity = nil
+            }
+
+            self.present(safariViewController, animated: true, completion: nil)
+        }
     }
     
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem] {
@@ -226,14 +230,18 @@ extension NewsViewController: PostTitleViewDelegate {
             activity.webpageURL = url
             activity.title = post.title
             self.userActivity = activity
-            
-            let vc = getSafariViewController(url)
-            vc.onDoneBlock = { _ in
-                self.userActivity = nil
-            }
 
-            self.navigationController?.present(vc, animated: true) {
-                HNManager.shared()?.setMarkAsReadFor(post)
+            HNManager.shared()?.setMarkAsReadFor(post)
+
+            let vc = UserDefaults.standard.openInBrowser(url)
+            if let vc = vc {
+                vc.previewActionItemsDelegate = self
+
+                vc.onDoneBlock = { _ in
+                    self.userActivity = nil
+                }
+
+                self.navigationController?.present(vc, animated: true, completion: nil)
             }
         }
     }
