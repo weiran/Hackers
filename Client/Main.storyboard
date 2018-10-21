@@ -561,7 +561,7 @@
                             <constraint firstItem="iN8-we-FRa" firstAttribute="leading" secondItem="X5f-lA-ZG1" secondAttribute="leading" id="9v7-a9-t1h"/>
                             <constraint firstItem="X5f-lA-ZG1" firstAttribute="trailing" secondItem="iN8-we-FRa" secondAttribute="trailing" id="Tdb-YI-CH7"/>
                             <constraint firstItem="iN8-we-FRa" firstAttribute="top" secondItem="X5f-lA-ZG1" secondAttribute="top" id="lck-h8-uad"/>
-                            <constraint firstItem="X5f-lA-ZG1" firstAttribute="bottom" secondItem="iN8-we-FRa" secondAttribute="bottom" id="s1L-EV-ngV"/>
+                            <constraint firstAttribute="bottom" secondItem="iN8-we-FRa" secondAttribute="bottom" id="s1L-EV-ngV"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="X5f-lA-ZG1"/>
                     </view>

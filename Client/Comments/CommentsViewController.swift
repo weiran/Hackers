@@ -42,11 +42,21 @@ class CommentsViewController : UIViewController {
         activity.title = self.post!.CommentsPageTitle
         activity.webpageURL = self.post!.CommentsURL
         self.userActivity = activity
+
+        tabBarController?.tabBar.isHidden = true
+        edgesForExtendedLayout = UIRectEdge.bottom
+        extendedLayoutIncludesOpaqueBars = true
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
         navigationItem.largeTitleDisplayMode = .never
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        tabBarController?.tabBar.isHidden = false
     }
     
     deinit {
