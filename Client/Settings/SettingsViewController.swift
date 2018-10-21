@@ -14,6 +14,8 @@ class SettingsViewController: FormViewController {
         super.viewDidLoad()
         setupTheming()
 
+        self.tableView.bounces = false
+
         PickerInlineRow<String>.defaultCellUpdate = { cell, row in
             let activeTheme = UserDefaults.standard.enabledTheme
             cell.textLabel?.textColor = activeTheme.textColor
