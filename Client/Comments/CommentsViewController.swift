@@ -34,6 +34,12 @@ class CommentsViewController : UIViewController {
         setupPostTitleView()
         view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
         loadComments()
+
+        let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.comments")
+        activity.isEligibleForHandoff = true
+        activity.title = self.post!.title + " | Hacker News"
+        activity.webpageURL = URL(string: "https://news.ycombinator.com/item?id=" + self.post!.postId)!
+        self.userActivity = activity
     }
     
     override func awakeFromNib() {
@@ -44,7 +50,7 @@ class CommentsViewController : UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
@@ -90,9 +96,25 @@ class CommentsViewController : UIViewController {
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-        present(activityViewController, animated: true, completion: nil)
+        let alertController = UIAlertController(title: "Share...", message: nil, preferredStyle: .actionSheet)
+        let postURLAction = UIAlertAction(title: "Content Link", style: .default) { action in
+            let activityViewController = UIActivityViewController(activityItems: [self.post!.title, URL(string: self.post!.urlString)!], applicationActivities: nil)
+            activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+            self.present(activityViewController, animated: true, completion: nil)
+        }
+        let hackerNewsURLAction = UIAlertAction(title: "Hacker News Link", style: .default) { action in
+            let hnTitle = self.post!.title + " | Hacker News"
+            let hnURL = URL(string: "https://news.ycombinator.com/item?id=" + self.post!.postId)!
+
+            let activityViewController = UIActivityViewController(activityItems: [hnTitle, hnURL], applicationActivities: nil)
+            activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+            self.present(activityViewController, animated: true, completion: nil)
+        }
+        alertController.addAction(postURLAction)
+        alertController.addAction(hackerNewsURLAction)
+        alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+
+        self.present(alertController, animated: true, completion: nil)
     }
 }
 
@@ -107,6 +129,16 @@ extension CommentsViewController: PostTitleViewDelegate {
             
             // show link
             let safariViewController = ThemedSafariViewController(url: url)
+            let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
+            activity.isEligibleForHandoff = true
+            activity.webpageURL = url
+            activity.title = post.title
+            self.userActivity = activity
+
+            safariViewController.onDoneBlock = { _ in
+                self.userActivity = nil
+            }
+
             self.present(safariViewController, animated: true, completion: nil)
         }
     }
@@ -163,7 +195,18 @@ extension CommentsViewController: CommentDelegate {
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
         let safariViewController = ThemedSafariViewController(url: URL)
-        self.present(safariViewController, animated: true, completion: nil)
+
+        let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
+        activity.isEligibleForHandoff = true
+        activity.webpageURL = URL
+        activity.title = post!.title
+        self.userActivity = activity
+        
+        safariViewController.onDoneBlock = { _ in
+            self.userActivity = nil
+        }
+
+        self.navigationController?.present(safariViewController, animated: true, completion: nil)
     }
     
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {

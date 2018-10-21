@@ -25,7 +25,6 @@
 		2464D213209DEFB100C7F8FC /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D212209DEFB100C7F8FC /* AppNavigationController.swift */; };
 		2464D216209DFF6D00C7F8FC /* CommentsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D215209DFF6D00C7F8FC /* CommentsHeaderView.swift */; };
 		2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */; };
-		2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */; };
 		2464D21F209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */; };
 		2464D221209E2CDF00C7F8FC /* ThemedSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
@@ -47,6 +46,7 @@
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
 		24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8C18AFB1150055F8DC /* UIKit.framework */; };
 		24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F39F9A18AFB1150055F8DC /* Images.xcassets */; };
+		B63E78C4217C1C6300750131 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
 
@@ -70,7 +70,6 @@
 		2464D212209DEFB100C7F8FC /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
 		2464D215209DFF6D00C7F8FC /* CommentsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsHeaderView.swift; sourceTree = "<group>"; };
 		2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+UserDefaultsExtensions.swift"; sourceTree = "<group>"; };
 		2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemedSafariViewController.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
@@ -97,6 +96,7 @@
 		24F39F9A18AFB1150055F8DC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
 		9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.release.xcconfig"; sourceTree = "<group>"; };
+		B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hackers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -139,6 +139,7 @@
 				2464D20C209DD8F400C7F8FC /* Weak.swift */,
 				2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */,
 				2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */,
+				B63E78C3217C1C6300750131 /* UIFont+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -147,7 +148,6 @@
 			isa = PBXGroup;
 			children = (
 				2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */,
-				2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */,
 				2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */,
 			);
 			path = Settings;
@@ -383,8 +383,9 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/SkeletonView/SkeletonView.framework",
@@ -393,6 +394,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SkeletonView.framework",
@@ -400,7 +402,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -411,6 +413,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
+				B63E78C4217C1C6300750131 /* UIFont+Extensions.swift in Sources */,
 				2464D216209DFF6D00C7F8FC /* CommentsHeaderView.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
@@ -418,7 +421,6 @@
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2464D20D209DD8F400C7F8FC /* ArrayExtensions.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
-				2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */,
 				24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */,
 				2464D20F209DD8F400C7F8FC /* Weak.swift in Sources */,
 				24CEAA9B1F8916970050DEDF /* UIView+Extensions.swift in Sources */,
@@ -477,6 +479,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -496,6 +499,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -529,6 +533,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -540,6 +545,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
@@ -553,14 +559,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = none;
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
@@ -576,14 +581,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = none;
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";

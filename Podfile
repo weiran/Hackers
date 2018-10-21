@@ -8,6 +8,7 @@ target 'Hackers' do
     pod 'PromiseKit', '~> 4.x'
     pod 'SkeletonView'
     pod 'Kingfisher'
+    pod 'Eureka'
 end
 
 post_install do |installer|

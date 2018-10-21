@@ -108,12 +108,15 @@ extension CommentTableViewCell: Themed {
         backgroundColor = theme.backgroundColor
         if commentTextView != nil {
             commentTextView.tintColor = theme.appTintColor
+            commentTextView.font = UIFont.mySystemFont(ofSize: 15.0)
         }
         if authorLabel != nil {
-            authorLabel.textColor = theme.textColor
+            authorLabel.textColor = theme.lightTextColor
+            authorLabel.font = UIFont.mySystemFont(ofSize: 15.0)
         }
         if datePostedLabel != nil {
             datePostedLabel.textColor = theme.lightTextColor
+            datePostedLabel.font = UIFont.mySystemFont(ofSize: 15.0)
         }
         if separatorView != nil {
             separatorView.backgroundColor = theme.separatorColor

@@ -7,13 +7,24 @@
 //
 
 extension UserDefaults {
-    public var darkModeEnabled: Bool {
+    public var enabledTheme: AppTheme {
         let themeSetting = string(forKey: UserDefaultsKeys.Theme.rawValue)
-        return themeSetting == "dark"
+        switch themeSetting {
+        case "Light":
+            return AppTheme.light
+        case "Dark":
+            return AppTheme.dark
+        case "Black":
+            return AppTheme.black
+        case "Original":
+            return AppTheme.original
+        default:
+            return .light
+        }
     }
     
-    public func setDarkMode(_ enabled: Bool) {
-        set(enabled ? "dark" : "light", forKey: UserDefaultsKeys.Theme.rawValue)
+    public func setTheme(_ themeKey: String) {
+        set(themeKey, forKey: UserDefaultsKeys.Theme.rawValue)
     }
 }
 

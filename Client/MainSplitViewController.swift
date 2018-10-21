@@ -32,7 +32,7 @@ extension MainSplitViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         UITextView.appearance().tintColor = theme.appTintColor
         UITabBar.appearance().tintColor = theme.appTintColor
-        
+
         /// It's not ideal to use UIApplication.shared but overriding preferredStatusBarStyle
         /// doesn't work with a UITabBarController and UISplitViewController
         UIApplication.shared.statusBarStyle = theme.statusBarStyle

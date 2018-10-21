@@ -7,19 +7,30 @@
 //
 
 import UIKit
+import Eureka
 
-class SettingsViewController: UITableViewController {
-    @IBOutlet weak var darkModeSwitch: UISwitch!
-    
+class SettingsViewController: FormViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
-    }
-    
-    @IBAction func darkModeValueChanged(_ sender: UISwitch) {
-        UserDefaults.standard.setDarkMode(sender.isOn)
-        AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
+
+        form
+            +++ PickerInlineRow<String>("theme") {
+                $0.title = "Theme"
+                $0.options = ["Light", "Dark", "Black", "Original"]
+                $0.value = UserDefaults.standard.enabledTheme.description
+            }.onChange {
+                if let rowVal = $0.value {
+                    UserDefaults.standard.setTheme(rowVal)
+                    AppThemeProvider.shared.currentTheme = UserDefaults.standard.enabledTheme
+                }
+            }.cellUpdate { cell, row in
+                let activeTheme = UserDefaults.standard.enabledTheme
+                cell.textLabel?.textColor = activeTheme.textColor
+                cell.detailTextLabel?.textColor = activeTheme.lightTextColor
+                cell.backgroundColor = activeTheme.barBackgroundColor
+                row.inlineRow?.cell.pickerTextAttributes = [.foregroundColor: activeTheme.titleTextColor]
+            }
     }
     
     @IBAction func didPressDone(_ sender: Any) {

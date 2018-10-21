@@ -1,5 +1,6 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
+  - Eureka (4.3.0)
   - Kingfisher (4.8.1)
   - libHN (4.1.0)
   - PromiseKit (4.5.2):
@@ -17,6 +18,7 @@ PODS:
 
 DEPENDENCIES:
   - DZNEmptyDataSet
+  - Eureka
   - Kingfisher
   - libHN (from `https://github.com/weiran/libHN`)
   - PromiseKit (~> 4.x)
@@ -25,6 +27,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - DZNEmptyDataSet
+    - Eureka
     - Kingfisher
     - PromiseKit
     - SkeletonView
@@ -40,11 +43,12 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
+  Eureka: 6d711cb30ca333b4bc893110285a722ae3840114
   Kingfisher: 868c1149679a7ab6869be118faa9b5aed154aaf0
   libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   SkeletonView: 041053e904504e7d8db83df166e599be75659fe1
 
-PODFILE CHECKSUM: 8dd039a397498324bdf6b5891dab89e56172bce4
+PODFILE CHECKSUM: 2b7a8d876617d6d5f8c7fbf60020e5ed03eb649f
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.beta.1

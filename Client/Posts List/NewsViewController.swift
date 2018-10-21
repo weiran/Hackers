@@ -58,7 +58,7 @@ class NewsViewController : UIViewController {
         })
     }
 
-    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+    func getSafariViewController(_ url: URL) -> ThemedSafariViewController {
         let safariViewController = ThemedSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
@@ -221,7 +221,18 @@ extension NewsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
         guard verifyLink(post.urlString) else { return }
         if let url = URL(string: post.urlString) {
-            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
+            let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
+            activity.isEligibleForHandoff = true
+            activity.webpageURL = url
+            activity.title = post.title
+            self.userActivity = activity
+            
+            let vc = getSafariViewController(url)
+            vc.onDoneBlock = { _ in
+                self.userActivity = nil
+            }
+
+            self.navigationController?.present(vc, animated: true, completion: nil)
         }
     }
     

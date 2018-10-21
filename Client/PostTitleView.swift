@@ -91,6 +91,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 extension PostTitleView: Themed {
     func applyTheme(_ theme: AppTheme) {
         titleLabel.textColor = theme.titleTextColor
+        titleLabel.font = UIFont.mySystemFont(ofSize: 18.0)
         metadataLabel.textColor = theme.textColor
+        metadataLabel.font = UIFont.mySystemFont(ofSize: 14.0)
     }
 }

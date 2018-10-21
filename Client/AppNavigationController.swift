@@ -20,10 +20,11 @@ extension AppNavigationController: Themed {
     func applyTheme(_ theme: AppTheme) {        
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
-        let titleTextAttributes = [
-            NSAttributedString.Key.foregroundColor: theme.titleTextColor
-        ]
-        navigationBar.titleTextAttributes = titleTextAttributes
-        navigationBar.largeTitleTextAttributes = titleTextAttributes
+        navigationBar.titleTextAttributes = [
+            NSAttributedString.Key.foregroundColor: theme.navigationBarTextColor,
+            NSAttributedString.Key.font: UIFont.mySystemFont(ofSize: 17.0)]
+        navigationBar.largeTitleTextAttributes = [
+            NSAttributedString.Key.foregroundColor: theme.navigationBarTextColor,
+            NSAttributedString.Key.font: UIFont.myBoldSystemFont(ofSize: 31.0)]
     }
 }

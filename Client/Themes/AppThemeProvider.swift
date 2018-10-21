@@ -12,7 +12,7 @@ final class AppThemeProvider: ThemeProvider {
     static let shared: AppThemeProvider = .init()
     
     private var theme: SubscribableValue<AppTheme>
-    private var availableThemes: [AppTheme] = [.light, .dark]
+    public var availableThemes: [AppTheme] = [.light, .dark, .original, .black]
     
     var currentTheme: AppTheme {
         get {
@@ -35,6 +35,7 @@ final class AppThemeProvider: ThemeProvider {
             options: [UIView.AnimationOptions.transitionCrossDissolve],
             animations: {
                 self.theme.value = newTheme
+                UIFont.overrideInitialize()
         },
             completion: nil
         )

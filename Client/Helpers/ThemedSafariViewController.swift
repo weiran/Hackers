@@ -9,9 +9,19 @@
 import SafariServices
 
 class ThemedSafariViewController: SFSafariViewController {
+    var onDoneBlock : ((Bool) -> Void)?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if let block = onDoneBlock {
+            block(true)
+        }
     }
 }
 

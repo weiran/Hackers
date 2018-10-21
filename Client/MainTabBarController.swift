@@ -13,7 +13,7 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        
+
         guard let viewControllers = self.viewControllers else { return }
         
         for (index, viewController) in viewControllers.enumerated() {
@@ -64,11 +64,41 @@ class MainTabBarController: UITabBarController {
         
         return (postType, typeName, iconName)
     }
+
+    override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        setButtonStates(item.tag)
+    }
+
+    func setButtonStates(_ itemTag: Int) {
+        let normalTitleFont = UIFont.mySystemFont(ofSize: 12.0)
+        let selectedTitleFont = UIFont.myBoldSystemFont(ofSize: 12.0)
+
+        let tabs = self.tabBar.items
+
+        var x = 0
+        while x < (tabs?.count)! {
+
+            if tabs?[x].tag == itemTag {
+                tabs?[x].setTitleTextAttributes([NSAttributedString.Key.font: selectedTitleFont], for: UIControl.State.normal)
+            } else {
+                tabs?[x].setTitleTextAttributes([NSAttributedString.Key.font: normalTitleFont], for: UIControl.State.normal)
+            }
+
+            x += 1
+
+        }
+
+    }
 }
 
 extension MainTabBarController: Themed {
     func applyTheme(_ theme: AppTheme) {
         tabBar.barTintColor = theme.barBackgroundColor
         tabBar.tintColor = theme.barForegroundColor
+
+        let application = UIApplication.shared.delegate as! AppDelegate
+        let tabbarController = application.window?.rootViewController as! UITabBarController
+        let selectedIndex = tabbarController.selectedIndex
+        self.setButtonStates(selectedIndex)
     }
 }
