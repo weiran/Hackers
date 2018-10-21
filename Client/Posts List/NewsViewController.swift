@@ -28,7 +28,7 @@ class NewsViewController : UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         registerForPreviewing(with: self, sourceView: tableView)
 
         refreshControl = UIRefreshControl()
@@ -49,7 +49,13 @@ class NewsViewController : UIViewController {
         super.viewWillAppear(animated)
         rz_smoothlyDeselectRows(tableView: tableView)
     }
-    
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        tabBarController?.tabBar.isHidden = false
+    }
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         DispatchQueue.global().async(execute: {
             DispatchQueue.main.sync {
