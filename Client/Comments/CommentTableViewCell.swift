@@ -16,7 +16,9 @@ class CommentTableViewCell : UITableViewCell {
     var level: Int = 0 {
         didSet { updateIndentPadding() }
     }
-    
+
+    var post: HNPost?
+
     var comment: CommentModel? {
         didSet {
             guard let comment = comment else { return }
@@ -34,13 +36,21 @@ class CommentTableViewCell : UITableViewCell {
         super.awakeFromNib()
         setupTheming()
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
+        contentView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellLongPress)))
     }
     
     @objc func cellTapped() {
         delegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }
-    
+
+    @objc func cellLongPress() {
+        if let comment = comment {
+            UIApplication.shared.keyWindow?.rootViewController?.present(comment.ActivityViewController,
+                                                                        animated: true, completion: nil)
+        }
+    }
+
     func updateIndentPadding() {
         let levelIndent = 15
         let padding = CGFloat(levelIndent * (level + 1))

@@ -41,5 +41,16 @@ class CommentModel {
         level = Int(source.level)
         text = source.text
     }
-    
+
+    var Link: URL {
+        return URL(string: "https://news.ycombinator.com/item?id=" + self.commentID)!
+    }
+
+    var PageTitle: String {
+        return self.authorUsername + "'s comment on Hacker News"
+    }
+
+    var ActivityViewController: UIActivityViewController {
+        return UIActivityViewController(activityItems: [self.PageTitle, self.Link], applicationActivities: nil)
+    }
 }

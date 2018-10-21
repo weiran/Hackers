@@ -39,8 +39,8 @@ class CommentsViewController : UIViewController {
 
         let activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.comments")
         activity.isEligibleForHandoff = true
-        activity.title = self.post!.title + " | Hacker News"
-        activity.webpageURL = URL(string: "https://news.ycombinator.com/item?id=" + self.post!.postId)!
+        activity.title = self.post!.CommentsPageTitle
+        activity.webpageURL = self.post!.CommentsURL
         self.userActivity = activity
     }
     
@@ -100,17 +100,14 @@ class CommentsViewController : UIViewController {
     @IBAction func shareTapped(_ sender: AnyObject) {
         let alertController = UIAlertController(title: "Share...", message: nil, preferredStyle: .actionSheet)
         let postURLAction = UIAlertAction(title: "Content Link", style: .default) { action in
-            let activityViewController = UIActivityViewController(activityItems: [self.post!.title, URL(string: self.post!.urlString)!], applicationActivities: nil)
-            activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-            self.present(activityViewController, animated: true, completion: nil)
+            let linkVC = self.post!.LinkActivityViewController
+            linkVC.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+            self.present(linkVC, animated: true, completion: nil)
         }
         let hackerNewsURLAction = UIAlertAction(title: "Hacker News Link", style: .default) { action in
-            let hnTitle = self.post!.title + " | Hacker News"
-            let hnURL = URL(string: "https://news.ycombinator.com/item?id=" + self.post!.postId)!
-
-            let activityViewController = UIActivityViewController(activityItems: [hnTitle, hnURL], applicationActivities: nil)
-            activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
-            self.present(activityViewController, animated: true, completion: nil)
+            let commentsVC = self.post!.CommentsActivityViewController
+            commentsVC.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+            self.present(commentsVC, animated: true, completion: nil)
         }
         alertController.addAction(postURLAction)
         alertController.addAction(hackerNewsURLAction)
@@ -164,7 +161,8 @@ extension CommentsViewController: UITableViewDataSource {
         let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
-        
+
+        cell.post = post
         cell.comment = comment
         cell.delegate = self
         
