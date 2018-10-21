@@ -12,7 +12,9 @@ extension UIImageView {
     func setImageWithPlaceholder(urlString: String) {
         let placeholderImage = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         self.image = placeholderImage
-        if let url = URL(string: "https://image-extractor.now.sh/?url=" + urlString) {
+        if urlString.contains("ycombinator.com/") {
+            self.image = UIImage(named: "ycombinator-logo")
+        } else if let url = URL(string: "https://image-extractor.now.sh/?url=" + urlString) {
             self.kf.setImage(with: url, placeholder: placeholderImage)
         }
     }
