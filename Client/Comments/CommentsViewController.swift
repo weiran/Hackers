@@ -14,7 +14,9 @@ import DZNEmptyDataSet
 import SkeletonView
 
 class CommentsViewController : UIViewController {
-    var post: HNPost?
+    var post: HNPost? {
+        didSet { HNManager.shared()?.setMarkAsReadFor(post!) }
+    }
     
     var comments: [CommentModel]? {
         didSet { commentsController.comments = comments! }

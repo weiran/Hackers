@@ -232,7 +232,9 @@ extension NewsViewController: PostTitleViewDelegate {
                 self.userActivity = nil
             }
 
-            self.navigationController?.present(vc, animated: true, completion: nil)
+            self.navigationController?.present(vc, animated: true) {
+                HNManager.shared()?.setMarkAsReadFor(post)
+            }
         }
     }
     
