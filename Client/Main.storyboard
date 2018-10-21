@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Hacker News-->
+        <!--News View-->
         <scene sceneID="la8-8X-mcP">
             <objects>
-                <viewController id="7mJ-zT-gNh" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="7mJ-zT-gNh" userLabel="News View" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="olH-VS-qRV">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -101,7 +101,6 @@
                                         <connections>
                                             <outlet property="postTitleView" destination="FIH-FV-HqO" id="Ft4-Qa-Ory"/>
                                             <outlet property="thumbnailImageView" destination="nll-fe-bGd" id="dMo-8J-QBg"/>
-                                            <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowComments" id="cCV-A1-rr5"/>
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SkeletonCell" rowHeight="90" id="qhe-sx-ztl" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
@@ -193,6 +192,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="sTU-Jc-dof" id="9Rr-YT-r8B"/>
+                        <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowComments" id="GfC-iI-31d"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cQy-Df-Rp9" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -205,7 +205,7 @@
                 <navigationController id="2FT-kg-cd5" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="aiG-Km-7Il"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="o2Y-R6-LxE">
-                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -216,10 +216,10 @@
             </objects>
             <point key="canvasLocation" x="1460" y="549"/>
         </scene>
-        <!--Item-->
+        <!--Split View Controller-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
-                <splitViewController id="506-JC-FDt" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
                         <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="BNY-4g-r0C"/>
@@ -230,10 +230,10 @@
             </objects>
             <point key="canvasLocation" x="534" y="547"/>
         </scene>
-        <!--Hacker News-->
+        <!--Main Tab Bar-->
         <scene sceneID="hn1-7Q-wdl">
             <objects>
-                <tabBarController id="jsb-Cl-SCJ" customClass="MainTabBarController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController id="jsb-Cl-SCJ" userLabel="Main Tab Bar" customClass="MainTabBarController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" title="Hacker News" id="nmK-0d-BKH"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="9cz-3d-LaB">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
@@ -588,10 +588,10 @@
             </objects>
             <point key="canvasLocation" x="1460" y="1397"/>
         </scene>
-        <!--App Navigation Controller-->
+        <!--Settings Navigation Controller-->
         <scene sceneID="CQx-j9-MSt">
             <objects>
-                <navigationController id="9fT-2D-AhL" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController id="9fT-2D-AhL" userLabel="Settings Navigation Controller" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="W1w-PO-Odu">
                         <rect key="frame" x="0.0" y="20" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -620,10 +620,10 @@
             </objects>
             <point key="canvasLocation" x="3225" y="1397"/>
         </scene>
-        <!--App Navigation Controller-->
+        <!--Comments Navigation Controller-->
         <scene sceneID="1UW-sd-Ilr">
             <objects>
-                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" userLabel="Comments Navigation Controller" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="nrG-IN-2HV"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Zkc-Rr-CEM">

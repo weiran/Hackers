@@ -157,6 +157,17 @@ extension NewsViewController: UITableViewDataSource {
         
         return cell
     }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let post = posts[indexPath.row]
+        if post.type == .jobs { // Job posts don't have comments, so lets go straight to the link
+            if let vc = UserDefaults.standard.openInBrowser(post.LinkURL) {
+                self.present(vc, animated: true, completion: nil)
+            }
+        } else {
+            self.performSegue(withIdentifier: "ShowComments", sender: self)
+        }
+    }
 }
 
 extension NewsViewController: UITableViewDelegate {
