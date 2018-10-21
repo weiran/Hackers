@@ -57,6 +57,9 @@ class CommentsViewController : UIViewController {
         super.viewWillDisappear(animated)
 
         tabBarController?.tabBar.isHidden = false
+
+        self.userActivity?.resignCurrent()
+        self.userActivity = nil
     }
     
     deinit {
