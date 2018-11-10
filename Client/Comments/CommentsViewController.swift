@@ -62,7 +62,7 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        HNScraper.shared.getComments(ForPost: post!) { (post, comments, error) in
+        HNScraper.shared.getComments(ForPost: post!, buildHierarchy: false) { (post, comments, error) in
             self.view.hideSkeleton()
             self.tableView.rowHeight = UITableView.automaticDimension
             let mappedComments = comments.map { CommentModel(source: $0) }
