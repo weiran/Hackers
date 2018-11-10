@@ -24,8 +24,6 @@ class NewsViewController : UIViewController {
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
     
-    private var cancelFetch: (() -> Void)?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -74,15 +72,8 @@ class NewsViewController : UIViewController {
 
 extension NewsViewController { // post fetching
     @objc func loadPosts() {
-        // cancel existing fetches
-        if let cancelFetch = cancelFetch {
-            cancelFetch()
-            self.cancelFetch = nil
-        }
-        
         // fetch new posts
-        let (fetchPromise, cancel) = fetch()
-        fetchPromise.then {
+        fetch().then {
             (posts, nextPageIdentifier) -> Void in
                 self.posts = posts ?? [HNPost]()
                 self.nextPageIdentifier = nextPageIdentifier
@@ -94,26 +85,11 @@ extension NewsViewController { // post fetching
                 self.view.hideSkeleton()
                 self.tableView.refreshControl?.endRefreshing()
         }
-        
-        cancelFetch = cancel
     }
     
-    func fetch() -> (Promise<([HNPost]?, String?)>, cancel: () -> Void) {
-        var cancelMe = false
-        var cancel: () -> Void = { }
-        
+    func fetch() -> (Promise<([HNPost]?, String?)>) {
         let promise = Promise<([HNPost]?, String?)> { fulfill, reject in
-            cancel = {
-                cancelMe = true
-                reject(NSError.cancelledError())
-            }
-            
             HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
-                guard !cancelMe else {
-                    reject(NSError.cancelledError())
-                    return
-                }
-                
                 if let error = error {
                     reject(error)
                     return
@@ -123,7 +99,7 @@ extension NewsViewController { // post fetching
             })
         }
         
-        return (promise, cancel)
+        return promise
     }
     
     func loadMorePosts() {
