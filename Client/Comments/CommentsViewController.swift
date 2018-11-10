@@ -85,7 +85,8 @@ class CommentsViewController : UIViewController {
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.title, post!.url], applicationActivities: nil)
+        guard let post = post, let url = post.url else { return }
+        let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
     }
