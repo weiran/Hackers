@@ -9,17 +9,17 @@
 import Foundation
 import UIKit
 import SafariServices
-import libHN
 import PromiseKit
 import SkeletonView
 import Kingfisher
+import HNScraper
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
     private var refreshControl: UIRefreshControl!
     
     var posts: [HNPost] = [HNPost]()
-    var postType: PostFilterType! = .top
+    var postType: HNScraper.PostListPageName! = .news
     
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
@@ -107,15 +107,20 @@ extension NewsViewController { // post fetching
                 cancelMe = true
                 reject(NSError.cancelledError())
             }
-            HNManager.shared().loadPosts(with: postType) { posts, nextPageIdentifier in
+            
+            HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
                 guard !cancelMe else {
                     reject(NSError.cancelledError())
                     return
                 }
-                if let posts = posts as? [HNPost] {
-                    fulfill((posts, nextPageIdentifier))
+                
+                if let error = error {
+                    reject(error)
+                    return
                 }
-            }
+                
+                fulfill((posts, nextPageIdentifier))
+            })
         }
         
         return (promise, cancel)
@@ -124,10 +129,9 @@ extension NewsViewController { // post fetching
     func loadMorePosts() {
         guard let nextPageIdentifier = nextPageIdentifier else { return }
         self.nextPageIdentifier = nil
-        HNManager.shared().loadPosts(withUrlAddition: nextPageIdentifier) { posts, nextPageIdentifier in
-            guard let downcastedArray = posts as? [HNPost] else { return }
+        HNScraper.shared.getMoreItems(linkForMore: nextPageIdentifier) { (posts, nextPageIdentifier, error) in
             self.nextPageIdentifier = nextPageIdentifier
-            self.posts.append(contentsOf: downcastedArray)
+            self.posts.append(contentsOf: posts)
             self.tableView.reloadData()
         }
     }
@@ -158,7 +162,7 @@ extension NewsViewController: UITableViewDataSource {
         let post = posts[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        cell.thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
+        cell.thumbnailImageView.setImageWithPlaceholder(url: post.url)
         
         return cell
     }
@@ -191,7 +195,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let indexPath = tableView.indexPathForRow(at: location), posts.count > indexPath.row else { return nil }
         let post = posts[indexPath.row]
-        if let url = URL(string: post.urlString), verifyLink(post.urlString) {
+        if let url = post.url, verifyLink(post.url) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
             return getSafariViewController(url)
@@ -219,14 +223,12 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
 
 extension NewsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        guard verifyLink(post.urlString) else { return }
-        if let url = URL(string: post.urlString) {
-            self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
-        }
+        guard verifyLink(post.url), let url = post.url else { return }
+        self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
     }
     
-    func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else { return false }
+    func verifyLink(_ url: URL?) -> Bool {
+        guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
 }

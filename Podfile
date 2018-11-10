@@ -4,8 +4,7 @@ inhibit_all_warnings!
 
 target 'Hackers' do
   pod 'HNScraper'
-  pod 'libHN', :git => 'https://github.com/weiran/libHN', :commit => '6759f4ac591f5f36b01158260627ba0bf36eddc1'
-	pod 'DZNEmptyDataSet'
+  pod 'DZNEmptyDataSet'
   pod 'PromiseKit', '~> 4.x'
   pod 'SkeletonView'
   pod 'Kingfisher'

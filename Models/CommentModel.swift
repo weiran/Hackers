@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import libHN
+import HNScraper
 
 enum CommentVisibilityType: Int {
     case visible = 3
@@ -17,7 +17,7 @@ enum CommentVisibilityType: Int {
 
 class CommentModel {
     
-    var type: HNCommentType
+    var type: HNComment.HNCommentType
     var text: String
     var authorUsername: String
     var commentID: String
@@ -29,14 +29,14 @@ class CommentModel {
     var visibility: CommentVisibilityType = .visible
     
     init(source: HNComment) {
-        type = HNCommentType.default
+        type = source.type
         authorUsername = source.username
-        commentID = source.commentId
+        commentID = source.id
         //parentCommentID = source.ParentID
         parentCommentID = ""
-        dateCreatedString = source.timeCreatedString
-        if let _ = source.replyURLString {
-            replyURL = URL(string: source.replyURLString!)
+        dateCreatedString = source.created
+        if let _ = source.replyUrl {
+            replyURL = URL(string: source.replyUrl)
         }
         level = Int(source.level)
         text = source.text

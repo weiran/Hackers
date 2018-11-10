@@ -2,7 +2,6 @@ PODS:
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
   - Kingfisher (4.10.1)
-  - libHN (4.1.0)
   - PromiseKit (4.5.2):
     - PromiseKit/Foundation (= 4.5.2)
     - PromiseKit/QuartzCore (= 4.5.2)
@@ -20,7 +19,6 @@ DEPENDENCIES:
   - DZNEmptyDataSet
   - HNScraper
   - Kingfisher
-  - libHN (from `https://github.com/weiran/libHN`, commit `6759f4ac591f5f36b01158260627ba0bf36eddc1`)
   - PromiseKit (~> 4.x)
   - SkeletonView
 
@@ -32,24 +30,13 @@ SPEC REPOS:
     - PromiseKit
     - SkeletonView
 
-EXTERNAL SOURCES:
-  libHN:
-    :commit: 6759f4ac591f5f36b01158260627ba0bf36eddc1
-    :git: https://github.com/weiran/libHN
-
-CHECKOUT OPTIONS:
-  libHN:
-    :commit: 6759f4ac591f5f36b01158260627ba0bf36eddc1
-    :git: https://github.com/weiran/libHN
-
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: 89d135811bc8b9088adbb677c0bbc6cf8ed85cc0
   Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
-  libHN: fe671e9d39466235239b793f1f0181baadb327b2
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
 
-PODFILE CHECKSUM: 528ca53b92f8890ad2f5712789d86c3c46cc0e7b
+PODFILE CHECKSUM: e10813922852ca5d7db1459262dc07413462b789
 
 COCOAPODS: 1.5.3

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import libHN
+import HNScraper
 
 protocol PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost)
@@ -44,7 +44,9 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     }
     
     private func domainLabelText(for post: HNPost) -> String {
-        guard let urlComponents = URLComponents(string: post.urlString), var host = urlComponents.host else {
+        guard let url = post.url,
+            let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            var host = urlComponents.host else {
             return "news.ycombinator.com"
         }
         
