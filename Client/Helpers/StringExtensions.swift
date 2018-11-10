@@ -63,7 +63,7 @@ extension String {
         
         let scanner = Scanner(string: text)
         scanner.charactersToBeSkipped = CharacterSet(charactersIn: "")
-        var goodText: NSString?, runningString: NSString = "", trash: NSString?
+        var goodText: NSString? = "", runningString: NSString = "", trash: NSString?
         
         while !scanner.isAtEnd {
             if scanner.string[scanner.scanLocation...].range(of: "<a href") != nil {
