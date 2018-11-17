@@ -166,24 +166,29 @@ extension CommentsViewController: CommentDelegate {
         self.present(safariViewController, animated: true, completion: nil)
     }
     
-    func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {
+    func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
+
+        var scrollToCell = false
+        let cellRectInTableView = tableView.rectForRow(at: indexPath)
+        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
+        if cellRectInSuperview.origin.y < 0 {
+            scrollToCell = true
+        }
         
         tableView.beginUpdates()
         tableView.reloadRows(at: [indexPath], with: .fade)
         if visibility == CommentVisibilityType.hidden {
-            tableView.deleteRows(at: modifiedIndexPaths, with: .top)
+            tableView.deleteRows(at: modifiedIndexPaths, with: .fade)
         } else {
-            tableView.insertRows(at: modifiedIndexPaths, with: .top)
+            tableView.insertRows(at: modifiedIndexPaths, with: .fade)
         }
         tableView.endUpdates()
         
-        let cellRectInTableView = tableView.rectForRow(at: indexPath)
-        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
-        if cellRectInSuperview.origin.y < 0 {
-            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+        if scrollToCell && scrollIfCellCovered {
+            self.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
 }
