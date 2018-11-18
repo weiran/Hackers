@@ -35,7 +35,7 @@ class NewsViewController : UIViewController {
         
         setupTheming()
         
-        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
+        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadPosts()
     }
     
