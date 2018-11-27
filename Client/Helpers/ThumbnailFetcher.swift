@@ -13,7 +13,10 @@ extension UIImageView {
         let placeholderImage = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         self.image = placeholderImage
         if let url = URL(string: "https://image-extractor.now.sh/?url=" + urlString) {
-            self.kf.setImage(with: url, placeholder: placeholderImage)
+            let deviceScale = UIScreen.main.scale
+            let thumbnailSize = 60 * deviceScale
+            let imageSizeProcessor = ResizingImageProcessor(referenceSize: CGSize(width: thumbnailSize, height: thumbnailSize), mode: .aspectFit)
+            self.kf.setImage(with: url, placeholder: placeholderImage, options: [.processor(imageSizeProcessor)])
         }
     }
 }
