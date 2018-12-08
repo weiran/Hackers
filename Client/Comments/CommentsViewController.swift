@@ -9,9 +9,9 @@
 import Foundation
 import UIKit
 import SafariServices
-import libHN
 import DZNEmptyDataSet
 import SkeletonView
+import HNScraper
 
 class CommentsViewController : UIViewController {
     var post: HNPost?
@@ -32,7 +32,7 @@ class CommentsViewController : UIViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
+        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadComments()
     }
     
@@ -49,7 +49,7 @@ class CommentsViewController : UIViewController {
         super.viewDidLayoutSubviews()
 
         if let headerView = tableView.tableHeaderView {
-            let height = headerView.systemLayoutSizeFitting(UILayoutFittingCompressedSize).height
+            let height = headerView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
             var headerFrame = headerView.frame
 
             // If we don't have this check, viewDidLayoutSubviews() will get called infinitely
@@ -62,16 +62,11 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        HNManager.shared().loadComments(from: post) { comments in
-            if let downcastedArray = comments as? [HNComment] {
-                let mappedComments = downcastedArray.map { CommentModel(source: $0) }
-                self.comments = mappedComments
-            } else {
-                self.comments = [CommentModel]()
-            }
-            
+        HNScraper.shared.getComments(ForPost: post!, buildHierarchy: false, offsetComments: false) { (post, comments, error) in
             self.view.hideSkeleton()
-            self.tableView.rowHeight = UITableViewAutomaticDimension
+            self.tableView.rowHeight = UITableView.automaticDimension
+            let mappedComments = comments.map { CommentModel(source: $0) }
+            self.comments = mappedComments
             self.tableView.reloadData()
         }
     }
@@ -82,7 +77,7 @@ class CommentsViewController : UIViewController {
         postTitleView.post = post
         postTitleView.delegate = self
         postTitleView.isTitleTapEnabled = true
-        thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
+        thumbnailImageView.setImageWithPlaceholder(url: post.url)
     }
     
     @IBAction func didTapThumbnail(_ sender: Any) {
@@ -90,7 +85,8 @@ class CommentsViewController : UIViewController {
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
+        guard let post = post, let url = post.url else { return }
+        let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
     }
@@ -98,7 +94,7 @@ class CommentsViewController : UIViewController {
 
 extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        if verifyLink(post.urlString), let url = URL(string: post.urlString) {
+        if verifyLink(post.url), let url = post.url {
             // animate background colour for tap
             self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
@@ -111,10 +107,8 @@ extension CommentsViewController: PostTitleViewDelegate {
         }
     }
     
-    func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return false
-        }
+    func verifyLink(_ url: URL?) -> Bool {
+        guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
 }
@@ -166,37 +160,42 @@ extension CommentsViewController: CommentDelegate {
         self.present(safariViewController, animated: true, completion: nil)
     }
     
-    func toggleCellVisibilityForCell(_ indexPath: IndexPath!) {
+    func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
         let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
+
+        var scrollToCell = false
+        let cellRectInTableView = tableView.rectForRow(at: indexPath)
+        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
+        if cellRectInSuperview.origin.y < 0 {
+            scrollToCell = true
+        }
         
         tableView.beginUpdates()
         tableView.reloadRows(at: [indexPath], with: .fade)
         if visibility == CommentVisibilityType.hidden {
-            tableView.deleteRows(at: modifiedIndexPaths, with: .top)
+            tableView.deleteRows(at: modifiedIndexPaths, with: .fade)
         } else {
-            tableView.insertRows(at: modifiedIndexPaths, with: .top)
+            tableView.insertRows(at: modifiedIndexPaths, with: .fade)
         }
         tableView.endUpdates()
         
-        let cellRectInTableView = tableView.rectForRow(at: indexPath)
-        let cellRectInSuperview = tableView.convert(cellRectInTableView, to: tableView.superview)
-        if cellRectInSuperview.origin.y < 0 {
-            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+        if scrollToCell && scrollIfCellCovered {
+            self.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
 }
 
 extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 15.0)]
+        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
 }
 
 extension CommentsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
         return "SkeletonCell"
     }
 }

@@ -58,15 +58,15 @@ class CommentTableViewCell : UITableViewCell {
             let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
             let lineSpacing = 4 as CGFloat
             
-            let commentAttributedString = NSMutableAttributedString(string: comment.text)
+            let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
             let paragraphStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
             paragraphStyle.lineSpacing = lineSpacing
             
             let commentRange = NSMakeRange(0, commentAttributedString.length)
             
-            commentAttributedString.addAttribute(NSAttributedStringKey.font, value: commentFont, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: commentTextColor, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.font, value: commentFont, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: commentTextColor, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: commentRange)
             
             commentTextView.attributedText = commentAttributedString
         }

@@ -6,14 +6,11 @@
 //  Copyright (c) 2014 Glass Umbrella. All rights reserved.
 //
 
-import libHN
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
-        HNManager.shared().startSession()
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
         setAppTheme()
