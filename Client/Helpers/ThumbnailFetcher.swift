@@ -9,14 +9,17 @@
 import Kingfisher
 
 extension UIImageView {
-    func setImageWithPlaceholder(url: URL?) {
+    func setImageWithPlaceholder(url: URL?, resizeToSize: Int? = nil) {
         let placeholderImage = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         self.image = placeholderImage
-        if let url = URL(string: "https://image-extractor.now.sh/?url=" + urlString) {
-            let deviceScale = UIScreen.main.scale
-            let thumbnailSize = 60 * deviceScale
-            let imageSizeProcessor = ResizingImageProcessor(referenceSize: CGSize(width: thumbnailSize, height: thumbnailSize), mode: .aspectFit)
-            self.kf.setImage(with: url, placeholder: placeholderImage, options: [.processor(imageSizeProcessor)])
+        if let url = url, let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=" + url.absoluteString) {
+            var options: KingfisherOptionsInfo?
+            if let resizeToSize = resizeToSize {
+                let thumbnailSize = CGFloat(resizeToSize) * UIScreen.main.scale
+                let imageSizeProcessor = ResizingImageProcessor(referenceSize: CGSize(width: thumbnailSize, height: thumbnailSize), mode: .aspectFit)
+                options = [.processor(imageSizeProcessor)]
+            }
+            self.kf.setImage(with: thumbnailURL, placeholder: placeholderImage, options: options)
         }
     }
 }
