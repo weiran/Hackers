@@ -86,6 +86,8 @@ extension NewsViewController { // post fetching
             self.tableView.refreshControl?.endRefreshing()
         }.catch { error in
             let alert = UIAlertController(title: "Couldn't fetch Hacker News", message: "Check your internet connection and try again.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true)
         }
     }
     
