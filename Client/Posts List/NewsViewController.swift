@@ -73,32 +73,32 @@ class NewsViewController : UIViewController {
 extension NewsViewController { // post fetching
     @objc func loadPosts() {
         // fetch new posts
-        fetch().then {
-            (posts, nextPageIdentifier) -> Void in
-                self.posts = posts ?? [HNPost]()
-                self.nextPageIdentifier = nextPageIdentifier
-                self.view.hideSkeleton()
-                self.tableView.rowHeight = UITableView.automaticDimension
-                self.tableView.estimatedRowHeight = UITableView.automaticDimension
-                self.tableView.reloadData()
-            }.always {
-                self.view.hideSkeleton()
-                self.tableView.refreshControl?.endRefreshing()
+        fetch().map { params in
+            let (posts, nextPageIdentifier) = params
+            self.posts = posts ?? [HNPost]()
+            self.nextPageIdentifier = nextPageIdentifier
+            self.view.hideSkeleton()
+            self.tableView.rowHeight = UITableView.automaticDimension
+            self.tableView.estimatedRowHeight = UITableView.automaticDimension
+            self.tableView.reloadData()
+        }.ensure {
+            self.view.hideSkeleton()
+            self.tableView.refreshControl?.endRefreshing()
+        }.catch { error in
+            let alert = UIAlertController(title: "Couldn't fetch Hacker News", message: "Check your internet connection and try again.", preferredStyle: .alert)
         }
     }
     
-    func fetch() -> (Promise<([HNPost]?, String?)>) {
-        let promise = Promise<([HNPost]?, String?)> { fulfill, reject in
-            HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
-                if let error = error {
-                    reject(error)
-                    return
-                }
-                
-                fulfill((posts, nextPageIdentifier))
-            })
-        }
-        
+    func fetch() -> Promise<([HNPost]?, String?)> {
+        let (promise, seal) = Promise<([HNPost]?, String?)>.pending()
+        HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill((posts, nextPageIdentifier))
+            }
+        })
+
         return promise
     }
     
