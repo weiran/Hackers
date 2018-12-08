@@ -9,11 +9,11 @@
 import Kingfisher
 
 extension UIImageView {
-    func setImageWithPlaceholder(urlString: String) {
+    func setImageWithPlaceholder(url: URL?) {
         let placeholderImage = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         self.image = placeholderImage
-        if let url = URL(string: "https://image-extractor.now.sh/?url=" + urlString) {
-            self.kf.setImage(with: url, placeholder: placeholderImage)
+        if let url = url, let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=" + url.absoluteString) {
+            self.kf.setImage(with: thumbnailURL, placeholder: placeholderImage)
         }
     }
 }

@@ -9,9 +9,9 @@
 import Foundation
 import UIKit
 import SafariServices
-import libHN
 import DZNEmptyDataSet
 import SkeletonView
+import HNScraper
 
 class CommentsViewController : UIViewController {
     var post: HNPost?
@@ -32,7 +32,7 @@ class CommentsViewController : UIViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        view.showAnimatedSkeleton(usingColor: AppThemeProvider.shared.currentTheme.skeletonColor)
+        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadComments()
     }
     
@@ -62,16 +62,11 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        HNManager.shared().loadComments(from: post) { comments in
-            if let downcastedArray = comments as? [HNComment] {
-                let mappedComments = downcastedArray.map { CommentModel(source: $0) }
-                self.comments = mappedComments
-            } else {
-                self.comments = [CommentModel]()
-            }
-            
+        HNScraper.shared.getComments(ForPost: post!, buildHierarchy: false, offsetComments: false) { (post, comments, error) in
             self.view.hideSkeleton()
             self.tableView.rowHeight = UITableView.automaticDimension
+            let mappedComments = comments.map { CommentModel(source: $0) }
+            self.comments = mappedComments
             self.tableView.reloadData()
         }
     }
@@ -82,7 +77,7 @@ class CommentsViewController : UIViewController {
         postTitleView.post = post
         postTitleView.delegate = self
         postTitleView.isTitleTapEnabled = true
-        thumbnailImageView.setImageWithPlaceholder(urlString: post.urlString)
+        thumbnailImageView.setImageWithPlaceholder(url: post.url)
     }
     
     @IBAction func didTapThumbnail(_ sender: Any) {
@@ -90,7 +85,8 @@ class CommentsViewController : UIViewController {
     }
     
     @IBAction func shareTapped(_ sender: AnyObject) {
-        let activityViewController = UIActivityViewController(activityItems: [post!.title, URL(string: post!.urlString)!], applicationActivities: nil)
+        guard let post = post, let url = post.url else { return }
+        let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
     }
@@ -98,7 +94,7 @@ class CommentsViewController : UIViewController {
 
 extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        if verifyLink(post.urlString), let url = URL(string: post.urlString) {
+        if verifyLink(post.url), let url = post.url {
             // animate background colour for tap
             self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
@@ -111,10 +107,8 @@ extension CommentsViewController: PostTitleViewDelegate {
         }
     }
     
-    func verifyLink(_ urlString: String?) -> Bool {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
-            return false
-        }
+    func verifyLink(_ url: URL?) -> Bool {
+        guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
 }
@@ -201,7 +195,7 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
 }
 
 extension CommentsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdenfierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
         return "SkeletonCell"
     }
 }
