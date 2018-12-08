@@ -277,13 +277,6 @@
       "idiom" : "mac",
       "filename" : "iTunesArtwork@2x.png",
       "scale" : "2x"
-    },
-    {
-      "size" : "44x44",
-      "idiom" : "watch",
-      "scale" : "2x",
-      "role" : "longLook",
-      "subtype" : "42mm"
     }
   ],
   "info" : {
