@@ -77,7 +77,7 @@ class CommentsViewController : UIViewController {
         postTitleView.post = post
         postTitleView.delegate = self
         postTitleView.isTitleTapEnabled = true
-        thumbnailImageView.setImageWithPlaceholder(url: post.url)
+        thumbnailImageView.setImageWithPlaceholder(url: post.url, resizeToSize: 60)
     }
     
     @IBAction func didTapThumbnail(_ sender: Any) {
