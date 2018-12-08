@@ -17,7 +17,7 @@ PODS:
 
 DEPENDENCIES:
   - DZNEmptyDataSet
-  - HNScraper
+  - HNScraper (from `https://github.com/weiran/HNScraper.git`)
   - Kingfisher
   - PromiseKit (~> 4.x)
   - SkeletonView
@@ -25,10 +25,18 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - DZNEmptyDataSet
-    - HNScraper
     - Kingfisher
     - PromiseKit
     - SkeletonView
+
+EXTERNAL SOURCES:
+  HNScraper:
+    :git: https://github.com/weiran/HNScraper.git
+
+CHECKOUT OPTIONS:
+  HNScraper:
+    :commit: 54b3e0f1b3ced275d6558f6d0a801d60a120cc66
+    :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
@@ -37,6 +45,6 @@ SPEC CHECKSUMS:
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
 
-PODFILE CHECKSUM: e10813922852ca5d7db1459262dc07413462b789
+PODFILE CHECKSUM: f7a77b564eaefb9e9172b5736f0ad5a19a970a48
 
 COCOAPODS: 1.5.3

@@ -3,7 +3,7 @@ use_frameworks!
 inhibit_all_warnings!
 
 target 'Hackers' do
-  pod 'HNScraper'
+  pod 'HNScraper', :git => 'https://github.com/weiran/HNScraper.git'
   pod 'DZNEmptyDataSet'
   pod 'PromiseKit', '~> 4.x'
   pod 'SkeletonView'
