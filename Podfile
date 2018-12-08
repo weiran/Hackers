@@ -7,5 +7,5 @@ target 'Hackers' do
   pod 'DZNEmptyDataSet'
   pod 'PromiseKit'
   pod 'SkeletonView'
-  pod 'Kingfisher', '~> 4.x'
+  pod 'Kingfisher'
 end

@@ -1,7 +1,7 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
-  - Kingfisher (4.10.1)
+  - Kingfisher (5.0.0)
   - PromiseKit (6.7.0):
     - PromiseKit/CorePromise (= 6.7.0)
     - PromiseKit/Foundation (= 6.7.0)
@@ -16,7 +16,7 @@ PODS:
 DEPENDENCIES:
   - DZNEmptyDataSet
   - HNScraper (from `https://github.com/weiran/HNScraper.git`)
-  - Kingfisher (~> 4.x)
+  - Kingfisher
   - PromiseKit
   - SkeletonView
 
@@ -39,10 +39,10 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: 89d135811bc8b9088adbb677c0bbc6cf8ed85cc0
-  Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
+  Kingfisher: 2b0dd651e4fe5a07305b8242fde56f8e2d410f58
   PromiseKit: 453ddcc947fe7b302f3ef41882b81d31c554df7f
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
 
-PODFILE CHECKSUM: 086cbd1721b95ab4a05946a448af9befb2442cb4
+PODFILE CHECKSUM: ad484d1b335fc735d913480e1dfa50d75be07fb5
 
 COCOAPODS: 1.5.3
