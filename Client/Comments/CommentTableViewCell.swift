@@ -54,19 +54,14 @@ class CommentTableViewCell : UITableViewCell {
         
         if let commentTextView = commentTextView {
             // only for expanded comments
-            let commentFont = UIFont.systemFont(ofSize: 15)
+            let commentFont = UIFont.preferredFont(forTextStyle: .subheadline)
             let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
-            let lineSpacing = 4 as CGFloat
             
             let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
-            let paragraphStyle = NSMutableParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
-            paragraphStyle.lineSpacing = lineSpacing
-            
             let commentRange = NSMakeRange(0, commentAttributedString.length)
             
             commentAttributedString.addAttribute(NSAttributedString.Key.font, value: commentFont, range: commentRange)
             commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: commentTextColor, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: commentRange)
             
             commentTextView.attributedText = commentAttributedString
         }
@@ -110,7 +105,7 @@ extension CommentTableViewCell: Themed {
             commentTextView.tintColor = theme.appTintColor
         }
         if authorLabel != nil {
-            authorLabel.textColor = theme.textColor
+            authorLabel.textColor = theme.titleTextColor
         }
         if datePostedLabel != nil {
             datePostedLabel.textColor = theme.lightTextColor
