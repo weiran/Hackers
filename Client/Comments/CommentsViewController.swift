@@ -127,6 +127,7 @@ extension CommentsViewController: UITableViewDataSource {
         
         cell.comment = comment
         cell.delegate = self
+        cell.isCollapsed = comment.visibility != .visible
         
         return cell
     }

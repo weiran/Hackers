@@ -622,7 +622,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark Mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUa-78-yFY">
-                                                    <rect key="frame" x="16" y="11.5" width="84" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="84" height="16.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -636,10 +636,10 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="CUa-78-yFY" firstAttribute="centerY" secondItem="e0A-YI-hGk" secondAttribute="centerY" id="4BK-rq-BNW"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="CUa-78-yFY" secondAttribute="bottom" constant="1" id="8lK-T1-6DU"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="CUa-78-yFY" secondAttribute="bottom" constant="3" id="8lK-T1-6DU"/>
                                                 <constraint firstItem="uAe-yS-ppv" firstAttribute="centerY" secondItem="e0A-YI-hGk" secondAttribute="centerY" id="Zhz-ON-eDY"/>
                                                 <constraint firstAttribute="trailing" secondItem="uAe-yS-ppv" secondAttribute="trailing" constant="15" id="fsf-33-8qK"/>
-                                                <constraint firstItem="CUa-78-yFY" firstAttribute="top" secondItem="e0A-YI-hGk" secondAttribute="topMargin" constant="0.5" id="mRZ-D8-lOY"/>
+                                                <constraint firstItem="CUa-78-yFY" firstAttribute="top" secondItem="e0A-YI-hGk" secondAttribute="topMargin" constant="2.5" id="mRZ-D8-lOY"/>
                                                 <constraint firstItem="CUa-78-yFY" firstAttribute="leading" secondItem="e0A-YI-hGk" secondAttribute="leadingMargin" id="zre-gX-58J"/>
                                             </constraints>
                                         </tableViewCellContentView>

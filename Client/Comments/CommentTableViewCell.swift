@@ -24,6 +24,8 @@ class CommentTableViewCell : UITableViewCell {
         }
     }
     
+    var isCollapsed: Bool = false
+    
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel : UILabel!
     @IBOutlet var datePostedLabel : UILabel!
@@ -49,10 +51,12 @@ class CommentTableViewCell : UITableViewCell {
     
     func updateCommentContent(with comment: CommentModel) {
         level = comment.level
-        datePostedLabel.text = comment.dateCreatedString
         authorLabel.text = comment.authorUsername
+        authorLabel.font = AppFont.commentUsernameFont(collapsed: isCollapsed)
+        datePostedLabel.text = comment.dateCreatedString
+        datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         
-        if let commentTextView = commentTextView {
+        if let commentTextView = commentTextView, !isCollapsed {
             // only for expanded comments
             let commentFont = UIFont.preferredFont(forTextStyle: .subheadline)
             let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
