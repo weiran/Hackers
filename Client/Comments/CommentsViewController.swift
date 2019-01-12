@@ -125,7 +125,7 @@ extension CommentsViewController: UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
-        cell.comment = comment
+        cell.updateCommentContent(with: comment)
         cell.delegate = self
         
         return cell
