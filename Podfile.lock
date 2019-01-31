@@ -12,6 +12,7 @@ PODS:
   - PromiseKit/UIKit (6.7.1):
     - PromiseKit/CorePromise
   - SkeletonView (1.4.1)
+  - SloppySwiper (0.6)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
@@ -19,6 +20,7 @@ DEPENDENCIES:
   - Kingfisher
   - PromiseKit
   - SkeletonView
+  - SloppySwiper
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -26,6 +28,7 @@ SPEC REPOS:
     - Kingfisher
     - PromiseKit
     - SkeletonView
+    - SloppySwiper
 
 EXTERNAL SOURCES:
   HNScraper:
@@ -42,7 +45,8 @@ SPEC CHECKSUMS:
   Kingfisher: 4f771421b9208185217550528a06fd48756cb7c2
   PromiseKit: ef376fb8b4e92edfeb66bd403b983eaa07fbde0c
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
+  SloppySwiper: 37e38f6da8df5c805914c6f32ec6ec8da63abe7c
 
-PODFILE CHECKSUM: ad484d1b335fc735d913480e1dfa50d75be07fb5
+PODFILE CHECKSUM: 85c4fb8b66d17745a609fb7fd5509829f381045f
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.rc.2

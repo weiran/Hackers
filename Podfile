@@ -8,4 +8,5 @@ target 'Hackers' do
   pod 'PromiseKit'
   pod 'SkeletonView'
   pod 'Kingfisher'
+  pod 'SloppySwiper'
 end

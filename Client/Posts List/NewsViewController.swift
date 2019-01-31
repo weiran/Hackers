@@ -13,10 +13,12 @@ import PromiseKit
 import SkeletonView
 import Kingfisher
 import HNScraper
+import SloppySwiper
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
     private var refreshControl: UIRefreshControl!
+    private var sloppySwiper = SloppySwiper()
     
     var posts: [HNPost] = [HNPost]()
     var postType: HNScraper.PostListPageName! = .news
@@ -32,6 +34,11 @@ class NewsViewController : UIViewController {
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControl.Event.valueChanged)
         tableView.refreshControl = refreshControl
+
+        if let navigationController = navigationController {
+            sloppySwiper = SloppySwiper(navigationController: navigationController)
+            navigationController.delegate = sloppySwiper
+        }
         
         setupTheming()
         
