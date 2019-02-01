@@ -14,6 +14,11 @@ import SkeletonView
 import HNScraper
 
 class CommentsViewController : UIViewController {
+    private enum ActivityType {
+        case comments
+        case link(url: URL)
+    }
+
     var post: HNPost?
     
     var comments: [CommentModel]? {
@@ -34,6 +39,7 @@ class CommentsViewController : UIViewController {
         setupPostTitleView()
         view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadComments()
+        setupHandoff(with: post, activityType: .comments)
     }
     
     override func awakeFromNib() {
@@ -70,6 +76,11 @@ class CommentsViewController : UIViewController {
             self.tableView.reloadData()
         }
     }
+
+    override func updateUserActivityState(_ activity: NSUserActivity) {
+        activity.addUserInfoEntries(from: [:])
+        super.updateUserActivityState(activity)
+    }
     
     func setupPostTitleView() {
         guard let post = post else { return }
@@ -103,6 +114,7 @@ extension CommentsViewController: PostTitleViewDelegate {
             
             // show link
             let safariViewController = ThemedSafariViewController(url: url)
+            setupHandoff(with: post, activityType: .link(url: url))
             self.present(safariViewController, animated: true, completion: nil)
         }
     }
@@ -157,6 +169,7 @@ extension CommentsViewController: CommentDelegate {
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
         let safariViewController = ThemedSafariViewController(url: URL)
+        setupHandoff(with: post, activityType: .link(url: URL))
         self.present(safariViewController, animated: true, completion: nil)
     }
     
@@ -197,5 +210,31 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
 extension CommentsViewController: SkeletonTableViewDataSource {
     func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
         return "SkeletonCell"
+    }
+}
+
+// MARK: - Handoff
+
+extension CommentsViewController {
+    private func setupHandoff(with post: HNPost?, activityType: ActivityType) {
+        guard let post = post else {
+            return
+        }
+        var activity: NSUserActivity?
+        
+        if case ActivityType.comments = activityType {
+            activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.comments")
+            guard let webpageURL = URL(string: "https://news.ycombinator.com/item?id=" + post.id) else {
+                return
+            }
+            activity?.webpageURL = webpageURL
+        } else if case ActivityType.link(let webpageURL) = activityType {
+            activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
+            activity?.webpageURL = webpageURL
+        }
+        
+        activity?.title = post.title + " | Hacker News"
+        userActivity = activity
+        userActivity?.becomeCurrent()
     }
 }
