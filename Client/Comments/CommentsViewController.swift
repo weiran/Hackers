@@ -39,6 +39,10 @@ class CommentsViewController : UIViewController {
         setupPostTitleView()
         view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadComments()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         setupHandoff(with: post, activityType: .comments)
     }
     
@@ -49,6 +53,7 @@ class CommentsViewController : UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        userActivity?.invalidate()
     }
     
     override func viewDidLayoutSubviews() {
