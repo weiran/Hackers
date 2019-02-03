@@ -18,6 +18,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet var metadataLabel: UILabel!
     
     var isTitleTapEnabled = false
+    var pointsMetadataRangeToHighlight: NSRange?
+    var popularPostPointsThreshold = 200
     
     var delegate: PostTitleViewDelegate?
     
@@ -26,6 +28,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
             guard let post = post else { return }
             titleLabel.text = post.title
             metadataLabel.attributedText = metadataText(for: post)
+            highlightPointsInMetadata()
         }
     }
     
@@ -68,6 +71,13 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         
         string.append(NSAttributedString(string: "\(post.points)"))
         string.append(pointsIconAttributedString)
+
+        if (post.points > popularPostPointsThreshold) {
+            pointsMetadataRangeToHighlight = NSRange(location: 0, length: string.length)
+        } else {
+            pointsMetadataRangeToHighlight = nil
+        }
+
         string.append(NSAttributedString(string: "• \(post.commentCount)"))
         string.append(commentsIconAttributedString)
         string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
@@ -88,11 +98,25 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         attachment.bounds = CGRect(x: 0, y: -2, width: image.size.width, height: image.size.height)
         return attachment
     }
+
+    private func highlightPointsInMetadata() {
+        guard let mutableMetadataText = metadataLabel.attributedText?.mutableCopy() as? NSMutableAttributedString else {
+            return
+        }
+        if let range = pointsMetadataRangeToHighlight {
+            mutableMetadataText.addAttribute(
+                NSAttributedString.Key.foregroundColor,
+                value: UIColor.orange,
+                range: range)
+            metadataLabel.attributedText = mutableMetadataText
+        }
+    }
 }
 
 extension PostTitleView: Themed {
     func applyTheme(_ theme: AppTheme) {
         titleLabel.textColor = theme.titleTextColor
         metadataLabel.textColor = theme.textColor
+        highlightPointsInMetadata()
     }
 }
