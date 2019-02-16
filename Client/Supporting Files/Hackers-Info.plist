@@ -50,5 +50,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>com.weiranzhang.Hackers.comments</string>
+        <string>com.weiranzhang.Hackers.link</string>
+    </array>
 </dict>
 </plist>
