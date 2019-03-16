@@ -13,6 +13,7 @@ import PromiseKit
 import SkeletonView
 import Kingfisher
 import HNScraper
+import Loaf
 
 class NewsViewController : UIViewController {
     @IBOutlet weak var tableView: UITableView!
@@ -85,9 +86,7 @@ extension NewsViewController { // post fetching
             self.view.hideSkeleton()
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
-            let alert = UIAlertController(title: "Couldn't fetch Hacker News", message: "Check your internet connection and try again.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert, animated: true)
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
     
