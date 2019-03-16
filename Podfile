@@ -1,4 +1,4 @@
-platform :ios, '10.0'
+platform :ios, '11.0'
 use_frameworks!
 inhibit_all_warnings!
 
@@ -8,4 +8,5 @@ target 'Hackers' do
   pod 'PromiseKit/CorePromise'
   pod 'SkeletonView'
   pod 'Kingfisher'
+  pod 'Loaf'
 end
