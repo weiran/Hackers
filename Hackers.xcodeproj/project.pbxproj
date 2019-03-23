@@ -162,8 +162,8 @@
 			children = (
 				245345FD2246732C001AF1CE /* Appfile */,
 				245345FC2246732C001AF1CE /* Fastfile */,
-				245345F722466F71001AF1CE /* SnapshotHelper.swift */,
 				245345F822466F71001AF1CE /* Snapfile */,
+				245345F722466F71001AF1CE /* SnapshotHelper.swift */,
 			);
 			path = fastlane;
 			sourceTree = "<group>";
