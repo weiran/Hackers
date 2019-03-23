@@ -19,6 +19,7 @@ platform :ios do
   desc "Generate new localized screenshots"
   lane :screenshots do
     capture_screenshots(workspace: "Hackers.xcworkspace", scheme: "Hackers")
+    frameit(path: "./fastlane/screenshots/")
 # upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
   end
 end

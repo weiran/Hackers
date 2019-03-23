@@ -3,16 +3,16 @@
 # A list of devices you want to take the screenshots from
 devices([
   "iPhone 8",
-  "iPhone 8 Plus",
-  "iPhone SE",
-  "iPhone XS",
-  "iPhone XS Max",
-  "iPhone XR",
-  "iPad Pro (9.7-inch)",
-  "iPad Pro (11-inch)",
-  "iPad Pro (10.5-inch)",
-  "iPad Pro (12.9-inch) (2nd generation)",
-  "iPad Pro (12.9-inch) (3rd generation)"
+#  "iPhone 8 Plus",
+#  "iPhone SE",
+#  "iPhone XS",
+#  "iPhone XS Max",
+#  "iPhone XR",
+#  "iPad Pro (9.7-inch)",
+#  "iPad Pro (11-inch)",
+#  "iPad Pro (10.5-inch)",
+#  "iPad Pro (12.9-inch) (2nd generation)",
+#  "iPad Pro (12.9-inch) (3rd generation)"
 ])
 
 # languages([
@@ -26,7 +26,7 @@ devices([
 scheme("Hackers")
 
 # Where should the resulting screenshots be stored?
-output_directory("./screenshots")
+output_directory("./fastlane/screenshots")
 
 # remove the '#' to clear all previously generated screenshots before creating new ones
 clear_previous_screenshots(true)
