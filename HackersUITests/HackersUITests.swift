@@ -11,15 +11,17 @@ import DeviceKit
 
 class HackersUITests: XCTestCase {
     let device = Device()
-
-    override func setUp() {
+    
+    func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
         setupSnapshot(app)
-        app.launchArguments = ["-Theme", "light"]
+        app.launchArguments = ["-Theme", darkTheme ? "dark" : "light"]
         app.launch()
     }
 
-    func screenshotUltimate() {
+    func testScreenshotUltimate() {
+        launch()
+        
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
         
@@ -32,10 +34,12 @@ class HackersUITests: XCTestCase {
         snapshot("Ultimate")
     }
     
-    func screenshotComments() {
+    func testScreenshotComments() {
         if self.device.isPad {
             return
         }
+        
+        launch()
         
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
@@ -45,6 +49,21 @@ class HackersUITests: XCTestCase {
         tablesQuery.cells.element(boundBy: 1).tap()
         
         snapshot("Comments")
+    }
+    
+    func testScreenshotDark() {
+        launch(darkTheme: true)
+        
+        let tablesQuery = XCUIApplication().tables
+        XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
+        
+        if self.device.isPad {
+            tablesQuery.cells.firstMatch.tap()
+            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
+            tablesQuery.cells.element(boundBy: 1).tap()
+        }
+        
+        snapshot("Dark")
     }
     
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
