@@ -34,21 +34,26 @@ Hackers is open source and licenced under the MIT licence.
 2. Install pods, in the project root folder, run `pod install`.
 3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 9 or later, and build.
 
-## Generate screenshots
+## Generate screenshots
 
 1. Install [fastlane](https://fastlane.tools).
 2. Run `fastlane frameit` in `/Screenshots`
-
-## About
-
-Hackers is an open source project by [Weiran Zhang](http://weiran.co) licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 ## Credits
 
 I use several open source projects in Hackers, in no particular order:
 
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
-* [libHN](https://github.com/bennyguitar/libHN) by Ben Gordon
+* [HNScraper](https://github.com/tsucres/HNScraper) by [Stéphane Sercu](https://github.com/tsucres)
 * [SkeletonView](https://github.com/Juanpe/SkeletonView) by [Juanpe Catalán](https://github.com/Juanpe)
 * [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl)
 * [Kingfisher](https://github.com/onevcat/Kingfisher) by [Wei Wang](https://github.com/onevcat)
+* [Loaf](https://github.com/schmidyy/Loaf) by [Mat Schmid](https://github.com/schmidyy)
+
+---
+<p align="center">
+  <b>By Weiran Zhang</b><br>
+  <a href="https://weiran.co">Website</a> |
+  <a href="https://twitter.com/weiran">Twitter</a> |
+  <a href="https://github.com/weiran">GitHub</a>
+</p>
