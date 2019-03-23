@@ -10,11 +10,10 @@
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func applicationDidFinishLaunching(_ application: UIApplication) {
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
         setAppTheme()
-        return true
     }
     
     private func setAppTheme() {
