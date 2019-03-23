@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import libHN
 
 class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     required init?(coder aDecoder: NSCoder) {

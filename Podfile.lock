@@ -1,51 +1,44 @@
 PODS:
   - DZNEmptyDataSet (1.8.1)
-  - Kingfisher (4.8.1)
-  - libHN (4.1.0)
-  - PromiseKit (4.5.2):
-    - PromiseKit/Foundation (= 4.5.2)
-    - PromiseKit/QuartzCore (= 4.5.2)
-    - PromiseKit/UIKit (= 4.5.2)
-  - PromiseKit/CorePromise (4.5.2)
-  - PromiseKit/Foundation (4.5.2):
-    - PromiseKit/CorePromise
-  - PromiseKit/QuartzCore (4.5.2):
-    - PromiseKit/CorePromise
-  - PromiseKit/UIKit (4.5.2):
-    - PromiseKit/CorePromise
-  - SkeletonView (1.1.1)
+  - HNScraper (0.2.2)
+  - Kingfisher (5.1.1)
+  - Loaf (0.3.0)
+  - PromiseKit/CorePromise (6.8.3)
+  - SkeletonView (1.4.1)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
+  - HNScraper (from `https://github.com/weiran/HNScraper.git`)
   - Kingfisher
-  - libHN (from `https://github.com/weiran/libHN`, commit `6759f4ac591f5f36b01158260627ba0bf36eddc1`)
-  - PromiseKit (~> 4.x)
+  - Loaf
+  - PromiseKit/CorePromise
   - SkeletonView
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - DZNEmptyDataSet
     - Kingfisher
+    - Loaf
     - PromiseKit
     - SkeletonView
 
 EXTERNAL SOURCES:
-  libHN:
-    :commit: 6759f4ac591f5f36b01158260627ba0bf36eddc1
-    :git: https://github.com/weiran/libHN
+  HNScraper:
+    :git: https://github.com/weiran/HNScraper.git
 
 CHECKOUT OPTIONS:
-  libHN:
-    :commit: 6759f4ac591f5f36b01158260627ba0bf36eddc1
-    :git: https://github.com/weiran/libHN
+  HNScraper:
+    :commit: 54b3e0f1b3ced275d6558f6d0a801d60a120cc66
+    :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  Kingfisher: 868c1149679a7ab6869be118faa9b5aed154aaf0
-  libHN: fe671e9d39466235239b793f1f0181baadb327b2
-  PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
-  SkeletonView: 041053e904504e7d8db83df166e599be75659fe1
+  HNScraper: 89d135811bc8b9088adbb677c0bbc6cf8ed85cc0
+  Kingfisher: 2558186963e5be42d98c5b110ccb3130148b77e4
+  Loaf: 081b392fbe142da036377ebd988831596b89cf98
+  PromiseKit: 94c6e781838c5bf4717677d0d882b0e7250c80fc
+  SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
 
-PODFILE CHECKSUM: 64e06282b3a5267d2aa358b7ada53d724a10782f
+PODFILE CHECKSUM: 811b5917d51ca0ca801a5d52951ba192892403ee
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.1

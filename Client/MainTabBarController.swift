@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import libHN
+import HNScraper
 
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
@@ -33,18 +33,18 @@ class MainTabBarController: UITabBarController {
         tabBar.clipsToBounds = true
     }
     
-    private func tabItems(for index: Int) -> (PostFilterType, String, String) {
-        var postType = PostFilterType.top
+    private func tabItems(for index: Int) -> (HNScraper.PostListPageName, String, String) {
+        var postType = HNScraper.PostListPageName.news
         var typeName = "Top"
         var iconName = "TopIcon"
         
         switch index {
         case 0:
-            postType = .top
+            postType = .news
             typeName = "Top"
             iconName = "TopIcon"
         case 1:
-            postType = .ask
+            postType = .asks
             typeName = "Ask"
             iconName = "AskIcon"
             break

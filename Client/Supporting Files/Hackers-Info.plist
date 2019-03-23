@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.5.4</string>
+	<string>3.6.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>48</string>
+	<string>51</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -50,5 +50,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>com.weiranzhang.Hackers.comments</string>
+        <string>com.weiranzhang.Hackers.link</string>
+    </array>
 </dict>
 </plist>
