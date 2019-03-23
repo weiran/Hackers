@@ -10,3 +10,7 @@ target 'Hackers' do
   pod 'Kingfisher'
   pod 'Loaf'
 end
+
+target 'HackersUITests' do
+  pod 'DeviceKit'
+end
