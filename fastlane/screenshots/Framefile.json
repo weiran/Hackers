@@ -7,7 +7,8 @@
         },
         "background": "./assets/background.png",
         "padding": 50,
-        "font_scale_factor": 0.06
+        "font_scale_factor": 0.06,
+        "frame": "BLACK"
     },
     "data": [
         {
