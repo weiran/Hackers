@@ -22,7 +22,7 @@ scheme("Hackers")
 output_directory("./fastlane/screenshots")
 
 # remove the '#' to clear all previously generated screenshots before creating new ones
-clear_previous_screenshots(true)
+# clear_previous_screenshots(true)
 
 # workspace "../Hackers.xcworkspace"
 
