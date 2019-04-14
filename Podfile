@@ -9,6 +9,7 @@ target 'Hackers' do
   pod 'SkeletonView'
   pod 'Kingfisher'
   pod 'Loaf'
+  pod 'SwipeCellKit'
 end
 
 target 'HackersUITests' do

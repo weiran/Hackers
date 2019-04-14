@@ -6,6 +6,7 @@ PODS:
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
   - SkeletonView (1.4.2)
+  - SwipeCellKit (2.6.0)
 
 DEPENDENCIES:
   - DeviceKit
@@ -15,6 +16,7 @@ DEPENDENCIES:
   - Loaf
   - PromiseKit/CorePromise
   - SkeletonView
+  - SwipeCellKit
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -24,6 +26,7 @@ SPEC REPOS:
     - Loaf
     - PromiseKit
     - SkeletonView
+    - SwipeCellKit
 
 EXTERNAL SOURCES:
   HNScraper:
@@ -42,7 +45,8 @@ SPEC CHECKSUMS:
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
   SkeletonView: c2523c3c8c6510e273e49a3bf364a434744c3914
+  SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
-PODFILE CHECKSUM: ad777a732587db27519eedbf1c6df755d4636425
+PODFILE CHECKSUM: d047a1df44c57ee7b8dbbae5fd6f16a1ae9e9d6d
 
 COCOAPODS: 1.6.1
