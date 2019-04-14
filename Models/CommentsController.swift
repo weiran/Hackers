@@ -10,9 +10,9 @@ import Foundation
 import UIKit
 
 class CommentsController {
-    var comments: [CommentModel]
+    public var comments: [CommentModel]
     
-    var visibleComments: [CommentModel] {
+    public var visibleComments: [CommentModel] {
         get {
             return comments.filter { $0.visibility != CommentVisibilityType.hidden }
         }
@@ -26,7 +26,7 @@ class CommentsController {
         comments = source
     }
     
-    func toggleCommentChildrenVisibility(_ comment: CommentModel) -> ([IndexPath], CommentVisibilityType) {
+    public func toggleChildrenVisibility(of comment: CommentModel) -> ([IndexPath], CommentVisibilityType) {
         let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
@@ -52,14 +52,14 @@ class CommentsController {
         return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
     
-    func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
+    private func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
         for (index, value) in source.enumerated() {
             if comment.commentID == value.commentID { return index }
         }
         return nil
     }
     
-    func countChildren(_ comment: CommentModel) -> Int {
+    private func countChildren(_ comment: CommentModel) -> Int {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
         

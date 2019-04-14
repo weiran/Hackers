@@ -181,7 +181,7 @@ extension CommentsViewController: CommentDelegate {
     func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
-        let (modifiedIndexPaths, visibility) = commentsController.toggleCommentChildrenVisibility(comment)
+        let (modifiedIndexPaths, visibility) = commentsController.toggleChildrenVisibility(of: comment)
 
         var scrollToCell = false
         let cellRectInTableView = tableView.rectForRow(at: indexPath)
