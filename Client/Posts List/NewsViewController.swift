@@ -46,7 +46,10 @@ class NewsViewController : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        rz_smoothlyDeselectRows(tableView: tableView)
+        // when the cell is still visible, no need to deselect it
+        if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
+            rz_smoothlyDeselectRows(tableView: tableView)
+        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
