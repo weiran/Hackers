@@ -12,6 +12,7 @@ import SafariServices
 import DZNEmptyDataSet
 import SkeletonView
 import HNScraper
+import SwipeCellKit
 
 class CommentsViewController : UIViewController {
     private enum ActivityType {
@@ -144,6 +145,7 @@ extension CommentsViewController: UITableViewDataSource {
         
         cell.updateCommentContent(with: comment)
         cell.commentDelegate = self
+        cell.delegate = self
         
         return cell
     }
@@ -155,6 +157,41 @@ extension CommentsViewController: UITableViewDelegate {
         return view
     }
 }
+
+extension CommentsViewController: SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .right else { return nil }
+        
+        let collapseAction = SwipeAction(style: .default, title: "Collapse") { action, indexPath in
+            let comment = self.commentsController.visibleComments[indexPath.row]
+            guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
+            self.toggleCellVisibilityForCell(IndexPath(row: index, section: 0))
+        }
+        collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
+        collapseAction.textColor = .white
+        
+        let iconImage = UIImage(named: "UpIcon")!.imageWithColor(color: .white)
+        collapseAction.image = iconImage
+        
+        return [collapseAction]
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
+                                                 elasticOverscroll: true,
+                                                 completionAnimation: .bounce)
+        
+        var options = SwipeOptions()
+        options.expansionStyle = expansionStyle
+        options.transitionStyle = .drag
+        return options
+    }
+
+    func visibleRect(for tableView: UITableView) -> CGRect? {
+        return tableView.safeAreaLayoutGuide.layoutFrame
+    }
+}
+
 
 extension CommentsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {

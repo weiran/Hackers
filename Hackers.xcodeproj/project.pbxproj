@@ -11,6 +11,7 @@
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241E8DA91944AF870004F457 /* CommentModel.swift */; };
 		242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */; };
+		242A90A422635B8C008E7910 /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A90A322635B8C008E7910 /* UIImage+Extensions.swift */; };
 		243271951F95EDA9008196DB /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243271941F95EDA9008196DB /* StringExtensions.swift */; };
 		24448F891FE7DFB800F85A28 /* ThumbnailFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24448F881FE7DFB800F85A28 /* ThumbnailFetcher.swift */; };
 		245345EF22466EA8001AF1CE /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345EE22466EA8001AF1CE /* HackersUITests.swift */; };
@@ -70,6 +71,7 @@
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		241E8DA91944AF870004F457 /* CommentModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
 		242A00D21D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewControllerSmoothlyDeselectCellExtension.swift; sourceTree = "<group>"; };
+		242A90A322635B8C008E7910 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
 		243271941F95EDA9008196DB /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		24448F881FE7DFB800F85A28 /* ThumbnailFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailFetcher.swift; sourceTree = "<group>"; };
 		245345EC22466EA8001AF1CE /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -193,6 +195,7 @@
 				2464D210209DE7B100C7F8FC /* UIColor+Extensions.swift */,
 				2464D220209E2CDF00C7F8FC /* ThemedSafariViewController.swift */,
 				24628BAC21E6897700BDEEF9 /* AppFont.swift */,
+				242A90A322635B8C008E7910 /* UIImage+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -594,6 +597,7 @@
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 				24448F891FE7DFB800F85A28 /* ThumbnailFetcher.swift in Sources */,
 				2464D206209DD27A00C7F8FC /* Theming.swift in Sources */,
+				242A90A422635B8C008E7910 /* UIImage+Extensions.swift in Sources */,
 				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
 			);

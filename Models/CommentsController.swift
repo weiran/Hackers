@@ -52,6 +52,18 @@ class CommentsController {
         return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
     
+    public func indexOfVisibleRootComment(of comment: CommentModel) -> Int? {
+        guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
+        
+        for i in (0...commentIndex).reversed() {
+            if visibleComments[i].level == 0 {
+                return i
+            }
+        }
+        
+        return nil
+    }
+    
     private func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
         for (index, value) in source.enumerated() {
             if comment.commentID == value.commentID { return index }
