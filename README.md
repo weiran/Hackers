@@ -11,7 +11,7 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 * Full iPad multitasking support
 * Safari View Controller
 
-<img src="https://github.com/weiran/Hackers/raw/master/Screenshots/iPhoneX_Ultimate_framed.png" width="350">
+<img src="https://is5-ssl.mzstatic.com/image/thumb/Purple115/v4/14/98/59/149859fe-f4e3-0a12-d7fb-2d3383efdf45/mzl.ebnguksi.png/460x0w.jpg" width="350">
 
 ## Open Source
 
