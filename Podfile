@@ -11,6 +11,10 @@ target 'Hackers' do
   pod 'Loaf'
 end
 
+target 'HackersUITests' do
+  pod 'DeviceKit'
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|

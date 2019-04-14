@@ -3,16 +3,18 @@
     "default": {
         "title": {
             "color": "#FFFFFF",
-            "font": "./SF-Pro-Display-Bold.otf"
+            "font": "./assets/SF-Pro-Display-Bold.otf"
         },
-        "background": "./background.png",
-        "padding": 50
+        "background": "./assets/background.png",
+        "padding": 50,
+        "font_scale_factor": 0.06,
+        "frame": "BLACK"
     },
     "data": [
         {
             "filter": "Ultimate",
             "title": {
-                "text": "The ultimate Hacker News experience"
+                "text": "The ultimate Hacker News app"
             }
         },
         {
