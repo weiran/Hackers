@@ -11,6 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
+        if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
+            ReviewController.disablePrompts = true
+        }
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
         setAppTheme()

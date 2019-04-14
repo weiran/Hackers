@@ -15,7 +15,10 @@ class HackersUITests: XCTestCase {
     func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
         setupSnapshot(app)
-        app.launchArguments = ["-Theme", darkTheme ? "dark" : "light"]
+        app.launchArguments = [
+            "-Theme", darkTheme ? "dark" : "light",
+            "disableReviewPrompts"
+        ]
         app.launch()
     }
 
@@ -27,8 +30,9 @@ class HackersUITests: XCTestCase {
         
         if self.device.isPad {
             tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
-            tablesQuery.cells.element(boundBy: 1).tap()
+            let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
+            XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
+            commentsTablesQuery.element(boundBy: 1).tap()
         }
         
         snapshot("Ultimate")
@@ -43,7 +47,7 @@ class HackersUITests: XCTestCase {
         
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
-        tablesQuery.cells.firstMatch.tap()
+        tablesQuery.cells.element(boundBy: 1).tap()
         
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         tablesQuery.cells.element(boundBy: 1).tap()
@@ -59,8 +63,9 @@ class HackersUITests: XCTestCase {
         
         if self.device.isPad {
             tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
-            tablesQuery.cells.element(boundBy: 1).tap()
+            let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
+            XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
+            commentsTablesQuery.element(boundBy: 1).tap()
         }
         
         snapshot("Dark")
