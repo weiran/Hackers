@@ -143,7 +143,7 @@ extension CommentsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
         cell.updateCommentContent(with: comment)
-        cell.delegate = self
+        cell.commentDelegate = self
         
         return cell
     }

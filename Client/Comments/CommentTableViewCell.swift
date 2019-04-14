@@ -8,10 +8,10 @@
 
 import Foundation
 import UIKit
+import SwipeCellKit
 
-
-class CommentTableViewCell : UITableViewCell {
-    var delegate: CommentDelegate?
+class CommentTableViewCell : SwipeTableViewCell {
+    var commentDelegate: CommentDelegate?
     
     var level: Int = 0 {
         didSet { updateIndentPadding() }
@@ -37,7 +37,7 @@ class CommentTableViewCell : UITableViewCell {
     }
     
     @objc func cellTapped() {
-        delegate?.commentTapped(self)
+        commentDelegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }
     
@@ -73,8 +73,8 @@ class CommentTableViewCell : UITableViewCell {
 
 extension CommentTableViewCell: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
-        if let delegate = delegate {
-            delegate.linkTapped(URL, sender: textView)
+        if let commentDelegate = commentDelegate {
+            commentDelegate.linkTapped(URL, sender: textView)
             return false
         }
         return true
