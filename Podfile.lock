@@ -2,7 +2,7 @@ PODS:
   - DeviceKit (1.11.0)
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
-  - Kingfisher (5.1.1)
+  - Kingfisher (5.3.1)
   - Loaf (0.3.0)
   - PromiseKit/CorePromise (6.8.3)
   - SkeletonView (1.4.1)
@@ -38,7 +38,7 @@ SPEC CHECKSUMS:
   DeviceKit: a3a86f8dddbe1317a9a243cdf9646858bf135dce
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: 89d135811bc8b9088adbb677c0bbc6cf8ed85cc0
-  Kingfisher: 2558186963e5be42d98c5b110ccb3130148b77e4
+  Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
   Loaf: 081b392fbe142da036377ebd988831596b89cf98
   PromiseKit: 94c6e781838c5bf4717677d0d882b0e7250c80fc
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475

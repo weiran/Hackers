@@ -5,14 +5,14 @@ devices([
   "iPhone 8",
   "iPhone 8 Plus",
   "iPhone SE",
-  "iPhone XS",
-  "iPhone XS Max",
-  "iPhone XR",
+  "iPhone Xs",
+  "iPhone Xs Max",
+  "iPhone Xʀ",
   "iPad Pro (9.7-inch)",
-#  "iPad Pro (11-inch)",
+  "iPad Pro (11-inch)",
   "iPad Pro (10.5-inch)",
   "iPad Pro (12.9-inch) (2nd generation)",
-#  "iPad Pro (12.9-inch) (3rd generation)"
+  "iPad Pro (12.9-inch) (3rd generation)"
 ])
 
 # The name of the scheme which contains the UI Tests
