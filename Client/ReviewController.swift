@@ -9,20 +9,22 @@
 import StoreKit
 
 class ReviewController {
+    public static var disablePrompts = false
+    
     private static let showPromptIncrements = [5, 10, 15]
     private static let LaunchCounter = "Launch Counter"
     
-    static func incrementLaunchCounter() {
+    public static func incrementLaunchCounter() {
         let counter = launchCounter()
         UserDefaults.standard.set(counter + 1, forKey: LaunchCounter)
     }
     
-    static func launchCounter() -> Int {
+    public static func launchCounter() -> Int {
         return UserDefaults.standard.integer(forKey: LaunchCounter)
     }
     
-    static func requestReview() {
-        if showPromptIncrements.contains(launchCounter()) {
+    public static func requestReview() {
+        if showPromptIncrements.contains(launchCounter()) && self.disablePrompts == false {
             SKStoreReviewController.requestReview()
         }
     }

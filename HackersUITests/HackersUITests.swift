@@ -15,7 +15,10 @@ class HackersUITests: XCTestCase {
     func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
         setupSnapshot(app)
-        app.launchArguments = ["-Theme", darkTheme ? "dark" : "light"]
+        app.launchArguments = [
+            "-Theme", darkTheme ? "dark" : "light",
+            "disableReviewPrompts"
+        ]
         app.launch()
     }
 
