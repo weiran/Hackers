@@ -43,13 +43,6 @@ final class AppThemeProvider: ThemeProvider {
     func subscribeToChanges(_ object: AnyObject, handler: @escaping (AppTheme) -> Void) {
         theme.subscribe(object, using: handler)
     }
-    
-    func nextTheme() {
-        guard let nextTheme = availableThemes.rotate() else {
-            return
-        }
-        currentTheme = nextTheme
-    }
 }
 
 extension Themed where Self: AnyObject {

@@ -17,13 +17,17 @@ class SettingsViewController: UITableViewController {
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
     }
     
-    @IBAction func darkModeValueChanged(_ sender: UISwitch) {
+    @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
     }
     
-    @IBAction func didPressDone(_ sender: Any) {
+    @IBAction private func didPressDone(_ sender: Any) {
         dismiss(animated: true)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        // override with empty implementation to prevent the extension running which reloads tableview data
     }
 }
 

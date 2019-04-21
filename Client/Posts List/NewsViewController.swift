@@ -10,109 +10,35 @@ import Foundation
 import UIKit
 import SafariServices
 import PromiseKit
-import SkeletonView
 import Kingfisher
 import HNScraper
 import Loaf
 
-class NewsViewController : UIViewController {
-    @IBOutlet weak var tableView: UITableView!
-    private var refreshControl: UIRefreshControl!
+class NewsViewController : UITableViewController {
+    public var hackerNewsService: HackerNewsService?
     
-    var posts: [HNPost] = [HNPost]()
-    var postType: HNScraper.PostListPageName! = .news
+    private var posts: [HNPost]?
+    public var postType: HNScraper.PostListPageName! = .news
     
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         registerForPreviewing(with: self, sourceView: tableView)
-
-        refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(NewsViewController.loadPosts), for: UIControl.Event.valueChanged)
-        tableView.refreshControl = refreshControl
-        
+        self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
+        self.tableView.emptyDataSetSource = self
+        self.tableView.emptyDataSetDelegate = self
+        self.tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         setupTheming()
-        
-        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadPosts()
-    }
-    
-    @IBAction func changeTheme(_ sender: Any) {
-        AppThemeProvider.shared.nextTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // when the cell is still visible, no need to deselect it
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
-            rz_smoothlyDeselectRows(tableView: tableView)
-        }
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        DispatchQueue.global().async(execute: {
-            DispatchQueue.main.sync {
-                self.viewDidRotate()
-            }
-        })
-    }
-
-    func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = ThemedSafariViewController(url: url)
-        safariViewController.previewActionItemsDelegate = self
-        return safariViewController
-    }
-    
-    public func viewDidRotate() {
-        guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
-        self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: indexPaths, with: .automatic)
-        self.tableView.endUpdates()
-    }
-}
-
-extension NewsViewController { // post fetching
-    @objc func loadPosts() {
-        // fetch new posts
-        fetch().map { params in
-            let (posts, nextPageIdentifier) = params
-            self.posts = posts ?? [HNPost]()
-            self.nextPageIdentifier = nextPageIdentifier
-            self.view.hideSkeleton()
-            self.tableView.rowHeight = UITableView.automaticDimension
-            self.tableView.estimatedRowHeight = UITableView.automaticDimension
-            self.tableView.reloadData()
-        }.ensure {
-            self.view.hideSkeleton()
-            self.tableView.refreshControl?.endRefreshing()
-        }.catch { _ in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-        }
-    }
-    
-    func fetch() -> Promise<([HNPost]?, String?)> {
-        let (promise, seal) = Promise<([HNPost]?, String?)>.pending()
-        HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
-            if let error = error {
-                seal.reject(error)
-            } else {
-                seal.fulfill((posts, nextPageIdentifier))
-            }
-        })
-
-        return promise
-    }
-    
-    func loadMorePosts() {
-        guard let nextPageIdentifier = nextPageIdentifier else { return }
-        self.nextPageIdentifier = nil
-        HNScraper.shared.getMoreItems(linkForMore: nextPageIdentifier) { (posts, nextPageIdentifier, error) in
-            self.nextPageIdentifier = nextPageIdentifier
-            self.posts.append(contentsOf: posts)
-            self.tableView.reloadData()
+            self.smoothlyDeselectRows()
         }
     }
     
@@ -121,36 +47,64 @@ extension NewsViewController { // post fetching
             if let indexPath = tableView.indexPathForSelectedRow,
                 let segueNavigationController = segue.destination as? UINavigationController,
                 let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
-        
-                let post = posts[indexPath.row]
+                let post = posts?[indexPath.row]
                 commentsViewController.post = post
             }
         }
     }
 }
 
-extension NewsViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts.count
+extension NewsViewController { // post fetching
+    @objc private func loadPosts() {
+        hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
+            self.posts = posts ?? [HNPost]()
+            self.nextPageIdentifier = nextPageIdentifier
+            self.tableView.reloadData()
+        }.ensure {
+            self.tableView.refreshControl?.endRefreshing()
+        }.catch { _ in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    private func loadMorePosts() {
+        guard let nextPageIdentifier = nextPageIdentifier else { return }
+        self.nextPageIdentifier = nil
+        
+        firstly {
+            hackerNewsService!.getPosts(of: self.postType, nextPageIdentifier: nextPageIdentifier)
+        }.done { (posts, nextPageIdentifier) in
+            if let posts = posts {
+                self.posts?.append(contentsOf: posts)
+            }
+            self.nextPageIdentifier = nextPageIdentifier
+            self.tableView.reloadData()
+        }.catch { error in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }
+    }
+}
+
+extension NewsViewController {
+    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return posts?.count ?? 0
+    }
+    
+    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
         cell.clearImage()
         
-        let post = posts[indexPath.row]
+        let post = posts?[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        cell.thumbnailImageView.setImageWithPlaceholder(url: post.url, resizeToSize: 60)
+        cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url, resizeToSize: 60)
         
         return cell
     }
-}
-
-extension NewsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == posts.count - 5 {
+    
+    override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
     }
@@ -158,22 +112,20 @@ extension NewsViewController: UITableViewDelegate {
 
 extension NewsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        refreshControl.tintColor = theme.appTintColor
-    }
-}
-
-extension NewsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return "SkeletonCell"
+        self.view.backgroundColor = theme.backgroundColor
+        self.tableView.backgroundColor = theme.backgroundColor
+        self.tableView.separatorColor = theme.separatorColor
+        self.tableView.refreshControl?.tintColor = theme.appTintColor
     }
 }
 
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        guard let indexPath = tableView.indexPathForRow(at: location), posts.count > indexPath.row else { return nil }
+        guard let posts = posts,
+            let indexPath = tableView.indexPathForRow(at: location),
+            posts.count > indexPath.row else {
+                return nil
+        }
         let post = posts[indexPath.row]
         if let url = post.url, verifyLink(post.url) {
             peekedIndexPath = indexPath
@@ -188,8 +140,10 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
     
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem] {
-        let indexPath = self.peekedIndexPath!
-        let post = posts[indexPath.row]
+        guard let indexPath = self.peekedIndexPath, let post = posts?[indexPath.row] else {
+            return [UIPreviewActionItem]()
+        }
+        
         let commentsPreviewActionTitle = post.commentCount > 0 ? "View \(post.commentCount) comments" : "View comments"
         
         let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
@@ -199,27 +153,44 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         }
         return [viewCommentsPreviewAction]
     }
+    
+    private func getSafariViewController(_ url: URL) -> SFSafariViewController {
+        let safariViewController = SFSafariViewController(url: url)
+        safariViewController.previewActionItemsDelegate = self
+        return safariViewController
+    }
 }
 
-extension NewsViewController: PostTitleViewDelegate {
+extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
     func didPressLinkButton(_ post: HNPost) {
         guard verifyLink(post.url), let url = post.url else { return }
         self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
     }
     
-    func verifyLink(_ url: URL?) -> Bool {
+    private func verifyLink(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
-}
-
-extension NewsViewController: PostCellDelegate {
+    
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point) {
-            let post = posts[indexPath.row]
+        if let indexPath = tableView.indexPathForRow(at: point), let post = posts?[indexPath.row] {
             didPressLinkButton(post)
         }
+    }
+}
+
+extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
+        return posts == nil ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "No posts", attributes: attributes)
+    }
+    
+    func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
+        guard posts == nil else { return nil }
+        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        activityIndicatorView.startAnimating()
+        return activityIndicatorView
     }
 }

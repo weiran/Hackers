@@ -50,3 +50,17 @@ extension SFSafariViewController {
 public protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
+
+// Theming
+extension SFSafariViewController: Themed {
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        setupTheming()
+    }
+    
+    func applyTheme(_ theme: AppTheme) {
+        preferredBarTintColor = theme.barBackgroundColor
+        preferredControlTintColor = theme.appTintColor
+        view.backgroundColor = theme.backgroundColor
+    }
+}

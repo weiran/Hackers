@@ -5,17 +5,20 @@ PODS:
   - Kingfisher (5.3.1)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
-  - SkeletonView (1.4.2)
+  - Swinject (2.6.0)
+  - SwinjectStoryboard (2.2.0):
+    - Swinject (~> 2.6)
   - SwipeCellKit (2.6.0)
 
 DEPENDENCIES:
   - DeviceKit
   - DZNEmptyDataSet
-  - HNScraper (from `https://github.com/weiran/HNScraper.git`)
+  - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
   - Kingfisher
   - Loaf
   - PromiseKit/CorePromise
-  - SkeletonView
+  - Swinject
+  - SwinjectStoryboard
   - SwipeCellKit
 
 SPEC REPOS:
@@ -25,28 +28,31 @@ SPEC REPOS:
     - Kingfisher
     - Loaf
     - PromiseKit
-    - SkeletonView
+    - Swinject
+    - SwinjectStoryboard
     - SwipeCellKit
 
 EXTERNAL SOURCES:
   HNScraper:
+    :branch: master
     :git: https://github.com/weiran/HNScraper.git
 
 CHECKOUT OPTIONS:
   HNScraper:
-    :commit: 54b3e0f1b3ced275d6558f6d0a801d60a120cc66
+    :commit: 855eb637922e59701596d0cdb55a1f04603d67c1
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
   DeviceKit: a3a86f8dddbe1317a9a243cdf9646858bf135dce
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  HNScraper: 89d135811bc8b9088adbb677c0bbc6cf8ed85cc0
+  HNScraper: 6b8bb52adcaf0d39c4efe49e7440e55253f48674
   Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
-  SkeletonView: c2523c3c8c6510e273e49a3bf364a434744c3914
+  Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
+  SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
-PODFILE CHECKSUM: d047a1df44c57ee7b8dbbae5fd6f16a1ae9e9d6d
+PODFILE CHECKSUM: 8d6d1f1f8b770a76ddb05235e57df829772a90ab
 
 COCOAPODS: 1.6.1

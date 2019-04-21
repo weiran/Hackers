@@ -10,46 +10,43 @@ import Foundation
 import UIKit
 import SafariServices
 import DZNEmptyDataSet
-import SkeletonView
 import HNScraper
 import SwipeCellKit
+import PromiseKit
+import Loaf
 
-class CommentsViewController : UIViewController {
+class CommentsViewController : UITableViewController {
+    public var hackerNewsService: HackerNewsService?
+    
     private enum ActivityType {
         case comments
         case link(url: URL)
     }
 
-    var post: HNPost?
+    public var post: HNPost?
     
-    var comments: [CommentModel]? {
+    private var comments: [CommentModel]? {
         didSet { commentsController.comments = comments! }
     }
     
-    let commentsController = CommentsController()
+    private let commentsController = CommentsController()
     
-    @IBOutlet var tableView: UITableView!
-    
-    @IBOutlet weak var postTitleContainerView: UIView!
-    @IBOutlet weak var postTitleView: PostTitleView!
-    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak private var postTitleContainerView: UIView!
+    @IBOutlet weak private var postTitleView: PostTitleView!
+    @IBOutlet weak private var thumbnailImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
+        self.tableView.emptyDataSetSource = self
+        self.tableView.emptyDataSetDelegate = self
         loadComments()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupHandoff(with: post, activityType: .comments)
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        navigationItem.largeTitleDisplayMode = .never
     }
     
     deinit {
@@ -73,13 +70,16 @@ class CommentsViewController : UIViewController {
         }
     }
     
-    func loadComments() {
-        HNScraper.shared.getComments(ForPost: post!, buildHierarchy: false, offsetComments: false) { (post, comments, error) in
-            self.view.hideSkeleton()
-            self.tableView.rowHeight = UITableView.automaticDimension
-            let mappedComments = comments.map { CommentModel(source: $0) }
-            self.comments = mappedComments
+    private func loadComments() {
+        firstly {
+            self.hackerNewsService!.getComments(of: self.post!)
+        }.done { comments in
+            self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
+        }.ensure {
+            // something
+        }.catch { error in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
 
@@ -88,7 +88,7 @@ class CommentsViewController : UIViewController {
         super.updateUserActivityState(activity)
     }
     
-    func setupPostTitleView() {
+    private func setupPostTitleView() {
         guard let post = post else { return }
         
         postTitleView.post = post
@@ -97,11 +97,11 @@ class CommentsViewController : UIViewController {
         thumbnailImageView.setImageWithPlaceholder(url: post.url, resizeToSize: 60)
     }
     
-    @IBAction func didTapThumbnail(_ sender: Any) {
+    @IBAction private func didTapThumbnail(_ sender: Any) {
         didPressLinkButton(post!)
     }
     
-    @IBAction func shareTapped(_ sender: AnyObject) {
+    @IBAction private func shareTapped(_ sender: AnyObject) {
         guard let post = post, let url = post.url else { return }
         let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
@@ -119,24 +119,24 @@ extension CommentsViewController: PostTitleViewDelegate {
             })
             
             // show link
-            let safariViewController = ThemedSafariViewController(url: url)
+            let safariViewController = SFSafariViewController(url: url)
             setupHandoff(with: post, activityType: .link(url: url))
             self.present(safariViewController, animated: true, completion: nil)
         }
     }
     
-    func verifyLink(_ url: URL?) -> Bool {
+    private func verifyLink(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
 }
 
-extension CommentsViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension CommentsViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.visibleComments.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let comment = commentsController.visibleComments[indexPath.row]
         assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
@@ -148,13 +148,6 @@ extension CommentsViewController: UITableViewDataSource {
         cell.delegate = self
         
         return cell
-    }
-}
-
-extension CommentsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
-        return view
     }
 }
 
@@ -170,17 +163,14 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
         collapseAction.textColor = .white
         
-        let iconImage = UIImage(named: "UpIcon")!.imageWithColor(color: .white)
+        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
         collapseAction.image = iconImage
         
         return [collapseAction]
     }
     
     func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
-        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
-                                                 elasticOverscroll: true,
-                                                 completionAnimation: .bounce)
-        
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
         options.transitionStyle = .drag
@@ -191,7 +181,6 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         return tableView.safeAreaLayoutGuide.layoutFrame
     }
 }
-
 
 extension CommentsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
@@ -210,12 +199,12 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = ThemedSafariViewController(url: URL)
+        let safariViewController = SFSafariViewController(url: URL)
         setupHandoff(with: post, activityType: .link(url: URL))
         self.present(safariViewController, animated: true, completion: nil)
     }
     
-    func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
+    private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
         let (modifiedIndexPaths, visibility) = commentsController.toggleChildrenVisibility(of: comment)
@@ -247,16 +236,16 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
         let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
     }
-}
-
-extension CommentsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return "SkeletonCell"
+    
+    func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
+        guard comments == nil else { return nil }
+        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        activityIndicatorView.startAnimating()
+        return activityIndicatorView
     }
 }
 
 // MARK: - Handoff
-
 extension CommentsViewController {
     private func setupHandoff(with post: HNPost?, activityType: ActivityType) {
         guard let post = post else {

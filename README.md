@@ -45,10 +45,11 @@ I use several open source projects in Hackers, in no particular order:
 
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
 * [HNScraper](https://github.com/tsucres/HNScraper) by [Stéphane Sercu](https://github.com/tsucres)
-* [SkeletonView](https://github.com/Juanpe/SkeletonView) by [Juanpe Catalán](https://github.com/Juanpe)
 * [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl)
 * [Kingfisher](https://github.com/onevcat/Kingfisher) by [Wei Wang](https://github.com/onevcat)
 * [Loaf](https://github.com/schmidyy/Loaf) by [Mat Schmid](https://github.com/schmidyy)
+* [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
+* [Swinject](https://github.com/Swinject/Swinject)
 
 ---
 <p align="center">

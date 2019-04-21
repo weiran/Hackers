@@ -13,11 +13,11 @@ import SwipeCellKit
 class CommentTableViewCell : SwipeTableViewCell {
     var commentDelegate: CommentDelegate?
     
-    var level: Int = 0 {
+    private var level: Int = 0 {
         didSet { updateIndentPadding() }
     }
     
-    var comment: CommentModel? {
+    private var comment: CommentModel? {
         didSet {
             guard let comment = comment else { return }
             updateCommentContent(with: comment)
@@ -36,18 +36,18 @@ class CommentTableViewCell : SwipeTableViewCell {
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
     }
     
-    @objc func cellTapped() {
+    @objc private func cellTapped() {
         commentDelegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }
     
-    func updateIndentPadding() {
+    private func updateIndentPadding() {
         let levelIndent = 15
         let padding = CGFloat(levelIndent * (level + 1))
         leftPaddingConstraint.constant = padding
     }
     
-    func updateCommentContent(with comment: CommentModel) {
+    public func updateCommentContent(with comment: CommentModel) {
         let isCollapsed = comment.visibility != .visible
         level = comment.level
         authorLabel.text = comment.authorUsername
@@ -92,11 +92,11 @@ extension CommentTableViewCell {
         highlighted ? setSelectedBackground() : setUnselectedBackground()
     }
     
-    func setSelectedBackground() {
+    private func setSelectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
     }
     
-    func setUnselectedBackground() {
+    private func setUnselectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }
 }

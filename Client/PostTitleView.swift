@@ -17,11 +17,11 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var metadataLabel: UILabel!
     
-    var isTitleTapEnabled = false
+    public var isTitleTapEnabled = false
     
-    var delegate: PostTitleViewDelegate?
+    public var delegate: PostTitleViewDelegate?
     
-    var post: HNPost? {
+    public var post: HNPost? {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
@@ -29,7 +29,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    override func layoutSubviews() {
+    override open func layoutSubviews() {
         super.layoutSubviews()
         setupTheming()
         
@@ -37,7 +37,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
     }
     
-    @objc func didPressTitleText(_ sender: UITapGestureRecognizer) {
+    @objc private func didPressTitleText(_ sender: UITapGestureRecognizer) {
         if isTitleTapEnabled, let delegate = delegate {
             delegate.didPressLinkButton(post!)
         }

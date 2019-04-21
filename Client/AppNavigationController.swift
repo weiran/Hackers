@@ -17,7 +17,7 @@ class AppNavigationController: UINavigationController {
 }
 
 extension AppNavigationController: Themed {
-    func applyTheme(_ theme: AppTheme) {        
+    func applyTheme(_ theme: AppTheme) {
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
         let titleTextAttributes = [

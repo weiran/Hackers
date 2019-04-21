@@ -8,13 +8,13 @@
 
 import UIKit
 
-class AppFont {
-    static func commentUsernameFont(collapsed: Bool) -> UIFont {
+public class AppFont {
+    static public func commentUsernameFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .medium)
     }
     
-    static func commentDateFont(collapsed: Bool) -> UIFont {
+    static public func commentDateFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .regular)
     }
