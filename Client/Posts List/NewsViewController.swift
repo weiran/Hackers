@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 import SafariServices
 import PromiseKit
-import SkeletonView
 import Kingfisher
 import HNScraper
 import Loaf
@@ -59,7 +58,6 @@ extension NewsViewController { // post fetching
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
         }.ensure {
-            self.view.hideSkeleton()
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
