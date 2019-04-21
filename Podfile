@@ -10,6 +10,8 @@ target 'Hackers' do
   pod 'Kingfisher'
   pod 'Loaf'
   pod 'SwipeCellKit'
+  pod 'Swinject'
+  pod 'SwinjectStoryboard'
 end
 
 target 'HackersUITests' do
