@@ -29,7 +29,7 @@ class NewsViewController : UITableViewController {
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
         self.tableView.emptyDataSetSource = self
         self.tableView.emptyDataSetDelegate = self
-        self.tableView.tableFooterView = UIView() // remove cell separators on empty table
+        self.tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         setupTheming()
         loadPosts()
     }
