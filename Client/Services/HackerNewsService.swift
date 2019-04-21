@@ -40,4 +40,29 @@ class HackerNewsService {
         }
         return promise
     }
+    
+    public func login(username: String, password: String) -> Promise<(HNUser?, HTTPCookie?)> {
+        let (promise, seal) = Promise<(HNUser?, HTTPCookie?)>.pending()
+        HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill((user, cookie))
+            }
+        }
+        return promise
+    }
+    
+    public func upvote(post: HNPost) -> Promise<Void> {
+        let (promise, seal) = Promise<Void>.pending()
+        HNScraper.shared.upvote(Post: post) { error in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill(())
+            }
+        }
+        return promise
+
+    }
 }
