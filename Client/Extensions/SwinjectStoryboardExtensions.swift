@@ -17,6 +17,9 @@ extension SwinjectStoryboard {
         container.storyboardInitCompleted(CommentsViewController.self) { r, c in
             c.hackerNewsService = r.resolve(HackerNewsService.self)!
         }
+        container.storyboardInitCompleted(SettingsViewController.self) { r, c in
+            c.hackerNewsService = r.resolve(HackerNewsService.self)!
+        }
         container.register(HackerNewsService.self) { _ in HackerNewsService() }
             .inObjectScope(.container)
     }

@@ -42,6 +42,8 @@ class HackerNewsService {
     }
     
     public func login(username: String, password: String) -> Promise<(HNUser?, HTTPCookie?)> {
+        HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
+        
         let (promise, seal) = Promise<(HNUser?, HTTPCookie?)>.pending()
         HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
             if let error = error {
