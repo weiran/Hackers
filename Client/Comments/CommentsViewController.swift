@@ -39,8 +39,6 @@ class CommentsViewController : UITableViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        self.tableView.emptyDataSetSource = self
-        self.tableView.emptyDataSetDelegate = self
         loadComments()
     }
 

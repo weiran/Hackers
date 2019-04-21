@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Hacker News-->
+        <!--Empty Data Set Delegate-->
         <scene sceneID="Jh0-BO-yhM">
             <objects>
                 <tableViewController id="6t9-fC-JrD" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
@@ -100,6 +100,8 @@
                         <connections>
                             <outlet property="dataSource" destination="6t9-fC-JrD" id="elo-ui-hGm"/>
                             <outlet property="delegate" destination="6t9-fC-JrD" id="IoO-Tz-pXH"/>
+                            <outlet property="emptyDataSetDelegate" destination="6t9-fC-JrD" id="dcr-PL-cAY"/>
+                            <outlet property="emptyDataSetSource" destination="6t9-fC-JrD" id="cfW-Jd-tmf"/>
                         </connections>
                     </tableView>
                     <toolbarItems/>
@@ -210,7 +212,7 @@
             </objects>
             <point key="canvasLocation" x="-396" y="1397"/>
         </scene>
-        <!--Comments View Controller-->
+        <!--Empty Data Set Delegate-->
         <scene sceneID="xDu-IX-6YL">
             <objects>
                 <tableViewController id="evu-Yh-MGy" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
@@ -417,6 +419,8 @@
                         <connections>
                             <outlet property="dataSource" destination="evu-Yh-MGy" id="4V2-pz-xZ2"/>
                             <outlet property="delegate" destination="evu-Yh-MGy" id="qal-AS-qcf"/>
+                            <outlet property="emptyDataSetDelegate" destination="evu-Yh-MGy" id="Afw-uR-2qU"/>
+                            <outlet property="emptyDataSetSource" destination="evu-Yh-MGy" id="OUQ-SS-XTQ"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="LhP-dy-b8f">
