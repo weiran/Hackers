@@ -39,6 +39,8 @@ class CommentsViewController : UITableViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
+        self.tableView.emptyDataSetSource = self
+        self.tableView.emptyDataSetDelegate = self
         loadComments()
     }
 
@@ -180,7 +182,6 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
     }
 }
 
-
 extension CommentsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.backgroundColor
@@ -234,6 +235,13 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
         let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
         return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
+    }
+    
+    func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
+        guard comments == nil else { return nil }
+        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        activityIndicatorView.startAnimating()
+        return activityIndicatorView
     }
 }
 

@@ -17,7 +17,7 @@ import Loaf
 class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
     
-    private var posts: [HNPost] = [HNPost]()
+    private var posts: [HNPost]?
     public var postType: HNScraper.PostListPageName! = .news
     
     private var peekedIndexPath: IndexPath?
@@ -27,6 +27,9 @@ class NewsViewController : UITableViewController {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
+        self.tableView.emptyDataSetSource = self
+        self.tableView.emptyDataSetDelegate = self
+        self.tableView.tableFooterView = UIView() // remove cell separators on empty table
         setupTheming()
         loadPosts()
     }
@@ -44,7 +47,7 @@ class NewsViewController : UITableViewController {
             if let indexPath = tableView.indexPathForSelectedRow,
                 let segueNavigationController = segue.destination as? UINavigationController,
                 let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
-                let post = posts[indexPath.row]
+                let post = posts?[indexPath.row]
                 commentsViewController.post = post
             }
         }
@@ -72,7 +75,7 @@ extension NewsViewController { // post fetching
             hackerNewsService!.getPosts(of: self.postType, nextPageIdentifier: nextPageIdentifier)
         }.done { (posts, nextPageIdentifier) in
             if let posts = posts {
-                self.posts.append(contentsOf: posts)
+                self.posts?.append(contentsOf: posts)
             }
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
@@ -84,7 +87,7 @@ extension NewsViewController { // post fetching
 
 extension NewsViewController {
     override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts.count
+        return posts?.count ?? 0
     }
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -92,18 +95,16 @@ extension NewsViewController {
         cell.delegate = self
         cell.clearImage()
         
-        let post = posts[indexPath.row]
+        let post = posts?[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        cell.thumbnailImageView.setImageWithPlaceholder(url: post.url, resizeToSize: 60)
+        cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url, resizeToSize: 60)
         
         return cell
     }
-}
-
-extension NewsViewController {
+    
     override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == posts.count - 5 {
+        if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
     }
@@ -120,7 +121,11 @@ extension NewsViewController: Themed {
 
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-        guard let indexPath = tableView.indexPathForRow(at: location), posts.count > indexPath.row else { return nil }
+        guard let posts = posts,
+            let indexPath = tableView.indexPathForRow(at: location),
+            posts.count > indexPath.row else {
+                return nil
+        }
         let post = posts[indexPath.row]
         if let url = post.url, verifyLink(post.url) {
             peekedIndexPath = indexPath
@@ -135,8 +140,10 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
     
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem] {
-        let indexPath = self.peekedIndexPath!
-        let post = posts[indexPath.row]
+        guard let indexPath = self.peekedIndexPath, let post = posts?[indexPath.row] else {
+            return [UIPreviewActionItem]()
+        }
+        
         let commentsPreviewActionTitle = post.commentCount > 0 ? "View \(post.commentCount) comments" : "View comments"
         
         let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
@@ -168,9 +175,22 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point) {
-            let post = posts[indexPath.row]
+        if let indexPath = tableView.indexPathForRow(at: point), let post = posts?[indexPath.row] {
             didPressLinkButton(post)
         }
+    }
+}
+
+extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
+        return posts == nil ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "No posts", attributes: attributes)
+    }
+    
+    func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
+        guard posts == nil else { return nil }
+        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        activityIndicatorView.startAnimating()
+        return activityIndicatorView
     }
 }

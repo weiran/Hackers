@@ -24,7 +24,7 @@ struct AppTheme {
     var cellHighlightColor: UIColor
     var separatorColor: UIColor
     
-    var skeletonColor: UIColor
+    var activityIndicatorStyle: UIActivityIndicatorView.Style
 }
 
 extension AppTheme {
@@ -47,7 +47,7 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
         separatorColor: UIColor(rgb: 0xCACACA),
         
-        skeletonColor: UIColor(rgb: 0xAAAAAA)
+        activityIndicatorStyle: .gray
     )
     
     static let dark = AppTheme(
@@ -66,6 +66,6 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0x34363D),
         separatorColor: UIColor(rgb: 0x757575),
         
-        skeletonColor: UIColor(rgb: 0x555555)
+        activityIndicatorStyle: .white
     )
 }
