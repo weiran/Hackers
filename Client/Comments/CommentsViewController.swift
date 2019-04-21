@@ -15,7 +15,7 @@ import SwipeCellKit
 import PromiseKit
 import Loaf
 
-class CommentsViewController : BaseTableViewController {
+class CommentsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
     
     private enum ActivityType {
@@ -117,7 +117,7 @@ extension CommentsViewController: PostTitleViewDelegate {
             })
             
             // show link
-            let safariViewController = ThemedSafariViewController(url: url)
+            let safariViewController = SFSafariViewController(url: url)
             setupHandoff(with: post, activityType: .link(url: url))
             self.present(safariViewController, animated: true, completion: nil)
         }
@@ -161,7 +161,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
         collapseAction.textColor = .white
         
-        let iconImage = UIImage(named: "UpIcon")!.imageWithColor(color: .white)
+        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
         collapseAction.image = iconImage
         
         return [collapseAction]
@@ -198,7 +198,7 @@ extension CommentsViewController: CommentDelegate {
     }
     
     func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = ThemedSafariViewController(url: URL)
+        let safariViewController = SFSafariViewController(url: URL)
         setupHandoff(with: post, activityType: .link(url: URL))
         self.present(safariViewController, animated: true, completion: nil)
     }

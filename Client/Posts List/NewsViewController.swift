@@ -14,7 +14,7 @@ import Kingfisher
 import HNScraper
 import Loaf
 
-class NewsViewController : BaseTableViewController {
+class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
     
     var posts: [HNPost] = [HNPost]()
@@ -35,7 +35,7 @@ class NewsViewController : BaseTableViewController {
         super.viewWillAppear(animated)
         // when the cell is still visible, no need to deselect it
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
-            rz_smoothlyDeselectRows(tableView: tableView)
+            self.smoothlyDeselectRows()
         }
     }
     
@@ -148,7 +148,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
     
     func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = ThemedSafariViewController(url: url)
+        let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }
