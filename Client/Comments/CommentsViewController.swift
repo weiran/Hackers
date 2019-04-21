@@ -15,7 +15,7 @@ import SwipeCellKit
 import PromiseKit
 import Loaf
 
-class CommentsViewController : UIViewController {
+class CommentsViewController : BaseTableViewController {
     public var hackerNewsService: HackerNewsService?
     
     private enum ActivityType {
@@ -31,8 +31,6 @@ class CommentsViewController : UIViewController {
     
     let commentsController = CommentsController()
     
-    @IBOutlet var tableView: UITableView!
-    
     @IBOutlet weak var postTitleContainerView: UIView!
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
@@ -47,11 +45,6 @@ class CommentsViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupHandoff(with: post, activityType: .comments)
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        navigationItem.largeTitleDisplayMode = .never
     }
     
     deinit {
@@ -136,12 +129,12 @@ extension CommentsViewController: PostTitleViewDelegate {
     }
 }
 
-extension CommentsViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension CommentsViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentsController.visibleComments.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let comment = commentsController.visibleComments[indexPath.row]
         assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
@@ -153,13 +146,6 @@ extension CommentsViewController: UITableViewDataSource {
         cell.delegate = self
         
         return cell
-    }
-}
-
-extension CommentsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = Bundle.main.loadNibNamed("CommentsHeader", owner: nil, options: nil)?.first as? UIView
-        return view
     }
 }
 
@@ -182,10 +168,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
     }
     
     func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
-        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
-                                                 elasticOverscroll: true,
-                                                 completionAnimation: .bounce)
-        
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
         options.transitionStyle = .drag
