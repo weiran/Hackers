@@ -13,6 +13,7 @@ import PromiseKit
 import Kingfisher
 import HNScraper
 import Loaf
+import SwipeCellKit
 
 class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
@@ -90,6 +91,7 @@ extension NewsViewController {
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+        cell.postDelegate = self
         cell.delegate = self
         cell.clearImage()
         
@@ -105,6 +107,32 @@ extension NewsViewController {
         if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
+    }
+}
+
+extension NewsViewController: SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .left else { return nil }
+        
+        let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+            guard let post = self.posts?[indexPath.row] else { return }
+            self.hackerNewsService?.upvote(post: post)
+        }
+        upvoteAction.backgroundColor = themeProvider.currentTheme.appTintColor
+        upvoteAction.textColor = .white
+        
+        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+        upvoteAction.image = iconImage
+        
+        return [upvoteAction]
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
+        var options = SwipeOptions()
+        options.expansionStyle = expansionStyle
+        options.transitionStyle = .drag
+        return options
     }
 }
 

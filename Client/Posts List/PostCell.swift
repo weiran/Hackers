@@ -8,13 +8,14 @@
 
 import Foundation
 import UIKit
+import SwipeCellKit
 
 protocol PostCellDelegate {
     func didTapThumbnail(_ sender: Any)
 }
 
-class PostCell : UITableViewCell {
-    var delegate: PostCellDelegate?
+class PostCell : SwipeTableViewCell {
+    var postDelegate: PostCellDelegate?
     
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
@@ -54,7 +55,7 @@ class PostCell : UITableViewCell {
     }
     
     @objc private func didTapThumbnail(_ sender: Any) {
-        delegate?.didTapThumbnail(sender)
+        postDelegate?.didTapThumbnail(sender)
     }
 }
 
