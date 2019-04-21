@@ -25,6 +25,10 @@ class SettingsViewController: UITableViewController {
     @IBAction private func didPressDone(_ sender: Any) {
         dismiss(animated: true)
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        // override with empty implementation to prevent the extension running which reloads tableview data
+    }
 }
 
 extension SettingsViewController: Themed {
