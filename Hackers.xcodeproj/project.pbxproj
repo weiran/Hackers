@@ -226,7 +226,6 @@
 				24DFD28B19436E51007F61E7 /* CommentsViewController.swift */,
 				249A7E31194374550059C079 /* CommentTableViewCell.swift */,
 				24E4F26019B4DA9900574B52 /* CommentDelegate.swift */,
-				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 				24D811A41FF90A58000951C3 /* TouchableTextView.swift */,
 			);
@@ -291,19 +290,20 @@
 		24F39F8E18AFB1150055F8DC /* Client */ = {
 			isa = PBXGroup;
 			children = (
-				24FF0219226C99B1002EF8DD /* Services */,
-				2464D200209DD06A00C7F8FC /* Themes */,
 				24ADA7E2206FAF2200C143F4 /* Main.storyboard */,
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
 				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
 				2464D212209DEFB100C7F8FC /* AppNavigationController.swift */,
+				24CEAA9C1F8917D60050DEDF /* ReviewController.swift */,
+				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				24CE5FEE19434DC0009D2677 /* Posts List */,
 				24CE5FEF19434DCB009D2677 /* Comments */,
 				2464D219209E1F8A00C7F8FC /* Settings */,
-				24F39F8F18AFB1150055F8DC /* Supporting Files */,
+				24FF0219226C99B1002EF8DD /* Services */,
+				2464D200209DD06A00C7F8FC /* Themes */,
 				2464D209209DD8AE00C7F8FC /* Extensions */,
-				24CEAA9C1F8917D60050DEDF /* ReviewController.swift */,
+				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 			);
 			path = Client;
 			sourceTree = "<group>";
