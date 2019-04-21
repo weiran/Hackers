@@ -57,7 +57,7 @@ class NewsViewController : UITableViewController {
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
         hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
-            self.posts = posts ?? [HNPost]()
+            self.posts = posts
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
         }.ensure {
@@ -74,9 +74,7 @@ extension NewsViewController { // post fetching
         firstly {
             hackerNewsService!.getPosts(of: self.postType, nextPageIdentifier: nextPageIdentifier)
         }.done { (posts, nextPageIdentifier) in
-            if let posts = posts {
-                self.posts?.append(contentsOf: posts)
-            }
+            self.posts?.append(contentsOf: posts)
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
         }.catch { error in
