@@ -5,7 +5,6 @@ PODS:
   - Kingfisher (5.3.1)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
-  - SkeletonView (1.4.2)
   - Swinject (2.6.0)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
@@ -18,7 +17,6 @@ DEPENDENCIES:
   - Kingfisher
   - Loaf
   - PromiseKit/CorePromise
-  - SkeletonView
   - Swinject
   - SwinjectStoryboard
   - SwipeCellKit
@@ -30,7 +28,6 @@ SPEC REPOS:
     - Kingfisher
     - Loaf
     - PromiseKit
-    - SkeletonView
     - Swinject
     - SwinjectStoryboard
     - SwipeCellKit
@@ -52,11 +49,10 @@ SPEC CHECKSUMS:
   Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
-  SkeletonView: c2523c3c8c6510e273e49a3bf364a434744c3914
   Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
-PODFILE CHECKSUM: ab31b3cb02d0907b41dc13f091b67825c32e892f
+PODFILE CHECKSUM: 8d6d1f1f8b770a76ddb05235e57df829772a90ab
 
 COCOAPODS: 1.6.1
