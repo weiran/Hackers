@@ -13,8 +13,12 @@ import DZNEmptyDataSet
 import SkeletonView
 import HNScraper
 import SwipeCellKit
+import PromiseKit
+import Loaf
 
 class CommentsViewController : UIViewController {
+    public var hackerNewsService: HackerNewsService?
+    
     private enum ActivityType {
         case comments
         case link(url: URL)
@@ -38,7 +42,6 @@ class CommentsViewController : UIViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadComments()
     }
 
@@ -74,12 +77,16 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        HNScraper.shared.getComments(ForPost: post!, buildHierarchy: false, offsetComments: false) { (post, comments, error) in
-            self.view.hideSkeleton()
-            self.tableView.rowHeight = UITableView.automaticDimension
-            let mappedComments = comments.map { CommentModel(source: $0) }
-            self.comments = mappedComments
+        self.view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
+        firstly {
+            self.hackerNewsService!.getComments(of: self.post!)
+        }.done { comments in
+            self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
+        }.ensure {
+            self.view.hideSkeleton()
+        }.catch { error in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
 
