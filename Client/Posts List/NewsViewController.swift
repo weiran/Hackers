@@ -16,6 +16,8 @@ import HNScraper
 import Loaf
 
 class NewsViewController : UIViewController {
+    public var hackerNewsService: HackerNewsService?
+    
     @IBOutlet weak var tableView: UITableView!
     private var refreshControl: UIRefreshControl!
     
@@ -38,6 +40,11 @@ class NewsViewController : UIViewController {
         
         view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadPosts()
+        
+//        HNLogin.shared.login(username: "weiran", psw: "bardev") { (user, cookie, error) in
+//            print(user)
+//            print(cookie)
+//        }
     }
     
     @IBAction func changeTheme(_ sender: Any) {
@@ -76,12 +83,10 @@ class NewsViewController : UIViewController {
 
 extension NewsViewController { // post fetching
     @objc func loadPosts() {
-        // fetch new posts
-        fetch().map { params in
-            let (posts, nextPageIdentifier) = params
+        hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
-            self.view.hideSkeleton()
+            
             self.tableView.rowHeight = UITableView.automaticDimension
             self.tableView.estimatedRowHeight = UITableView.automaticDimension
             self.tableView.reloadData()
@@ -93,26 +98,20 @@ extension NewsViewController { // post fetching
         }
     }
     
-    func fetch() -> Promise<([HNPost]?, String?)> {
-        let (promise, seal) = Promise<([HNPost]?, String?)>.pending()
-        HNScraper.shared.getPostsList(page: postType, completion: { (posts, nextPageIdentifier, error) in
-            if let error = error {
-                seal.reject(error)
-            } else {
-                seal.fulfill((posts, nextPageIdentifier))
-            }
-        })
-
-        return promise
-    }
-    
     func loadMorePosts() {
         guard let nextPageIdentifier = nextPageIdentifier else { return }
         self.nextPageIdentifier = nil
-        HNScraper.shared.getMoreItems(linkForMore: nextPageIdentifier) { (posts, nextPageIdentifier, error) in
+        
+        firstly {
+            hackerNewsService!.getPosts(of: self.postType, nextPageIdentifier: nextPageIdentifier)
+        }.done { (posts, nextPageIdentifier) in
+            if let posts = posts {
+                self.posts.append(contentsOf: posts)
+            }
             self.nextPageIdentifier = nextPageIdentifier
-            self.posts.append(contentsOf: posts)
             self.tableView.reloadData()
+        }.catch { error in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
     
