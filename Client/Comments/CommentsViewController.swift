@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 import SafariServices
 import DZNEmptyDataSet
-import SkeletonView
 import HNScraper
 import SwipeCellKit
 import PromiseKit
@@ -77,14 +76,13 @@ class CommentsViewController : UIViewController {
     }
     
     func loadComments() {
-        self.view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         firstly {
             self.hackerNewsService!.getComments(of: self.post!)
         }.done { comments in
             self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
         }.ensure {
-            self.view.hideSkeleton()
+            // something
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
@@ -256,14 +254,7 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
     }
 }
 
-extension CommentsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return "SkeletonCell"
-    }
-}
-
 // MARK: - Handoff
-
 extension CommentsViewController {
     private func setupHandoff(with post: HNPost?, activityType: ActivityType) {
         guard let post = post else {
