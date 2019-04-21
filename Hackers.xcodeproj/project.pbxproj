@@ -53,6 +53,7 @@
 		24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F39F9A18AFB1150055F8DC /* Images.xcassets */; };
 		24FF021B226C99FA002EF8DD /* HackerNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021A226C99FA002EF8DD /* HackerNewsService.swift */; };
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtension.swift */; };
+		24FF021F226CAAB5002EF8DD /* BaseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021E226CAAB5002EF8DD /* BaseTableViewController.swift */; };
 		288B0D6127D9C12BD8FE062F /* Pods_HackersUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
@@ -123,6 +124,7 @@
 		24F39F9A18AFB1150055F8DC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		24FF021A226C99FA002EF8DD /* HackerNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackerNewsService.swift; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtension.swift; sourceTree = "<group>"; };
+		24FF021E226CAAB5002EF8DD /* BaseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTableViewController.swift; sourceTree = "<group>"; };
 		5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HackersUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
 		5C36BEF23DF27134A4F29678 /* Pods-HackersUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HackersUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HackersUITests/Pods-HackersUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				24628BAC21E6897700BDEEF9 /* AppFont.swift */,
 				242A90A322635B8C008E7910 /* UIImage+Extensions.swift */,
 				24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtension.swift */,
+				24FF021E226CAAB5002EF8DD /* BaseTableViewController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -599,6 +602,7 @@
 				24CEAA9B1F8916970050DEDF /* UIView+Extensions.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewController+PreviewActionItems.swift in Sources */,
+				24FF021F226CAAB5002EF8DD /* BaseTableViewController.swift in Sources */,
 				2464D221209E2CDF00C7F8FC /* ThemedSafariViewController.swift in Sources */,
 				242A00D31D086927003D915B /* UIViewControllerSmoothlyDeselectCellExtension.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
