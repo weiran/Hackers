@@ -37,18 +37,7 @@ class NewsViewController : UIViewController {
         tableView.refreshControl = refreshControl
         
         setupTheming()
-        
-        view.showAnimatedGradientSkeleton(usingGradient: SkeletonGradient(baseColor: AppThemeProvider.shared.currentTheme.skeletonColor))
         loadPosts()
-        
-//        HNLogin.shared.login(username: "weiran", psw: "bardev") { (user, cookie, error) in
-//            print(user)
-//            print(cookie)
-//        }
-    }
-    
-    @IBAction func changeTheme(_ sender: Any) {
-        AppThemeProvider.shared.nextTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -66,18 +55,18 @@ class NewsViewController : UIViewController {
             }
         })
     }
-
-    func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = ThemedSafariViewController(url: url)
-        safariViewController.previewActionItemsDelegate = self
-        return safariViewController
-    }
     
     public func viewDidRotate() {
         guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: indexPaths, with: .automatic)
         self.tableView.endUpdates()
+    }
+
+    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+        let safariViewController = ThemedSafariViewController(url: url)
+        safariViewController.previewActionItemsDelegate = self
+        return safariViewController
     }
 }
 
@@ -86,9 +75,6 @@ extension NewsViewController { // post fetching
         hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
-            
-            self.tableView.rowHeight = UITableView.automaticDimension
-            self.tableView.estimatedRowHeight = UITableView.automaticDimension
             self.tableView.reloadData()
         }.ensure {
             self.view.hideSkeleton()
@@ -118,9 +104,8 @@ extension NewsViewController { // post fetching
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowComments" {
             if let indexPath = tableView.indexPathForSelectedRow,
-                let segueNavigationController = segue.destination as? UINavigationController,
-                let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
-        
+            let segueNavigationController = segue.destination as? UINavigationController,
+            let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
                 let post = posts[indexPath.row]
                 commentsViewController.post = post
             }
@@ -161,12 +146,6 @@ extension NewsViewController: Themed {
         tableView.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
         refreshControl.tintColor = theme.appTintColor
-    }
-}
-
-extension NewsViewController: SkeletonTableViewDataSource {
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return "SkeletonCell"
     }
 }
 
