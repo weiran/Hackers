@@ -22,7 +22,7 @@ extension UITableViewController {
         })
     }
     
-    open func smoothlyDeselectRows() {
+    public func smoothlyDeselectRows() {
         // Get the initially selected index paths, if any
         let selectedIndexPaths = self.tableView.indexPathsForSelectedRows ?? []
         

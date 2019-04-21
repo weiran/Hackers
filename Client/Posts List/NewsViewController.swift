@@ -17,13 +17,13 @@ import Loaf
 class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
     
-    var posts: [HNPost] = [HNPost]()
-    var postType: HNScraper.PostListPageName! = .news
+    private var posts: [HNPost] = [HNPost]()
+    public var postType: HNScraper.PostListPageName! = .news
     
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
     
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
@@ -31,7 +31,7 @@ class NewsViewController : UITableViewController {
         loadPosts()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // when the cell is still visible, no need to deselect it
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
@@ -52,7 +52,7 @@ class NewsViewController : UITableViewController {
 }
 
 extension NewsViewController { // post fetching
-    @objc public func loadPosts() {
+    @objc private func loadPosts() {
         hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
             self.posts = posts ?? [HNPost]()
             self.nextPageIdentifier = nextPageIdentifier
@@ -64,7 +64,7 @@ extension NewsViewController { // post fetching
         }
     }
     
-    func loadMorePosts() {
+    private func loadMorePosts() {
         guard let nextPageIdentifier = nextPageIdentifier else { return }
         self.nextPageIdentifier = nil
         
@@ -83,11 +83,11 @@ extension NewsViewController { // post fetching
 }
 
 extension NewsViewController {
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.delegate = self
         cell.clearImage()
@@ -102,7 +102,7 @@ extension NewsViewController {
 }
 
 extension NewsViewController {
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
@@ -147,7 +147,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         return [viewCommentsPreviewAction]
     }
     
-    func getSafariViewController(_ url: URL) -> SFSafariViewController {
+    private func getSafariViewController(_ url: URL) -> SFSafariViewController {
         let safariViewController = SFSafariViewController(url: url)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
@@ -160,7 +160,7 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
         self.navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
     }
     
-    func verifyLink(_ url: URL?) -> Bool {
+    private func verifyLink(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }

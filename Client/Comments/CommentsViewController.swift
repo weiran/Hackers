@@ -23,17 +23,17 @@ class CommentsViewController : UITableViewController {
         case link(url: URL)
     }
 
-    var post: HNPost?
+    public var post: HNPost?
     
-    var comments: [CommentModel]? {
+    private var comments: [CommentModel]? {
         didSet { commentsController.comments = comments! }
     }
     
-    let commentsController = CommentsController()
+    private let commentsController = CommentsController()
     
-    @IBOutlet weak var postTitleContainerView: UIView!
-    @IBOutlet weak var postTitleView: PostTitleView!
-    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak private var postTitleContainerView: UIView!
+    @IBOutlet weak private var postTitleView: PostTitleView!
+    @IBOutlet weak private var thumbnailImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,7 +68,7 @@ class CommentsViewController : UITableViewController {
         }
     }
     
-    func loadComments() {
+    private func loadComments() {
         firstly {
             self.hackerNewsService!.getComments(of: self.post!)
         }.done { comments in
@@ -86,7 +86,7 @@ class CommentsViewController : UITableViewController {
         super.updateUserActivityState(activity)
     }
     
-    func setupPostTitleView() {
+    private func setupPostTitleView() {
         guard let post = post else { return }
         
         postTitleView.post = post
@@ -95,11 +95,11 @@ class CommentsViewController : UITableViewController {
         thumbnailImageView.setImageWithPlaceholder(url: post.url, resizeToSize: 60)
     }
     
-    @IBAction func didTapThumbnail(_ sender: Any) {
+    @IBAction private func didTapThumbnail(_ sender: Any) {
         didPressLinkButton(post!)
     }
     
-    @IBAction func shareTapped(_ sender: AnyObject) {
+    @IBAction private func shareTapped(_ sender: AnyObject) {
         guard let post = post, let url = post.url else { return }
         let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
@@ -123,7 +123,7 @@ extension CommentsViewController: PostTitleViewDelegate {
         }
     }
     
-    func verifyLink(_ url: URL?) -> Bool {
+    private func verifyLink(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         return UIApplication.shared.canOpenURL(url)
     }
@@ -203,7 +203,7 @@ extension CommentsViewController: CommentDelegate {
         self.present(safariViewController, animated: true, completion: nil)
     }
     
-    func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
+    private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
         let (modifiedIndexPaths, visibility) = commentsController.toggleChildrenVisibility(of: comment)

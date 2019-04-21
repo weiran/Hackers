@@ -9,7 +9,7 @@
 import UIKit
 
 class AppNavigationController: UINavigationController {
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         navigationBar.setValue(true, forKey: "hidesShadow")
@@ -17,7 +17,7 @@ class AppNavigationController: UINavigationController {
 }
 
 extension AppNavigationController: Themed {
-    func applyTheme(_ theme: AppTheme) {        
+    func applyTheme(_ theme: AppTheme) {
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
         let titleTextAttributes = [

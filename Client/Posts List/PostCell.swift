@@ -40,20 +40,20 @@ class PostCell : UITableViewCell {
         highlighted ? setSelectedBackground() : setUnselectedBackground()
     }
     
-    func setSelectedBackground() {
+    private func setSelectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
     }
     
-    func setUnselectedBackground() {
+    private func setUnselectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }
     
-    func clearImage() {
+    public func clearImage() {
         let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         thumbnailImageView.image = placeholder
     }
     
-    @objc func didTapThumbnail(_ sender: Any) {
+    @objc private func didTapThumbnail(_ sender: Any) {
         delegate?.didTapThumbnail(sender)
     }
 }

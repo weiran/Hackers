@@ -17,12 +17,12 @@ class SettingsViewController: UITableViewController {
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
     }
     
-    @IBAction func darkModeValueChanged(_ sender: UISwitch) {
+    @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
     }
     
-    @IBAction func didPressDone(_ sender: Any) {
+    @IBAction private func didPressDone(_ sender: Any) {
         dismiss(animated: true)
     }
 }
