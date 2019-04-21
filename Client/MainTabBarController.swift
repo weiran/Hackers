@@ -10,7 +10,7 @@ import UIKit
 import HNScraper
 
 class MainTabBarController: UITabBarController {
-    override open func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         

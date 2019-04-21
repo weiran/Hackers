@@ -23,7 +23,7 @@ class NewsViewController : UITableViewController {
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
     
-    override open func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
@@ -31,7 +31,7 @@ class NewsViewController : UITableViewController {
         loadPosts()
     }
     
-    override open func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // when the cell is still visible, no need to deselect it
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
