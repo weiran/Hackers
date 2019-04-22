@@ -2,6 +2,7 @@ PODS:
   - DeviceKit (1.11.0)
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
+  - KeychainAccess (3.2.0)
   - Kingfisher (5.3.1)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
@@ -14,6 +15,7 @@ DEPENDENCIES:
   - DeviceKit
   - DZNEmptyDataSet
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
+  - KeychainAccess
   - Kingfisher
   - Loaf
   - PromiseKit/CorePromise
@@ -25,6 +27,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - DeviceKit
     - DZNEmptyDataSet
+    - KeychainAccess
     - Kingfisher
     - Loaf
     - PromiseKit
@@ -46,6 +49,7 @@ SPEC CHECKSUMS:
   DeviceKit: a3a86f8dddbe1317a9a243cdf9646858bf135dce
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: 6b8bb52adcaf0d39c4efe49e7440e55253f48674
+  KeychainAccess: 3b1bf8a77eb4c6ea1ce9404c292e48f948954c6b
   Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
@@ -53,6 +57,6 @@ SPEC CHECKSUMS:
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
-PODFILE CHECKSUM: 8d6d1f1f8b770a76ddb05235e57df829772a90ab
+PODFILE CHECKSUM: 0c541693b4cca4eb8f9fbf0a8088df416fe725f0
 
 COCOAPODS: 1.6.1
