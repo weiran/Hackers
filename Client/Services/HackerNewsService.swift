@@ -78,4 +78,28 @@ class HackerNewsService {
         }
         return promise
     }
+    
+    public func upvote(comment: HNComment) -> Promise<Void> {
+        let (promise, seal) = Promise<Void>.pending()
+        HNScraper.shared.upvote(Comment: comment) { error in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill(())
+            }
+        }
+        return promise
+    }
+    
+    public func unvote(comment: HNComment) -> Promise<Void> {
+        let (promise, seal) = Promise<Void>.pending()
+        HNScraper.shared.unvote(Comment: comment) { error in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill(())
+            }
+        }
+        return promise
+    }
 }

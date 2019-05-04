@@ -134,7 +134,7 @@ extension NewsViewController: SwipeTableViewCellDelegate {
         upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         upvoteAction.textColor = .white
         
-        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
         upvoteAction.image = iconImage
         
         return [upvoteAction]

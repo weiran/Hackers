@@ -29,11 +29,13 @@ class CommentTableViewCell : SwipeTableViewCell {
     @IBOutlet var datePostedLabel : UILabel!
     @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
     @IBOutlet weak var separatorView: UIView!
+    @IBOutlet weak var upvoteIconImageView: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         setupTheming()
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
+        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?.withTint(color: themeProvider.currentTheme.upvotedColor)
     }
     
     @objc private func cellTapped() {
@@ -54,6 +56,7 @@ class CommentTableViewCell : SwipeTableViewCell {
         authorLabel.font = AppFont.commentUsernameFont(collapsed: isCollapsed)
         datePostedLabel.text = comment.dateCreatedString
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
+        upvoteIconImageView?.isHidden = comment.upvoted == false
         
         if let commentTextView = commentTextView, comment.visibility == .visible {
             // only for expanded comments
