@@ -116,9 +116,6 @@
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="XS1-ZM-tYj">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <connections>
-                            <action selector="test:" destination="6t9-fC-JrD" eventType="valueChanged" id="JGT-oV-ler"/>
-                        </connections>
                     </refreshControl>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ac0-3E-Nwr" userLabel="First Responder" sceneMemberID="firstResponder"/>
