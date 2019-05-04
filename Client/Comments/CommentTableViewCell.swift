@@ -72,12 +72,19 @@ class CommentTableViewCell : SwipeTableViewCell {
 }
 
 extension CommentTableViewCell: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
-        if let commentDelegate = commentDelegate {
-            commentDelegate.linkTapped(URL, sender: textView)
-            return false
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        switch interaction {
+            //This is the case when user just taps on the link
+        case .invokeDefaultAction:
+            if let commentDelegate = commentDelegate {
+                commentDelegate.linkTapped(URL, sender: textView)
+                return false
+            }
+            return true
+        default:
+            // default case will handle presentActions (Long Press) case on url
+            return true
         }
-        return true
     }
 }
 
