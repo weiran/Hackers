@@ -128,7 +128,7 @@
                 <navigationController id="2FT-kg-cd5" customClass="AppNavigationController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="aiG-Km-7Il"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="o2Y-R6-LxE">
-                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -429,7 +429,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="LhP-dy-b8f">
-                        <barButtonItem key="rightBarButtonItem" image="ShareIcon" id="Pwq-bS-F9T">
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="Pwq-bS-F9T">
                             <connections>
                                 <action selector="shareTapped:" destination="evu-Yh-MGy" id="lG5-n2-ry1"/>
                             </connections>
@@ -626,7 +626,6 @@
         <image name="HackersIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
         <image name="SettingsIcon" width="28" height="28"/>
-        <image name="ShareIcon" width="16" height="22"/>
         <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
     </resources>
     <inferredMetricsTieBreakers>
