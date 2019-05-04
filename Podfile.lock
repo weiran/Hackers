@@ -1,8 +1,8 @@
 PODS:
-  - DeviceKit (1.11.0)
+  - DeviceKit (2.0.0)
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
-  - Kingfisher (5.3.1)
+  - Kingfisher (5.4.0)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
   - Swinject (2.6.0)
@@ -43,10 +43,10 @@ CHECKOUT OPTIONS:
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
-  DeviceKit: a3a86f8dddbe1317a9a243cdf9646858bf135dce
+  DeviceKit: 72d36709552d4b3582abd76a53949148acad9811
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: 6b8bb52adcaf0d39c4efe49e7440e55253f48674
-  Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
+  Kingfisher: 9c8f2cc6710334e06f32ba2b45e77707d5e2f0c9
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
   Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
