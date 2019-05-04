@@ -115,10 +115,9 @@ extension NewsViewController {
 
 extension NewsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .left else { return nil }
+        guard orientation == .left, let post = self.posts?[indexPath.row], post.type != .jobs else { return nil }
         
         let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
-            guard let post = self.posts?[indexPath.row] else { return }
             if post.upvoted {
                 _ = self.hackerNewsService?.unvote(post: post)
                 post.upvoted = false
