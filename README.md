@@ -50,7 +50,6 @@ I use several open source projects in Hackers, in no particular order:
 * [Loaf](https://github.com/schmidyy/Loaf) by [Mat Schmid](https://github.com/schmidyy)
 * [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
 * [Swinject](https://github.com/Swinject/Swinject)
-* [KeychainAccess](https://github.com/kishikawakatsumi/KeychainAccess) by [Kishikawa Katsumi](https://github.com/kishikawakatsumi)
 
 ---
 <p align="center">

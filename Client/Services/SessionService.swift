@@ -7,11 +7,9 @@
 //
 
 import PromiseKit
-import KeychainAccess
 import HNScraper
 
 class SessionService {
-    private let keychain = Keychain(service: StorageKeys.service.rawValue)
     private var hackerNewsService: HackerNewsService
     
     private var user: HNUser?
@@ -22,6 +20,7 @@ class SessionService {
         }
         return .notAuthenticated
     }
+    
     public var username: String? {
         return user?.username
     }
@@ -29,30 +28,6 @@ class SessionService {
     init(hackerNewsService: HackerNewsService) {
         self.hackerNewsService = hackerNewsService
         HNLogin.shared.addObserver(self)
-    }
-    
-    public func authenticate() -> Promise<AuthenticationState> {
-        let (promise, seal) = Promise<AuthenticationState>.pending()
-        
-        if let username = self.keychain[StorageKeys.username.rawValue],
-            let password = self.keychain[StorageKeys.password.rawValue] {
-            firstly {
-                self.hackerNewsService.login(username: username, password: password)
-            }.done { (user, _) in
-                if let user = user {
-                    self.user = user
-                    seal.fulfill(.authenticated)
-                } else {
-                    seal.fulfill(.notAuthenticated)
-                }
-            }.catch { error in
-                seal.reject(error)
-            }
-        } else {
-            seal.fulfill(.notAuthenticated)
-        }
-        
-        return promise
     }
     
     public func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
@@ -64,9 +39,6 @@ class SessionService {
             if let user = user {
                 self.user = user
                 seal.fulfill(.authenticated)
-                
-                self.keychain[StorageKeys.username.rawValue] = username
-                self.keychain[StorageKeys.password.rawValue] = password
             } else {
                 seal.fulfill(.notAuthenticated)
             }
@@ -75,12 +47,6 @@ class SessionService {
         }
         
         return promise
-    }
-    
-    private enum StorageKeys: String {
-        case service = "com.weiranzhang.Hackers"
-        case username = "username"
-        case password = "password"
     }
     
     public enum AuthenticationState {
