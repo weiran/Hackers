@@ -12,15 +12,19 @@ import HNScraper
 import Loaf
 
 class SettingsViewController: UITableViewController {
-    public var hackerNewsService: HackerNewsService?
+    public var sessionService: SessionService?
     
     @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
+        if self.sessionService!.authenticationState == .authenticated {
+            self.usernameLabel.text = self.sessionService?.username
+        }
     }
     
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
@@ -55,10 +59,10 @@ extension SettingsViewController {
                 return
             }
             firstly {
-                self.hackerNewsService!.login(username: username, password: password)
-            }.done { user, cookie in
-                guard let user = user, let username = user.username else { return }
-                self.usernameLabel.text = username
+                self.sessionService!.authenticate(username: username, password: password)
+            }.done { authenticationState in
+                guard authenticationState == .authenticated else { return }
+                self.usernameLabel.text = self.sessionService!.username
                 Loaf("Logged in as \(username)", state: .success, sender: self).show()
             }.ensure {
                 guard let indexPath = self.tableView.indexPathForSelectedRow else { return }
@@ -98,5 +102,6 @@ extension SettingsViewController: Themed {
         view.backgroundColor = theme.barBackgroundColor
         tableView.backgroundColor = theme.barBackgroundColor
         tableView.separatorColor = theme.separatorColor
+//        usernameLabel.textColor = theme.textColor
     }
 }

@@ -65,6 +65,17 @@ class HackerNewsService {
             }
         }
         return promise
-
+    }
+    
+    public func unvote(post: HNPost) -> Promise<Void> {
+        let (promise, seal) = Promise<Void>.pending()
+        HNScraper.shared.unvote(Post: post) { error in
+            if let error = error {
+                seal.reject(error)
+            } else {
+                seal.fulfill(())
+            }
+        }
+        return promise
     }
 }

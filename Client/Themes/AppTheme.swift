@@ -24,6 +24,8 @@ struct AppTheme {
     var cellHighlightColor: UIColor
     var separatorColor: UIColor
     
+    var upvotedColor: UIColor
+    
     var activityIndicatorStyle: UIActivityIndicatorView.Style
 }
 
@@ -47,6 +49,8 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
         separatorColor: UIColor(rgb: 0xCACACA),
         
+        upvotedColor: UIColor(rgb: 0xFF9300),
+        
         activityIndicatorStyle: .gray
     )
     
@@ -65,6 +69,8 @@ extension AppTheme {
         
         cellHighlightColor: UIColor(rgb: 0x34363D),
         separatorColor: UIColor(rgb: 0x757575),
+        
+        upvotedColor: UIColor(rgb: 0xFF9300),
         
         activityIndicatorStyle: .white
     )

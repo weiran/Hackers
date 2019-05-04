@@ -114,9 +114,19 @@ extension NewsViewController: SwipeTableViewCellDelegate {
         
         let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
             guard let post = self.posts?[indexPath.row] else { return }
-            self.hackerNewsService?.upvote(post: post)
+            if post.upvoted {
+                _ = self.hackerNewsService?.unvote(post: post)
+                post.upvoted = false
+                post.points -= 1
+            } else {
+                _ = self.hackerNewsService?.upvote(post: post)
+                post.upvoted = true
+                post.points += 1
+            }
+            guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
+            cell.postTitleView.post = post
         }
-        upvoteAction.backgroundColor = themeProvider.currentTheme.appTintColor
+        upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         upvoteAction.textColor = .white
         
         let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)

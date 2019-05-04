@@ -13,7 +13,7 @@ protocol PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost)
 }
 
-class PostTitleView: UIView, UIGestureRecognizerDelegate {
+class PostTitleView: UIView, UIGestureRecognizerDelegate {    
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var metadataLabel: UILabel!
     
@@ -24,8 +24,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     public var post: HNPost? {
         didSet {
             guard let post = post else { return }
-            titleLabel.text = post.title
-            metadataLabel.attributedText = metadataText(for: post)
+            self.titleLabel.text = post.title
+            self.metadataLabel.attributedText = metadataText(for: post, theme: themeProvider.currentTheme)
         }
     }
     
@@ -34,12 +34,12 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         setupTheming()
         
         let titleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.didPressTitleText(_:)))
-        titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
+        self.titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
     }
     
     @objc private func didPressTitleText(_ sender: UITapGestureRecognizer) {
-        if isTitleTapEnabled, let delegate = delegate {
-            delegate.didPressLinkButton(post!)
+        if isTitleTapEnabled, let delegate = self.delegate, let post = self.post {
+            delegate.didPressLinkButton(post)
         }
     }
     
@@ -57,33 +57,43 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return host
     }
     
-    private func metadataText(for post: HNPost) -> NSAttributedString {
-        let string = NSMutableAttributedString()
+    private func metadataText(for post: HNPost, theme: AppTheme) -> NSAttributedString {
+        let defaultAttributes = [NSAttributedString.Key.foregroundColor: theme.textColor]
+        var pointsAttributes = defaultAttributes
+        var pointsTintColor: UIColor?
         
-        let pointsIconAttachment = textAttachment(for: "PointsIcon")
+        if post.upvoted {
+            pointsAttributes = [NSAttributedString.Key.foregroundColor: theme.upvotedColor]
+            pointsTintColor = theme.upvotedColor
+        }
+        
+        let pointsIconAttachment = textAttachment(for: "PointsIcon", tintColor: pointsTintColor)
         let pointsIconAttributedString = NSAttributedString(attachment: pointsIconAttachment)
         
-        let commentsIconAttachment = textAttachment(for: "CommentsIcon")
+        let commentsIconAttachment = textAttachment(for: "CommentsIcon", tintColor: theme.textColor)
         let commentsIconAttributedString = NSAttributedString(attachment: commentsIconAttachment)
         
-        string.append(NSAttributedString(string: "\(post.points)"))
+        let string = NSMutableAttributedString()
+        string.append(NSAttributedString(string: "\(post.points)", attributes: pointsAttributes))
         string.append(pointsIconAttributedString)
-        string.append(NSAttributedString(string: "• \(post.commentCount)"))
+        string.append(NSAttributedString(string: "• \(post.commentCount) ", attributes: defaultAttributes))
         string.append(commentsIconAttributedString)
-        string.append(NSAttributedString(string: " • \(domainLabelText(for: post))"))
-        
+        string.append(NSAttributedString(string: " • \(domainLabelText(for: post))", attributes: defaultAttributes))
         return string
     }
     
-    private func templateImage(named: String) -> UIImage? {
+    private func templateImage(named: String, tintColor: UIColor? = nil) -> UIImage? {
         let image = UIImage.init(named: named)
-        let templateImage = image?.withRenderingMode(.alwaysTemplate)
+        var templateImage = image?.withRenderingMode(.alwaysTemplate)
+        if let tintColor = tintColor {
+           templateImage = templateImage?.withTint(color: tintColor)
+        }
         return templateImage
     }
     
-    private func textAttachment(for imageNamed: String) -> NSTextAttachment {
+    private func textAttachment(for imageNamed: String, tintColor: UIColor? = nil) -> NSTextAttachment {
         let attachment = NSTextAttachment()
-        guard let image = templateImage(named: imageNamed) else { return attachment }
+        guard let image = templateImage(named: imageNamed, tintColor: tintColor) else { return attachment }
         attachment.image = image
         attachment.bounds = CGRect(x: 0, y: -2, width: image.size.width, height: image.size.height)
         return attachment
@@ -93,6 +103,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 extension PostTitleView: Themed {
     func applyTheme(_ theme: AppTheme) {
         titleLabel.textColor = theme.titleTextColor
-        metadataLabel.textColor = theme.textColor
+        if let post = post {
+            self.metadataLabel.attributedText = metadataText(for: post, theme: theme)
+        }
     }
 }
