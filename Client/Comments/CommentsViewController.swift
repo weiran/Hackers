@@ -74,10 +74,10 @@ class CommentsViewController : UITableViewController {
         }.done { comments in
             self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
-        }.ensure {
-            // something
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            self.comments = []
+            self.tableView.reloadData()
         }
     }
 

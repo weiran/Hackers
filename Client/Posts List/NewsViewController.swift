@@ -63,6 +63,11 @@ extension NewsViewController { // post fetching
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            // show empty data state by having an empty array rather than nil
+            if self.posts == nil {
+                self.posts = []
+            }
+            self.tableView.reloadData()
         }
     }
     
@@ -226,5 +231,9 @@ extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
         let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
         activityIndicatorView.startAnimating()
         return activityIndicatorView
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return posts != nil // only when empty data
     }
 }
