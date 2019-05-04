@@ -16,7 +16,12 @@ class SessionService {
     
     private var user: HNUser?
     
-    public var authenticationState: AuthenticationState = .notAuthenticated
+    public var authenticationState: AuthenticationState {
+        if HNLogin.shared.user != nil && HNLogin.shared.sessionCookie != nil {
+            return .authenticated
+        }
+        return .notAuthenticated
+    }
     public var username: String? {
         return user?.username
     }
@@ -36,7 +41,6 @@ class SessionService {
             }.done { (user, _) in
                 if let user = user {
                     self.user = user
-                    self.authenticationState = .authenticated
                     seal.fulfill(.authenticated)
                 } else {
                     seal.fulfill(.notAuthenticated)
@@ -59,7 +63,6 @@ class SessionService {
         }.done { (user, _) in
             if let user = user {
                 self.user = user
-                self.authenticationState = .authenticated
                 seal.fulfill(.authenticated)
                 
                 self.keychain[StorageKeys.username.rawValue] = username
@@ -89,6 +92,5 @@ class SessionService {
 extension SessionService: HNLoginDelegate {
     func didLogin(user: HNUser, cookie: HTTPCookie) {
         self.user = user
-        self.authenticationState = .authenticated
     }
 }
