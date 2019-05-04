@@ -230,6 +230,8 @@
 				24E4F26019B4DA9900574B52 /* CommentDelegate.swift */,
 				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 				24D811A41FF90A58000951C3 /* TouchableTextView.swift */,
+				241E8DA91944AF870004F457 /* CommentModel.swift */,
+				24191F8C1944C991003C0D98 /* CommentsController.swift */,
 			);
 			path = Comments;
 			sourceTree = "<group>";
@@ -243,20 +245,10 @@
 			path = Assets;
 			sourceTree = "<group>";
 		};
-		24CE5FF219434E20009D2677 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				241E8DA91944AF870004F457 /* CommentModel.swift */,
-				24191F8C1944C991003C0D98 /* CommentsController.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		24F39F7C18AFB1150055F8DC = {
 			isa = PBXGroup;
 			children = (
 				24F39F8E18AFB1150055F8DC /* Client */,
-				24CE5FF219434E20009D2677 /* Models */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				245345ED22466EA8001AF1CE /* HackersUITests */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
