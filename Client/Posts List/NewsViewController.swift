@@ -193,7 +193,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
     
     private func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: url)
+        let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self)
         safariViewController.previewActionItemsDelegate = self
         return safariViewController
     }

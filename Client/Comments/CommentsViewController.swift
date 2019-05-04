@@ -117,7 +117,7 @@ extension CommentsViewController: PostTitleViewDelegate {
             })
             
             // show link
-            let safariViewController = SFSafariViewController(url: url)
+            let safariViewController = SFSafariViewController.instance(for: url)
             setupHandoff(with: post, activityType: .link(url: url))
             self.present(safariViewController, animated: true, completion: nil)
         }
@@ -219,9 +219,9 @@ extension CommentsViewController: CommentDelegate {
         }
     }
     
-    func linkTapped(_ URL: Foundation.URL, sender: UITextView) {
-        let safariViewController = SFSafariViewController(url: URL)
-        setupHandoff(with: post, activityType: .link(url: URL))
+    func linkTapped(_ url: URL, sender: UITextView) {
+        let safariViewController = SFSafariViewController.instance(for: url)
+        setupHandoff(with: post, activityType: .link(url: url))
         self.present(safariViewController, animated: true, completion: nil)
     }
     

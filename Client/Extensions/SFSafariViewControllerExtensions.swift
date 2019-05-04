@@ -64,3 +64,13 @@ extension SFSafariViewController: Themed {
         view.backgroundColor = theme.backgroundColor
     }
 }
+
+extension SFSafariViewController {
+    public static func instance(for url: URL, previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? = nil) -> SFSafariViewController {
+        let configuration = SFSafariViewController.Configuration()
+        configuration.entersReaderIfAvailable = UserDefaults.standard.safariReaderModeEnabled
+        let safariViewController = SFSafariViewController(url: url, configuration: configuration)
+        safariViewController.previewActionItemsDelegate = previewActionItemsDelegate
+        return safariViewController
+    }
+}

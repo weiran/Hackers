@@ -15,8 +15,18 @@ extension UserDefaults {
     public func setDarkMode(_ enabled: Bool) {
         set(enabled ? "dark" : "light", forKey: UserDefaultsKeys.Theme.rawValue)
     }
+    
+    public var safariReaderModeEnabled: Bool {
+        let safariReaderModeSetting = bool(forKey: UserDefaultsKeys.SafariReaderMode.rawValue)
+        return safariReaderModeSetting
+    }
+    
+    public func setSafariReaderMode(_ enabled: Bool) {
+        set(enabled, forKey: UserDefaultsKeys.SafariReaderMode.rawValue)
+    }
 }
 
 enum UserDefaultsKeys: String {
     case Theme
+    case SafariReaderMode
 }

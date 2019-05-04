@@ -537,6 +537,44 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Reading" id="1AH-ih-fLT">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="SLb-pc-dXs" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="255.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SLb-pc-dXs" id="6r6-dg-b6u">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Open Safari in Reader mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wlj-6e-BYP">
+                                                    <rect key="frame" x="16" y="13.5" width="214" height="16.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cmY-8P-GUK">
+                                                    <rect key="frame" x="311" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="safariReaderModelValueChanged:" destination="uZL-eS-tCe" eventType="valueChanged" id="3vO-T8-iCV"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="cmY-8P-GUK" firstAttribute="centerY" secondItem="6r6-dg-b6u" secondAttribute="centerY" id="BKA-os-kxf"/>
+                                                <constraint firstItem="wlj-6e-BYP" firstAttribute="top" secondItem="6r6-dg-b6u" secondAttribute="topMargin" constant="2.5" id="BZd-48-jEX"/>
+                                                <constraint firstItem="wlj-6e-BYP" firstAttribute="leading" secondItem="6r6-dg-b6u" secondAttribute="leadingMargin" id="Gik-k2-BT0"/>
+                                                <constraint firstItem="wlj-6e-BYP" firstAttribute="centerY" secondItem="6r6-dg-b6u" secondAttribute="centerY" id="Icp-Bn-g1O"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="wlj-6e-BYP" secondAttribute="bottom" constant="3" id="RGM-8K-3kY"/>
+                                                <constraint firstAttribute="trailing" secondItem="cmY-8P-GUK" secondAttribute="trailing" constant="15" id="zwl-gm-26E"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="wlj-6e-BYP" id="SZR-Oy-MSz"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="uZL-eS-tCe" id="qU2-ix-dVN"/>
@@ -553,6 +591,7 @@
                     <connections>
                         <outlet property="accountLabel" destination="EN8-wt-Iug" id="dpg-ot-HmF"/>
                         <outlet property="darkModeSwitch" destination="uAe-yS-ppv" id="54F-9Q-wfy"/>
+                        <outlet property="safariReaderModeSwitch" destination="cmY-8P-GUK" id="6fh-TZ-GYa"/>
                         <outlet property="usernameLabel" destination="PDK-aN-wRW" id="lDn-Zb-2N1"/>
                     </connections>
                 </tableViewController>

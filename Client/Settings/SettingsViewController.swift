@@ -14,14 +14,16 @@ import Loaf
 class SettingsViewController: UITableViewController {
     public var sessionService: SessionService?
     
-    @IBOutlet weak var darkModeSwitch: UISwitch!
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
+    @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
+        safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         if self.sessionService!.authenticationState == .authenticated {
             self.usernameLabel.text = self.sessionService?.username
         }
@@ -30,6 +32,10 @@ class SettingsViewController: UITableViewController {
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
+    }
+    
+    @IBAction func safariReaderModelValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setSafariReaderMode(sender.isOn)
     }
     
     @IBAction private func didPressDone(_ sender: Any) {
