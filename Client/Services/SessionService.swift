@@ -15,14 +15,14 @@ class SessionService {
     private var user: HNUser?
     
     public var authenticationState: AuthenticationState {
-        if HNLogin.shared.user != nil && HNLogin.shared.sessionCookie != nil {
+        if HNLogin.shared.sessionCookie != nil {
             return .authenticated
         }
         return .notAuthenticated
     }
     
     public var username: String? {
-        return user?.username
+        return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
     
     init(hackerNewsService: HackerNewsService) {
@@ -58,5 +58,6 @@ class SessionService {
 extension SessionService: HNLoginDelegate {
     func didLogin(user: HNUser, cookie: HTTPCookie) {
         self.user = user
+        UserDefaults.standard.set(user.username, forKey: "username")
     }
 }

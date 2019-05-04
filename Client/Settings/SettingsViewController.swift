@@ -102,6 +102,5 @@ extension SettingsViewController: Themed {
         view.backgroundColor = theme.barBackgroundColor
         tableView.backgroundColor = theme.barBackgroundColor
         tableView.separatorColor = theme.separatorColor
-//        usernameLabel.textColor = theme.textColor
     }
 }
