@@ -17,7 +17,17 @@ extension SwinjectStoryboard {
         container.storyboardInitCompleted(CommentsViewController.self) { r, c in
             c.hackerNewsService = r.resolve(HackerNewsService.self)!
         }
+        container.storyboardInitCompleted(SettingsViewController.self) { r, c in
+            c.sessionService = r.resolve(SessionService.self)!
+        }
+        
         container.register(HackerNewsService.self) { _ in HackerNewsService() }
             .inObjectScope(.container)
+        container.register(SessionService.self) { r in SessionService(hackerNewsService: r.resolve(HackerNewsService.self)!) }
+            .inObjectScope(.container)
+    }
+    
+    class func getService<T>() -> T? {
+        return defaultContainer.resolve(T.self)
     }
 }

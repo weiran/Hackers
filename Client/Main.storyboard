@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Hacker News-->
+        <!--Empty Data Set Delegate-->
         <scene sceneID="Jh0-BO-yhM">
             <objects>
                 <tableViewController id="6t9-fC-JrD" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
@@ -100,6 +100,8 @@
                         <connections>
                             <outlet property="dataSource" destination="6t9-fC-JrD" id="elo-ui-hGm"/>
                             <outlet property="delegate" destination="6t9-fC-JrD" id="IoO-Tz-pXH"/>
+                            <outlet property="emptyDataSetDelegate" destination="6t9-fC-JrD" id="dcr-PL-cAY"/>
+                            <outlet property="emptyDataSetSource" destination="6t9-fC-JrD" id="cfW-Jd-tmf"/>
                         </connections>
                     </tableView>
                     <toolbarItems/>
@@ -207,7 +209,7 @@
             </objects>
             <point key="canvasLocation" x="-396" y="1397"/>
         </scene>
-        <!--Comments View Controller-->
+        <!--Empty Data Set Delegate-->
         <scene sceneID="xDu-IX-6YL">
             <objects>
                 <tableViewController id="evu-Yh-MGy" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
@@ -310,16 +312,22 @@
                                             </constraints>
                                         </view>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Author" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L3E-7j-QsZ">
-                                            <rect key="frame" x="10" y="10" width="145" height="21"/>
+                                            <rect key="frame" x="10" y="10" width="48" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" id="EPV-U0-UmM"/>
-                                                <constraint firstAttribute="width" constant="145" id="GKj-I0-OX2"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PointsIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Sef-jo-KdV">
+                                            <rect key="frame" x="59" y="13.5" width="14" height="14"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="14" id="5Mw-qs-KlH"/>
+                                                <constraint firstAttribute="height" constant="14" id="gtP-Tw-L8K"/>
+                                            </constraints>
+                                        </imageView>
                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2h ago" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SiI-0P-vgU">
-                                            <rect key="frame" x="220" y="10" width="145" height="21"/>
+                                            <rect key="frame" x="317.5" y="10" width="47.5" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" id="qeV-EL-Zz5"/>
                                             </constraints>
@@ -333,12 +341,13 @@
                                         <constraint firstItem="s0c-Xx-bNG" firstAttribute="leading" secondItem="Sbd-17-xKG" secondAttribute="leading" constant="-5" id="4gL-cL-iCW"/>
                                         <constraint firstAttribute="trailing" secondItem="s0c-Xx-bNG" secondAttribute="trailing" constant="10" id="8JF-bs-hgU"/>
                                         <constraint firstItem="s0c-Xx-bNG" firstAttribute="top" secondItem="L3E-7j-QsZ" secondAttribute="bottom" constant="2" id="DdF-Gx-NiT"/>
+                                        <constraint firstItem="Sef-jo-KdV" firstAttribute="leading" secondItem="L3E-7j-QsZ" secondAttribute="trailing" constant="1" id="LO0-Jq-bGB"/>
                                         <constraint firstAttribute="trailing" secondItem="SiI-0P-vgU" secondAttribute="trailing" constant="10" id="MfJ-ZM-Rko"/>
                                         <constraint firstItem="SiI-0P-vgU" firstAttribute="top" secondItem="cbj-iP-y7N" secondAttribute="top" constant="10" id="NIx-dN-JaW"/>
                                         <constraint firstAttribute="bottom" secondItem="s0c-Xx-bNG" secondAttribute="bottom" constant="9" id="WiD-Jv-5YL"/>
                                         <constraint firstItem="L3E-7j-QsZ" firstAttribute="top" secondItem="cbj-iP-y7N" secondAttribute="top" constant="10" id="e7P-kP-fsS"/>
-                                        <constraint firstItem="L3E-7j-QsZ" firstAttribute="width" secondItem="SiI-0P-vgU" secondAttribute="width" id="gvw-50-I6R"/>
                                         <constraint firstAttribute="trailing" secondItem="Sbd-17-xKG" secondAttribute="trailing" id="nTw-jd-4cq"/>
+                                        <constraint firstItem="Sef-jo-KdV" firstAttribute="centerY" secondItem="L3E-7j-QsZ" secondAttribute="centerY" id="p1F-tk-wp4"/>
                                         <constraint firstItem="Sbd-17-xKG" firstAttribute="leading" secondItem="cbj-iP-y7N" secondAttribute="leading" constant="10" id="uhJ-ru-QvA"/>
                                         <constraint firstItem="L3E-7j-QsZ" firstAttribute="leading" secondItem="Sbd-17-xKG" secondAttribute="leading" id="wYF-gp-a0O"/>
                                         <constraint firstAttribute="bottom" secondItem="Sbd-17-xKG" secondAttribute="bottom" id="waA-NK-VWY"/>
@@ -353,6 +362,7 @@
                                     <outlet property="datePostedLabel" destination="SiI-0P-vgU" id="L0N-mu-jYQ"/>
                                     <outlet property="leftPaddingConstraint" destination="uhJ-ru-QvA" id="cg9-7u-am2"/>
                                     <outlet property="separatorView" destination="Sbd-17-xKG" id="4x3-oC-jGC"/>
+                                    <outlet property="upvoteIconImageView" destination="Sef-jo-KdV" id="7Tq-5z-9RB"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ClosedCommentCell" rowHeight="44" id="SRx-1V-zp4" userLabel="Closed Comment Cell" customClass="CommentTableViewCell" customModule="Hackers" customModuleProvider="target">
@@ -414,6 +424,8 @@
                         <connections>
                             <outlet property="dataSource" destination="evu-Yh-MGy" id="4V2-pz-xZ2"/>
                             <outlet property="delegate" destination="evu-Yh-MGy" id="qal-AS-qcf"/>
+                            <outlet property="emptyDataSetDelegate" destination="evu-Yh-MGy" id="Afw-uR-2qU"/>
+                            <outlet property="emptyDataSetSource" destination="evu-Yh-MGy" id="OUQ-SS-XTQ"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="LhP-dy-b8f">
@@ -431,7 +443,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZK9-xq-FV6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1460" y="1397"/>
+            <point key="canvasLocation" x="1460" y="1396.5517241379312"/>
         </scene>
         <!--App Navigation Controller-->
         <scene sceneID="CQx-j9-MSt">
@@ -453,15 +465,44 @@
         <scene sceneID="Elr-K2-C7N">
             <objects>
                 <tableViewController id="uZL-eS-tCe" customClass="SettingsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="HXS-MD-hjw">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="HXS-MD-hjw">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
-                            <tableViewSection id="Ggi-tJ-1Av">
+                            <tableViewSection headerTitle="Login" id="cxD-wx-jlJ">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Uaz-Fp-Wl1" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="35" width="375" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="EN8-wt-Iug" detailTextLabel="PDK-aN-wRW" style="IBUITableViewCellStyleValue1" id="b2z-TO-21M" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="b2z-TO-21M" id="Nqt-rx-GbL">
+                                            <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Account" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="EN8-wt-Iug">
+                                                    <rect key="frame" x="16" y="12" width="63.5" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Not logged in" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PDK-aN-wRW">
+                                                    <rect key="frame" x="237" y="12" width="103" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Appearance" id="Ggi-tJ-1Av">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Uaz-Fp-Wl1" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="155.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Uaz-Fp-Wl1" id="e0A-YI-hGk">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -510,7 +551,9 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="accountLabel" destination="EN8-wt-Iug" id="dpg-ot-HmF"/>
                         <outlet property="darkModeSwitch" destination="uAe-yS-ppv" id="54F-9Q-wfy"/>
+                        <outlet property="usernameLabel" destination="PDK-aN-wRW" id="lDn-Zb-2N1"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KhC-65-Tqy" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -542,6 +585,7 @@
     </scenes>
     <resources>
         <image name="HackersIcon" width="128" height="128"/>
+        <image name="PointsIcon" width="14" height="14"/>
         <image name="SettingsIcon" width="28" height="28"/>
         <image name="ShareIcon" width="16" height="22"/>
         <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>

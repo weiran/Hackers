@@ -13,6 +13,7 @@ import PromiseKit
 import Kingfisher
 import HNScraper
 import Loaf
+import SwipeCellKit
 
 class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
@@ -27,8 +28,6 @@ class NewsViewController : UITableViewController {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
-        self.tableView.emptyDataSetSource = self
-        self.tableView.emptyDataSetDelegate = self
         self.tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         setupTheming()
         loadPosts()
@@ -57,13 +56,18 @@ class NewsViewController : UITableViewController {
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
         hackerNewsService?.getPosts(of: self.postType).map { (posts, nextPageIdentifier) in
-            self.posts = posts ?? [HNPost]()
+            self.posts = posts
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            // show empty data state by having an empty array rather than nil
+            if self.posts == nil {
+                self.posts = []
+            }
+            self.tableView.reloadData()
         }
     }
     
@@ -74,9 +78,7 @@ extension NewsViewController { // post fetching
         firstly {
             hackerNewsService!.getPosts(of: self.postType, nextPageIdentifier: nextPageIdentifier)
         }.done { (posts, nextPageIdentifier) in
-            if let posts = posts {
-                self.posts?.append(contentsOf: posts)
-            }
+            self.posts?.append(contentsOf: posts)
             self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
         }.catch { error in
@@ -92,6 +94,7 @@ extension NewsViewController {
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+        cell.postDelegate = self
         cell.delegate = self
         cell.clearImage()
         
@@ -107,6 +110,41 @@ extension NewsViewController {
         if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
+    }
+}
+
+extension NewsViewController: SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .left, let post = self.posts?[indexPath.row], post.type != .jobs else { return nil }
+        
+        let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+            if post.upvoted {
+                _ = self.hackerNewsService?.unvote(post: post)
+                post.upvoted = false
+                post.points -= 1
+            } else {
+                _ = self.hackerNewsService?.upvote(post: post)
+                post.upvoted = true
+                post.points += 1
+            }
+            guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
+            cell.postTitleView.post = post
+        }
+        upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
+        upvoteAction.textColor = .white
+        
+        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
+        upvoteAction.image = iconImage
+        
+        return [upvoteAction]
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
+        var options = SwipeOptions()
+        options.expansionStyle = expansionStyle
+        options.transitionStyle = .drag
+        return options
     }
 }
 
@@ -192,5 +230,9 @@ extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
         let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
         activityIndicatorView.startAnimating()
         return activityIndicatorView
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return posts != nil // only when empty data
     }
 }

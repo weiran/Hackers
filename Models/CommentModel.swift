@@ -16,7 +16,6 @@ enum CommentVisibilityType: Int {
 }
 
 class CommentModel {
-    
     var type: HNComment.HNCommentType
     var text: String
     var authorUsername: String
@@ -25,21 +24,24 @@ class CommentModel {
     var dateCreatedString: String
     var replyURL: URL?
     var level: Int
+    var upvoted: Bool
     
     var visibility: CommentVisibilityType = .visible
+    var source: HNComment
     
     init(source: HNComment) {
-        type = source.type
-        authorUsername = source.username
-        commentID = source.id
+        self.type = source.type
+        self.authorUsername = source.username
+        self.commentID = source.id
         //parentCommentID = source.ParentID
-        parentCommentID = ""
-        dateCreatedString = source.created
+        self.parentCommentID = ""
+        self.dateCreatedString = source.created
         if let _ = source.replyUrl {
-            replyURL = URL(string: source.replyUrl)
+            self.replyURL = URL(string: source.replyUrl)
         }
-        level = Int(source.level)
-        text = source.text
+        self.level = Int(source.level)
+        self.text = source.text
+        self.upvoted = source.upvoted
+        self.source = source
     }
-    
 }

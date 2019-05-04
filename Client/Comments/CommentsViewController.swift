@@ -39,8 +39,6 @@ class CommentsViewController : UITableViewController {
         super.viewDidLoad()
         setupTheming()
         setupPostTitleView()
-        self.tableView.emptyDataSetSource = self
-        self.tableView.emptyDataSetDelegate = self
         loadComments()
     }
 
@@ -76,10 +74,10 @@ class CommentsViewController : UITableViewController {
         }.done { comments in
             self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
-        }.ensure {
-            // something
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            self.comments = []
+            self.tableView.reloadData()
         }
     }
 
@@ -153,20 +151,43 @@ extension CommentsViewController {
 
 extension CommentsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
+        switch orientation {
+        case .right:
+            let collapseAction = SwipeAction(style: .default, title: "Collapse") { action, indexPath in
+                let comment = self.commentsController.visibleComments[indexPath.row]
+                guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
+                self.toggleCellVisibilityForCell(IndexPath(row: index, section: 0))
+            }
+            collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
+            collapseAction.textColor = .white
+            
+            let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+            collapseAction.image = iconImage
+            
+            return [collapseAction]
         
-        let collapseAction = SwipeAction(style: .default, title: "Collapse") { action, indexPath in
-            let comment = self.commentsController.visibleComments[indexPath.row]
-            guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
-            self.toggleCellVisibilityForCell(IndexPath(row: index, section: 0))
+        case .left:
+            let voteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+                let comment = self.commentsController.visibleComments[indexPath.row]
+                if comment.upvoted == false {
+                    _ = self.hackerNewsService?.upvote(comment: comment.source)
+                    comment.upvoted = true
+                } else {
+                    _ = self.hackerNewsService?.unvote(comment: comment.source)
+                    comment.upvoted = false
+                }
+                if let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell {
+                    cell.updateCommentContent(with: comment)
+                }
+            }
+            voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
+            voteAction.textColor = .white
+            
+            let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
+            voteAction.image = iconImage
+            
+            return [voteAction]
         }
-        collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
-        collapseAction.textColor = .white
-        
-        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
-        collapseAction.image = iconImage
-        
-        return [collapseAction]
     }
     
     func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
