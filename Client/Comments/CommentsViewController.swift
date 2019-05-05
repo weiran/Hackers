@@ -141,7 +141,7 @@ extension CommentsViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
-        cell.updateCommentContent(with: comment)
+        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
         cell.commentDelegate = self
         cell.delegate = self
         
@@ -177,7 +177,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                     comment.upvoted = false
                 }
                 if let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell {
-                    cell.updateCommentContent(with: comment)
+                    cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
                 }
             }
             voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
