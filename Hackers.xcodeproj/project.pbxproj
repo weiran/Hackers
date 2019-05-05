@@ -401,11 +401,11 @@
 			};
 			buildConfigurationList = 24F39F8018AFB1150055F8DC /* Build configuration list for PBXProject "Hackers" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
