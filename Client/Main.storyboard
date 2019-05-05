@@ -279,9 +279,12 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="trailingMargin" secondItem="8cN-uq-YpK" secondAttribute="trailing" constant="8" id="013-ZY-aoA"/>
-                                <constraint firstItem="8cN-uq-YpK" firstAttribute="bottom" secondItem="TBd-Ir-wIJ" secondAttribute="bottomMargin" id="Odf-Dd-tgD"/>
+                                <constraint firstItem="8cN-uq-YpK" firstAttribute="bottom" secondItem="TBd-Ir-wIJ" secondAttribute="bottomMargin" constant="-8" id="Odf-Dd-tgD"/>
+                                <constraint firstAttribute="bottom" secondItem="iMM-lY-F2T" secondAttribute="bottom" id="pkS-Nd-VE8"/>
                                 <constraint firstItem="8cN-uq-YpK" firstAttribute="top" secondItem="TBd-Ir-wIJ" secondAttribute="topMargin" constant="8" id="req-yr-Puw"/>
                                 <constraint firstItem="8cN-uq-YpK" firstAttribute="leading" secondItem="TBd-Ir-wIJ" secondAttribute="leadingMargin" constant="8" id="rkl-EZ-1eh"/>
+                                <constraint firstAttribute="trailing" secondItem="iMM-lY-F2T" secondAttribute="trailing" id="vvB-PZ-8fB"/>
+                                <constraint firstItem="iMM-lY-F2T" firstAttribute="leading" secondItem="TBd-Ir-wIJ" secondAttribute="leading" constant="15" id="wSD-R0-Gnw"/>
                             </constraints>
                         </view>
                         <prototypes>
