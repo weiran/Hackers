@@ -34,6 +34,7 @@ class CommentsViewController : UITableViewController {
     @IBOutlet weak private var postTitleContainerView: UIView!
     @IBOutlet weak private var postTitleView: PostTitleView!
     @IBOutlet weak private var thumbnailImageView: UIImageView!
+    @IBOutlet weak private var postTitleSeparatorView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,7 +142,7 @@ extension CommentsViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
-        cell.updateCommentContent(with: comment)
+        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
         cell.commentDelegate = self
         cell.delegate = self
         
@@ -177,7 +178,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                     comment.upvoted = false
                 }
                 if let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell {
-                    cell.updateCommentContent(with: comment)
+                    cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
                 }
             }
             voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
@@ -208,6 +209,7 @@ extension CommentsViewController: Themed {
         view.backgroundColor = theme.backgroundColor
         tableView.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
+        postTitleSeparatorView.backgroundColor = theme.separatorColor
         postTitleContainerView.backgroundColor = theme.backgroundColor
     }
 }

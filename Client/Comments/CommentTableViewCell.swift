@@ -17,12 +17,7 @@ class CommentTableViewCell : SwipeTableViewCell {
         didSet { updateIndentPadding() }
     }
     
-    private var comment: CommentModel? {
-        didSet {
-            guard let comment = comment else { return }
-            updateCommentContent(with: comment)
-        }
-    }
+    private var comment: CommentModel?
     
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel : UILabel!
@@ -49,7 +44,9 @@ class CommentTableViewCell : SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
     
-    public func updateCommentContent(with comment: CommentModel) {
+    public func updateCommentContent(with comment: CommentModel, theme: AppTheme) {
+        self.comment = comment
+        
         let isCollapsed = comment.visibility != .visible
         level = comment.level
         authorLabel.text = comment.authorUsername
@@ -61,13 +58,11 @@ class CommentTableViewCell : SwipeTableViewCell {
         if let commentTextView = commentTextView, comment.visibility == .visible {
             // only for expanded comments
             let commentFont = UIFont.preferredFont(forTextStyle: .subheadline)
-            let commentTextColor = AppThemeProvider.shared.currentTheme.textColor
-            
             let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
             let commentRange = NSMakeRange(0, commentAttributedString.length)
             
             commentAttributedString.addAttribute(NSAttributedString.Key.font, value: commentFont, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: commentTextColor, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: theme.textColor, range: commentRange)
             
             commentTextView.attributedText = commentAttributedString
         }
@@ -125,6 +120,9 @@ extension CommentTableViewCell: Themed {
         }
         if separatorView != nil {
             separatorView.backgroundColor = theme.separatorColor
+        }
+        if let comment = self.comment {
+            updateCommentContent(with: comment, theme: theme)
         }
     }
 }
