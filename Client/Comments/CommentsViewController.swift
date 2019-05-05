@@ -34,6 +34,7 @@ class CommentsViewController : UITableViewController {
     @IBOutlet weak private var postTitleContainerView: UIView!
     @IBOutlet weak private var postTitleView: PostTitleView!
     @IBOutlet weak private var thumbnailImageView: UIImageView!
+    @IBOutlet weak private var postTitleSeparatorView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -208,6 +209,7 @@ extension CommentsViewController: Themed {
         view.backgroundColor = theme.backgroundColor
         tableView.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
+        postTitleSeparatorView.backgroundColor = theme.separatorColor
         postTitleContainerView.backgroundColor = theme.backgroundColor
     }
 }

@@ -222,10 +222,10 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="8cN-uq-YpK">
-                                    <rect key="frame" x="16" y="36" width="343" height="76"/>
+                                    <rect key="frame" x="16" y="36" width="343" height="68"/>
                                     <subviews>
                                         <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" highlightedImage="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="kJA-Yu-NaE">
-                                            <rect key="frame" x="0.0" y="8" width="60" height="60"/>
+                                            <rect key="frame" x="0.0" y="4" width="60" height="60"/>
                                             <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                             <gestureRecognizers/>
@@ -240,7 +240,7 @@
                                             </userDefinedRuntimeAttributes>
                                         </imageView>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DpN-B9-9nA" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                            <rect key="frame" x="72" y="17.5" width="271" height="41.5"/>
+                                            <rect key="frame" x="72" y="13.5" width="271" height="41.5"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="IX9-Bp-PXi">
                                                     <rect key="frame" x="0.0" y="0.0" width="271" height="41.5"/>
@@ -275,6 +275,13 @@
                                         </view>
                                     </subviews>
                                 </stackView>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iMM-lY-F2T" userLabel="Separator View">
+                                    <rect key="frame" x="15" y="119.5" width="360" height="0.5"/>
+                                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="0.5" id="33M-Ld-VdQ"/>
+                                    </constraints>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
@@ -307,7 +314,7 @@
                                                 <outlet property="delegate" destination="cqK-Qe-Eib" id="iVE-6k-IE5"/>
                                             </connections>
                                         </textView>
-                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sbd-17-xKG" userLabel="Seperator View">
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sbd-17-xKG" userLabel="Separator View">
                                             <rect key="frame" x="10" y="143.5" width="365" height="0.5"/>
                                             <color key="backgroundColor" red="0.785933514" green="0.785933514" blue="0.785933514" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
@@ -375,7 +382,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="42"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yXr-Oq-Vwx" userLabel="Seperator View">
+                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yXr-Oq-Vwx" userLabel="Separator View">
                                             <rect key="frame" x="10" y="41.5" width="365" height="0.5"/>
                                             <color key="backgroundColor" red="0.785933514" green="0.785933514" blue="0.785933514" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
@@ -440,6 +447,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="postTitleContainerView" destination="TBd-Ir-wIJ" id="Q5s-7i-qMX"/>
+                        <outlet property="postTitleSeparatorView" destination="iMM-lY-F2T" id="Onr-N2-3mW"/>
                         <outlet property="postTitleView" destination="DpN-B9-9nA" id="TNI-Zg-vfG"/>
                         <outlet property="thumbnailImageView" destination="kJA-Yu-NaE" id="edk-8C-BHl"/>
                     </connections>
