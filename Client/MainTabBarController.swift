@@ -43,6 +43,7 @@ class MainTabBarController: UITabBarController {
             postType = .news
             typeName = "Top"
             iconName = "TopIcon"
+            break
         case 1:
             postType = .asks
             typeName = "Ask"

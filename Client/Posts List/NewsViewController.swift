@@ -48,6 +48,7 @@ class NewsViewController : UITableViewController {
                 let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
                 let post = posts?[indexPath.row]
                 commentsViewController.post = post
+                commentsViewController.hidesBottomBarWhenPushed = true
             }
         }
     }
