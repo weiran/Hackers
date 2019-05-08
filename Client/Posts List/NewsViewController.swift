@@ -41,15 +41,12 @@ class NewsViewController : UITableViewController {
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowComments" {
-            if let indexPath = tableView.indexPathForSelectedRow,
-                let segueNavigationController = segue.destination as? UINavigationController,
-                let commentsViewController = segueNavigationController.topViewController as? CommentsViewController {
-                let post = posts?[indexPath.row]
-                commentsViewController.post = post
-                commentsViewController.hidesBottomBarWhenPushed = true
-            }
+    func navigateToComments(for post : HNPost) {
+        if let commentsViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CommentsViewController") as? CommentsViewController {
+            commentsViewController.post = post
+            commentsViewController.hidesBottomBarWhenPushed = true
+            let appNavigationController = AppNavigationController(rootViewController: commentsViewController)
+            self.navigationController?.pushViewController(appNavigationController, animated: true)
         }
     }
 }
@@ -110,6 +107,15 @@ extension NewsViewController {
     override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let post = posts?[indexPath.row] else { return }
+        if postType == .jobs {
+            didPressLinkButton(post)
+        } else {
+            navigateToComments(for: post)
         }
     }
 }
@@ -188,7 +194,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
             [unowned self, indexPath = indexPath] (action, viewController) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self.performSegue(withIdentifier: "ShowComments", sender: nil)
+            self.navigateToComments(for: post)
         }
         return [viewCommentsPreviewAction]
     }
