@@ -39,6 +39,8 @@ class NewsViewController : UITableViewController {
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
             self.smoothlyDeselectRows()
         }
+        self.tabBarController?.tabBar.layer.zPosition = 0
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
