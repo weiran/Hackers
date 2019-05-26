@@ -93,7 +93,6 @@
                                 <connections>
                                     <outlet property="postTitleView" destination="fNt-dt-R2Y" id="Xg6-38-hok"/>
                                     <outlet property="thumbnailImageView" destination="OFG-KR-Pd0" id="i8s-bN-Xew"/>
-                                    <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowComments" id="Tz8-FP-fhl"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -212,7 +211,7 @@
         <!--Empty Data Set Delegate-->
         <scene sceneID="xDu-IX-6YL">
             <objects>
-                <tableViewController id="evu-Yh-MGy" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="CommentsViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="evu-Yh-MGy" customClass="CommentsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="60" sectionFooterHeight="18" id="TkO-Pr-orw">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
