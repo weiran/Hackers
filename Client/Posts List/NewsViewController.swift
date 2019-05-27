@@ -53,7 +53,7 @@ class NewsViewController : UITableViewController {
         if let commentsViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CommentsViewController") as? CommentsViewController {
             commentsViewController.post = post
             commentsViewController.hidesBottomBarWhenPushed = true
-            let appNavigationController = AppNavigationController(rootViewController: commentsViewController)
+            let appNavigationController = UINavigationController(rootViewController: commentsViewController)
             self.navigationController?.pushViewController(appNavigationController, animated: true)
         }
     }

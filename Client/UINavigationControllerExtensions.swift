@@ -1,5 +1,5 @@
 //
-//  AppNavigationController.swift
+//  UINavigationControllerExtensions.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 05/05/2018.
@@ -8,15 +8,17 @@
 
 import UIKit
 
-class AppNavigationController: UINavigationController {
-    override func viewDidLoad() {
+extension UINavigationController: Themed {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         navigationBar.setValue(true, forKey: "hidesShadow")
     }
-}
-
-extension AppNavigationController: Themed {
+    
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
+        return AppThemeProvider.shared.currentTheme.statusBarStyle
+    }
+    
     func applyTheme(_ theme: AppTheme) {
         navigationBar.barTintColor = theme.barBackgroundColor
         navigationBar.tintColor = theme.barForegroundColor
@@ -25,5 +27,8 @@ extension AppNavigationController: Themed {
         ]
         navigationBar.titleTextAttributes = titleTextAttributes
         navigationBar.largeTitleTextAttributes = titleTextAttributes
+        DispatchQueue.main.async {
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
     }
 }
