@@ -30,6 +30,7 @@
 		2464D21F209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */; };
 		2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2477BDE4227D9D8200771FE2 /* SessionService.swift */; };
 		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
+		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
@@ -95,6 +96,7 @@
 		2464D21E209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+UserDefaultsExtensions.swift"; sourceTree = "<group>"; };
 		2477BDE4227D9D8200771FE2 /* SessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionService.swift; sourceTree = "<group>"; };
 		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
+		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
@@ -215,6 +217,15 @@
 			name = HackerSwifter;
 			sourceTree = "<group>";
 		};
+		24993C58229C76EA00AF1891 /* AuthenticationUIService */ = {
+			isa = PBXGroup;
+			children = (
+				24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */,
+				24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */,
+			);
+			path = AuthenticationUIService;
+			sourceTree = "<group>";
+		};
 		24CE5FEE19434DC0009D2677 /* Posts List */ = {
 			isa = PBXGroup;
 			children = (
@@ -317,9 +328,9 @@
 		24FF0219226C99B1002EF8DD /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				24993C58229C76EA00AF1891 /* AuthenticationUIService */,
 				24FF021A226C99FA002EF8DD /* HackerNewsService.swift */,
 				2477BDE4227D9D8200771FE2 /* SessionService.swift */,
-				24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -569,6 +580,7 @@
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
 				2464D211209DE7B100C7F8FC /* UIColorExtensions.swift in Sources */,
+				24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
 				24FF021B226C99FA002EF8DD /* HackerNewsService.swift in Sources */,
