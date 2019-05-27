@@ -22,8 +22,17 @@ class AuthenticationUIService {
     var bulletinManager: BLTNItemManager?
     
     public func showAuthentication() {
-        self.bulletinManager = BLTNItemManager(rootItem: loginPage())
+        let manager = BLTNItemManager(rootItem: loginPage())
+        let theme = AppThemeProvider.shared.currentTheme
+        manager.backgroundColor = theme.barBackgroundColor
+        self.bulletinManager = manager
         self.bulletinManager?.showBulletin(in: UIApplication.shared)
+    }
+    
+    private func displayActivityIndicator() {
+        guard let bulletinManager = self.bulletinManager else { return }
+        let theme = AppThemeProvider.shared.currentTheme
+        bulletinManager.displayActivityIndicator(color: theme.textColor)
     }
     
     private func loginPage() -> AuthenticationBulletinPage {
@@ -41,7 +50,7 @@ class AuthenticationUIService {
             if item.usernameTextField.text!.isEmpty || item.passwordTextField.text!.isEmpty {
                 item.set(state: .invalid)
             } else {
-                self.bulletinManager?.displayActivityIndicator()
+                self.displayActivityIndicator()
             
                 self.sessionService.authenticate(username: item.usernameTextField.text!, password: item.passwordTextField.text!)
                 .done { authenticationState in
@@ -62,6 +71,8 @@ class AuthenticationUIService {
             item.manager?.dismissBulletin()
         }
         
+        themeAppearance(of: page)
+        
         return page
     }
     
@@ -70,13 +81,23 @@ class AuthenticationUIService {
         let username = self.sessionService.username!
         page.descriptionText = "Successfully logged in as \(username)"
         page.image = UIImage(named: "SuccessIcon")?.withRenderingMode(.alwaysTemplate)
+        page.appearance.imageViewTintColor = #colorLiteral(red: 0.2980392157, green: 0.8509803922, blue: 0.3921568627, alpha: 1)
         page.isDismissable = true
         page.actionButtonTitle = "Dismiss"
         page.actionHandler = { item in
             item.manager?.dismissBulletin()
         }
+        themeAppearance(of: page)
         
         return page
+    }
+    
+    private func themeAppearance(of item: BLTNPageItem) {
+        let theme = AppThemeProvider.shared.currentTheme
+        item.appearance.actionButtonColor = theme.appTintColor
+        item.appearance.alternativeButtonTitleColor = theme.appTintColor
+        item.appearance.titleTextColor = theme.titleTextColor
+        item.appearance.descriptionTextColor = theme.textColor
     }
     
     struct Notifications {
@@ -93,20 +114,44 @@ class AuthenticationBulletinPage: BLTNPageItem {
     @objc public var passwordTextField: UITextField!
     
     override func makeViewsUnderDescription(with interfaceBuilder: BLTNInterfaceBuilder) -> [UIView]? {
-        let usernameTextField = interfaceBuilder.makeTextField(placeholder: "Username", returnKey: .next, delegate: self)
+        let theme = AppThemeProvider.shared.currentTheme
+        
+        let usernameTextField = textField(with: theme)
+        usernameTextField.delegate = self
         usernameTextField.textContentType = .username
         usernameTextField.autocorrectionType = .no
         usernameTextField.autocapitalizationType = .none
+        usernameTextField.returnKeyType = .next
+        usernameTextField.attributedPlaceholder = themedAttributedString(for: "Username", color: theme.lightTextColor)
         
-        
-        let passwordTextField = interfaceBuilder.makeTextField(placeholder: "Password", returnKey: .go, delegate: self)
+        let passwordTextField = textField(with: theme)
+        passwordTextField.delegate = self
         passwordTextField.isSecureTextEntry = true
         passwordTextField.textContentType = .password
+        passwordTextField.returnKeyType = .done
+        passwordTextField.attributedPlaceholder = themedAttributedString(for: "Password", color: theme.lightTextColor)
         
         self.usernameTextField = usernameTextField
         self.passwordTextField = passwordTextField
         
         return [self.usernameTextField, self.passwordTextField]
+    }
+    
+    private func themedAttributedString(for string: String, color: UIColor) -> NSAttributedString {
+        let attributes = [NSAttributedString.Key.foregroundColor: color]
+        return NSAttributedString(string: string, attributes: attributes)
+    }
+    
+    private func textField(with theme: AppTheme) -> UITextField {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.backgroundColor = theme.backgroundColor
+        textField.textColor = theme.textColor
+        textField.layer.borderColor = theme.separatorColor.cgColor
+        textField.layer.borderWidth = 1.0
+        textField.layer.cornerRadius = 8
+        textField.layer.masksToBounds = true
+        return textField
     }
     
     override func actionButtonTapped(sender: UIButton) {
