@@ -113,6 +113,10 @@ class AuthenticationBulletinPage: BLTNPageItem {
     @objc public var usernameTextField: UITextField!
     @objc public var passwordTextField: UITextField!
     
+    override func willDisplay() {
+        self.usernameTextField.becomeFirstResponder()
+    }
+    
     override func makeViewsUnderDescription(with interfaceBuilder: BLTNInterfaceBuilder) -> [UIView]? {
         let theme = AppThemeProvider.shared.currentTheme
         
