@@ -122,20 +122,44 @@ extension NewsViewController {
 
 extension NewsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .left, let post = self.posts?[indexPath.row], post.type != .jobs else { return nil }
+        guard orientation == .left,
+            let post = self.posts?[indexPath.row],
+            post.type != .jobs,
+            let hackerNewsService = self.hackerNewsService else {
+                return nil
+        }
+        
+        let voteOnPost: (HNPost, Bool) -> Void = { post, isUpvote in
+            guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
+            post.upvoted = isUpvote
+            post.points += isUpvote ? 1 : -1
+            cell.postTitleView.post = post
+        }
+        
+        let errorHandler: (Error) -> Void = { error in
+            guard let hnError = error as? HNScraper.HNScraperError else { return }
+            switch hnError {
+            case .notLoggedIn:
+                Loaf("Not authenticated", state: .error, sender: self).show()
+            default:
+                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            }
+            
+            // revert to the previous post state
+            voteOnPost(post, !post.upvoted)
+        }
         
         let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+            voteOnPost(post, !post.upvoted)
             if post.upvoted {
-                _ = self.hackerNewsService?.unvote(post: post)
-                post.upvoted = false
-                post.points -= 1
+                hackerNewsService
+                    .unvote(post: post)
+                    .catch(errorHandler)
             } else {
-                _ = self.hackerNewsService?.upvote(post: post)
-                post.upvoted = true
-                post.points += 1
+                hackerNewsService
+                    .upvote(post: post)
+                    .catch(errorHandler)
             }
-            guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
-            cell.postTitleView.post = post
         }
         upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         upvoteAction.textColor = .white
