@@ -2,7 +2,7 @@ PODS:
   - DeviceKit (2.0.0)
   - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
-  - Kingfisher (5.4.0)
+  - Kingfisher (5.5.0)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
   - Swinject (2.6.0)
@@ -45,8 +45,8 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   DeviceKit: 72d36709552d4b3582abd76a53949148acad9811
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  HNScraper: 6b8bb52adcaf0d39c4efe49e7440e55253f48674
-  Kingfisher: 9c8f2cc6710334e06f32ba2b45e77707d5e2f0c9
+  HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
+  Kingfisher: 6fe5e67a90fd335e49b0f5c075ff55ac5ebedd94
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
   Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
@@ -55,4 +55,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 8d6d1f1f8b770a76ddb05235e57df829772a90ab
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.7.0
