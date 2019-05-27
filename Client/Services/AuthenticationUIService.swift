@@ -100,6 +100,10 @@ class AuthenticationUIService {
         item.appearance.descriptionTextColor = theme.textColor
     }
     
+    public func performLogin() {
+        
+    }
+    
     struct Notifications {
         static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
     }
@@ -193,5 +197,15 @@ extension AuthenticationBulletinPage: UITextFieldDelegate {
         } else {
             self.set(state: .invalid)
         }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == self.usernameTextField {
+            self.passwordTextField.becomeFirstResponder()
+        } else if textField == self.passwordTextField {
+            self.actionButtonTapped(sender: UIButton())
+        }
+        
+        return true
     }
 }
