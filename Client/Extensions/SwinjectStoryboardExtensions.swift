@@ -17,6 +17,7 @@ extension SwinjectStoryboard {
         }
         container.storyboardInitCompleted(CommentsViewController.self) { r, c in
             c.hackerNewsService = r.resolve(HackerNewsService.self)!
+            c.authenticationUIService = r.resolve(AuthenticationUIService.self)!
         }
         container.storyboardInitCompleted(SettingsViewController.self) { r, c in
             c.sessionService = r.resolve(SessionService.self)!
