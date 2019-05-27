@@ -107,6 +107,15 @@ class AuthenticationUIService {
     private func sendAuthenticationDidChangeNotification() {
         NotificationCenter.default.post(name: Notifications.AuthenticationDidChangeNotification, object: nil)
     }
+    
+    public func unauthenticatedAlertController() -> UIAlertController {
+        let authenticationAlert = UIAlertController(title: "Not logged in", message: "You're not logged into Hacker News. Do you want to login now?", preferredStyle: .alert)
+        authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
+        authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { action in
+            self.showAuthentication()
+        }))
+        return authenticationAlert
+    }
 }
 
 class AuthenticationBulletinPage: BLTNPageItem {

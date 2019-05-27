@@ -141,12 +141,9 @@ extension NewsViewController: SwipeTableViewCellDelegate {
             guard let hnError = error as? HNScraper.HNScraperError else { return }
             switch hnError {
             case .notLoggedIn:
-                let authenticationAlert = UIAlertController(title: "Not logged in", message: "You're not logged into Hacker News. Do you want to login now?", preferredStyle: .alert)
-                authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
-                authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { action in
-                    self.authenticationUIService?.showAuthentication()
-                }))
-                self.present(authenticationAlert, animated: true)
+                if let authenticationAlert = self.authenticationUIService?.unauthenticatedAlertController() {
+                    self.present(authenticationAlert, animated: true)
+                }
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
             }
