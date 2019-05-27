@@ -100,10 +100,6 @@ class AuthenticationUIService {
         item.appearance.descriptionTextColor = theme.textColor
     }
     
-    public func performLogin() {
-        
-    }
-    
     struct Notifications {
         static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
     }
