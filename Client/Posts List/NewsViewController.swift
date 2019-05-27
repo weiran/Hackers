@@ -30,8 +30,15 @@ class NewsViewController : UITableViewController {
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
         self.tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
+        NotificationCenter.default.addObserver(forName: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                                               object: nil,
+                                               queue: .main) { _ in self.loadPosts() }
         setupTheming()
         loadPosts()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
