@@ -19,12 +19,11 @@ class AuthenticationUIService {
         self.sessionService = sessionService
     }
     
-    lazy var bulletinManager: BLTNItemManager = {
-        return BLTNItemManager(rootItem: loginPage())
-    }()
+    var bulletinManager: BLTNItemManager?
     
     public func showAuthentication() {
-        self.bulletinManager.showBulletin(in: UIApplication.shared)
+        self.bulletinManager = BLTNItemManager(rootItem: loginPage())
+        self.bulletinManager?.showBulletin(in: UIApplication.shared)
     }
     
     private func loginPage() -> AuthenticationBulletinPage {
@@ -42,21 +41,24 @@ class AuthenticationUIService {
             if item.usernameTextField.text!.isEmpty || item.passwordTextField.text!.isEmpty {
                 item.set(state: .invalid)
             } else {
-                self.bulletinManager.displayActivityIndicator()
+                self.bulletinManager?.displayActivityIndicator()
             
                 self.sessionService.authenticate(username: item.usernameTextField.text!, password: item.passwordTextField.text!)
                 .done { authenticationState in
                     page.next = self.loginSuccessPage()
                     item.manager?.displayNextItem()
+                }.ensure {
+                    self.sendAuthenticationDidChangeNotification()
                 }.catch { error in
                     item.set(state: .invalid)
-                    self.bulletinManager.hideActivityIndicator()
+                    self.bulletinManager?.hideActivityIndicator()
                 }
             }
         }
         
         page.alternativeHandler = { item in
             self.hackerNewsService.logout()
+            self.sendAuthenticationDidChangeNotification()
             item.manager?.dismissBulletin()
         }
         
@@ -75,6 +77,14 @@ class AuthenticationUIService {
         }
         
         return page
+    }
+    
+    struct Notifications {
+        static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
+    }
+    
+    private func sendAuthenticationDidChangeNotification() {
+        NotificationCenter.default.post(name: Notifications.AuthenticationDidChangeNotification, object: nil)
     }
 }
 
