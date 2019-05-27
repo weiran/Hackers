@@ -24,6 +24,10 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return AppThemeProvider.shared.currentTheme.statusBarStyle
+    }
 }
 
 extension MainSplitViewController: Themed {
@@ -31,9 +35,5 @@ extension MainSplitViewController: Themed {
     open func applyTheme(_ theme: AppTheme) {
         UITextView.appearance().tintColor = theme.appTintColor
         UITabBar.appearance().tintColor = theme.appTintColor
-        
-        /// It's not ideal to use UIApplication.shared but overriding preferredStatusBarStyle
-        /// doesn't work with a UITabBarController and UISplitViewController
-        UIApplication.shared.statusBarStyle = theme.statusBarStyle
     }
 }

@@ -11,6 +11,7 @@ target 'Hackers' do
   pod 'SwipeCellKit'
   pod 'Swinject'
   pod 'SwinjectStoryboard'
+  pod 'BulletinBoard'
 end
 
 target 'HackersUITests' do

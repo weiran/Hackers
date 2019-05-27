@@ -17,6 +17,7 @@ import Loaf
 
 class CommentsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
+    public var authenticationUIService: AuthenticationUIService?
     
     private enum ActivityType {
         case comments
@@ -111,7 +112,7 @@ class CommentsViewController : UITableViewController {
 extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
         if verifyLink(post.url), let url = post.url {
-            // animate background colour for tap
+            // animate background color for tap
             self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
@@ -168,17 +169,41 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             return [collapseAction]
         
         case .left:
-            let voteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
-                let comment = self.commentsController.visibleComments[indexPath.row]
-                if comment.upvoted == false {
-                    _ = self.hackerNewsService?.upvote(comment: comment.source)
-                    comment.upvoted = true
-                } else {
-                    _ = self.hackerNewsService?.unvote(comment: comment.source)
-                    comment.upvoted = false
+            guard let hackerNewsService = self.hackerNewsService else { return nil }
+            let comment = self.commentsController.visibleComments[indexPath.row]
+            
+            let voteOnComment: (CommentModel, Bool) -> () = { comment, isUpvote in
+                guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
+                comment.upvoted = isUpvote
+                cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
+            }
+            
+            let errorHandler: (Error) -> Void = { error in
+                guard let hnError = error as? HNScraper.HNScraperError else { return }
+                switch hnError {
+                case .notLoggedIn:
+                    if let authenticationAlert = self.authenticationUIService?.unauthenticatedAlertController() {
+                        self.present(authenticationAlert, animated: true)
+                    }
+                default:
+                    Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
                 }
-                if let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell {
-                    cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
+                
+                // revert to the previous post state
+                voteOnComment(comment, !comment.upvoted)
+            }
+            
+            let voteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+                let upvoted = comment.upvoted
+                voteOnComment(comment, !comment.upvoted)
+                if upvoted {
+                    hackerNewsService
+                        .unvote(comment: comment.source)
+                        .catch(errorHandler)
+                } else {
+                    hackerNewsService
+                        .upvote(comment: comment.source)
+                        .catch(errorHandler)
                 }
             }
             voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor

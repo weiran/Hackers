@@ -40,7 +40,7 @@ class SessionService {
                 self.user = user
                 seal.fulfill(.authenticated)
             } else {
-                seal.fulfill(.notAuthenticated)
+                seal.reject(HNScraper.HNScraperError.notLoggedIn)
             }
         }.catch { error in
             seal.reject(error)

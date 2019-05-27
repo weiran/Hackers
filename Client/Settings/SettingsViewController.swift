@@ -13,6 +13,7 @@ import Loaf
 
 class SettingsViewController: UITableViewController {
     public var sessionService: SessionService?
+    public var authenticationUIService: AuthenticationUIService?
     
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
@@ -24,8 +25,21 @@ class SettingsViewController: UITableViewController {
         setupTheming()
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
+        updateUsername()
+        NotificationCenter.default.addObserver(forName: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification, object: nil, queue: .main) { _ in
+            self.updateUsername()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func updateUsername() {
         if self.sessionService!.authenticationState == .authenticated {
             self.usernameLabel.text = self.sessionService?.username
+        } else {
+            self.usernameLabel.text = "Not logged in"
         }
     }
     
@@ -51,55 +65,14 @@ extension SettingsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            self.showLogin()
+            self.authenticationUIService?.showAuthentication()
             break
             
         default: break
         }
-    }
-    
-    private func showLogin() {
-        let loginController = UIAlertController(title: "Login to Hacker News", message: "Your Hacker News credentials are stored securely on your device only.", preferredStyle: .alert)
-        let loginAction = UIAlertAction(title: "Login", style: .default) { action in
-            guard let username = loginController.textFields?[0].text, let password = loginController.textFields?[1].text else {
-                return
-            }
-            firstly {
-                self.sessionService!.authenticate(username: username, password: password)
-            }.done { authenticationState in
-                guard authenticationState == .authenticated else { return }
-                self.usernameLabel.text = self.sessionService!.username
-                Loaf("Logged in as \(username)", state: .success, sender: self).show()
-            }.ensure {
-                guard let indexPath = self.tableView.indexPathForSelectedRow else { return }
-                self.tableView.deselectRow(at: indexPath, animated: true)
-            }.catch { error in
-                switch error as! HNLogin.HNLoginError {
-                case .badCredentials:
-                    let badCredentialsAlert = UIAlertController(title: "Login to Hacker News", message: "Your username or password was incorrect.", preferredStyle: .alert)
-                    badCredentialsAlert.addAction(UIAlertAction(title: "Try Again", style: .default, handler: { action in
-                        self.showLogin()
-                    }))
-                    badCredentialsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                    self.present(badCredentialsAlert, animated: true)
-                default:
-                    Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-                    break
-                }
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            tableView.deselectRow(at: indexPath, animated: true)
         }
-        loginController.addAction(loginAction)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        loginController.addAction(cancelAction)
-        loginController.addTextField { textField in
-            textField.placeholder = "Username"
-            textField.autocorrectionType = .no
-        }
-        loginController.addTextField { textField in
-            textField.placeholder = "Password"
-            textField.isSecureTextEntry = true
-        }
-        self.present(loginController, animated: true)
     }
 }
 
