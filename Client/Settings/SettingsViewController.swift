@@ -13,6 +13,7 @@ import Loaf
 
 class SettingsViewController: UITableViewController {
     public var sessionService: SessionService?
+    public var authenticationUIService: AuthenticationUIService?
     
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
@@ -52,9 +53,13 @@ extension SettingsViewController {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
             self.showLogin()
+//            self.authenticationUIService?.showAuthentication()
             break
             
         default: break
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
     

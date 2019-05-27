@@ -17,6 +17,7 @@ import SwipeCellKit
 
 class NewsViewController : UITableViewController {
     public var hackerNewsService: HackerNewsService?
+    public var authenticationUIService: AuthenticationUIService?
     
     private var posts: [HNPost]?
     public var postType: HNScraper.PostListPageName! = .news
@@ -140,7 +141,13 @@ extension NewsViewController: SwipeTableViewCellDelegate {
             guard let hnError = error as? HNScraper.HNScraperError else { return }
             switch hnError {
             case .notLoggedIn:
-                Loaf("Not authenticated", state: .error, sender: self).show()
+                let authenticationAlert = UIAlertController(title: "Not logged in", message: "You're not logged into Hacker News. Do you want to login now?", preferredStyle: .alert)
+                authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
+                authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { action in
+                    // TODO navigate to authentication
+                    self.authenticationUIService?.showAuthentication()
+                }))
+                self.present(authenticationAlert, animated: true)
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
             }
@@ -150,8 +157,9 @@ extension NewsViewController: SwipeTableViewCellDelegate {
         }
         
         let upvoteAction = SwipeAction(style: .default, title: "Up") { action, indexPath in
+            let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
-            if post.upvoted {
+            if upvoted {
                 hackerNewsService
                     .unvote(post: post)
                     .catch(errorHandler)
