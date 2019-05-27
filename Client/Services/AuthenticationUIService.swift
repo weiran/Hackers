@@ -25,6 +25,7 @@ class AuthenticationUIService {
         let manager = BLTNItemManager(rootItem: loginPage())
         let theme = AppThemeProvider.shared.currentTheme
         manager.backgroundColor = theme.barBackgroundColor
+        manager.backgroundViewStyle = .blurredDark
         self.bulletinManager = manager
         self.bulletinManager?.showBulletin(in: UIApplication.shared)
     }
