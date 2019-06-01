@@ -13,9 +13,7 @@ class CommentsController {
     public var comments: [CommentModel]
 
     public var visibleComments: [CommentModel] {
-        get {
-            return comments.filter { $0.visibility != CommentVisibilityType.hidden }
-        }
+        return comments.filter { $0.visibility != CommentVisibilityType.hidden }
     }
 
     convenience init() {
@@ -56,6 +54,7 @@ class CommentsController {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
         for index in (0...commentIndex).reversed() {
+            // swiftlint:disable for_where
             if visibleComments[index].level == 0 {
                 return index
             }
@@ -65,10 +64,7 @@ class CommentsController {
     }
 
     private func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
-        for (index, value) in source.enumerated() {
-            if comment.commentID == value.commentID { return index }
-        }
-        return nil
+        return source.firstIndex(where: { $0.commentID == comment.commentID })
     }
 
     private func countChildren(_ comment: CommentModel) -> Int {

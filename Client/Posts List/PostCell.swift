@@ -10,12 +10,12 @@ import Foundation
 import UIKit
 import SwipeCellKit
 
-protocol PostCellDelegate {
+protocol PostCellDelegate: class {
     func didTapThumbnail(_ sender: Any)
 }
 
 class PostCell: SwipeTableViewCell {
-    var postDelegate: PostCellDelegate?
+    public weak var postDelegate: PostCellDelegate?
 
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!

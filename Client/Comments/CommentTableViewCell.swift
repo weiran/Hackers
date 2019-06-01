@@ -11,7 +11,7 @@ import UIKit
 import SwipeCellKit
 
 class CommentTableViewCell: SwipeTableViewCell {
-    var commentDelegate: CommentDelegate?
+    public weak var commentDelegate: CommentDelegate?
 
     private var level: Int = 0 {
         didSet { updateIndentPadding() }
@@ -29,8 +29,10 @@ class CommentTableViewCell: SwipeTableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         setupTheming()
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
-        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?.withTint(color: themeProvider.currentTheme.upvotedColor)
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                                action: #selector(CommentTableViewCell.cellTapped)))
+        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?
+            .withTint(color: themeProvider.currentTheme.upvotedColor)
     }
 
     @objc private func cellTapped() {
@@ -61,8 +63,12 @@ class CommentTableViewCell: SwipeTableViewCell {
             let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
             let commentRange = NSRange(location: 0, length: commentAttributedString.length)
 
-            commentAttributedString.addAttribute(NSAttributedString.Key.font, value: commentFont, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: theme.textColor, range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.font,
+                                                 value: commentFont,
+                                                 range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                                 value: theme.textColor,
+                                                 range: commentRange)
 
             commentTextView.attributedText = commentAttributedString
         }
@@ -70,7 +76,10 @@ class CommentTableViewCell: SwipeTableViewCell {
 }
 
 extension CommentTableViewCell: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+    func textView(_ textView: UITextView,
+                  shouldInteractWith URL: URL,
+                  in characterRange: NSRange,
+                  interaction: UITextItemInteraction) -> Bool {
         switch interaction {
             //This is the case when user just taps on the link
         case .invokeDefaultAction:

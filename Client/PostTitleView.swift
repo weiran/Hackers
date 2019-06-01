@@ -9,7 +9,7 @@
 import UIKit
 import HNScraper
 
-protocol PostTitleViewDelegate {
+protocol PostTitleViewDelegate: class {
     func didPressLinkButton(_ post: HNPost)
 }
 
@@ -19,7 +19,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 
     public var isTitleTapEnabled = false
 
-    public var delegate: PostTitleViewDelegate?
+    public weak var delegate: PostTitleViewDelegate?
 
     public var post: HNPost? {
         didSet {
@@ -33,7 +33,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         super.layoutSubviews()
         setupTheming()
 
-        let titleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.didPressTitleText(_:)))
+        let titleTapGestureRecognizer = UITapGestureRecognizer(target: self,
+                                                               action: #selector(self.didPressTitleText(_:)))
         self.titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
     }
 

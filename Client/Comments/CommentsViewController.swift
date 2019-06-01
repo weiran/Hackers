@@ -103,7 +103,8 @@ class CommentsViewController: UITableViewController {
 
     @IBAction private func shareTapped(_ sender: AnyObject) {
         guard let post = post, let url = post.url else { return }
-        let activityViewController = UIActivityViewController(activityItems: [post.title, url], applicationActivities: nil)
+        let activityViewController = UIActivityViewController(activityItems: [post.title, url],
+                                                              applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
     }
@@ -139,10 +140,12 @@ extension CommentsViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let comment = commentsController.visibleComments[indexPath.row]
         assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
-        let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
+        let cellIdentifier = comment.visibility == CommentVisibilityType.visible ?
+            "OpenCommentCell" : "ClosedCommentCell"
 
         // swiftlint:disable force_cast
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier,
+                                                 for: indexPath) as! CommentTableViewCell
 
         cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
         cell.commentDelegate = self
@@ -153,72 +156,84 @@ extension CommentsViewController {
 }
 
 extension CommentsViewController: SwipeTableViewCellDelegate {
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+    func tableView(_ tableView: UITableView,
+                   editActionsForRowAt indexPath: IndexPath,
+                   for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         switch orientation {
         case .right:
-            let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
-                let comment = self.commentsController.visibleComments[indexPath.row]
-                guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
-                self.toggleCellVisibilityForCell(IndexPath(row: index, section: 0))
-            }
-            collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
-            collapseAction.textColor = .white
-
-            let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
-            collapseAction.image = iconImage
-
-            return [collapseAction]
+            return collapseAction()
 
         case .left:
-            guard let hackerNewsService = self.hackerNewsService else { return nil }
             let comment = self.commentsController.visibleComments[indexPath.row]
-
-            let voteOnComment: (CommentModel, Bool) -> Void = { comment, isUpvote in
-                guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
-                comment.upvoted = isUpvote
-                cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
-            }
-
-            let errorHandler: (Error) -> Void = { error in
-                guard let hnError = error as? HNScraper.HNScraperError else { return }
-                switch hnError {
-                case .notLoggedIn:
-                    if let authenticationAlert = self.authenticationUIService?.unauthenticatedAlertController() {
-                        self.present(authenticationAlert, animated: true)
-                    }
-                default:
-                    Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-                }
-
-                // revert to the previous post state
-                voteOnComment(comment, !comment.upvoted)
-            }
-
-            let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
-                let upvoted = comment.upvoted
-                voteOnComment(comment, !comment.upvoted)
-                if upvoted {
-                    hackerNewsService
-                        .unvote(comment: comment.source)
-                        .catch(errorHandler)
-                } else {
-                    hackerNewsService
-                        .upvote(comment: comment.source)
-                        .catch(errorHandler)
-                }
-            }
-            voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
-            voteAction.textColor = .white
-
-            let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
-            voteAction.image = iconImage
-
-            return [voteAction]
+            return voteAction(for: comment, at: indexPath)
         }
     }
 
-    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
-        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
+    private func collapseAction() -> [SwipeAction] {
+        let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
+            let comment = self.commentsController.visibleComments[indexPath.row]
+            guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
+            self.toggleCellVisibilityForCell(IndexPath(row: index, section: 0))
+        }
+        collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
+        collapseAction.textColor = .white
+
+        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+        collapseAction.image = iconImage
+
+        return [collapseAction]
+    }
+
+    private func voteAction(for comment: CommentModel, at indexPath: IndexPath) -> [SwipeAction] {
+        let voteOnComment: (CommentModel, Bool) -> Void = { comment, isUpvote in
+            guard let cell = self.tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
+            comment.upvoted = isUpvote
+            cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
+        }
+
+        let errorHandler: (Error) -> Void = { error in
+            guard let hnError = error as? HNScraper.HNScraperError else { return }
+            switch hnError {
+            case .notLoggedIn:
+                if let authenticationAlert = self.authenticationUIService?.unauthenticatedAlertController() {
+                    self.present(authenticationAlert, animated: true)
+                }
+            default:
+                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            }
+
+            // revert to the previous post state
+            voteOnComment(comment, !comment.upvoted)
+        }
+
+        let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
+            let upvoted = comment.upvoted
+            voteOnComment(comment, !comment.upvoted)
+            if upvoted {
+                self.hackerNewsService?
+                    .unvote(comment: comment.source)
+                    .catch(errorHandler)
+            } else {
+                self.hackerNewsService?
+                    .upvote(comment: comment.source)
+                    .catch(errorHandler)
+            }
+        }
+        voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
+        voteAction.textColor = .white
+
+        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
+        voteAction.image = iconImage
+
+        return [voteAction]
+    }
+
+    func tableView(_ tableView: UITableView,
+                   editActionsOptionsForRowAt indexPath: IndexPath,
+                   for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
+                                                 elasticOverscroll: true,
+                                                 completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
         options.transitionStyle = .drag
@@ -283,12 +298,17 @@ extension CommentsViewController: CommentDelegate {
 extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
         let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
-        return comments == nil ? NSAttributedString(string: "Loading comments", attributes: attributes) : NSAttributedString(string: "No comments", attributes: attributes)
+        if comments == nil {
+            return NSAttributedString(string: "Loading comments", attributes: attributes)
+        } else {
+            return NSAttributedString(string: "No comments", attributes: attributes)
+        }
     }
 
     func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
         guard comments == nil else { return nil }
-        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        let activityIndicatorView = UIActivityIndicatorView(
+            style: self.themeProvider.currentTheme.activityIndicatorStyle)
         activityIndicatorView.startAnimating()
         return activityIndicatorView
     }

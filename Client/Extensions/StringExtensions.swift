@@ -10,21 +10,15 @@ import Foundation
 
 extension String {
     subscript(value: PartialRangeUpTo<Int>) -> Substring {
-        get {
-            return self[..<index(startIndex, offsetBy: value.upperBound)]
-        }
+        return self[..<index(startIndex, offsetBy: value.upperBound)]
     }
 
     subscript(value: PartialRangeThrough<Int>) -> Substring {
-        get {
-            return self[...index(startIndex, offsetBy: value.upperBound)]
-        }
+        return self[...index(startIndex, offsetBy: value.upperBound)]
     }
 
     subscript(value: PartialRangeFrom<Int>) -> Substring {
-        get {
-            return self[index(startIndex, offsetBy: value.lowerBound)...]
-        }
+        return self[index(startIndex, offsetBy: value.lowerBound)...]
     }
 }
 

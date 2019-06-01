@@ -27,7 +27,9 @@ class TouchableTextView: UITextView {
         location.y -= self.textContainerInset.top
 
         // find the character that's been tapped
-        let characterIndex = self.layoutManager.characterIndex(for: location, in: self.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+        let characterIndex = self.layoutManager.characterIndex(for: location,
+                                                               in: self.textContainer,
+                                                               fractionOfDistanceBetweenInsertionPoints: nil)
         if characterIndex < self.textStorage.length {
             // if the character is a link, handle the tap as UITextView normally would
             if self.textStorage.attribute(NSAttributedString.Key.link, at: characterIndex, effectiveRange: nil) != nil {

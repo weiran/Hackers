@@ -25,14 +25,16 @@ class NewsViewController: UITableViewController {
     private var peekedIndexPath: IndexPath?
     private var nextPageIdentifier: String?
 
+    private var notificationToken: NotificationToken?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
         self.tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
         self.tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
-        NotificationCenter.default.addObserver(forName: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                                               object: nil,
-                                               queue: .main) { _ in self.loadPosts() }
+        notificationToken = NotificationCenter.default
+            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                                           object: nil, queue: .main) { _ in self.loadPosts() }
         setupTheming()
         loadPosts()
     }
@@ -50,7 +52,9 @@ class NewsViewController: UITableViewController {
     }
 
     func navigateToComments(for post: HNPost) {
-        if let commentsViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CommentsViewController") as? CommentsViewController {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let viewController = storyboard.instantiateViewController(withIdentifier: "CommentsViewController")
+        if let commentsViewController = viewController as? CommentsViewController {
             commentsViewController.post = post
             commentsViewController.hidesBottomBarWhenPushed = true
             let appNavigationController = UINavigationController(rootViewController: commentsViewController)
@@ -113,7 +117,9 @@ extension NewsViewController {
         return cell
     }
 
-    override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    override open func tableView(_ tableView: UITableView,
+                                 willDisplay cell: UITableViewCell,
+                                 forRowAt indexPath: IndexPath) {
         if let posts = posts, indexPath.row == posts.count - 5 {
             loadMorePosts()
         }
@@ -130,7 +136,9 @@ extension NewsViewController {
 }
 
 extension NewsViewController: SwipeTableViewCellDelegate {
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+    func tableView(_ tableView: UITableView,
+                   editActionsForRowAt indexPath: IndexPath,
+                   for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .left,
             let post = self.posts?[indexPath.row],
             post.type != .jobs,
@@ -182,8 +190,12 @@ extension NewsViewController: SwipeTableViewCellDelegate {
         return [upvoteAction]
     }
 
-    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
-        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2), elasticOverscroll: true, completionAnimation: .bounce)
+    func tableView(_ tableView: UITableView,
+                   editActionsOptionsForRowAt indexPath: IndexPath,
+                   for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
+                                                 elasticOverscroll: true,
+                                                 completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
         options.transitionStyle = .drag
@@ -201,7 +213,8 @@ extension NewsViewController: Themed {
 }
 
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
-    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing,
+                           viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard let posts = posts,
             let indexPath = tableView.indexPathForRow(at: location),
             posts.count > indexPath.row else {
@@ -216,7 +229,8 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         return nil
     }
 
-    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing,
+                           commit viewControllerToCommit: UIViewController) {
         present(viewControllerToCommit, animated: true, completion: nil)
     }
 
@@ -227,8 +241,9 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
 
         let commentsPreviewActionTitle = post.commentCount > 0 ? "View \(post.commentCount) comments" : "View comments"
 
-        let viewCommentsPreviewAction = UIPreviewAction(title: commentsPreviewActionTitle, style: .default) {
-            [unowned self, indexPath = indexPath] (_, _) -> Void in
+        let viewCommentsPreviewAction =
+            UIPreviewAction(title: commentsPreviewActionTitle,
+                            style: .default) { [unowned self, indexPath = indexPath] (_, _) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
             self.navigateToComments(for: post)
         }
@@ -265,12 +280,17 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
 extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
         let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
-        return posts == nil ? NSAttributedString(string: "Loading", attributes: attributes) : NSAttributedString(string: "No posts", attributes: attributes)
+        if posts == nil {
+            return NSAttributedString(string: "Loading", attributes: attributes)
+        } else {
+            return NSAttributedString(string: "No posts", attributes: attributes)
+        }
     }
 
     func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
         guard posts == nil else { return nil }
-        let activityIndicatorView = UIActivityIndicatorView(style: self.themeProvider.currentTheme.activityIndicatorStyle)
+        let activityIndicatorView = UIActivityIndicatorView(
+            style: self.themeProvider.currentTheme.activityIndicatorStyle)
         activityIndicatorView.startAnimating()
         return activityIndicatorView
     }

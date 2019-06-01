@@ -10,7 +10,8 @@ import PromiseKit
 import HNScraper
 
 class HackerNewsService {
-    public func getPosts(of type: HNScraper.PostListPageName, nextPageIdentifier: String? = nil) -> Promise<([HNPost], String?)> {
+    public func getPosts(of type: HNScraper.PostListPageName,
+                         nextPageIdentifier: String? = nil) -> Promise<([HNPost], String?)> {
         let (promise, seal) = Promise<([HNPost], String?)>.pending()
         let completionHandler: HNScraper.PostListDownloadCompletionHandler = { (posts, nextPageIdentifier, error) in
             if let error = error {
@@ -31,7 +32,9 @@ class HackerNewsService {
 
     public func getComments(of post: HNPost) -> Promise<[HNComment]?> {
         let (promise, seal) = Promise<[HNComment]?>.pending()
-        HNScraper.shared.getComments(ForPost: post, buildHierarchy: false, offsetComments: false) { (_, comments, error) in
+        HNScraper.shared.getComments(ForPost: post,
+                                     buildHierarchy: false,
+                                     offsetComments: false) { (_, comments, error) in
             if let error = error {
                 seal.reject(error)
             } else {

@@ -6,10 +6,9 @@
 //  Copyright (c) 2014 Glass Umbrella. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-protocol CommentDelegate {
+protocol CommentDelegate: class {
     func commentTapped(_ sender: UITableViewCell)
     func linkTapped(_ url: URL, sender: UITextView)
 }

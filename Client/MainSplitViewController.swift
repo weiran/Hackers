@@ -20,7 +20,9 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         preferredDisplayMode = .allVisible
     }
 
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+    func splitViewController(_ splitViewController: UISplitViewController,
+                             collapseSecondary secondaryViewController: UIViewController,
+                             onto primaryViewController: UIViewController) -> Bool {
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
     }

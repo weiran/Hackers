@@ -52,7 +52,8 @@ class AuthenticationUIService {
             } else {
                 self.displayActivityIndicator()
 
-                self.sessionService.authenticate(username: item.usernameTextField.text!, password: item.passwordTextField.text!)
+                self.sessionService.authenticate(username: item.usernameTextField.text!,
+                                                 password: item.passwordTextField.text!)
                 .done { _ in
                     page.next = self.loginSuccessPage()
                     item.manager?.displayNextItem()
@@ -101,6 +102,7 @@ class AuthenticationUIService {
     }
 
     struct Notifications {
+        // swiftlint:disable line_length
         static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
     }
 
@@ -109,7 +111,10 @@ class AuthenticationUIService {
     }
 
     public func unauthenticatedAlertController() -> UIAlertController {
-        let authenticationAlert = UIAlertController(title: "Not logged in", message: "You're not logged into Hacker News. Do you want to login now?", preferredStyle: .alert)
+        let unauthenticatedMessage = "You're not logged into Hacker News. Do you want to login now?"
+        let authenticationAlert = UIAlertController(title: "Not logged in",
+                                                    message: unauthenticatedMessage,
+                                                    preferredStyle: .alert)
         authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
         authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
             self.showAuthentication()

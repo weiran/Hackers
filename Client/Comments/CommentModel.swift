@@ -36,7 +36,7 @@ class CommentModel {
         //parentCommentID = source.ParentID
         self.parentCommentID = ""
         self.dateCreatedString = source.created
-        if let _ = source.replyUrl {
+        if source.replyUrl != nil {
             self.replyURL = URL(string: source.replyUrl)
         }
         self.level = Int(source.level)

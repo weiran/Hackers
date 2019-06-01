@@ -16,7 +16,9 @@ extension UIImageView {
             var options: KingfisherOptionsInfo?
             if let resizeToSize = resizeToSize {
                 let thumbnailSize = CGFloat(resizeToSize) * UIScreen.main.scale
-                let imageSizeProcessor = ResizingImageProcessor(referenceSize: CGSize(width: thumbnailSize, height: thumbnailSize), mode: .aspectFit)
+                let thumbnailCGSize = CGSize(width: thumbnailSize, height: thumbnailSize)
+                let imageSizeProcessor = ResizingImageProcessor(referenceSize: thumbnailCGSize,
+                                                                mode: .aspectFit)
                 options = [.processor(imageSizeProcessor)]
             }
             self.kf.setImage(with: thumbnailURL, placeholder: placeholderImage, options: options)

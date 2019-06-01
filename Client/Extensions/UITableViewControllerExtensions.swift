@@ -14,7 +14,8 @@ extension UITableViewController {
         super.viewWillTransition(to: size, with: coordinator)
         DispatchQueue.global().async(execute: {
             DispatchQueue.main.sync {
-                guard let tableView = self.tableView, let indexPaths = tableView.indexPathsForVisibleRows else { return }
+                guard let tableView = self.tableView,
+                    let indexPaths = tableView.indexPathsForVisibleRows else { return }
                 self.tableView.beginUpdates()
                 self.tableView.reloadRows(at: indexPaths, with: .automatic)
                 self.tableView.endUpdates()
