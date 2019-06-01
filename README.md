@@ -44,12 +44,15 @@ Hackers is open source and licenced under the MIT licence.
 I use several open source projects in Hackers, in no particular order:
 
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
-* [HNScraper](https://github.com/tsucres/HNScraper) by [Stéphane Sercu](https://github.com/tsucres)
-* [PromiseKit](https://github.com/mxcl/PromiseKit) by [Max Howell](https://github.com/mxcl)
-* [Kingfisher](https://github.com/onevcat/Kingfisher) by [Wei Wang](https://github.com/onevcat)
-* [Loaf](https://github.com/schmidyy/Loaf) by [Mat Schmid](https://github.com/schmidyy)
+* [HNScraper](https://github.com/tsucres/HNScraper)
+* [PromiseKit](https://github.com/mxcl/PromiseKit)
+* [Kingfisher](https://github.com/onevcat/Kingfisher)
+* [Loaf](https://github.com/schmidyy/Loaf)
 * [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
 * [Swinject](https://github.com/Swinject/Swinject)
+* [BulletinBoard](https://github.com/alexaubry/BulletinBoard)
+* [SwiftLint](https://github.com/realm/SwiftLint)
+* [DeviceKit](https://github.com/devicekit/DeviceKit)
 
 ---
 <p align="center">
