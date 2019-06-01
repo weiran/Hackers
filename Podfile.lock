@@ -7,7 +7,7 @@ PODS:
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.8.4)
   - SwiftLint (0.32.0)
-  - Swinject (2.6.0)
+  - Swinject (2.6.1)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
   - SwipeCellKit (2.6.0)
@@ -57,7 +57,7 @@ SPEC CHECKSUMS:
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 51794a832647e7b819336dc2279039ce9f1cc49b
   SwiftLint: 009a898ef2a1c851f45e1b59349bf6ff2ddc990d
-  Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
+  Swinject: b624462f47b635a64f89a60a247baa5fccec14e1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
