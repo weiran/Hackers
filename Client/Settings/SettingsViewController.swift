@@ -38,10 +38,10 @@ class SettingsViewController: UITableViewController {
     }
 
     private func updateUsername() {
-        if self.sessionService!.authenticationState == .authenticated {
-            self.usernameLabel.text = self.sessionService?.username
+        if sessionService?.authenticationState == .authenticated {
+            usernameLabel.text = sessionService?.username
         } else {
-            self.usernameLabel.text = "Not logged in"
+            usernameLabel.text = "Not logged in"
         }
     }
 
@@ -67,7 +67,7 @@ extension SettingsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            self.authenticationUIService?.showAuthentication()
+            authenticationUIService?.showAuthentication()
         default: break
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

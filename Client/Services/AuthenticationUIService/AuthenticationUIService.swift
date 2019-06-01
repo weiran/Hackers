@@ -25,8 +25,8 @@ class AuthenticationUIService {
         let theme = AppThemeProvider.shared.currentTheme
         manager.backgroundColor = theme.barBackgroundColor
         manager.backgroundViewStyle = .blurredDark
-        self.bulletinManager = manager
-        self.bulletinManager?.showBulletin(in: UIApplication.shared)
+        bulletinManager = manager
+        bulletinManager?.showBulletin(in: UIApplication.shared)
     }
 
     private func displayActivityIndicator() {
@@ -39,7 +39,7 @@ class AuthenticationUIService {
         let page = AuthenticationBulletinPage(title: "Login")
         page.descriptionText = "Hackers never stores your password."
         page.actionButtonTitle = "Login"
-        if self.sessionService.authenticationState == .authenticated {
+        if sessionService.authenticationState == .authenticated {
             page.alternativeButtonTitle = "Logout"
         }
         page.isDismissable = true
@@ -79,7 +79,7 @@ class AuthenticationUIService {
 
     private func loginSuccessPage() -> BLTNPageItem {
         let page = BLTNPageItem(title: "Logged In")
-        let username = self.sessionService.username!
+        let username = sessionService.username!
         page.descriptionText = "Successfully logged in as \(username)"
         page.image = UIImage(named: "SuccessIcon")?.withRenderingMode(.alwaysTemplate)
         page.appearance.imageViewTintColor = #colorLiteral(red: 0.2980392157, green: 0.8509803922, blue: 0.3921568627, alpha: 1)

@@ -13,7 +13,7 @@ class AuthenticationBulletinPage: BLTNPageItem {
     @objc public var passwordTextField: UITextField!
 
     override func willDisplay() {
-        self.usernameTextField.becomeFirstResponder()
+        usernameTextField.becomeFirstResponder()
     }
 
     override func makeViewsUnderDescription(with interfaceBuilder: BLTNInterfaceBuilder) -> [UIView]? {
@@ -37,7 +37,7 @@ class AuthenticationBulletinPage: BLTNPageItem {
         self.usernameTextField = usernameTextField
         self.passwordTextField = passwordTextField
 
-        return [self.usernameTextField, self.passwordTextField]
+        return [usernameTextField, passwordTextField]
     }
 
     private func themedAttributedString(for string: String, color: UIColor) -> NSAttributedString {
@@ -58,20 +58,20 @@ class AuthenticationBulletinPage: BLTNPageItem {
     }
 
     override func actionButtonTapped(sender: UIButton) {
-        self.usernameTextField.resignFirstResponder()
-        self.passwordTextField.resignFirstResponder()
+        usernameTextField.resignFirstResponder()
+        passwordTextField.resignFirstResponder()
         super.actionButtonTapped(sender: sender)
     }
 
     public func set(state: CredentialsState) {
         switch state {
         case .standard:
-            self.usernameTextField.backgroundColor = .clear
-            self.passwordTextField.backgroundColor = .clear
+            usernameTextField.backgroundColor = .clear
+            passwordTextField.backgroundColor = .clear
         case .invalid:
             let errorColor = UIColor.red.withAlphaComponent(0.3)
-            self.usernameTextField.backgroundColor = errorColor
-            self.passwordTextField.backgroundColor = errorColor
+            usernameTextField.backgroundColor = errorColor
+            passwordTextField.backgroundColor = errorColor
         }
     }
 
@@ -92,17 +92,17 @@ extension AuthenticationBulletinPage: UITextFieldDelegate {
 
     func textFieldDidEndEditing(_ textField: UITextField) {
         if isInputValid(text: textField.text) {
-            self.set(state: .standard)
+            set(state: .standard)
         } else {
-            self.set(state: .invalid)
+            set(state: .invalid)
         }
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == self.usernameTextField {
-            self.passwordTextField.becomeFirstResponder()
+        if textField == usernameTextField {
+            passwordTextField.becomeFirstResponder()
         } else if textField == self.passwordTextField {
-            self.actionButtonTapped(sender: UIButton())
+            actionButtonTapped(sender: UIButton())
         }
 
         return true

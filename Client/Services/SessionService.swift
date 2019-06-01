@@ -34,7 +34,7 @@ class SessionService {
         let (promise, seal) = Promise<AuthenticationState>.pending()
 
         firstly {
-            self.hackerNewsService.login(username: username, password: password)
+            hackerNewsService.login(username: username, password: password)
         }.done { (user, _) in
             if let user = user {
                 self.user = user

@@ -24,7 +24,7 @@ class ReviewController {
     }
 
     public static func requestReview() {
-        if showPromptIncrements.contains(launchCounter()) && self.disablePrompts == false {
+        if showPromptIncrements.contains(launchCounter()) && disablePrompts == false {
             SKStoreReviewController.requestReview()
         }
     }
