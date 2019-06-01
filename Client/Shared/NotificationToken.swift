@@ -6,6 +6,8 @@
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import Foundation
+
 final class NotificationToken: NSObject {
     let notificationCenter: NotificationCenter
     let token: Any

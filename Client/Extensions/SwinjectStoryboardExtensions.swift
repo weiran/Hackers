@@ -14,10 +14,12 @@ extension SwinjectStoryboard {
         container.storyboardInitCompleted(NewsViewController.self) { resolver, controller in
             controller.hackerNewsService = resolver.resolve(HackerNewsService.self)!
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
+            controller.swipeCellKitActions = resolver.resolve(SwipeCellKitActions.self)!
         }
         container.storyboardInitCompleted(CommentsViewController.self) { resolver, controller in
             controller.hackerNewsService = resolver.resolve(HackerNewsService.self)!
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
+            controller.swipeCellKitActions = resolver.resolve(SwipeCellKitActions.self)!
         }
         container.storyboardInitCompleted(SettingsViewController.self) { resolver, controller in
             controller.sessionService = resolver.resolve(SessionService.self)!
@@ -27,15 +29,18 @@ extension SwinjectStoryboard {
         container.register(HackerNewsService.self) { _ in HackerNewsService() }
             .inObjectScope(.container)
         container.register(SessionService.self) { resolver in
-                SessionService(hackerNewsService: resolver.resolve(HackerNewsService.self)!)
-            }
-            .inObjectScope(.container)
+            SessionService(hackerNewsService: resolver.resolve(HackerNewsService.self)!)
+        }.inObjectScope(.container)
         container.register(AuthenticationUIService.self) { resolver in
-                AuthenticationUIService(
-                    hackerNewsService: resolver.resolve(HackerNewsService.self)!,
-                    sessionService: resolver.resolve(SessionService.self)!)
-            }
-            .inObjectScope(.container)
+            AuthenticationUIService(
+                hackerNewsService: resolver.resolve(HackerNewsService.self)!,
+                sessionService: resolver.resolve(SessionService.self)!)
+        }.inObjectScope(.container)
+        container.register(SwipeCellKitActions.self) { resolver in
+            SwipeCellKitActions(
+                authenticationUIService: resolver.resolve(AuthenticationUIService.self)!,
+                hackerNewsService: resolver.resolve(HackerNewsService.self)!)
+        }
     }
 
     class func getService<T>() -> T? {
