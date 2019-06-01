@@ -16,16 +16,16 @@ extension UITableViewController {
             DispatchQueue.main.sync {
                 guard let tableView = self.tableView,
                     let indexPaths = tableView.indexPathsForVisibleRows else { return }
-                self.tableView.beginUpdates()
-                self.tableView.reloadRows(at: indexPaths, with: .automatic)
-                self.tableView.endUpdates()
+                tableView.beginUpdates()
+                tableView.reloadRows(at: indexPaths, with: .automatic)
+                tableView.endUpdates()
             }
         })
     }
 
     public func smoothlyDeselectRows() {
         // Get the initially selected index paths, if any
-        let selectedIndexPaths = self.tableView.indexPathsForSelectedRows ?? []
+        let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
 
         // Grab the transition coordinator responsible for the current transition
         if let coordinator = transitionCoordinator {

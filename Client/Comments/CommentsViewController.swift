@@ -72,7 +72,7 @@ class CommentsViewController: UITableViewController {
 
     private func loadComments() {
         firstly {
-            self.hackerNewsService!.getComments(of: self.post!)
+            hackerNewsService!.getComments(of: post!)
         }.done { comments in
             self.comments = comments?.map { CommentModel(source: $0) }
             self.tableView.reloadData()
@@ -114,7 +114,7 @@ extension CommentsViewController: PostTitleViewDelegate {
     func didPressLinkButton(_ post: HNPost) {
         if verifyLink(post.url), let url = post.url {
             // animate background color for tap
-            self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
+            tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
             UIView.animate(withDuration: 0.3, animations: {
                 self.tableView.tableHeaderView?.backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
             })
@@ -122,7 +122,7 @@ extension CommentsViewController: PostTitleViewDelegate {
             // show link
             let safariViewController = SFSafariViewController.instance(for: url)
             setupHandoff(with: post, activityType: .link(url: url))
-            self.present(safariViewController, animated: true, completion: nil)
+            present(safariViewController, animated: true, completion: nil)
         }
     }
 
@@ -164,7 +164,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             return collapseAction()
 
         case .left:
-            let comment = self.commentsController.visibleComments[indexPath.row]
+            let comment = commentsController.visibleComments[indexPath.row]
             return voteAction(for: comment, at: indexPath)
         }
     }
@@ -265,7 +265,7 @@ extension CommentsViewController: CommentDelegate {
     func linkTapped(_ url: URL, sender: UITextView) {
         let safariViewController = SFSafariViewController.instance(for: url)
         setupHandoff(with: post, activityType: .link(url: url))
-        self.present(safariViewController, animated: true, completion: nil)
+        present(safariViewController, animated: true, completion: nil)
     }
 
     private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
@@ -290,7 +290,7 @@ extension CommentsViewController: CommentDelegate {
         tableView.endUpdates()
 
         if scrollToCell && scrollIfCellCovered {
-            self.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+            tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
 }
@@ -308,7 +308,7 @@ extension CommentsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate
     func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
         guard comments == nil else { return nil }
         let activityIndicatorView = UIActivityIndicatorView(
-            style: self.themeProvider.currentTheme.activityIndicatorStyle)
+            style: themeProvider.currentTheme.activityIndicatorStyle)
         activityIndicatorView.startAnimating()
         return activityIndicatorView
     }

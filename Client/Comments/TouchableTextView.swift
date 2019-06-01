@@ -13,8 +13,8 @@ class TouchableTextView: UITextView {
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
 
-        self.delaysContentTouches = false
-        self.isScrollEnabled = false
+        delaysContentTouches = false
+        isScrollEnabled = false
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -23,16 +23,16 @@ class TouchableTextView: UITextView {
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         var location = point
-        location.x -= self.textContainerInset.left
-        location.y -= self.textContainerInset.top
+        location.x -= textContainerInset.left
+        location.y -= textContainerInset.top
 
         // find the character that's been tapped
-        let characterIndex = self.layoutManager.characterIndex(for: location,
-                                                               in: self.textContainer,
-                                                               fractionOfDistanceBetweenInsertionPoints: nil)
-        if characterIndex < self.textStorage.length {
+        let characterIndex = layoutManager.characterIndex(for: location,
+                                                          in: textContainer,
+                                                          fractionOfDistanceBetweenInsertionPoints: nil)
+        if characterIndex < textStorage.length {
             // if the character is a link, handle the tap as UITextView normally would
-            if self.textStorage.attribute(NSAttributedString.Key.link, at: characterIndex, effectiveRange: nil) != nil {
+            if textStorage.attribute(NSAttributedString.Key.link, at: characterIndex, effectiveRange: nil) != nil {
                 return self
             }
         }

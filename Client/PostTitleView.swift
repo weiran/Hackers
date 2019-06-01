@@ -24,8 +24,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     public var post: HNPost? {
         didSet {
             guard let post = post else { return }
-            self.titleLabel.text = post.title
-            self.metadataLabel.attributedText = metadataText(for: post, theme: themeProvider.currentTheme)
+            titleLabel.text = post.title
+            metadataLabel.attributedText = metadataText(for: post, theme: themeProvider.currentTheme)
         }
     }
 
@@ -34,8 +34,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         setupTheming()
 
         let titleTapGestureRecognizer = UITapGestureRecognizer(target: self,
-                                                               action: #selector(self.didPressTitleText(_:)))
-        self.titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
+                                                               action: #selector(didPressTitleText(_:)))
+        titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
     }
 
     @objc private func didPressTitleText(_ sender: UITapGestureRecognizer) {
@@ -105,7 +105,7 @@ extension PostTitleView: Themed {
     func applyTheme(_ theme: AppTheme) {
         titleLabel.textColor = theme.titleTextColor
         if let post = post {
-            self.metadataLabel.attributedText = metadataText(for: post, theme: theme)
+            metadataLabel.attributedText = metadataText(for: post, theme: theme)
         }
     }
 }

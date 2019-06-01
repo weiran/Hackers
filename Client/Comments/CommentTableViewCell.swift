@@ -31,7 +31,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         setupTheming()
         contentView.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                                 action: #selector(CommentTableViewCell.cellTapped)))
-        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?
+        upvoteIconImageView?.image = UIImage(named: "PointsIcon")?
             .withTint(color: themeProvider.currentTheme.upvotedColor)
     }
 

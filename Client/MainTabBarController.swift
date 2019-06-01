@@ -14,7 +14,7 @@ class MainTabBarController: UITabBarController {
         super.viewDidLoad()
         setupTheming()
 
-        guard let viewControllers = self.viewControllers else { return }
+        guard let viewControllers = viewControllers else { return }
 
         for (index, viewController) in viewControllers.enumerated() {
             guard let splitViewController = viewController as? UISplitViewController,
