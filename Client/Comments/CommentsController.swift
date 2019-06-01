@@ -6,9 +6,6 @@
 //  Copyright (c) 2014 Glass Umbrella. All rights reserved.
 //
 
-import Foundation
-import UIKit
-
 class CommentsController {
     public var comments: [CommentModel]
 
@@ -42,7 +39,7 @@ class CommentsController {
                 if visible && currentComment.visibility == .hidden { continue }
 
                 currentComment.visibility = visible ? .hidden : .visible
-                modifiedIndexPaths.append(IndexPath(row: currentIndex, section: 0))
+                modifiedIndexPaths.append(IndexPath(row: currentIndex, section: 1))
                 currentIndex += 1
             }
         }

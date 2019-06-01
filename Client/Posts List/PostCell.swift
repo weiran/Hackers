@@ -19,6 +19,7 @@ class PostCell: SwipeTableViewCell {
 
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var separatorView: UIView!
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -62,5 +63,6 @@ class PostCell: SwipeTableViewCell {
 extension PostCell: Themed {
     func applyTheme(_ theme: AppTheme) {
         backgroundColor = theme.backgroundColor
+        separatorView?.backgroundColor = theme.separatorColor
     }
 }

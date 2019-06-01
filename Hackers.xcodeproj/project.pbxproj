@@ -34,6 +34,9 @@
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
 		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
+		249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */; };
+		249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */; };
+		249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
 		24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C20D381A7E42D5005B759B /* MainSplitViewController.swift */; };
@@ -102,6 +105,9 @@
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationToken.swift; sourceTree = "<group>"; };
 		249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterExtensions.swift; sourceTree = "<group>"; };
+		249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellKitActions.swift; sourceTree = "<group>"; };
+		249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBackgroundView.swift; sourceTree = "<group>"; };
+		249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewBackgroundView.xib; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
@@ -234,9 +240,20 @@
 		249B8F8122A2A474002A9EC5 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				249B8F8822A2C870002A9EC5 /* TableViewStates */,
 				249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */,
+				249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		249B8F8822A2C870002A9EC5 /* TableViewStates */ = {
+			isa = PBXGroup;
+			children = (
+				249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */,
+				249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */,
+			);
+			path = TableViewStates;
 			sourceTree = "<group>";
 		};
 		24CE5FEE19434DC0009D2677 /* Posts List */ = {
@@ -460,6 +477,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */,
+				249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */,
 				240C5BE018D267C70011177A /* Icons.xcassets in Resources */,
 				24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */,
 				24EF5BF41C393D110012AA8A /* LaunchStoryboard.storyboard in Resources */,
@@ -548,7 +566,6 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/BulletinBoard/BLTNBoard.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/HNScraper/HNScraper.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/Loaf/Loaf.framework",
@@ -560,7 +577,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLTNBoard.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HNScraper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Loaf.framework",
@@ -625,11 +641,13 @@
 				24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */,
 				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				241E8DAA1944AF870004F457 /* CommentModel.swift in Sources */,
+				249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */,
 				2464D208209DD7B100C7F8FC /* AppThemeProvider.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
+				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
 				2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */,
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,

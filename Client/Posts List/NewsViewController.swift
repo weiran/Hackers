@@ -18,6 +18,7 @@ import SwipeCellKit
 class NewsViewController: UITableViewController {
     public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
+    public var swipeCellKitActions: SwipeCellKitActions?
 
     private var posts: [HNPost]?
     public var postType: HNScraper.PostListPageName! = .news
@@ -32,6 +33,7 @@ class NewsViewController: UITableViewController {
         registerForPreviewing(with: self, sourceView: tableView)
         tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
+        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
         notificationToken = NotificationCenter.default
             .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
                                            object: nil, queue: .main) { _ in self.loadPosts() }
@@ -66,18 +68,17 @@ class NewsViewController: UITableViewController {
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
         hackerNewsService?.getPosts(of: postType).map { (posts, nextPageIdentifier) in
-            self.posts = posts
-            self.nextPageIdentifier = nextPageIdentifier
-            self.tableView.reloadData()
+            if posts.count == 0 {
+                self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
+            } else {
+                self.posts = posts
+                self.nextPageIdentifier = nextPageIdentifier
+                self.tableView.reloadData()
+            }
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-            // show empty data state by having an empty array rather than nil
-            if self.posts == nil {
-                self.posts = []
-            }
-            self.tableView.reloadData()
         }
     }
 
@@ -141,51 +142,10 @@ extension NewsViewController: SwipeTableViewCellDelegate {
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .left,
             let post = posts?[indexPath.row],
-            post.type != .jobs,
-            let hackerNewsService = self.hackerNewsService else { return nil }
+            post.type != .jobs else { return nil }
 
-        let voteOnPost: (HNPost, Bool) -> Void = { post, isUpvote in
-            guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
-            post.upvoted = isUpvote
-            post.points += isUpvote ? 1 : -1
-            cell.postTitleView.post = post
-        }
-
-        let errorHandler: (Error) -> Void = { error in
-            guard let hnError = error as? HNScraper.HNScraperError else { return }
-            switch hnError {
-            case .notLoggedIn:
-                if let authenticationAlert = self.authenticationUIService?.unauthenticatedAlertController() {
-                    self.present(authenticationAlert, animated: true)
-                }
-            default:
-                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-            }
-
-            // revert to the previous post state
-            voteOnPost(post, !post.upvoted)
-        }
-
-        let upvoteAction = SwipeAction(style: .default, title: "Up") { _, _ in
-            let upvoted = post.upvoted
-            voteOnPost(post, !post.upvoted)
-            if upvoted {
-                hackerNewsService
-                    .unvote(post: post)
-                    .catch(errorHandler)
-            } else {
-                hackerNewsService
-                    .upvote(post: post)
-                    .catch(errorHandler)
-            }
-        }
-        upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
-        upvoteAction.textColor = .white
-
-        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
-        upvoteAction.image = iconImage
-
-        return [upvoteAction]
+        return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
+                                               indexPath: indexPath, viewController: self)
     }
 
     func tableView(_ tableView: UITableView,
@@ -272,28 +232,5 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
         if let indexPath = tableView.indexPathForRow(at: point), let post = posts?[indexPath.row] {
             didPressLinkButton(post)
         }
-    }
-}
-
-extension NewsViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
-    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15.0)]
-        if posts == nil {
-            return NSAttributedString(string: "Loading", attributes: attributes)
-        } else {
-            return NSAttributedString(string: "No posts", attributes: attributes)
-        }
-    }
-
-    func customView(forEmptyDataSet scrollView: UIScrollView!) -> UIView? {
-        guard posts == nil else { return nil }
-        let activityIndicatorView = UIActivityIndicatorView(
-            style: themeProvider.currentTheme.activityIndicatorStyle)
-        activityIndicatorView.startAnimating()
-        return activityIndicatorView
-    }
-
-    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
-        return posts != nil // only when empty data
     }
 }

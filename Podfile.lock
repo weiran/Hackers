@@ -1,7 +1,6 @@
 PODS:
   - BulletinBoard (3.0.0)
   - DeviceKit (2.0.0)
-  - DZNEmptyDataSet (1.8.1)
   - HNScraper (0.2.2)
   - Kingfisher (5.5.0)
   - Loaf (0.4.0)
@@ -15,7 +14,6 @@ PODS:
 DEPENDENCIES:
   - BulletinBoard
   - DeviceKit
-  - DZNEmptyDataSet
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
   - Kingfisher
   - Loaf
@@ -29,7 +27,6 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - BulletinBoard
     - DeviceKit
-    - DZNEmptyDataSet
     - Kingfisher
     - Loaf
     - PromiseKit
@@ -51,7 +48,6 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   BulletinBoard: 927f4f9fd22503ceecd71bfc830fd65d5996593a
   DeviceKit: 72d36709552d4b3582abd76a53949148acad9811
-  DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Kingfisher: 6fe5e67a90fd335e49b0f5c075ff55ac5ebedd94
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
@@ -61,6 +57,6 @@ SPEC CHECKSUMS:
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
 
-PODFILE CHECKSUM: 25f24f72f60bc6a134f60b73a58c25684c177a31
+PODFILE CHECKSUM: d9eba396f37d96ac74e38d7b274bf7c9030278f8
 
 COCOAPODS: 1.7.1

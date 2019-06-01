@@ -4,7 +4,6 @@ inhibit_all_warnings!
 
 target 'Hackers' do
   pod 'HNScraper', :git => 'https://github.com/weiran/HNScraper.git', :branch => 'master'
-  pod 'DZNEmptyDataSet'
   pod 'PromiseKit/CorePromise'
   pod 'Kingfisher'
   pod 'Loaf'

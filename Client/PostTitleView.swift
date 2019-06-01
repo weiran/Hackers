@@ -38,6 +38,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
     }
 
+    // todo remove this gesture recognizer
     @objc private func didPressTitleText(_ sender: UITapGestureRecognizer) {
         if isTitleTapEnabled, let delegate = self.delegate, let post = self.post {
             delegate.didPressLinkButton(post)
