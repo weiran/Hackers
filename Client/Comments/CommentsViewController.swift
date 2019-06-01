@@ -27,7 +27,7 @@ class CommentsViewController: UITableViewController {
     public var post: HNPost?
     private let commentsController = CommentsController()
 
-    private var comments: [CommentModel]? {
+    private var comments: [HNComment]? {
         didSet { commentsController.comments = comments! }
     }
 
@@ -57,7 +57,7 @@ class CommentsViewController: UITableViewController {
             case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
             default:
                 self.tableView.backgroundView = nil
-                self.comments = comments?.map { CommentModel(source: $0) }
+                self.comments = comments
                 self.tableView.reloadData()
             }
         }.catch { error in

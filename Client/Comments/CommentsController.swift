@@ -7,23 +7,24 @@
 //
 
 import Foundation
+import HNScraper
 
 class CommentsController {
-    public var comments: [CommentModel]
+    public var comments: [HNComment]
 
-    public var visibleComments: [CommentModel] {
+    public var visibleComments: [HNComment] {
         return comments.filter { $0.visibility != CommentVisibilityType.hidden }
     }
 
     convenience init() {
-        self.init(source: [CommentModel]())
+        self.init(source: [HNComment]())
     }
 
-    init(source: [CommentModel]) {
+    init(source: [HNComment]) {
         comments = source
     }
 
-    public func toggleChildrenVisibility(of comment: CommentModel) -> ([IndexPath], CommentVisibilityType) {
+    public func toggleChildrenVisibility(of comment: HNComment) -> ([IndexPath], CommentVisibilityType) {
         let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
@@ -49,7 +50,7 @@ class CommentsController {
         return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
 
-    public func indexOfVisibleRootComment(of comment: CommentModel) -> Int? {
+    public func indexOfVisibleRootComment(of comment: HNComment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
         for index in (0...commentIndex).reversed() {
@@ -62,11 +63,11 @@ class CommentsController {
         return nil
     }
 
-    private func indexOfComment(_ comment: CommentModel, source: [CommentModel]) -> Int? {
-        return source.firstIndex(where: { $0.commentID == comment.commentID })
+    private func indexOfComment(_ comment: HNComment, source: [HNComment]) -> Int? {
+        return source.firstIndex(where: { $0.id == comment.id })
     }
 
-    private func countChildren(_ comment: CommentModel) -> Int {
+    private func countChildren(_ comment: HNComment) -> Int {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
 
