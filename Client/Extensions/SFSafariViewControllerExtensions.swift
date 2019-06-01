@@ -6,6 +6,7 @@
 //  Copyright © 2016 Glass Umbrella. All rights reserved.
 //
 
+import Foundation
 import SafariServices
 import ObjectiveC
 

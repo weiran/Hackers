@@ -6,6 +6,8 @@
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import UIKit
+
 class TableViewBackgroundView: UIView {
     @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var titleLabel: UILabel!

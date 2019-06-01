@@ -6,6 +6,8 @@
 //  Copyright © 2018 Glass Umbrella. All rights reserved.
 //
 
+import Foundation
+
 extension UserDefaults {
     public var darkModeEnabled: Bool {
         let themeSetting = string(forKey: UserDefaultsKeys.theme.rawValue)

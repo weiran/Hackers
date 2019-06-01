@@ -6,6 +6,8 @@
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import Foundation
+
 extension NotificationCenter {
     func observe(name: NSNotification.Name?, object obj: Any?,
                  queue: OperationQueue?,

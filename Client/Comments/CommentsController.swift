@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Glass Umbrella. All rights reserved.
 //
 
+import Foundation
+
 class CommentsController {
     public var comments: [CommentModel]
 
