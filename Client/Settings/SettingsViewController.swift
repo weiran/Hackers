@@ -33,10 +33,6 @@ class SettingsViewController: UITableViewController {
                      object: nil, queue: .main) { _ in self.updateUsername() }
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     private func updateUsername() {
         if sessionService?.authenticationState == .authenticated {
             usernameLabel.text = sessionService?.username

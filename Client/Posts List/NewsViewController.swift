@@ -41,10 +41,6 @@ class NewsViewController: UITableViewController {
         loadPosts()
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // when the cell is still visible, no need to deselect it
