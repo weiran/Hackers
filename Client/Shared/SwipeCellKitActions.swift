@@ -64,9 +64,9 @@ class SwipeCellKitActions: Themed {
         return [upvoteAction]
     }
 
-    public func voteAction(comment: CommentModel, tableView: UITableView,
+    public func voteAction(comment: HNComment, tableView: UITableView,
                            indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
-        let voteOnComment: (CommentModel, Bool) -> Void = { comment, isUpvote in
+        let voteOnComment: (HNComment, Bool) -> Void = { comment, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
             comment.upvoted = isUpvote
             cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
@@ -90,11 +90,11 @@ class SwipeCellKitActions: Themed {
             voteOnComment(comment, !comment.upvoted)
             if upvoted {
                 self.hackerNewsService
-                    .unvote(comment: comment.source)
+                    .unvote(comment: comment)
                     .catch(errorHandler)
             } else {
                 self.hackerNewsService
-                    .upvote(comment: comment.source)
+                    .upvote(comment: comment)
                     .catch(errorHandler)
             }
         }

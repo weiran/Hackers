@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import HNScraper
 import SwipeCellKit
 
 class CommentTableViewCell: SwipeTableViewCell {
@@ -17,7 +18,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         didSet { updateIndentPadding() }
     }
 
-    private var comment: CommentModel?
+    private var comment: HNComment?
 
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel: UILabel!
@@ -46,14 +47,14 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    public func updateCommentContent(with comment: CommentModel, theme: AppTheme) {
+    public func updateCommentContent(with comment: HNComment, theme: AppTheme) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible
         level = comment.level
-        authorLabel.text = comment.authorUsername
+        authorLabel.text = comment.username
         authorLabel.font = AppFont.commentUsernameFont(collapsed: isCollapsed)
-        datePostedLabel.text = comment.dateCreatedString
+        datePostedLabel.text = comment.created
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         upvoteIconImageView?.isHidden = comment.upvoted == false
 
