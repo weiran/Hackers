@@ -13,57 +13,44 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        
+
         guard let viewControllers = self.viewControllers else { return }
-        
+
         for (index, viewController) in viewControllers.enumerated() {
             guard let splitViewController = viewController as? UISplitViewController,
                 let navigationController = splitViewController.viewControllers.first as? UINavigationController,
                 let newsViewController = navigationController.viewControllers.first as? NewsViewController
-                else {
-                    return
+                else { return }
+
+            if let tabItem = self.tabItem(for: index) {
+                newsViewController.postType = tabItem.postType
+                splitViewController.tabBarItem.title = tabItem.typeName
+                splitViewController.tabBarItem.image = UIImage(named: tabItem.iconName)
             }
-            
-            let (postType, typeName, iconName) = tabItems(for: index)
-            newsViewController.postType = postType
-            splitViewController.tabBarItem.title = typeName
-            splitViewController.tabBarItem.image = UIImage(named: iconName)
         }
-        
+
         tabBar.clipsToBounds = true
     }
-    
-    private func tabItems(for index: Int) -> (HNScraper.PostListPageName, String, String) {
-        var postType = HNScraper.PostListPageName.news
-        var typeName = "Top"
-        var iconName = "TopIcon"
-        
+
+    private func tabItem(for index: Int) -> TabItem? {
         switch index {
         case 0:
-            postType = .news
-            typeName = "Top"
-            iconName = "TopIcon"
-            break
+            return TabItem(postType: .news, typeName: "Top", iconName: "TopIcon")
         case 1:
-            postType = .asks
-            typeName = "Ask"
-            iconName = "AskIcon"
-            break
+            return TabItem(postType: .asks, typeName: "Ask", iconName: "AskIcon")
         case 2:
-            postType = .jobs
-            typeName = "Jobs"
-            iconName = "JobsIcon"
-            break
+            return TabItem(postType: .jobs, typeName: "Jobs", iconName: "JobsIcon")
         case 3:
-            postType = .new
-            typeName = "New"
-            iconName = "NewIcon"
-            break
+            return TabItem(postType: .new, typeName: "New", iconName: "NewIcon")
         default:
-            break
+            return nil
         }
-        
-        return (postType, typeName, iconName)
+    }
+
+    struct TabItem {
+        let postType: HNScraper.PostListPageName
+        let typeName: String
+        let iconName: String
     }
 }
 

@@ -8,4 +8,5 @@ before_install:
 install:
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 script:
+- Pods/SwiftLint/swiftlint
 - set -o pipefail && xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme ${TRAVIS_XCODE_SCHEME} -sdk iphonesimulator -configuration Release | xcpretty

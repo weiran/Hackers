@@ -25,10 +25,10 @@ class CommentModel {
     var replyURL: URL?
     var level: Int
     var upvoted: Bool
-    
+
     var visibility: CommentVisibilityType = .visible
     var source: HNComment
-    
+
     init(source: HNComment) {
         self.type = source.type
         self.authorUsername = source.username
@@ -36,7 +36,7 @@ class CommentModel {
         //parentCommentID = source.ParentID
         self.parentCommentID = ""
         self.dateCreatedString = source.created
-        if let _ = source.replyUrl {
+        if source.replyUrl != nil {
             self.replyURL = URL(string: source.replyUrl)
         }
         self.level = Int(source.level)

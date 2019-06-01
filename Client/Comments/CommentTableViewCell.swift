@@ -10,43 +10,45 @@ import Foundation
 import UIKit
 import SwipeCellKit
 
-class CommentTableViewCell : SwipeTableViewCell {
-    var commentDelegate: CommentDelegate?
-    
+class CommentTableViewCell: SwipeTableViewCell {
+    public weak var commentDelegate: CommentDelegate?
+
     private var level: Int = 0 {
         didSet { updateIndentPadding() }
     }
-    
+
     private var comment: CommentModel?
-    
+
     @IBOutlet var commentTextView: TouchableTextView!
-    @IBOutlet var authorLabel : UILabel!
-    @IBOutlet var datePostedLabel : UILabel!
-    @IBOutlet var leftPaddingConstraint : NSLayoutConstraint!
+    @IBOutlet var authorLabel: UILabel!
+    @IBOutlet var datePostedLabel: UILabel!
+    @IBOutlet var leftPaddingConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorView: UIView!
     @IBOutlet weak var upvoteIconImageView: UIImageView!
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
         setupTheming()
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(CommentTableViewCell.cellTapped)))
-        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?.withTint(color: themeProvider.currentTheme.upvotedColor)
+        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                                action: #selector(CommentTableViewCell.cellTapped)))
+        self.upvoteIconImageView?.image = UIImage(named: "PointsIcon")?
+            .withTint(color: themeProvider.currentTheme.upvotedColor)
     }
-    
+
     @objc private func cellTapped() {
         commentDelegate?.commentTapped(self)
         setSelected(!isSelected, animated: false)
     }
-    
+
     private func updateIndentPadding() {
         let levelIndent = 15
         let padding = CGFloat(levelIndent * (level + 1))
         leftPaddingConstraint.constant = padding
     }
-    
+
     public func updateCommentContent(with comment: CommentModel, theme: AppTheme) {
         self.comment = comment
-        
+
         let isCollapsed = comment.visibility != .visible
         level = comment.level
         authorLabel.text = comment.authorUsername
@@ -54,23 +56,30 @@ class CommentTableViewCell : SwipeTableViewCell {
         datePostedLabel.text = comment.dateCreatedString
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         upvoteIconImageView?.isHidden = comment.upvoted == false
-        
+
         if let commentTextView = commentTextView, comment.visibility == .visible {
             // only for expanded comments
             let commentFont = UIFont.preferredFont(forTextStyle: .subheadline)
             let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
-            let commentRange = NSMakeRange(0, commentAttributedString.length)
-            
-            commentAttributedString.addAttribute(NSAttributedString.Key.font, value: commentFont, range: commentRange)
-            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: theme.textColor, range: commentRange)
-            
+            let commentRange = NSRange(location: 0, length: commentAttributedString.length)
+
+            commentAttributedString.addAttribute(NSAttributedString.Key.font,
+                                                 value: commentFont,
+                                                 range: commentRange)
+            commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                                 value: theme.textColor,
+                                                 range: commentRange)
+
             commentTextView.attributedText = commentAttributedString
         }
     }
 }
 
 extension CommentTableViewCell: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+    func textView(_ textView: UITextView,
+                  shouldInteractWith URL: URL,
+                  in characterRange: NSRange,
+                  interaction: UITextItemInteraction) -> Bool {
         switch interaction {
             //This is the case when user just taps on the link
         case .invokeDefaultAction:
@@ -91,16 +100,16 @@ extension CommentTableViewCell {
         super.setSelected(selected, animated: animated)
         selected ? setSelectedBackground() : setUnselectedBackground()
     }
-    
+
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
         highlighted ? setSelectedBackground() : setUnselectedBackground()
     }
-    
+
     private func setSelectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
     }
-    
+
     private func setUnselectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }

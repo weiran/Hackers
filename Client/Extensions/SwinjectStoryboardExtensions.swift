@@ -11,28 +11,33 @@ import SwinjectStoryboard
 extension SwinjectStoryboard {
     @objc class func setup() {
         let container = defaultContainer
-        container.storyboardInitCompleted(NewsViewController.self) { r, c in
-            c.hackerNewsService = r.resolve(HackerNewsService.self)!
-            c.authenticationUIService = r.resolve(AuthenticationUIService.self)!
+        container.storyboardInitCompleted(NewsViewController.self) { resolver, controller in
+            controller.hackerNewsService = resolver.resolve(HackerNewsService.self)!
+            controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
         }
-        container.storyboardInitCompleted(CommentsViewController.self) { r, c in
-            c.hackerNewsService = r.resolve(HackerNewsService.self)!
-            c.authenticationUIService = r.resolve(AuthenticationUIService.self)!
+        container.storyboardInitCompleted(CommentsViewController.self) { resolver, controller in
+            controller.hackerNewsService = resolver.resolve(HackerNewsService.self)!
+            controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
         }
-        container.storyboardInitCompleted(SettingsViewController.self) { r, c in
-            c.sessionService = r.resolve(SessionService.self)!
-            c.authenticationUIService = r.resolve(AuthenticationUIService.self)!
+        container.storyboardInitCompleted(SettingsViewController.self) { resolver, controller in
+            controller.sessionService = resolver.resolve(SessionService.self)!
+            controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
         }
-        
+
         container.register(HackerNewsService.self) { _ in HackerNewsService() }
             .inObjectScope(.container)
-        container.register(SessionService.self) { r in SessionService(hackerNewsService: r.resolve(HackerNewsService.self)!) }
+        container.register(SessionService.self) { resolver in
+                SessionService(hackerNewsService: resolver.resolve(HackerNewsService.self)!)
+            }
             .inObjectScope(.container)
-        container.register(AuthenticationUIService.self) { r in AuthenticationUIService(hackerNewsService: r.resolve(HackerNewsService.self)!,
-                                                                                        sessionService: r.resolve(SessionService.self)!) }
+        container.register(AuthenticationUIService.self) { resolver in
+                AuthenticationUIService(
+                    hackerNewsService: resolver.resolve(HackerNewsService.self)!,
+                    sessionService: resolver.resolve(SessionService.self)!)
+            }
             .inObjectScope(.container)
     }
-    
+
     class func getService<T>() -> T? {
         return defaultContainer.resolve(T.self)
     }

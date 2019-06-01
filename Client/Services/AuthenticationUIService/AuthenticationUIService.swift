@@ -12,14 +12,14 @@ import PromiseKit
 class AuthenticationUIService {
     private let hackerNewsService: HackerNewsService
     private let sessionService: SessionService
-    
+
     public init(hackerNewsService: HackerNewsService, sessionService: SessionService) {
         self.hackerNewsService = hackerNewsService
         self.sessionService = sessionService
     }
-    
+
     var bulletinManager: BLTNItemManager?
-    
+
     public func showAuthentication() {
         let manager = BLTNItemManager(rootItem: loginPage())
         let theme = AppThemeProvider.shared.currentTheme
@@ -28,13 +28,13 @@ class AuthenticationUIService {
         self.bulletinManager = manager
         self.bulletinManager?.showBulletin(in: UIApplication.shared)
     }
-    
+
     private func displayActivityIndicator() {
         guard let bulletinManager = self.bulletinManager else { return }
         let theme = AppThemeProvider.shared.currentTheme
         bulletinManager.displayActivityIndicator(color: theme.textColor)
     }
-    
+
     private func loginPage() -> AuthenticationBulletinPage {
         let page = AuthenticationBulletinPage(title: "Login")
         page.descriptionText = "Hackers never stores your password."
@@ -43,39 +43,40 @@ class AuthenticationUIService {
             page.alternativeButtonTitle = "Logout"
         }
         page.isDismissable = true
-        
+
         page.actionHandler = { item in
             guard let item = item as? AuthenticationBulletinPage else { return }
-            
+
             if item.usernameTextField.text!.isEmpty || item.passwordTextField.text!.isEmpty {
                 item.set(state: .invalid)
             } else {
                 self.displayActivityIndicator()
-            
-                self.sessionService.authenticate(username: item.usernameTextField.text!, password: item.passwordTextField.text!)
-                .done { authenticationState in
+
+                self.sessionService.authenticate(username: item.usernameTextField.text!,
+                                                 password: item.passwordTextField.text!)
+                .done { _ in
                     page.next = self.loginSuccessPage()
                     item.manager?.displayNextItem()
                 }.ensure {
                     self.sendAuthenticationDidChangeNotification()
-                }.catch { error in
+                }.catch { _ in
                     item.set(state: .invalid)
                     self.bulletinManager?.hideActivityIndicator()
                 }
             }
         }
-        
+
         page.alternativeHandler = { item in
             self.hackerNewsService.logout()
             self.sendAuthenticationDidChangeNotification()
             item.manager?.dismissBulletin()
         }
-        
+
         themeAppearance(of: page)
-        
+
         return page
     }
-    
+
     private func loginSuccessPage() -> BLTNPageItem {
         let page = BLTNPageItem(title: "Logged In")
         let username = self.sessionService.username!
@@ -88,10 +89,10 @@ class AuthenticationUIService {
             item.manager?.dismissBulletin()
         }
         themeAppearance(of: page)
-        
+
         return page
     }
-    
+
     private func themeAppearance(of item: BLTNPageItem) {
         let theme = AppThemeProvider.shared.currentTheme
         item.appearance.actionButtonColor = theme.appTintColor
@@ -99,19 +100,23 @@ class AuthenticationUIService {
         item.appearance.titleTextColor = theme.titleTextColor
         item.appearance.descriptionTextColor = theme.textColor
     }
-    
+
     struct Notifications {
+        // swiftlint:disable line_length
         static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
     }
-    
+
     private func sendAuthenticationDidChangeNotification() {
         NotificationCenter.default.post(name: Notifications.AuthenticationDidChangeNotification, object: nil)
     }
-    
+
     public func unauthenticatedAlertController() -> UIAlertController {
-        let authenticationAlert = UIAlertController(title: "Not logged in", message: "You're not logged into Hacker News. Do you want to login now?", preferredStyle: .alert)
+        let unauthenticatedMessage = "You're not logged into Hacker News. Do you want to login now?"
+        let authenticationAlert = UIAlertController(title: "Not logged in",
+                                                    message: unauthenticatedMessage,
+                                                    preferredStyle: .alert)
         authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
-        authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { action in
+        authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
             self.showAuthentication()
         }))
         return authenticationAlert

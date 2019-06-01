@@ -12,6 +12,8 @@ target 'Hackers' do
   pod 'Swinject'
   pod 'SwinjectStoryboard'
   pod 'BulletinBoard'
+  
+  pod 'SwiftLint'
 end
 
 target 'HackersUITests' do

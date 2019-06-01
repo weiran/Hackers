@@ -32,6 +32,8 @@
 		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
 		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
+		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
+		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
 		24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C20D381A7E42D5005B759B /* MainSplitViewController.swift */; };
@@ -98,6 +100,8 @@
 		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
 		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
+		249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationToken.swift; sourceTree = "<group>"; };
+		249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterExtensions.swift; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
@@ -196,6 +200,7 @@
 				242A90A322635B8C008E7910 /* UIImageExtensions.swift */,
 				24448F881FE7DFB800F85A28 /* UIImageViewExtensions.swift */,
 				24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */,
+				249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -224,6 +229,14 @@
 				24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */,
 			);
 			path = AuthenticationUIService;
+			sourceTree = "<group>";
+		};
+		249B8F8122A2A474002A9EC5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		24CE5FEE19434DC0009D2677 /* Posts List */ = {
@@ -310,6 +323,7 @@
 				24FF0219226C99B1002EF8DD /* Services */,
 				2464D200209DD06A00C7F8FC /* Themes */,
 				2464D209209DD8AE00C7F8FC /* Extensions */,
+				249B8F8122A2A474002A9EC5 /* Shared */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 			);
 			path = Client;
@@ -379,6 +393,7 @@
 				24F39F8318AFB1150055F8DC /* Resources */,
 				46C1D99CBFD349F8D40A6170 /* [CP] Embed Pods Frameworks */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
+				249B8F8022A29B2E002A9EC5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -467,6 +482,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "TAGS=\"TODO:|FIXME:\"\nERRORTAG=\"ERROR:\"\nfind \"${SRCROOT}\" \\( -path ./Pods -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$|($ERRORTAG).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\" | perl -p -e \"s/($ERRORTAG)/ error: \\$1/\"";
+		};
+		249B8F8022A29B2E002A9EC5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
 		};
 		32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -599,6 +631,7 @@
 				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
 				2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */,
+				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				2464D21F209E27FE00C7F8FC /* Settings+UserDefaultsExtensions.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
@@ -610,6 +643,7 @@
 				24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */,
 				2464D206209DD27A00C7F8FC /* Theming.swift in Sources */,
 				242A90A422635B8C008E7910 /* UIImageExtensions.swift in Sources */,
+				249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */,
 				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
 			);

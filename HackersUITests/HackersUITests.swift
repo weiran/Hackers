@@ -22,53 +22,53 @@ class HackersUITests: XCTestCase {
 
     func testScreenshotUltimate() {
         launch()
-        
+
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
-        
+
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
             let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
             XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
             commentsTablesQuery.element(boundBy: 1).tap()
         }
-        
+
         snapshot("Ultimate")
     }
-    
+
     func testScreenshotComments() {
         if Device.current.isPad {
             return
         }
-        
+
         launch()
-        
+
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
         tablesQuery.cells.element(boundBy: 1).tap()
-        
+
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         tablesQuery.cells.element(boundBy: 1).tap()
-        
+
         snapshot("Comments")
     }
-    
+
     func testScreenshotDark() {
         launch(darkTheme: true)
-        
+
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
-        
+
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
             let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
             XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
             commentsTablesQuery.element(boundBy: 1).tap()
         }
-        
+
         snapshot("Dark")
     }
-    
+
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)

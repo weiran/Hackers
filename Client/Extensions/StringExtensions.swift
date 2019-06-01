@@ -10,21 +10,15 @@ import Foundation
 
 extension String {
     subscript(value: PartialRangeUpTo<Int>) -> Substring {
-        get {
-            return self[..<index(startIndex, offsetBy: value.upperBound)]
-        }
+        return self[..<index(startIndex, offsetBy: value.upperBound)]
     }
-    
+
     subscript(value: PartialRangeThrough<Int>) -> Substring {
-        get {
-            return self[...index(startIndex, offsetBy: value.upperBound)]
-        }
+        return self[...index(startIndex, offsetBy: value.upperBound)]
     }
-    
+
     subscript(value: PartialRangeFrom<Int>) -> Substring {
-        get {
-            return self[index(startIndex, offsetBy: value.lowerBound)...]
-        }
+        return self[index(startIndex, offsetBy: value.lowerBound)...]
     }
 }
 
@@ -34,7 +28,7 @@ extension String {
         let end = index(startIndex, offsetBy: bounds.upperBound)
         return String(self[start...end])
     }
-    
+
     subscript (bounds: CountableRange<Int>) -> String {
         let start = index(startIndex, offsetBy: bounds.lowerBound)
         let end = index(startIndex, offsetBy: bounds.upperBound)
@@ -60,11 +54,11 @@ extension String {
         text = text.replacingOccurrences(of: "&amp;", with: "")
         text = text.replacingOccurrences(of: "<pre><code>", with: "")
         text = text.replacingOccurrences(of: "</code></pre>", with: "")
-        
+
         let scanner = Scanner(string: text)
         scanner.charactersToBeSkipped = CharacterSet(charactersIn: "")
         var goodText: NSString? = "", runningString: NSString = "", trash: NSString?
-        
+
         while !scanner.isAtEnd {
             if scanner.string[scanner.scanLocation...].range(of: "<a href") != nil {
                 scanner.scanUpTo("<a href=", into: &goodText)
@@ -80,7 +74,7 @@ extension String {
                 scanner.scanLocation = text.count
             }
         }
-        
+
         return runningString as String
     }
 }
