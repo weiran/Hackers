@@ -13,10 +13,10 @@ import Foundation
 protocol ThemeProvider {
     /// Placeholder for the theme type that the app will use
     associatedtype Theme
-    
+
     /// The current theme that is active
     var currentTheme: Theme { get }
-    
+
     /// Subscribe to be notified when the theme changes. Handler will be
     /// remove from subscription when `object` is deallocated.
     func subscribeToChanges(_ object: AnyObject, handler: @escaping (Theme) -> Void)
@@ -29,10 +29,10 @@ protocol Themed {
     /// let's call this associated type _ThemeProvider
     // swiftlint:disable type_name
     associatedtype _ThemeProvider: ThemeProvider
-    
+
     /// Return the current app-wide theme provider
     var themeProvider: _ThemeProvider { get }
-    
+
     /// This will be called whenever the current theme changes
     func applyTheme(_ theme: _ThemeProvider.Theme)
 }

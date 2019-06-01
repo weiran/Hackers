@@ -19,19 +19,19 @@ class HackerNewsService {
                 seal.fulfill((posts, nextPageIdentifier))
             }
         }
-        
+
         if let nextPageIdentifier = nextPageIdentifier {
             HNScraper.shared.getMoreItems(linkForMore: nextPageIdentifier, completionHandler: completionHandler)
         } else {
             HNScraper.shared.getPostsList(page: type, completion: completionHandler)
         }
-        
+
         return promise
     }
-    
+
     public func getComments(of post: HNPost) -> Promise<[HNComment]?> {
         let (promise, seal) = Promise<[HNComment]?>.pending()
-        HNScraper.shared.getComments(ForPost: post, buildHierarchy: false, offsetComments: false) { (post, comments, error) in
+        HNScraper.shared.getComments(ForPost: post, buildHierarchy: false, offsetComments: false) { (_, comments, error) in
             if let error = error {
                 seal.reject(error)
             } else {
@@ -40,10 +40,10 @@ class HackerNewsService {
         }
         return promise
     }
-    
+
     public func login(username: String, password: String) -> Promise<(HNUser?, HTTPCookie?)> {
         HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
-        
+
         let (promise, seal) = Promise<(HNUser?, HTTPCookie?)>.pending()
         HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
             if let error = error, cookie == nil {
@@ -54,11 +54,11 @@ class HackerNewsService {
         }
         return promise
     }
-    
+
     public func logout() {
         HNLogin.shared.logout()
     }
-    
+
     public func upvote(post: HNPost) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.upvote(Post: post) { error in
@@ -70,7 +70,7 @@ class HackerNewsService {
         }
         return promise
     }
-    
+
     public func unvote(post: HNPost) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.unvote(Post: post) { error in
@@ -82,7 +82,7 @@ class HackerNewsService {
         }
         return promise
     }
-    
+
     public func upvote(comment: HNComment) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.upvote(Comment: comment) { error in
@@ -94,7 +94,7 @@ class HackerNewsService {
         }
         return promise
     }
-    
+
     public func unvote(comment: HNComment) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.unvote(Comment: comment) { error in

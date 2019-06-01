@@ -14,12 +14,12 @@ import Loaf
 class SettingsViewController: UITableViewController {
     public var sessionService: SessionService?
     public var authenticationUIService: AuthenticationUIService?
-    
+
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var darkModeSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
@@ -30,11 +30,11 @@ class SettingsViewController: UITableViewController {
             self.updateUsername()
         }
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     private func updateUsername() {
         if self.sessionService!.authenticationState == .authenticated {
             self.usernameLabel.text = self.sessionService?.username
@@ -42,20 +42,20 @@ class SettingsViewController: UITableViewController {
             self.usernameLabel.text = "Not logged in"
         }
     }
-    
+
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
     }
-    
+
     @IBAction func safariReaderModelValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setSafariReaderMode(sender.isOn)
     }
-    
+
     @IBAction private func didPressDone(_ sender: Any) {
         dismiss(animated: true)
     }
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         // override with empty implementation to prevent the extension running which reloads tableview data
     }
@@ -67,7 +67,7 @@ extension SettingsViewController {
         case (0, 0):
             self.authenticationUIService?.showAuthentication()
             break
-            
+
         default: break
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

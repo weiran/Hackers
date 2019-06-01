@@ -13,9 +13,9 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        
+
         guard let viewControllers = self.viewControllers else { return }
-        
+
         for (index, viewController) in viewControllers.enumerated() {
             guard let splitViewController = viewController as? UISplitViewController,
                 let navigationController = splitViewController.viewControllers.first as? UINavigationController,
@@ -23,21 +23,21 @@ class MainTabBarController: UITabBarController {
                 else {
                     return
             }
-            
+
             let (postType, typeName, iconName) = tabItems(for: index)
             newsViewController.postType = postType
             splitViewController.tabBarItem.title = typeName
             splitViewController.tabBarItem.image = UIImage(named: iconName)
         }
-        
+
         tabBar.clipsToBounds = true
     }
-    
+
     private func tabItems(for index: Int) -> (HNScraper.PostListPageName, String, String) {
         var postType = HNScraper.PostListPageName.news
         var typeName = "Top"
         var iconName = "TopIcon"
-        
+
         switch index {
         case 0:
             postType = .news
@@ -62,7 +62,7 @@ class MainTabBarController: UITabBarController {
         default:
             break
         }
-        
+
         return (postType, typeName, iconName)
     }
 }

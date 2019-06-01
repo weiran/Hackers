@@ -21,11 +21,11 @@ extension UITableViewController {
             }
         })
     }
-    
+
     public func smoothlyDeselectRows() {
         // Get the initially selected index paths, if any
         let selectedIndexPaths = self.tableView.indexPathsForSelectedRows ?? []
-        
+
         // Grab the transition coordinator responsible for the current transition
         if let coordinator = transitionCoordinator {
             // Animate alongside the master view controller's view
@@ -43,8 +43,7 @@ extension UITableViewController {
                     }
                 }
             })
-        }
-        else { // If this isn't a transition coordinator, just deselect the rows without animating
+        } else { // If this isn't a transition coordinator, just deselect the rows without animating
             selectedIndexPaths.forEach {
                 self.tableView.deselectRow(at: $0, animated: false)
             }

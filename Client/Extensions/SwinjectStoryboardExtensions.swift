@@ -23,7 +23,7 @@ extension SwinjectStoryboard {
             controller.sessionService = resolver.resolve(SessionService.self)!
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
         }
-        
+
         container.register(HackerNewsService.self) { _ in HackerNewsService() }
             .inObjectScope(.container)
         container.register(SessionService.self) { resolver in
@@ -37,7 +37,7 @@ extension SwinjectStoryboard {
             }
             .inObjectScope(.container)
     }
-    
+
     class func getService<T>() -> T? {
         return defaultContainer.resolve(T.self)
     }

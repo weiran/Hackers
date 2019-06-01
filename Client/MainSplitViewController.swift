@@ -14,17 +14,17 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         setupTheming()
         delegate = self
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         preferredDisplayMode = .allVisible
     }
-    
+
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return AppThemeProvider.shared.currentTheme.statusBarStyle
     }

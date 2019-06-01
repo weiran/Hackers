@@ -23,17 +23,16 @@ extension SFSafariViewController {
             return objc_getAssociatedObject(self, &AssociatedKeys.InitialURL) as? URL
         }
     }
-    
+
     public convenience init(initialURL: URL) {
         self.init(url: initialURL)
         self.initialURL = initialURL
     }
 }
 
-
 // Preview action items
 extension SFSafariViewController {
-    weak var previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? {
+    var previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName, newValue, .OBJC_ASSOCIATION_ASSIGN)
         }
@@ -41,7 +40,7 @@ extension SFSafariViewController {
             return objc_getAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName) as? SFSafariViewControllerPreviewActionItemsDelegate
         }
     }
-    
+
     open override var previewActionItems: [UIPreviewActionItem] {
         return previewActionItemsDelegate?.safariViewControllerPreviewActionItems(self) ?? []
     }
@@ -57,7 +56,7 @@ extension SFSafariViewController: Themed {
         super.viewDidLoad()
         setupTheming()
     }
-    
+
     func applyTheme(_ theme: AppTheme) {
         preferredBarTintColor = theme.barBackgroundColor
         preferredControlTintColor = theme.appTintColor
