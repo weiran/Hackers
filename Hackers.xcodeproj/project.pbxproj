@@ -109,7 +109,7 @@
 		249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBackgroundView.swift; sourceTree = "<group>"; };
 		249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewBackgroundView.xib; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
+		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/Shared/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
 		24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers2-Bridging-Header.h"; sourceTree = "<group>"; };
 		24CE5FEC19434BDC009D2677 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -199,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */,
+				2464D212209DEFB100C7F8FC /* UINavigationControllerExtensions.swift */,
 				243271941F95EDA9008196DB /* StringExtensions.swift */,
 				24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */,
 				2464D210209DE7B100C7F8FC /* UIColorExtensions.swift */,
@@ -243,6 +244,8 @@
 				249B8F8822A2C870002A9EC5 /* TableViewStates */,
 				249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */,
 				249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */,
+				24CEAA9C1F8917D60050DEDF /* ReviewController.swift */,
+				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -331,9 +334,6 @@
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
 				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
-				2464D212209DEFB100C7F8FC /* UINavigationControllerExtensions.swift */,
-				24CEAA9C1F8917D60050DEDF /* ReviewController.swift */,
-				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				24CE5FEE19434DC0009D2677 /* Posts List */,
 				24CE5FEF19434DCB009D2677 /* Comments */,
 				2464D219209E1F8A00C7F8FC /* Settings */,
