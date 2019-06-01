@@ -49,15 +49,19 @@ class NewsViewController: UITableViewController {
         }
     }
 
-    func navigateToComments(for post: HNPost) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let viewController = storyboard.instantiateViewController(withIdentifier: "CommentsViewController")
-        if let commentsViewController = viewController as? CommentsViewController {
-            commentsViewController.post = post
-            commentsViewController.hidesBottomBarWhenPushed = true
-            let appNavigationController = UINavigationController(rootViewController: commentsViewController)
-            navigationController?.pushViewController(appNavigationController, animated: true)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowCommentsSegue" {
+            if let navigationController = segue.destination as? UINavigationController,
+                let commentsViewController = navigationController.viewControllers.first as? CommentsViewController,
+                let indexPath = tableView.indexPathForSelectedRow,
+                let post = posts?[indexPath.row] {
+                commentsViewController.post = post
+            }
         }
+    }
+
+    private func navigateToComments(for post: HNPost) {
+        performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
 }
 
