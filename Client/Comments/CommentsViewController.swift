@@ -56,6 +56,7 @@ class CommentsViewController: UITableViewController {
             switch comments?.count {
             case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
             default:
+                self.tableView.backgroundView = nil
                 self.comments = comments?.map { CommentModel(source: $0) }
                 self.tableView.reloadData()
             }
