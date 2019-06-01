@@ -27,6 +27,7 @@ protocol Themed {
     /// A Themed type needs to know about what concrete type the
     /// ThemeProvider is. So we don't clash with the protocol,
     /// let's call this associated type _ThemeProvider
+    // swiftlint:disable type_name
     associatedtype _ThemeProvider: ThemeProvider
     
     /// Return the current app-wide theme provider

@@ -38,8 +38,8 @@ class CommentsController {
         var currentIndex = visibleIndex + 1;
         
         if childrenCount > 0 {
-            for i in 1...childrenCount {
-                let currentComment = comments[commentIndex + i]
+            for childIndex in 1...childrenCount {
+                let currentComment = comments[commentIndex + childIndex]
                 
                 if visible && currentComment.visibility == .hidden { continue }
                 
@@ -55,9 +55,9 @@ class CommentsController {
     public func indexOfVisibleRootComment(of comment: CommentModel) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
         
-        for i in (0...commentIndex).reversed() {
-            if visibleComments[i].level == 0 {
-                return i
+        for index in (0...commentIndex).reversed() {
+            if visibleComments[index].level == 0 {
+                return index
             }
         }
         
@@ -80,8 +80,8 @@ class CommentsController {
             return 0
         }
         
-        for i in startIndex...comments.count - 1 {
-            let currentComment = comments[i]
+        for index in startIndex...comments.count - 1 {
+            let currentComment = comments[index]
             if currentComment.level > comment.level {
                 count += 1
             } else {

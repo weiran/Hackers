@@ -99,6 +99,7 @@ extension NewsViewController {
     }
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // swiftlint:disable force_cast
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.postDelegate = self
         cell.delegate = self

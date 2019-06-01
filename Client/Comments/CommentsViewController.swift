@@ -141,6 +141,7 @@ extension CommentsViewController {
         assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
         let cellIdentifier = comment.visibility == CommentVisibilityType.visible ? "OpenCommentCell" : "ClosedCommentCell"
         
+        // swiftlint:disable force_cast
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! CommentTableViewCell
         
         cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
