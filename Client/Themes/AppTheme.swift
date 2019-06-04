@@ -59,7 +59,7 @@ extension AppTheme {
 
         statusBarStyle: .lightContent,
 
-        barBackgroundColor: UIColor(rgb: 0x111111),
+        barBackgroundColor: .black,
         barForegroundColor: appTintColorDark,
         backgroundColor: .black,
 
