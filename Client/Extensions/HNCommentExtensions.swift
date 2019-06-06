@@ -26,16 +26,18 @@ extension HNComment: PropertyStoring {
         }
     }
 
-    private struct CustomProperties {
+    private enum CustomProperties {
         static var commentVisibilityType: CommentVisibilityType = .visible
     }
 
     public var visibility: CommentVisibilityType {
         get {
-            return getAssociatedObject(&CustomProperties.commentVisibilityType, defaultValue: CustomProperties.commentVisibilityType)
+            return getAssociatedObject(&CustomProperties.commentVisibilityType,
+                                       defaultValue: CustomProperties.commentVisibilityType)
         }
         set {
-            return objc_setAssociatedObject(self, &CustomProperties.commentVisibilityType, newValue, .OBJC_ASSOCIATION_RETAIN)
+            return objc_setAssociatedObject(self, &CustomProperties.commentVisibilityType,
+                                            newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 }

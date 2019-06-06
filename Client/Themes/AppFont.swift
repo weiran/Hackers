@@ -8,18 +8,18 @@
 
 import UIKit
 
-public class AppFont {
-    static public func commentUsernameFont(collapsed: Bool) -> UIFont {
+public enum AppFont {
+    public static func commentUsernameFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .medium)
     }
 
-    static public func commentDateFont(collapsed: Bool) -> UIFont {
+    public static func commentDateFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .regular)
     }
 
-    static private func scaledFont(for textStyle: UIFont.TextStyle,
+    private static func scaledFont(for textStyle: UIFont.TextStyle,
                                    of size: CGFloat,
                                    with weight: UIFont.Weight) -> UIFont {
         let fontMetrics = UIFontMetrics(forTextStyle: textStyle)
@@ -28,7 +28,7 @@ public class AppFont {
         return scaledFont
     }
 
-    static private func scaledItalicFont(for textStyle: UIFont.TextStyle,
+    private static func scaledItalicFont(for textStyle: UIFont.TextStyle,
                                          of size: CGFloat,
                                          with weight: UIFont.Weight) -> UIFont {
         let fontMetrics = UIFontMetrics(forTextStyle: textStyle)

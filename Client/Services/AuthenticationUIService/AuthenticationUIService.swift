@@ -101,7 +101,7 @@ class AuthenticationUIService {
         item.appearance.descriptionTextColor = theme.textColor
     }
 
-    struct Notifications {
+    enum Notifications {
         // swiftlint:disable line_length
         static let AuthenticationDidChangeNotification = NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
     }

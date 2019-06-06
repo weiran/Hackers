@@ -68,7 +68,7 @@ class NewsViewController: UITableViewController {
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
         hackerNewsService?.getPosts(of: postType).map { (posts, nextPageIdentifier) in
-            if posts.count == 0 {
+            if posts.isEmpty {
                 self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
             } else {
                 self.posts = posts

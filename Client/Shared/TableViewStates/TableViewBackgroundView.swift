@@ -55,7 +55,7 @@ extension TableViewBackgroundView: Themed {
 }
 
 extension TableViewBackgroundView {
-    static public func loadingBackgroundView() -> TableViewBackgroundView? {
+    public static func loadingBackgroundView() -> TableViewBackgroundView? {
         guard let view = Bundle.main.loadNibNamed("TableViewBackgroundView",
                                                   owner: self,
                                                   options: nil)?.first as? TableViewBackgroundView else {
@@ -65,7 +65,7 @@ extension TableViewBackgroundView {
         return view
     }
 
-    static public func emptyBackgroundView(message: String) -> TableViewBackgroundView? {
+    public static func emptyBackgroundView(message: String) -> TableViewBackgroundView? {
         guard let view = Bundle.main.loadNibNamed("TableViewBackgroundView",
                                                   owner: self,
                                                   options: nil)?.first as? TableViewBackgroundView else {
