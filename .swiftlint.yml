@@ -1,3 +1,16 @@
-excluded: # paths to ignore during linting. Takes precedence over `included`.
+excluded:
   - Pods
   - fastlane
+opt_in_rules:
+  - convenience_type
+  - empty_count
+  - empty_string
+  - fatal_error_message
+  - first_where
+  - modifier_order
+  - toggle_bool
+  - unused_private_declaration
+  - overridden_super_call
+type_name:
+  excluded:
+    - T

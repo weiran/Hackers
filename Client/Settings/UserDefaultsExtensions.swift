@@ -1,5 +1,5 @@
 //
-//  Settings+UserDefaultsExtensions.swift
+//  UserDefaultsExtensions.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 05/05/2018.

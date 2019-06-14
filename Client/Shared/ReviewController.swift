@@ -8,7 +8,7 @@
 
 import StoreKit
 
-class ReviewController {
+enum ReviewController {
     public static var disablePrompts = false
 
     private static let showPromptIncrements = [5, 10, 15]

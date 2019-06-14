@@ -10,13 +10,13 @@ import Foundation
 import SafariServices
 import ObjectiveC
 
-private struct AssociatedKeys {
+private enum AssociatedKeys {
     static var PreviewActionItemsDelegateName = "previewActionItemsDelegate"
     static var InitialURL = "initialURL"
 }
 
 extension SFSafariViewController {
-    private(set) public var initialURL: URL? {
+    public private(set) var initialURL: URL? {
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.InitialURL, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
@@ -44,7 +44,7 @@ extension SFSafariViewController {
         }
     }
 
-    open override var previewActionItems: [UIPreviewActionItem] {
+    override open var previewActionItems: [UIPreviewActionItem] {
         return previewActionItemsDelegate?.safariViewControllerPreviewActionItems(self) ?? []
     }
 }
@@ -55,7 +55,7 @@ public protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
 
 // Theming
 extension SFSafariViewController: Themed {
-    open override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
     }
