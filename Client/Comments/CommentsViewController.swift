@@ -168,10 +168,11 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                    editActionsOptionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> SwipeOptions {
         let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
-                                                 elasticOverscroll: true,
+                                                 elasticOverscroll: false,
                                                  completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
+        options.expansionDelegate = BounceExpansion()
         options.transitionStyle = .drag
         return options
     }
