@@ -32,12 +32,16 @@ class CommentsViewController: UITableViewController {
     }
 
     @IBOutlet var loadingView: UIView!
+    private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
         loadComments()
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+        notificationToken = NotificationCenter.default
+            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                     object: nil, queue: .main) { _ in self.loadComments() }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -164,10 +168,11 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                    editActionsOptionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> SwipeOptions {
         let expansionStyle = SwipeExpansionStyle(target: .percentage(0.2),
-                                                 elasticOverscroll: true,
+                                                 elasticOverscroll: false,
                                                  completionAnimation: .bounce)
         var options = SwipeOptions()
         options.expansionStyle = expansionStyle
+        options.expansionDelegate = BounceExpansion()
         options.transitionStyle = .drag
         return options
     }

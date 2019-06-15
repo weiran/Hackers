@@ -63,7 +63,13 @@ extension SettingsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
+            // login
             authenticationUIService?.showAuthentication()
+        case (3, 0):
+            // what's new
+            if let viewController = OnboardingService.onboardingViewController(forceShow: true) {
+                present(viewController, animated: true)
+            }
         default: break
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

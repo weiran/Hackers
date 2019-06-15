@@ -11,6 +11,7 @@ target 'Hackers' do
   pod 'Swinject'
   pod 'SwinjectStoryboard'
   pod 'BulletinBoard'
+  pod 'WhatsNewKit'
   
   pod 'SwiftLint'
 end

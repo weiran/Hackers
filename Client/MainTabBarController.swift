@@ -32,6 +32,13 @@ class MainTabBarController: UITabBarController {
         tabBar.clipsToBounds = true
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let viewController = OnboardingService.onboardingViewController() {
+            present(viewController, animated: true)
+        }
+    }
+
     private func tabItem(for index: Int) -> TabItem? {
         switch index {
         case 0:
