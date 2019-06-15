@@ -48,7 +48,7 @@ enum OnboardingService {
     private static func items() -> [WhatsNew.Item] {
         let votingItem = WhatsNew.Item(
             title: "Up Vote",
-            subtitle: "Up vote a post or comment by swiping right.",
+            subtitle: "Swipe right on posts and comments to up vote them.",
             image: UIImage(named: "UpvoteOnboardingIcon")
         )
         let collapseCommentsItem = WhatsNew.Item(
