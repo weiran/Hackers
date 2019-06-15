@@ -179,8 +179,11 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0, indexPath.section == 0 {
-            guard let url = post?.url, UIApplication.shared.canOpenURL(url) else { return }
-            let safariViewController = SFSafariViewController.instance(for: url)
+            guard let url = post?.url,
+                UIApplication.shared.canOpenURL(url),
+                let safariViewController = SFSafariViewController.instance(for: url) else {
+                    return
+            }
             setupHandoff(with: post, activityType: .link(url: url))
             present(safariViewController, animated: true, completion: nil)
         }
@@ -202,9 +205,10 @@ extension CommentsViewController: CommentDelegate {
     }
 
     func linkTapped(_ url: URL, sender: UITextView) {
-        let safariViewController = SFSafariViewController.instance(for: url)
-        setupHandoff(with: post, activityType: .link(url: url))
-        present(safariViewController, animated: true, completion: nil)
+        if let safariViewController = SFSafariViewController.instance(for: url) {
+            setupHandoff(with: post, activityType: .link(url: url))
+            present(safariViewController, animated: true)
+        }
     }
 
     private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {

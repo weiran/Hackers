@@ -180,7 +180,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
                 return nil
         }
         let post = posts[indexPath.row]
-        if let url = post.url, verifyLink(post.url) {
+        if let url = post.url, UIApplication.shared.canOpenURL(url) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
             return getSafariViewController(url)
@@ -209,22 +209,20 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         return [viewCommentsPreviewAction]
     }
 
-    private func getSafariViewController(_ url: URL) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self)
-        safariViewController.previewActionItemsDelegate = self
-        return safariViewController
+    private func getSafariViewController(_ url: URL) -> SFSafariViewController? {
+        if let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self) {
+            safariViewController.previewActionItemsDelegate = self
+            return safariViewController
+        }
+        return nil
     }
 }
 
 extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        guard verifyLink(post.url), let url = post.url else { return }
-        navigationController?.present(getSafariViewController(url), animated: true, completion: nil)
-    }
-
-    private func verifyLink(_ url: URL?) -> Bool {
-        guard let url = url else { return false }
-        return UIApplication.shared.canOpenURL(url)
+        if let url = post.url, let safariViewController = getSafariViewController(url) {
+            navigationController?.present(safariViewController, animated: true)
+        }
     }
 
     func didTapThumbnail(_ sender: Any) {
