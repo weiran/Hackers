@@ -183,7 +183,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         if let url = post.url, UIApplication.shared.canOpenURL(url) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return getSafariViewController(url)
+            return SFSafariViewController.instance(for: url, previewActionItemsDelegate: self)
         }
         return nil
     }
@@ -208,19 +208,12 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
         }
         return [viewCommentsPreviewAction]
     }
-
-    private func getSafariViewController(_ url: URL) -> SFSafariViewController? {
-        if let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self) {
-            safariViewController.previewActionItemsDelegate = self
-            return safariViewController
-        }
-        return nil
-    }
 }
 
 extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
     func didPressLinkButton(_ post: HNPost) {
-        if let url = post.url, let safariViewController = getSafariViewController(url) {
+        if let url = post.url,
+            let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self) {
             navigationController?.present(safariViewController, animated: true)
         }
     }
