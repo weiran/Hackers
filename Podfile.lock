@@ -10,6 +10,7 @@ PODS:
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
   - SwipeCellKit (2.6.0)
+  - WhatsNewKit (1.1.9)
 
 DEPENDENCIES:
   - BulletinBoard
@@ -22,6 +23,7 @@ DEPENDENCIES:
   - Swinject
   - SwinjectStoryboard
   - SwipeCellKit
+  - WhatsNewKit
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -34,6 +36,7 @@ SPEC REPOS:
     - Swinject
     - SwinjectStoryboard
     - SwipeCellKit
+    - WhatsNewKit
 
 EXTERNAL SOURCES:
   HNScraper:
@@ -56,7 +59,8 @@ SPEC CHECKSUMS:
   Swinject: b624462f47b635a64f89a60a247baa5fccec14e1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
+  WhatsNewKit: 4012e2195e96df01ff9bd556d4ca27d48d27f1b1
 
-PODFILE CHECKSUM: d9eba396f37d96ac74e38d7b274bf7c9030278f8
+PODFILE CHECKSUM: ade55dec75a157ac5e9c060bce9d01aa057009af
 
 COCOAPODS: 1.7.2
