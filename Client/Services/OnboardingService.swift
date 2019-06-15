@@ -11,7 +11,7 @@ import WhatsNewKit
 enum OnboardingService {
     public static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
         let whatsNew = WhatsNew(
-            title: "Whats New in Hackers",
+            title: "What's New in Hackers",
             items: items())
 
         let keyValueVersionStore = KeyValueWhatsNewVersionStore(
