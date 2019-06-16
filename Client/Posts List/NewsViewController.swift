@@ -71,9 +71,13 @@ extension NewsViewController { // post fetching
             if posts.isEmpty {
                 self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
             } else {
-                self.posts = posts
-                self.nextPageIdentifier = nextPageIdentifier
-                self.tableView.reloadData()
+                DispatchQueue.main.async {
+                    self.posts = posts
+                    self.nextPageIdentifier = nextPageIdentifier
+                    self.tableView.reloadData()
+                    self.tableView.setNeedsLayout()
+                    self.tableView.layoutIfNeeded()
+                }
             }
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
