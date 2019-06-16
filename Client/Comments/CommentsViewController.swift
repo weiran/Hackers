@@ -104,7 +104,7 @@ extension CommentsViewController {
 
             cell.delegate = self
             cell.postTitleView.post = post
-            cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url)
+            cell.setImageWithPlaceholder(url: post?.url)
             cell.thumbnailImageView.isUserInteractionEnabled = false
 
             return cell

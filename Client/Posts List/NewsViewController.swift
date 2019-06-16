@@ -112,7 +112,7 @@ extension NewsViewController {
         let post = posts?[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url)
+        cell.setImageWithPlaceholder(url: post?.url)
 
         return cell
     }
