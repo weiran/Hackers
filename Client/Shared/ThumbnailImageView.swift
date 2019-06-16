@@ -12,7 +12,6 @@ import Kingfisher
 class ThumbnailImageView: UIImageView {
     public func setImageWithPlaceholder(url: URL?) {
         setPlaceholder()
-        return
         guard let url = url,
             let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
                 return
