@@ -12,7 +12,8 @@ extension UIImageView {
     public func setImageWithPlaceholder(url: URL?, resizeToSize: Int? = nil) {
         let placeholderImage = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
         image = placeholderImage
-        if let url = url, let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=" + url.absoluteString) {
+        if let url = url, let thumbnailURL = URL(
+            string: "https://image-extractor.now.sh/?url=" + url.absoluteString) {
             var options: KingfisherOptionsInfo?
             if let resizeToSize = resizeToSize {
                 let thumbnailSize = CGFloat(resizeToSize) * UIScreen.main.scale
