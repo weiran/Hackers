@@ -35,7 +35,7 @@ enum OnboardingService {
     private static func configuration() -> WhatsNewViewController.Configuration {
         let appTheme = AppThemeProvider.shared.currentTheme
         let theme = WhatsNewViewController.Theme { theme in
-            theme.backgroundColor = appTheme.backgroundColor
+            theme.backgroundColor = appTheme.groupedTableViewBackgroundColor
             theme.titleView.titleColor = appTheme.titleTextColor
             theme.completionButton.backgroundColor = appTheme.appTintColor
             theme.completionButton.titleColor = .white
