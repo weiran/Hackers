@@ -107,6 +107,10 @@ extension CommentsViewController {
             cell.setImageWithPlaceholder(url: post?.url)
             cell.thumbnailImageView.isUserInteractionEnabled = false
 
+            // fixes cell height being incorrect on initial load
+            cell.setNeedsDisplay()
+            cell.layoutIfNeeded()
+
             return cell
         default:
             let comment = commentsController.visibleComments[indexPath.row]
