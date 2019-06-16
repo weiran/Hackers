@@ -77,6 +77,7 @@ extension NewsViewController { // post fetching
                     self.tableView.reloadData()
                     self.tableView.setNeedsLayout()
                     self.tableView.layoutIfNeeded()
+                    self.tableView.reloadData()
                 }
             }
         }.ensure {
