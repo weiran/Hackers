@@ -10,11 +10,11 @@ import UIKit
 import Kingfisher
 
 class ThumbnailImageView: UIImageView {
-    public func setImageWithPlaceholder(url: URL?) {
+    public func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
         guard let url = url,
             let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
-                return
+                return nil
         }
 
         let newSize = 60
@@ -28,7 +28,7 @@ class ThumbnailImageView: UIImageView {
 
         let resource = ImageResource(downloadURL: thumbnailURL)
 
-        KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
+        let task = KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
             switch result {
             case .success(let imageResult):
                 self.contentMode = .scaleAspectFill
@@ -36,6 +36,8 @@ class ThumbnailImageView: UIImageView {
             default: break
             }
         }
+
+        return task
     }
 
     private func setPlaceholder() {
