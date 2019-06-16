@@ -30,5 +30,6 @@ extension UINavigationController: Themed {
         DispatchQueue.main.async {
             self.setNeedsStatusBarAppearanceUpdate()
         }
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
