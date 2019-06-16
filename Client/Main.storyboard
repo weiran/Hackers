@@ -26,14 +26,14 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Hqt-ay-B4F">
                                             <rect key="frame" x="15" y="8" width="345" height="61"/>
                                             <subviews>
-                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="OFG-KR-Pd0">
-                                                    <rect key="frame" x="0.0" y="0.5" width="60" height="60"/>
+                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="safari" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OFG-KR-Pd0">
+                                                    <rect key="frame" x="0.0" y="1" width="60" height="59.5"/>
                                                     <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
                                                     <constraints>
+                                                        <constraint firstAttribute="height" constant="60" id="0fz-82-wYv"/>
                                                         <constraint firstAttribute="width" constant="60" id="L9o-uS-yyT"/>
-                                                        <constraint firstAttribute="width" secondItem="OFG-KR-Pd0" secondAttribute="height" multiplier="1:1" id="lVP-g9-qut"/>
                                                     </constraints>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -226,8 +226,8 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="I5m-DV-Pgi">
                                             <rect key="frame" x="15" y="8" width="345" height="61"/>
                                             <subviews>
-                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ThumbnailPlaceholderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="GWX-Xv-GpQ">
-                                                    <rect key="frame" x="0.0" y="0.5" width="60" height="60"/>
+                                                <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="safari" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="GWX-Xv-GpQ">
+                                                    <rect key="frame" x="0.0" y="1" width="60" height="59.5"/>
                                                     <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -654,8 +654,8 @@
     <resources>
         <image name="HackersIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
-        <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
         <image name="gear" catalog="system" width="64" height="60"/>
+        <image name="safari" catalog="system" width="64" height="62"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="vbE-ZV-SDt"/>

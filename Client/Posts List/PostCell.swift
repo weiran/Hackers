@@ -51,8 +51,7 @@ class PostCell: SwipeTableViewCell {
     }
 
     public func clearImage() {
-        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
-        thumbnailImageView.image = placeholder
+        thumbnailImageView.setPlaceholder()
     }
 
     @objc private func didTapThumbnail(_ sender: Any) {
@@ -64,5 +63,6 @@ extension PostCell: Themed {
     func applyTheme(_ theme: AppTheme) {
         backgroundColor = theme.backgroundColor
         separatorView?.backgroundColor = theme.separatorColor
+        thumbnailImageView.backgroundColor = theme.groupedTableViewBackgroundColor
     }
 }
