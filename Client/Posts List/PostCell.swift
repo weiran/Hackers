@@ -18,7 +18,7 @@ class PostCell: SwipeTableViewCell {
     public weak var postDelegate: PostCellDelegate?
 
     @IBOutlet weak var postTitleView: PostTitleView!
-    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var thumbnailImageView: ThumbnailImageView!
     @IBOutlet weak var separatorView: UIView!
 
     override func layoutSubviews() {
@@ -48,10 +48,6 @@ class PostCell: SwipeTableViewCell {
 
     private func setUnselectedBackground() {
         backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
-    }
-
-    public func clearImage() {
-        thumbnailImageView.setPlaceholder()
     }
 
     @objc private func didTapThumbnail(_ sender: Any) {

@@ -103,7 +103,6 @@ extension CommentsViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
 
             cell.delegate = self
-            cell.clearImage()
             cell.postTitleView.post = post
             cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url)
             cell.thumbnailImageView.isUserInteractionEnabled = false

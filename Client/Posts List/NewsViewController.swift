@@ -108,7 +108,6 @@ extension NewsViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.postDelegate = self
         cell.delegate = self
-        cell.clearImage()
 
         let post = posts?[indexPath.row]
         cell.postTitleView.post = post

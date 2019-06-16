@@ -1,21 +1,21 @@
 //
-//  ThumbnailFetcher.swift
+//  ThumbnailImageView.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on 18/12/2017.
-//  Copyright © 2017 Glass Umbrella. All rights reserved.
+//  Created by Weiran Zhang on 16/06/2019.
+//  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import UIKit
 import Kingfisher
 
-/// Extensions for thumbnail UIImageView
-extension UIImageView {
+class ThumbnailImageView: UIImageView {
     public func setImageWithPlaceholder(url: URL?) {
         setPlaceholder()
-
+        return
         guard let url = url,
             let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
-            return
+                return
         }
 
         let newSize = 60
@@ -32,16 +32,14 @@ extension UIImageView {
         KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
             switch result {
             case .success(let imageResult):
-                DispatchQueue.main.async {
-                    self.contentMode = .scaleAspectFill
-                    self.image = imageResult.image
-                }
+                self.contentMode = .scaleAspectFill
+                self.image = imageResult.image
             default: break
             }
         }
     }
 
-    public func setPlaceholder() {
+    private func setPlaceholder() {
         let placeholderImage = self.placeholderImage()
         contentMode = .center
         preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
@@ -77,5 +75,9 @@ extension UIImageView {
         UIGraphicsEndImageContext()
 
         return newImage!
+    }
+
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: 60, height: 60)
     }
 }
