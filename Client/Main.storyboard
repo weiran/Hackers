@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14810.11" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jsb-Cl-SCJ">
-    <device id="retina4_7" orientation="portrait" appearance="dark"/>
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14766.13"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -101,7 +101,7 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Hacker News" id="lRO-C4-ESL">
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="SettingsIcon" id="onC-T5-IAt">
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="gear" catalog="system" id="onC-T5-IAt">
                             <connections>
                                 <segue destination="9fT-2D-AhL" kind="presentation" modalPresentationStyle="formSheet" id="RIp-Wm-4ds"/>
                             </connections>
@@ -654,8 +654,8 @@
     <resources>
         <image name="HackersIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
-        <image name="SettingsIcon" width="28" height="28"/>
         <image name="ThumbnailPlaceholderIcon" width="42" height="42"/>
+        <image name="gear" catalog="system" width="64" height="60"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="vbE-ZV-SDt"/>
