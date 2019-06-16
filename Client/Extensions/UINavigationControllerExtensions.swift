@@ -20,8 +20,7 @@ extension UINavigationController: Themed {
     }
 
     func applyTheme(_ theme: AppTheme) {
-        navigationBar.barTintColor = theme.barBackgroundColor
-        navigationBar.tintColor = theme.barForegroundColor
+        navigationBar.tintColor = theme.appTintColor
         let titleTextAttributes = [
             NSAttributedString.Key.foregroundColor: theme.titleTextColor
         ]

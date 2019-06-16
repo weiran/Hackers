@@ -13,8 +13,6 @@ struct AppTheme {
 
     var statusBarStyle: UIStatusBarStyle
 
-    var barBackgroundColor: UIColor
-    var barForegroundColor: UIColor
     var backgroundColor: UIColor
 
     var titleTextColor: UIColor
@@ -41,8 +39,6 @@ extension AppTheme {
 
         statusBarStyle: .darkContent,
 
-        barBackgroundColor: .white,
-        barForegroundColor: appTintColorLight,
         backgroundColor: .white,
 
         titleTextColor: .black,
@@ -65,8 +61,6 @@ extension AppTheme {
 
         statusBarStyle: .lightContent,
 
-        barBackgroundColor: .black,
-        barForegroundColor: appTintColorDark,
         backgroundColor: .black,
 
         titleTextColor: UIColor(rgb: 0xDDDDDD),

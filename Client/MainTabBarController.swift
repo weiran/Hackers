@@ -63,7 +63,6 @@ class MainTabBarController: UITabBarController {
 
 extension MainTabBarController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        tabBar.barTintColor = theme.barBackgroundColor
-        tabBar.tintColor = theme.barForegroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
