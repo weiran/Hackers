@@ -75,6 +75,7 @@ extension NewsViewController { // post fetching
                     self.posts = posts
                     self.nextPageIdentifier = nextPageIdentifier
                     self.tableView.reloadData()
+                    // fixes cell height being incorrect on initial load
                     self.tableView.setNeedsLayout()
                     self.tableView.layoutIfNeeded()
                     self.tableView.reloadData()
