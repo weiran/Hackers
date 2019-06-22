@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 import SafariServices
 import PromiseKit
 import Kingfisher
@@ -62,6 +63,14 @@ class NewsViewController: UITableViewController {
 
     private func navigateToComments(for post: HNPost) {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
+    }
+
+    @IBAction func showNewSettings(_ sender: Any) {
+        let settingsStore = SettingsStore()
+        let hostingVC = UIHostingController(
+            rootView: SettingsView()
+                .environmentObject(settingsStore))
+        present(hostingVC, animated: true)
     }
 }
 

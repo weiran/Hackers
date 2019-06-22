@@ -24,6 +24,9 @@ enum ReviewController {
     }
 
     public static func requestReview() {
+        if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
+            return
+        }
         if showPromptIncrements.contains(launchCounter()) && disablePrompts == false {
             SKStoreReviewController.requestReview()
         }

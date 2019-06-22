@@ -15,7 +15,8 @@ class HackersUITests: XCTestCase {
         setupSnapshot(app)
         app.launchArguments = [
             "-Theme", darkTheme ? "dark" : "light",
-            "disableReviewPrompts"
+            "disableReviewPrompts",
+            "disableOnboarding"
         ]
         app.launch()
     }

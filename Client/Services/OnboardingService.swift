@@ -6,13 +6,19 @@
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import SwiftUI
 import WhatsNewKit
 
 enum OnboardingService {
     public static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
+        if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
+            return nil
+        }
+
         let whatsNew = WhatsNew(
             title: "What's New in Hackers",
-            items: items())
+            items: items()
+        )
 
         let keyValueVersionStore = KeyValueWhatsNewVersionStore(
             keyValueable: UserDefaults.standard
@@ -68,4 +74,20 @@ enum OnboardingService {
         )
         return [votingItem, collapseCommentsItem, swipeCollapseCommentsItem, darkModeItem]
     }
+}
+
+struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
+    typealias UIViewControllerType = WhatsNewViewController
+
+    func makeUIViewController(
+        context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
+    ) -> UIViewControllerType {
+        let onboardingViewController = OnboardingService.onboardingViewController(forceShow: true)!
+        // swiftlint:disable force_cast
+        return onboardingViewController as! UIViewControllerType
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewControllerType,
+                                context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
+    ) {}
 }
