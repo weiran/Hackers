@@ -18,7 +18,8 @@ class CommentsViewController: UITableViewController {
     public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
-
+    var isCollapsed = false
+    
     private enum ActivityType {
         case comments
         case link(url: URL)
@@ -138,7 +139,12 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                                                    indexPath: indexPath, viewController: self)
 
         case (.right, 1):
-            return collapseAction()
+            if !isCollapsed {
+                return collapseAction()
+                
+            } else {
+                return expandAction()
+            }
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
@@ -149,19 +155,29 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         }
     }
 
-    private func collapseAction() -> [SwipeAction] {
-        let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
+    private func collapseExpandActionManager(title: String, imageName: String, isCollapsed: Bool) -> [SwipeAction] {
+        let action = SwipeAction(style: .default, title: title) { _, indexPath in
             let comment = self.commentsController.visibleComments[indexPath.row]
             guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
             self.toggleCellVisibilityForCell(IndexPath(row: index, section: 1))
         }
-        collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
-        collapseAction.textColor = .white
-
-        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
-        collapseAction.image = iconImage
-
-        return [collapseAction]
+        action.backgroundColor = themeProvider.currentTheme.appTintColor
+        action.textColor = .white
+        
+        let iconImage = UIImage(named: imageName)!.withTint(color: .white)
+        action.image = iconImage
+        
+        self.isCollapsed = isCollapsed
+        return [action]
+    }
+    
+    private func collapseAction() -> [SwipeAction] {
+        return collapseExpandActionManager(title: "Collapse", imageName: "UpIcon", isCollapsed: true)
+    }
+    
+    private func expandAction() -> [SwipeAction] {
+        
+        return collapseExpandActionManager(title: "Expand", imageName: "DownIcon", isCollapsed: false)
     }
 
     func tableView(_ tableView: UITableView,
