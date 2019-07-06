@@ -2,7 +2,7 @@ PODS:
   - BulletinBoard (3.0.0)
   - DeviceKit (2.0.0)
   - HNScraper (0.2.2)
-  - Kingfisher (5.6.0)
+  - Kingfisher (5.7.0)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.10.0)
   - SwiftLint (0.33.0)
@@ -52,7 +52,7 @@ SPEC CHECKSUMS:
   BulletinBoard: 927f4f9fd22503ceecd71bfc830fd65d5996593a
   DeviceKit: 72d36709552d4b3582abd76a53949148acad9811
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
-  Kingfisher: 1a50df6880a60bae26f3e21a0df3d17b892f5e0b
+  Kingfisher: c7d211b54f1f30d8060aadab177d52b4349c825b
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 1fdaeb6c0a94a5114fcb814ff3d772b86886ad4e
   SwiftLint: fed9c66336e41fc74dc48a73678380718f0c8b0e
