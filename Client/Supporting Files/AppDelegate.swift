@@ -22,6 +22,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func setAppTheme() {
-        AppThemeProvider.shared.currentTheme = UserDefaults.standard.darkModeEnabled ? .dark : .light
+        if #available(iOS 13, *) {
+            AppThemeProvider.shared.currentTheme = .dynamic
+        } else {
+            AppThemeProvider.shared.currentTheme = UserDefaults.standard.darkModeEnabled ? .dark : .light
+        }
     }
 }

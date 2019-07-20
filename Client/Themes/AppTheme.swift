@@ -74,4 +74,26 @@ extension AppTheme {
 
         activityIndicatorStyle: .white
     )
+
+    @available(iOS 13.0, *)
+    static let dynamic = AppTheme(
+        appTintColor: appTintColorDark,
+
+        statusBarStyle: .default,
+
+        barBackgroundColor: .systemBackground,
+        barForegroundColor: appTintColorDark,
+        backgroundColor: .systemBackground,
+
+        titleTextColor: .label,
+        textColor: .secondaryLabel,
+        lightTextColor: .tertiaryLabel,
+
+        cellHighlightColor: UIColor(rgb: 0x34363D),
+        separatorColor: UIColor(rgb: 0x757575),
+
+        upvotedColor: UIColor(rgb: 0xFF9300),
+
+        activityIndicatorStyle: .white
+    )
 }
