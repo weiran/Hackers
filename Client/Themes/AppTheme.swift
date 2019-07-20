@@ -94,6 +94,6 @@ extension AppTheme {
 
         upvotedColor: UIColor(rgb: 0xFF9300),
 
-        activityIndicatorStyle: .white
+        activityIndicatorStyle: .medium
     )
 }
