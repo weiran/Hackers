@@ -60,6 +60,7 @@
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */; };
 		288B0D6127D9C12BD8FE062F /* Pods_HackersUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */; };
+		69E06BB422E491A3002D8DED /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69E06BB322E491A3002D8DED /* Colors.xcassets */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
 
@@ -139,6 +140,7 @@
 		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
 		5C36BEF23DF27134A4F29678 /* Pods-HackersUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HackersUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HackersUITests/Pods-HackersUITests.release.xcconfig"; sourceTree = "<group>"; };
 		5E579CFC7EF20C95FB344A2E /* Pods-HackersUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HackersUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HackersUITests/Pods-HackersUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		69E06BB322E491A3002D8DED /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = ../../../../../../System/Volumes/Data/Users/ekildeew/Projet/githubForks/Hackers/Assets/Colors.xcassets; sourceTree = "<group>"; };
 		9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.release.xcconfig"; sourceTree = "<group>"; };
 		F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hackers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -292,6 +294,7 @@
 			children = (
 				24F39F9A18AFB1150055F8DC /* Images.xcassets */,
 				240C5BDF18D267C70011177A /* Icons.xcassets */,
+				69E06BB322E491A3002D8DED /* Colors.xcassets */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -487,6 +490,7 @@
 				240C5BE018D267C70011177A /* Icons.xcassets in Resources */,
 				24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */,
 				24EF5BF41C393D110012AA8A /* LaunchStoryboard.storyboard in Resources */,
+				69E06BB422E491A3002D8DED /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

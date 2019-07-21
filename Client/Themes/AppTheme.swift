@@ -77,22 +77,22 @@ extension AppTheme {
 
     @available(iOS 13.0, *)
     static let dynamic = AppTheme(
-        appTintColor: appTintColorDark,
+        appTintColor: UIColor(named: "appTintColor") ?? appTintColorDark,
 
         statusBarStyle: .default,
 
         barBackgroundColor: .systemBackground,
-        barForegroundColor: appTintColorDark,
+        barForegroundColor: UIColor(named: "appTintColor") ?? appTintColorDark,
         backgroundColor: .systemBackground,
 
-        titleTextColor: .label,
-        textColor: .secondaryLabel,
-        lightTextColor: .tertiaryLabel,
+        titleTextColor: UIColor(named: "titleTextColor") ?? .label,
+        textColor: UIColor(named: "textColor") ?? .secondaryLabel,
+        lightTextColor: UIColor(named: "lightTextColor") ?? .tertiaryLabel,
 
-        cellHighlightColor: UIColor(rgb: 0x34363D),
-        separatorColor: UIColor(rgb: 0x757575),
+        cellHighlightColor: UIColor(named: "cellHighlightColor") ?? UIColor(rgb: 0x34363D),
+        separatorColor: UIColor(named: "separatorColor") ?? UIColor(rgb: 0x757575),
 
-        upvotedColor: UIColor(rgb: 0xFF9300),
+        upvotedColor: UIColor(named: "upvotedColor") ?? UIColor(rgb: 0xFF9300),
 
         activityIndicatorStyle: .medium
     )
