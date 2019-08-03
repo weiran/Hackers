@@ -40,6 +40,7 @@ struct SettingsView: View {
                     }
                 }
             }
+            .listStyle(GroupedListStyle())
             .navigationBarTitle(Text("Settings"))
             .navigationBarItems(trailing:
                 Button(
