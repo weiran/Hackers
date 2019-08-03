@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 import UIKit
 
-class SettingsStore: BindableObject {
+class SettingsStore: ObservableObject {
     var didChange = PassthroughSubject<Void, Never>()
 
     private enum Keys {

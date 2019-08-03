@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
-    @Environment(\.isPresented) private var isPresented: Binding<Bool>?
+    @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
 
     var body: some View {
         NavigationView {
@@ -35,7 +35,7 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("MORE")) {
-                    PresentationButton(destination: OnboardingViewControllerWrapper()) {
+                    NavigationLink(destination: OnboardingViewControllerWrapper()) {
                         Text("Show What's New")
                     }
                 }
@@ -44,7 +44,7 @@ struct SettingsView: View {
             .navigationBarItems(trailing:
                 Button(
                     action: {
-                        self.isPresented?.value = false
+                        self.presentationMode.value.dismiss()
                     },
                     label: {
                         Text("Close")
