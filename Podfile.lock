@@ -1,11 +1,11 @@
 PODS:
-  - BulletinBoard (3.0.0)
+  - BulletinBoard (4.0.0)
   - DeviceKit (2.0.0)
   - HNScraper (0.2.2)
-  - Kingfisher (5.6.0)
+  - Kingfisher (5.7.0)
   - Loaf (0.4.0)
   - PromiseKit/CorePromise (6.10.0)
-  - SwiftLint (0.33.0)
+  - SwiftLint (0.34.0)
   - Swinject (2.6.2)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
@@ -49,13 +49,13 @@ CHECKOUT OPTIONS:
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
-  BulletinBoard: 927f4f9fd22503ceecd71bfc830fd65d5996593a
+  BulletinBoard: 2e312814ff70f3af364a6dda3857a801f6d2adb6
   DeviceKit: 72d36709552d4b3582abd76a53949148acad9811
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
-  Kingfisher: 1a50df6880a60bae26f3e21a0df3d17b892f5e0b
+  Kingfisher: c7d211b54f1f30d8060aadab177d52b4349c825b
   Loaf: 070a55b75527d541e710f69c0c7642ead3676a96
   PromiseKit: 1fdaeb6c0a94a5114fcb814ff3d772b86886ad4e
-  SwiftLint: fed9c66336e41fc74dc48a73678380718f0c8b0e
+  SwiftLint: 79d48a17c6565dc286c37efb8322c7b450f95c67
   Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
@@ -63,4 +63,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ade55dec75a157ac5e9c060bce9d01aa057009af
 
-COCOAPODS: 1.7.3
+COCOAPODS: 1.7.5
