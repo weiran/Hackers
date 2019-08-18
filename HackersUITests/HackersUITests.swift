@@ -69,7 +69,7 @@ class HackersUITests: XCTestCase {
             XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
             commentsTablesQuery.element(boundBy: 1).tap()
         }
-        
+
         wait(for: 2)
 
         snapshot("Dark")
