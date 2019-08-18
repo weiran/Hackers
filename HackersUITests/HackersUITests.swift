@@ -16,7 +16,8 @@ class HackersUITests: XCTestCase {
         app.launchArguments = [
             "-Theme", darkTheme ? "dark" : "light",
             "disableReviewPrompts",
-            "skipAnimations"
+            "skipAnimations",
+            "disableOnboarding"
         ]
         app.launch()
     }
