@@ -12,10 +12,11 @@ import DeviceKit
 class HackersUITests: XCTestCase {
     func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
-        setupSnapshot(app)
+        setupSnapshot(app, waitForAnimations: false)
         app.launchArguments = [
             "-Theme", darkTheme ? "dark" : "light",
-            "disableReviewPrompts"
+            "disableReviewPrompts",
+            "skipAnimations"
         ]
         app.launch()
     }
