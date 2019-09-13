@@ -37,7 +37,7 @@ Hackers is open source and licenced under the MIT licence.
 ## Generate screenshots
 
 1. Install [fastlane](https://fastlane.tools).
-2. Run `fastlane frameit` in `/Screenshots`
+2. Run `fastlane screenshots` in `/fastlane`
 
 ## Credits
 

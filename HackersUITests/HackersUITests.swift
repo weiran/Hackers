@@ -12,10 +12,12 @@ import DeviceKit
 class HackersUITests: XCTestCase {
     func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
-        setupSnapshot(app)
+        setupSnapshot(app, waitForAnimations: false)
         app.launchArguments = [
-            "-Theme", darkTheme ? "dark" : "light",
-            "disableReviewPrompts"
+            "-theme", darkTheme ? "dark" : "light",
+            "disableReviewPrompts",
+            "skipAnimations",
+            "disableOnboarding"
         ]
         app.launch()
     }
@@ -32,6 +34,8 @@ class HackersUITests: XCTestCase {
             XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
             commentsTablesQuery.element(boundBy: 1).tap()
         }
+
+        wait(for: 2)
 
         snapshot("Ultimate")
     }
@@ -66,6 +70,8 @@ class HackersUITests: XCTestCase {
             commentsTablesQuery.element(boundBy: 1).tap()
         }
 
+        wait(for: 2)
+
         snapshot("Dark")
     }
 
@@ -74,5 +80,18 @@ class HackersUITests: XCTestCase {
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
         let result = XCTWaiter().wait(for: [expectation], timeout: 5)
         return result == .completed
+    }
+}
+
+extension XCTestCase {
+    func wait(for duration: TimeInterval) {
+        let waitExpectation = expectation(description: "Waiting")
+
+        let when = DispatchTime.now() + duration
+        DispatchQueue.main.asyncAfter(deadline: when) {
+            waitExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: duration)
     }
 }

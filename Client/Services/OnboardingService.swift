@@ -10,6 +10,10 @@ import WhatsNewKit
 
 enum OnboardingService {
     public static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
+        guard !ProcessInfo.processInfo.arguments.contains("disableOnboarding") else {
+            return nil
+        }
+
         let whatsNew = WhatsNew(
             title: "What's New in Hackers",
             items: items())
