@@ -4,10 +4,9 @@
 devices([
   "iPhone 8",
   "iPhone 8 Plus",
-  "iPhone SE",
-  "iPhone Xs",
-  "iPhone Xs Max",
-  "iPhone Xʀ",
+  "iPhone 11 Pro",
+  "iPhone 11 Pro Max",
+  "iPhone 11",
   "iPad Pro (9.7-inch)",
   "iPad Pro (11-inch)",
   "iPad Pro (10.5-inch)",
