@@ -62,6 +62,7 @@
 		24FF021B226C99FA002EF8DD /* HackerNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021A226C99FA002EF8DD /* HackerNewsService.swift */; };
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */; };
+		24FFFF5A23362C7800D009EF /* HNPostExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HNPostExtensions.swift */; };
 		288B0D6127D9C12BD8FE062F /* Pods_HackersUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
@@ -141,6 +142,7 @@
 		24FF021A226C99FA002EF8DD /* HackerNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackerNewsService.swift; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewControllerExtensions.swift; sourceTree = "<group>"; };
+		24FFFF5923362C7800D009EF /* HNPostExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNPostExtensions.swift; sourceTree = "<group>"; };
 		5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HackersUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
 		5C36BEF23DF27134A4F29678 /* Pods-HackersUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HackersUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HackersUITests/Pods-HackersUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */,
 				249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */,
 				241E8DA91944AF870004F457 /* HNCommentExtensions.swift */,
+				24FFFF5923362C7800D009EF /* HNPostExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -684,6 +687,7 @@
 				24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */,
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
+				24FFFF5A23362C7800D009EF /* HNPostExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 				2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */,
