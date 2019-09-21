@@ -11,6 +11,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    @State var showOnboarding = false
 
     var body: some View {
         NavigationView {
@@ -35,8 +36,12 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("MORE")) {
-                    NavigationLink(destination: OnboardingViewControllerWrapper()) {
+                    Button(action: {
+                        self.showOnboarding = true
+                    }) {
                         Text("Show What's New")
+                    }.sheet(isPresented: $showOnboarding) {
+                        OnboardingViewControllerWrapper()
                     }
                 }
             }
@@ -45,7 +50,7 @@ struct SettingsView: View {
             .navigationBarItems(trailing:
                 Button(
                     action: {
-                        self.presentationMode.value.dismiss()
+                        self.presentationMode.wrappedValue.dismiss()
                     },
                     label: {
                         Text("Close")
