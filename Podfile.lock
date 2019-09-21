@@ -6,7 +6,7 @@ PODS:
   - Loaf (0.5.0)
   - PromiseKit/CorePromise (6.11.0)
   - SwiftLint (0.35.0)
-  - Swinject (2.7.1)
+  - Swinject (2.6.2)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
   - SwipeCellKit (2.7.0)
@@ -20,7 +20,7 @@ DEPENDENCIES:
   - Loaf
   - PromiseKit/CorePromise
   - SwiftLint
-  - Swinject
+  - Swinject (~> 2.6.2)
   - SwinjectStoryboard
   - SwipeCellKit
   - WhatsNewKit
@@ -56,11 +56,11 @@ SPEC CHECKSUMS:
   Loaf: 0800b444431366bc395d54267975d4ad4ad5c99c
   PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
   SwiftLint: 5553187048b900c91aa03552807681bb6b027846
-  Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
+  Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: cfcdcbfb739734e494c9d3832a7b6e6f9411e1fd
   WhatsNewKit: 7ec83c4ab2240605c3af63e302ede1310ab366be
 
-PODFILE CHECKSUM: ade55dec75a157ac5e9c060bce9d01aa057009af
+PODFILE CHECKSUM: ff0bb34eb1ead360aae2ed1c33bf1cef676f053b
 
 COCOAPODS: 1.7.5

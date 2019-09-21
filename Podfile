@@ -8,7 +8,7 @@ target 'Hackers' do
   pod 'Kingfisher'
   pod 'Loaf'
   pod 'SwipeCellKit'
-  pod 'Swinject'
+  pod 'Swinject', '~> 2.6.2' # SwinjectStoryboard needs updating
   pod 'SwinjectStoryboard'
   pod 'BulletinBoard'
   pod 'WhatsNewKit'
