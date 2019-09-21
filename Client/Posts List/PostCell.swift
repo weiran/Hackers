@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SwipeCellKit
+import Kingfisher
 
 protocol PostCellDelegate: class {
     func didTapThumbnail(_ sender: Any)
@@ -16,9 +17,10 @@ protocol PostCellDelegate: class {
 
 class PostCell: SwipeTableViewCell {
     public weak var postDelegate: PostCellDelegate?
+    private var downloadTask: DownloadTask?
 
     @IBOutlet weak var postTitleView: PostTitleView!
-    @IBOutlet weak var thumbnailImageView: UIImageView!
+    @IBOutlet weak var thumbnailImageView: ThumbnailImageView!
     @IBOutlet weak var separatorView: UIView!
 
     override func layoutSubviews() {
@@ -50,13 +52,17 @@ class PostCell: SwipeTableViewCell {
         backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
     }
 
-    public func clearImage() {
-        let placeholder = UIImage(named: "ThumbnailPlaceholderIcon")?.withRenderingMode(.alwaysTemplate)
-        thumbnailImageView.image = placeholder
-    }
-
     @objc private func didTapThumbnail(_ sender: Any) {
         postDelegate?.didTapThumbnail(sender)
+    }
+
+    public func setImageWithPlaceholder(url: URL?) {
+        downloadTask = thumbnailImageView.setImageWithPlaceholder(url: url)
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        downloadTask?.cancel()
     }
 }
 
@@ -64,5 +70,6 @@ extension PostCell: Themed {
     func applyTheme(_ theme: AppTheme) {
         backgroundColor = theme.backgroundColor
         separatorView?.backgroundColor = theme.separatorColor
+        thumbnailImageView.backgroundColor = theme.groupedTableViewBackgroundColor
     }
 }

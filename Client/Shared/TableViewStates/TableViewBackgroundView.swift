@@ -49,8 +49,8 @@ class TableViewBackgroundView: UIView {
 extension TableViewBackgroundView: Themed {
     func applyTheme(_ theme: AppTheme) {
         backgroundColor = theme.backgroundColor
-        activityIndicatorView.style = theme.activityIndicatorStyle
         titleLabel.textColor = theme.textColor
+        activityIndicatorView.style = .medium
     }
 }
 

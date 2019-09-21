@@ -31,7 +31,7 @@ class SettingsTableViewCell: UITableViewCell {
     }
 
     private func setUnselectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
+        backgroundColor = AppThemeProvider.shared.currentTheme.groupedTableViewCellBackgroundColor
     }
 }
 
@@ -40,6 +40,6 @@ extension SettingsTableViewCell: Themed {
         titleLabel?.textColor = theme.titleTextColor
         textLabel?.textColor = theme.titleTextColor
         detailTextLabel?.textColor = theme.textColor
-        backgroundColor = theme.barBackgroundColor
+        backgroundColor = theme.groupedTableViewCellBackgroundColor
     }
 }

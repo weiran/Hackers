@@ -25,7 +25,7 @@ class MainTabBarController: UITabBarController {
             if let tabItem = self.tabItem(for: index) {
                 newsViewController.postType = tabItem.postType
                 splitViewController.tabBarItem.title = tabItem.typeName
-                splitViewController.tabBarItem.image = UIImage(named: tabItem.iconName)
+                splitViewController.tabBarItem.image = UIImage(systemName: tabItem.iconName)
             }
         }
 
@@ -42,13 +42,13 @@ class MainTabBarController: UITabBarController {
     private func tabItem(for index: Int) -> TabItem? {
         switch index {
         case 0:
-            return TabItem(postType: .news, typeName: "Top", iconName: "TopIcon")
+            return TabItem(postType: .news, typeName: "Top", iconName: "globe")
         case 1:
-            return TabItem(postType: .asks, typeName: "Ask", iconName: "AskIcon")
+            return TabItem(postType: .asks, typeName: "Ask", iconName: "questionmark.circle")
         case 2:
-            return TabItem(postType: .jobs, typeName: "Jobs", iconName: "JobsIcon")
+            return TabItem(postType: .jobs, typeName: "Jobs", iconName: "briefcase")
         case 3:
-            return TabItem(postType: .new, typeName: "New", iconName: "NewIcon")
+            return TabItem(postType: .new, typeName: "New", iconName: "clock")
         default:
             return nil
         }
@@ -63,7 +63,6 @@ class MainTabBarController: UITabBarController {
 
 extension MainTabBarController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        tabBar.barTintColor = theme.barBackgroundColor
-        tabBar.tintColor = theme.barForegroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

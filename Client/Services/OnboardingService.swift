@@ -6,17 +6,19 @@
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
 
+import SwiftUI
 import WhatsNewKit
 
 enum OnboardingService {
     public static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
-        guard !ProcessInfo.processInfo.arguments.contains("disableOnboarding") else {
+        if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
 
         let whatsNew = WhatsNew(
             title: "What's New in Hackers",
-            items: items())
+            items: items()
+        )
 
         let keyValueVersionStore = KeyValueWhatsNewVersionStore(
             keyValueable: UserDefaults.standard
@@ -39,7 +41,7 @@ enum OnboardingService {
     private static func configuration() -> WhatsNewViewController.Configuration {
         let appTheme = AppThemeProvider.shared.currentTheme
         let theme = WhatsNewViewController.Theme { theme in
-            theme.backgroundColor = appTheme.backgroundColor
+            theme.backgroundColor = appTheme.groupedTableViewBackgroundColor
             theme.titleView.titleColor = appTheme.titleTextColor
             theme.completionButton.backgroundColor = appTheme.appTintColor
             theme.completionButton.titleColor = .white
@@ -72,4 +74,20 @@ enum OnboardingService {
         )
         return [votingItem, collapseCommentsItem, swipeCollapseCommentsItem, darkModeItem]
     }
+}
+
+struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
+    typealias UIViewControllerType = WhatsNewViewController
+
+    func makeUIViewController(
+        context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
+    ) -> UIViewControllerType {
+        let onboardingViewController = OnboardingService.onboardingViewController(forceShow: true)!
+        // swiftlint:disable force_cast
+        return onboardingViewController as! UIViewControllerType
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewControllerType,
+                                context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
+    ) {}
 }

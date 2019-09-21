@@ -2,15 +2,15 @@
 
 # A list of devices you want to take the screenshots from
 devices([
+  "iPhone SE",
   "iPhone 8",
   "iPhone 8 Plus",
-  "iPhone SE",
-  "iPhone Xs",
-  "iPhone Xs Max",
-  "iPhone Xʀ",
+  "iPhone 11 Pro",
+  "iPhone 11 Pro Max",
+  "iPhone 11",
   "iPad Pro (9.7-inch)",
+  "iPad Air (3rd generation)",
   "iPad Pro (11-inch)",
-  "iPad Pro (10.5-inch)",
   "iPad Pro (12.9-inch) (2nd generation)",
   "iPad Pro (12.9-inch) (3rd generation)"
 ])

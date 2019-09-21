@@ -76,8 +76,11 @@ class CommentsViewController: UITableViewController {
     }
 
     @IBAction private func shareTapped(_ sender: AnyObject) {
-        guard let post = post, let url = post.url else { return }
-        let activityViewController = UIActivityViewController(activityItems: [post.title, url],
+        guard let post = post else {
+            return
+        }
+
+        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
@@ -103,10 +106,13 @@ extension CommentsViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
 
             cell.delegate = self
-            cell.clearImage()
             cell.postTitleView.post = post
-            cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url, resizeToSize: 60)
+            cell.setImageWithPlaceholder(url: post?.url)
             cell.thumbnailImageView.isUserInteractionEnabled = false
+
+            // fixes cell height being incorrect on initial load
+            cell.setNeedsDisplay()
+            cell.layoutIfNeeded()
 
             return cell
         default:
@@ -244,14 +250,12 @@ extension CommentsViewController {
         guard let post = post else {
             return
         }
+
         var activity: NSUserActivity?
 
         if case ActivityType.comments = activityType {
             activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.comments")
-            guard let webpageURL = URL(string: "https://news.ycombinator.com/item?id=" + post.id) else {
-                return
-            }
-            activity?.webpageURL = webpageURL
+            activity?.webpageURL = post.hackerNewsURL
         } else if case ActivityType.link(let webpageURL) = activityType {
             activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
             activity?.webpageURL = webpageURL

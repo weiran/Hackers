@@ -14,3 +14,5 @@ opt_in_rules:
 type_name:
   excluded:
     - T
+  allowed_symbols:
+    - _Previews

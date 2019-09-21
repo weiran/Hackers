@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 import SafariServices
 import PromiseKit
 import Kingfisher
@@ -63,6 +64,14 @@ class NewsViewController: UITableViewController {
     private func navigateToComments(for post: HNPost) {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
+
+    @IBAction func showNewSettings(_ sender: Any) {
+        let settingsStore = SettingsStore()
+        let hostingVC = UIHostingController(
+            rootView: SettingsView()
+                .environmentObject(settingsStore))
+        present(hostingVC, animated: true)
+    }
 }
 
 extension NewsViewController { // post fetching
@@ -71,9 +80,15 @@ extension NewsViewController { // post fetching
             if posts.isEmpty {
                 self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
             } else {
-                self.posts = posts
-                self.nextPageIdentifier = nextPageIdentifier
-                self.tableView.reloadData()
+                DispatchQueue.main.async {
+                    self.posts = posts
+                    self.nextPageIdentifier = nextPageIdentifier
+                    self.tableView.reloadData()
+                    // fixes cell height being incorrect on initial load
+                    self.tableView.setNeedsLayout()
+                    self.tableView.layoutIfNeeded()
+                    self.tableView.reloadData()
+                }
             }
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
@@ -108,12 +123,11 @@ extension NewsViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
         cell.postDelegate = self
         cell.delegate = self
-        cell.clearImage()
 
         let post = posts?[indexPath.row]
         cell.postTitleView.post = post
         cell.postTitleView.delegate = self
-        cell.thumbnailImageView.setImageWithPlaceholder(url: post?.url, resizeToSize: 60)
+        cell.setImageWithPlaceholder(url: post?.url)
 
         return cell
     }

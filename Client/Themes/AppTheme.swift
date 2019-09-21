@@ -13,8 +13,6 @@ struct AppTheme {
 
     var statusBarStyle: UIStatusBarStyle
 
-    var barBackgroundColor: UIColor
-    var barForegroundColor: UIColor
     var backgroundColor: UIColor
 
     var titleTextColor: UIColor
@@ -24,9 +22,12 @@ struct AppTheme {
     var cellHighlightColor: UIColor
     var separatorColor: UIColor
 
+    var groupedTableViewBackgroundColor: UIColor
+    var groupedTableViewCellBackgroundColor: UIColor
+
     var upvotedColor: UIColor
 
-    var activityIndicatorStyle: UIActivityIndicatorView.Style
+    var userInterfaceStyle: UIUserInterfaceStyle
 }
 
 extension AppTheme {
@@ -36,10 +37,8 @@ extension AppTheme {
     static let light = AppTheme(
         appTintColor: appTintColorLight,
 
-        statusBarStyle: .default,
+        statusBarStyle: .darkContent,
 
-        barBackgroundColor: .white,
-        barForegroundColor: appTintColorLight,
         backgroundColor: .white,
 
         titleTextColor: .black,
@@ -49,9 +48,12 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0xF4D1F2),
         separatorColor: UIColor(rgb: 0xCACACA),
 
+        groupedTableViewBackgroundColor: UIColor(rgb: 0xF2F2F7),
+        groupedTableViewCellBackgroundColor: .white,
+
         upvotedColor: UIColor(rgb: 0xFF9300),
 
-        activityIndicatorStyle: .gray
+        userInterfaceStyle: .light
     )
 
     static let dark = AppTheme(
@@ -59,8 +61,6 @@ extension AppTheme {
 
         statusBarStyle: .lightContent,
 
-        barBackgroundColor: .black,
-        barForegroundColor: appTintColorDark,
         backgroundColor: .black,
 
         titleTextColor: UIColor(rgb: 0xDDDDDD),
@@ -70,8 +70,12 @@ extension AppTheme {
         cellHighlightColor: UIColor(rgb: 0x34363D),
         separatorColor: UIColor(rgb: 0x757575),
 
+        // these are colours for a presented VC
+        groupedTableViewBackgroundColor: UIColor(rgb: 0x1c1c1e),
+        groupedTableViewCellBackgroundColor: UIColor(rgb: 0x2c2c2e),
+
         upvotedColor: UIColor(rgb: 0xFF9300),
 
-        activityIndicatorStyle: .white
+        userInterfaceStyle: .dark
     )
 }

@@ -62,8 +62,9 @@ extension SFSafariViewController: Themed {
     }
 
     func applyTheme(_ theme: AppTheme) {
-        preferredBarTintColor = theme.barBackgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
         preferredControlTintColor = theme.appTintColor
+        preferredBarTintColor = theme.backgroundColor
         view.backgroundColor = theme.backgroundColor
     }
 }

@@ -80,8 +80,6 @@ extension SettingsViewController {
 
 extension SettingsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.barBackgroundColor
-        tableView.backgroundColor = theme.barBackgroundColor
-        tableView.separatorColor = theme.separatorColor
+        view.backgroundColor = theme.groupedTableViewBackgroundColor
     }
 }
