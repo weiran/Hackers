@@ -9,8 +9,8 @@ PODS:
   - Swinject (2.7.1)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
-  - SwipeCellKit (2.6.0)
-  - WhatsNewKit (1.2.0)
+  - SwipeCellKit (2.7.0)
+  - WhatsNewKit (1.3.0)
 
 DEPENDENCIES:
   - BulletinBoard
@@ -58,8 +58,8 @@ SPEC CHECKSUMS:
   SwiftLint: 5553187048b900c91aa03552807681bb6b027846
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
-  SwipeCellKit: 935ca28c187ec6e1ffb2b578cf8ddca842bfdcbb
-  WhatsNewKit: 3fc7e34db0902b086fa2760e05d4d4403a38a0e0
+  SwipeCellKit: cfcdcbfb739734e494c9d3832a7b6e6f9411e1fd
+  WhatsNewKit: 7ec83c4ab2240605c3af63e302ede1310ab366be
 
 PODFILE CHECKSUM: ade55dec75a157ac5e9c060bce9d01aa057009af
 
