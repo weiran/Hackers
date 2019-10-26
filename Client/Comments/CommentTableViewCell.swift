@@ -82,11 +82,16 @@ extension CommentTableViewCell: UITextViewDelegate {
                   in characterRange: NSRange,
                   interaction: UITextItemInteraction) -> Bool {
         switch interaction {
-            //This is the case when user just taps on the link
         case .invokeDefaultAction:
-            if let commentDelegate = commentDelegate {
-                commentDelegate.linkTapped(URL, sender: textView)
-                return false
+            // For some reason iOS 13 calls this multiple times when interacting with a link
+            // so we need to check gesture recognizer to see if its when ended
+            if textView.gestureRecognizers?.contains(where: {
+                $0.isKind(of: UITapGestureRecognizer.self) &&
+                $0.state == .ended }) == true {
+                if let commentDelegate = commentDelegate {
+                    commentDelegate.linkTapped(URL, sender: textView)
+                    return false
+                }
             }
             return true
         default:
