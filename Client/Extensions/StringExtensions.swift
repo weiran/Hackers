@@ -70,6 +70,12 @@ extension String {
                 scanner.scanString("</a>", into: &trash)
             } else {
                 let string = scanner.string[scanner.scanLocation...]
+                if string.isEmpty {
+                    // sometimes the scanner never gets to isAtEnd so we have to
+                    // break out of this loop manually
+                    // https://github.com/weiran/Hackers/issues/133
+                    break
+                }
                 runningString = runningString.appending(String(string)) as NSString
                 scanner.scanLocation = text.count
             }
