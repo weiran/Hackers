@@ -47,7 +47,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   HNScraper:
-    :commit: cb8399dc18232cc31e48165015884860d313e89c
+    :commit: 48e391b52f7d0ab6b7eadba6305427ac12d3b19e
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
