@@ -12,6 +12,7 @@ import Kingfisher
 class ThumbnailImageView: UIImageView {
     public func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
+
         guard let url = url,
             let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
                 return nil
@@ -31,8 +32,10 @@ class ThumbnailImageView: UIImageView {
         let task = KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
             switch result {
             case .success(let imageResult):
-                self.contentMode = .scaleAspectFill
-                self.image = imageResult.image
+                DispatchQueue.main.async {
+                    self.contentMode = .scaleAspectFill
+                    self.image = imageResult.image
+                }
             default: break
             }
         }
@@ -41,15 +44,12 @@ class ThumbnailImageView: UIImageView {
     }
 
     private func setPlaceholder() {
-        let placeholderImage = self.placeholderImage()
-        contentMode = .center
-        preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
-        image = placeholderImage
-    }
-
-    private func placeholderImage() -> UIImage {
-        let placeholderImage = UIImage(systemName: "safari")!
-        return placeholderImage
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
+        let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
+        DispatchQueue.main.async {
+            self.contentMode = .center
+            self.image = placeholderImage
+        }
     }
 
     private func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {

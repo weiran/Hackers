@@ -80,13 +80,9 @@ extension NewsViewController { // post fetching
             if posts.isEmpty {
                 self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
             } else {
+                self.posts = posts
+                self.nextPageIdentifier = nextPageIdentifier
                 DispatchQueue.main.async {
-                    self.posts = posts
-                    self.nextPageIdentifier = nextPageIdentifier
-                    self.tableView.reloadData()
-                    // fixes cell height being incorrect on initial load
-                    self.tableView.setNeedsLayout()
-                    self.tableView.layoutIfNeeded()
                     self.tableView.reloadData()
                 }
             }
