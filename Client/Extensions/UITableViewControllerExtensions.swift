@@ -14,11 +14,10 @@ extension UITableViewController {
         super.viewWillTransition(to: size, with: coordinator)
         DispatchQueue.global().async(execute: {
             DispatchQueue.main.sync {
-                guard let tableView = self.tableView,
-                    let indexPaths = tableView.indexPathsForVisibleRows else { return }
-                tableView.beginUpdates()
-                tableView.reloadRows(at: indexPaths, with: .automatic)
-                tableView.endUpdates()
+                guard let indexPaths = self.tableView.indexPathsForVisibleRows else { return }
+                self.tableView.beginUpdates()
+                self.tableView.reloadRows(at: indexPaths, with: .automatic)
+                self.tableView.endUpdates()
             }
         })
     }
