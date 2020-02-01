@@ -1,18 +1,18 @@
 PODS:
   - BulletinBoard (4.1.0)
-  - DeviceKit (2.3.0)
+  - DeviceKit (3.0.0)
   - HNScraper (0.2.2)
-  - Kingfisher (5.9.0):
-    - Kingfisher/Core (= 5.9.0)
-  - Kingfisher/Core (5.9.0)
+  - Kingfisher (5.13.0):
+    - Kingfisher/Core (= 5.13.0)
+  - Kingfisher/Core (5.13.0)
   - Loaf (0.5.0)
-  - PromiseKit/CorePromise (6.11.0)
-  - SwiftLint (0.36.0)
+  - PromiseKit/CorePromise (6.13.1)
+  - SwiftLint (0.38.2)
   - Swinject (2.6.2)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
   - SwipeCellKit (2.7.1)
-  - WhatsNewKit (1.3.0)
+  - WhatsNewKit (1.3.1)
 
 DEPENDENCIES:
   - BulletinBoard
@@ -47,21 +47,21 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   HNScraper:
-    :commit: cb8399dc18232cc31e48165015884860d313e89c
+    :commit: 48e391b52f7d0ab6b7eadba6305427ac12d3b19e
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
   BulletinBoard: c774340545b5cfd05a96a89f63b105ecc95c86f9
-  DeviceKit: da103891aa928d89f64ea8dd8aca738c5f3d8ac0
+  DeviceKit: fc3c2bd361a8d68d8a91eb715e453aede57317e5
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
-  Kingfisher: ff98240aebb7302bdc4f1ecd701761030ce18b16
+  Kingfisher: 0d334cada987fcddbe9b5cec516406e1ee9d4748
   Loaf: 0800b444431366bc395d54267975d4ad4ad5c99c
-  PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
-  SwiftLint: fc9859e4e1752340664851f667bb1898b9c90114
+  PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
+  SwiftLint: 8f5d2f903e1c9bcbc832fd16771e80a263ac6cbb
   Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
-  WhatsNewKit: 7ec83c4ab2240605c3af63e302ede1310ab366be
+  WhatsNewKit: fc8ca82510148c030d66b3bb9b937175f8dcb3fd
 
 PODFILE CHECKSUM: d70f074b2d24b1a621743d5403c8ccc041288902
 
