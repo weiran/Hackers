@@ -9,19 +9,6 @@
 import UIKit
 
 extension UITableViewController {
-    // resize visible table view cells on rotation
-    override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        DispatchQueue.global().async(execute: {
-            DispatchQueue.main.sync {
-                guard let indexPaths = self.tableView.indexPathsForVisibleRows else { return }
-                self.tableView.beginUpdates()
-                self.tableView.reloadRows(at: indexPaths, with: .automatic)
-                self.tableView.endUpdates()
-            }
-        })
-    }
-
     public func smoothlyDeselectRows() {
         // Get the initially selected index paths, if any
         let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
