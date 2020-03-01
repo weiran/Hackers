@@ -26,6 +26,7 @@ class MainTabBarController: UITabBarController {
                 newsViewController.postType = tabItem.postType
                 splitViewController.tabBarItem.title = tabItem.typeName
                 splitViewController.tabBarItem.image = UIImage(systemName: tabItem.iconName)
+                splitViewController.tabBarItem.selectedImage = UIImage(systemName: tabItem.selectedIconName)
             }
         }
 
@@ -42,13 +43,17 @@ class MainTabBarController: UITabBarController {
     private func tabItem(for index: Int) -> TabItem? {
         switch index {
         case 0:
-            return TabItem(postType: .news, typeName: "Top", iconName: "globe")
+            return TabItem(postType: .news, typeName: "Top",
+                           iconName: "globe", selectedIconName: "globe")
         case 1:
-            return TabItem(postType: .asks, typeName: "Ask", iconName: "questionmark.circle")
+            return TabItem(postType: .asks, typeName: "Ask",
+                           iconName: "bubble.left", selectedIconName: "bubble.left.fill")
         case 2:
-            return TabItem(postType: .jobs, typeName: "Jobs", iconName: "briefcase")
+            return TabItem(postType: .jobs, typeName: "Jobs",
+                           iconName: "briefcase", selectedIconName: "briefcase.fill")
         case 3:
-            return TabItem(postType: .new, typeName: "New", iconName: "clock")
+            return TabItem(postType: .new, typeName: "New",
+                           iconName: "clock", selectedIconName: "clock.fill")
         default:
             return nil
         }
@@ -58,6 +63,7 @@ class MainTabBarController: UITabBarController {
         let postType: HNScraper.PostListPageName
         let typeName: String
         let iconName: String
+        let selectedIconName: String
     }
 }
 
