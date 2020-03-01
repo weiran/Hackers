@@ -94,7 +94,7 @@ extension SettingsViewController {
     }
 
     private func showWebsite() {
-        let url = URL(string: "https://weiran.co/projects/hackers")!
+        let url = URL(string: "https://github.com/weiran/hackers")!
         if let safariViewController = SFSafariViewController.instance(for: url) {
             present(safariViewController, animated: true)
         }
