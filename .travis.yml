@@ -6,7 +6,6 @@ before_install:
 - gem install xcpretty
 - gem update cocoapods
 install:
-- pod repo update
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 script:
 - Pods/SwiftLint/swiftlint
