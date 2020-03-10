@@ -25,7 +25,7 @@ final class AppThemeProvider: ThemeProvider {
 
     init() {
         if #available(iOS 13, *) {
-            theme = SubscribableValue<AppTheme>(value: .dynamic)
+            theme = SubscribableValue<AppTheme>(value: .system)
         } else {
             theme = SubscribableValue<AppTheme>(value: .light)
         }

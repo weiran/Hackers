@@ -18,13 +18,21 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var systemSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
 
     private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13, *) {
+            systemSwitch.isEnabled = true
+        } else {
+            systemSwitch.isEnabled = false
+        }
         setupTheming()
+        systemSwitch.isOn = UserDefaults.standard.systemThemeEnabled
+        darkModeSwitch.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         updateUsername()
@@ -38,6 +46,18 @@ class SettingsViewController: UITableViewController {
             usernameLabel.text = sessionService?.username
         } else {
             usernameLabel.text = "Not logged in"
+        }
+    }
+
+    @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setSystemTheme(sender.isOn)
+        if !sender.isOn {
+            let darkMode = UserDefaults.standard.darkModeEnabled
+            AppThemeProvider.shared.currentTheme = darkMode ? .dark : .light
+            darkModeSwitch.isEnabled = true
+        } else {
+            AppThemeProvider.shared.currentTheme = .system
+            darkModeSwitch.isEnabled = false
         }
     }
 

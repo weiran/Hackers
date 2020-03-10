@@ -26,7 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func setAppTheme() {
         if #available(iOS 13, *) {
-            AppThemeProvider.shared.currentTheme = .dynamic
+            AppThemeProvider.shared.currentTheme
+                = UserDefaults.standard.systemThemeEnabled ? .system
+                : UserDefaults.standard.darkModeEnabled ? .dark : .light
         } else {
             AppThemeProvider.shared.currentTheme
                 = UserDefaults.standard.darkModeEnabled ? .dark : .light

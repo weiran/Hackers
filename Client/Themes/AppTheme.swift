@@ -80,7 +80,7 @@ extension AppTheme {
     )
 
     @available(iOS 13.0, *)
-    static let dynamic = AppTheme(
+    static let system = AppTheme(
         appTintColor: UIColor(named: "appTintColor") ?? appTintColorDark,
 
         statusBarStyle: .default,
