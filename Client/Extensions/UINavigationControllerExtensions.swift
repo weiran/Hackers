@@ -15,10 +15,6 @@ extension UINavigationController: Themed {
         navigationBar.setValue(true, forKey: "hidesShadow")
     }
 
-    override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return AppThemeProvider.shared.currentTheme.statusBarStyle
-    }
-
     func applyTheme(_ theme: AppTheme) {
         navigationBar.tintColor = theme.appTintColor
         let titleTextAttributes = [

@@ -26,10 +26,6 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
     }
-
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return AppThemeProvider.shared.currentTheme.statusBarStyle
-    }
 }
 
 extension MainSplitViewController: Themed {
