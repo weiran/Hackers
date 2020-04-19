@@ -58,6 +58,12 @@ class SettingsViewController: UITableViewController {
         }
     }
 
+    private func updateVersion() {
+        if let appVersion = appVersion() {
+            self.versionLabel.text = "Version \(appVersion)"
+        }
+    }
+
     @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
          UserDefaults.standard.setSystemTheme(sender.isOn)
          if !sender.isOn {
@@ -116,8 +122,8 @@ extension SettingsViewController {
     }
 
     private func sendFeedbackEmail() {
-        let appVersion = self.appVersion()
         if MFMailComposeViewController.canSendMail() {
+            let appVersion = self.appVersion() ?? ""
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.setToRecipients(["weiran@zhang.me.uk"])
@@ -125,6 +131,10 @@ extension SettingsViewController {
             mail.setMessageBody("", isHTML: true)
             present(mail, animated: true)
         }
+    }
+
+    private func appVersion() -> String? {
+        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     }
 
     private func login() {
