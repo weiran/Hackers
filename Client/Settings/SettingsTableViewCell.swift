@@ -15,24 +15,6 @@ class SettingsTableViewCell: UITableViewCell {
         super.awakeFromNib()
         setupTheming()
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        selected ? setSelectedBackground() : setUnselectedBackground()
-    }
-
-    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
-        highlighted ? setSelectedBackground() : setUnselectedBackground()
-    }
-
-    private func setSelectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
-    }
-
-    private func setUnselectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.groupedTableViewCellBackgroundColor
-    }
 }
 
 extension SettingsTableViewCell: Themed {
