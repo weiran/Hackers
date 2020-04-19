@@ -20,6 +20,7 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var systemSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     @IBOutlet weak var versionLabel: UILabel!
 
@@ -27,7 +28,14 @@ class SettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13, *) {
+            systemSwitch.isEnabled = true
+        } else {
+            systemSwitch.isEnabled = false
+        }
         setupTheming()
+        systemSwitch.isOn = UserDefaults.standard.systemThemeEnabled
+        darkModeSwitch.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         updateUsername()
@@ -50,16 +58,17 @@ class SettingsViewController: UITableViewController {
         }
     }
 
-    private func appVersion() -> String {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        return appVersion
-    }
-
-    private func updateVersion() {
-        if let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            self.versionLabel.text = "Version \(appVersion)"
-        }
-    }
+    @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
+         UserDefaults.standard.setSystemTheme(sender.isOn)
+         if !sender.isOn {
+             let darkMode = UserDefaults.standard.darkModeEnabled
+             AppThemeProvider.shared.currentTheme = darkMode ? .dark : .light
+             darkModeSwitch.isEnabled = true
+         } else {
+             AppThemeProvider.shared.currentTheme = .system
+             darkModeSwitch.isEnabled = false
+         }
+     }
 
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)

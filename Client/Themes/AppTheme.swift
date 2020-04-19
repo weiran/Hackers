@@ -78,4 +78,29 @@ extension AppTheme {
 
         userInterfaceStyle: .dark
     )
+
+    @available(iOS 13.0, *)
+    static let system = AppTheme(
+        appTintColor: UIColor(named: "appTintColor") ?? appTintColorDark,
+
+        statusBarStyle: .default,
+
+        backgroundColor: .systemBackground,
+
+        titleTextColor: UIColor(named: "titleTextColor") ?? .label,
+        textColor: UIColor(named: "textColor") ?? .secondaryLabel,
+        lightTextColor: UIColor(named: "lightTextColor") ?? .tertiaryLabel,
+
+        cellHighlightColor: UIColor(named: "cellHighlightColor") ?? UIColor(rgb: 0x34363D),
+        separatorColor: UIColor(named: "separatorColor") ?? UIColor(rgb: 0x757575),
+
+        groupedTableViewBackgroundColor: UIColor(named: "groupedTableViewBackgroundColor")
+            ?? UIColor(rgb: 0x1c1c1e),
+        groupedTableViewCellBackgroundColor: UIColor(named: "groupedTableViewCellBackgroundColor")
+            ?? UIColor(rgb: 0x2c2c2e),
+
+        upvotedColor: UIColor(named: "upvotedColor") ?? UIColor(rgb: 0xFF9300),
+
+        userInterfaceStyle: .unspecified
+    )
 }
