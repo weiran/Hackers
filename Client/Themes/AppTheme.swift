@@ -25,12 +25,12 @@ struct AppTheme {
 
     var upvotedColor: UIColor
 
-    var userInterfaceStyle: UIUserInterfaceStyle
+    var userInterfaceStyle: UIUserInterfaceStyle?
 }
 
 extension AppTheme {
     static func themeBuilder(userInterfaceStyle: UIUserInterfaceStyle? = nil) -> AppTheme {
-        var traitCollection = UITraitCollection.current
+        var traitCollection: UITraitCollection?
         if let userInterfaceStyle = userInterfaceStyle {
             traitCollection = UITraitCollection(userInterfaceStyle: userInterfaceStyle)
         }
@@ -53,7 +53,7 @@ extension AppTheme {
                                                          in: nil, compatibleWith: traitCollection)!,
             upvotedColor: UIColor(named: "upvotedColor", in: nil, compatibleWith: traitCollection)!,
 
-            userInterfaceStyle: userInterfaceStyle ?? traitCollection.userInterfaceStyle
+            userInterfaceStyle: userInterfaceStyle
         )
     }
 

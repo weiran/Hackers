@@ -69,6 +69,8 @@ class MainTabBarController: UITabBarController {
 
 extension MainTabBarController: Themed {
     func applyTheme(_ theme: AppTheme) {
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
+        if let uInterfaceStyle = theme.userInterfaceStyle {
+            overrideUserInterfaceStyle = uInterfaceStyle
+        }
     }
 }
