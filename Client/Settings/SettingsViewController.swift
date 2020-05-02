@@ -146,5 +146,6 @@ extension SettingsViewController: MFMailComposeViewControllerDelegate {
 extension SettingsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.groupedTableViewBackgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

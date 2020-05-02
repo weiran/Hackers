@@ -107,5 +107,6 @@ extension PostTitleView: Themed {
         if let post = post {
             metadataLabel.attributedText = metadataText(for: post, theme: theme)
         }
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

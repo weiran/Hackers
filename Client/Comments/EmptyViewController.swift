@@ -20,5 +20,6 @@ extension EmptyViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.backgroundColor
         descriptionLabel.textColor = theme.titleTextColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

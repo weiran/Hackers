@@ -119,6 +119,7 @@ class AuthenticationUIService {
         authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
             self.showAuthentication()
         }))
+        authenticationAlert.overrideUserInterfaceStyle = AppThemeProvider.shared.currentTheme.userInterfaceStyle
         return authenticationAlert
     }
 }

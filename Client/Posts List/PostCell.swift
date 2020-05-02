@@ -71,5 +71,6 @@ extension PostCell: Themed {
         backgroundColor = theme.backgroundColor
         separatorView?.backgroundColor = theme.separatorColor
         thumbnailImageView.backgroundColor = theme.groupedTableViewBackgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

@@ -66,6 +66,7 @@ extension SFSafariViewController: Themed {
         preferredControlTintColor = theme.appTintColor
         preferredBarTintColor = theme.backgroundColor
         view.backgroundColor = theme.backgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

@@ -139,5 +139,6 @@ extension CommentTableViewCell: Themed {
         if let comment = self.comment {
             updateCommentContent(with: comment, theme: theme)
         }
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
