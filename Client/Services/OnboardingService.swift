@@ -24,18 +24,25 @@ enum OnboardingService {
             keyValueable: UserDefaults.standard
         )
 
+        let viewController: WhatsNewViewController?
+
         if forceShow {
-            return WhatsNewViewController(
+            viewController = WhatsNewViewController(
                 whatsNew: whatsNew,
                 configuration: configuration()
             )
         } else {
-            return WhatsNewViewController(
+            viewController = WhatsNewViewController(
                 whatsNew: whatsNew,
                 configuration: configuration(),
                 versionStore: keyValueVersionStore
             )
         }
+
+        let theme = AppThemeProvider.shared.currentTheme
+        viewController?.overrideUserInterfaceStyle = theme.userInterfaceStyle
+
+        return viewController
     }
 
     private static func configuration() -> WhatsNewViewController.Configuration {

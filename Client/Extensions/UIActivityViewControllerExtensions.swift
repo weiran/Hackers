@@ -9,6 +9,11 @@
 import UIKit
 
 extension UIActivityViewController: Themed {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        setupTheming()
+    }
+
     func applyTheme(_ theme: AppTheme) {
         overrideUserInterfaceStyle = theme.userInterfaceStyle
     }

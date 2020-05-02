@@ -9,6 +9,11 @@
 import UIKit
 
 extension UIAlertController: Themed {
+    public convenience init(title: String?, message: String?, preferredStyle: UIAlertController.Style, themed: Bool) {
+        self.init(title: title, message: message, preferredStyle: preferredStyle)
+        setupTheming()
+    }
+
     func applyTheme(_ theme: AppTheme) {
         overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
