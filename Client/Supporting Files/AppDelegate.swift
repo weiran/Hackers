@@ -21,18 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
-        setAppTheme()
-    }
-
-    private func setAppTheme() {
-        if #available(iOS 13, *) {
-            AppThemeProvider.shared.currentTheme
-                = UserDefaults.standard.systemThemeEnabled ? .system
-                : UserDefaults.standard.darkModeEnabled ? .dark : .light
-        } else {
-            AppThemeProvider.shared.currentTheme
-                = UserDefaults.standard.darkModeEnabled ? .dark : .light
-        }
         UserDefaults.standard.registerDefaults()
+        ThemeSwitcher.switchTheme()
     }
 }
