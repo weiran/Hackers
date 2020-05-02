@@ -29,10 +29,15 @@ struct AppTheme {
 }
 
 extension AppTheme {
-    static func themeBuilder(userInterfaceStyle: UIUserInterfaceStyle? = nil) -> AppTheme {
-        var traitCollection: UITraitCollection?
+    private static func themeBuilder(_ userInterfaceStyle: UIUserInterfaceStyle? = nil) -> AppTheme {
+        // always get a fresh trait collection as the user may have changed system appearance
+        var traitCollection = currentTraitCollection()
+        var selectedUserInterfaceStyle = traitCollection.userInterfaceStyle
+
+        // if a specific theme is selected
         if let userInterfaceStyle = userInterfaceStyle {
             traitCollection = UITraitCollection(userInterfaceStyle: userInterfaceStyle)
+            selectedUserInterfaceStyle = userInterfaceStyle
         }
 
         return AppTheme(
@@ -53,11 +58,19 @@ extension AppTheme {
                                                          in: nil, compatibleWith: traitCollection)!,
             upvotedColor: UIColor(named: "upvotedColor", in: nil, compatibleWith: traitCollection)!,
 
-            userInterfaceStyle: userInterfaceStyle
+            userInterfaceStyle: selectedUserInterfaceStyle
         )
     }
 
-    static let light = AppTheme.themeBuilder(userInterfaceStyle: .light)
-    static let dark = AppTheme.themeBuilder(userInterfaceStyle: .dark)
-    static let system = AppTheme.themeBuilder()
+    private static func currentTraitCollection() -> UITraitCollection {
+        // use a fresh UIViewController uncontaminated by theme changes
+        let viewController = UIViewController()
+        return viewController.traitCollection
+    }
+
+    static let light = AppTheme.themeBuilder(.light)
+    static let dark = AppTheme.themeBuilder(.dark)
+    static var system: AppTheme {
+        AppTheme.themeBuilder()
+    }
 }
