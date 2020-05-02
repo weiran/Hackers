@@ -25,7 +25,7 @@ struct AppTheme {
 
     var upvotedColor: UIColor
 
-    var userInterfaceStyle: UIUserInterfaceStyle?
+    var userInterfaceStyle: UIUserInterfaceStyle
 }
 
 extension AppTheme {
