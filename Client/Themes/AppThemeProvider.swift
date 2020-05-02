@@ -24,7 +24,11 @@ final class AppThemeProvider: ThemeProvider {
     }
 
     init() {
-        theme = SubscribableValue<AppTheme>(value: .light)
+        if #available(iOS 13, *) {
+            theme = SubscribableValue<AppTheme>(value: .system)
+        } else {
+            theme = SubscribableValue<AppTheme>(value: .light)
+        }
     }
 
     private func setNewTheme(_ newTheme: AppTheme) {

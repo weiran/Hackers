@@ -21,6 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
+        UserDefaults.standard.registerDefaults()
         ThemeSwitcher.switchTheme()
     }
 }

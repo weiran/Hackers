@@ -10,16 +10,10 @@ import UIKit
 
 enum ThemeSwitcher {
     public static func switchTheme() {
-        let settingsStore = SettingsStore()
-        let theme = settingsStore.theme
-
-        switch (theme, UITraitCollection.current.userInterfaceStyle) {
-        case (.dark, _), (.system, .dark):
-            AppThemeProvider.shared.currentTheme = .dark
-        case (.light, _), (.system, .light):
-            AppThemeProvider.shared.currentTheme = .light
-        default:
-            AppThemeProvider.shared.currentTheme = .light
+        switch (UserDefaults.standard.systemThemeEnabled, UserDefaults.standard.darkModeEnabled) {
+        case (true, _): AppThemeProvider.shared.currentTheme = .system
+        case (false, false): AppThemeProvider.shared.currentTheme = .light
+        case (false, true): AppThemeProvider.shared.currentTheme = .dark
         }
     }
 }
