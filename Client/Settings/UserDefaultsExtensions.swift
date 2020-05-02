@@ -35,6 +35,14 @@ extension UserDefaults {
     public func setSafariReaderMode(_ enabled: Bool) {
         set(enabled, forKey: UserDefaultsKeys.safariReaderMode.rawValue)
     }
+
+    public func registerDefaults() {
+        register(defaults: [
+            UserDefaultsKeys.theme.rawValue: "light",
+            UserDefaultsKeys.systemTheme.rawValue: true,
+            UserDefaultsKeys.safariReaderMode.rawValue: false
+        ])
+    }
 }
 
 enum UserDefaultsKeys: String {

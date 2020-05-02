@@ -33,5 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             AppThemeProvider.shared.currentTheme
                 = UserDefaults.standard.darkModeEnabled ? .dark : .light
         }
+        UserDefaults.standard.registerDefaults()
     }
 }
