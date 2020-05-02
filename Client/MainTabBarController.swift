@@ -74,3 +74,14 @@ extension MainTabBarController: Themed {
         }
     }
 }
+
+extension MainTabBarController {
+    /// this is a good place to detect if a system appearance change has occured
+    override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        guard UIApplication.shared.applicationState == .inactive else { return }
+
+        ThemeSwitcher.switchTheme()
+    }
+}
