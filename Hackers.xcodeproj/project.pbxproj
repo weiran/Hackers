@@ -17,6 +17,8 @@
 		245345FB22466F75001AF1CE /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345F722466F71001AF1CE /* SnapshotHelper.swift */; };
 		2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9011F654DB2005A98C7 /* MainTabBarController.swift */; };
 		2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9031F655426005A98C7 /* EmptyViewController.swift */; };
+		2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */; };
+		2457FF79245DCE60000FA160 /* UIAlertControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2457FF78245DCE60000FA160 /* UIAlertControllerExtensions.swift */; };
 		245DCAB01CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245DCAAF1CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift */; };
 		24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24628BAC21E6897700BDEEF9 /* AppFont.swift */; };
 		2464D206209DD27A00C7F8FC /* Theming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D205209DD27A00C7F8FC /* Theming.swift */; };
@@ -95,6 +97,8 @@
 		245345FD2246732C001AF1CE /* Appfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Appfile; sourceTree = "<group>"; };
 		2454B9011F654DB2005A98C7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		2454B9031F655426005A98C7 /* EmptyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyViewController.swift; sourceTree = "<group>"; };
+		2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActivityViewControllerExtensions.swift; sourceTree = "<group>"; };
+		2457FF78245DCE60000FA160 /* UIAlertControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIAlertControllerExtensions.swift; sourceTree = "<group>"; };
 		245DCAAF1CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SFSafariViewControllerExtensions.swift; sourceTree = "<group>"; };
 		24628BAC21E6897700BDEEF9 /* AppFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		2464D205209DD27A00C7F8FC /* Theming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theming.swift; sourceTree = "<group>"; };
@@ -224,6 +228,8 @@
 				249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */,
 				241E8DA91944AF870004F457 /* HNCommentExtensions.swift */,
 				24FFFF5923362C7800D009EF /* HNPostExtensions.swift */,
+				2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */,
+				2457FF78245DCE60000FA160 /* UIAlertControllerExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -690,8 +696,10 @@
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
 				24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */,
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
+				2457FF79245DCE60000FA160 /* UIAlertControllerExtensions.swift in Sources */,
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
 				24FFFF5A23362C7800D009EF /* HNPostExtensions.swift in Sources */,
+				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 				2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */,
