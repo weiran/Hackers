@@ -23,5 +23,6 @@ extension SettingsTableViewCell: Themed {
         textLabel?.textColor = theme.titleTextColor
         detailTextLabel?.textColor = theme.textColor
         backgroundColor = theme.groupedTableViewCellBackgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

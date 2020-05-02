@@ -33,5 +33,6 @@ extension MainSplitViewController: Themed {
     open func applyTheme(_ theme: AppTheme) {
         UITextView.appearance().tintColor = theme.appTintColor
         UITabBar.appearance().tintColor = theme.appTintColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

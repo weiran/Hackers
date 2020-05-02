@@ -196,6 +196,7 @@ extension CommentsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

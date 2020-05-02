@@ -178,6 +178,7 @@ extension NewsViewController: Themed {
         tableView.backgroundColor = theme.backgroundColor
         tableView.separatorColor = theme.separatorColor
         tableView.refreshControl?.tintColor = theme.appTintColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

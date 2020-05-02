@@ -114,7 +114,8 @@ class AuthenticationUIService {
         let unauthenticatedMessage = "You're not logged into Hacker News. Do you want to login now?"
         let authenticationAlert = UIAlertController(title: "Not logged in",
                                                     message: unauthenticatedMessage,
-                                                    preferredStyle: .alert)
+                                                    preferredStyle: .alert,
+                                                    themed: true)
         authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
         authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
             self.showAuthentication()

@@ -51,6 +51,7 @@ extension TableViewBackgroundView: Themed {
         backgroundColor = theme.backgroundColor
         titleLabel.textColor = theme.textColor
         activityIndicatorView.style = .medium
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

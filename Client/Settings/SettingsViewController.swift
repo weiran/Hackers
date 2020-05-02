@@ -65,15 +65,9 @@ class SettingsViewController: UITableViewController {
     }
 
     @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
-         UserDefaults.standard.setSystemTheme(sender.isOn)
-         if !sender.isOn {
-             let darkMode = UserDefaults.standard.darkModeEnabled
-             AppThemeProvider.shared.currentTheme = darkMode ? .dark : .light
-             darkModeSwitch.isEnabled = true
-         } else {
-             AppThemeProvider.shared.currentTheme = .system
-             darkModeSwitch.isEnabled = false
-         }
+        UserDefaults.standard.setSystemTheme(sender.isOn)
+        ThemeSwitcher.switchTheme()
+        darkModeSwitch.isEnabled = !sender.isOn
      }
 
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
@@ -152,5 +146,6 @@ extension SettingsViewController: MFMailComposeViewControllerDelegate {
 extension SettingsViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.groupedTableViewBackgroundColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
