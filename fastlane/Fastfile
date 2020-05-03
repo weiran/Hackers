@@ -16,10 +16,14 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Generate new localized screenshots"
+  desc "Generate new screenshots"
   lane :screenshots do
     capture_screenshots(workspace: "Hackers.xcworkspace", scheme: "Hackers")
     frameit(path: "./fastlane/screenshots/")
 # upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
+  end
+  desc "Run Tests"
+  lane :test do
+  	scan(scheme: "Hackers")
   end
 end
