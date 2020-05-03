@@ -19,6 +19,7 @@ jobs:
       name: "UI Tests"
       script:
         - bundle exec fastlane test
+        - sleep 10
     - stage: "Build"
       name: "Release"
       script:
