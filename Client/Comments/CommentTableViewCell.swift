@@ -79,11 +79,13 @@ class CommentTableViewCell: SwipeTableViewCell {
     private func parseToAttributedString(_ html: String) -> NSMutableAttributedString {
         let paragraphIdentifier = "PARAGRAPH_NEED_NEW_LINES_HERE"
 
+        // swiftlint:disable unused_optional_binding
         guard let document = try? SwiftSoup.parse(html),
             let _ = try? document.select("p").before(paragraphIdentifier),
             let text = try? document.text() else {
             return NSMutableAttributedString()
         }
+        // swiftlint:enable unused_optional_binding
 
         return NSMutableAttributedString(string: text.replacingOccurrences(of: paragraphIdentifier + " ", with: "\n\n"))
     }
