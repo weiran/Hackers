@@ -18,7 +18,7 @@ jobs:
     - stage: "Tests"
       name: "UI Tests"
       script:
-        - bundle exec fastlane test --scheme ${TRAVIS_XCODE_SCHEME}
+        - bundle exec fastlane test
     - stage: "Build"
       name: "Release"
       script:
