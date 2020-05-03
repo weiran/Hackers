@@ -14,11 +14,16 @@ class HackersUITests: XCTestCase {
         let app = XCUIApplication()
         setupSnapshot(app, waitForAnimations: false)
         app.launchArguments = [
-            "-theme", darkTheme ? "dark" : "light",
             "disableReviewPrompts",
             "skipAnimations",
             "disableOnboarding"
         ]
+        if darkTheme {
+            app.launchArguments.append("-systemTheme")
+            app.launchArguments.append("false")
+            app.launchArguments.append("-theme")
+            app.launchArguments.append("dark")
+        }
         app.launch()
     }
 
