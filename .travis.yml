@@ -18,8 +18,8 @@ jobs:
     - stage: "Tests"
       name: "UI Tests"
       script:
-        - bundle exec fastlane test
-        - sleep 10
+        # - bundle exec fastlane test
+        - xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme "HackersUITests" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.4' test
     - stage: "Build"
       name: "Release"
       script:
