@@ -640,7 +640,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use System Appearance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CUa-78-yFY">
-                                                    <rect key="frame" x="23" y="11.5" width="188" height="21"/>
+                                                    <rect key="frame" x="15" y="11.5" width="188" height="21"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -656,7 +656,7 @@
                                                 <constraint firstItem="CUa-78-yFY" firstAttribute="centerY" secondItem="e0A-YI-hGk" secondAttribute="centerY" id="4BK-rq-BNW"/>
                                                 <constraint firstItem="uAe-yS-ppv" firstAttribute="centerY" secondItem="e0A-YI-hGk" secondAttribute="centerY" id="Zhz-ON-eDY"/>
                                                 <constraint firstAttribute="trailing" secondItem="uAe-yS-ppv" secondAttribute="trailing" constant="15" id="fsf-33-8qK"/>
-                                                <constraint firstItem="CUa-78-yFY" firstAttribute="leading" secondItem="e0A-YI-hGk" secondAttribute="leadingMargin" constant="8" id="zre-gX-58J"/>
+                                                <constraint firstItem="CUa-78-yFY" firstAttribute="leading" secondItem="e0A-YI-hGk" secondAttribute="leadingMargin" id="zre-gX-58J"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
@@ -672,7 +672,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark Mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZJj-OK-IbA">
-                                                    <rect key="frame" x="23" y="12" width="84" height="20.5"/>
+                                                    <rect key="frame" x="15" y="12" width="84" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -688,7 +688,7 @@
                                                 <constraint firstItem="ZJj-OK-IbA" firstAttribute="centerY" secondItem="VQv-8y-qQ7" secondAttribute="centerY" id="2lL-rk-7qA"/>
                                                 <constraint firstAttribute="trailing" secondItem="Gqs-fj-YB0" secondAttribute="trailing" constant="15" id="Qr3-Qv-PBI"/>
                                                 <constraint firstItem="Gqs-fj-YB0" firstAttribute="centerY" secondItem="VQv-8y-qQ7" secondAttribute="centerY" id="cSG-Fj-azY"/>
-                                                <constraint firstItem="ZJj-OK-IbA" firstAttribute="leading" secondItem="VQv-8y-qQ7" secondAttribute="leadingMargin" constant="8" id="q4M-jk-a8L"/>
+                                                <constraint firstItem="ZJj-OK-IbA" firstAttribute="leading" secondItem="VQv-8y-qQ7" secondAttribute="leadingMargin" id="q4M-jk-a8L"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
@@ -708,7 +708,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Open Safari in Reader mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wlj-6e-BYP">
-                                                    <rect key="frame" x="23" y="12" width="214" height="20.5"/>
+                                                    <rect key="frame" x="15" y="12" width="214" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -722,7 +722,7 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="cmY-8P-GUK" firstAttribute="centerY" secondItem="6r6-dg-b6u" secondAttribute="centerY" id="BKA-os-kxf"/>
-                                                <constraint firstItem="wlj-6e-BYP" firstAttribute="leading" secondItem="6r6-dg-b6u" secondAttribute="leadingMargin" constant="8" id="Gik-k2-BT0"/>
+                                                <constraint firstItem="wlj-6e-BYP" firstAttribute="leading" secondItem="6r6-dg-b6u" secondAttribute="leadingMargin" id="Gik-k2-BT0"/>
                                                 <constraint firstItem="wlj-6e-BYP" firstAttribute="centerY" secondItem="6r6-dg-b6u" secondAttribute="centerY" id="Icp-Bn-g1O"/>
                                                 <constraint firstAttribute="trailing" secondItem="cmY-8P-GUK" secondAttribute="trailing" constant="15" id="zwl-gm-26E"/>
                                             </constraints>
