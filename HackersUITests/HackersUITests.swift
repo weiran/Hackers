@@ -35,9 +35,7 @@ class HackersUITests: XCTestCase {
 
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
-            let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
-            XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
-            commentsTablesQuery.element(boundBy: 1).tap()
+            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
 
         wait(for: 2)
@@ -54,10 +52,6 @@ class HackersUITests: XCTestCase {
 
         let tablesQuery = XCUIApplication().tables
         XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
-        tablesQuery.cells.element(boundBy: 1).tap()
-
-        XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
-        tablesQuery.cells.element(boundBy: 1).tap()
 
         snapshot("Comments")
     }
@@ -70,9 +64,7 @@ class HackersUITests: XCTestCase {
 
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
-            let commentsTablesQuery = tablesQuery.cells.matching(identifier: "CommentCell")
-            XCTAssertTrue(waitForElementToAppear(commentsTablesQuery.element))
-            commentsTablesQuery.element(boundBy: 1).tap()
+            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
 
         wait(for: 2)
