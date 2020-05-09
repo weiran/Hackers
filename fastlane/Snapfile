@@ -11,6 +11,7 @@ devices([
   "iPad (7th generation)",
   "iPad Air (3rd generation)",
   "iPad Pro (11-inch) (2nd generation)",
+  "iPad Pro (12.9-inch) (2nd generation)"
   "iPad Pro (12.9-inch) (4th generation)"
 ])
 
