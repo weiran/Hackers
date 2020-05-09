@@ -11,15 +11,15 @@ install:
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 jobs:
   include:
-    - stage: "Static Analysis"
-      name: "SwiftLint"
-      script:
-        - Pods/SwiftLint/swiftlint
     - stage: "Tests"
       name: "UI Tests"
       script:
         # - bundle exec fastlane test
         - xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme "HackersUITests" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.4' test
+    - stage: "Static Analysis"
+      name: "SwiftLint"
+      script:
+        - Pods/SwiftLint/swiftlint
     - stage: "Build"
       name: "Release"
       script:
