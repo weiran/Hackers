@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import HNScraper
 import SwipeCellKit
+import SwiftSoup
 
 class CommentTableViewCell: SwipeTableViewCell {
     public weak var commentDelegate: CommentDelegate?
@@ -61,7 +62,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         if let commentTextView = commentTextView, comment.visibility == .visible {
             // only for expanded comments
             let commentFont = UIFont.preferredFont(forTextStyle: .subheadline)
-            let commentAttributedString = NSMutableAttributedString(string: comment.text.parsedHTML())
+            let commentAttributedString = parseToAttributedString(comment.text)
             let commentRange = NSRange(location: 0, length: commentAttributedString.length)
 
             commentAttributedString.addAttribute(NSAttributedString.Key.font,
@@ -73,6 +74,20 @@ class CommentTableViewCell: SwipeTableViewCell {
 
             commentTextView.attributedText = commentAttributedString
         }
+    }
+
+    private func parseToAttributedString(_ html: String) -> NSMutableAttributedString {
+        let paragraphIdentifier = "PARAGRAPH_NEED_NEW_LINES_HERE"
+
+        // swiftlint:disable unused_optional_binding
+        guard let document = try? SwiftSoup.parse(html),
+            let _ = try? document.select("p").before(paragraphIdentifier),
+            let text = try? document.text() else {
+            return NSMutableAttributedString()
+        }
+        // swiftlint:enable unused_optional_binding
+
+        return NSMutableAttributedString(string: text.replacingOccurrences(of: paragraphIdentifier + " ", with: "\n\n"))
     }
 }
 

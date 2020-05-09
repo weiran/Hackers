@@ -2,8 +2,7 @@
 
 # A list of devices you want to take the screenshots from
 devices([
-  "iPhone SE",
-  "iPhone 8",
+  "iPhone SE (2nd generation)",
   "iPhone 8 Plus",
   "iPhone 11 Pro",
   "iPhone 11 Pro Max",
@@ -11,10 +10,8 @@ devices([
   "iPad Pro (9.7-inch)",
   "iPad (7th generation)",
   "iPad Air (3rd generation)",
-  "iPad Pro (10.5-inch)",
-  "iPad Pro (11-inch)",
-  "iPad Pro (12.9-inch) (2nd generation)",
-  "iPad Pro (12.9-inch) (3rd generation)"
+  "iPad Pro (11-inch) (2nd generation)",
+  "iPad Pro (12.9-inch) (4th generation)"
 ])
 
 # The name of the scheme which contains the UI Tests

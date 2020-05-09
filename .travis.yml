@@ -1,12 +1,26 @@
-language: objective-c
+language: swift
 osx_image: xcode11.4
 xcode_workspace: Hackers.xcworkspace
 xcode_scheme: Hackers
 before_install:
 - gem install xcpretty
 - gem update cocoapods
+- gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"
 install:
+- bundle install
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
-script:
-- Pods/SwiftLint/swiftlint
-- set -o pipefail && xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme ${TRAVIS_XCODE_SCHEME} -sdk iphonesimulator -configuration Release | xcpretty
+jobs:
+  include:
+    - stage: "Tests"
+      name: "UI Tests"
+      script:
+        # - bundle exec fastlane test
+        - xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme "HackersUITests" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.4' test
+    - stage: "Static Analysis"
+      name: "SwiftLint"
+      script:
+        - Pods/SwiftLint/swiftlint
+    - stage: "Build"
+      name: "Release"
+      script:
+        - set -o pipefail && xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme ${TRAVIS_XCODE_SCHEME} -sdk iphonesimulator -configuration Release | xcpretty
