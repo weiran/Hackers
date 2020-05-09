@@ -38,8 +38,6 @@ class HackersUITests: XCTestCase {
             XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
 
-        wait(for: 2)
-
         snapshot("Ultimate")
     }
 
@@ -51,7 +49,12 @@ class HackersUITests: XCTestCase {
         launch()
 
         let tablesQuery = XCUIApplication().tables
-        XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "PostCell").element))
+        let postCell = tablesQuery.cells.matching(identifier: "PostCell").element
+        XCTAssertTrue(waitForElementToAppear(postCell))
+        postCell.firstMatch.tap()
+
+        let commentCell = tablesQuery.cells.matching(identifier: "CommentCell").element
+        XCTAssertTrue(waitForElementToAppear(commentCell))
 
         snapshot("Comments")
     }
@@ -66,8 +69,6 @@ class HackersUITests: XCTestCase {
             tablesQuery.cells.firstMatch.tap()
             XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
-
-        wait(for: 2)
 
         snapshot("Dark")
     }
