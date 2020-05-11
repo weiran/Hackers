@@ -82,10 +82,9 @@ extension NewsViewController { // post fetching
             } else {
                 self.posts = posts
                 self.nextPageIdentifier = nextPageIdentifier
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
             }
+        }.done {
+            self.tableView.reloadData()
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
         }.catch { _ in
