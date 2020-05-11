@@ -40,6 +40,14 @@ class NewsViewController: UITableViewController {
                                            object: nil, queue: .main) { _ in self.loadPosts() }
         setupTheming()
         loadPosts()
+
+        firstly {
+            HackerNewsData.shared.getPosts(type: .top)
+        }.done { items in
+            print(items)
+        }.catch { error in
+            print(error.localizedDescription)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {

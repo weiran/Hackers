@@ -16,3 +16,7 @@ type_name:
     - T
   allowed_symbols:
     - _Previews
+identifier_name:
+  excluded:
+      - id
+      - by
