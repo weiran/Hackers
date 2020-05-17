@@ -5,11 +5,14 @@
 //  Created by Weiran Zhang on 21/04/2019.
 //  Copyright © 2019 Glass Umbrella. All rights reserved.
 //
+// swiftlint:disable trailing_whitespace
 
 import PromiseKit
 import HNScraper
+import Combine
 
 class HackerNewsService {
+    private var cancellableBag = CancellableBag()
     public func getPosts(of type: HNScraper.PostListPageName,
                          nextPageIdentifier: String? = nil) -> Promise<([HNPost], String?)> {
         let (promise, seal) = Promise<([HNPost], String?)>.pending()
@@ -31,6 +34,7 @@ class HackerNewsService {
     }
 
     public func getComments(of post: HNPost) -> Promise<[HNComment]?> {
+        combineGetComments(postItemId: Int(post.id)!)
         let (promise, seal) = Promise<[HNComment]?>.pending()
         HNScraper.shared.getComments(ForPost: post,
                                      buildHierarchy: false,
@@ -108,5 +112,71 @@ class HackerNewsService {
             }
         }
         return promise
+    }
+}
+
+struct StoryItem: Codable {
+    // swiftlint:disable identifier_name
+    var by: String? = ""
+    var id: Int = 0
+    var kids: [Int] = []
+    var title: String = ""
+}
+
+struct CommentItem: Codable {
+    // swiftlint:disable identifier_name
+    var by: String? = ""
+    var id: Int = 0
+    var kids: [Int]? = []
+    var parent: Int = 0
+    var text: String? = ""
+}
+
+extension HackerNewsService {
+    static private var baseURL = "https://hacker-news.firebaseio.com/v0"
+    
+    private func makeUrl(itemId: Int) -> URL {
+        return URL(string: "\(HackerNewsService.baseURL)/item/\(itemId).json")!
+    }
+    
+    public func fetchComment(id: Int) -> AnyPublisher<CommentItem, Error> {
+        let url = makeUrl(itemId: id)
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map { $0.data }
+            .decode(type: CommentItem.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
+    }
+    
+    public func combineGetComments(postItemId: Int) -> AnyPublisher<[CommentItem], Error> {
+        
+        // recommended test data
+        // post url -> https://news.ycombinator.com/item?id=23209225
+        // post title -> "UC Berkeley hosted a virtual graduation on Minecraft"
+        // descendants count: 8
+        // let postItemId = 23209225
+        let publisher = URLSession.shared.dataTaskPublisher(for: makeUrl(itemId: postItemId))
+            .map { $0.data }
+            .decode(type: StoryItem.self, decoder: JSONDecoder())
+            .map { $0.kids }
+            .flatMap { ids -> AnyPublisher<[CommentItem], Error> in
+                let comments = ids.map { self.fetchComment(id: $0) }
+                return Publishers.ZipMany(comments)
+                    .eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
+        
+        // test printing out results
+        publisher
+            .sink(receiveCompletion: { (error) in
+                // error to handle
+                print(error)
+            }, receiveValue: { comments in
+                comments.forEach { (comment) in
+                    print("by \(comment.by)")
+                }
+            })
+            .cancelled(by: cancellableBag)
+        
+        return publisher
     }
 }

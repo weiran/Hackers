@@ -68,6 +68,8 @@
 		288B0D6127D9C12BD8FE062F /* Pods_HackersUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
 		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
+		F3F5E17B247143FC006E6065 /* CancellableBag.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F5E17A247143FC006E6065 /* CancellableBag.swift */; };
+		F3F5E17D24715F1A006E6065 /* ZipManyPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F5E17C24715F1A006E6065 /* ZipManyPublisher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +157,8 @@
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.release.xcconfig"; sourceTree = "<group>"; };
 		F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hackers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F3F5E17A247143FC006E6065 /* CancellableBag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancellableBag.swift; sourceTree = "<group>"; };
+		F3F5E17C24715F1A006E6065 /* ZipManyPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipManyPublisher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +274,8 @@
 				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
+				F3F5E17A247143FC006E6065 /* CancellableBag.swift */,
+				F3F5E17C24715F1A006E6065 /* ZipManyPublisher.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -475,7 +481,7 @@
 						TestTargetID = 24F39F8418AFB1150055F8DC;
 					};
 					24F39F8418AFB1150055F8DC = {
-						DevelopmentTeam = 2KB59GPA9B;
+						DevelopmentTeam = 9739RA7ZLD;
 						LastSwiftMigration = 1020;
 					};
 				};
@@ -675,6 +681,7 @@
 				24FF021B226C99FA002EF8DD /* HackerNewsService.swift in Sources */,
 				2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */,
 				24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */,
+				F3F5E17D24715F1A006E6065 /* ZipManyPublisher.swift in Sources */,
 				2464D20F209DD8F400C7F8FC /* Weak.swift in Sources */,
 				24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */,
 				24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */,
@@ -712,6 +719,7 @@
 				24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */,
 				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
+				F3F5E17B247143FC006E6065 /* CancellableBag.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -895,7 +903,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 64;
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
+				DEVELOPMENT_TEAM = 9739RA7ZLD;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
@@ -903,7 +911,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.tanin.Hackers;
 				PRODUCT_NAME = Hackers;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
@@ -922,7 +930,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 64;
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
+				DEVELOPMENT_TEAM = 9739RA7ZLD;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
@@ -930,7 +938,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.2.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.tanin.Hackers;
 				PRODUCT_NAME = Hackers;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
