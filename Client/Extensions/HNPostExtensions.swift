@@ -8,8 +8,8 @@
 
 import HNScraper
 
-extension HNPost {
+extension HackerNewsPost {
     var hackerNewsURL: URL {
-        return URL(string: "https://news.ycombinator.com/item?id=" + id)!
+        return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
     }
 }

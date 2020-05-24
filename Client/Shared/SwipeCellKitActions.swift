@@ -20,12 +20,12 @@ class SwipeCellKitActions: Themed {
         self.hackerNewsService = hackerNewsService
     }
 
-    public func voteAction(post: HNPost, tableView: UITableView,
+    public func voteAction(post: HackerNewsPost, tableView: UITableView,
                            indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
-        let voteOnPost: (HNPost, Bool) -> Void = { post, isUpvote in
+        let voteOnPost: (HackerNewsPost, Bool) -> Void = { post, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
             post.upvoted = isUpvote
-            post.points += isUpvote ? 1 : -1
+            post.score += isUpvote ? 1 : -1
             cell.postTitleView.post = post
         }
 
@@ -46,13 +46,13 @@ class SwipeCellKitActions: Themed {
             let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
             if upvoted {
-                self.hackerNewsService
-                    .unvote(post: post)
-                    .catch(errorHandler)
+//                self.hackerNewsService
+//                    .unvote(post: post)
+//                    .catch(errorHandler)
             } else {
-                self.hackerNewsService
-                    .upvote(post: post)
-                    .catch(errorHandler)
+//                self.hackerNewsService
+//                    .upvote(post: post)
+//                    .catch(errorHandler)
             }
         }
         upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
@@ -64,9 +64,9 @@ class SwipeCellKitActions: Themed {
         return [upvoteAction]
     }
 
-    public func voteAction(comment: HNComment, tableView: UITableView,
+    public func voteAction(comment: HackerNewsComment, tableView: UITableView,
                            indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
-        let voteOnComment: (HNComment, Bool) -> Void = { comment, isUpvote in
+        let voteOnComment: (HackerNewsComment, Bool) -> Void = { comment, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
             comment.upvoted = isUpvote
             cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
@@ -88,15 +88,16 @@ class SwipeCellKitActions: Themed {
         let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = comment.upvoted
             voteOnComment(comment, !comment.upvoted)
-            if upvoted {
-                self.hackerNewsService
-                    .unvote(comment: comment)
-                    .catch(errorHandler)
-            } else {
-                self.hackerNewsService
-                    .upvote(comment: comment)
-                    .catch(errorHandler)
-            }
+            // TODO fix voting
+//            if upvoted {
+//                self.hackerNewsService
+//                    .unvote(comment: comment)
+//                    .catch(errorHandler)
+//            } else {
+//                self.hackerNewsService
+//                    .upvote(comment: comment)
+//                    .catch(errorHandler)
+//            }
         }
         voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         voteAction.textColor = .white

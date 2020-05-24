@@ -14,39 +14,121 @@ protocol HackerNewsDataProtocol {
 }
 
 enum HackerNewsPath: String {
-    case new = "v0/newstories.json"
-    case top = "v0/topstories.json"
-    case best = "v0/beststories.json"
-    case ask = "v0/askstories.json"
-    case show = "v0/showstories.json"
-    case jobs = "v0/jobsstories.json"
+    case new = "newstories.json"
+    case top = "topstories.json"
+    case best = "beststories.json"
+    case ask = "askstories.json"
+    case show = "showstories.json"
+    case jobs = "jobsstories.json"
+}
+
+struct HNPath {
+    let new = "v0/newstories.json"
+    func item(id: Int) -> String {
+        return "item/\(id).json"
+    }
 }
 
 class HackerNewsData {
     public static let shared = HackerNewsData()
 
     let session = URLSession(configuration: .default)
-    let baseURL = URL(string: "https://hacker-news.firebaseio.com/")!
+    let firebaseURL = URL(string: "https://hacker-news.firebaseio.com/v0/")!
+    let agoliaURL = URL(string: "https://hn.algolia.com/api/v1/")!
 
-    init() {
+    init() { }
 
-    }
+    public func getPosts(type: HackerNewsPath, page: Int = 0) -> Promise<[HackerNewsPost]> {
+        let pageLimit = 25
 
-    public func getPosts(type: HackerNewsPath) -> Promise<[HackerNewsPost]> {
         return firstly {
             getIds(type: type)
+        }.compactMap { ids in
+            if page == 0 {
+                return Array(ids.prefix(pageLimit))
+            } else {
+                let start = pageLimit * page
+                let end = start + pageLimit
+                return Array(ids[start...end])
+            }
         }.then { ids in
             self.getItems(for: ids)
         }.map { items in
             items.compactMap { item in
-                return HackerNewsPost(item)
+                HackerNewsPost(item)
             }
         }
     }
+
+    public func getComments(postId: Int) -> Promise<[HackerNewsRawItem]> {
+        func test(items: [HackerNewsRawItem]) -> Promise<[HackerNewsRawItem]> {
+            func flattenItems(_ items: [HackerNewsRawItem]) -> [Int] {
+                var flatItems = [Int]()
+                items.forEach { item in
+                    guard let kids = item.kids else { return }
+                    flatItems.append(contentsOf: kids)
+                }
+                return flatItems
+            }
+            let flatChildren = flattenItems(items)
+            let promises = flatChildren.map { self.getItem(for: $0) } as [Promise<HackerNewsRawItem>]
+            return when(fulfilled: promises)
+        }
+
+        return firstly {
+            getItem(for: postId)
+        }.compactMap { item in
+            return item.kids
+        }.then { ids in
+            self.getItems(for: ids)
+        }
+        .then { items in
+            test(items: items)
+        }
+    }
+
+    public func getPost(postId: Int) -> Promise<AgoliaRawItem> {
+        let (promise, seal) = Promise<AgoliaRawItem>.pending()
+
+        let url = URL(string: "items/\(postId)", relativeTo: agoliaURL)!
+        session.dataTask(with: url) { data, _, error in
+            let decoder = JSONDecoder()
+            do {
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Full)
+                try decoder.decode(AgoliaRawItem.self, from: data!)
+            } catch {
+                print(error.localizedDescription)
+            }
+
+            if let data = data, let item = try? decoder.decode(AgoliaRawItem.self, from: data) {
+                seal.fulfill(item)
+            } else if let error = error {
+                seal.reject(error)
+            } else {
+                seal.reject(HackerNewsError.typeError)
+            }
+        }.resume()
+
+        return promise
+
+    }
 }
 
+extension DateFormatter {
+  static let iso8601Full: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+    formatter.calendar = Calendar(identifier: .iso8601)
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    return formatter
+  }()
+}
+
+
 extension HackerNewsData { // all private methods
-    private func route(for path: HackerNewsPath, limit: Int? = nil, orderBy: String? = "\"$key\"") -> String {
+    private func route(for path: String, limit: Int? = nil, orderBy: String? = "\"$key\"") -> String {
         var queryParameters: [String: String] = [String: String]()
         if let limit = limit {
             queryParameters["limitToFirst"] = String(limit)
@@ -58,7 +140,7 @@ extension HackerNewsData { // all private methods
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host = "hacker-news.firebaseio.com"
-        urlComponents.path = "/\(path.rawValue)"
+        urlComponents.path = "/v0/\(path)"
         urlComponents.setQueryItems(with: queryParameters)
         return urlComponents.string!
     }
@@ -66,7 +148,7 @@ extension HackerNewsData { // all private methods
     private func getIds(type: HackerNewsPath) -> Promise<[Int]> {
         let (promise, seal) = Promise<[Int]>.pending()
 
-        let route = self.route(for: type, limit: 25)
+        let route = self.route(for: type.rawValue)
         let url = URL(string: route)!
         session.dataTask(with: url) { data, _, error in
             if let data = data, let ids = try? JSONDecoder().decode([Int].self, from: data) {
@@ -81,7 +163,7 @@ extension HackerNewsData { // all private methods
         return promise
     }
 
-    private func getItems(for ids: [Int]) -> Promise<[HackerNewsRawItem]> {
+    func getItems(for ids: [Int]) -> Promise<[HackerNewsRawItem]> {
         let (promise, seal) = Promise<[HackerNewsRawItem]>.pending()
         let itemPromises = ids.map { id in
             return getItem(for: id)
@@ -101,7 +183,7 @@ extension HackerNewsData { // all private methods
     private func getItem(for id: Int) -> Promise<HackerNewsRawItem> {
         let (promise, seal) = Promise<HackerNewsRawItem>.pending()
 
-        let url = URL(string: "v0/item/\(id).json", relativeTo: baseURL)!
+        let url = URL(string: "item/\(id).json", relativeTo: firebaseURL)!
         session.dataTask(with: url) { data, _, error in
             if let data = data, let item = try? JSONDecoder().decode(HackerNewsRawItem.self, from: data) {
                 seal.fulfill(item)
@@ -134,15 +216,30 @@ struct HackerNewsRawItem: Codable {
     let type: String?
 }
 
-struct HackerNewsPost {
+struct AgoliaRawItem: Codable {
+    let id: Int
+    let createdAt: Date
+    let author: String?
+    let title: String?
+    let url: String?
+    let text: String?
+    let points: Int?
+    let parentId: Int?
+    let children: [AgoliaRawItem]?
+}
+
+class HackerNewsPost {
     let id: Int
     let url: URL
     let title: String
     let date: Date
     let commentsCount: Int
     let by: String
-    let score: Int
+    var score: Int
     let postType: HackerNewsPostType
+
+    // not from API
+    var upvoted: Bool = false
 
     init?(_ item: HackerNewsRawItem) {
         guard let id = item.id,
@@ -167,12 +264,36 @@ struct HackerNewsPost {
     }
 }
 
-struct HackerNewsComment {
+class HackerNewsComment {
     let id: Int
     let date: Date
-    let kids: [HackerNewsComment]?
+    var children: [HackerNewsComment]?
     let text: String
     let by: String
+
+    // custom properties
+    var visibility = CommentVisibilityType.visible
+    var level: Int
+    var upvoted = false
+
+    init?(_ item: AgoliaRawItem, level: Int = 0) {
+        guard let author = item.author,
+            let text = item.text else {
+                return nil
+        }
+
+        self.id = item.id
+        self.date = item.createdAt
+        self.by = author
+        self.text = text
+        self.level = level
+
+        if let children = item.children {
+            self.children = children.compactMap { child in
+                return HackerNewsComment(child, level: level + 1)
+            }
+        }
+    }
 }
 
 extension HackerNewsRawItem: Equatable {

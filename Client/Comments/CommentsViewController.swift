@@ -24,10 +24,10 @@ class CommentsViewController: UITableViewController {
         case link(url: URL)
     }
 
-    public var post: HNPost?
+    public var post: HackerNewsPost?
     private let commentsController = CommentsController()
 
-    private var comments: [HNComment]? {
+    private var comments: [HackerNewsComment]? {
         didSet { commentsController.comments = comments! }
     }
 
@@ -54,20 +54,47 @@ class CommentsViewController: UITableViewController {
     }
 
     private func loadComments() {
+//        firstly {
+//            hackerNewsService!.getComments(of: post!)
+//        }.done { comments in
+//            switch comments?.count {
+//            case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
+//            default:
+//                self.tableView.backgroundView = nil
+//                self.comments = comments
+//                self.tableView.reloadData()
+//            }
+//        }.catch { error in
+//            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+//            self.tableView.backgroundView = nil
+//        }
+
         firstly {
-            hackerNewsService!.getComments(of: post!)
-        }.done { comments in
-            switch comments?.count {
-            case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
-            default:
-                self.tableView.backgroundView = nil
-                self.comments = comments
-                self.tableView.reloadData()
-            }
+            HackerNewsData.shared.getComments(postId: post!.id)
+        }.done { result in
+            print(result)
         }.catch { error in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-            self.tableView.backgroundView = nil
+            print(error)
         }
+
+//        firstly {
+//            HackerNewsData.shared.getPost(postId: post!.id)
+//        }.done { post in
+//            if let children = post.children {
+//                let comments = children.compactMap { child in
+//                    return HackerNewsComment(child)
+//                }
+//                func traverse(_ comments: [HackerNewsComment]?) -> [HackerNewsComment] {
+//                    let comments = comments ?? []
+//                    return comments + comments.flatMap { traverse($0.children) }
+//                }
+//                let flatComments = traverse(comments)
+//                self.comments = flatComments
+//                self.tableView.reloadData()
+//            }
+//        }.catch { error in
+//
+//        }
     }
 
     override func updateUserActivityState(_ activity: NSUserActivity) {
@@ -80,7 +107,7 @@ class CommentsViewController: UITableViewController {
             return
         }
 
-        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
+        let activityViewController = UIActivityViewController(activityItems: [post.url],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
@@ -243,7 +270,7 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-    private func setupHandoff(with post: HNPost?, activityType: ActivityType) {
+    private func setupHandoff(with post: HackerNewsPost?, activityType: ActivityType) {
         guard let post = post else {
             return
         }
@@ -261,5 +288,21 @@ extension CommentsViewController {
         activity?.title = post.title + " | Hacker News"
         userActivity = activity
         userActivity?.becomeCurrent()
+    }
+}
+
+protocol AnyArray { }
+extension Array: AnyArray {
+    func recursiveFlatMap<T>(_ array: [AnyObject]) -> [T] {
+        var result: [T] = []
+        array.forEach {
+            if $0 is AnyArray {
+                let flatArray: [AnyObject] = $0 as! [AnyObject]
+                result += recursiveFlatMap(flatArray)
+            } else {
+                result.append($0 as! T)
+            }
+        }
+        return result
     }
 }

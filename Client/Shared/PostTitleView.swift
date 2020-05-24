@@ -10,7 +10,7 @@ import UIKit
 import HNScraper
 
 protocol PostTitleViewDelegate: class {
-    func didPressLinkButton(_ post: HNPost)
+    func didPressLinkButton(_ post: HackerNewsPost)
 }
 
 class PostTitleView: UIView, UIGestureRecognizerDelegate {
@@ -21,7 +21,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 
     public weak var delegate: PostTitleViewDelegate?
 
-    public var post: HNPost? {
+    public var post: HackerNewsPost? {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
@@ -44,9 +44,9 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
-    private func domainLabelText(for post: HNPost) -> String {
-        guard let url = post.url,
-            let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
+    private func domainLabelText(for post: HackerNewsPost) -> String {
+        guard
+            let urlComponents = URLComponents(url: post.url, resolvingAgainstBaseURL: false),
             var host = urlComponents.host else {
             return "news.ycombinator.com"
         }
@@ -58,7 +58,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return host
     }
 
-    private func metadataText(for post: HNPost, theme: AppTheme) -> NSAttributedString {
+    private func metadataText(for post: HackerNewsPost, theme: AppTheme) -> NSAttributedString {
         let defaultAttributes = [NSAttributedString.Key.foregroundColor: theme.textColor]
         var pointsAttributes = defaultAttributes
         var pointsTintColor: UIColor?
@@ -75,9 +75,9 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         let commentsIconAttributedString = NSAttributedString(attachment: commentsIconAttachment)
 
         let string = NSMutableAttributedString()
-        string.append(NSAttributedString(string: "\(post.points)", attributes: pointsAttributes))
+        string.append(NSAttributedString(string: "\(post.score)", attributes: pointsAttributes))
         string.append(pointsIconAttributedString)
-        string.append(NSAttributedString(string: "• \(post.commentCount) ", attributes: defaultAttributes))
+        string.append(NSAttributedString(string: "• \(post.commentsCount) ", attributes: defaultAttributes))
         string.append(commentsIconAttributedString)
         string.append(NSAttributedString(string: " • \(domainLabelText(for: post))", attributes: defaultAttributes))
         return string

@@ -21,11 +21,11 @@ class NewsViewController: UITableViewController {
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
 
-    private var posts: [HNPost]?
+    private var posts: [HackerNewsPost]?
     public var postType: HNScraper.PostListPageName! = .news
 
     private var peekedIndexPath: IndexPath?
-    private var nextPageIdentifier: String?
+    private var pageIndex = 0
 
     private var notificationToken: NotificationToken?
 
@@ -40,14 +40,6 @@ class NewsViewController: UITableViewController {
                                            object: nil, queue: .main) { _ in self.loadPosts() }
         setupTheming()
         loadPosts()
-
-        firstly {
-            HackerNewsData.shared.getPosts(type: .top)
-        }.done { items in
-            print(items)
-        }.catch { error in
-            print(error.localizedDescription)
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -59,17 +51,16 @@ class NewsViewController: UITableViewController {
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowCommentsSegue" {
-            if let navigationController = segue.destination as? UINavigationController,
-                let commentsViewController = navigationController.viewControllers.first as? CommentsViewController,
-                let indexPath = tableView.indexPathForSelectedRow,
-                let post = posts?[indexPath.row] {
-                commentsViewController.post = post
-            }
+        if segue.identifier == "ShowCommentsSegue",
+            let navigationController = segue.destination as? UINavigationController,
+            let commentsViewController = navigationController.viewControllers.first as? CommentsViewController,
+            let indexPath = tableView.indexPathForSelectedRow,
+            let post = posts?[indexPath.row] {
+            commentsViewController.post = post
         }
     }
 
-    private func navigateToComments(for post: HNPost) {
+    private func navigateToComments() {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
 
@@ -84,32 +75,27 @@ class NewsViewController: UITableViewController {
 
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
-        hackerNewsService?.getPosts(of: postType).map { (posts, nextPageIdentifier) in
-            if posts.isEmpty {
-                self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
-            } else {
-                self.posts = posts
-                self.nextPageIdentifier = nextPageIdentifier
-            }
-        }.done {
+        firstly {
+            HackerNewsData.shared.getPosts(type: .top)
+        }.done { posts in
+            self.posts = posts
             self.tableView.reloadData()
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
-        }.catch { _ in
+        }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
 
     private func loadMorePosts() {
-        guard let nextPageIdentifier = nextPageIdentifier else { return }
-        self.nextPageIdentifier = nil
-
+        pageIndex += 1
         firstly {
-            hackerNewsService!.getPosts(of: postType, nextPageIdentifier: nextPageIdentifier)
-        }.done { (posts, nextPageIdentifier) in
+            HackerNewsData.shared.getPosts(type: .top, page: pageIndex)
+        }.done { posts in
             self.posts?.append(contentsOf: posts)
-            self.nextPageIdentifier = nextPageIdentifier
             self.tableView.reloadData()
+        }.ensure {
+            self.tableView.refreshControl?.endRefreshing()
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
@@ -148,7 +134,7 @@ extension NewsViewController {
         if postType == .jobs {
             didPressLinkButton(post)
         } else {
-            navigateToComments(for: post)
+            navigateToComments()
         }
     }
 }
@@ -159,7 +145,7 @@ extension NewsViewController: SwipeTableViewCellDelegate {
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .left,
             let post = posts?[indexPath.row],
-            post.type != .jobs else { return nil }
+            post.postType != .job else { return nil }
 
         return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
                                                indexPath: indexPath, viewController: self)
@@ -198,10 +184,10 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
                 return nil
         }
         let post = posts[indexPath.row]
-        if let url = post.url, UIApplication.shared.canOpenURL(url) {
+        if UIApplication.shared.canOpenURL(post.url) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return SFSafariViewController.instance(for: url, previewActionItemsDelegate: self)
+            return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
         }
         return nil
     }
@@ -216,22 +202,22 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
             return [UIPreviewActionItem]()
         }
 
-        let commentsPreviewActionTitle = post.commentCount > 0 ? "View \(post.commentCount) comments" : "View comments"
+        let commentsPreviewActionTitle = post.commentsCount > 0 ? "View \(post.commentsCount) comments" : "View comments"
 
         let viewCommentsPreviewAction =
             UIPreviewAction(title: commentsPreviewActionTitle,
                             style: .default) { [unowned self, indexPath = indexPath] (_, _) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self.navigateToComments(for: post)
+            self.navigateToComments()
         }
         return [viewCommentsPreviewAction]
     }
 }
 
 extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
-    func didPressLinkButton(_ post: HNPost) {
-        if let url = post.url,
-            let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self) {
+    func didPressLinkButton(_ post: HackerNewsPost) {
+        if let safariViewController =
+            SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self) {
             navigationController?.present(safariViewController, animated: true)
         }
     }
