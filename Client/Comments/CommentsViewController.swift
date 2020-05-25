@@ -14,7 +14,6 @@ import PromiseKit
 import Loaf
 
 class CommentsViewController: UITableViewController {
-    public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
 

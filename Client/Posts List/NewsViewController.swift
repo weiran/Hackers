@@ -16,7 +16,6 @@ import Loaf
 import SwipeCellKit
 
 class NewsViewController: UITableViewController {
-    public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
 
