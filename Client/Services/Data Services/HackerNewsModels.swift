@@ -80,3 +80,9 @@ enum HackerNewsError: Error {
     case typeError
     case hnScraperError
 }
+
+enum CommentVisibilityType: Int {
+    case visible = 3
+    case compact = 2
+    case hidden = 1
+}
