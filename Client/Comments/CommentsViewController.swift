@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import SafariServices
-import HNScraper
 import SwipeCellKit
 import PromiseKit
 import Loaf
