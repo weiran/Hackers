@@ -8,7 +8,7 @@
 
 import Foundation
 
-class HackerNewsPost {
+class HackerNewsPost: Hashable {
     let id: Int
     let url: URL
     let title: String
@@ -40,9 +40,17 @@ class HackerNewsPost {
         self.postType = postType
         self.upvoted = upvoted
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: HackerNewsPost, rhs: HackerNewsPost) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
-class HackerNewsComment {
+class HackerNewsComment: Hashable {
     let id: Int
     let age: String
     let text: String
@@ -68,6 +76,14 @@ class HackerNewsComment {
         self.by = by
         self.level = level
         self.upvoted = upvoted
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: HackerNewsComment, rhs: HackerNewsComment) -> Bool {
+        lhs.id == rhs.id
     }
 }
 

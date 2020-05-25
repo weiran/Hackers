@@ -21,6 +21,7 @@ class NewsViewController: UITableViewController {
     public var swipeCellKitActions: SwipeCellKitActions?
 
     private var posts: [HackerNewsPost]?
+    private var dataSource: UITableViewDiffableDataSource<Section, HackerNewsPost>?
     public var postType: HackerNewsPostType = .news
 
     private var peekedIndexPath: IndexPath?
@@ -31,12 +32,19 @@ class NewsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
+
         tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+        dataSource = makeDataSource()
+        tableView.dataSource = dataSource
+
         notificationToken = NotificationCenter.default
             .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                                           object: nil, queue: .main) { _ in self.loadPosts() }
+                     object: nil,
+                     queue: .main
+            ) { _ in self.loadPosts() }
+
         setupTheming()
         loadPosts()
     }
@@ -78,7 +86,7 @@ extension NewsViewController { // post fetching
             HackerNewsData.shared.getPosts(type: postType)
         }.done { posts in
             self.posts = posts
-            self.tableView.reloadData()
+            self.update(with: posts, animate: false)
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
         }.catch { error in
@@ -92,7 +100,7 @@ extension NewsViewController { // post fetching
             HackerNewsData.shared.getPosts(type: .news, page: pageIndex)
         }.done { posts in
             self.posts?.append(contentsOf: posts)
-            self.tableView.reloadData()
+            self.update(with: self.posts!)
         }.ensure {
             self.tableView.refreshControl?.endRefreshing()
         }.catch { error in
@@ -102,24 +110,38 @@ extension NewsViewController { // post fetching
 }
 
 extension NewsViewController {
-    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts?.count ?? 0
+    enum Section: CaseIterable {
+        case main
     }
 
-    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // swiftlint:disable force_cast
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
-        cell.postDelegate = self
-        cell.delegate = self
+    func makeDataSource() -> UITableViewDiffableDataSource<Section, HackerNewsPost> {
+        let reuseIdentifier = "PostCell"
 
-        let post = posts?[indexPath.row]
-        cell.postTitleView.post = post
-        cell.postTitleView.delegate = self
-        cell.setImageWithPlaceholder(url: post?.url)
+        return UITableViewDiffableDataSource(tableView: tableView) { (tableView, indexPath, post) in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: reuseIdentifier,
+                for: indexPath
+            ) as? PostCell else { return nil }
+            cell.postDelegate = self
+            cell.delegate = self
 
-        return cell
+            cell.postTitleView.post = post
+            cell.postTitleView.delegate = self
+            cell.setImageWithPlaceholder(url: post.url)
+
+            return cell
+        }
     }
 
+    func update(with posts: [HackerNewsPost], animate: Bool = true) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, HackerNewsPost>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(posts)
+        self.dataSource?.apply(snapshot, animatingDifferences: animate)
+    }
+}
+
+extension NewsViewController {
     override open func tableView(_ tableView: UITableView,
                                  willDisplay cell: UITableViewCell,
                                  forRowAt indexPath: IndexPath) {
