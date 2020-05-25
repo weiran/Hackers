@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import HNScraper
 
 class CommentsController {
     public var comments: [HackerNewsComment]

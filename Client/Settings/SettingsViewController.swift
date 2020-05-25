@@ -10,7 +10,6 @@ import UIKit
 import SafariServices
 import MessageUI
 import PromiseKit
-import HNScraper
 import Loaf
 
 class SettingsViewController: UITableViewController {

@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import HNScraper
 import SwipeCellKit
 import SwiftSoup
 

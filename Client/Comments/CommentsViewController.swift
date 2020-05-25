@@ -258,19 +258,3 @@ extension CommentsViewController {
         userActivity?.becomeCurrent()
     }
 }
-
-protocol AnyArray { }
-extension Array: AnyArray {
-    func recursiveFlatMap<T>(_ array: [AnyObject]) -> [T] {
-        var result: [T] = []
-        array.forEach {
-            if $0 is AnyArray {
-                let flatArray: [AnyObject] = $0 as! [AnyObject]
-                result += recursiveFlatMap(flatArray)
-            } else {
-                result.append($0 as! T)
-            }
-        }
-        return result
-    }
-}

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HNScraper
 
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
