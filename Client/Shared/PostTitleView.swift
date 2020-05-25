@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HNScraper
 
 protocol PostTitleViewDelegate: class {
     func didPressLinkButton(_ post: HackerNewsPost)

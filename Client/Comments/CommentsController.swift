@@ -52,11 +52,8 @@ class CommentsController {
     public func indexOfVisibleRootComment(of comment: HackerNewsComment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
-        for index in (0...commentIndex).reversed() {
-            // swiftlint:disable for_where
-            if visibleComments[index].level == 0 {
-                return index
-            }
+        for index in (0...commentIndex).reversed() where visibleComments[index].level == 0 {
+            return index
         }
 
         return nil
