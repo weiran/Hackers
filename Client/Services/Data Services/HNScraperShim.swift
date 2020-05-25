@@ -47,13 +47,14 @@ extension HNScraperShim { // comments
         return hackerNewsService.unvote(comment: comment)
     }
 
-    func getComment(id: Int, for postId: Int) -> Promise<HNComment> {
+    func getComment(id: Int, for post: HackerNewsPost) -> Promise<HNComment> {
         let (promise, seal) = Promise<HNComment>.pending()
-        HNScraper.shared.getPost(ById: String(postId)) { (_, comments, error) in
+
+        HNScraper.shared.getComments(ByPostId: String(post.id)) { (_, comments, error) in
             if let error = error {
                 seal.reject(error)
             } else {
-                let comment = comments.first { $0.id == String(id) }
+                let comment = self.firstComment(in: comments, for: id)
                 if let comment = comment {
                     seal.fulfill(comment)
                 } else {
@@ -63,5 +64,20 @@ extension HNScraperShim { // comments
         }
 
         return promise
+    }
+
+    private func firstComment(in comments: [HNComment], for commentId: Int) -> HNComment? {
+        let commentIdString = String(commentId)
+
+        for comment in comments {
+            if comment.id == commentIdString {
+                return comment
+            } else if !comment.replies.isEmpty {
+                let replies = comment.replies.compactMap { $0 as? HNComment }
+                return firstComment(in: replies, for: commentId)
+            }
+        }
+
+        return nil
     }
 }

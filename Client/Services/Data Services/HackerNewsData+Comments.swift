@@ -40,8 +40,14 @@ extension HackerNewsData {
         }
         let level = indentWidth / 40
         let upvoteLink = try element.select(".votelinks a").attr("href")
+        var upvoted = false
+        let voteLinks = try? element.select("a").filter { $0.hasAttr("id") }
+        if let voteLinks = voteLinks {
+            let hasUnvote = try voteLinks.first { try $0.attr("id").starts(with: "un_") } != nil
+            upvoted = hasUnvote
+        }
 
-        let comment = HackerNewsComment(id: id, age: age, text: text, by: user, level: level)
+        let comment = HackerNewsComment(id: id, age: age, text: text, by: user, level: level, upvoted: upvoted)
         comment.upvoteLink = upvoteLink
         return comment
     }

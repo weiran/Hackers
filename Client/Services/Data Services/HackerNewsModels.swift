@@ -17,8 +17,6 @@ class HackerNewsPost {
     let by: String
     var score: Int
     let postType: HackerNewsPostType
-
-    // UI properties
     var upvoted = false
 
     init(
@@ -29,7 +27,8 @@ class HackerNewsPost {
         commentsCount: Int,
         by: String,
         score: Int,
-        postType: HackerNewsPostType
+        postType: HackerNewsPostType,
+        upvoted: Bool
     ) {
         self.id = id
         self.url = url
@@ -39,6 +38,7 @@ class HackerNewsPost {
         self.by = by
         self.score = score
         self.postType = postType
+        self.upvoted = upvoted
     }
 }
 
@@ -49,23 +49,25 @@ class HackerNewsComment {
     let by: String
     var level: Int
     var upvoteLink: String?
+    var upvoted = false
 
     // UI properties
     var visibility = CommentVisibilityType.visible
-    var upvoted = false
 
     init(
         id: Int,
         age: String,
         text: String,
         by: String,
-        level: Int
+        level: Int,
+        upvoted: Bool
     ) {
         self.id = id
         self.age = age
         self.text = text
         self.by = by
         self.level = level
+        self.upvoted = upvoted
     }
 }
 

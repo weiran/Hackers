@@ -56,6 +56,16 @@ extension HackerNewsData {
         let age = try metadataElement.select("age").text()
         let commentsCount = try self.commentsCount(from: metadataElement)
 
+        var upvoted = false
+        let voteLink = try? postElement.select(".votelinks a").first { $0.hasAttr("id") }
+        if let voteLink = voteLink {
+            let hasUnvote = try voteLink.attr("id").starts(with: "un_")
+            let hasUpvote = try voteLink.attr("id").starts(with: "up_")
+            let hasNosee = try voteLink.classNames().contains("nosee")
+
+            upvoted = hasUnvote || (hasUpvote && hasNosee)
+        }
+
         return HackerNewsPost(
             id: id,
             url: url,
@@ -64,7 +74,8 @@ extension HackerNewsData {
             commentsCount: commentsCount,
             by: by,
             score: score,
-            postType: type // todo parse this
+            postType: type,
+            upvoted: upvoted
         )
     }
 
