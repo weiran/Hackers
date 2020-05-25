@@ -10,21 +10,21 @@ import Foundation
 import PromiseKit
 
 extension HackerNewsData {
-    public func upvote(post id: Int) -> Promise<Void> {
+    public func upvote(post: HackerNewsPost) -> Promise<Void> {
         let scraperShim = HNScraperShim()
 
         return firstly {
-            scraperShim.getPost(id: id)
+            scraperShim.getPost(id: post.id)
         }.then { post in
             scraperShim.upvote(post: post)
         }
     }
 
-    public func unvote(post id: Int) -> Promise<Void> {
+    public func unvote(post: HackerNewsPost) -> Promise<Void> {
         let scraperShim = HNScraperShim()
 
         return firstly {
-            scraperShim.getPost(id: id)
+            scraperShim.getPost(id: post.id)
         }.then { post in
             scraperShim.unvote(post: post)
         }

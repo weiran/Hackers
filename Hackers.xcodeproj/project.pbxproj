@@ -38,6 +38,7 @@
 		2481BD5F247C103B0088CA2B /* HackerNewsData+Comments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */; };
 		2481BD61247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */; };
 		2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD62247C12540088CA2B /* HNScraperShim.swift */; };
+		2481BD65247C1B380088CA2B /* HackerNewsData+PostVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD64247C1B380088CA2B /* HackerNewsData+PostVoting.swift */; };
 		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
 		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
@@ -124,6 +125,7 @@
 		2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+Comments.swift"; sourceTree = "<group>"; };
 		2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+CommentVoting.swift"; sourceTree = "<group>"; };
 		2481BD62247C12540088CA2B /* HNScraperShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNScraperShim.swift; sourceTree = "<group>"; };
+		2481BD64247C1B380088CA2B /* HackerNewsData+PostVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+PostVoting.swift"; sourceTree = "<group>"; };
 		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
 		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				2481BD5A247C0FFB0088CA2B /* HackerNewsModels.swift */,
 				2457F04424696EB000F3E7A4 /* HackerNewsData.swift */,
 				2481BD5C247C10330088CA2B /* HackerNewsData+Posts.swift */,
+				2481BD64247C1B380088CA2B /* HackerNewsData+PostVoting.swift */,
 				2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */,
 				2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */,
 				2481BD62247C12540088CA2B /* HNScraperShim.swift */,
@@ -729,6 +732,7 @@
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
 				2457F04524696EB000F3E7A4 /* HackerNewsData.swift in Sources */,
 				2457FF79245DCE60000FA160 /* UIAlertControllerExtensions.swift in Sources */,
+				2481BD65247C1B380088CA2B /* HackerNewsData+PostVoting.swift in Sources */,
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
 				24FFFF5A23362C7800D009EF /* HNPostExtensions.swift in Sources */,
 				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,

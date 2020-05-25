@@ -47,11 +47,11 @@ class SwipeCellKitActions: Themed {
             voteOnPost(post, !post.upvoted)
             if upvoted {
                 HackerNewsData.shared
-                    .unvote(post: post.id)
+                    .unvote(post: post)
                     .catch(errorHandler)
             } else {
                 HackerNewsData.shared
-                    .upvote(post: post.id)
+                    .upvote(post: post)
                     .catch(errorHandler)
             }
         }
@@ -64,8 +64,13 @@ class SwipeCellKitActions: Themed {
         return [upvoteAction]
     }
 
-    public func voteAction(comment: HackerNewsComment, tableView: UITableView,
-                           indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
+    public func voteAction(
+        comment: HackerNewsComment,
+        post: HackerNewsPost,
+        tableView: UITableView,
+        indexPath: IndexPath,
+        viewController: UIViewController
+    ) -> [SwipeAction] {
         let voteOnComment: (HackerNewsComment, Bool) -> Void = { comment, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
             comment.upvoted = isUpvote
@@ -88,16 +93,15 @@ class SwipeCellKitActions: Themed {
         let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = comment.upvoted
             voteOnComment(comment, !comment.upvoted)
-            // TODO fix voting
-//            if upvoted {
-//                self.hackerNewsService
-//                    .unvote(comment: comment)
-//                    .catch(errorHandler)
-//            } else {
-//                self.hackerNewsService
-//                    .upvote(comment: comment)
-//                    .catch(errorHandler)
-//            }
+            if upvoted {
+                HackerNewsData.shared
+                    .unvote(comment: comment, for: post)
+                    .catch(errorHandler)
+            } else {
+                HackerNewsData.shared
+                    .upvote(comment: comment, for: post)
+                    .catch(errorHandler)
+            }
         }
         voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         voteAction.textColor = .white

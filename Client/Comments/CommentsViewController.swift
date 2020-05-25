@@ -129,9 +129,10 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard let post = self.post else { return nil }
         switch (orientation, indexPath.section) {
         case (.left, 0):
-            return swipeCellKitActions?.voteAction(post: post!, tableView: tableView,
+            return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
                                                    indexPath: indexPath, viewController: self)
 
         case (.right, 1):
@@ -139,7 +140,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
-            return swipeCellKitActions?.voteAction(comment: comment, tableView: tableView,
+            return swipeCellKitActions?.voteAction(comment: comment, post: post, tableView: tableView,
                                                    indexPath: indexPath, viewController: self)
 
         default: return nil
