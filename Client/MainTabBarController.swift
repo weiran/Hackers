@@ -46,7 +46,7 @@ class MainTabBarController: UITabBarController {
             return TabItem(postType: .news, typeName: "Top",
                            iconName: "globe", selectedIconName: "globe")
         case 1:
-            return TabItem(postType: .asks, typeName: "Ask",
+            return TabItem(postType: .ask, typeName: "Ask",
                            iconName: "bubble.left", selectedIconName: "bubble.left.fill")
         case 2:
             return TabItem(postType: .jobs, typeName: "Jobs",
@@ -60,7 +60,7 @@ class MainTabBarController: UITabBarController {
     }
 
     struct TabItem {
-        let postType: HNScraper.PostListPageName
+        let postType: HackerNewsPostType
         let typeName: String
         let iconName: String
         let selectedIconName: String

@@ -55,7 +55,7 @@ class CommentsViewController: UITableViewController {
 
     private func loadComments() {
         firstly {
-            HackerNewsData.shared.getHTMLComments(postId: post!.id)
+            HackerNewsData.shared.getComments(postId: post!.id)
         }.done { result in
             self.comments = result
             self.tableView.reloadData()

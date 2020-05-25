@@ -22,10 +22,10 @@ class NewsViewController: UITableViewController {
     public var swipeCellKitActions: SwipeCellKitActions?
 
     private var posts: [HackerNewsPost]?
-    public var postType: HNScraper.PostListPageName! = .news
+    public var postType: HackerNewsPostType = .news
 
     private var peekedIndexPath: IndexPath?
-    private var pageIndex = 0
+    private var pageIndex = 1
 
     private var notificationToken: NotificationToken?
 
@@ -76,7 +76,7 @@ class NewsViewController: UITableViewController {
 extension NewsViewController { // post fetching
     @objc private func loadPosts() {
         firstly {
-            HackerNewsData.shared.getPosts(type: .top)
+            HackerNewsData.shared.getPosts(type: postType)
         }.done { posts in
             self.posts = posts
             self.tableView.reloadData()
@@ -90,7 +90,7 @@ extension NewsViewController { // post fetching
     private func loadMorePosts() {
         pageIndex += 1
         firstly {
-            HackerNewsData.shared.getPosts(type: .top, page: pageIndex)
+            HackerNewsData.shared.getPosts(type: .news, page: pageIndex)
         }.done { posts in
             self.posts?.append(contentsOf: posts)
             self.tableView.reloadData()
@@ -145,7 +145,7 @@ extension NewsViewController: SwipeTableViewCellDelegate {
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .left,
             let post = posts?[indexPath.row],
-            post.postType != .job else { return nil }
+            post.postType != .jobs else { return nil }
 
         return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
                                                indexPath: indexPath, viewController: self)

@@ -14,56 +14,111 @@ protocol HackerNewsDataProtocol {
 
 }
 
-enum HackerNewsPath: String {
-    case new = "newstories.json"
-    case top = "topstories.json"
-    case best = "beststories.json"
-    case ask = "askstories.json"
-    case show = "showstories.json"
-    case jobs = "jobsstories.json"
-}
-
-struct HNPath {
-    let new = "v0/newstories.json"
-    func item(id: Int) -> String {
-        return "item/\(id).json"
-    }
+enum HackerNewsPostType: String {
+    case news
+    case ask
+    case jobs
+    case new
 }
 
 class HackerNewsData {
     public static let shared = HackerNewsData()
 
     let session = URLSession(configuration: .default)
-    let firebaseURL = URL(string: "https://hacker-news.firebaseio.com/v0/")!
-    let agoliaURL = URL(string: "https://hn.algolia.com/api/v1/")!
 
     init() { }
+}
 
-    public func getPosts(type: HackerNewsPath, page: Int = 0) -> Promise<[HackerNewsPost]> {
-        let pageLimit = 25
-
-        return firstly {
-            getIds(type: type)
-        }.compactMap { ids in
-            if page == 0 {
-                return Array(ids.prefix(pageLimit))
-            } else {
-                let start = pageLimit * page
-                let end = start + pageLimit
-                return Array(ids[start...end])
-            }
-        }.then { ids in
-            self.getItems(for: ids)
-        }.map { items in
-            items.compactMap { item in
-                HackerNewsPost(item)
+extension HackerNewsData { // posts
+    public func getPosts(type: HackerNewsPostType, page: Int = 1) -> Promise<[HackerNewsPost]> {
+        firstly {
+            fetchPostsHtml(type: type, page: page)
+        }.map { html in
+            try self.postElements(from: html)
+        }.map { groupedElements in
+            groupedElements.compactMap { elements in
+                try? self.post(from: elements, type: type)
             }
         }
     }
 
-    public func getHTMLComments(postId: Int) -> Promise<[HackerNewsComment]> {
+    private func postElements(from data: String) throws -> [Elements] {
+        let document = try SwiftSoup.parse(data)
+
+        let postElements = try document.select(".athing").compactMap { postElement -> Elements? in
+            guard let metadataElement = try postElement.nextElementSibling() else {
+                return nil
+            }
+            return Elements([postElement, metadataElement])
+        }
+
+        return postElements
+    }
+
+    private func post(from elements: Elements, type: HackerNewsPostType) throws -> HackerNewsPost {
+        guard let metadataElement = try elements.select("tr:not(.athing)").first() else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find metadata element")
+        }
+        guard let postElement = try elements.select(".athing").first() else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post element")
+        }
+        guard let id = Int(try postElement.attr("id")) else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
+        }
+        let title = try postElement.select(".storylink").text()
+        let urlString = try postElement.select(".storylink").attr("href")
+        guard let url = URL(string: urlString) else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
+        }
+        let by = try metadataElement.select("hnuser").text()
+        let score = try self.score(from: metadataElement)
+        let age = try metadataElement.select("age").text()
+        let commentsCount = try self.commentsCount(from: metadataElement)
+
+        return HackerNewsPost(
+            id: id,
+            url: url,
+            title: title,
+            age: age,
+            commentsCount: commentsCount,
+            by: by,
+            score: score,
+            postType: type // todo parse this
+        )
+    }
+
+    private func commentsCount(from metadataElement: Element) throws -> Int {
+        let linkElements = try metadataElement.select("a")
+        let commentLinkElement = try linkElements.first { try $0.text().contains("comment") }
+        guard
+            let commentLinkText = try commentLinkElement?.text(),
+            let commentsCountString = commentLinkText.components(separatedBy: " ").first,
+            let commentsCount = Int(String(commentsCountString)) else {
+            return 0
+        }
+        return commentsCount
+    }
+
+    private func score(from metadataElement: Element) throws -> Int {
+        let scoreString = try metadataElement.select(".score").text()
+        guard
+            let scoreNumberString = scoreString.components(separatedBy: " ").first,
+            let score = Int(String(scoreNumberString)) else {
+                return 0
+        }
+        return score
+    }
+
+    private func fetchPostsHtml(type: HackerNewsPostType, page: Int) -> Promise<String> {
+        let url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
+        return fetchHtml(url: url)
+    }
+}
+
+extension HackerNewsData { // comments
+    public func getComments(postId: Int) -> Promise<[HackerNewsComment]> {
         firstly {
-            getHackerNewsHTML(id: postId)
+            fetchCommentsHtml(id: postId)
         }.map { html in
             try self.commentElements(from: html)
         }.map { elements in
@@ -103,150 +158,19 @@ class HackerNewsData {
         return try elements.html()
     }
 
-    func getHackerNewsHTML(id: Int) -> Promise<String> {
+    private func fetchCommentsHtml(id: Int) -> Promise<String> {
+        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)")!
+        return fetchHtml(url: url)
+    }
+}
+
+extension HackerNewsData { // shared
+    private func fetchHtml(url: URL) -> Promise<String> {
         let (promise, seal) = Promise<String>.pending()
 
-        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)")!
         session.dataTask(with: url) { data, _, error in
-            if let data = data, let ids = String(bytes: data, encoding: .utf8) {
-                seal.fulfill(ids)
-            } else if let error = error {
-                seal.reject(error)
-            } else {
-                seal.reject(HackerNewsError.typeError)
-            }
-        }.resume()
-
-        return promise
-    }
-
-    public func getComments(postId: Int) -> Promise<[HackerNewsRawItem]> {
-        func test(items: [HackerNewsRawItem]) -> Promise<[HackerNewsRawItem]> {
-            func flattenItems(_ items: [HackerNewsRawItem]) -> [Int] {
-                var flatItems = [Int]()
-                items.forEach { item in
-                    guard let kids = item.kids else { return }
-                    flatItems.append(contentsOf: kids)
-                }
-                return flatItems
-            }
-            let flatChildren = flattenItems(items)
-            let promises = flatChildren.map { self.getItem(for: $0) } as [Promise<HackerNewsRawItem>]
-            return when(fulfilled: promises)
-        }
-
-        return firstly {
-            getItem(for: postId)
-        }.compactMap { item in
-            return item.kids
-        }.then { ids in
-            self.getItems(for: ids)
-        }
-        .then { items in
-            test(items: items)
-        }
-    }
-
-    public func getPost(postId: Int) -> Promise<AgoliaRawItem> {
-        let (promise, seal) = Promise<AgoliaRawItem>.pending()
-
-        let url = URL(string: "items/\(postId)", relativeTo: agoliaURL)!
-        session.dataTask(with: url) { data, _, error in
-            let decoder = JSONDecoder()
-            do {
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                decoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601Full)
-                try decoder.decode(AgoliaRawItem.self, from: data!)
-            } catch {
-                print(error.localizedDescription)
-            }
-
-            if let data = data, let item = try? decoder.decode(AgoliaRawItem.self, from: data) {
-                seal.fulfill(item)
-            } else if let error = error {
-                seal.reject(error)
-            } else {
-                seal.reject(HackerNewsError.typeError)
-            }
-        }.resume()
-
-        return promise
-
-    }
-}
-
-extension DateFormatter {
-  static let iso8601Full: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-    formatter.calendar = Calendar(identifier: .iso8601)
-    formatter.timeZone = TimeZone(secondsFromGMT: 0)
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    return formatter
-  }()
-}
-
-
-extension HackerNewsData { // all private methods
-    private func route(for path: String, limit: Int? = nil, orderBy: String? = "\"$key\"") -> String {
-        var queryParameters: [String: String] = [String: String]()
-        if let limit = limit {
-            queryParameters["limitToFirst"] = String(limit)
-        }
-        if let orderBy = orderBy {
-            queryParameters["orderBy"] = orderBy
-        }
-
-        var urlComponents = URLComponents()
-        urlComponents.scheme = "https"
-        urlComponents.host = "hacker-news.firebaseio.com"
-        urlComponents.path = "/v0/\(path)"
-        urlComponents.setQueryItems(with: queryParameters)
-        return urlComponents.string!
-    }
-
-    private func getIds(type: HackerNewsPath) -> Promise<[Int]> {
-        let (promise, seal) = Promise<[Int]>.pending()
-
-        let route = self.route(for: type.rawValue)
-        let url = URL(string: route)!
-        session.dataTask(with: url) { data, _, error in
-            if let data = data, let ids = try? JSONDecoder().decode([Int].self, from: data) {
-                seal.fulfill(ids)
-            } else if let error = error {
-                seal.reject(error)
-            } else {
-                seal.reject(HackerNewsError.typeError)
-            }
-        }.resume()
-
-        return promise
-    }
-
-    func getItems(for ids: [Int]) -> Promise<[HackerNewsRawItem]> {
-        let (promise, seal) = Promise<[HackerNewsRawItem]>.pending()
-        let itemPromises = ids.map { id in
-            return getItem(for: id)
-        }
-
-        firstly {
-            when(fulfilled: itemPromises)
-        }.done { items in
-            seal.fulfill(items)
-        }.catch { error in
-            seal.reject(error)
-        }
-
-        return promise
-    }
-
-    private func getItem(for id: Int) -> Promise<HackerNewsRawItem> {
-        let (promise, seal) = Promise<HackerNewsRawItem>.pending()
-
-        let url = URL(string: "item/\(id).json", relativeTo: firebaseURL)!
-        session.dataTask(with: url) { data, _, error in
-            if let data = data, let item = try? JSONDecoder().decode(HackerNewsRawItem.self, from: data) {
-                seal.fulfill(item)
+            if let data = data, let html = String(bytes: data, encoding: .utf8) {
+                seal.fulfill(html)
             } else if let error = error {
                 seal.reject(error)
             } else {
@@ -262,72 +186,43 @@ enum HackerNewsError: Error {
     case typeError
 }
 
-struct HackerNewsRawItem: Codable {
-    let id: Int?
-    let url: String?
-    let title: String?
-    let time: Int?
-    let descendants: Int?
-    let score: Int?
-    let by: String?
-    let text: String?
-    let parent: Int?
-    let kids: [Int]?
-    let type: String?
-}
-
-struct AgoliaRawItem: Codable {
-    let id: Int
-    let createdAt: Date
-    let author: String?
-    let title: String?
-    let url: String?
-    let text: String?
-    let points: Int?
-    let parentId: Int?
-    let children: [AgoliaRawItem]?
-}
-
 class HackerNewsPost {
     let id: Int
     let url: URL
     let title: String
-    let date: Date
+    let age: String
     let commentsCount: Int
     let by: String
     var score: Int
     let postType: HackerNewsPostType
 
-    // not from API
-    var upvoted: Bool = false
+    // UI properties
+    var upvoted = false
 
-    init?(_ item: HackerNewsRawItem) {
-        guard let id = item.id,
-            let urlString = item.url,
-            let url = URL(string: urlString),
-            let title = item.title,
-            let time = item.time,
-            let commentsCount = item.descendants,
-            let by = item.by,
-            let score = item.score else {
-                return nil
-        }
-
+    init(
+        id: Int,
+        url: URL,
+        title: String,
+        age: String,
+        commentsCount: Int,
+        by: String,
+        score: Int,
+        postType: HackerNewsPostType
+    ) {
         self.id = id
         self.url = url
         self.title = title
-        self.date = Date(timeIntervalSince1970: Double(time))
+        self.age = age
         self.commentsCount = commentsCount
         self.by = by
         self.score = score
-        self.postType = .standard // TODO fix this
+        self.postType = postType
     }
 }
 
 class HackerNewsComment {
     let id: Int
     let age: String
-    var children: [HackerNewsComment]?
     let text: String
     let by: String
     var level: Int
@@ -337,37 +232,17 @@ class HackerNewsComment {
     var visibility = CommentVisibilityType.visible
     var upvoted = false
 
-    init(id: Int, age: String, text: String, by: String, level: Int) {
+    init(
+        id: Int,
+        age: String,
+        text: String,
+        by: String,
+        level: Int
+    ) {
         self.id = id
         self.age = age
         self.text = text
         self.by = by
         self.level = level
-    }
-}
-
-extension HackerNewsRawItem: Equatable {
-    public static func == (lhs: HackerNewsRawItem, rhs: HackerNewsRawItem) -> Bool {
-        return lhs.id == rhs.id
-    }
-}
-
-enum HackerNewsItemType {
-    case story
-    case comment
-    case job
-    case poll
-    case pollopt
-}
-
-enum HackerNewsPostType {
-    case standard
-    case ask
-    case job
-}
-
-extension URLComponents {
-    mutating func setQueryItems(with parameters: [String: String]) {
-        self.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
 }
