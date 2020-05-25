@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
-//  Copyright © 2020 Glass Umbrella. All rights reserved.
+//  Copyright © 2020 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
@@ -74,4 +74,8 @@ enum HackerNewsPostType: String {
     case ask
     case jobs
     case new
+}
+
+enum HackerNewsError: Error {
+    case typeError
 }

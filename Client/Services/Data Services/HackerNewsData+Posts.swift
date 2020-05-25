@@ -3,14 +3,14 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
-//  Copyright © 2020 Glass Umbrella. All rights reserved.
+//  Copyright © 2020 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
 import PromiseKit
 import SwiftSoup
 
-extension HackerNewsData { // posts
+extension HackerNewsData {
     public func getPosts(type: HackerNewsPostType, page: Int = 1) -> Promise<[HackerNewsPost]> {
         firstly {
             fetchPostsHtml(type: type, page: page)

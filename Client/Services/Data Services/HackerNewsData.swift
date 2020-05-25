@@ -8,7 +8,6 @@
 
 import Foundation
 import PromiseKit
-import SwiftSoup
 
 class HackerNewsData {
     public static let shared = HackerNewsData()
@@ -30,8 +29,4 @@ class HackerNewsData {
 
         return promise
     }
-}
-
-enum HackerNewsError: Error {
-    case typeError
 }
