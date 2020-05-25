@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 31/12/2017.
-//  Copyright © 2017 Glass Umbrella. All rights reserved.
+//  Copyright © 2017 Weiran Zhang. All rights reserved.
 //
 //  A UITextView that doesn't pass taps on links down the responder chain.
 

@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 22/06/2019.
-//  Copyright © 2019 Glass Umbrella. All rights reserved.
+//  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI

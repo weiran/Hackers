@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 30/04/2016.
-//  Copyright © 2016 Glass Umbrella. All rights reserved.
+//  Copyright © 2016 Weiran Zhang. All rights reserved.
 //
 
 import Foundation

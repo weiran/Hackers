@@ -3,7 +3,7 @@
 //  HackersUITests
 //
 //  Created by Weiran Zhang on 23/03/2019.
-//  Copyright © 2019 Glass Umbrella. All rights reserved.
+//  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
 import XCTest
