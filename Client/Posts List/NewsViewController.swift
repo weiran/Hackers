@@ -201,7 +201,8 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
             return [UIPreviewActionItem]()
         }
 
-        let commentsPreviewActionTitle = post.commentsCount > 0 ? "View \(post.commentsCount) comments" : "View comments"
+        let commentsPreviewActionTitle = post.commentsCount > 0 ?
+            "View \(post.commentsCount) comments" : "View comments"
 
         let viewCommentsPreviewAction =
             UIPreviewAction(title: commentsPreviewActionTitle,

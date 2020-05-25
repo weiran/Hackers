@@ -21,4 +21,3 @@ extension String {
         return self[index(startIndex, offsetBy: value.lowerBound)...]
     }
 }
-
