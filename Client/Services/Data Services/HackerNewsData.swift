@@ -1,5 +1,5 @@
 //
-//  HackerNewsDataProtocol.swift
+//  HackerNewsData.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 11/05/2020.
