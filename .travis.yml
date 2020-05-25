@@ -1,5 +1,5 @@
 language: swift
-osx_image: xcode11.4
+osx_image: xcode11.5
 xcode_workspace: Hackers.xcworkspace
 xcode_scheme: Hackers
 before_install:
@@ -15,7 +15,7 @@ jobs:
       name: "UI Tests"
       script:
         # - bundle exec fastlane test
-        - xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme "HackersUITests" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.4' test
+        - xcodebuild -workspace ${TRAVIS_XCODE_WORKSPACE} -scheme "HackersUITests" -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.5' test
     - stage: "Static Analysis"
       name: "SwiftLint"
       script:
