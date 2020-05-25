@@ -36,6 +36,8 @@
 		2481BD5B247C0FFB0088CA2B /* HackerNewsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5A247C0FFB0088CA2B /* HackerNewsModels.swift */; };
 		2481BD5D247C10330088CA2B /* HackerNewsData+Posts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5C247C10330088CA2B /* HackerNewsData+Posts.swift */; };
 		2481BD5F247C103B0088CA2B /* HackerNewsData+Comments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */; };
+		2481BD61247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */; };
+		2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD62247C12540088CA2B /* HNScraperShim.swift */; };
 		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
 		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
@@ -120,6 +122,8 @@
 		2481BD5A247C0FFB0088CA2B /* HackerNewsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackerNewsModels.swift; sourceTree = "<group>"; };
 		2481BD5C247C10330088CA2B /* HackerNewsData+Posts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+Posts.swift"; sourceTree = "<group>"; };
 		2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+Comments.swift"; sourceTree = "<group>"; };
+		2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackerNewsData+CommentVoting.swift"; sourceTree = "<group>"; };
+		2481BD62247C12540088CA2B /* HNScraperShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNScraperShim.swift; sourceTree = "<group>"; };
 		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
 		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
@@ -215,6 +219,8 @@
 				2457F04424696EB000F3E7A4 /* HackerNewsData.swift */,
 				2481BD5C247C10330088CA2B /* HackerNewsData+Posts.swift */,
 				2481BD5E247C103B0088CA2B /* HackerNewsData+Comments.swift */,
+				2481BD60247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift */,
+				2481BD62247C12540088CA2B /* HNScraperShim.swift */,
 			);
 			path = "Data Services";
 			sourceTree = "<group>";
@@ -715,6 +721,7 @@
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
 				2464D20E209DD8F400C7F8FC /* SubscribableValue.swift in Sources */,
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
+				2481BD61247C11AE0088CA2B /* HackerNewsData+CommentVoting.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
@@ -734,6 +741,7 @@
 				249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */,
 				24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */,
 				2481BD5D247C10330088CA2B /* HackerNewsData+Posts.swift in Sources */,
+				2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */,
 				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
 			);
