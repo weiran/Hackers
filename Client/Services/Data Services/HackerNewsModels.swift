@@ -78,4 +78,5 @@ enum HackerNewsPostType: String {
 
 enum HackerNewsError: Error {
     case typeError
+    case hnScraperError
 }

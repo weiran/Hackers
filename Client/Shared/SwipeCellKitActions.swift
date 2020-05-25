@@ -46,13 +46,13 @@ class SwipeCellKitActions: Themed {
             let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
             if upvoted {
-//                self.hackerNewsService
-//                    .unvote(post: post)
-//                    .catch(errorHandler)
+                HackerNewsData.shared
+                    .unvote(post: post.id)
+                    .catch(errorHandler)
             } else {
-//                self.hackerNewsService
-//                    .upvote(post: post)
-//                    .catch(errorHandler)
+                HackerNewsData.shared
+                    .upvote(post: post.id)
+                    .catch(errorHandler)
             }
         }
         upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
