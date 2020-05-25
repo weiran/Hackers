@@ -8,6 +8,7 @@
 
 import Foundation
 import PromiseKit
+import SwiftSoup
 
 protocol HackerNewsDataProtocol {
 
@@ -58,6 +59,65 @@ class HackerNewsData {
                 HackerNewsPost(item)
             }
         }
+    }
+
+    public func getHTMLComments(postId: Int) -> Promise<[HackerNewsComment]> {
+        firstly {
+            getHackerNewsHTML(id: postId)
+        }.map { html in
+            try self.commentElements(from: html)
+        }.map { elements in
+            elements.compactMap { element in
+                try? self.comment(from: element)
+            }
+        }
+    }
+
+    private func commentElements(from data: String) throws -> Elements {
+        let document = try SwiftSoup.parse(data)
+        return try document.select(".comtr")
+    }
+
+    private func comment(from element: Element) throws -> HackerNewsComment {
+        let text = try commentText(from: element.select(".commtext"))
+        let age = try element.select(".age").text()
+        let user = try element.select(".hnuser").text()
+        guard let id = try Int(element.select(".comtr").attr("id")) else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse comment id")
+        }
+        guard let indentWidth = try Int(element.select(".ind img").attr("width")) else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse comment indent width")
+        }
+        let level = indentWidth / 40
+        let upvoteLink = try element.select(".votelinks a").attr("href")
+
+        let comment = HackerNewsComment(id: id, age: age, text: text, by: user, level: level)
+        comment.upvoteLink = upvoteLink
+        return comment
+    }
+
+    private func commentText(from elements: Elements) throws -> String {
+        if let replyElement = try? elements.select(".reply") {
+            try replyElement.html("")
+        }
+        return try elements.html()
+    }
+
+    func getHackerNewsHTML(id: Int) -> Promise<String> {
+        let (promise, seal) = Promise<String>.pending()
+
+        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)")!
+        session.dataTask(with: url) { data, _, error in
+            if let data = data, let ids = String(bytes: data, encoding: .utf8) {
+                seal.fulfill(ids)
+            } else if let error = error {
+                seal.reject(error)
+            } else {
+                seal.reject(HackerNewsError.typeError)
+            }
+        }.resume()
+
+        return promise
     }
 
     public func getComments(postId: Int) -> Promise<[HackerNewsRawItem]> {
@@ -266,33 +326,23 @@ class HackerNewsPost {
 
 class HackerNewsComment {
     let id: Int
-    let date: Date
+    let age: String
     var children: [HackerNewsComment]?
     let text: String
     let by: String
-
-    // custom properties
-    var visibility = CommentVisibilityType.visible
     var level: Int
+    var upvoteLink: String?
+
+    // UI properties
+    var visibility = CommentVisibilityType.visible
     var upvoted = false
 
-    init?(_ item: AgoliaRawItem, level: Int = 0) {
-        guard let author = item.author,
-            let text = item.text else {
-                return nil
-        }
-
-        self.id = item.id
-        self.date = item.createdAt
-        self.by = author
+    init(id: Int, age: String, text: String, by: String, level: Int) {
+        self.id = id
+        self.age = age
         self.text = text
+        self.by = by
         self.level = level
-
-        if let children = item.children {
-            self.children = children.compactMap { child in
-                return HackerNewsComment(child, level: level + 1)
-            }
-        }
     }
 }
 

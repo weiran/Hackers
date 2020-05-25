@@ -55,7 +55,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         level = comment.level
         authorLabel.text = comment.by
         authorLabel.font = AppFont.commentUsernameFont(collapsed: isCollapsed)
-        datePostedLabel.text = comment.date.description // TODO format this date
+        datePostedLabel.text = comment.age
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         upvoteIconImageView?.isHidden = comment.upvoted == false
 

@@ -54,47 +54,15 @@ class CommentsViewController: UITableViewController {
     }
 
     private func loadComments() {
-//        firstly {
-//            hackerNewsService!.getComments(of: post!)
-//        }.done { comments in
-//            switch comments?.count {
-//            case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
-//            default:
-//                self.tableView.backgroundView = nil
-//                self.comments = comments
-//                self.tableView.reloadData()
-//            }
-//        }.catch { error in
-//            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-//            self.tableView.backgroundView = nil
-//        }
-
         firstly {
-            HackerNewsData.shared.getComments(postId: post!.id)
+            HackerNewsData.shared.getHTMLComments(postId: post!.id)
         }.done { result in
-            print(result)
+            self.comments = result
+            self.tableView.reloadData()
         }.catch { error in
-            print(error)
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            self.tableView.backgroundView = nil
         }
-
-//        firstly {
-//            HackerNewsData.shared.getPost(postId: post!.id)
-//        }.done { post in
-//            if let children = post.children {
-//                let comments = children.compactMap { child in
-//                    return HackerNewsComment(child)
-//                }
-//                func traverse(_ comments: [HackerNewsComment]?) -> [HackerNewsComment] {
-//                    let comments = comments ?? []
-//                    return comments + comments.flatMap { traverse($0.children) }
-//                }
-//                let flatComments = traverse(comments)
-//                self.comments = flatComments
-//                self.tableView.reloadData()
-//            }
-//        }.catch { error in
-//
-//        }
     }
 
     override func updateUserActivityState(_ activity: NSUserActivity) {
