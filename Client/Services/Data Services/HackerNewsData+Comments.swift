@@ -21,7 +21,7 @@ extension HackerNewsData {
                 try? self.comment(from: element)
             }
             if let postTextComment = try? self.postTextComment(from: postElement, with: post) {
-                // post text for AskHN
+                // get the post text for AskHN
                 comments.insert(postTextComment, at: 0)
             }
             return comments
@@ -91,8 +91,17 @@ extension HackerNewsData {
         return nil
     }
 
-    private func fetchCommentsHtml(id: Int) -> Promise<String> {
-        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)")!
-        return fetchHtml(url: url)
+    /// Recursively fetch comments until there are no more
+    private func fetchCommentsHtml(id: Int, page: Int = 1, workingHtml: String = "") -> Promise<String> {
+        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)&p=\(page)")!
+        return fetchHtml(url: url).then { html -> Promise<String> in
+            let document = try SwiftSoup.parse(html)
+            let moreLinkExists = try !document.select("a.morelink").isEmpty()
+            if moreLinkExists {
+                return self.fetchCommentsHtml(id: id, page: page + 1, workingHtml: html)
+            } else {
+                return Promise.value(workingHtml + html)
+            }
+        }
     }
 }
