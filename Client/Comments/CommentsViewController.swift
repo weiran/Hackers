@@ -209,6 +209,18 @@ extension CommentsViewController: CommentDelegate {
         }
     }
 
+    func internalLinkTapped(postId: Int, url: URL, sender: UITextView) {
+        _ = HackerNewsData.shared.getPost(id: postId).done { post in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let viewController =
+                storyboard.instantiateViewController(identifier: "CommentsViewController") as CommentsViewController
+            viewController.post = post
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }.catch { _ in
+            self.linkTapped(url, sender: sender)
+        }
+    }
+
     private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]

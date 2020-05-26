@@ -11,4 +11,5 @@ import UIKit
 protocol CommentDelegate: class {
     func commentTapped(_ sender: UITableViewCell)
     func linkTapped(_ url: URL, sender: UITextView)
+    func internalLinkTapped(postId: Int, url: URL, sender: UITextView)
 }
