@@ -3,12 +3,11 @@
 //  Hackers2
 //
 //  Created by Weiran Zhang on 07/06/2014.
-//  Copyright (c) 2014 Glass Umbrella. All rights reserved.
+//  Copyright (c) 2014 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
 import UIKit
-import HNScraper
 import SwipeCellKit
 import SwiftSoup
 
@@ -19,7 +18,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         didSet { updateIndentPadding() }
     }
 
-    private var comment: HNComment?
+    private var comment: HackerNewsComment?
 
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel: UILabel!
@@ -48,14 +47,14 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    public func updateCommentContent(with comment: HNComment, theme: AppTheme) {
+    public func updateCommentContent(with comment: HackerNewsComment, theme: AppTheme) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible
         level = comment.level
-        authorLabel.text = comment.username
+        authorLabel.text = comment.by
         authorLabel.font = AppFont.commentUsernameFont(collapsed: isCollapsed)
-        datePostedLabel.text = comment.created
+        datePostedLabel.text = comment.age
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         upvoteIconImageView?.isHidden = comment.upvoted == false
 

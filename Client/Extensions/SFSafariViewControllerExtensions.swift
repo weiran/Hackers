@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 30/04/2016.
-//  Copyright © 2016 Glass Umbrella. All rights reserved.
+//  Copyright © 2016 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
@@ -13,23 +13,6 @@ import WebKit
 
 private enum AssociatedKeys {
     static var PreviewActionItemsDelegateName = "previewActionItemsDelegate"
-    static var InitialURL = "initialURL"
-}
-
-extension SFSafariViewController {
-    public private(set) var initialURL: URL? {
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.InitialURL, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.InitialURL) as? URL
-        }
-    }
-
-    public convenience init(initialURL: URL) {
-        self.init(url: initialURL)
-        self.initialURL = initialURL
-    }
 }
 
 // Preview action items

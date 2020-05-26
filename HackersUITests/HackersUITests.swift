@@ -3,7 +3,7 @@
 //  HackersUITests
 //
 //  Created by Weiran Zhang on 23/03/2019.
-//  Copyright © 2019 Glass Umbrella. All rights reserved.
+//  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
 import XCTest
@@ -42,10 +42,6 @@ class HackersUITests: XCTestCase {
     }
 
     func testScreenshotComments() {
-        if Device.current.isPad {
-            return
-        }
-
         launch()
 
         let tablesQuery = XCUIApplication().tables
@@ -56,7 +52,9 @@ class HackersUITests: XCTestCase {
         let commentCell = tablesQuery.cells.matching(identifier: "CommentCell").element
         XCTAssertTrue(waitForElementToAppear(commentCell))
 
-        snapshot("Comments")
+        if !Device.current.isPad {
+            snapshot("Comments")
+        }
     }
 
     func testScreenshotDark() {
@@ -76,7 +74,7 @@ class HackersUITests: XCTestCase {
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        let result = XCTWaiter().wait(for: [expectation], timeout: 5)
+        let result = XCTWaiter().wait(for: [expectation], timeout: 15)
         return result == .completed
     }
 }

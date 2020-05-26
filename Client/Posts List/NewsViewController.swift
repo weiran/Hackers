@@ -3,7 +3,7 @@
 //  Hackers2
 //
 //  Created by Weiran Zhang on 07/06/2014.
-//  Copyright (c) 2014 Glass Umbrella. All rights reserved.
+//  Copyright (c) 2014 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
@@ -12,34 +12,41 @@ import SwiftUI
 import SafariServices
 import PromiseKit
 import Kingfisher
-import HNScraper
 import Loaf
 import SwipeCellKit
 
 class NewsViewController: UITableViewController {
-    public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
 
-    private var posts: [HNPost]?
-    public var postType: HNScraper.PostListPageName! = .news
+    private var posts = [HackerNewsPost]()
+    private var dataSource: UITableViewDiffableDataSource<Section, HackerNewsPost>?
+    public var postType: HackerNewsPostType = .news
 
     private var peekedIndexPath: IndexPath?
-    private var nextPageIdentifier: String?
+    private var pageIndex = 1
+    private var isFetching = false
 
     private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
-        tableView.refreshControl?.addTarget(self, action: #selector(loadPosts), for: UIControl.Event.valueChanged)
+
+        tableView.refreshControl?.addTarget(self, action: #selector(fetchPosts), for: UIControl.Event.valueChanged)
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+        dataSource = makeDataSource()
+        tableView.dataSource = dataSource
+
         notificationToken = NotificationCenter.default
             .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                                           object: nil, queue: .main) { _ in self.loadPosts() }
+                     object: nil,
+                     queue: .main
+            ) { _ in self.fetchPosts() }
+
         setupTheming()
-        loadPosts()
+        fetchPosts()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -51,17 +58,15 @@ class NewsViewController: UITableViewController {
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowCommentsSegue" {
-            if let navigationController = segue.destination as? UINavigationController,
-                let commentsViewController = navigationController.viewControllers.first as? CommentsViewController,
-                let indexPath = tableView.indexPathForSelectedRow,
-                let post = posts?[indexPath.row] {
-                commentsViewController.post = post
-            }
+        if segue.identifier == "ShowCommentsSegue",
+            let navigationController = segue.destination as? UINavigationController,
+            let commentsViewController = navigationController.viewControllers.first as? CommentsViewController,
+            let indexPath = tableView.indexPathForSelectedRow {
+            commentsViewController.post = posts[indexPath.row]
         }
     }
 
-    private func navigateToComments(for post: HNPost) {
+    private func navigateToComments() {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
 
@@ -75,72 +80,79 @@ class NewsViewController: UITableViewController {
 }
 
 extension NewsViewController { // post fetching
-    @objc private func loadPosts() {
-        hackerNewsService?.getPosts(of: postType).map { (posts, nextPageIdentifier) in
-            if posts.isEmpty {
-                self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No posts")
-            } else {
-                self.posts = posts
-                self.nextPageIdentifier = nextPageIdentifier
-            }
-        }.done {
-            self.tableView.reloadData()
-        }.ensure {
-            self.tableView.refreshControl?.endRefreshing()
-        }.catch { _ in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-        }
-    }
+    @objc private func fetchPosts() {
+        guard !isFetching else { return }
 
-    private func loadMorePosts() {
-        guard let nextPageIdentifier = nextPageIdentifier else { return }
-        self.nextPageIdentifier = nil
+        isFetching = true
+        let isFirstPage = pageIndex == 1
 
         firstly {
-            hackerNewsService!.getPosts(of: postType, nextPageIdentifier: nextPageIdentifier)
-        }.done { (posts, nextPageIdentifier) in
-            self.posts?.append(contentsOf: posts)
-            self.nextPageIdentifier = nextPageIdentifier
-            self.tableView.reloadData()
+            HackerNewsData.shared.getPosts(type: postType, page: pageIndex)
+        }.done { posts in
+            if isFirstPage {
+                self.posts = [HackerNewsPost]()
+            }
+            self.posts.append(contentsOf: posts)
+            self.update(with: self.posts, animate: !isFirstPage)
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }.finally {
+            self.isFetching = false
+            self.tableView.refreshControl?.endRefreshing()
+            self.pageIndex += 1
         }
     }
 }
 
 extension NewsViewController {
-    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts?.count ?? 0
+    enum Section: CaseIterable {
+        case main
     }
 
-    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // swiftlint:disable force_cast
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
-        cell.postDelegate = self
-        cell.delegate = self
+    func makeDataSource() -> UITableViewDiffableDataSource<Section, HackerNewsPost> {
+        let reuseIdentifier = "PostCell"
 
-        let post = posts?[indexPath.row]
-        cell.postTitleView.post = post
-        cell.postTitleView.delegate = self
-        cell.setImageWithPlaceholder(url: post?.url)
+        return UITableViewDiffableDataSource(tableView: tableView) { (tableView, indexPath, post) in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: reuseIdentifier,
+                for: indexPath
+            ) as? PostCell else { return nil }
+            cell.postDelegate = self
+            cell.delegate = self
 
-        return cell
+            cell.postTitleView.post = post
+            cell.postTitleView.delegate = self
+            cell.setImageWithPlaceholder(url: post.url)
+
+            return cell
+        }
     }
 
-    override open func tableView(_ tableView: UITableView,
-                                 willDisplay cell: UITableViewCell,
-                                 forRowAt indexPath: IndexPath) {
-        if let posts = posts, indexPath.row == posts.count - 5 {
-            loadMorePosts()
+    func update(with posts: [HackerNewsPost], animate: Bool = true) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, HackerNewsPost>()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(posts)
+        self.dataSource?.apply(snapshot, animatingDifferences: animate)
+    }
+}
+
+extension NewsViewController {
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let buffer: CGFloat = 200
+        let scrollPosition = scrollView.contentOffset.y
+        let bottomPosition = scrollView.contentSize.height - scrollView.frame.size.height
+
+        if scrollPosition > bottomPosition - buffer {
+            fetchPosts()
         }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let post = posts?[indexPath.row] else { return }
+        let post = posts[indexPath.row]
         if postType == .jobs {
             didPressLinkButton(post)
         } else {
-            navigateToComments(for: post)
+            navigateToComments()
         }
     }
 }
@@ -149,9 +161,11 @@ extension NewsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        let post = posts[indexPath.row]
         guard orientation == .left,
-            let post = posts?[indexPath.row],
-            post.type != .jobs else { return nil }
+            post.postType != .jobs else {
+                return nil
+        }
 
         return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
                                                indexPath: indexPath, viewController: self)
@@ -184,16 +198,16 @@ extension NewsViewController: Themed {
 extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,
                            viewControllerForLocation location: CGPoint) -> UIViewController? {
-        guard let posts = posts,
+        guard
             let indexPath = tableView.indexPathForRow(at: location),
             posts.count > indexPath.row else {
                 return nil
         }
         let post = posts[indexPath.row]
-        if let url = post.url, UIApplication.shared.canOpenURL(url) {
+        if UIApplication.shared.canOpenURL(post.url) {
             peekedIndexPath = indexPath
             previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return SFSafariViewController.instance(for: url, previewActionItemsDelegate: self)
+            return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
         }
         return nil
     }
@@ -204,26 +218,28 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
 
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem] {
-        guard let indexPath = peekedIndexPath, let post = posts?[indexPath.row] else {
+        guard let indexPath = peekedIndexPath else {
             return [UIPreviewActionItem]()
         }
 
-        let commentsPreviewActionTitle = post.commentCount > 0 ? "View \(post.commentCount) comments" : "View comments"
+        let post = posts[indexPath.row]
+        let commentsPreviewActionTitle = post.commentsCount > 0 ?
+            "View \(post.commentsCount) comments" : "View comments"
 
         let viewCommentsPreviewAction =
             UIPreviewAction(title: commentsPreviewActionTitle,
                             style: .default) { [unowned self, indexPath = indexPath] (_, _) -> Void in
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self.navigateToComments(for: post)
+            self.navigateToComments()
         }
         return [viewCommentsPreviewAction]
     }
 }
 
 extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
-    func didPressLinkButton(_ post: HNPost) {
-        if let url = post.url,
-            let safariViewController = SFSafariViewController.instance(for: url, previewActionItemsDelegate: self) {
+    func didPressLinkButton(_ post: HackerNewsPost) {
+        if let safariViewController =
+            SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self) {
             navigationController?.present(safariViewController, animated: true)
         }
     }
@@ -231,7 +247,8 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point), let post = posts?[indexPath.row] {
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
             didPressLinkButton(post)
         }
     }

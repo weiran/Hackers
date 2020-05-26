@@ -26,6 +26,16 @@ Generate new screenshots
 fastlane ios test
 ```
 Run Tests
+### ios build
+```
+fastlane ios build
+```
+Build
+### ios lint
+```
+fastlane ios lint
+```
+Lint
 
 ----
 

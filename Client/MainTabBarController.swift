@@ -3,11 +3,10 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 10/09/2017.
-//  Copyright © 2017 Glass Umbrella. All rights reserved.
+//  Copyright © 2017 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
-import HNScraper
 
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
@@ -46,13 +45,13 @@ class MainTabBarController: UITabBarController {
             return TabItem(postType: .news, typeName: "Top",
                            iconName: "globe", selectedIconName: "globe")
         case 1:
-            return TabItem(postType: .asks, typeName: "Ask",
+            return TabItem(postType: .ask, typeName: "Ask",
                            iconName: "bubble.left", selectedIconName: "bubble.left.fill")
         case 2:
             return TabItem(postType: .jobs, typeName: "Jobs",
                            iconName: "briefcase", selectedIconName: "briefcase.fill")
         case 3:
-            return TabItem(postType: .new, typeName: "New",
+            return TabItem(postType: .newest, typeName: "New",
                            iconName: "clock", selectedIconName: "clock.fill")
         default:
             return nil
@@ -60,7 +59,7 @@ class MainTabBarController: UITabBarController {
     }
 
     struct TabItem {
-        let postType: HNScraper.PostListPageName
+        let postType: HackerNewsPostType
         let typeName: String
         let iconName: String
         let selectedIconName: String

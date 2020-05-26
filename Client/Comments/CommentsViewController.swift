@@ -3,19 +3,17 @@
 //  Hackers2
 //
 //  Created by Weiran Zhang on 07/06/2014.
-//  Copyright (c) 2014 Glass Umbrella. All rights reserved.
+//  Copyright (c) 2014 Weiran Zhang. All rights reserved.
 //
 
 import Foundation
 import UIKit
 import SafariServices
-import HNScraper
 import SwipeCellKit
 import PromiseKit
 import Loaf
 
 class CommentsViewController: UITableViewController {
-    public var hackerNewsService: HackerNewsService?
     public var authenticationUIService: AuthenticationUIService?
     public var swipeCellKitActions: SwipeCellKitActions?
 
@@ -24,10 +22,10 @@ class CommentsViewController: UITableViewController {
         case link(url: URL)
     }
 
-    public var post: HNPost?
+    public var post: HackerNewsPost?
     private let commentsController = CommentsController()
 
-    private var comments: [HNComment]? {
+    private var comments: [HackerNewsComment]? {
         didSet { commentsController.comments = comments! }
     }
 
@@ -55,17 +53,13 @@ class CommentsViewController: UITableViewController {
 
     private func loadComments() {
         firstly {
-            hackerNewsService!.getComments(of: post!)
+            HackerNewsData.shared.getComments(for: post!)
         }.done { comments in
-            switch comments?.count {
-            case 0: self.tableView.backgroundView = TableViewBackgroundView.emptyBackgroundView(message: "No comments")
-            default:
-                self.tableView.backgroundView = nil
-                self.comments = comments
-                self.tableView.reloadData()
-            }
+            self.comments = comments
+            self.tableView.reloadData()
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }.finally {
             self.tableView.backgroundView = nil
         }
     }
@@ -80,7 +74,7 @@ class CommentsViewController: UITableViewController {
             return
         }
 
-        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
+        let activityViewController = UIActivityViewController(activityItems: [post.url],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
@@ -134,9 +128,10 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard let post = self.post else { return nil }
         switch (orientation, indexPath.section) {
         case (.left, 0):
-            return swipeCellKitActions?.voteAction(post: post!, tableView: tableView,
+            return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
                                                    indexPath: indexPath, viewController: self)
 
         case (.right, 1):
@@ -144,7 +139,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
-            return swipeCellKitActions?.voteAction(comment: comment, tableView: tableView,
+            return swipeCellKitActions?.voteAction(comment: comment, post: post, tableView: tableView,
                                                    indexPath: indexPath, viewController: self)
 
         default: return nil
@@ -243,7 +238,7 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-    private func setupHandoff(with post: HNPost?, activityType: ActivityType) {
+    private func setupHandoff(with post: HackerNewsPost?, activityType: ActivityType) {
         guard let post = post else {
             return
         }

@@ -3,13 +3,13 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 21/09/2019.
-//  Copyright © 2019 Glass Umbrella. All rights reserved.
+//  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
 import HNScraper
 
-extension HNPost {
+extension HackerNewsPost {
     var hackerNewsURL: URL {
-        return URL(string: "https://news.ycombinator.com/item?id=" + id)!
+        return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
     }
 }
