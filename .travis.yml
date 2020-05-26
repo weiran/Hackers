@@ -8,8 +8,8 @@ before_install:
 - gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"
 install:
 - brew install swiftlint
-- gem install fastlane
 - bundle install
+- bundle update fastlane
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 jobs:
   include:
