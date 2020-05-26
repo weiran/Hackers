@@ -91,7 +91,7 @@ enum HackerNewsPostType: String {
     case news
     case ask
     case jobs
-    case new
+    case newest
 }
 
 enum HackerNewsError: Error {

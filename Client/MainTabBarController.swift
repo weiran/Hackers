@@ -51,7 +51,7 @@ class MainTabBarController: UITabBarController {
             return TabItem(postType: .jobs, typeName: "Jobs",
                            iconName: "briefcase", selectedIconName: "briefcase.fill")
         case 3:
-            return TabItem(postType: .new, typeName: "New",
+            return TabItem(postType: .newest, typeName: "New",
                            iconName: "clock", selectedIconName: "clock.fill")
         default:
             return nil
