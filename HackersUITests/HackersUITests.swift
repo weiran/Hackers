@@ -35,17 +35,13 @@ class HackersUITests: XCTestCase {
 
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "OpenCommentCell").element))
+            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
 
         snapshot("Ultimate")
     }
 
     func testScreenshotComments() {
-        if Device.current.isPad {
-            return
-        }
-
         launch()
 
         let tablesQuery = XCUIApplication().tables
@@ -56,7 +52,9 @@ class HackersUITests: XCTestCase {
         let commentCell = tablesQuery.cells.matching(identifier: "CommentCell").element
         XCTAssertTrue(waitForElementToAppear(commentCell))
 
-        snapshot("Comments")
+        if !Device.current.isPad {
+            snapshot("Comments")
+        }
     }
 
     func testScreenshotDark() {
