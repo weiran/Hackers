@@ -74,7 +74,7 @@ class HackersUITests: XCTestCase {
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        let result = XCTWaiter().wait(for: [expectation], timeout: 10)
+        let result = XCTWaiter().wait(for: [expectation], timeout: 15)
         return result == .completed
     }
 }

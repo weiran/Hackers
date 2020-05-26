@@ -1,18 +1,3 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
 default_platform(:ios)
 
 platform :ios do
@@ -20,10 +5,21 @@ platform :ios do
   lane :screenshots do
     capture_screenshots(workspace: "Hackers.xcworkspace", scheme: "Hackers")
     frameit(path: "./fastlane/screenshots/")
-# upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
+	# upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
   end
+
   desc "Run Tests"
   lane :test do
-  	scan(scheme: "Hackers")
+  	scan(scheme: "HackersUITests")
+  end
+
+  desc "Build"
+  lane :build do
+  	gym(scheme: "Hackers")
+  end
+
+  desc "Lint"
+  lane :lint do
+  	swiftlint
   end
 end
