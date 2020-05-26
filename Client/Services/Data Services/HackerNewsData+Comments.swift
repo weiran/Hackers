@@ -11,21 +11,29 @@ import PromiseKit
 import SwiftSoup
 
 extension HackerNewsData {
-    public func getComments(postId: Int) -> Promise<[HackerNewsComment]> {
+    public func getComments(for post: HackerNewsPost) -> Promise<[HackerNewsComment]> {
         firstly {
-            fetchCommentsHtml(id: postId)
+            fetchCommentsHtml(id: post.id)
         }.map { html in
             try self.commentElements(from: html)
-        }.map { elements in
-            elements.compactMap { element in
+        }.map { (commentElements, postElement) in
+            var comments = commentElements.compactMap { element in
                 try? self.comment(from: element)
             }
+            if let postTextComment = try? self.postTextComment(from: postElement, with: post) {
+                // post text for AskHN
+                comments.insert(postTextComment, at: 0)
+            }
+            return comments
         }
     }
 
-    private func commentElements(from data: String) throws -> Elements {
+    private func commentElements(from data: String) throws -> (Elements, Element) {
         let document = try SwiftSoup.parse(data)
-        return try document.select(".comtr")
+        let commentElements = try document.select(".comtr")
+        let postElements = try document.select("table.fatitem td")[6]
+        commentElements.add(postElements)
+        return (commentElements, postElements)
     }
 
     private func comment(from element: Element) throws -> HackerNewsComment {
@@ -52,11 +60,33 @@ extension HackerNewsData {
         return comment
     }
 
+    private func postTextComment(from element: Element, with post: HackerNewsPost) throws -> HackerNewsComment {
+        guard let text = try postText(from: element) else {
+            throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
+        }
+        return HackerNewsComment(
+            id: post.id,
+            age: post.age,
+            text: text,
+            by: post.by,
+            level: 0,
+            upvoted: post.upvoted
+        )
+    }
+
     private func commentText(from elements: Elements) throws -> String {
+        // clear reply link from text
         if let replyElement = try? elements.select(".reply") {
             try replyElement.html("")
         }
         return try elements.html()
+    }
+
+    private func postText(from element: Element) throws -> String? {
+        if let text = try? element.html() {
+            return text
+        }
+        return nil
     }
 
     private func fetchCommentsHtml(id: Int) -> Promise<String> {

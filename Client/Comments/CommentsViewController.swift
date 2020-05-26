@@ -53,7 +53,7 @@ class CommentsViewController: UITableViewController {
 
     private func loadComments() {
         firstly {
-            HackerNewsData.shared.getComments(postId: post!.id)
+            HackerNewsData.shared.getComments(for: post!)
         }.done { result in
             self.comments = result
             self.tableView.reloadData()
