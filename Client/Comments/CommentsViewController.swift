@@ -54,11 +54,12 @@ class CommentsViewController: UITableViewController {
     private func loadComments() {
         firstly {
             HackerNewsData.shared.getComments(for: post!)
-        }.done { result in
-            self.comments = result
+        }.done { comments in
+            self.comments = comments
             self.tableView.reloadData()
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }.finally {
             self.tableView.backgroundView = nil
         }
     }
