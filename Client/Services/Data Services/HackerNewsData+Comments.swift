@@ -61,7 +61,7 @@ extension HackerNewsData {
 
     private func postTextComment(from element: Element, with post: HackerNewsPost) throws -> HackerNewsComment {
         guard
-            element.child(0).tagName() == "p",
+            element.child(0).tagName() != "form",
             let text = try postText(from: element) else {
             throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
         }
