@@ -66,6 +66,7 @@ extension HNScraperShim { // comments
         return promise
     }
 
+    /// Recursively search the comment tree for a specific `HackerNewsComment` by `id`
     private func firstComment(in comments: [HNComment], for commentId: Int) -> HNComment? {
         let commentIdString = String(commentId)
 
