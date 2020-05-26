@@ -65,7 +65,7 @@ class HackersUITests: XCTestCase {
 
         if Device.current.isPad {
             tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "OpenCommentCell").element))
+            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: "CommentCell").element))
         }
 
         snapshot("Dark")
