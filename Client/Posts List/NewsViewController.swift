@@ -86,10 +86,10 @@ extension NewsViewController { // post fetching
         }.done { posts in
             self.posts = posts
             self.update(with: posts, animate: false)
-        }.ensure {
-            self.tableView.refreshControl?.endRefreshing()
         }.catch { error in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }.finally {
+            self.tableView.refreshControl?.endRefreshing()
         }
     }
 
