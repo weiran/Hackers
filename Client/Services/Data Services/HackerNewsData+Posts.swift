@@ -51,9 +51,9 @@ extension HackerNewsData {
         guard let url = URL(string: urlString) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
         }
-        let by = try metadataElement.select("hnuser").text()
+        let by = try metadataElement.select(".hnuser").text()
         let score = try self.score(from: metadataElement)
-        let age = try metadataElement.select("age").text()
+        let age = try metadataElement.select(".age").text()
         let commentsCount = try self.commentsCount(from: metadataElement)
 
         var upvoted = false
