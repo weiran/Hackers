@@ -53,7 +53,7 @@ class HackersUITests: XCTestCase {
         XCTAssertTrue(waitForElementToAppear(postCell))
         postCell.firstMatch.tap()
 
-        let commentCell = tablesQuery.cells.matching(identifier: "OpenCommentCell").element
+        let commentCell = tablesQuery.cells.matching(identifier: "CommentCell").element
         XCTAssertTrue(waitForElementToAppear(commentCell))
 
         snapshot("Comments")
@@ -76,7 +76,7 @@ class HackersUITests: XCTestCase {
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        let result = XCTWaiter().wait(for: [expectation], timeout: 5)
+        let result = XCTWaiter().wait(for: [expectation], timeout: 10)
         return result == .completed
     }
 }
