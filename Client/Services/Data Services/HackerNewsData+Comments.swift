@@ -32,7 +32,6 @@ extension HackerNewsData {
         let document = try SwiftSoup.parse(data)
         let commentElements = try document.select(".comtr")
         let postElements = try document.select("table.fatitem td")[6]
-        commentElements.add(postElements)
         return (commentElements, postElements)
     }
 
@@ -61,7 +60,9 @@ extension HackerNewsData {
     }
 
     private func postTextComment(from element: Element, with post: HackerNewsPost) throws -> HackerNewsComment {
-        guard let text = try postText(from: element) else {
+        guard
+            element.child(0).tagName() == "p",
+            let text = try postText(from: element) else {
             throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
         }
         return HackerNewsComment(
@@ -83,7 +84,8 @@ extension HackerNewsData {
     }
 
     private func postText(from element: Element) throws -> String? {
-        if let text = try? element.html() {
+        if let text = try? element.html(),
+            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return text
         }
         return nil
