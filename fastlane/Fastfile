@@ -18,7 +18,7 @@ platform :ios do
 
   desc "Build"
   lane :build do
-    gym(scheme: "Hackers")
+    gym(scheme: "Hackers", configuration: "Debug")
   end
 
   desc "Lint"
