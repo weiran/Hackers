@@ -2,7 +2,7 @@
 # https://docs.fastlane.tools/actions/scan/#scanfile
 
 scheme("HackersUITests")
-devices(["iPhone 11 Pro"])
+devices(["iPad Pro (11-inch) (2nd generation)"])
 
 # Enable skip_build to skip debug builds for faster test performance
 skip_build(true)
