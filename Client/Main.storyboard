@@ -24,10 +24,10 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Hqt-ay-B4F">
-                                            <rect key="frame" x="15" y="8" width="345" height="61"/>
+                                            <rect key="frame" x="15" y="11" width="345" height="55"/>
                                             <subviews>
                                                 <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OFG-KR-Pd0" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.5" width="60" height="60"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="55" height="55"/>
                                                     <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -42,19 +42,19 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fNt-dt-R2Y" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="72" y="10" width="273" height="41.5"/>
+                                                    <rect key="frame" x="67" y="7" width="278" height="41.5"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="u9g-AO-wgl">
-                                                            <rect key="frame" x="0.0" y="0.0" width="273" height="41.5"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="278" height="41.5"/>
                                                             <subviews>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gUp-Yn-NeV">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="273" height="20.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="278" height="20.5"/>
                                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kzm-bv-9Fd">
-                                                                    <rect key="frame" x="0.0" y="25.5" width="273" height="16"/>
+                                                                    <rect key="frame" x="0.0" y="25.5" width="278" height="16"/>
                                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                                     <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                     <nil key="highlightedColor"/>
@@ -79,11 +79,10 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="Hqt-ay-B4F" secondAttribute="trailing" constant="15" id="4gf-e4-vSw"/>
-                                        <constraint firstItem="Hqt-ay-B4F" firstAttribute="top" secondItem="qV7-qk-OZs" secondAttribute="top" constant="8" id="dzi-hq-Tbj"/>
+                                        <constraint firstItem="Hqt-ay-B4F" firstAttribute="top" secondItem="qV7-qk-OZs" secondAttribute="topMargin" id="dzi-hq-Tbj"/>
                                         <constraint firstItem="Hqt-ay-B4F" firstAttribute="leading" secondItem="qV7-qk-OZs" secondAttribute="leading" constant="15" id="wza-Ed-bqQ"/>
-                                        <constraint firstAttribute="bottom" secondItem="Hqt-ay-B4F" secondAttribute="bottom" constant="8" id="z4t-hn-RvJ"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="Hqt-ay-B4F" secondAttribute="bottom" id="z4t-hn-RvJ"/>
                                     </constraints>
-                                    <edgeInsets key="layoutMargins" top="8" left="15" bottom="8" right="8"/>
                                 </tableViewCellContentView>
                                 <accessibility key="accessibilityConfiguration" identifier="PostCell"/>
                                 <gestureRecognizers/>
@@ -223,10 +222,10 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="I5m-DV-Pgi">
-                                            <rect key="frame" x="15" y="8" width="345" height="61"/>
+                                            <rect key="frame" x="15" y="11" width="345" height="55"/>
                                             <subviews>
                                                 <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="safari" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="GWX-Xv-GpQ" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="1" width="60" height="59"/>
+                                                    <rect key="frame" x="0.0" y="0.5" width="60" height="54"/>
                                                     <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                                     <gestureRecognizers/>
@@ -241,7 +240,7 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fFz-HF-Y5S" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="72" y="10" width="273" height="41.5"/>
+                                                    <rect key="frame" x="72" y="7" width="273" height="41.5"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="siM-Zi-8Sk">
                                                             <rect key="frame" x="0.0" y="0.0" width="273" height="41.5"/>
@@ -288,11 +287,10 @@
                                         <constraint firstAttribute="trailing" secondItem="LyR-Eg-785" secondAttribute="trailing" id="BpR-9d-G6c"/>
                                         <constraint firstAttribute="bottom" secondItem="LyR-Eg-785" secondAttribute="bottom" id="CXS-KI-4va"/>
                                         <constraint firstItem="LyR-Eg-785" firstAttribute="leading" secondItem="BKa-yl-PzM" secondAttribute="leading" constant="88" id="CnH-iZ-yNd"/>
-                                        <constraint firstAttribute="bottom" secondItem="I5m-DV-Pgi" secondAttribute="bottom" constant="8" id="KTS-pv-Mdt"/>
-                                        <constraint firstItem="I5m-DV-Pgi" firstAttribute="top" secondItem="BKa-yl-PzM" secondAttribute="top" constant="8" id="daR-hn-vda"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="I5m-DV-Pgi" secondAttribute="bottom" id="KTS-pv-Mdt"/>
+                                        <constraint firstItem="I5m-DV-Pgi" firstAttribute="top" secondItem="BKa-yl-PzM" secondAttribute="topMargin" id="daR-hn-vda"/>
                                         <constraint firstItem="I5m-DV-Pgi" firstAttribute="leading" secondItem="BKa-yl-PzM" secondAttribute="leading" constant="15" id="qeg-6o-OWW"/>
                                     </constraints>
-                                    <edgeInsets key="layoutMargins" top="8" left="15" bottom="8" right="8"/>
                                 </tableViewCellContentView>
                                 <accessibility key="accessibilityConfiguration" identifier="PostCell"/>
                                 <gestureRecognizers/>
