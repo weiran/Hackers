@@ -149,3 +149,4 @@ iOSInjectionProject/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.gitignore.io/api/macos,swift,xcode,fastlane,cocoapods
+scan_derived_data
