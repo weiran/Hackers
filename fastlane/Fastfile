@@ -11,7 +11,8 @@ platform :ios do
   desc "Run Tests"
   lane :test do
     scan(
-      scheme: "HackersUITests"
+      scheme: "HackersUITests",
+      derived_data_path: "scan_derived_data" # https://github.com/fastlane/fastlane/issues/15768
     )
   end
 
