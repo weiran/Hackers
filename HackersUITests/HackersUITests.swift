@@ -50,8 +50,7 @@ class HackersUITests: XCTestCase {
         postCell.firstMatch.tap()
 
         let commentCell = tablesQuery.cells.matching(identifier: "CommentCell").element
-//        XCTAssertTrue(waitForElementToAppear(commentCell))
-        _ = waitForElementToAppear(commentCell) // don't assert this as it can be too slow on Travis
+        XCTAssertTrue(waitForElementToAppear(commentCell))
 
         if !Device.current.isPad {
             snapshot("Comments")

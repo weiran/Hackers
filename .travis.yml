@@ -11,10 +11,11 @@ install:
 - pod install --project-directory=$TRAVIS_BUILD_DIR --repo-update
 jobs:
   include:
-    - stage: "Tests"
-      name: "UI Tests"
-      script:
-        - bundle exec fastlane test
+    # UI tests disable on Travis until data can be mocked to prevent timeouts
+    # - stage: "Tests"
+    #   name: "UI Tests"
+    #   script:
+    #     - bundle exec fastlane test
     - stage: "Static Analysis"
       name: "SwiftLint"
       script:
