@@ -23,4 +23,4 @@ jobs:
       name: "Release"
       script:
         - bundle exec fastlane build
-after_success: wait 5
+after_success: travis_wait 5
