@@ -16,11 +16,11 @@ extension HackerNewsData {
             fetchCommentsHtml(id: post.id)
         }.map { html in
             try self.commentElements(from: html)
-        }.map { (commentElements, postElement) in
+        }.map { (commentElements, postElements) in
             var comments = commentElements.compactMap { element in
                 try? self.comment(from: element)
             }
-            if let postTextComment = try? self.postTextComment(from: postElement, with: post) {
+            if let postTextComment = try? self.postTextComment(from: postElements, with: post) {
                 // get the post text for AskHN
                 comments.insert(postTextComment, at: 0)
             }
@@ -28,10 +28,10 @@ extension HackerNewsData {
         }
     }
 
-    private func commentElements(from data: String) throws -> (Elements, Element) {
+    private func commentElements(from data: String) throws -> (Elements, Elements) {
         let document = try SwiftSoup.parse(data)
         let commentElements = try document.select(".comtr")
-        let postElements = try document.select("table.fatitem td")[6]
+        let postElements = try document.select("table.fatitem td")
         return (commentElements, postElements)
     }
 
@@ -59,9 +59,22 @@ extension HackerNewsData {
         return comment
     }
 
-    private func postTextComment(from element: Element, with post: HackerNewsPost) throws -> HackerNewsComment {
+    private func postTextComment(from elements: Elements, with post: HackerNewsPost) throws -> HackerNewsComment {
+        // get last element
+        // if form then get 2 further back
+        // should be td with no class, no colspan
+
+        guard var element = elements.last else {
+            throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
+        }
+
+        if element.child(0).tagName() == "form" {
+            let elementsCount = elements.count
+            element = elements[elementsCount - 3]
+        }
+
         guard
-            element.child(0).tagName() != "form",
+            !element.hasClass("subtext"),
             let text = try postText(from: element) else {
             throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
         }
@@ -91,13 +104,17 @@ extension HackerNewsData {
         return nil
     }
 
-    /// Recursively fetch comments until there are no more
-    private func fetchCommentsHtml(id: Int, page: Int = 1, workingHtml: String = "") -> Promise<String> {
+    /// Optionally recursively fetch post comments over pages
+    internal func fetchCommentsHtml(
+        id: Int,
+        page: Int = 1,
+        recursive: Bool = true,
+        workingHtml: String = "") -> Promise<String> {
         let url = URL(string: "https://news.ycombinator.com/item?id=\(id)&p=\(page)")!
         return fetchHtml(url: url).then { html -> Promise<String> in
             let document = try SwiftSoup.parse(html)
             let moreLinkExists = try !document.select("a.morelink").isEmpty()
-            if moreLinkExists {
+            if moreLinkExists && recursive {
                 return self.fetchCommentsHtml(id: id, page: page + 1, workingHtml: html)
             } else {
                 return Promise.value(workingHtml + html)

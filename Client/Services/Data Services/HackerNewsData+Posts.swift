@@ -23,6 +23,15 @@ extension HackerNewsData {
         }
     }
 
+    public func getPost(id: Int) -> Promise<HackerNewsPost> {
+        firstly {
+            fetchCommentsHtml(id: id, recursive: false)
+        }.map { html in
+            let document = try SwiftSoup.parse(html)
+            return try self.post(from: document.select(".fatitem"), type: .news)
+        }
+    }
+
     private func postElements(from data: String) throws -> [Elements] {
         let document = try SwiftSoup.parse(data)
 
@@ -37,12 +46,9 @@ extension HackerNewsData {
     }
 
     private func post(from elements: Elements, type: HackerNewsPostType) throws -> HackerNewsPost {
-        guard let metadataElement = try elements.select("tr:not(.athing)").first() else {
-            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find metadata element")
-        }
-        guard let postElement = try elements.select(".athing").first() else {
-            throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post element")
-        }
+        let rows = try elements.select("tr")
+        let postElement = rows[0]
+        let metadataElement = rows[1]
         guard let id = Int(try postElement.attr("id")) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
         }

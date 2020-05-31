@@ -103,7 +103,18 @@ extension CommentTableViewCell: UITextViewDelegate {
                 $0.isKind(of: UITapGestureRecognizer.self) &&
                 $0.state == .ended }) == true {
                 if let commentDelegate = commentDelegate {
-                    commentDelegate.linkTapped(URL, sender: textView)
+                    if
+                        let host = URL.host,
+                        host.contains("news.ycombinator.com"),
+                        let range = URL.absoluteString.range(of: "id="),
+                        let id = Int(
+                            URL.absoluteString[range.upperBound...]
+                                .trimmingCharacters(in: .whitespaces)
+                            ) {
+                        commentDelegate.internalLinkTapped(postId: id, url: URL, sender: textView)
+                    } else {
+                        commentDelegate.linkTapped(URL, sender: textView)
+                    }
                     return false
                 }
             }

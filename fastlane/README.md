@@ -31,6 +31,11 @@ Run Tests
 fastlane ios build
 ```
 Build
+### ios archive
+```
+fastlane ios archive
+```
+Archive
 ### ios lint
 ```
 fastlane ios lint

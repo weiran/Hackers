@@ -12,12 +12,24 @@ platform :ios do
   lane :test do
     scan(
       scheme: "HackersUITests",
-      derived_data_path: "scan_derived_data"
+      derived_data_path: "scan_derived_data" # https://github.com/fastlane/fastlane/issues/15768
     )
   end
 
   desc "Build"
-  lane :build do
+  lane :build do |options|
+    xcodebuild(
+      workspace: "Hackers.xcworkspace",
+      scheme: "Hackers",
+      configuration: "Debug",
+      clean: options[:clean],
+      build: true,
+      sdk: "iphonesimulator"
+    )
+  end
+
+  desc "Archive"
+  lane :archive do
     gym(scheme: "Hackers")
   end
 

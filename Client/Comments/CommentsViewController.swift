@@ -209,6 +209,43 @@ extension CommentsViewController: CommentDelegate {
         }
     }
 
+    func internalLinkTapped(postId: Int, url: URL, sender: UITextView) {
+        let spinnerView = showTerribleActivityView()
+        _ = HackerNewsData.shared.getPost(id: postId).done { post in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let viewController =
+                storyboard.instantiateViewController(identifier: "CommentsViewController") as CommentsViewController
+            viewController.post = post
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }.catch { _ in
+            self.linkTapped(url, sender: sender)
+        }.finally {
+            spinnerView.removeFromSuperview()
+        }
+    }
+
+    private func showTerribleActivityView() -> UIView {
+        // TODO remove this after refactoring Comments VC to support loading
+        // in the post async
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.color = .white
+
+        let spinnerView = UIView()
+        spinnerView.backgroundColor = UIColor(white: 0, alpha: 0.7)
+        spinnerView.frame = navigationController!.view!.frame
+
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.startAnimating()
+        spinnerView.addSubview(spinner)
+
+        spinner.centerXAnchor.constraint(equalTo: spinnerView.centerXAnchor).isActive = true
+        spinner.centerYAnchor.constraint(equalTo: spinnerView.centerYAnchor).isActive = true
+
+        UIApplication.shared.windows.first?.addSubview(spinnerView)
+
+        return spinnerView
+    }
+
     private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
         guard commentsController.visibleComments.count > indexPath.row else { return }
         let comment = commentsController.visibleComments[indexPath.row]
