@@ -11,8 +11,7 @@ platform :ios do
   desc "Run Tests"
   lane :test do
     scan(
-      scheme: "HackersUITests",
-      derived_data_path: "scan_derived_data"
+      scheme: "HackersUITests"
     )
   end
 
