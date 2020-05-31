@@ -17,8 +17,20 @@ platform :ios do
   end
 
   desc "Build"
-  lane :build do
-    gym(scheme: "Hackers", configuration: "Debug")
+  lane :build do |options|
+    xcodebuild(
+      workspace: "Hackers.xcworkspace",
+      scheme: "Hackers",
+      configuration: "Debug",
+      clean: options[:clean],
+      build: true,
+      sdk: "iphonesimulator"
+    )
+  end
+
+  desc "Archive"
+  lane :archive do
+    gym(scheme: "Hackers")
   end
 
   desc "Lint"
