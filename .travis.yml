@@ -17,7 +17,8 @@ jobs:
     #     - bundle exec fastlane test
     - stage: "Static Analysis"
       name: "SwiftLint"
-      before_install: false
+      before_install:
+      install:
       script:
         - brew install swiftlint
         - bundle exec fastlane lint
