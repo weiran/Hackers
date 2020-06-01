@@ -16,11 +16,10 @@ jobs:
     #     - bundle exec fastlane test
     - stage: "Static Analysis"
       name: "SwiftLint"
-      install: brew install swiftlint
+      install: skip
       script:
         - bundle exec fastlane lint
     - stage: "Build"
       name: "Release"
       script:
         - bundle exec fastlane build
-after_success: travis_wait 5
