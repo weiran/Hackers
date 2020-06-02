@@ -25,6 +25,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ThemeSwitcher.switchTheme()
     }
 
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        if let scheme = url.scheme,
+            scheme.localizedCaseInsensitiveCompare("com.weiranzhang.Hackers") == .orderedSame,
+            let view = url.host {
+            let parameters = parseParameters(from: url)
+
+            switch view {
+            case "item":
+                if let idString = parameters["id"], let id = Int(idString) {
+                    // redirect to post
+                }
+            default: break
+            }
+
+//            redirect(to: view, with: parameters)
+        }
+        return true
+    }
+
+    private func parseParameters(from url: URL) -> [String: String] {
+        var parameters: [String: String] = [:]
+        URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.forEach {
+            parameters[$0.name] = $0.value
+        }
+        return parameters
+    }
+
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Update the theme every time the app is active in case the system
         // appearance has changed. We're not using traitCollectionDidChange
