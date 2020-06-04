@@ -13,11 +13,9 @@ import Loaf
 
 class SwipeCellKitActions: Themed {
     private let authenticationUIService: AuthenticationUIService
-    private let hackerNewsService: HackerNewsService
 
-    init(authenticationUIService: AuthenticationUIService, hackerNewsService: HackerNewsService) {
+    init(authenticationUIService: AuthenticationUIService) {
         self.authenticationUIService = authenticationUIService
-        self.hackerNewsService = hackerNewsService
     }
 
     public func voteAction(post: HackerNewsPost, tableView: UITableView,

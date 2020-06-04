@@ -36,8 +36,7 @@ extension SwinjectStoryboard {
         }.inObjectScope(.container)
         container.register(SwipeCellKitActions.self) { resolver in
             SwipeCellKitActions(
-                authenticationUIService: resolver.resolve(AuthenticationUIService.self)!,
-                hackerNewsService: resolver.resolve(HackerNewsService.self)!)
+                authenticationUIService: resolver.resolve(AuthenticationUIService.self)!)
         }
     }
 
