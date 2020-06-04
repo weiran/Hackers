@@ -11,35 +11,55 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    var mainTabBarController: MainTabBarController?
 
     func applicationDidFinishLaunching(_ application: UIApplication) {
+        // process args for testing
         if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
             ReviewController.disablePrompts = true
         }
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
+
+        // setup window and entry point
+        window = UIWindow()
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        mainTabBarController = storyboard.instantiateViewController(identifier: "MainTabBarController")
+        window?.rootViewController = mainTabBarController
+        window?.makeKeyAndVisible()
+
+        // setup review prompt
         ReviewController.incrementLaunchCounter()
         ReviewController.requestReview()
+
+        // init default settings
         UserDefaults.standard.registerDefaults()
+
+        // setup theming
         ThemeSwitcher.switchTheme()
     }
 
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        // handle incoming links to open post
+        let bundleIdentifier = String(Bundle.main.bundleIdentifier!)
         if let scheme = url.scheme,
-            scheme.localizedCaseInsensitiveCompare("com.weiranzhang.Hackers") == .orderedSame,
+            scheme.localizedCaseInsensitiveCompare(bundleIdentifier) == .orderedSame,
             let view = url.host {
             let parameters = parseParameters(from: url)
 
             switch view {
             case "item":
-                if let idString = parameters["id"], let id = Int(idString) {
-                    // redirect to post
+                if let idString = parameters["id"],
+                    let id = Int(idString) {
+                    mainTabBarController?.showPost(id: id)
                 }
             default: break
             }
-
-//            redirect(to: view, with: parameters)
         }
         return true
     }
