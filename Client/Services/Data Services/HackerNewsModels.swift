@@ -18,6 +18,9 @@ class HackerNewsPost: Hashable {
     var score: Int
     let postType: HackerNewsPostType
     var upvoted = false
+    var text: String?
+
+    var comments: [HackerNewsComment]?
 
     init(
         id: Int,
