@@ -23,15 +23,6 @@ extension HackerNewsData {
         }
     }
 
-    // TODO DEPRECATED
-    public func getComments(for post: HackerNewsPost) -> Promise<[HackerNewsComment]> {
-        firstly {
-            fetchPostHtml(id: post.id)
-        }.map { html in
-            try self.comments(from: html)
-        }
-    }
-
     private func comments(from html: String) throws -> [HackerNewsComment] {
         let commentElements = try HackerNewsHtmlParser.commentElements(from: html)
         var comments = commentElements.compactMap { element in
@@ -41,8 +32,16 @@ extension HackerNewsData {
         // get the post text for AskHN
         let postTableElement = try HackerNewsHtmlParser.postsTableElement(from: html)
         if let post = try HackerNewsHtmlParser.posts(from: postTableElement, type: .news).first,
-            let text = post.text {
-            let postComment = HackerNewsComment(
+            let postComment = self.postComment(from: post) {
+            comments.insert(postComment, at: 0)
+        }
+
+        return comments
+    }
+
+    private func postComment(from post: HackerNewsPost) -> HackerNewsComment? {
+        if let text = post.text {
+            return HackerNewsComment(
                 id: post.id,
                 age: post.age,
                 text: text,
@@ -50,10 +49,9 @@ extension HackerNewsData {
                 level: 0,
                 upvoted: post.upvoted
             )
-            comments.insert(postComment, at: 0)
         }
 
-        return comments
+        return nil
     }
 
     /// Optionally recursively fetch post comments over pages

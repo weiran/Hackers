@@ -84,28 +84,6 @@ enum HackerNewsHtmlParser {
         return parentTable
     }
 
-    public static func commentsCount(from metadataElement: Element) throws -> Int {
-        let linkElements = try metadataElement.select("a")
-        let commentLinkElement = try linkElements.first { try $0.text().contains("comment") }
-        guard
-            let commentLinkText = try commentLinkElement?.text(),
-            let commentsCountString = commentLinkText.components(separatedBy: " ").first,
-            let commentsCount = Int(String(commentsCountString)) else {
-            return 0
-        }
-        return commentsCount
-    }
-
-    public static func score(from metadataElement: Element) throws -> Int {
-        let scoreString = try metadataElement.select(".score").text()
-        guard
-            let scoreNumberString = scoreString.components(separatedBy: " ").first,
-            let score = Int(String(scoreNumberString)) else {
-                return 0
-        }
-        return score
-    }
-
     public static func commentElements(from html: String) throws -> Elements {
         let document = try SwiftSoup.parse(html)
         return try document.select(".comtr")
@@ -135,33 +113,26 @@ enum HackerNewsHtmlParser {
         return comment
     }
 
-    public static func postTextComment(from elements: Elements, with post: HackerNewsPost) throws -> HackerNewsComment {
-        // get last element
-        // if form then get 2 further back
-        // should be td with no class, no colspan
-
-        guard var element = elements.last else {
-            throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
-        }
-
-        if element.child(0).tagName() == "form" {
-            let elementsCount = elements.count
-            element = elements[elementsCount - 3]
-        }
-
+    private static func commentsCount(from metadataElement: Element) throws -> Int {
+        let linkElements = try metadataElement.select("a")
+        let commentLinkElement = try linkElements.first { try $0.text().contains("comment") }
         guard
-            !element.hasClass("subtext"),
-            let text = try postText(from: element) else {
-            throw Exception.Error(type: .SelectorParseException, Message: "No post text found")
+            let commentLinkText = try commentLinkElement?.text(),
+            let commentsCountString = commentLinkText.components(separatedBy: " ").first,
+            let commentsCount = Int(String(commentsCountString)) else {
+            return 0
         }
-        return HackerNewsComment(
-            id: post.id,
-            age: post.age,
-            text: text,
-            by: post.by,
-            level: 0,
-            upvoted: post.upvoted
-        )
+        return commentsCount
+    }
+
+    private static func score(from metadataElement: Element) throws -> Int {
+        let scoreString = try metadataElement.select(".score").text()
+        guard
+            let scoreNumberString = scoreString.components(separatedBy: " ").first,
+            let score = Int(String(scoreNumberString)) else {
+                return 0
+        }
+        return score
     }
 
     private static func commentText(from elements: Elements) throws -> String {
@@ -183,7 +154,7 @@ enum HackerNewsHtmlParser {
     }
 
     /// Returns any text content in the post, or otherwise nil
-    public static func postText(from element: Element) -> String? {
+    private static func postText(from element: Element) -> String? {
         do {
             guard element.hasClass("fatitem") else {
                 return nil
