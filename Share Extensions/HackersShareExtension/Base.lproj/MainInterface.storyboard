@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="j1y-V4-xli">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Share View Controller-->
+        <scene sceneID="ceB-am-kn3">
+            <objects>
+                <viewController id="j1y-V4-xli" customClass="ShareViewController" customModule="HackersShareExtension" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" opaque="NO" contentMode="scaleToFill" id="wbc-yd-nQP">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HMF-PZ-htX">
+                                <rect key="frame" x="16" y="397.5" width="382" height="101.5"/>
+                                <string key="text">That's not a link from Hacker News that can be opened in Hackers. 
+
+Try opening a post's comments, then you'll be able to open Hackers.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <navigationBar contentMode="scaleToFill" largeTitles="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UCJ-HU-Zrf">
+                                <rect key="frame" x="0.0" y="44" width="414" height="96"/>
+                                <items>
+                                    <navigationItem id="JOL-a7-tl6">
+                                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="hh4-2v-HdF">
+                                            <connections>
+                                                <action selector="done" destination="j1y-V4-xli" id="uDX-xL-4ML"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="UCJ-HU-Zrf" firstAttribute="trailing" secondItem="1Xd-am-t49" secondAttribute="trailing" id="BQJ-Zj-H5b"/>
+                            <constraint firstItem="HMF-PZ-htX" firstAttribute="centerY" secondItem="wbc-yd-nQP" secondAttribute="centerY" id="Dvv-TF-rJT"/>
+                            <constraint firstItem="UCJ-HU-Zrf" firstAttribute="leading" secondItem="1Xd-am-t49" secondAttribute="leading" id="JeO-gb-Mci"/>
+                            <constraint firstItem="UCJ-HU-Zrf" firstAttribute="top" secondItem="1Xd-am-t49" secondAttribute="top" id="KDj-CC-gl8"/>
+                            <constraint firstAttribute="trailing" secondItem="HMF-PZ-htX" secondAttribute="trailing" constant="16" id="Z5h-Au-7GB"/>
+                            <constraint firstItem="HMF-PZ-htX" firstAttribute="leading" secondItem="wbc-yd-nQP" secondAttribute="leading" constant="16" id="fuY-tJ-4Tl"/>
+                            <constraint firstItem="HMF-PZ-htX" firstAttribute="centerX" secondItem="wbc-yd-nQP" secondAttribute="centerX" id="rBp-mn-Gr1"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="1Xd-am-t49"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CEy-Cv-SGf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="132" y="138"/>
+        </scene>
+    </scenes>
+</document>
