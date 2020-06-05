@@ -545,6 +545,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2419D02F24898DF700740184 /* Build configuration list for PBXNativeTarget "HackersActionExtension" */;
 			buildPhases = (
+				2419D03E248AC2CA00740184 /* Update Version Numbers */,
 				2419D01C24898DF700740184 /* Sources */,
 				2419D01D24898DF700740184 /* Frameworks */,
 				2419D01E24898DF700740184 /* Resources */,
@@ -582,6 +583,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 24C10BFE24866D3F00B93F68 /* Build configuration list for PBXNativeTarget "HackersShareExtension" */;
 			buildPhases = (
+				2419D03D248AC2A300740184 /* Update Version Numbers */,
 				24C10BEF24866D3F00B93F68 /* Sources */,
 				24C10BF024866D3F00B93F68 /* Frameworks */,
 				24C10BF124866D3F00B93F68 /* Resources */,
@@ -600,7 +602,6 @@
 			buildConfigurationList = 24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers" */;
 			buildPhases = (
 				32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */,
-				2419D03C248ABA6C00740184 /* Match Extension Version and Build to App */,
 				24F39F8118AFB1150055F8DC /* Sources */,
 				24F39F8218AFB1150055F8DC /* Frameworks */,
 				24F39F8318AFB1150055F8DC /* Resources */,
@@ -716,7 +717,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2419D03C248ABA6C00740184 /* Match Extension Version and Build to App */ = {
+		2419D03D248AC2A300740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -725,14 +726,32 @@
 			);
 			inputPaths = (
 			);
-			name = "Match Extension Version and Build to App";
+			name = "Update Version Numbers";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n";
+			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n";
+		};
+		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update Version Numbers";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n";
 		};
 		244DE6BB1E599EB6005B441E /* TODO as Warnings */ = {
 			isa = PBXShellScriptBuildPhase;
