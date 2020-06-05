@@ -10,7 +10,13 @@ import UIKit
 import Social
 
 class ShareViewController: OpenInViewController {
+    @IBOutlet weak var infoLabel: UILabel!
+
     @IBAction func done() {
         close()
+    }
+
+    override func error() {
+        infoLabel.isHidden = false
     }
 }

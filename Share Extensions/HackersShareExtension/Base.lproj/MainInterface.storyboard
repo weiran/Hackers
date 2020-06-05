@@ -49,6 +49,9 @@ Try opening a post's comments, then you'll be able to open Hackers.</string>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="1Xd-am-t49"/>
                     </view>
+                    <connections>
+                        <outlet property="infoLabel" destination="HMF-PZ-htX" id="ghV-k8-gu6"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CEy-Cv-SGf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

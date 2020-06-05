@@ -10,7 +10,13 @@ import UIKit
 import MobileCoreServices
 
 class ActionViewController: OpenInViewController {
+    @IBOutlet weak var infoLabel: UILabel!
+
     @IBAction func done() {
         close()
+    }
+
+    override func error() {
+        infoLabel.isHidden = false
     }
 }

@@ -24,7 +24,7 @@
 	<dict>
 		<key>NSExtensionAttributes</key>
 		<dict>
-			<key>NSExtensionActivationRule - 2</key>
+			<key>NSExtensionActivationRule</key>
 			<dict>
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
 				<integer>1</integer>

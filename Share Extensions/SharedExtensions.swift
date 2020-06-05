@@ -14,6 +14,7 @@ enum SharedExtensions {
         while let res = responder {
             // can't reference openURL: with #selector due to it
             // being unavailble in extensions
+            // TODO find a working alternative
             if res.responds(to: "openURL:") {
                 res.perform("openURL:", with: url)
                 break

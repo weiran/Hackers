@@ -30,15 +30,17 @@ class OpenInViewController: UIViewController {
                             self.close()
                         }
                     } else {
-//                        self.close()
+                        self.error()
                     }
             })
         } else {
-//            close()
+            self.error()
         }
     }
 
     func close() {
         self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
+
+    func error() { }
 }
