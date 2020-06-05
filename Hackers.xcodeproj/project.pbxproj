@@ -600,6 +600,7 @@
 			buildConfigurationList = 24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers" */;
 			buildPhases = (
 				32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */,
+				2419D03C248ABA6C00740184 /* Match Extension Version and Build to App */,
 				24F39F8118AFB1150055F8DC /* Sources */,
 				24F39F8218AFB1150055F8DC /* Frameworks */,
 				24F39F8318AFB1150055F8DC /* Resources */,
@@ -607,7 +608,6 @@
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 				249B8F8022A29B2E002A9EC5 /* ShellScript */,
 				24C10C0124866D3F00B93F68 /* Embed App Extensions */,
-				2419D03C248ABA6C00740184 /* Match Extension Version and Build to App */,
 			);
 			buildRules = (
 			);
