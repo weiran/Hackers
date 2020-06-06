@@ -13,14 +13,14 @@ class AuthenticationUIService {
     private let hackerNewsService: HackerNewsService
     private let sessionService: SessionService
 
-    public init(hackerNewsService: HackerNewsService, sessionService: SessionService) {
+    init(hackerNewsService: HackerNewsService, sessionService: SessionService) {
         self.hackerNewsService = hackerNewsService
         self.sessionService = sessionService
     }
 
     var bulletinManager: BLTNItemManager?
 
-    public func showAuthentication() {
+    func showAuthentication() {
         let manager = BLTNItemManager(rootItem: loginPage())
         let theme = AppThemeProvider.shared.currentTheme
         manager.backgroundColor = theme.backgroundColor
@@ -110,7 +110,7 @@ class AuthenticationUIService {
         NotificationCenter.default.post(name: Notifications.AuthenticationDidChangeNotification, object: nil)
     }
 
-    public func unauthenticatedAlertController() -> UIAlertController {
+    func unauthenticatedAlertController() -> UIAlertController {
         let unauthenticatedMessage = "You're not logged into Hacker News. Do you want to login now?"
         let authenticationAlert = UIAlertController(title: "Not logged in",
                                                     message: unauthenticatedMessage,

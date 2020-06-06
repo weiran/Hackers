@@ -11,7 +11,7 @@ import PromiseKit
 import SwiftSoup
 
 extension HackerNewsData {
-    public func getPosts(type: HackerNewsPostType, page: Int = 1) -> Promise<[HackerNewsPost]> {
+    func getPosts(type: HackerNewsPostType, page: Int = 1) -> Promise<[HackerNewsPost]> {
         firstly {
             fetchPostsHtml(type: type, page: page)
         }.map { html in

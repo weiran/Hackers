@@ -14,14 +14,14 @@ class SessionService {
 
     private var user: HNUser?
 
-    public var authenticationState: AuthenticationState {
+    var authenticationState: AuthenticationState {
         if HNLogin.shared.sessionCookie != nil {
             return .authenticated
         }
         return .notAuthenticated
     }
 
-    public var username: String? {
+    var username: String? {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
 
@@ -30,7 +30,7 @@ class SessionService {
         HNLogin.shared.addObserver(self)
     }
 
-    public func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
+    func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
         let (promise, seal) = Promise<AuthenticationState>.pending()
 
         firstly {
@@ -49,7 +49,7 @@ class SessionService {
         return promise
     }
 
-    public enum AuthenticationState {
+    enum AuthenticationState {
         case authenticated
         case notAuthenticated
     }

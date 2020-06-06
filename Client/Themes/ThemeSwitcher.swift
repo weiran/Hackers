@@ -9,7 +9,7 @@
 import UIKit
 
 enum ThemeSwitcher {
-    public static func switchTheme() {
+    static func switchTheme() {
         switch (UserDefaults.standard.systemThemeEnabled, UserDefaults.standard.darkModeEnabled) {
         case (true, _): AppThemeProvider.shared.currentTheme = .system
         case (false, false): AppThemeProvider.shared.currentTheme = .light

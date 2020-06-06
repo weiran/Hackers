@@ -18,7 +18,7 @@ class SwipeCellKitActions: Themed {
         self.authenticationUIService = authenticationUIService
     }
 
-    public func voteAction(post: HackerNewsPost, tableView: UITableView,
+    func voteAction(post: HackerNewsPost, tableView: UITableView,
                            indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
         let voteOnPost: (HackerNewsPost, Bool) -> Void = { post, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
@@ -62,7 +62,7 @@ class SwipeCellKitActions: Themed {
         return [upvoteAction]
     }
 
-    public func voteAction(
+    func voteAction(
         comment: HackerNewsComment,
         post: HackerNewsPost,
         tableView: UITableView,

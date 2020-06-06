@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 extension HackerNewsData {
-    public func upvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+    func upvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
         let scraperShim = HNScraperShim()
 
         return firstly {
@@ -20,7 +20,7 @@ extension HackerNewsData {
         }
     }
 
-    public func unvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+    func unvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
         let scraperShim = HNScraperShim()
 
         return firstly {

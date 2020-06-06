@@ -8,13 +8,13 @@
 
 import UIKit
 
-public enum AppFont {
-    public static func commentUsernameFont(collapsed: Bool) -> UIFont {
+enum AppFont {
+    static func commentUsernameFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .medium)
     }
 
-    public static func commentDateFont(collapsed: Bool) -> UIFont {
+    static func commentDateFont(collapsed: Bool) -> UIFont {
         let fontFunc = collapsed ? scaledItalicFont : scaledFont
         return fontFunc(.subheadline, 15, .regular)
     }

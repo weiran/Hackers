@@ -10,7 +10,7 @@ import Foundation
 import SwiftSoup
 
 enum HackerNewsHtmlParser {
-    public static func posts(from tableElement: Element, type: HackerNewsPostType) throws -> [HackerNewsPost] {
+    static func posts(from tableElement: Element, type: HackerNewsPostType) throws -> [HackerNewsPost] {
         if tableElement.hasClass("fatitem") {
             // single post
             let postElements = try tableElement.select("tr")
@@ -32,7 +32,7 @@ enum HackerNewsHtmlParser {
         throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post elements")
     }
 
-    public static func post(from elements: Elements, type: HackerNewsPostType) throws -> HackerNewsPost {
+    static func post(from elements: Elements, type: HackerNewsPostType) throws -> HackerNewsPost {
         let rows = try elements.select("tr")
         let postElement = rows[0]
         let metadataElement = rows[1]
@@ -72,7 +72,7 @@ enum HackerNewsHtmlParser {
         )
     }
 
-    public static func postsTableElement(from html: String) throws -> Element {
+    static func postsTableElement(from html: String) throws -> Element {
         let document = try SwiftSoup.parse(html)
 
         guard let parentTable = try document
@@ -84,12 +84,12 @@ enum HackerNewsHtmlParser {
         return parentTable
     }
 
-    public static func commentElements(from html: String) throws -> Elements {
+    static func commentElements(from html: String) throws -> Elements {
         let document = try SwiftSoup.parse(html)
         return try document.select(".comtr")
     }
 
-    public static func comment(from element: Element) throws -> HackerNewsComment {
+    static func comment(from element: Element) throws -> HackerNewsComment {
         let text = try commentText(from: element.select(".commtext"))
         let age = try element.select(".age").text()
         let user = try element.select(".hnuser").text()

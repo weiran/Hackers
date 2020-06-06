@@ -16,12 +16,12 @@ import Loaf
 import SwipeCellKit
 
 class NewsViewController: UITableViewController {
-    public var authenticationUIService: AuthenticationUIService?
-    public var swipeCellKitActions: SwipeCellKitActions?
+    var authenticationUIService: AuthenticationUIService?
+    var swipeCellKitActions: SwipeCellKitActions?
 
     private var posts = [HackerNewsPost]()
     private var dataSource: UITableViewDiffableDataSource<Section, HackerNewsPost>?
-    public var postType: HackerNewsPostType = .news
+    var postType: HackerNewsPostType = .news
 
     private var peekedIndexPath: IndexPath?
     private var pageIndex = 1

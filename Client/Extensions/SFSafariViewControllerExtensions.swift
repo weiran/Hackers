@@ -33,7 +33,7 @@ extension SFSafariViewController {
     }
 }
 
-public protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
+protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
 
@@ -54,7 +54,7 @@ extension SFSafariViewController: Themed {
 }
 
 extension SFSafariViewController {
-    public static func instance(for url: URL,
+    static func instance(for url: URL,
                                 previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? = nil)
         -> SFSafariViewController? {
         if WKWebView.handlesURLScheme(url.scheme ?? "") == false {

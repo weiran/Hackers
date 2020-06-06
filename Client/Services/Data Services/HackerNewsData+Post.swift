@@ -11,7 +11,7 @@ import PromiseKit
 import SwiftSoup
 
 extension HackerNewsData {
-    public func getPost(id: Int, includeAllComments: Bool = false) -> Promise<HackerNewsPost> {
+    func getPost(id: Int, includeAllComments: Bool = false) -> Promise<HackerNewsPost> {
         firstly {
             fetchPostHtml(id: id, recursive: includeAllComments)
         }.map { html in

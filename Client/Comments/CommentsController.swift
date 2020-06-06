@@ -9,9 +9,9 @@
 import Foundation
 
 class CommentsController {
-    public var comments: [HackerNewsComment]
+    var comments: [HackerNewsComment]
 
-    public var visibleComments: [HackerNewsComment] {
+    var visibleComments: [HackerNewsComment] {
         return comments.filter { $0.visibility != CommentVisibilityType.hidden }
     }
 
@@ -23,7 +23,7 @@ class CommentsController {
         comments = source
     }
 
-    public func toggleChildrenVisibility(of comment: HackerNewsComment) -> ([IndexPath], CommentVisibilityType) {
+    func toggleChildrenVisibility(of comment: HackerNewsComment) -> ([IndexPath], CommentVisibilityType) {
         let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
@@ -49,7 +49,7 @@ class CommentsController {
         return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
 
-    public func indexOfVisibleRootComment(of comment: HackerNewsComment) -> Int? {
+    func indexOfVisibleRootComment(of comment: HackerNewsComment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
         for index in (0...commentIndex).reversed() where visibleComments[index].level == 0 {

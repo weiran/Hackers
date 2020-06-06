@@ -16,11 +16,11 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var metadataLabel: UILabel!
 
-    public var isTitleTapEnabled = false
+    var isTitleTapEnabled = false
 
-    public weak var delegate: PostTitleViewDelegate?
+    weak var delegate: PostTitleViewDelegate?
 
-    public var post: HackerNewsPost? {
+    var post: HackerNewsPost? {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title

@@ -1,9 +1,9 @@
 //
 //  AppThemeProvider.swift
-//  Night Mode
+//  Hackers
 //
-//  Created by Michael on 01/04/2018.
-//  Copyright © 2018 Late Night Swift. All rights reserved.
+//  Created by Weiran Zhang on 05/05/2018.
+//  Copyright © 2018 Weiran Zhang. All rights reserved.
 //
 
 import UIKit

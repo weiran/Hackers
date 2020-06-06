@@ -9,8 +9,8 @@
 import BLTNBoard
 
 class AuthenticationBulletinPage: BLTNPageItem {
-    @objc public var usernameTextField: UITextField!
-    @objc public var passwordTextField: UITextField!
+    @objc var usernameTextField: UITextField!
+    @objc var passwordTextField: UITextField!
 
     override func willDisplay() {
         usernameTextField.becomeFirstResponder()
@@ -63,7 +63,7 @@ class AuthenticationBulletinPage: BLTNPageItem {
         super.actionButtonTapped(sender: sender)
     }
 
-    public func set(state: CredentialsState) {
+    func set(state: CredentialsState) {
         switch state {
         case .standard:
             usernameTextField.backgroundColor = .clear
@@ -75,7 +75,7 @@ class AuthenticationBulletinPage: BLTNPageItem {
         }
     }
 
-    public enum CredentialsState {
+    enum CredentialsState {
         case standard
         case invalid
     }

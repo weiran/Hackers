@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 class HackerNewsData {
-    public static let shared = HackerNewsData()
+    static let shared = HackerNewsData()
 
     let session = URLSession(configuration: .default)
 

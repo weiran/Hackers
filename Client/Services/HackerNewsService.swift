@@ -10,7 +10,7 @@ import PromiseKit
 import HNScraper
 
 class HackerNewsService {
-    public func login(username: String, password: String) -> Promise<(HNUser?, HTTPCookie?)> {
+    func login(username: String, password: String) -> Promise<(HNUser?, HTTPCookie?)> {
         HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
 
         let (promise, seal) = Promise<(HNUser?, HTTPCookie?)>.pending()
@@ -24,11 +24,11 @@ class HackerNewsService {
         return promise
     }
 
-    public func logout() {
+    func logout() {
         HNLogin.shared.logout()
     }
 
-    public func upvote(post: HNPost) -> Promise<Void> {
+    func upvote(post: HNPost) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.upvote(Post: post) { error in
             if let error = error {
@@ -40,7 +40,7 @@ class HackerNewsService {
         return promise
     }
 
-    public func unvote(post: HNPost) -> Promise<Void> {
+    func unvote(post: HNPost) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.unvote(Post: post) { error in
             if let error = error {
@@ -52,7 +52,7 @@ class HackerNewsService {
         return promise
     }
 
-    public func upvote(comment: HNComment) -> Promise<Void> {
+    func upvote(comment: HNComment) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.upvote(Comment: comment) { error in
             if let error = error {
@@ -64,7 +64,7 @@ class HackerNewsService {
         return promise
     }
 
-    public func unvote(comment: HNComment) -> Promise<Void> {
+    func unvote(comment: HNComment) -> Promise<Void> {
         let (promise, seal) = Promise<Void>.pending()
         HNScraper.shared.unvote(Comment: comment) { error in
             if let error = error {

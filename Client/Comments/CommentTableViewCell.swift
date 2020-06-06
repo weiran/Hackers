@@ -12,7 +12,7 @@ import SwipeCellKit
 import SwiftSoup
 
 class CommentTableViewCell: SwipeTableViewCell {
-    public weak var commentDelegate: CommentDelegate?
+    weak var commentDelegate: CommentDelegate?
 
     private var level: Int = 0 {
         didSet { updateIndentPadding() }
@@ -47,7 +47,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    public func updateCommentContent(with comment: HackerNewsComment, theme: AppTheme) {
+    func updateCommentContent(with comment: HackerNewsComment, theme: AppTheme) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible

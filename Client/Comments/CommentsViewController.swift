@@ -14,16 +14,16 @@ import PromiseKit
 import Loaf
 
 class CommentsViewController: UITableViewController {
-    public var authenticationUIService: AuthenticationUIService?
-    public var swipeCellKitActions: SwipeCellKitActions?
+    var authenticationUIService: AuthenticationUIService?
+    var swipeCellKitActions: SwipeCellKitActions?
 
     private enum ActivityType {
         case comments
         case link(url: URL)
     }
 
-    public var postId: Int?
-    public var post: HackerNewsPost?
+    var postId: Int?
+    var post: HackerNewsPost?
 
     private var comments: [HackerNewsComment]? {
         didSet { commentsController.comments = comments! }
