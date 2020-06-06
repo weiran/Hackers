@@ -473,6 +473,7 @@
 		24F39F8718AFB1150055F8DC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2457F04324696E9400F3E7A4 /* HackersKit */,
 				24F39F8818AFB1150055F8DC /* Foundation.framework */,
 				24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */,
 				24F39F8C18AFB1150055F8DC /* UIKit.framework */,
@@ -515,7 +516,6 @@
 		24FF0219226C99B1002EF8DD /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				2457F04324696E9400F3E7A4 /* HackersKit */,
 				24993C58229C76EA00AF1891 /* AuthenticationUIService */,
 				2477BDE4227D9D8200771FE2 /* SessionService.swift */,
 				24B1A6A422B508A40051EAFD /* OnboardingService.swift */,
