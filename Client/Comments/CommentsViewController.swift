@@ -143,9 +143,8 @@ extension CommentsViewController {
 
             return cell
 
-        case CommentsTableSections.comments.rawValue:
-            fallthrough
-            
+        case CommentsTableSections.comments.rawValue: fallthrough
+
         default:
             let comment = commentsController.visibleComments[indexPath.row]
             assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
@@ -251,6 +250,8 @@ extension CommentsViewController: CommentDelegate {
     }
 
     func internalLinkTapped(postId: Int, url: URL, sender: UITextView) {
+        UIApplication.shared.delegate.window
+
         let spinnerView = showTerribleActivityView()
         _ = HackersKit.shared.getPost(id: postId).done { post in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)

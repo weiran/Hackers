@@ -17,8 +17,12 @@ class SwipeCellKitActions: Themed {
         self.authenticationUIService = authenticationUIService
     }
 
-    func voteAction(post: Post, tableView: UITableView,
-                           indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
+    func voteAction(
+        post: Post,
+        tableView: UITableView,
+        indexPath: IndexPath,
+        viewController: UIViewController
+    ) -> [SwipeAction] {
         let voteOnPost: (Post, Bool) -> Void = { post, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
             post.upvoted = isUpvote
