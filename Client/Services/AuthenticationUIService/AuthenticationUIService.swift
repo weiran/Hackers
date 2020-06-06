@@ -10,11 +10,9 @@ import BLTNBoard
 import PromiseKit
 
 class AuthenticationUIService {
-    private let hackerNewsService: HackerNewsService
     private let sessionService: SessionService
 
-    init(hackerNewsService: HackerNewsService, sessionService: SessionService) {
-        self.hackerNewsService = hackerNewsService
+    init(sessionService: SessionService) {
         self.sessionService = sessionService
     }
 
@@ -67,7 +65,7 @@ class AuthenticationUIService {
         }
 
         page.alternativeHandler = { item in
-            self.hackerNewsService.logout()
+            HackerNewsData.shared.logout()
             self.sendAuthenticationDidChangeNotification()
             item.manager?.dismissBulletin()
         }

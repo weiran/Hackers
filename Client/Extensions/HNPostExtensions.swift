@@ -6,7 +6,7 @@
 //  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
-import HNScraper
+import Foundation
 
 extension HackerNewsPost {
     var hackerNewsURL: URL {

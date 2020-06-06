@@ -7,15 +7,12 @@
 //
 
 import PromiseKit
-import HNScraper
 
 class SessionService {
-    private var hackerNewsService: HackerNewsService
-
-    private var user: HNUser?
+    private var user: HackerNewsUser?
 
     var authenticationState: AuthenticationState {
-        if HNLogin.shared.sessionCookie != nil {
+        if HackerNewsData.shared.isAuthenticated() {
             return .authenticated
         }
         return .notAuthenticated
@@ -25,23 +22,14 @@ class SessionService {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
 
-    init(hackerNewsService: HackerNewsService) {
-        self.hackerNewsService = hackerNewsService
-        HNLogin.shared.addObserver(self)
-    }
-
     func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
         let (promise, seal) = Promise<AuthenticationState>.pending()
 
         firstly {
-            hackerNewsService.login(username: username, password: password)
-        }.done { (user, _) in
-            if let user = user {
-                self.user = user
-                seal.fulfill(.authenticated)
-            } else {
-                seal.reject(HNScraper.HNScraperError.notLoggedIn)
-            }
+            HackerNewsData.shared.login(username: username, password: password)
+        }.done { user in
+            self.user = user
+            seal.fulfill(.authenticated)
         }.catch { error in
             seal.reject(error)
         }
@@ -55,8 +43,8 @@ class SessionService {
     }
 }
 
-extension SessionService: HNLoginDelegate {
-    func didLogin(user: HNUser, cookie: HTTPCookie) {
+extension SessionService: HNScraperShimAuthenticationDelegate {
+    func didAuthenticate(user: HackerNewsUser, cookie: HTTPCookie) {
         self.user = user
         UserDefaults.standard.set(user.username, forKey: "username")
     }

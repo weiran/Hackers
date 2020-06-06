@@ -15,6 +15,12 @@ class HackerNewsData {
     let session = URLSession(configuration: .default)
     let scraperShim = HNScraperShim()
 
+    weak var authenticationDelegate: HackerNewsAuthenticationDelegate?
+
+    init() {
+        scraperShim.authenticationDelegate = self
+    }
+
     internal func fetchHtml(url: URL) -> Promise<String> {
         let (promise, seal) = Promise<String>.pending()
 
@@ -24,7 +30,7 @@ class HackerNewsData {
             } else if let error = error {
                 seal.reject(error)
             } else {
-                seal.reject(HackerNewsError.typeError)
+                seal.reject(HackerNewsError.requestFailure)
             }
         }.resume()
 

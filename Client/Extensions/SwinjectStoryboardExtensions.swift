@@ -24,15 +24,11 @@ extension SwinjectStoryboard {
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
         }
 
-        container.register(HackerNewsService.self) { _ in HackerNewsService() }
-            .inObjectScope(.container)
-        container.register(SessionService.self) { resolver in
-            SessionService(hackerNewsService: resolver.resolve(HackerNewsService.self)!)
+        container.register(SessionService.self) { _ in
+            SessionService()
         }.inObjectScope(.container)
         container.register(AuthenticationUIService.self) { resolver in
-            AuthenticationUIService(
-                hackerNewsService: resolver.resolve(HackerNewsService.self)!,
-                sessionService: resolver.resolve(SessionService.self)!)
+            AuthenticationUIService(sessionService: resolver.resolve(SessionService.self)!)
         }.inObjectScope(.container)
         container.register(SwipeCellKitActions.self) { resolver in
             SwipeCellKitActions(

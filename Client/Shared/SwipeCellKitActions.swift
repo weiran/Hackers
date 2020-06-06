@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import HNScraper
 import SwipeCellKit
 import Loaf
 
@@ -28,9 +27,9 @@ class SwipeCellKitActions: Themed {
         }
 
         let errorHandler: (Error) -> Void = { error in
-            guard let hnError = error as? HNScraper.HNScraperError else { return }
-            switch hnError {
-            case .notLoggedIn:
+            guard let error = error as? HackerNewsError else { return }
+            switch error {
+            case .unauthenticated:
                 viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()
@@ -76,9 +75,9 @@ class SwipeCellKitActions: Themed {
         }
 
         let errorHandler: (Error) -> Void = { error in
-            guard let hnError = error as? HNScraper.HNScraperError else { return }
-            switch hnError {
-            case .notLoggedIn:
+            guard let error = error as? HackerNewsError else { return }
+            switch error {
+            case .unauthenticated:
                 viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()

@@ -53,6 +53,13 @@ class HackerNewsPost: Hashable {
     }
 }
 
+enum HackerNewsPostType: String {
+    case news
+    case ask
+    case jobs
+    case newest
+}
+
 class HackerNewsComment: Hashable {
     let id: Int
     let age: String
@@ -90,20 +97,34 @@ class HackerNewsComment: Hashable {
     }
 }
 
-enum HackerNewsPostType: String {
-    case news
-    case ask
-    case jobs
-    case newest
-}
-
-enum HackerNewsError: Error {
-    case typeError
-    case hnScraperError
-}
-
 enum CommentVisibilityType: Int {
     case visible = 3
     case compact = 2
     case hidden = 1
+}
+
+class HackerNewsUser {
+    let username: String
+    let karma: Int
+    let joined: Date
+
+    init(username: String, karma: Int, joined: Date) {
+        self.username = username
+        self.karma = karma
+        self.joined = joined
+    }
+}
+
+enum HackerNewsError: Error {
+    case requestFailure
+    case scraperError // internal failure from HNScraper
+    case unauthenticated // tried an request that requires authentication when unauthenticated
+    case authenticationError(error: HackerNewsAuthenticationError)
+}
+
+enum HackerNewsAuthenticationError: Error {
+    case badCredentials
+    case serverUnreachable
+    case noInternet
+    case unknown
 }
