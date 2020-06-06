@@ -13,6 +13,7 @@ class HackerNewsData {
     static let shared = HackerNewsData()
 
     let session = URLSession(configuration: .default)
+    let scraperShim = HNScraperShim()
 
     internal func fetchHtml(url: URL) -> Promise<String> {
         let (promise, seal) = Promise<String>.pending()

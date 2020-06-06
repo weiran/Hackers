@@ -15,15 +15,23 @@ class HNScraperShim {
 }
 
 extension HNScraperShim { // posts
-    func upvote(post: HNPost) -> Promise<Void> {
-        return hackerNewsService.upvote(post: post)
+    func upvote(post: HackerNewsPost) -> Promise<Void> {
+        return firstly {
+            getPost(id: post.id)
+        }.then { post in
+            self.hackerNewsService.upvote(post: post)
+        }
     }
 
-    func unvote(post: HNPost) -> Promise<Void> {
-        return hackerNewsService.unvote(post: post)
+    func unvote(post: HackerNewsPost) -> Promise<Void> {
+        return firstly {
+            getPost(id: post.id)
+        }.then { post in
+            self.hackerNewsService.upvote(post: post)
+        }
     }
 
-    func getPost(id: Int) -> Promise<HNPost> {
+    private func getPost(id: Int) -> Promise<HNPost> {
         let (promise, seal) = Promise<HNPost>.pending()
         HNScraper.shared.getPost(ById: String(id)) { (post, _, error) in
             if let post = post {
@@ -39,15 +47,23 @@ extension HNScraperShim { // posts
 }
 
 extension HNScraperShim { // comments
-    func upvote(comment: HNComment) -> Promise<Void> {
-        return hackerNewsService.upvote(comment: comment)
+    func upvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+        return firstly {
+            getComment(id: comment.id, for: post)
+        }.then { comment in
+            self.hackerNewsService.upvote(comment: comment)
+        }
     }
 
-    func unvote(comment: HNComment) -> Promise<Void> {
-        return hackerNewsService.unvote(comment: comment)
+    func unvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+        return firstly {
+            getComment(id: comment.id, for: post)
+        }.then { comment in
+            self.hackerNewsService.unvote(comment: comment)
+        }
     }
 
-    func getComment(id: Int, for post: HackerNewsPost) -> Promise<HNComment> {
+    private func getComment(id: Int, for post: HackerNewsPost) -> Promise<HNComment> {
         let (promise, seal) = Promise<HNComment>.pending()
 
         HNScraper.shared.getComments(ByPostId: String(post.id)) { (_, comments, error) in
