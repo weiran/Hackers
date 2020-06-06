@@ -59,7 +59,7 @@ class MainTabBarController: UITabBarController {
     }
 
     struct TabItem {
-        let postType: HackerNewsPostType
+        let postType: PostType
         let typeName: String
         let iconName: String
         let selectedIconName: String

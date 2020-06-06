@@ -65,7 +65,7 @@ class AuthenticationUIService {
         }
 
         page.alternativeHandler = { item in
-            HackerNewsData.shared.logout()
+            HackersKit.shared.logout()
             self.sendAuthenticationDidChangeNotification()
             item.manager?.dismissBulletin()
         }

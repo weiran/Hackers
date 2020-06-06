@@ -23,9 +23,9 @@ class CommentsViewController: UITableViewController {
     }
 
     var postId: Int?
-    var post: HackerNewsPost?
+    var post: Post?
 
-    private var comments: [HackerNewsComment]? {
+    private var comments: [Comment]? {
         didSet { commentsController.comments = comments! }
     }
     private let commentsController = CommentsController()
@@ -56,7 +56,7 @@ class CommentsViewController: UITableViewController {
 
         firstly {
             loadPost()
-        }.then { (post) -> Promise<[HackerNewsComment]> in
+        }.then { (post) -> Promise<[Comment]> in
             self.post = post
             return self.loadComments(for: post)
         }.done { comments in
@@ -69,14 +69,14 @@ class CommentsViewController: UITableViewController {
         }
     }
 
-    private func loadPost() -> Promise<HackerNewsPost> {
+    private func loadPost() -> Promise<Post> {
         if let post = self.post {
             return Promise.value(post)
         }
-        return HackerNewsData.shared.getPost(id: postId!, includeAllComments: true)
+        return HackersKit.shared.getPost(id: postId!, includeAllComments: true)
     }
 
-    private func loadComments(for post: HackerNewsPost) -> Promise<[HackerNewsComment]> {
+    private func loadComments(for post: Post) -> Promise<[Comment]> {
         // if it already has comments then use those
         if let comments = post.comments {
             return Promise.value(comments)
@@ -84,7 +84,7 @@ class CommentsViewController: UITableViewController {
 
         // otherwise always try to fetch comments
         return firstly {
-            HackerNewsData.shared.getPost(id: post.id, includeAllComments: true)
+            HackersKit.shared.getPost(id: post.id, includeAllComments: true)
         }.map { post in
             return post.comments ?? []
         }
@@ -252,7 +252,7 @@ extension CommentsViewController: CommentDelegate {
 
     func internalLinkTapped(postId: Int, url: URL, sender: UITextView) {
         let spinnerView = showTerribleActivityView()
-        _ = HackerNewsData.shared.getPost(id: postId).done { post in
+        _ = HackersKit.shared.getPost(id: postId).done { post in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let viewController =
                 storyboard.instantiateViewController(identifier: "CommentsViewController") as CommentsViewController
@@ -316,7 +316,7 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-    private func setupHandoff(with post: HackerNewsPost?, activityType: ActivityType) {
+    private func setupHandoff(with post: Post?, activityType: ActivityType) {
         guard let post = post else {
             return
         }

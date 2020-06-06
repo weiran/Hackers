@@ -1,5 +1,5 @@
 //
-//  HackerNewsData+PostsList.swift
+//  HackersKit+PostsList.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
@@ -10,18 +10,18 @@ import Foundation
 import PromiseKit
 import SwiftSoup
 
-extension HackerNewsData {
-    func getPosts(type: HackerNewsPostType, page: Int = 1) -> Promise<[HackerNewsPost]> {
+extension HackersKit {
+    func getPosts(type: PostType, page: Int = 1) -> Promise<[Post]> {
         firstly {
             fetchPostsHtml(type: type, page: page)
         }.map { html in
-            try HackerNewsHtmlParser.postsTableElement(from: html)
+            try HtmlParser.postsTableElement(from: html)
         }.map { tableElement in
-            try HackerNewsHtmlParser.posts(from: tableElement, type: type)
+            try HtmlParser.posts(from: tableElement, type: type)
         }
     }
 
-    private func fetchPostsHtml(type: HackerNewsPostType, page: Int) -> Promise<String> {
+    private func fetchPostsHtml(type: PostType, page: Int) -> Promise<String> {
         let url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
         return fetchHtml(url: url)
     }

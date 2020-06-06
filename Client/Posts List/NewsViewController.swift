@@ -19,9 +19,9 @@ class NewsViewController: UITableViewController {
     var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
 
-    private var posts = [HackerNewsPost]()
-    private var dataSource: UITableViewDiffableDataSource<Section, HackerNewsPost>?
-    var postType: HackerNewsPostType = .news
+    private var posts = [Post]()
+    private var dataSource: UITableViewDiffableDataSource<Section, Post>?
+    var postType: PostType = .news
 
     private var peekedIndexPath: IndexPath?
     private var pageIndex = 1
@@ -89,10 +89,10 @@ extension NewsViewController { // post fetching
         let isFirstPage = pageIndex == 1
 
         firstly {
-            HackerNewsData.shared.getPosts(type: postType, page: pageIndex)
+            HackersKit.shared.getPosts(type: postType, page: pageIndex)
         }.done { posts in
             if isFirstPage {
-                self.posts = [HackerNewsPost]()
+                self.posts = [Post]()
             }
             self.posts.append(contentsOf: posts)
             self.update(with: self.posts, animate: !isFirstPage)
@@ -116,7 +116,7 @@ extension NewsViewController {
         case main
     }
 
-    func makeDataSource() -> UITableViewDiffableDataSource<Section, HackerNewsPost> {
+    func makeDataSource() -> UITableViewDiffableDataSource<Section, Post> {
         let reuseIdentifier = "PostCell"
 
         return UITableViewDiffableDataSource(tableView: tableView) { (tableView, indexPath, post) in
@@ -135,8 +135,8 @@ extension NewsViewController {
         }
     }
 
-    func update(with posts: [HackerNewsPost], animate: Bool = true) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, HackerNewsPost>()
+    func update(with posts: [Post], animate: Bool = true) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Post>()
         snapshot.appendSections(Section.allCases)
         snapshot.appendItems(posts)
         self.dataSource?.apply(snapshot, animatingDifferences: animate)
@@ -248,7 +248,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
 }
 
 extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
-    func didPressLinkButton(_ post: HackerNewsPost) {
+    func didPressLinkButton(_ post: Post) {
         if let safariViewController =
             SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self) {
             navigationController?.present(safariViewController, animated: true)

@@ -17,7 +17,7 @@ class HNScraperShim {
         HNLogin.shared.addObserver(self)
     }
 
-    internal func convert(error: HNScraper.HNScraperError) -> HackerNewsError {
+    internal func convert(error: HNScraper.HNScraperError) -> HackersKitError {
         switch error {
         case .notLoggedIn: return .unauthenticated
         default: return .scraperError
@@ -26,7 +26,7 @@ class HNScraperShim {
 }
 
 extension HNScraperShim { // posts
-    func upvote(post: HackerNewsPost) -> Promise<Void> {
+    func upvote(post: Post) -> Promise<Void> {
         return firstly {
             getPost(id: post.id)
         }.then { post in
@@ -34,7 +34,7 @@ extension HNScraperShim { // posts
         }
     }
 
-    func unvote(post: HackerNewsPost) -> Promise<Void> {
+    func unvote(post: Post) -> Promise<Void> {
         return firstly {
             getPost(id: post.id)
         }.then { post in
@@ -50,7 +50,7 @@ extension HNScraperShim { // posts
             } else if let error = error {
                 seal.reject(self.convert(error: error))
             } else {
-                seal.reject(HackerNewsError.scraperError)
+                seal.reject(HackersKitError.scraperError)
             }
         }
         return promise
@@ -82,7 +82,7 @@ extension HNScraperShim { // posts
 }
 
 extension HNScraperShim { // comments
-    func upvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+    func upvote(comment: Comment, for post: Post) -> Promise<Void> {
         return firstly {
             getComment(id: comment.id, for: post)
         }.then { comment in
@@ -90,7 +90,7 @@ extension HNScraperShim { // comments
         }
     }
 
-    func unvote(comment: HackerNewsComment, for post: HackerNewsPost) -> Promise<Void> {
+    func unvote(comment: Comment, for post: Post) -> Promise<Void> {
         return firstly {
             getComment(id: comment.id, for: post)
         }.then { comment in
@@ -98,7 +98,7 @@ extension HNScraperShim { // comments
         }
     }
 
-    private func getComment(id: Int, for post: HackerNewsPost) -> Promise<HNComment> {
+    private func getComment(id: Int, for post: Post) -> Promise<HNComment> {
         let (promise, seal) = Promise<HNComment>.pending()
 
         HNScraper.shared.getComments(ByPostId: String(post.id)) { (_, comments, error) in
@@ -109,7 +109,7 @@ extension HNScraperShim { // comments
                 if let comment = comment {
                     seal.fulfill(comment)
                 } else {
-                    seal.reject(HackerNewsError.scraperError)
+                    seal.reject(HackersKitError.scraperError)
                 }
             }
         }
@@ -117,7 +117,7 @@ extension HNScraperShim { // comments
         return promise
     }
 
-    /// Recursively search the comment tree for a specific `HackerNewsComment` by `id`
+    /// Recursively search the comment tree for a specific `Comment` by `id`
     private func firstComment(in comments: [HNComment], for commentId: Int) -> HNComment? {
         let commentIdString = String(commentId)
 
@@ -159,17 +159,17 @@ extension HNScraperShim { // comments
 }
 
 extension HNScraperShim { // authentication
-    func login(username: String, password: String) -> Promise<HackerNewsUser> {
-        let (promise, seal) = Promise<HackerNewsUser>.pending()
+    func login(username: String, password: String) -> Promise<User> {
+        let (promise, seal) = Promise<User>.pending()
         HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
         HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
             if let user = user, cookie != nil {
-                let hackerNewsUser = HackerNewsUser(username: user.username, karma: user.karma, joined: user.age)
-                seal.fulfill(hackerNewsUser)
+                let user = User(username: user.username, karma: user.karma, joined: user.age)
+                seal.fulfill(user)
             } else if let error = error {
                 seal.reject(self.convert(error: error))
             } else {
-                seal.reject(HackerNewsAuthenticationError.unknown)
+                seal.reject(HackersKitAuthenticationError.unknown)
             }
         }
         return promise
@@ -183,7 +183,7 @@ extension HNScraperShim { // authentication
         return HNLogin.shared.sessionCookie != nil
     }
 
-    private func convert(error: HNLogin.HNLoginError) -> HackerNewsAuthenticationError {
+    private func convert(error: HNLogin.HNLoginError) -> HackersKitAuthenticationError {
         switch error {
         case .badCredentials: return .badCredentials
         case .noInternet: return .noInternet
@@ -194,12 +194,12 @@ extension HNScraperShim { // authentication
 }
 
 protocol HNScraperShimAuthenticationDelegate: class {
-    func didAuthenticate(user: HackerNewsUser, cookie: HTTPCookie)
+    func didAuthenticate(user: User, cookie: HTTPCookie)
 }
 
 extension HNScraperShim: HNLoginDelegate {
     func didLogin(user: HNUser, cookie: HTTPCookie) {
-        let hackerNewsUser = HackerNewsUser(username: user.username, karma: user.karma, joined: user.age)
-        authenticationDelegate?.didAuthenticate(user: hackerNewsUser, cookie: cookie)
+        let user = User(username: user.username, karma: user.karma, joined: user.age)
+        authenticationDelegate?.didAuthenticate(user: user, cookie: cookie)
     }
 }

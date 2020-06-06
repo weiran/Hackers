@@ -9,10 +9,10 @@
 import PromiseKit
 
 class SessionService {
-    private var user: HackerNewsUser?
+    private var user: User?
 
     var authenticationState: AuthenticationState {
-        if HackerNewsData.shared.isAuthenticated() {
+        if HackersKit.shared.isAuthenticated() {
             return .authenticated
         }
         return .notAuthenticated
@@ -26,7 +26,7 @@ class SessionService {
         let (promise, seal) = Promise<AuthenticationState>.pending()
 
         firstly {
-            HackerNewsData.shared.login(username: username, password: password)
+            HackersKit.shared.login(username: username, password: password)
         }.done { user in
             self.user = user
             seal.fulfill(.authenticated)
@@ -44,7 +44,7 @@ class SessionService {
 }
 
 extension SessionService: HNScraperShimAuthenticationDelegate {
-    func didAuthenticate(user: HackerNewsUser, cookie: HTTPCookie) {
+    func didAuthenticate(user: User, cookie: HTTPCookie) {
         self.user = user
         UserDefaults.standard.set(user.username, forKey: "username")
     }

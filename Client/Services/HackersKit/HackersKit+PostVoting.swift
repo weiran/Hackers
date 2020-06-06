@@ -1,5 +1,5 @@
 //
-//  HackerNewsData+PostVoting.swift
+//  HackersKit+PostVoting.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
@@ -9,12 +9,12 @@
 import Foundation
 import PromiseKit
 
-extension HackerNewsData {
-    func upvote(post: HackerNewsPost) -> Promise<Void> {
+extension HackersKit {
+    func upvote(post: Post) -> Promise<Void> {
         scraperShim.upvote(post: post)
     }
 
-    func unvote(post: HackerNewsPost) -> Promise<Void> {
+    func unvote(post: Post) -> Promise<Void> {
         scraperShim.unvote(post: post)
     }
 }

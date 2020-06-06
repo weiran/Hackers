@@ -9,7 +9,7 @@
 import UIKit
 
 protocol PostTitleViewDelegate: class {
-    func didPressLinkButton(_ post: HackerNewsPost)
+    func didPressLinkButton(_ post: Post)
 }
 
 class PostTitleView: UIView, UIGestureRecognizerDelegate {
@@ -20,7 +20,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 
     weak var delegate: PostTitleViewDelegate?
 
-    var post: HackerNewsPost? {
+    var post: Post? {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
@@ -43,7 +43,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
-    private func domainLabelText(for post: HackerNewsPost) -> String {
+    private func domainLabelText(for post: Post) -> String {
         guard
             let urlComponents = URLComponents(url: post.url, resolvingAgainstBaseURL: false),
             var host = urlComponents.host else {
@@ -57,7 +57,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return host
     }
 
-    private func metadataText(for post: HackerNewsPost, theme: AppTheme) -> NSAttributedString {
+    private func metadataText(for post: Post, theme: AppTheme) -> NSAttributedString {
         let defaultAttributes = [NSAttributedString.Key.foregroundColor: theme.textColor]
         var pointsAttributes = defaultAttributes
         var pointsTintColor: UIColor?

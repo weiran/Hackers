@@ -1,5 +1,5 @@
 //
-//  HackerNewsData+Authentication.swift
+//  HackersKit+Authentication.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 06/06/2020.
@@ -10,11 +10,11 @@ import Foundation
 import PromiseKit
 
 protocol HackerNewsAuthenticationDelegate: class {
-    func didAuthenticate(user: HackerNewsUser)
+    func didAuthenticate(user: User)
 }
 
-extension HackerNewsData {
-    func login(username: String, password: String) -> Promise<HackerNewsUser> {
+extension HackersKit {
+    func login(username: String, password: String) -> Promise<User> {
         scraperShim.login(username: username, password: password)
     }
 
@@ -27,8 +27,8 @@ extension HackerNewsData {
     }
 }
 
-extension HackerNewsData: HNScraperShimAuthenticationDelegate {
-    func didAuthenticate(user: HackerNewsUser, cookie: HTTPCookie) {
+extension HackersKit: HNScraperShimAuthenticationDelegate {
+    func didAuthenticate(user: User, cookie: HTTPCookie) {
         authenticationDelegate?.didAuthenticate(user: user)
     }
 }

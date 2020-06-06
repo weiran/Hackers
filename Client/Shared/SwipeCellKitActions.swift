@@ -17,9 +17,9 @@ class SwipeCellKitActions: Themed {
         self.authenticationUIService = authenticationUIService
     }
 
-    func voteAction(post: HackerNewsPost, tableView: UITableView,
+    func voteAction(post: Post, tableView: UITableView,
                            indexPath: IndexPath, viewController: UIViewController) -> [SwipeAction] {
-        let voteOnPost: (HackerNewsPost, Bool) -> Void = { post, isUpvote in
+        let voteOnPost: (Post, Bool) -> Void = { post, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? PostCell else { return }
             post.upvoted = isUpvote
             post.score += isUpvote ? 1 : -1
@@ -27,7 +27,7 @@ class SwipeCellKitActions: Themed {
         }
 
         let errorHandler: (Error) -> Void = { error in
-            guard let error = error as? HackerNewsError else { return }
+            guard let error = error as? HackersKitError else { return }
             switch error {
             case .unauthenticated:
                 viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
@@ -43,11 +43,11 @@ class SwipeCellKitActions: Themed {
             let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
             if upvoted {
-                HackerNewsData.shared
+                HackersKit.shared
                     .unvote(post: post)
                     .catch(errorHandler)
             } else {
-                HackerNewsData.shared
+                HackersKit.shared
                     .upvote(post: post)
                     .catch(errorHandler)
             }
@@ -62,20 +62,20 @@ class SwipeCellKitActions: Themed {
     }
 
     func voteAction(
-        comment: HackerNewsComment,
-        post: HackerNewsPost,
+        comment: Comment,
+        post: Post,
         tableView: UITableView,
         indexPath: IndexPath,
         viewController: UIViewController
     ) -> [SwipeAction] {
-        let voteOnComment: (HackerNewsComment, Bool) -> Void = { comment, isUpvote in
+        let voteOnComment: (Comment, Bool) -> Void = { comment, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
             comment.upvoted = isUpvote
             cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
         }
 
         let errorHandler: (Error) -> Void = { error in
-            guard let error = error as? HackerNewsError else { return }
+            guard let error = error as? HackersKitError else { return }
             switch error {
             case .unauthenticated:
                 viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
@@ -91,11 +91,11 @@ class SwipeCellKitActions: Themed {
             let upvoted = comment.upvoted
             voteOnComment(comment, !comment.upvoted)
             if upvoted {
-                HackerNewsData.shared
+                HackersKit.shared
                     .unvote(comment: comment, for: post)
                     .catch(errorHandler)
             } else {
-                HackerNewsData.shared
+                HackersKit.shared
                     .upvote(comment: comment, for: post)
                     .catch(errorHandler)
             }

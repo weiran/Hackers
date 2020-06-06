@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension HackerNewsPost {
+extension Post {
     var hackerNewsURL: URL {
         return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
     }

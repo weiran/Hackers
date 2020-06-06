@@ -18,7 +18,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         didSet { updateIndentPadding() }
     }
 
-    private var comment: HackerNewsComment?
+    private var comment: Comment?
 
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel: UILabel!
@@ -47,7 +47,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    func updateCommentContent(with comment: HackerNewsComment, theme: AppTheme) {
+    func updateCommentContent(with comment: Comment, theme: AppTheme) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible

@@ -1,5 +1,5 @@
 //
-//  HackerNewsHtmlParser.swift
+//  HtmlParser.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 02/06/2020.
@@ -9,8 +9,8 @@
 import Foundation
 import SwiftSoup
 
-enum HackerNewsHtmlParser {
-    static func posts(from tableElement: Element, type: HackerNewsPostType) throws -> [HackerNewsPost] {
+enum HtmlParser {
+    static func posts(from tableElement: Element, type: PostType) throws -> [Post] {
         if tableElement.hasClass("fatitem") {
             // single post
             let postElements = try tableElement.select("tr")
@@ -20,7 +20,7 @@ enum HackerNewsHtmlParser {
         } else if tableElement.hasClass("itemlist") {
             // post list
             let titleElements = try tableElement.select("tr.athing")
-            let posts = try titleElements.compactMap { titleElement -> HackerNewsPost? in
+            let posts = try titleElements.compactMap { titleElement -> Post? in
                 guard let metadataElement = try titleElement.nextElementSibling() else {
                     return nil
                 }
@@ -32,7 +32,7 @@ enum HackerNewsHtmlParser {
         throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post elements")
     }
 
-    static func post(from elements: Elements, type: HackerNewsPostType) throws -> HackerNewsPost {
+    static func post(from elements: Elements, type: PostType) throws -> Post {
         let rows = try elements.select("tr")
         let postElement = rows[0]
         let metadataElement = rows[1]
@@ -59,7 +59,7 @@ enum HackerNewsHtmlParser {
             upvoted = hasUnvote || (hasUpvote && hasNosee)
         }
 
-        return HackerNewsPost(
+        return Post(
             id: id,
             url: url,
             title: title,
@@ -89,7 +89,7 @@ enum HackerNewsHtmlParser {
         return try document.select(".comtr")
     }
 
-    static func comment(from element: Element) throws -> HackerNewsComment {
+    static func comment(from element: Element) throws -> Comment {
         let text = try commentText(from: element.select(".commtext"))
         let age = try element.select(".age").text()
         let user = try element.select(".hnuser").text()
@@ -108,7 +108,7 @@ enum HackerNewsHtmlParser {
             upvoted = hasUnvote
         }
 
-        let comment = HackerNewsComment(id: id, age: age, text: text, by: user, level: level, upvoted: upvoted)
+        let comment = Comment(id: id, age: age, text: text, by: user, level: level, upvoted: upvoted)
         comment.upvoteLink = upvoteLink
         return comment
     }
