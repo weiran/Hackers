@@ -9,21 +9,21 @@
 import Foundation
 
 class CommentsController {
-    public var comments: [HackerNewsComment]
+    var comments: [Comment]
 
-    public var visibleComments: [HackerNewsComment] {
+    var visibleComments: [Comment] {
         return comments.filter { $0.visibility != CommentVisibilityType.hidden }
     }
 
     convenience init() {
-        self.init(source: [HackerNewsComment]())
+        self.init(source: [Comment]())
     }
 
-    init(source: [HackerNewsComment]) {
+    init(source: [Comment]) {
         comments = source
     }
 
-    public func toggleChildrenVisibility(of comment: HackerNewsComment) -> ([IndexPath], CommentVisibilityType) {
+    func toggleChildrenVisibility(of comment: Comment) -> ([IndexPath], CommentVisibilityType) {
         let visible = comment.visibility == .visible
         let visibleIndex = indexOfComment(comment, source: visibleComments)!
         let commentIndex = indexOfComment(comment, source: comments)!
@@ -49,7 +49,7 @@ class CommentsController {
         return (modifiedIndexPaths, visible ? .hidden : .visible)
     }
 
-    public func indexOfVisibleRootComment(of comment: HackerNewsComment) -> Int? {
+    func indexOfVisibleRootComment(of comment: Comment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
         for index in (0...commentIndex).reversed() where visibleComments[index].level == 0 {
@@ -59,11 +59,11 @@ class CommentsController {
         return nil
     }
 
-    private func indexOfComment(_ comment: HackerNewsComment, source: [HackerNewsComment]) -> Int? {
+    private func indexOfComment(_ comment: Comment, source: [Comment]) -> Int? {
         return source.firstIndex(where: { $0.id == comment.id })
     }
 
-    private func countChildren(_ comment: HackerNewsComment) -> Int {
+    private func countChildren(_ comment: Comment) -> Int {
         let startIndex = indexOfComment(comment, source: comments)! + 1
         var count = 0
 

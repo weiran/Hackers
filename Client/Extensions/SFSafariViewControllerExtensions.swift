@@ -33,7 +33,7 @@ extension SFSafariViewController {
     }
 }
 
-public protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
+protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
 
@@ -54,16 +54,20 @@ extension SFSafariViewController: Themed {
 }
 
 extension SFSafariViewController {
-    public static func instance(for url: URL,
-                                previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? = nil)
-        -> SFSafariViewController? {
+    static func instance(
+        for url: URL,
+        previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? = nil
+    ) -> SFSafariViewController? {
         if WKWebView.handlesURLScheme(url.scheme ?? "") == false {
             return nil
         }
+
         let configuration = SFSafariViewController.Configuration()
         configuration.entersReaderIfAvailable = UserDefaults.standard.safariReaderModeEnabled
+
         let safariViewController = SFSafariViewController(url: url, configuration: configuration)
         safariViewController.previewActionItemsDelegate = previewActionItemsDelegate
+
         return safariViewController
     }
 }

@@ -12,18 +12,18 @@ class TableViewBackgroundView: UIView {
     @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var titleLabel: UILabel!
 
-    public var state: TableViewState = .loading {
+    var state: TableViewState = .loading {
         didSet {
             updateState()
         }
     }
-    public var emptyTitle = "No data" {
+    var emptyTitle = "No data" {
         didSet {
             updateState()
         }
     }
 
-    public enum TableViewState {
+    enum TableViewState {
         case loading
         case empty
     }
@@ -56,21 +56,25 @@ extension TableViewBackgroundView: Themed {
 }
 
 extension TableViewBackgroundView {
-    public static func loadingBackgroundView() -> TableViewBackgroundView? {
-        guard let view = Bundle.main.loadNibNamed("TableViewBackgroundView",
-                                                  owner: self,
-                                                  options: nil)?.first as? TableViewBackgroundView else {
+    static func loadingBackgroundView() -> TableViewBackgroundView? {
+        guard let view = Bundle.main.loadNibNamed(
+            "TableViewBackgroundView",
+            owner: self,
+            options: nil
+        )?.first as? TableViewBackgroundView else {
             return nil
         }
         view.state = .loading
         return view
     }
 
-    public static func emptyBackgroundView(message: String) -> TableViewBackgroundView? {
-        guard let view = Bundle.main.loadNibNamed("TableViewBackgroundView",
-                                                  owner: self,
-                                                  options: nil)?.first as? TableViewBackgroundView else {
-                                                    return nil
+    static func emptyBackgroundView(message: String) -> TableViewBackgroundView? {
+        guard let view = Bundle.main.loadNibNamed(
+            "TableViewBackgroundView",
+            owner: self,
+            options: nil
+        )?.first as? TableViewBackgroundView else {
+            return nil
         }
         view.state = .empty
         view.emptyTitle = message

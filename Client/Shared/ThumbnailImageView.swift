@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 
 class ThumbnailImageView: UIImageView {
-    public func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
+    func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
 
         guard let url = url,

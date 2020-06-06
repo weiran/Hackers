@@ -59,31 +59,10 @@ class MainTabBarController: UITabBarController {
     }
 
     struct TabItem {
-        let postType: HackerNewsPostType
+        let postType: PostType
         let typeName: String
         let iconName: String
         let selectedIconName: String
-    }
-}
-
-extension MainTabBarController {
-    func showPost(id: Int) {
-        if let splitController = visibleViewController(),
-            let navController = viewController(for: "PostViewNavigationController") as? UINavigationController,
-            let vc = navController.children.first as? CommentsViewController {
-            vc.postId = id
-            splitController.showDetailViewController(navController, sender: self)
-        }
-    }
-
-    private func visibleViewController() -> UISplitViewController? {
-        let viewController = viewControllers?[selectedIndex] as? UISplitViewController
-        return viewController
-    }
-
-    private func viewController(for identifier: String) -> UIViewController? {
-        let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        return storyboard.instantiateViewController(identifier: identifier)
     }
 }
 

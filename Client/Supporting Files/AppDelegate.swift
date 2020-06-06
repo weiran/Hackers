@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import SwinjectStoryboard
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var mainTabBarController: MainTabBarController?
+    var navigationService: NavigationService?
 
     func applicationDidFinishLaunching(_ application: UIApplication) {
         // process args for testing
@@ -25,9 +26,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // setup window and entry point
         window = UIWindow()
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        mainTabBarController = storyboard.instantiateViewController(identifier: "MainTabBarController")
+        let mainTabBarController = storyboard.instantiateViewController(identifier: "MainTabBarController")
         window?.rootViewController = mainTabBarController
         window?.makeKeyAndVisible()
+
+        // setup NavigationService
+        navigationService = SwinjectStoryboard.getService()
+        navigationService?.mainTabBarController = mainTabBarController as? MainTabBarController
 
         // setup review prompt
         ReviewController.incrementLaunchCounter()
@@ -56,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             case "item":
                 if let idString = parameters["id"],
                     let id = Int(idString) {
-                    mainTabBarController?.showPost(id: id)
+                    navigationService?.showPost(id: id)
                 }
             default: break
             }

@@ -7,41 +7,29 @@
 //
 
 import PromiseKit
-import HNScraper
 
 class SessionService {
-    private var hackerNewsService: HackerNewsService
+    private var user: User?
 
-    private var user: HNUser?
-
-    public var authenticationState: AuthenticationState {
-        if HNLogin.shared.sessionCookie != nil {
+    var authenticationState: AuthenticationState {
+        if HackersKit.shared.isAuthenticated() {
             return .authenticated
         }
         return .notAuthenticated
     }
 
-    public var username: String? {
+    var username: String? {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
 
-    init(hackerNewsService: HackerNewsService) {
-        self.hackerNewsService = hackerNewsService
-        HNLogin.shared.addObserver(self)
-    }
-
-    public func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
+    func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
         let (promise, seal) = Promise<AuthenticationState>.pending()
 
         firstly {
-            hackerNewsService.login(username: username, password: password)
-        }.done { (user, _) in
-            if let user = user {
-                self.user = user
-                seal.fulfill(.authenticated)
-            } else {
-                seal.reject(HNScraper.HNScraperError.notLoggedIn)
-            }
+            HackersKit.shared.login(username: username, password: password)
+        }.done { user in
+            self.user = user
+            seal.fulfill(.authenticated)
         }.catch { error in
             seal.reject(error)
         }
@@ -49,14 +37,14 @@ class SessionService {
         return promise
     }
 
-    public enum AuthenticationState {
+    enum AuthenticationState {
         case authenticated
         case notAuthenticated
     }
 }
 
-extension SessionService: HNLoginDelegate {
-    func didLogin(user: HNUser, cookie: HTTPCookie) {
+extension SessionService: HNScraperShimAuthenticationDelegate {
+    func didAuthenticate(user: User, cookie: HTTPCookie) {
         self.user = user
         UserDefaults.standard.set(user.username, forKey: "username")
     }

@@ -9,7 +9,7 @@
 import UIKit
 
 extension UITableViewController {
-    public func smoothlyDeselectRows() {
+    func smoothlyDeselectRows() {
         // Get the initially selected index paths, if any
         let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
 

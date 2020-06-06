@@ -13,8 +13,8 @@ import PromiseKit
 import Loaf
 
 class SettingsViewController: UITableViewController {
-    public var sessionService: SessionService?
-    public var authenticationUIService: AuthenticationUIService?
+    var sessionService: SessionService?
+    var authenticationUIService: AuthenticationUIService?
 
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!

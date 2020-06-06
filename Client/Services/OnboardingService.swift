@@ -10,7 +10,7 @@ import SwiftUI
 import WhatsNewKit
 
 enum OnboardingService {
-    public static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
+    static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
@@ -55,31 +55,23 @@ enum OnboardingService {
             theme.itemsView.titleColor = appTheme.titleTextColor
             theme.itemsView.subtitleColor = appTheme.textColor
         }
-        return WhatsNewViewController.Configuration(theme: theme)
+        var configuration = WhatsNewViewController.Configuration(theme: theme)
+        configuration.titleView.titleMode = .scrolls
+        return configuration
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let votingItem = WhatsNew.Item(
-            title: "Up Vote",
-            subtitle: "Swipe right on posts and comments to up vote them.",
-            image: UIImage(named: "UpvoteOnboardingIcon")
+        let openInItem = WhatsNew.Item(
+            title: "Open in Hackers",
+            subtitle: "New share extension to open Hacker News links in Hackers.",
+            image: UIImage(systemName: "square.and.arrow.up")
         )
-        let collapseCommentsItem = WhatsNew.Item(
-            title: "Collapse Comments",
-            subtitle: "Tap on a comment to collapse its replies. Tap again to expand.",
-            image: UIImage(named: "CollapseCommentsOnboardingIcon")
+        let internalLinksItem = WhatsNew.Item(
+            title: "Directly open links",
+            subtitle: "Links to other Hacker News posts in comments open directly in the app.",
+            image: UIImage(systemName: "bubble.right")
         )
-        let swipeCollapseCommentsItem = WhatsNew.Item(
-            title: "Collapse Comment Threads",
-            subtitle: "Swipe left on a comment to collapse the whole thread of comments.",
-            image: UIImage(named: "CollapseCommentThreadOnboardingIcon")
-        )
-        let darkModeItem = WhatsNew.Item(
-            title: "Dark Mode",
-            subtitle: "Switch to a true black dark theme in settings.",
-            image: UIImage(named: "DarkThemeOnboardingIcon")
-        )
-        return [votingItem, collapseCommentsItem, swipeCollapseCommentsItem, darkModeItem]
+        return [openInItem, internalLinksItem]
     }
 }
 

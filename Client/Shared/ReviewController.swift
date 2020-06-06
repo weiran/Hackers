@@ -9,21 +9,21 @@
 import StoreKit
 
 enum ReviewController {
-    public static var disablePrompts = false
+    static var disablePrompts = false
 
     private static let showPromptIncrements = [5, 10, 15]
     private static let LaunchCounter = "Launch Counter"
 
-    public static func incrementLaunchCounter() {
+    static func incrementLaunchCounter() {
         let counter = launchCounter()
         UserDefaults.standard.set(counter + 1, forKey: LaunchCounter)
     }
 
-    public static func launchCounter() -> Int {
+    static func launchCounter() -> Int {
         return UserDefaults.standard.integer(forKey: LaunchCounter)
     }
 
-    public static func requestReview() {
+    static func requestReview() {
         if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
             return
         }

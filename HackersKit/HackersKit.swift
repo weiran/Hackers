@@ -1,5 +1,5 @@
 //
-//  HackerNewsData.swift
+//  HackersKit.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 11/05/2020.
@@ -9,10 +9,17 @@
 import Foundation
 import PromiseKit
 
-class HackerNewsData {
-    public static let shared = HackerNewsData()
+class HackersKit {
+    static let shared = HackersKit()
 
     let session = URLSession(configuration: .default)
+    let scraperShim = HNScraperShim()
+
+    weak var authenticationDelegate: HackerNewsAuthenticationDelegate?
+
+    init() {
+        scraperShim.authenticationDelegate = self
+    }
 
     internal func fetchHtml(url: URL) -> Promise<String> {
         let (promise, seal) = Promise<String>.pending()
@@ -23,7 +30,7 @@ class HackerNewsData {
             } else if let error = error {
                 seal.reject(error)
             } else {
-                seal.reject(HackerNewsError.typeError)
+                seal.reject(HackersKitError.requestFailure)
             }
         }.resume()
 

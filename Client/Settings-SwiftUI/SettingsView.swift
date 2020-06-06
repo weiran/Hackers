@@ -38,9 +38,9 @@ struct SettingsView: View {
                 Section(header: Text("MORE")) {
                     Button(action: {
                         self.showOnboarding = true
-                    }) {
+                    }, label: {
                         Text("Show What's New")
-                    }.sheet(isPresented: $showOnboarding) {
+                    }).sheet(isPresented: $showOnboarding) {
                         OnboardingViewControllerWrapper()
                     }
                 }

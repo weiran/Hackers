@@ -1,5 +1,5 @@
 //
-//  HackerNewsData+Comments.swift
+//  HackersKit+Post.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
@@ -10,28 +10,28 @@ import Foundation
 import PromiseKit
 import SwiftSoup
 
-extension HackerNewsData {
-    public func getPost(id: Int, includeAllComments: Bool = false) -> Promise<HackerNewsPost> {
+extension HackersKit {
+    func getPost(id: Int, includeAllComments: Bool = false) -> Promise<Post> {
         firstly {
             fetchPostHtml(id: id, recursive: includeAllComments)
         }.map { html in
             let document = try SwiftSoup.parse(html)
-            let post = try HackerNewsHtmlParser.post(from: document.select(".fatitem"), type: .news)
+            let post = try HtmlParser.post(from: document.select(".fatitem"), type: .news)
             let comments = try self.comments(from: html)
             post.comments = comments
             return post
         }
     }
 
-    private func comments(from html: String) throws -> [HackerNewsComment] {
-        let commentElements = try HackerNewsHtmlParser.commentElements(from: html)
+    private func comments(from html: String) throws -> [Comment] {
+        let commentElements = try HtmlParser.commentElements(from: html)
         var comments = commentElements.compactMap { element in
-            try? HackerNewsHtmlParser.comment(from: element)
+            try? HtmlParser.comment(from: element)
         }
 
         // get the post text for AskHN
-        let postTableElement = try HackerNewsHtmlParser.postsTableElement(from: html)
-        if let post = try HackerNewsHtmlParser.posts(from: postTableElement, type: .news).first,
+        let postTableElement = try HtmlParser.postsTableElement(from: html)
+        if let post = try HtmlParser.posts(from: postTableElement, type: .news).first,
             let postComment = self.postComment(from: post) {
             comments.insert(postComment, at: 0)
         }
@@ -39,9 +39,9 @@ extension HackerNewsData {
         return comments
     }
 
-    private func postComment(from post: HackerNewsPost) -> HackerNewsComment? {
+    private func postComment(from post: Post) -> Comment? {
         if let text = post.text {
-            return HackerNewsComment(
+            return Comment(
                 id: post.id,
                 age: post.age,
                 text: text,

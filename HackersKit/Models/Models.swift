@@ -1,5 +1,5 @@
 //
-//  HackerNewsModels.swift
+//  Models.swift
 //  Hackers
 //
 //  Created by Weiran Zhang on 25/05/2020.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class HackerNewsPost: Hashable {
+class Post: Hashable {
     let id: Int
     let url: URL
     let title: String
@@ -16,11 +16,11 @@ class HackerNewsPost: Hashable {
     let commentsCount: Int
     let by: String
     var score: Int
-    let postType: HackerNewsPostType
+    let postType: PostType
     var upvoted = false
     var text: String?
 
-    var comments: [HackerNewsComment]?
+    var comments: [Comment]?
 
     init(
         id: Int,
@@ -30,7 +30,7 @@ class HackerNewsPost: Hashable {
         commentsCount: Int,
         by: String,
         score: Int,
-        postType: HackerNewsPostType,
+        postType: PostType,
         upvoted: Bool
     ) {
         self.id = id
@@ -48,12 +48,19 @@ class HackerNewsPost: Hashable {
         hasher.combine(id)
     }
 
-    static func == (lhs: HackerNewsPost, rhs: HackerNewsPost) -> Bool {
+    static func == (lhs: Post, rhs: Post) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-class HackerNewsComment: Hashable {
+enum PostType: String {
+    case news
+    case ask
+    case jobs
+    case newest
+}
+
+class Comment: Hashable {
     let id: Int
     let age: String
     let text: String
@@ -85,25 +92,39 @@ class HackerNewsComment: Hashable {
         hasher.combine(id)
     }
 
-    static func == (lhs: HackerNewsComment, rhs: HackerNewsComment) -> Bool {
+    static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
     }
-}
-
-enum HackerNewsPostType: String {
-    case news
-    case ask
-    case jobs
-    case newest
-}
-
-enum HackerNewsError: Error {
-    case typeError
-    case hnScraperError
 }
 
 enum CommentVisibilityType: Int {
     case visible = 3
     case compact = 2
     case hidden = 1
+}
+
+class User {
+    let username: String
+    let karma: Int
+    let joined: Date
+
+    init(username: String, karma: Int, joined: Date) {
+        self.username = username
+        self.karma = karma
+        self.joined = joined
+    }
+}
+
+enum HackersKitError: Error {
+    case requestFailure
+    case scraperError // internal failure from HNScraper
+    case unauthenticated // tried an request that requires authentication when unauthenticated
+    case authenticationError(error: HackersKitAuthenticationError)
+}
+
+enum HackersKitAuthenticationError: Error {
+    case badCredentials
+    case serverUnreachable
+    case noInternet
+    case unknown
 }

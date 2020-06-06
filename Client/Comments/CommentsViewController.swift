@@ -14,18 +14,19 @@ import PromiseKit
 import Loaf
 
 class CommentsViewController: UITableViewController {
-    public var authenticationUIService: AuthenticationUIService?
-    public var swipeCellKitActions: SwipeCellKitActions?
+    var authenticationUIService: AuthenticationUIService?
+    var swipeCellKitActions: SwipeCellKitActions?
+    var navigationService: NavigationService?
 
     private enum ActivityType {
         case comments
         case link(url: URL)
     }
 
-    public var postId: Int?
-    public var post: HackerNewsPost?
+    var postId: Int?
+    var post: Post?
 
-    private var comments: [HackerNewsComment]? {
+    private var comments: [Comment]? {
         didSet { commentsController.comments = comments! }
     }
     private let commentsController = CommentsController()
@@ -40,13 +41,8 @@ class CommentsViewController: UITableViewController {
         load()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setupHandoff(with: post, activityType: .comments)
-    }
-
     deinit {
-        userActivity?.invalidate()
+        tearDownHandoff()
     }
 
     private func load(showSpinner: Bool = true) {
@@ -56,8 +52,9 @@ class CommentsViewController: UITableViewController {
 
         firstly {
             loadPost()
-        }.then { (post) -> Promise<[HackerNewsComment]> in
+        }.then { (post) -> Promise<[Comment]> in
             self.post = post
+            self.setupHandoff(with: post, activityType: .comments)
             return self.loadComments(for: post)
         }.done { comments in
             self.comments = comments
@@ -69,14 +66,14 @@ class CommentsViewController: UITableViewController {
         }
     }
 
-    private func loadPost() -> Promise<HackerNewsPost> {
+    private func loadPost() -> Promise<Post> {
         if let post = self.post {
             return Promise.value(post)
         }
-        return HackerNewsData.shared.getPost(id: postId!, includeAllComments: true)
+        return HackersKit.shared.getPost(id: postId!, includeAllComments: true)
     }
 
-    private func loadComments(for post: HackerNewsPost) -> Promise<[HackerNewsComment]> {
+    private func loadComments(for post: Post) -> Promise<[Comment]> {
         // if it already has comments then use those
         if let comments = post.comments {
             return Promise.value(comments)
@@ -84,7 +81,7 @@ class CommentsViewController: UITableViewController {
 
         // otherwise always try to fetch comments
         return firstly {
-            HackerNewsData.shared.getPost(id: post.id, includeAllComments: true)
+            HackersKit.shared.getPost(id: post.id, includeAllComments: true)
         }.map { post in
             return post.comments ?? []
         }
@@ -133,36 +130,52 @@ extension CommentsViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case CommentsTableSections.post.rawValue:
-            // swiftlint:disable force_cast
-            let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+            return postCell(for: post, in: tableView, with: indexPath)
 
-            cell.delegate = self
-            cell.postTitleView.post = post
-            cell.setImageWithPlaceholder(url: post?.url)
-            cell.thumbnailImageView.isUserInteractionEnabled = false
+        // we disable no_fallthrough_only here as it's a valid case to use it
+        // swiftlint:disable no_fallthrough_only
+        case CommentsTableSections.comments.rawValue: fallthrough
+        // swiftlint:enable no_fallthrough_only
 
-            return cell
-
-        case CommentsTableSections.comments.rawValue:
-            fallthrough
-            
         default:
             let comment = commentsController.visibleComments[indexPath.row]
-            assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
-            let cellIdentifier = comment.visibility == CommentVisibilityType.visible ?
-                "OpenCommentCell" : "ClosedCommentCell"
-
-            // swiftlint:disable force_cast
-            let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier,
-                                                     for: indexPath) as! CommentTableViewCell
-
-            cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
-            cell.commentDelegate = self
-            cell.delegate = self
-
-            return cell
+            return commentCell(for: comment, in: tableView, with: indexPath)
         }
     }
+
+    // disabling force cast here as we want the app to crash if the table can't dequeue a cell
+    // swiftlint:disable force_cast
+    private func postCell(for post: Post?, in tableView: UITableView, with indexPath: IndexPath) -> PostCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+
+        cell.delegate = self
+        cell.postTitleView.post = post
+        cell.setImageWithPlaceholder(url: post?.url)
+        cell.thumbnailImageView.isUserInteractionEnabled = false
+
+        return cell
+    }
+
+    private func commentCell(
+        for comment: Comment,
+        in tableView: UITableView,
+        with indexPath: IndexPath
+    ) -> CommentTableViewCell {
+        let cellIdentifier = comment.visibility == CommentVisibilityType.visible ?
+            "OpenCommentCell" : "ClosedCommentCell"
+
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: cellIdentifier,
+            for: indexPath
+        ) as! CommentTableViewCell
+
+        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
+        cell.commentDelegate = self
+        cell.delegate = self
+
+        return cell
+    }
+    // swiftlint:enable force_cast
 }
 
 extension CommentsViewController: SwipeTableViewCellDelegate {
@@ -251,40 +264,7 @@ extension CommentsViewController: CommentDelegate {
     }
 
     func internalLinkTapped(postId: Int, url: URL, sender: UITextView) {
-        let spinnerView = showTerribleActivityView()
-        _ = HackerNewsData.shared.getPost(id: postId).done { post in
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let viewController =
-                storyboard.instantiateViewController(identifier: "CommentsViewController") as CommentsViewController
-            viewController.post = post
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }.catch { _ in
-            self.linkTapped(url, sender: sender)
-        }.finally {
-            spinnerView.removeFromSuperview()
-        }
-    }
-
-    private func showTerribleActivityView() -> UIView {
-        // TODO remove this after refactoring Comments VC to support loading
-        // in the post async
-        let spinner = UIActivityIndicatorView(style: .large)
-        spinner.color = .white
-
-        let spinnerView = UIView()
-        spinnerView.backgroundColor = UIColor(white: 0, alpha: 0.7)
-        spinnerView.frame = navigationController!.view!.frame
-
-        spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.startAnimating()
-        spinnerView.addSubview(spinner)
-
-        spinner.centerXAnchor.constraint(equalTo: spinnerView.centerXAnchor).isActive = true
-        spinner.centerYAnchor.constraint(equalTo: spinnerView.centerYAnchor).isActive = true
-
-        UIApplication.shared.windows.first?.addSubview(spinnerView)
-
-        return spinnerView
+        navigationService?.showPost(id: postId)
     }
 
     private func toggleCellVisibilityForCell(_ indexPath: IndexPath!, scrollIfCellCovered: Bool = true) {
@@ -316,7 +296,7 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-    private func setupHandoff(with post: HackerNewsPost?, activityType: ActivityType) {
+    private func setupHandoff(with post: Post?, activityType: ActivityType) {
         guard let post = post else {
             return
         }
@@ -334,5 +314,9 @@ extension CommentsViewController {
         activity?.title = post.title + " | Hacker News"
         userActivity = activity
         userActivity?.becomeCurrent()
+    }
+
+    private func tearDownHandoff() {
+        userActivity?.invalidate()
     }
 }

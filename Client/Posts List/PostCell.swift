@@ -16,7 +16,7 @@ protocol PostCellDelegate: class {
 }
 
 class PostCell: SwipeTableViewCell {
-    public weak var postDelegate: PostCellDelegate?
+    weak var postDelegate: PostCellDelegate?
     private var downloadTask: DownloadTask?
 
     @IBOutlet weak var postTitleView: PostTitleView!
@@ -56,7 +56,7 @@ class PostCell: SwipeTableViewCell {
         postDelegate?.didTapThumbnail(sender)
     }
 
-    public func setImageWithPlaceholder(url: URL?) {
+    func setImageWithPlaceholder(url: URL?) {
         downloadTask = thumbnailImageView.setImageWithPlaceholder(url: url)
     }
 
