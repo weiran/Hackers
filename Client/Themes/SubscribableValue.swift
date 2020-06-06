@@ -29,14 +29,5 @@ struct SubscribableValue<T> {
 
 	mutating func subscribe(_ object: AnyObject, using handler: @escaping (T) -> Void) {
 		subscriptions.append((Weak(value: object), handler))
-//		cleanupSubscriptions()
-	}
-
-	/// Removes any subscriptions where the object has been deallocated
-	/// and no longer exists
-	private mutating func cleanupSubscriptions() {
-		subscriptions = subscriptions.filter({ entry in
-			return entry.object.value != nil
-		})
 	}
 }
