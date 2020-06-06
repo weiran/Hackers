@@ -353,13 +353,6 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		2489068919B74CAC009F591E /* HackerSwifter */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = HackerSwifter;
-			sourceTree = "<group>";
-		};
 		24993C58229C76EA00AF1891 /* AuthenticationUIService */ = {
 			isa = PBXGroup;
 			children = (
@@ -480,7 +473,6 @@
 		24F39F8718AFB1150055F8DC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2489068919B74CAC009F591E /* HackerSwifter */,
 				24F39F8818AFB1150055F8DC /* Foundation.framework */,
 				24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */,
 				24F39F8C18AFB1150055F8DC /* UIKit.framework */,
