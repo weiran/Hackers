@@ -37,6 +37,7 @@
 		2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */; };
 		2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2477BDE4227D9D8200771FE2 /* SessionService.swift */; };
 		2479E11522B69CF100D9F1A4 /* ThumbnailImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */; };
+		247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247C9C78248BC35000AF4E60 /* NavigationService.swift */; };
 		2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5A247C0FFB0088CA2B /* Models.swift */; };
 		2481BD5D247C10330088CA2B /* HackersKit+PostsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */; };
 		2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5E247C103B0088CA2B /* HackersKit+Post.swift */; };
@@ -161,6 +162,7 @@
 		2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		2477BDE4227D9D8200771FE2 /* SessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionService.swift; sourceTree = "<group>"; };
 		2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailImageView.swift; sourceTree = "<group>"; };
+		247C9C78248BC35000AF4E60 /* NavigationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationService.swift; sourceTree = "<group>"; };
 		2481BD5A247C0FFB0088CA2B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostsList.swift"; sourceTree = "<group>"; };
 		2481BD5E247C103B0088CA2B /* HackersKit+Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+Post.swift"; sourceTree = "<group>"; };
@@ -519,6 +521,7 @@
 				24993C58229C76EA00AF1891 /* AuthenticationUIService */,
 				2477BDE4227D9D8200771FE2 /* SessionService.swift */,
 				24B1A6A422B508A40051EAFD /* OnboardingService.swift */,
+				247C9C78248BC35000AF4E60 /* NavigationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -948,6 +951,7 @@
 				2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */,
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
 				24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */,
+				247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */,
 				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
