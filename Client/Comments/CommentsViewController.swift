@@ -22,12 +22,13 @@ class CommentsViewController: UITableViewController {
         case link(url: URL)
     }
 
+    public var postId: Int?
     public var post: HackerNewsPost?
-    private let commentsController = CommentsController()
 
     private var comments: [HackerNewsComment]? {
         didSet { commentsController.comments = comments! }
     }
+    private let commentsController = CommentsController()
 
     @IBOutlet var loadingView: UIView!
     private var notificationToken: NotificationToken?
@@ -35,11 +36,8 @@ class CommentsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTheming()
-        loadComments()
-        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
-        notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                     object: nil, queue: .main) { _ in self.loadComments() }
+
+        load()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -51,9 +49,16 @@ class CommentsViewController: UITableViewController {
         userActivity?.invalidate()
     }
 
-    private func loadComments() {
+    private func load(showSpinner: Bool = true) {
+        if showSpinner {
+            tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+        }
+
         firstly {
-            HackerNewsData.shared.getComments(for: post!)
+            loadPost()
+        }.then { (post) -> Promise<[HackerNewsComment]> in
+            self.post = post
+            return self.loadComments(for: post)
         }.done { comments in
             self.comments = comments
             self.tableView.reloadData()
@@ -62,6 +67,33 @@ class CommentsViewController: UITableViewController {
         }.finally {
             self.tableView.backgroundView = nil
         }
+    }
+
+    private func loadPost() -> Promise<HackerNewsPost> {
+        if let post = self.post {
+            return Promise.value(post)
+        }
+        return HackerNewsData.shared.getPost(id: postId!, includeAllComments: true)
+    }
+
+    private func loadComments(for post: HackerNewsPost) -> Promise<[HackerNewsComment]> {
+        // if it already has comments then use those
+        if let comments = post.comments {
+            return Promise.value(comments)
+        }
+
+        // otherwise always try to fetch comments
+        return firstly {
+            HackerNewsData.shared.getPost(id: post.id, includeAllComments: true)
+        }.map { post in
+            return post.comments ?? []
+        }
+    }
+
+    private func observeNotifications() {
+        notificationToken = NotificationCenter.default
+            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                     object: nil, queue: .main) { _ in self.load(showSpinner: false) }
     }
 
     override func updateUserActivityState(_ activity: NSUserActivity) {
@@ -82,20 +114,25 @@ class CommentsViewController: UITableViewController {
 }
 
 extension CommentsViewController {
+    enum CommentsTableSections: Int, CaseIterable {
+        case post = 0
+        case comments = 1
+    }
+
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return CommentsTableSections.allCases.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return 1
+        case 0: return post == nil ? 0 : 1
         default: return commentsController.visibleComments.count
         }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
-        case 0:
+        case CommentsTableSections.post.rawValue:
             // swiftlint:disable force_cast
             let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
 
@@ -105,6 +142,10 @@ extension CommentsViewController {
             cell.thumbnailImageView.isUserInteractionEnabled = false
 
             return cell
+
+        case CommentsTableSections.comments.rawValue:
+            fallthrough
+            
         default:
             let comment = commentsController.visibleComments[indexPath.row]
             assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")

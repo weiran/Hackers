@@ -33,7 +33,9 @@ class NewsViewController: UITableViewController {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
-        tableView.refreshControl?.addTarget(self, action: #selector(fetchPosts), for: UIControl.Event.valueChanged)
+        tableView.refreshControl?.addTarget(self,
+                                            action: #selector(fetchPostsWithReset),
+                                            for: UIControl.Event.valueChanged)
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
         dataSource = makeDataSource()
@@ -43,7 +45,7 @@ class NewsViewController: UITableViewController {
             .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
                      object: nil,
                      queue: .main
-            ) { _ in self.fetchPosts() }
+            ) { _ in self.fetchPostsWithReset() }
 
         setupTheming()
         fetchPosts()
@@ -101,6 +103,11 @@ extension NewsViewController { // post fetching
             self.tableView.refreshControl?.endRefreshing()
             self.pageIndex += 1
         }
+    }
+
+    @objc private func fetchPostsWithReset() {
+        pageIndex = 1
+        fetchPosts()
     }
 }
 
