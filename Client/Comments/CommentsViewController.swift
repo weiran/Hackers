@@ -54,7 +54,7 @@ class CommentsViewController: UITableViewController {
             loadPost()
         }.then { (post) -> Promise<[Comment]> in
             self.post = post
-            setupHandoff(with: post, activityType: .comments)
+            self.setupHandoff(with: post, activityType: .comments)
             return self.loadComments(for: post)
         }.done { comments in
             self.comments = comments
