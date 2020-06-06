@@ -10,7 +10,7 @@ import SwiftUI
 import WhatsNewKit
 
 enum OnboardingService {
-    static func onboardingViewController(forceShow: Bool = true) -> UIViewController? {
+    static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
