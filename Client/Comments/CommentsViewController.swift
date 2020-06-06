@@ -41,13 +41,8 @@ class CommentsViewController: UITableViewController {
         load()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setupHandoff(with: post, activityType: .comments)
-    }
-
     deinit {
-        userActivity?.invalidate()
+        tearDownHandoff()
     }
 
     private func load(showSpinner: Bool = true) {
@@ -59,6 +54,7 @@ class CommentsViewController: UITableViewController {
             loadPost()
         }.then { (post) -> Promise<[Comment]> in
             self.post = post
+            setupHandoff(with: post, activityType: .comments)
             return self.loadComments(for: post)
         }.done { comments in
             self.comments = comments
@@ -318,5 +314,9 @@ extension CommentsViewController {
         activity?.title = post.title + " | Hacker News"
         userActivity = activity
         userActivity?.becomeCurrent()
+    }
+
+    private func tearDownHandoff() {
+        userActivity?.invalidate()
     }
 }
