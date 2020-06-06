@@ -134,35 +134,52 @@ extension CommentsViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case CommentsTableSections.post.rawValue:
-            // swiftlint:disable force_cast
-            let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+            return postCell(for: post, in: tableView, with: indexPath)
 
-            cell.delegate = self
-            cell.postTitleView.post = post
-            cell.setImageWithPlaceholder(url: post?.url)
-            cell.thumbnailImageView.isUserInteractionEnabled = false
-
-            return cell
-
+        // we disable no_fallthrough_only here as it's a valid case to use it
+        // swiftlint:disable no_fallthrough_only
         case CommentsTableSections.comments.rawValue: fallthrough
+        // swiftlint:enable no_fallthrough_only
 
         default:
             let comment = commentsController.visibleComments[indexPath.row]
-            assert(comment.visibility != .hidden, "Cell cannot be hidden and in the array of visible cells")
-            let cellIdentifier = comment.visibility == CommentVisibilityType.visible ?
-                "OpenCommentCell" : "ClosedCommentCell"
-
-            // swiftlint:disable force_cast
-            let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier,
-                                                     for: indexPath) as! CommentTableViewCell
-
-            cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
-            cell.commentDelegate = self
-            cell.delegate = self
-
-            return cell
+            return commentCell(for: comment, in: tableView, with: indexPath)
         }
     }
+
+    // disabling force cast here as we want the app to crash if the table can't dequeue a cell
+    // swiftlint:disable force_cast
+    private func postCell(for post: Post?, in tableView: UITableView, with indexPath: IndexPath) -> PostCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath) as! PostCell
+
+        cell.delegate = self
+        cell.postTitleView.post = post
+        cell.setImageWithPlaceholder(url: post?.url)
+        cell.thumbnailImageView.isUserInteractionEnabled = false
+
+        return cell
+    }
+
+    private func commentCell(
+        for comment: Comment,
+        in tableView: UITableView,
+        with indexPath: IndexPath
+    ) -> CommentTableViewCell {
+        let cellIdentifier = comment.visibility == CommentVisibilityType.visible ?
+            "OpenCommentCell" : "ClosedCommentCell"
+
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: cellIdentifier,
+            for: indexPath
+        ) as! CommentTableViewCell
+
+        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
+        cell.commentDelegate = self
+        cell.delegate = self
+
+        return cell
+    }
+    // swiftlint:enable force_cast
 }
 
 extension CommentsViewController: SwipeTableViewCellDelegate {

@@ -14,8 +14,8 @@ class NavigationService {
     func showPost(id: Int) {
         if let splitController = visibleViewController(),
             let navController = viewController(for: "PostViewNavigationController") as? UINavigationController,
-            let vc = navController.children.first as? CommentsViewController {
-            vc.postId = id
+            let controller = navController.children.first as? CommentsViewController {
+            controller.postId = id
             splitController.showDetailViewController(navController, sender: self)
         }
     }
