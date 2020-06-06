@@ -14,8 +14,6 @@
 		2419D02524898DF700740184 /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D02424898DF700740184 /* ActionViewController.swift */; };
 		2419D02824898DF700740184 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02624898DF700740184 /* MainInterface.storyboard */; };
 		2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2419D033248AAEEF00740184 /* SharedExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D030248AAE6100740184 /* SharedExtensions.swift */; };
-		2419D034248AAEEF00740184 /* SharedExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D030248AAE6100740184 /* SharedExtensions.swift */; };
 		2419D037248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		2419D038248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		242A90A422635B8C008E7910 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A90A322635B8C008E7910 /* UIImageExtensions.swift */; };
@@ -136,7 +134,6 @@
 		2419D02424898DF700740184 /* ActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionViewController.swift; sourceTree = "<group>"; };
 		2419D02724898DF700740184 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		2419D02924898DF700740184 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2419D030248AAE6100740184 /* SharedExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedExtensions.swift; sourceTree = "<group>"; };
 		2419D035248AAFDF00740184 /* OpenInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenInViewController.swift; sourceTree = "<group>"; };
 		242A90A322635B8C008E7910 /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
 		243271941F95EDA9008196DB /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
@@ -271,7 +268,6 @@
 		2419D032248AAED500740184 /* Share Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				2419D030248AAE6100740184 /* SharedExtensions.swift */,
 				2419D035248AAFDF00740184 /* OpenInViewController.swift */,
 				24C10BF424866D3F00B93F68 /* HackersShareExtension */,
 				2419D02124898DF700740184 /* HackersActionExtension */,
@@ -885,7 +881,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2419D034248AAEEF00740184 /* SharedExtensions.swift in Sources */,
 				2419D038248AB03700740184 /* OpenInViewController.swift in Sources */,
 				2419D02524898DF700740184 /* ActionViewController.swift in Sources */,
 			);
@@ -904,7 +899,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2419D033248AAEEF00740184 /* SharedExtensions.swift in Sources */,
 				2419D037248AB03700740184 /* OpenInViewController.swift in Sources */,
 				24C10BF624866D3F00B93F68 /* ShareViewController.swift in Sources */,
 			);

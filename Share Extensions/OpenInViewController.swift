@@ -26,7 +26,7 @@ class OpenInViewController: UIViewController {
                         let id = Int(idString),
                         let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)") {
                         DispatchQueue.main.async {
-                            SharedExtensions.open(openInURL, in: self)
+                            self.openURL(openInURL)
                             self.close()
                         }
                     } else {
@@ -43,4 +43,16 @@ class OpenInViewController: UIViewController {
     }
 
     func error() { }
+
+    /// Specifically crafted `openURL` to work with shared extensions
+    /// https://stackoverflow.com/a/44499373/33137
+    @objc func openURL(_ url: URL) {
+        var responder: UIResponder? = self
+        while responder != nil {
+            if let application = responder as? UIApplication {
+                application.perform(#selector(openURL(_:)), with: url)
+            }
+            responder = responder?.next
+        }
+    }
 }
