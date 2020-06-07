@@ -764,7 +764,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TAGS=\"TODO:|FIXME:\"\nERRORTAG=\"ERROR:\"\nfind \"${SRCROOT}\" \\( -path ./Pods -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$|($ERRORTAG).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\" | perl -p -e \"s/($ERRORTAG)/ error: \\$1/\"";
+			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \n  xargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \n  perl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
 		};
 		249B8F8022A29B2E002A9EC5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1296,7 +1296,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1324,7 +1323,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
