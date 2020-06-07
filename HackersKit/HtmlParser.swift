@@ -35,8 +35,8 @@ enum HtmlParser {
     static func post(from elements: Elements, type: PostType) throws -> Post {
         let rows = try elements.select("tr")
         guard
-            let postElement: Element = elementOrNil(rows, index: 0),
-            let metadataElement: Element = elementOrNil(rows, index: 1) else {
+            let postElement: Element = safeGet(rows, index: 0),
+            let metadataElement: Element = safeGet(rows, index: 1) else {
                 throw Exception.Error(type: .SelectorParseException, Message: "Coldn't find post elements")
         }
         guard let id = Int(try postElement.attr("id")) else {
@@ -73,10 +73,6 @@ enum HtmlParser {
             postType: type,
             upvoted: upvoted
         )
-    }
-
-    private static func elementOrNil(_ elements: Elements, index: Int) -> Element? {
-        return elements.indices.contains(index) ? elements[index] : nil
     }
 
     static func postsTableElement(from html: String) throws -> Element {
@@ -177,7 +173,7 @@ enum HtmlParser {
             // this happens because the user is logged in
             if try !rowElement.select("form").isEmpty() {
                 let newIndex = rowElements.count - 3
-                guard let backThreeElement = elementOrNil(rowElements, index: newIndex) else {
+                guard let backThreeElement = safeGet(rowElements, index: newIndex) else {
                     return nil
                 }
                 rowElement = backThreeElement
@@ -200,5 +196,9 @@ enum HtmlParser {
         } catch {
             return nil
         }
+    }
+
+    private static func safeGet(_ elements: Elements, index: Int) -> Element? {
+        return elements.indices.contains(index) ? elements.get(index) : nil
     }
 }
