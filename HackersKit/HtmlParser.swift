@@ -34,8 +34,11 @@ enum HtmlParser {
 
     static func post(from elements: Elements, type: PostType) throws -> Post {
         let rows = try elements.select("tr")
-        let postElement = rows[0]
-        let metadataElement = rows[1]
+        guard
+            let postElement: Element = elementOrNil(rows, index: 0),
+            let metadataElement: Element = elementOrNil(rows, index: 1) else {
+                throw Exception.Error(type: .SelectorParseException, Message: "Coldn't find post elements")
+        }
         guard let id = Int(try postElement.attr("id")) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
         }
@@ -70,6 +73,10 @@ enum HtmlParser {
             postType: type,
             upvoted: upvoted
         )
+    }
+
+    private static func elementOrNil(_ elements: Elements, index: Int) -> Element? {
+        return elements.indices.contains(index) ? elements[index] : nil
     }
 
     static func postsTableElement(from html: String) throws -> Element {
@@ -169,7 +176,11 @@ enum HtmlParser {
             // if it contains a row, then check 2 rows up for text row
             // this happens because the user is logged in
             if try !rowElement.select("form").isEmpty() {
-                rowElement = rowElements[rowElements.count - 3]
+                let newIndex = rowElements.count - 3
+                guard let backThreeElement = elementOrNil(rowElements, index: newIndex) else {
+                    return nil
+                }
+                rowElement = backThreeElement
             }
 
             // if the row has a subtext column, that means there isn't
