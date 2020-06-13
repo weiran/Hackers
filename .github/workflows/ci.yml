@@ -1,0 +1,25 @@
+name: Swift
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maierj/fastlane-action@v1.4.0
+    - name: Lint
+      with: 
+        lane: lint
+    - name: Run UI Tests
+      with: 
+        lane: test
+    - name: Build
+      with: 
+        lane: build
