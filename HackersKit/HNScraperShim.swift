@@ -83,10 +83,15 @@ extension HNScraperShim { // posts
 
 extension HNScraperShim { // comments
     func upvote(comment: Comment, for post: Post) -> Promise<Void> {
-        return firstly {
-            getComment(id: comment.id, for: post)
-        }.then { comment in
-            self.scraperUpvote(comment: comment)
+        if let upvoteLink = comment.upvoteLink {
+            let hnComment = HNComment()
+            hnComment.id = String(comment.id)
+            hnComment.upvoteUrl = upvoteLink
+            return scraperUpvote(comment: hnComment)
+        } else {
+            return getComment(id: comment.id, for: post).then { comment in
+                return self.scraperUpvote(comment: comment)
+            }
         }
     }
 
