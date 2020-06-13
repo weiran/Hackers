@@ -16,6 +16,7 @@
 		2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2419D037248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		2419D038248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
+		241C32DE24950C05000876DC /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241C32DD24950C05000876DC /* PostTitleView.swift */; };
 		242A90A422635B8C008E7910 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242A90A322635B8C008E7910 /* UIImageExtensions.swift */; };
 		243271951F95EDA9008196DB /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243271941F95EDA9008196DB /* StringExtensions.swift */; };
 		245345EF22466EA8001AF1CE /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345EE22466EA8001AF1CE /* HackersUITests.swift */; };
@@ -55,7 +56,6 @@
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A422B508A40051EAFD /* OnboardingService.swift */; };
 		24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A622B521470051EAFD /* BounceExpansion.swift */; };
-		24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */; };
 		24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B982DC22BE65E2000D8913 /* SettingsView.swift */; };
 		24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B982DE22BE65FF000D8913 /* SettingsStore.swift */; };
 		24C10BF624866D3F00B93F68 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C10BF524866D3F00B93F68 /* ShareViewController.swift */; };
@@ -136,6 +136,7 @@
 		2419D02724898DF700740184 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		2419D02924898DF700740184 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2419D035248AAFDF00740184 /* OpenInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenInViewController.swift; sourceTree = "<group>"; };
+		241C32DD24950C05000876DC /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTitleView.swift; sourceTree = "<group>"; };
 		242A90A322635B8C008E7910 /* UIImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
 		243271941F95EDA9008196DB /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		245345EC22466EA8001AF1CE /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -180,7 +181,6 @@
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
 		24B1A6A622B521470051EAFD /* BounceExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceExpansion.swift; sourceTree = "<group>"; };
-		24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PostTitleView.swift; path = Client/Shared/PostTitleView.swift; sourceTree = SOURCE_ROOT; };
 		24B982DC22BE65E2000D8913 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		24B982DE22BE65FF000D8913 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		24C10BF324866D3F00B93F68 /* HackersShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HackersShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -267,14 +267,30 @@
 			path = HackersActionExtension;
 			sourceTree = "<group>";
 		};
-		2419D032248AAED500740184 /* Share Extensions */ = {
+		2419D032248AAED500740184 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 				2419D035248AAFDF00740184 /* OpenInViewController.swift */,
 				24C10BF424866D3F00B93F68 /* HackersShareExtension */,
 				2419D02124898DF700740184 /* HackersActionExtension */,
 			);
-			path = "Share Extensions";
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		241C32DB24950AB3000876DC /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				245345ED22466EA8001AF1CE /* HackersUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		241C32DC24950AF3000876DC /* Shared Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2457F04324696E9400F3E7A4 /* HackersKit */,
+			);
+			path = "Shared Frameworks";
 			sourceTree = "<group>";
 		};
 		245345ED22466EA8001AF1CE /* HackersUITests */ = {
@@ -371,7 +387,7 @@
 				249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */,
 				249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */,
 				24CEAA9C1F8917D60050DEDF /* ReviewController.swift */,
-				24B5BFEE1B52CE8900328C62 /* PostTitleView.swift */,
+				241C32DD24950C05000876DC /* PostTitleView.swift */,
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
 			);
@@ -449,10 +465,11 @@
 		24F39F7C18AFB1150055F8DC = {
 			isa = PBXGroup;
 			children = (
-				24F39F8E18AFB1150055F8DC /* Client */,
+				24F39F8E18AFB1150055F8DC /* App */,
 				24CE5FF119434E0B009D2677 /* Assets */,
-				245345ED22466EA8001AF1CE /* HackersUITests */,
-				2419D032248AAED500740184 /* Share Extensions */,
+				241C32DB24950AB3000876DC /* Tests */,
+				2419D032248AAED500740184 /* Extensions */,
+				241C32DC24950AF3000876DC /* Shared Frameworks */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
 				24F39F8618AFB1150055F8DC /* Products */,
 				241387A51945A6E100D71220 /* README.md */,
@@ -475,7 +492,6 @@
 		24F39F8718AFB1150055F8DC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2457F04324696E9400F3E7A4 /* HackersKit */,
 				24F39F8818AFB1150055F8DC /* Foundation.framework */,
 				24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */,
 				24F39F8C18AFB1150055F8DC /* UIKit.framework */,
@@ -485,9 +501,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		24F39F8E18AFB1150055F8DC /* Client */ = {
+		24F39F8E18AFB1150055F8DC /* App */ = {
 			isa = PBXGroup;
 			children = (
+				24CE5FEC19434BDC009D2677 /* AppDelegate.swift */,
 				24ADA7E2206FAF2200C143F4 /* Main.storyboard */,
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
@@ -502,14 +519,13 @@
 				249B8F8122A2A474002A9EC5 /* Shared */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 			);
-			path = Client;
+			path = App;
 			sourceTree = "<group>";
 		};
 		24F39F8F18AFB1150055F8DC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
 				24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */,
-				24CE5FEC19434BDC009D2677 /* AppDelegate.swift */,
 				24F39F9018AFB1150055F8DC /* Hackers-Info.plist */,
 			);
 			path = "Supporting Files";
@@ -732,7 +748,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersShareExtension/Info.plist\"\n";
+			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n";
 		};
 		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -750,7 +766,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Share Extensions/HackersActionExtension/Info.plist\"\n";
+			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n";
 		};
 		244DE6BB1E599EB6005B441E /* TODO as Warnings */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -928,7 +944,6 @@
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift in Sources */,
 				24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */,
 				2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */,
-				24B5BFEF1B52CE8900328C62 /* PostTitleView.swift in Sources */,
 				249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */,
 				2464D208209DD7B100C7F8FC /* AppThemeProvider.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
@@ -952,6 +967,7 @@
 				2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */,
 				24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */,
 				247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */,
+				241C32DE24950C05000876DC /* PostTitleView.swift in Sources */,
 				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
@@ -1025,7 +1041,7 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "Share Extensions/HackersActionExtension/Info.plist";
+				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1057,7 +1073,7 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "Share Extensions/HackersActionExtension/Info.plist";
+				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1147,7 +1163,7 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "Share Extensions/HackersShareExtension/Info.plist";
+				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1179,7 +1195,7 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "Share Extensions/HackersShareExtension/Info.plist";
+				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1303,15 +1319,15 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
-				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
+				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
+				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "App/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1330,15 +1346,15 @@
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Client/Supporting Files/Hackers2-Prefix.pch";
-				INFOPLIST_FILE = "Client/Supporting Files/Hackers-Info.plist";
+				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
+				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_OBJC_BRIDGING_HEADER = "Client/Supporting Files/Hackers2-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "App/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
