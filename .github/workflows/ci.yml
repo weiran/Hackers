@@ -1,0 +1,47 @@
+name: Hackers
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install SwiftLint
+      run: brew install swiftlint
+    - name: Run SwiftLint
+      uses: maierj/fastlane-action@v1.4.0
+      with: 
+        lane: 'lint'
+        subdirectory: 'fastlane'
+
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: pod install --repo-update
+    - name: Run UI Tests
+      uses: maierj/fastlane-action@v1.4.0
+      with: 
+        lane: 'test'
+        subdirectory: 'fastlane'
+
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: pod install --repo-update
+    - name: Build
+      uses: maierj/fastlane-action@v1.4.0
+      with: 
+        lane: 'build'
+        subdirectory: 'fastlane'
