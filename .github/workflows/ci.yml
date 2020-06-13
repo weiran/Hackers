@@ -16,10 +16,10 @@ jobs:
     - uses: maierj/fastlane-action@v1.4.0
     - name: Lint
       with: 
-        lane: lint
+        lane: 'lint'
     - name: Run UI Tests
       with: 
-        lane: test
+        lane: 'test'
     - name: Build
       with: 
-        lane: build
+        lane: 'build'
