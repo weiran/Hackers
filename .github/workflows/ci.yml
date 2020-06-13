@@ -25,6 +25,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: pod install --repo-update
     - name: Run UI Tests
       uses: maierj/fastlane-action@v1.4.0
       with: 
@@ -36,6 +38,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: pod install --repo-update
     - name: Build
       uses: maierj/fastlane-action@v1.4.0
       with: 
