@@ -17,11 +17,14 @@ jobs:
       uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'lint'
+        subdirectory: 'fastlane'
     - name: Run UI Tests
       uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'test'
+        subdirectory: 'fastlane'
     - name: Build
       uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'build'
+        subdirectory: 'fastlane'
