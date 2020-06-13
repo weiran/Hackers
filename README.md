@@ -61,7 +61,6 @@ I use several open source projects in Hackers, in no particular order:
 * [BulletinBoard](https://github.com/alexaubry/BulletinBoard)
 * [SwiftLint](https://github.com/realm/SwiftLint)
 * [DeviceKit](https://github.com/devicekit/DeviceKit)
-* [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
 * [WhatsNewKit](https://github.com/SvenTiigi/WhatsNewKit)
 
 ---
