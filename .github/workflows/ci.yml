@@ -13,13 +13,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: maierj/fastlane-action@v1.4.0
     - name: Lint
+      uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'lint'
     - name: Run UI Tests
+      uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'test'
     - name: Build
+      uses: maierj/fastlane-action@v1.4.0
       with: 
         lane: 'build'
