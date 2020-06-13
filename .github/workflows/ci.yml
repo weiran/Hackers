@@ -1,4 +1,4 @@
-name: Swift
+name: Hackers
 
 on:
   push:
@@ -24,6 +24,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - uses: actions/checkout@v2
     - name: Run UI Tests
       uses: maierj/fastlane-action@v1.4.0
       with: 
@@ -34,6 +35,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - uses: actions/checkout@v2
     - name: Build
       uses: maierj/fastlane-action@v1.4.0
       with: 
