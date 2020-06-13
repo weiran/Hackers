@@ -61,7 +61,10 @@ extension HackersKit {
         recursive: Bool = true,
         workingHtml: String = ""
     ) -> Promise<String> {
-        let url = URL(string: "https://news.ycombinator.com/item?id=\(id)&p=\(page)")!
+        guard let url = hackerNewsURL(id: id, page: page) else {
+            return Promise(error: Exception.Error(type: .MalformedURLException, Message: "Internal error"))
+        }
+
         return fetchHtml(url: url).then { html -> Promise<String> in
             let document = try SwiftSoup.parse(html)
             let moreLinkExists = try !document.select("a.morelink").isEmpty()
@@ -71,5 +74,19 @@ extension HackersKit {
                 return Promise.value(workingHtml + html)
             }
         }
+    }
+
+    private func hackerNewsURL(id: Int, page: Int) -> URL? {
+        var components = URLComponents()
+
+        components.scheme = "https"
+        components.host = "news.ycombinator.com"
+        components.path = "/item"
+        components.queryItems = [
+            URLQueryItem(name: "id", value: String(id)),
+            URLQueryItem(name: "p", value: String(page))
+        ]
+
+        return components.url
     }
 }
