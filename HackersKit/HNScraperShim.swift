@@ -83,10 +83,8 @@ extension HNScraperShim { // posts
 
 extension HNScraperShim { // comments
     func upvote(comment: Comment, for post: Post) -> Promise<Void> {
-        if let upvoteLink = comment.upvoteLink {
-            let hnComment = HNComment()
-            hnComment.id = String(comment.id)
-            hnComment.upvoteUrl = upvoteLink
+        if comment.upvoteLink != nil {
+            let hnComment = self.hnComment(for: comment)
             return scraperUpvote(comment: hnComment)
         } else {
             return getComment(id: comment.id, for: post).then { comment in
@@ -96,11 +94,21 @@ extension HNScraperShim { // comments
     }
 
     func unvote(comment: Comment, for post: Post) -> Promise<Void> {
-        return firstly {
-            getComment(id: comment.id, for: post)
-        }.then { comment in
-            self.scraperUnvote(comment: comment)
+        if comment.upvoteLink != nil {
+            let hnComment = self.hnComment(for: comment)
+            return scraperUnvote(comment: hnComment)
+        } else {
+            return getComment(id: comment.id, for: post).then { comment in
+                return self.scraperUpvote(comment: comment)
+            }
         }
+    }
+
+    private func hnComment(for comment: Comment) -> HNComment {
+        let hnComment = HNComment()
+        hnComment.id = String(comment.id)
+        hnComment.upvoteUrl = comment.upvoteLink
+        return hnComment
     }
 
     private func getComment(id: Int, for post: Post) -> Promise<HNComment> {
