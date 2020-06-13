@@ -1,15 +1,18 @@
 # Hackers
 
-[![Build Status](https://travis-ci.org/weiran/Hackers.svg?branch=master)](https://travis-ci.org/weiran/Hackers)
+![Hackers](https://github.com/weiran/Hackers/workflows/Hackers/badge.svg?branch=master)
 
 Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimised for quickly catching up on the latest news and comments without getting in your way.
 
 ## Features
 
 * Thumbnails generated for posts
-* Comments threads are collapsable
+* Collapsable comments threads
+* iOS 13 dark mode
 * Full iPad multitasking support
 * Safari View Controller
+* Upvote posts and comments
+* Open In Hackers share extension
 
 <img src="https://is5-ssl.mzstatic.com/image/thumb/Purple115/v4/14/98/59/149859fe-f4e3-0a12-d7fb-2d3383efdf45/mzl.ebnguksi.png/460x0w.jpg" width="350">
 
@@ -36,8 +39,8 @@ Or install the [latest beta version from TestFlight][4].
 ## How to build
 
 1. Install [CocoaPods](https://cocoapods.org), you can use RubyGems: `gem install cocoapods`.
-2. Install pods, in the project root folder, run `pod install`.
-3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 9 or later, and build.
+2. Install dependencies, in the project's root folder run `pod install`.
+3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 11.5 or later and build.
 
 ## Generate screenshots
 
@@ -58,6 +61,7 @@ I use several open source projects in Hackers, in no particular order:
 * [BulletinBoard](https://github.com/alexaubry/BulletinBoard)
 * [SwiftLint](https://github.com/realm/SwiftLint)
 * [DeviceKit](https://github.com/devicekit/DeviceKit)
+* [WhatsNewKit](https://github.com/SvenTiigi/WhatsNewKit)
 
 ---
 <p align="center">
