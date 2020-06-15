@@ -14,7 +14,6 @@ target 'Hackers' do
   pod 'BulletinBoard'
   pod 'WhatsNewKit'
   pod 'SwiftSoup'
-  pod 'DropDownMenuKit'
   
   pod 'SwiftLint'
 end
