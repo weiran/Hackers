@@ -1,6 +1,7 @@
 PODS:
   - BulletinBoard (4.1.1)
   - DeviceKit (3.2.0)
+  - DropDownMenuKit (0.9)
   - HNScraper (0.2.2)
   - Kingfisher (5.14.0):
     - Kingfisher/Core (= 5.14.0)
@@ -18,6 +19,7 @@ PODS:
 DEPENDENCIES:
   - BulletinBoard
   - DeviceKit
+  - DropDownMenuKit
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
   - Kingfisher
   - Loaf
@@ -33,6 +35,7 @@ SPEC REPOS:
   trunk:
     - BulletinBoard
     - DeviceKit
+    - DropDownMenuKit
     - Kingfisher
     - Loaf
     - PromiseKit
@@ -56,6 +59,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   BulletinBoard: 25cf38fa1dd9292936ea6122b95ec2ec9b773e9c
   DeviceKit: d081659419cce07c0b5239dbc9fb39ed7413c7fe
+  DropDownMenuKit: b277b3863719c8c8e53c68898bb2c0eb69d502b6
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Kingfisher: 7b64389a43139c903ec434788344c288217c792d
   Loaf: 0800b444431366bc395d54267975d4ad4ad5c99c
@@ -67,6 +71,6 @@ SPEC CHECKSUMS:
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
   WhatsNewKit: 3cbe30a202cc387086a977deba52af50f61c656f
 
-PODFILE CHECKSUM: 4d79374218a0f2a60cd14be65bd425b62782e740
+PODFILE CHECKSUM: 7c04ba2f3a9ace7631e05346ee285c75f4f836f5
 
-COCOAPODS: 1.9.2
+COCOAPODS: 1.9.3
