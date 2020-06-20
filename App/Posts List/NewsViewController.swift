@@ -35,31 +35,18 @@ class NewsViewController: UITableViewController {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
-        tableView.refreshControl?.addTarget(self,
-                                            action: #selector(fetchPostsWithReset),
-                                            for: UIControl.Event.valueChanged)
-        tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
-        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
-        dataSource = makeDataSource()
-        tableView.dataSource = dataSource
-
-        notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                     object: nil,
-                     queue: .main
-            ) { _ in self.fetchPostsWithReset() }
-
         setupTheming()
-        fetchPosts()
-
+        setupAuthenticationObserver()
+        setupTableView()
         setupTitle()
+        fetchPosts()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
-            // when the cell is still visible, no need to deselect it
+            // only deselect in compact size where the view isn't split
             smoothlyDeselectRows()
         }
 
@@ -84,6 +71,25 @@ class NewsViewController: UITableViewController {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
 
+    private func setupTableView() {
+        tableView.refreshControl?.addTarget(self,
+                                            action: #selector(fetchPostsWithReset),
+                                            for: UIControl.Event.valueChanged)
+        tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
+        dataSource = makeDataSource()
+        tableView.dataSource = dataSource
+    }
+
+    private func setupAuthenticationObserver() {
+        notificationToken = NotificationCenter.default
+        .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                 object: nil,
+                 queue: .main
+        ) { _ in
+            self.fetchPostsWithReset()
+        }
+    }
+
     @IBAction func showNewSettings(_ sender: Any) {
         let settingsStore = SettingsStore()
         let hostingVC = UIHostingController(
@@ -93,18 +99,40 @@ class NewsViewController: UITableViewController {
     }
 }
 
-extension NewsViewController {
-    // Navigation selection
+extension NewsViewController { // post fetching
+    @objc private func fetchPosts() {
+        guard !isFetching else { return }
 
+        isFetching = true
+        let isFirstPage = pageIndex == 1
+
+        firstly {
+            HackersKit.shared.getPosts(type: postType, page: pageIndex)
+        }.done { posts in
+            if isFirstPage {
+                self.posts = [Post]()
+            }
+            self.posts.append(contentsOf: posts)
+            self.update(with: self.posts, animate: !isFirstPage)
+        }.catch { error in
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+        }.finally {
+            self.isFetching = false
+            self.tableView.refreshControl?.endRefreshing()
+            self.pageIndex += 1
+        }
+    }
+
+    @objc private func fetchPostsWithReset() {
+        pageIndex = 1
+        fetchPosts()
+    }
+}
+
+extension NewsViewController { // post type selector
     private func setupTitle() {
         let titleLabel = TappableNavigationTitleView()
-        switch postType {
-        case .news: titleLabel.setTitleText("Top")
-        case .ask: titleLabel.setTitleText("Ask")
-        case .jobs: titleLabel.setTitleText("Jobs")
-        case .newest: titleLabel.setTitleText("New")
-        }
-
+        titleLabel.setTitleText(postType.title)
         navigationItem.titleView = titleLabel
     }
 
@@ -139,103 +167,29 @@ extension NewsViewController {
             return
         }
 
-        let controller = UIAlertController(
-            title: nil,
-            message: nil,
-            preferredStyle: .actionSheet,
-            themed: true
-        )
-        let top = UIAlertAction(
-            title: "Top",
-            style: .default,
-            handler: changePostType(action:)
-        )
-        top.setValue(UIImage(systemName: "globe"), forKey: "image")
-        top.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-        let ask = UIAlertAction(
-            title: "Ask",
-            style: .default,
-            handler: changePostType(action:)
-        )
-        ask.setValue(UIImage(systemName: "bubble.left"), forKey: "image")
-        ask.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-        let jobs = UIAlertAction(
-            title: "Jobs",
-            style: .default,
-            handler: changePostType(action:)
-        )
-        jobs.setValue(UIImage(systemName: "briefcase"), forKey: "image")
-        jobs.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-        let new = UIAlertAction(
-            title: "New",
-            style: .default,
-            handler: changePostType(action:)
-        )
-        new.setValue(UIImage(systemName: "clock"), forKey: "image")
-        new.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
-        controller.addAction(top)
-        controller.addAction(ask)
-        controller.addAction(jobs)
-        controller.addAction(new)
-        controller.addAction(UIAlertAction(
-            title: "Cancel",
-            style: .cancel,
-            handler: nil
-        ))
+        let controller = NavigationAlertController()
+        controller.setup(handler: navigationAlertControllerHandler(postType:))
         present(controller, animated: true)
     }
 
-    private func changePostType(action: UIAlertAction) {
-        switch action.title {
-        case "Top": postType = .news
-        case "Ask": postType = .ask
-        case "Jobs": postType = .jobs
-        case "New": postType = .newest
-        default: postType = .news
-        }
+    private func navigationAlertControllerHandler(postType: PostType) {
+        self.postType = postType
 
+        // update title
         setupTitle()
 
-        // reset
+        // reset tableview
         self.posts = [Post]()
         self.update(with: self.posts, animate: false)
 
+        // show spinner
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+
         fetchPostsWithReset()
     }
 }
 
-extension NewsViewController { // post fetching
-    @objc private func fetchPosts() {
-        guard !isFetching else { return }
-
-        isFetching = true
-        let isFirstPage = pageIndex == 1
-
-        firstly {
-            HackersKit.shared.getPosts(type: postType, page: pageIndex)
-        }.done { posts in
-            if isFirstPage {
-                self.posts = [Post]()
-            }
-            self.posts.append(contentsOf: posts)
-            self.update(with: self.posts, animate: !isFirstPage)
-        }.catch { error in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-        }.finally {
-            self.isFetching = false
-            self.tableView.refreshControl?.endRefreshing()
-            self.pageIndex += 1
-        }
-    }
-
-    @objc private func fetchPostsWithReset() {
-        pageIndex = 1
-        fetchPosts()
-    }
-}
-
-extension NewsViewController {
+extension NewsViewController { // table view data source
     enum Section: CaseIterable {
         case main
     }
@@ -267,7 +221,7 @@ extension NewsViewController {
     }
 }
 
-extension NewsViewController {
+extension NewsViewController { // table view delegate
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let buffer: CGFloat = 200
         let scrollPosition = scrollView.contentOffset.y
@@ -287,12 +241,12 @@ extension NewsViewController {
         }
     }
 
-    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+//    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return UITableView.automaticDimension
+//    }
 }
 
-extension NewsViewController: SwipeTableViewCellDelegate {
+extension NewsViewController: SwipeTableViewCellDelegate { // swipe cell delegate
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
@@ -320,13 +274,23 @@ extension NewsViewController: SwipeTableViewCellDelegate {
     }
 }
 
-extension NewsViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        tableView.refreshControl?.tintColor = theme.appTintColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
+extension NewsViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
+    func didPressLinkButton(_ post: Post) {
+        if let safariViewController = SFSafariViewController.instance(
+            for: post.url,
+            previewActionItemsDelegate: self
+        ) {
+            navigationController?.present(safariViewController, animated: true)
+        }
+    }
+
+    func didTapThumbnail(_ sender: Any) {
+        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
+        let point = tapGestureRecognizer.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
+            didPressLinkButton(post)
+        }
     }
 }
 
@@ -371,20 +335,12 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
 }
 
-extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
-    func didPressLinkButton(_ post: Post) {
-        if let safariViewController =
-            SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self) {
-            navigationController?.present(safariViewController, animated: true)
-        }
-    }
-
-    func didTapThumbnail(_ sender: Any) {
-        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
-        let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point) {
-            let post = posts[indexPath.row]
-            didPressLinkButton(post)
-        }
+extension NewsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        tableView.refreshControl?.tintColor = theme.appTintColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
