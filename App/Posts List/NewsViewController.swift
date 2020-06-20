@@ -78,6 +78,7 @@ class NewsViewController: UITableViewController {
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         dataSource = makeDataSource()
         tableView.dataSource = dataSource
+        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
     }
 
     private func setupAuthenticationObserver() {
@@ -181,9 +182,6 @@ extension NewsViewController { // post type selector
         // reset tableview
         self.posts = [Post]()
         self.update(with: self.posts, animate: false)
-
-        // show spinner
-        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
 
         fetchPostsWithReset()
     }
