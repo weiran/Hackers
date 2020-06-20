@@ -11,7 +11,9 @@ import UIKit
 extension UIAlertController: Themed {
     convenience init(title: String?, message: String?, preferredStyle: UIAlertController.Style, themed: Bool) {
         self.init(title: title, message: message, preferredStyle: preferredStyle)
-        setupTheming()
+        if themed {
+            setupTheming()
+        }
     }
 
     func applyTheme(_ theme: AppTheme) {

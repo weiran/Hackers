@@ -59,7 +59,7 @@ class SwipeCellKitActions: Themed {
         upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         upvoteAction.textColor = .white
 
-        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
+        let iconImage = UIImage(named: "PointsIcon")!.withTintColor(.white)
         upvoteAction.image = iconImage
 
         return [upvoteAction]
@@ -107,7 +107,7 @@ class SwipeCellKitActions: Themed {
         voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
         voteAction.textColor = .white
 
-        let iconImage = UIImage(named: "PointsIcon")!.withTint(color: .white)
+        let iconImage = UIImage(named: "PointsIcon")!.withTintColor(.white)
         voteAction.image = iconImage
 
         return [voteAction]

@@ -209,7 +209,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
         collapseAction.textColor = .white
 
-        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+        let iconImage = UIImage(named: "UpIcon")!.withTintColor(.white)
         collapseAction.image = iconImage
 
         return [collapseAction]
