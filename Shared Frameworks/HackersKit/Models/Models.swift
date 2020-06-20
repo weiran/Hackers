@@ -58,6 +58,7 @@ enum PostType: String, CaseIterable {
     case ask
     case jobs
     case newest
+    case best
 }
 
 class Comment: Hashable {

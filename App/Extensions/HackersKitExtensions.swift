@@ -21,6 +21,7 @@ extension PostType {
         case .ask: return "Ask"
         case .jobs: return "Jobs"
         case .newest: return "New"
+        case .best: return "Best"
         }
     }
 
@@ -30,6 +31,7 @@ extension PostType {
         case .ask: return "bubble.left"
         case .jobs: return "briefcase"
         case .newest: return "clock"
+        case .best: return "rosette"
         }
     }
 }
