@@ -20,7 +20,6 @@
 		243271951F95EDA9008196DB /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243271941F95EDA9008196DB /* StringExtensions.swift */; };
 		245345EF22466EA8001AF1CE /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345EE22466EA8001AF1CE /* HackersUITests.swift */; };
 		245345FB22466F75001AF1CE /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345F722466F71001AF1CE /* SnapshotHelper.swift */; };
-		2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9011F654DB2005A98C7 /* MainTabBarController.swift */; };
 		2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9031F655426005A98C7 /* EmptyViewController.swift */; };
 		2457F04524696EB000F3E7A4 /* HackersKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2457F04424696EB000F3E7A4 /* HackersKit.swift */; };
 		2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */; };
@@ -146,7 +145,6 @@
 		245345F822466F71001AF1CE /* Snapfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Snapfile; sourceTree = "<group>"; };
 		245345FC2246732C001AF1CE /* Fastfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
 		245345FD2246732C001AF1CE /* Appfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Appfile; sourceTree = "<group>"; };
-		2454B9011F654DB2005A98C7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		2454B9031F655426005A98C7 /* EmptyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyViewController.swift; sourceTree = "<group>"; };
 		2457F04424696EB000F3E7A4 /* HackersKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKit.swift; sourceTree = "<group>"; };
 		2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIActivityViewControllerExtensions.swift; sourceTree = "<group>"; };
@@ -513,7 +511,6 @@
 				24ADA7E2206FAF2200C143F4 /* Main.storyboard */,
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
-				2454B9011F654DB2005A98C7 /* MainTabBarController.swift */,
 				24CE5FEE19434DC0009D2677 /* Posts List */,
 				24CE5FEF19434DCB009D2677 /* Comments */,
 				24B982DB22BE6575000D8913 /* Settings-SwiftUI */,
@@ -985,7 +982,6 @@
 				24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */,
 				2481BD5D247C10330088CA2B /* HackersKit+PostsList.swift in Sources */,
 				2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */,
-				2454B9021F654DB2005A98C7 /* MainTabBarController.swift in Sources */,
 				24C10C082486DB0700B93F68 /* HtmlParser.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
 			);
