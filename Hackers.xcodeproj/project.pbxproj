@@ -53,6 +53,7 @@
 		249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */; };
 		249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */; };
 		249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */; };
+		249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A422B508A40051EAFD /* OnboardingService.swift */; };
 		24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A622B521470051EAFD /* BounceExpansion.swift */; };
@@ -178,6 +179,7 @@
 		249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellKitActions.swift; sourceTree = "<group>"; };
 		249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBackgroundView.swift; sourceTree = "<group>"; };
 		249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewBackgroundView.xib; sourceTree = "<group>"; };
+		249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableNavigationTitleView.swift; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
 		24B1A6A622B521470051EAFD /* BounceExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceExpansion.swift; sourceTree = "<group>"; };
@@ -392,6 +394,7 @@
 				241C32DD24950C05000876DC /* PostTitleView.swift */,
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
+				249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -951,6 +954,7 @@
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
+				249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,

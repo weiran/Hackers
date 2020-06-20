@@ -29,6 +29,8 @@ class NewsViewController: UITableViewController {
 
     private var notificationToken: NotificationToken?
 
+    private var navigationBarGestureRecognizer: UITapGestureRecognizer?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
@@ -49,14 +51,24 @@ class NewsViewController: UITableViewController {
 
         setupTheming()
         fetchPosts()
+
+        setupTitle()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // when the cell is still visible, no need to deselect it
+
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
+            // when the cell is still visible, no need to deselect it
             smoothlyDeselectRows()
         }
+
+        prepareNavigationTapRecognizer()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeNavigationTapRecognizer()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -78,6 +90,118 @@ class NewsViewController: UITableViewController {
             rootView: SettingsView()
                 .environmentObject(settingsStore))
         present(hostingVC, animated: true)
+    }
+}
+
+extension NewsViewController {
+    // Navigation selection
+
+    private func setupTitle() {
+        let titleLabel = TappableNavigationTitleView()
+        switch postType {
+        case .news: titleLabel.setTitleText("Top")
+        case .ask: titleLabel.setTitleText("Ask")
+        case .jobs: titleLabel.setTitleText("Jobs")
+        case .newest: titleLabel.setTitleText("New")
+        }
+
+        navigationItem.titleView = titleLabel
+    }
+
+    private func prepareNavigationTapRecognizer() {
+        if navigationBarGestureRecognizer == nil {
+            let gestureRecognizer = UITapGestureRecognizer(
+                target: self,
+                action: #selector(navigationBarTapped(_:))
+            )
+            gestureRecognizer.cancelsTouchesInView = false
+            navigationBarGestureRecognizer = gestureRecognizer
+        }
+
+        if let gestureRecognizer = navigationBarGestureRecognizer {
+            navigationController?.navigationBar.addGestureRecognizer(gestureRecognizer)
+            navigationBarGestureRecognizer = gestureRecognizer
+        }
+    }
+
+    private func removeNavigationTapRecognizer() {
+        if let gestureRecognizer = navigationBarGestureRecognizer {
+            navigationController?.navigationBar.removeGestureRecognizer(gestureRecognizer)
+        }
+    }
+
+    @objc private func navigationBarTapped(_ sender: UITapGestureRecognizer) {
+        let location = sender.location(in: navigationController?.navigationBar)
+        let hitView = navigationController?.navigationBar.hitTest(location, with: nil)
+
+        // let the tap fall through if its on a button
+        guard !(hitView is UIControl) else {
+            return
+        }
+
+        let controller = UIAlertController(
+            title: nil,
+            message: nil,
+            preferredStyle: .actionSheet,
+            themed: true
+        )
+        let top = UIAlertAction(
+            title: "Top",
+            style: .default,
+            handler: changePostType(action:)
+        )
+        top.setValue(UIImage(systemName: "globe"), forKey: "image")
+        top.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
+        let ask = UIAlertAction(
+            title: "Ask",
+            style: .default,
+            handler: changePostType(action:)
+        )
+        ask.setValue(UIImage(systemName: "bubble.left"), forKey: "image")
+        ask.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
+        let jobs = UIAlertAction(
+            title: "Jobs",
+            style: .default,
+            handler: changePostType(action:)
+        )
+        jobs.setValue(UIImage(systemName: "briefcase"), forKey: "image")
+        jobs.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
+        let new = UIAlertAction(
+            title: "New",
+            style: .default,
+            handler: changePostType(action:)
+        )
+        new.setValue(UIImage(systemName: "clock"), forKey: "image")
+        new.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
+        controller.addAction(top)
+        controller.addAction(ask)
+        controller.addAction(jobs)
+        controller.addAction(new)
+        controller.addAction(UIAlertAction(
+            title: "Cancel",
+            style: .cancel,
+            handler: nil
+        ))
+        present(controller, animated: true)
+    }
+
+    private func changePostType(action: UIAlertAction) {
+        switch action.title {
+        case "Top": postType = .news
+        case "Ask": postType = .ask
+        case "Jobs": postType = .jobs
+        case "New": postType = .newest
+        default: postType = .news
+        }
+
+        setupTitle()
+
+        // reset
+        self.posts = [Post]()
+        self.update(with: self.posts, animate: false)
+
+        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+        fetchPostsWithReset()
     }
 }
 
