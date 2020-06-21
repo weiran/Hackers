@@ -7,10 +7,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Hacker News-->
+        <!--Feed Controller-->
         <scene sceneID="Jh0-BO-yhM">
             <objects>
-                <tableViewController id="6t9-fC-JrD" customClass="NewsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="6t9-fC-JrD" userLabel="Feed Controller" customClass="FeedViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="AjT-wK-ps1">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -123,10 +123,10 @@
             </objects>
             <point key="canvasLocation" x="2361" y="546"/>
         </scene>
-        <!--Item-->
+        <!--Feed Navigation Controller-->
         <scene sceneID="1am-tW-4v5">
             <objects>
-                <navigationController id="2FT-kg-cd5" sceneMemberID="viewController">
+                <navigationController id="2FT-kg-cd5" userLabel="Feed Navigation Controller" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="aiG-Km-7Il"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="o2Y-R6-LxE">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -140,10 +140,10 @@
             </objects>
             <point key="canvasLocation" x="1460" y="549"/>
         </scene>
-        <!--Item-->
+        <!--Split View Controller-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
-                <splitViewController storyboardIdentifier="MainSplitViewController" id="506-JC-FDt" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController storyboardIdentifier="MainSplitViewController" id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
                         <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="BNY-4g-r0C"/>
@@ -433,10 +433,10 @@
             </objects>
             <point key="canvasLocation" x="1460" y="1396.5517241379312"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Settings Navigation Controller-->
         <scene sceneID="CQx-j9-MSt">
             <objects>
-                <navigationController id="9fT-2D-AhL" sceneMemberID="viewController">
+                <navigationController id="9fT-2D-AhL" userLabel="Settings Navigation Controller" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="W1w-PO-Odu">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="108"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -449,10 +449,10 @@
             </objects>
             <point key="canvasLocation" x="2361" y="1397"/>
         </scene>
-        <!--Settings-->
+        <!--Settings Controller-->
         <scene sceneID="Elr-K2-C7N">
             <objects>
-                <tableViewController id="uZL-eS-tCe" customClass="SettingsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="uZL-eS-tCe" userLabel="Settings Controller" customClass="SettingsViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="HXS-MD-hjw">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -736,10 +736,10 @@
             </objects>
             <point key="canvasLocation" x="3224.8000000000002" y="1396.5517241379312"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Comments Navigation Controller-->
         <scene sceneID="1UW-sd-Ilr">
             <objects>
-                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="PostViewNavigationController" id="PXZ-r3-pvU" userLabel="Comments Navigation Controller" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="nrG-IN-2HV"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Zkc-Rr-CEM">

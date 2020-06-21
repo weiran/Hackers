@@ -63,7 +63,7 @@
 		24C10C082486DB0700B93F68 /* HtmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C10C072486DB0700B93F68 /* HtmlParser.swift */; };
 		24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C20D381A7E42D5005B759B /* MainSplitViewController.swift */; };
 		24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FEC19434BDC009D2677 /* AppDelegate.swift */; };
-		24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF319435061009D2677 /* NewsViewController.swift */; };
+		24CE5FF419435061009D2677 /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF319435061009D2677 /* FeedViewController.swift */; };
 		24CE5FF819435A90009D2677 /* PostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF719435A90009D2677 /* PostCell.swift */; };
 		24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */; };
 		24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9C1F8917D60050DEDF /* ReviewController.swift */; };
@@ -190,7 +190,7 @@
 		24C20D381A7E42D5005B759B /* MainSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSplitViewController.swift; sourceTree = "<group>"; };
 		24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hackers2-Bridging-Header.h"; sourceTree = "<group>"; };
 		24CE5FEC19434BDC009D2677 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		24CE5FF319435061009D2677 /* NewsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
+		24CE5FF319435061009D2677 /* FeedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
 		24CE5FF719435A90009D2677 /* PostCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
 		24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		24CEAA9C1F8917D60050DEDF /* ReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewController.swift; sourceTree = "<group>"; };
@@ -365,6 +365,7 @@
 		2464D219209E1F8A00C7F8FC /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				24B982DB22BE6575000D8913 /* Settings-SwiftUI */,
 				2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */,
 				2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */,
 				2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */,
@@ -424,14 +425,14 @@
 			path = HackersShareExtension;
 			sourceTree = "<group>";
 		};
-		24CE5FEE19434DC0009D2677 /* Posts List */ = {
+		24CE5FEE19434DC0009D2677 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
-				24CE5FF319435061009D2677 /* NewsViewController.swift */,
+				24CE5FF319435061009D2677 /* FeedViewController.swift */,
 				24CE5FF719435A90009D2677 /* PostCell.swift */,
 				24F31A90249E6A6600E44AD2 /* NavigationAlertController.swift */,
 			);
-			path = "Posts List";
+			path = Feed;
 			sourceTree = "<group>";
 		};
 		24CE5FEF19434DCB009D2677 /* Comments */ = {
@@ -511,9 +512,8 @@
 				24ADA7E2206FAF2200C143F4 /* Main.storyboard */,
 				24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */,
 				24C20D381A7E42D5005B759B /* MainSplitViewController.swift */,
-				24CE5FEE19434DC0009D2677 /* Posts List */,
+				24CE5FEE19434DC0009D2677 /* Feed */,
 				24CE5FEF19434DCB009D2677 /* Comments */,
-				24B982DB22BE6575000D8913 /* Settings-SwiftUI */,
 				2464D219209E1F8A00C7F8FC /* Settings */,
 				24FF0219226C99B1002EF8DD /* Services */,
 				2464D200209DD06A00C7F8FC /* Themes */,
@@ -932,7 +932,7 @@
 				2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
-				24CE5FF419435061009D2677 /* NewsViewController.swift in Sources */,
+				24CE5FF419435061009D2677 /* FeedViewController.swift in Sources */,
 				24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2479E11522B69CF100D9F1A4 /* ThumbnailImageView.swift in Sources */,

@@ -1,6 +1,6 @@
 //
-//  NewsViewController.swift
-//  Hackers2
+//  FeedViewController.swift
+//  Hackers
 //
 //  Created by Weiran Zhang on 07/06/2014.
 //  Copyright (c) 2014 Weiran Zhang. All rights reserved.
@@ -15,7 +15,7 @@ import Kingfisher
 import Loaf
 import SwipeCellKit
 
-class NewsViewController: UITableViewController {
+class FeedViewController: UITableViewController {
     var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
 
@@ -100,7 +100,7 @@ class NewsViewController: UITableViewController {
     }
 }
 
-extension NewsViewController { // post fetching
+extension FeedViewController { // post fetching
     @objc private func fetchPosts() {
         guard !isFetching else { return }
 
@@ -130,7 +130,7 @@ extension NewsViewController { // post fetching
     }
 }
 
-extension NewsViewController { // post type selector
+extension FeedViewController { // post type selector
     private func setupTitle() {
         let titleLabel = TappableNavigationTitleView()
         titleLabel.setTitleText(postType.title)
@@ -187,7 +187,7 @@ extension NewsViewController { // post type selector
     }
 }
 
-extension NewsViewController { // table view data source
+extension FeedViewController { // table view data source
     enum Section: CaseIterable {
         case main
     }
@@ -219,7 +219,7 @@ extension NewsViewController { // table view data source
     }
 }
 
-extension NewsViewController { // table view delegate
+extension FeedViewController { // table view delegate
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let buffer: CGFloat = 200
         let scrollPosition = scrollView.contentOffset.y
@@ -240,7 +240,7 @@ extension NewsViewController { // table view delegate
     }
 }
 
-extension NewsViewController: SwipeTableViewCellDelegate { // swipe cell delegate
+extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegate
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
@@ -268,7 +268,7 @@ extension NewsViewController: SwipeTableViewCellDelegate { // swipe cell delegat
     }
 }
 
-extension NewsViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
+extension FeedViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
     func didPressLinkButton(_ post: Post) {
         if let safariViewController = SFSafariViewController.instance(
             for: post.url,
@@ -288,7 +288,7 @@ extension NewsViewController: PostTitleViewDelegate, PostCellDelegate { // cell 
     }
 }
 
-extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
+extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,
                            viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard
@@ -329,7 +329,7 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
 }
 
-extension NewsViewController: Themed {
+extension FeedViewController: Themed {
     func applyTheme(_ theme: AppTheme) {
         view.backgroundColor = theme.backgroundColor
         tableView.backgroundColor = theme.backgroundColor
