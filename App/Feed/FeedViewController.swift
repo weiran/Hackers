@@ -72,9 +72,11 @@ class FeedViewController: UITableViewController {
     }
 
     private func setupTableView() {
-        tableView.refreshControl?.addTarget(self,
-                                            action: #selector(fetchPostsWithReset),
-                                            for: UIControl.Event.valueChanged)
+        tableView.refreshControl?.addTarget(
+            self,
+            action: #selector(fetchPostsWithReset),
+            for: UIControl.Event.valueChanged
+        )
         tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
         dataSource = makeDataSource()
         tableView.dataSource = dataSource
