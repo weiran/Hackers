@@ -170,6 +170,7 @@ extension FeedViewController { // post type selector
 
         let controller = NavigationAlertController()
         controller.setup(handler: navigationAlertControllerHandler(postType:))
+        controller.popoverPresentationController?.sourceView = navigationController?.navigationBar
         present(controller, animated: true)
     }
 
