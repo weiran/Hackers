@@ -716,7 +716,7 @@
                             <outlet property="delegate" destination="uZL-eS-tCe" id="MKB-Y0-sUw"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Settings" largeTitleDisplayMode="always" id="l6b-y9-0zz">
+                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="l6b-y9-0zz">
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="OGd-XQ-8lp">
                             <connections>
                                 <action selector="didPressDone:" destination="uZL-eS-tCe" id="Gqb-oO-06H"/>
