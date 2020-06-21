@@ -18,5 +18,6 @@ extension UIAlertController: Themed {
 
     func applyTheme(_ theme: AppTheme) {
         overrideUserInterfaceStyle = theme.userInterfaceStyle
+        view.tintColor = theme.appTintColor
     }
 }
