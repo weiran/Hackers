@@ -171,6 +171,11 @@ extension FeedViewController { // post type selector
             return
         }
 
+        // haptic feedback
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        generator.selectionChanged()
+
         let controller = NavigationAlertController()
         controller.setup(handler: navigationAlertControllerHandler(postType:))
         controller.popoverPresentationController?.sourceView = navigationController?.navigationBar
@@ -179,6 +184,11 @@ extension FeedViewController { // post type selector
 
     private func navigationAlertControllerHandler(postType: PostType) {
         self.postType = postType
+
+        // haptic feedback
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.success)
 
         // update title
         setupTitle()
