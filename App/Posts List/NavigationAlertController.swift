@@ -25,7 +25,6 @@ class NavigationAlertController: UIAlertController {
                 handler: actionHandler(action:)
             )
             action.setValue(UIImage(systemName: postType.iconName), forKey: "image")
-            action.setValue(CATextLayerAlignmentMode.left, forKey: "titleTextAlignment")
             self.addAction(action)
         }
 
