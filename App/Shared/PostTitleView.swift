@@ -86,7 +86,7 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         let image = UIImage.init(named: named)
         var templateImage = image?.withRenderingMode(.alwaysTemplate)
         if let tintColor = tintColor {
-           templateImage = templateImage?.withTint(color: tintColor)
+           templateImage = templateImage?.withTintColor(tintColor)
         }
         return templateImage
     }

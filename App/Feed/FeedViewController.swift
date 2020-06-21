@@ -1,6 +1,6 @@
 //
-//  NewsViewController.swift
-//  Hackers2
+//  FeedViewController.swift
+//  Hackers
 //
 //  Created by Weiran Zhang on 07/06/2014.
 //  Copyright (c) 2014 Weiran Zhang. All rights reserved.
@@ -15,7 +15,7 @@ import Kingfisher
 import Loaf
 import SwipeCellKit
 
-class NewsViewController: UITableViewController {
+class FeedViewController: UITableViewController {
     var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
 
@@ -29,34 +29,33 @@ class NewsViewController: UITableViewController {
 
     private var notificationToken: NotificationToken?
 
+    private var navigationBarGestureRecognizer: UITapGestureRecognizer?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
-        tableView.refreshControl?.addTarget(self,
-                                            action: #selector(fetchPostsWithReset),
-                                            for: UIControl.Event.valueChanged)
-        tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
-        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
-        dataSource = makeDataSource()
-        tableView.dataSource = dataSource
-
-        notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
-                     object: nil,
-                     queue: .main
-            ) { _ in self.fetchPostsWithReset() }
-
         setupTheming()
+        setupAuthenticationObserver()
+        setupTableView()
+        setupTitle()
         fetchPosts()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // when the cell is still visible, no need to deselect it
+
         if UIScreen.main.traitCollection.horizontalSizeClass == .compact {
+            // only deselect in compact size where the view isn't split
             smoothlyDeselectRows()
         }
+
+        prepareNavigationTapRecognizer()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeNavigationTapRecognizer()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -72,6 +71,28 @@ class NewsViewController: UITableViewController {
         performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
     }
 
+    private func setupTableView() {
+        tableView.refreshControl?.addTarget(
+            self,
+            action: #selector(fetchPostsWithReset),
+            for: UIControl.Event.valueChanged
+        )
+        tableView.tableFooterView = UIView(frame: .zero) // remove cell separators on empty table
+        dataSource = makeDataSource()
+        tableView.dataSource = dataSource
+        tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+    }
+
+    private func setupAuthenticationObserver() {
+        notificationToken = NotificationCenter.default
+        .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+                 object: nil,
+                 queue: .main
+        ) { _ in
+            self.fetchPostsWithReset()
+        }
+    }
+
     @IBAction func showNewSettings(_ sender: Any) {
         let settingsStore = SettingsStore()
         let hostingVC = UIHostingController(
@@ -81,7 +102,7 @@ class NewsViewController: UITableViewController {
     }
 }
 
-extension NewsViewController { // post fetching
+extension FeedViewController { // post fetching
     @objc private func fetchPosts() {
         guard !isFetching else { return }
 
@@ -111,7 +132,76 @@ extension NewsViewController { // post fetching
     }
 }
 
-extension NewsViewController {
+extension FeedViewController { // post type selector
+    private func setupTitle() {
+        let titleLabel = TappableNavigationTitleView()
+        titleLabel.setTitleText(postType.title)
+        navigationItem.titleView = titleLabel
+        title = postType.title
+    }
+
+    private func prepareNavigationTapRecognizer() {
+        if navigationBarGestureRecognizer == nil {
+            let gestureRecognizer = UITapGestureRecognizer(
+                target: self,
+                action: #selector(navigationBarTapped(_:))
+            )
+            gestureRecognizer.cancelsTouchesInView = false
+            navigationBarGestureRecognizer = gestureRecognizer
+        }
+
+        if let gestureRecognizer = navigationBarGestureRecognizer {
+            navigationController?.navigationBar.addGestureRecognizer(gestureRecognizer)
+            navigationBarGestureRecognizer = gestureRecognizer
+        }
+    }
+
+    private func removeNavigationTapRecognizer() {
+        if let gestureRecognizer = navigationBarGestureRecognizer {
+            navigationController?.navigationBar.removeGestureRecognizer(gestureRecognizer)
+        }
+    }
+
+    @objc private func navigationBarTapped(_ sender: UITapGestureRecognizer) {
+        let location = sender.location(in: navigationController?.navigationBar)
+        let hitView = navigationController?.navigationBar.hitTest(location, with: nil)
+
+        // let the tap fall through if its on a button
+        guard !(hitView is UIControl) else {
+            return
+        }
+
+        // haptic feedback
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        generator.selectionChanged()
+
+        let controller = NavigationAlertController()
+        controller.setup(handler: navigationAlertControllerHandler(postType:))
+        controller.popoverPresentationController?.sourceView = navigationController?.navigationBar
+        present(controller, animated: true)
+    }
+
+    private func navigationAlertControllerHandler(postType: PostType) {
+        self.postType = postType
+
+        // haptic feedback
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.success)
+
+        // update title
+        setupTitle()
+
+        // reset tableview
+        self.posts = [Post]()
+        self.update(with: self.posts, animate: false)
+
+        fetchPostsWithReset()
+    }
+}
+
+extension FeedViewController { // table view data source
     enum Section: CaseIterable {
         case main
     }
@@ -143,7 +233,7 @@ extension NewsViewController {
     }
 }
 
-extension NewsViewController {
+extension FeedViewController { // table view delegate
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let buffer: CGFloat = 200
         let scrollPosition = scrollView.contentOffset.y
@@ -162,13 +252,9 @@ extension NewsViewController {
             navigateToComments()
         }
     }
-
-    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
 }
 
-extension NewsViewController: SwipeTableViewCellDelegate {
+extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegate
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
@@ -196,17 +282,27 @@ extension NewsViewController: SwipeTableViewCellDelegate {
     }
 }
 
-extension NewsViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        tableView.refreshControl?.tintColor = theme.appTintColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
+extension FeedViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
+    func didPressLinkButton(_ post: Post) {
+        if let safariViewController = SFSafariViewController.instance(
+            for: post.url,
+            previewActionItemsDelegate: self
+        ) {
+            navigationController?.present(safariViewController, animated: true)
+        }
+    }
+
+    func didTapThumbnail(_ sender: Any) {
+        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
+        let point = tapGestureRecognizer.location(in: tableView)
+        if let indexPath = tableView.indexPathForRow(at: point) {
+            let post = posts[indexPath.row]
+            didPressLinkButton(post)
+        }
     }
 }
 
-extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
+extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewControllerPreviewActionItemsDelegate {
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,
                            viewControllerForLocation location: CGPoint) -> UIViewController? {
         guard
@@ -247,20 +343,12 @@ extension NewsViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
     }
 }
 
-extension NewsViewController: PostTitleViewDelegate, PostCellDelegate {
-    func didPressLinkButton(_ post: Post) {
-        if let safariViewController =
-            SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self) {
-            navigationController?.present(safariViewController, animated: true)
-        }
-    }
-
-    func didTapThumbnail(_ sender: Any) {
-        guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
-        let point = tapGestureRecognizer.location(in: tableView)
-        if let indexPath = tableView.indexPathForRow(at: point) {
-            let post = posts[indexPath.row]
-            didPressLinkButton(post)
-        }
+extension FeedViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        tableView.refreshControl?.tintColor = theme.appTintColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

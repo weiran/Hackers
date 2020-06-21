@@ -16,7 +16,7 @@ extension HackersKit {
             fetchPostsHtml(type: type, page: page)
         }.map { html in
             try HtmlParser.postsTableElement(from: html)
-        }.map { tableElement in
+        }.compactMap { tableElement in
             try HtmlParser.posts(from: tableElement, type: type)
         }
     }

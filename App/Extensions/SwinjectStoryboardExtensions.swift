@@ -12,7 +12,7 @@ extension SwinjectStoryboard {
     @objc class func setup() {
         let container = defaultContainer
 
-        container.storyboardInitCompleted(NewsViewController.self) { resolver, controller in
+        container.storyboardInitCompleted(FeedViewController.self) { resolver, controller in
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
             controller.swipeCellKitActions = resolver.resolve(SwipeCellKitActions.self)!
         }

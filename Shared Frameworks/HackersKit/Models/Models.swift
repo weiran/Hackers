@@ -53,11 +53,12 @@ class Post: Hashable {
     }
 }
 
-enum PostType: String {
+enum PostType: String, CaseIterable {
     case news
     case ask
     case jobs
     case newest
+    case best
 }
 
 class Comment: Hashable {
