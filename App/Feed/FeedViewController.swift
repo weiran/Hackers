@@ -137,6 +137,7 @@ extension FeedViewController { // post type selector
         let titleLabel = TappableNavigationTitleView()
         titleLabel.setTitleText(postType.title)
         navigationItem.titleView = titleLabel
+        title = postType.title
     }
 
     private func prepareNavigationTapRecognizer() {
