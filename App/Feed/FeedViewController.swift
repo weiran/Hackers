@@ -219,7 +219,10 @@ extension FeedViewController { // table view data source
 
             cell.postTitleView.post = post
             cell.postTitleView.delegate = self
-            cell.setImageWithPlaceholder(url: post.url)
+
+            cell.setImageWithPlaceholder(
+                url: UserDefaults.standard.showThumbnails ? post.url : nil
+            )
 
             return cell
         }

@@ -13,6 +13,7 @@ class ThumbnailImageView: UIImageView {
     func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
 
+        // TODO improve this URL construction
         guard let url = url,
             let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
                 return nil
@@ -44,9 +45,9 @@ class ThumbnailImageView: UIImageView {
     }
 
     private func setPlaceholder() {
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
+        let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
         DispatchQueue.main.async {
-            let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
-            let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
             self.contentMode = .center
             self.image = placeholderImage
         }
