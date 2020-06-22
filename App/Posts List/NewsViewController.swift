@@ -1,6 +1,6 @@
 //
 //  NewsViewController.swift
-//  Hackers2
+//  Hackers
 //
 //  Created by Weiran Zhang on 07/06/2014.
 //  Copyright (c) 2014 Weiran Zhang. All rights reserved.
