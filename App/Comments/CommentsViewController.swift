@@ -110,8 +110,8 @@ class CommentsViewController: UITableViewController {
         let postLinkAction = UIAlertAction(
             title: "Article Link", style: .default) { _ in
                 self.showShareSheet(url: post.url, sender: sender)
-        alertController.addAction(postLinkAction)
         }
+        alertController.addAction(postLinkAction)
 
         let hackerNewsLinkAction = UIAlertAction(
             title: "Hacker News Link", style: .default) { _ in
@@ -125,7 +125,7 @@ class CommentsViewController: UITableViewController {
     }
 
     private func showShareSheet(url: URL, sender: UIBarButtonItem) {
-        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
+        let activityViewController = UIActivityViewController(activityItems: [url],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender
         present(activityViewController, animated: true, completion: nil)
