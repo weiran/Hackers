@@ -103,7 +103,7 @@ class CommentsViewController: UITableViewController {
             return
         }
 
-        let activityViewController = UIActivityViewController(activityItems: [post.url],
+        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
