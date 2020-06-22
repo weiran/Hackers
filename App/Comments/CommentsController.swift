@@ -1,6 +1,6 @@
 //
 //  CommentsController.swift
-//  Hackers2
+//  Hackers
 //
 //  Created by Weiran Zhang on 08/06/2014.
 //  Copyright (c) 2014 Weiran Zhang. All rights reserved.

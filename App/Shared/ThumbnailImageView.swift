@@ -14,7 +14,7 @@ class ThumbnailImageView: UIImageView {
         setPlaceholder()
 
         guard let url = url,
-            let thumbnailURL = URL(string: "https://image-extractor.now.sh/?url=\(url.absoluteString)") else {
+            let thumbnailURL = URL(string: "https://thumbnail-extractor.herokuapp.com/?url=\(url.absoluteString)") else {
                 return nil
         }
 

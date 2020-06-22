@@ -1,6 +1,6 @@
 //
 //  CommentsViewController.swift
-//  Hackers2
+//  Hackers
 //
 //  Created by Weiran Zhang on 07/06/2014.
 //  Copyright (c) 2014 Weiran Zhang. All rights reserved.
@@ -103,7 +103,7 @@ class CommentsViewController: UITableViewController {
             return
         }
 
-        let activityViewController = UIActivityViewController(activityItems: [post.url],
+        let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
                                                               applicationActivities: nil)
         activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
         present(activityViewController, animated: true, completion: nil)
