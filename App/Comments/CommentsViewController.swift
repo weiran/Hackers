@@ -98,18 +98,41 @@ class CommentsViewController: UITableViewController {
         super.updateUserActivityState(activity)
     }
 
-    @IBAction private func shareTapped(_ sender: AnyObject) {
+    @IBAction private func shareTapped(_ sender: UIBarButtonItem) {
         guard let post = post else {
             return
         }
 
+        let alertController = UIAlertController(
+            title: nil, message: nil, preferredStyle: .actionSheet, themed: true)
+        alertController.popoverPresentationController?.barButtonItem = sender
+
+        let postLinkAction = UIAlertAction(
+            title: "Article Link", style: .default) { _ in
+                self.showShareSheet(url: post.url, sender: sender)
+        alertController.addAction(postLinkAction)
+        }
+
+        let hackerNewsLinkAction = UIAlertAction(
+            title: "Hacker News Link", style: .default) { _ in
+                self.showShareSheet(url: post.hackerNewsURL, sender: sender)
+        }
+        alertController.addAction(hackerNewsLinkAction)
+
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+        present(alertController, animated: true)
+    }
+
+    private func showShareSheet(url: URL, sender: UIBarButtonItem) {
         let activityViewController = UIActivityViewController(activityItems: [post.hackerNewsURL],
                                                               applicationActivities: nil)
-        activityViewController.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
+        activityViewController.popoverPresentationController?.barButtonItem = sender
         present(activityViewController, animated: true, completion: nil)
     }
 }
 
+// MARK: - Table data source
 extension CommentsViewController {
     enum CommentsTableSections: Int, CaseIterable {
         case post = 0
@@ -178,6 +201,7 @@ extension CommentsViewController {
     // swiftlint:enable force_cast
 }
 
+// MARK: - SwipeTableViewCellDelegate
 extension CommentsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView,
                    editActionsForRowAt indexPath: IndexPath,
@@ -209,7 +233,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
         collapseAction.textColor = .white
 
-        let iconImage = UIImage(named: "UpIcon")!.withTint(color: .white)
+        let iconImage = UIImage(named: "UpIcon")!.withTintColor(.white)
         collapseAction.image = iconImage
 
         return [collapseAction]
@@ -241,14 +265,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
     }
 }
 
-extension CommentsViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
-    }
-}
-
+// MARK: - CommentDelegate
 extension CommentsViewController: CommentDelegate {
     func commentTapped(_ sender: UITableViewCell) {
         if let indexPath = tableView.indexPath(for: sender) {
@@ -291,6 +308,15 @@ extension CommentsViewController: CommentDelegate {
         if scrollToCell && scrollIfCellCovered {
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
+    }
+}
+
+// MARK: - Themed
+extension CommentsViewController: Themed {
+    func applyTheme(_ theme: AppTheme) {
+        view.backgroundColor = theme.backgroundColor
+        tableView.separatorColor = theme.separatorColor
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

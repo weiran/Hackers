@@ -9,22 +9,15 @@
 import UIKit
 
 class NavigationService {
-    weak var mainTabBarController: MainTabBarController?
+    weak var mainSplitViewController: MainSplitViewController?
 
     func showPost(id: Int) {
-        if let splitController = visibleViewController(),
+        if let splitViewController = mainSplitViewController,
             let navController = viewController(for: "PostViewNavigationController") as? UINavigationController,
             let controller = navController.children.first as? CommentsViewController {
             controller.postId = id
-            splitController.showDetailViewController(navController, sender: self)
+            splitViewController.showDetailViewController(navController, sender: self)
         }
-    }
-
-    private func visibleViewController() -> UISplitViewController? {
-        guard let controller = mainTabBarController else {
-            return nil
-        }
-        return controller.viewControllers?[controller.selectedIndex] as? UISplitViewController
     }
 
     private func viewController(for identifier: String) -> UIViewController? {

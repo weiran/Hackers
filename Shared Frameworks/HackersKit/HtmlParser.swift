@@ -44,7 +44,8 @@ enum HtmlParser {
         }
         let title = try postElement.select(".storylink").text()
         let urlString = try postElement.select(".storylink").attr("href")
-        guard let url = URL(string: urlString) else {
+        guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let url = URL(string: encodedUrlString) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
         }
         let by = try metadataElement.select(".hnuser").text()

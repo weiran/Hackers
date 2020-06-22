@@ -26,13 +26,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // setup window and entry point
         window = UIWindow()
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        let mainTabBarController = storyboard.instantiateViewController(identifier: "MainTabBarController")
-        window?.rootViewController = mainTabBarController
+        let mainSplitViewController = storyboard.instantiateViewController(
+            identifier: "MainSplitViewController"
+        ) as MainSplitViewController
+        window?.rootViewController = mainSplitViewController
         window?.makeKeyAndVisible()
 
         // setup NavigationService
         navigationService = SwinjectStoryboard.getService()
-        navigationService?.mainTabBarController = mainTabBarController as? MainTabBarController
+        navigationService?.mainSplitViewController = mainSplitViewController
 
         // setup review prompt
         ReviewController.incrementLaunchCounter()
