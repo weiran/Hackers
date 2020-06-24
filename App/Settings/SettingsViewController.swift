@@ -38,6 +38,7 @@ class SettingsViewController: UITableViewController {
         darkModeSwitch.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
+        showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
         updateUsername()
         updateVersion()
         notificationToken = NotificationCenter.default
