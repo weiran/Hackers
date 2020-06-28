@@ -85,7 +85,7 @@ class FeedViewController: UITableViewController {
 
     private func setupAuthenticationObserver() {
         notificationToken = NotificationCenter.default
-        .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+        .observe(name: Notification.Name.refreshRequired,
                  object: nil,
                  queue: .main
         ) { _ in
@@ -219,7 +219,10 @@ extension FeedViewController { // table view data source
 
             cell.postTitleView.post = post
             cell.postTitleView.delegate = self
-            cell.setImageWithPlaceholder(url: post.url)
+
+            cell.setImageWithPlaceholder(
+                url: UserDefaults.standard.showThumbnails ? post.url : nil
+            )
 
             return cell
         }
