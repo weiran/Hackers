@@ -85,7 +85,7 @@ class FeedViewController: UITableViewController {
 
     private func setupAuthenticationObserver() {
         notificationToken = NotificationCenter.default
-        .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+        .observe(name: Notification.Name.refreshRequired,
                  object: nil,
                  queue: .main
         ) { _ in

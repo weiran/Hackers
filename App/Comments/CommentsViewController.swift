@@ -89,7 +89,7 @@ class CommentsViewController: UITableViewController {
 
     private func observeNotifications() {
         notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+            .observe(name: Notification.Name.refreshRequired,
                      object: nil, queue: .main) { _ in self.load(showSpinner: false) }
     }
 

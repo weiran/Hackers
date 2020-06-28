@@ -42,7 +42,7 @@ class SettingsViewController: UITableViewController {
         updateUsername()
         updateVersion()
         notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+            .observe(name: Notification.Name.refreshRequired,
                      object: nil, queue: .main) { _ in self.updateUsername() }
     }
 
@@ -78,6 +78,7 @@ class SettingsViewController: UITableViewController {
 
     @IBAction func showThumbnailsValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setShowThumbnails(sender.isOn)
+        NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
     }
 
     @IBAction func safariReaderModelValueChanged(_ sender: UISwitch) {
