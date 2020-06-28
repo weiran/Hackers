@@ -13,9 +13,8 @@ class ThumbnailImageView: UIImageView {
     func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
 
-        guard let url = url,
-            let thumbnailURL = URL(string: "https://thumbnail-extractor.herokuapp.com/?url=\(url.absoluteString)") else {
-                return nil
+        guard let url = url, let thumbnailURL = thumbnailURL(for: url) else {
+            return nil
         }
 
         let newSize = 60
@@ -50,6 +49,16 @@ class ThumbnailImageView: UIImageView {
             self.contentMode = .center
             self.image = placeholderImage
         }
+    }
+
+    private func thumbnailURL(for url: URL) -> URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "hackers-thumbnails.azurewebsites.net"
+        components.path = "/api/FetchThumbnail"
+        let urlString = url.absoluteString
+        components.queryItems = [URLQueryItem(name: "url", value: urlString)]
+        return components.url
     }
 
     override var intrinsicContentSize: CGSize {
