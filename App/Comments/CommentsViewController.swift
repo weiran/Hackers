@@ -103,6 +103,13 @@ class CommentsViewController: UITableViewController {
             return
         }
 
+        guard post.url.host != nil else {
+            // hostless url means its an internal Hacker News link
+            // can also check postType but this is more future proof
+            self.showShareSheet(url: post.hackerNewsURL, sender: sender)
+            return
+        }
+
         let alertController = UIAlertController(
             title: nil, message: nil, preferredStyle: .actionSheet, themed: true)
         alertController.popoverPresentationController?.barButtonItem = sender
