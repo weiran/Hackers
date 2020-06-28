@@ -99,13 +99,8 @@ class AuthenticationUIService {
         item.appearance.descriptionTextColor = theme.textColor
     }
 
-    enum Notifications {
-        static let AuthenticationDidChangeNotification =
-            NSNotification.Name(rawValue: "AuthenticationDidChangeNotification")
-    }
-
     private func sendAuthenticationDidChangeNotification() {
-        NotificationCenter.default.post(name: Notifications.AuthenticationDidChangeNotification, object: nil)
+        NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
     }
 
     func unauthenticatedAlertController() -> UIAlertController {

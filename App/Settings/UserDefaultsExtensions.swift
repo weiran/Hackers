@@ -27,6 +27,15 @@ extension UserDefaults {
         set(enabled, forKey: UserDefaultsKeys.systemTheme.rawValue)
     }
 
+    var showThumbnails: Bool {
+        let showThumbnails = bool(forKey: UserDefaultsKeys.showThumbnails.rawValue)
+        return showThumbnails
+    }
+
+    func setShowThumbnails(_ enabled: Bool) {
+        set(enabled, forKey: UserDefaultsKeys.showThumbnails.rawValue)
+    }
+
     var safariReaderModeEnabled: Bool {
         let safariReaderModeSetting = bool(forKey: UserDefaultsKeys.safariReaderMode.rawValue)
         return safariReaderModeSetting
@@ -40,6 +49,7 @@ extension UserDefaults {
         register(defaults: [
             UserDefaultsKeys.theme.rawValue: "light",
             UserDefaultsKeys.systemTheme.rawValue: true,
+            UserDefaultsKeys.showThumbnails.rawValue: true,
             UserDefaultsKeys.safariReaderMode.rawValue: false
         ])
     }
@@ -49,4 +59,5 @@ enum UserDefaultsKeys: String {
     case theme
     case systemTheme
     case safariReaderMode
+    case showThumbnails
 }

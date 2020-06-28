@@ -20,6 +20,7 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var darkModeSwitch: UISwitch!
     @IBOutlet weak var systemSwitch: UISwitch!
+    @IBOutlet weak var showThumbnailsSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     @IBOutlet weak var versionLabel: UILabel!
 
@@ -37,10 +38,11 @@ class SettingsViewController: UITableViewController {
         darkModeSwitch.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
+        showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
         updateUsername()
         updateVersion()
         notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+            .observe(name: Notification.Name.refreshRequired,
                      object: nil, queue: .main) { _ in self.updateUsername() }
     }
 
@@ -72,6 +74,11 @@ class SettingsViewController: UITableViewController {
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setDarkMode(sender.isOn)
         AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
+    }
+
+    @IBAction func showThumbnailsValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setShowThumbnails(sender.isOn)
+        NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
     }
 
     @IBAction func safariReaderModelValueChanged(_ sender: UISwitch) {

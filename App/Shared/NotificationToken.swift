@@ -22,3 +22,7 @@ final class NotificationToken: NSObject {
         notificationCenter.removeObserver(token)
     }
 }
+
+extension Notification.Name {
+    static let refreshRequired = NSNotification.Name(rawValue: "RefreshREquiredNotification")
+}

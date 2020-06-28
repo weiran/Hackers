@@ -89,7 +89,7 @@ class CommentsViewController: UITableViewController {
 
     private func observeNotifications() {
         notificationToken = NotificationCenter.default
-            .observe(name: AuthenticationUIService.Notifications.AuthenticationDidChangeNotification,
+            .observe(name: Notification.Name.refreshRequired,
                      object: nil, queue: .main) { _ in self.load(showSpinner: false) }
     }
 
@@ -100,6 +100,13 @@ class CommentsViewController: UITableViewController {
 
     @IBAction private func shareTapped(_ sender: UIBarButtonItem) {
         guard let post = post else {
+            return
+        }
+
+        guard post.url.host != nil else {
+            // hostless url means its an internal Hacker News link
+            // can also check postType but this is more future proof
+            self.showShareSheet(url: post.hackerNewsURL, sender: sender)
             return
         }
 
