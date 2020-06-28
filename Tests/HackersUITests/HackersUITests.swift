@@ -18,12 +18,17 @@ class HackersUITests: XCTestCase {
             "skipAnimations",
             "disableOnboarding"
         ]
+
+        // set theme
+        app.launchArguments.append("-systemTheme")
+        app.launchArguments.append("false")
+        app.launchArguments.append("-theme")
         if darkTheme {
-            app.launchArguments.append("-systemTheme")
-            app.launchArguments.append("false")
-            app.launchArguments.append("-theme")
             app.launchArguments.append("dark")
+        } else {
+            app.launchArguments.append("light")
         }
+        
         app.launch()
     }
 
