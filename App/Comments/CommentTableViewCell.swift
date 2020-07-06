@@ -19,6 +19,7 @@ class CommentTableViewCell: SwipeTableViewCell {
     }
 
     private var comment: Comment?
+    private var isPostAuthor: Bool = false
 
     @IBOutlet var commentTextView: TouchableTextView!
     @IBOutlet var authorLabel: UILabel!
@@ -47,7 +48,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    func updateCommentContent(with comment: Comment, theme: AppTheme) {
+    func updateCommentContent(with comment: Comment, theme: AppTheme, isPostAuthor: Bool? = nil) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible
@@ -57,6 +58,11 @@ class CommentTableViewCell: SwipeTableViewCell {
         datePostedLabel.text = comment.age
         datePostedLabel.font = AppFont.commentDateFont(collapsed: isCollapsed)
         upvoteIconImageView?.isHidden = comment.upvoted == false
+
+        if let isPostAuthor = isPostAuthor {
+            self.isPostAuthor = isPostAuthor
+            self.applyAuthorLabelTheme(theme)
+        }
 
         if let commentTextView = commentTextView, comment.visibility == .visible {
             // only for expanded comments
@@ -165,5 +171,9 @@ extension CommentTableViewCell: Themed {
             updateCommentContent(with: comment, theme: theme)
         }
         overrideUserInterfaceStyle = theme.userInterfaceStyle
+    }
+
+    private func applyAuthorLabelTheme(_ theme: AppTheme) {
+        authorLabel.textColor = self.isPostAuthor ? theme.appTintColor : theme.titleTextColor
     }
 }

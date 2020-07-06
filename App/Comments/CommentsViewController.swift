@@ -199,7 +199,8 @@ extension CommentsViewController {
             for: indexPath
         ) as! CommentTableViewCell
 
-        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme)
+        let isPostAuthor = comment.by == post?.by ?? ""
+        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme, isPostAuthor: isPostAuthor)
         cell.commentDelegate = self
         cell.delegate = self
 
