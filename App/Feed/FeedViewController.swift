@@ -27,7 +27,7 @@ class FeedViewController: UITableViewController {
     private var pageIndex = 1
     private var isFetching = false
 
-    private var refreshToken: NotificationToken
+    private var refreshToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,11 +101,11 @@ class FeedViewController: UITableViewController {
     }
 
     private func setupNotificationObservers() {
-        notificationToken = NotificationCenter.default.observe(
+        refreshToken = NotificationCenter.default.observe(
             name: Notification.Name.refreshRequired,
             object: nil,
-            queue: .main) { _ in
-                self.fetchPostsWithReset()
+            queue: .main) { [weak self] _ in
+                self?.fetchPostsWithReset()
         }
     }
 
