@@ -51,7 +51,6 @@
 		249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */; };
 		249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */; };
 		249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */; };
-		249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A422B508A40051EAFD /* OnboardingService.swift */; };
 		24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A622B521470051EAFD /* BounceExpansion.swift */; };
@@ -67,6 +66,7 @@
 		24CE5FF819435A90009D2677 /* PostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF719435A90009D2677 /* PostCell.swift */; };
 		24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */; };
 		24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9C1F8917D60050DEDF /* ReviewController.swift */; };
+		24D1845924B336B60017E4F4 /* TitleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845824B336B60017E4F4 /* TitleButton.swift */; };
 		24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */; };
 		24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* AppTheme.swift */; };
 		24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D811A41FF90A58000951C3 /* TouchableTextView.swift */; };
@@ -176,7 +176,6 @@
 		249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellKitActions.swift; sourceTree = "<group>"; };
 		249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBackgroundView.swift; sourceTree = "<group>"; };
 		249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewBackgroundView.xib; sourceTree = "<group>"; };
-		249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableNavigationTitleView.swift; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
 		24B1A6A622B521470051EAFD /* BounceExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceExpansion.swift; sourceTree = "<group>"; };
@@ -194,6 +193,7 @@
 		24CE5FF719435A90009D2677 /* PostCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
 		24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		24CEAA9C1F8917D60050DEDF /* ReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewController.swift; sourceTree = "<group>"; };
+		24D1845824B336B60017E4F4 /* TitleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleButton.swift; sourceTree = "<group>"; };
 		24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+Authentication.swift"; sourceTree = "<group>"; };
 		24D6B8C91C1EDBFC00618422 /* AppTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		24D811A41FF90A58000951C3 /* TouchableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchableTextView.swift; sourceTree = "<group>"; };
@@ -392,7 +392,7 @@
 				241C32DD24950C05000876DC /* PostTitleView.swift */,
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
-				249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */,
+				24D1845824B336B60017E4F4 /* TitleButton.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -951,7 +951,6 @@
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
-				249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
@@ -971,6 +970,7 @@
 				24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */,
 				247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */,
 				241C32DE24950C05000876DC /* PostTitleView.swift in Sources */,
+				24D1845924B336B60017E4F4 /* TitleButton.swift in Sources */,
 				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
@@ -1323,7 +1323,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
@@ -1350,7 +1350,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";

@@ -49,13 +49,6 @@ class FeedViewController: UITableViewController {
             // only deselect in compact size where the view isn't split
             smoothlyDeselectRows()
         }
-
-        prepareNavigationTapRecognizer()
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        removeNavigationTapRecognizer()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -81,6 +74,33 @@ class FeedViewController: UITableViewController {
         dataSource = makeDataSource()
         tableView.dataSource = dataSource
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+    }
+
+
+    private func setupTitle() {
+        let button = TitleButton()
+        button.setTitleText(postType.title)
+        button.setupMenu()
+        button.handler = { postType in
+            self.postType = postType
+
+            // haptic feedback
+            let generator = UINotificationFeedbackGenerator()
+            generator.prepare()
+            generator.notificationOccurred(.success)
+
+            // update title
+            self.setupTitle()
+
+            // reset tableview
+            self.posts = [Post]()
+            self.update(with: self.posts, animate: false)
+
+            self.fetchPostsWithReset()
+        }
+
+        navigationItem.titleView = button
+        title = postType.title
     }
 
     private func setupAuthenticationObserver() {
@@ -129,75 +149,6 @@ extension FeedViewController { // post fetching
     @objc private func fetchPostsWithReset() {
         pageIndex = 1
         fetchPosts()
-    }
-}
-
-extension FeedViewController { // post type selector
-    private func setupTitle() {
-        let titleLabel = TappableNavigationTitleView()
-        titleLabel.setTitleText(postType.title)
-        navigationItem.titleView = titleLabel
-        title = postType.title
-    }
-
-    private func prepareNavigationTapRecognizer() {
-        if navigationBarGestureRecognizer == nil {
-            let gestureRecognizer = UITapGestureRecognizer(
-                target: self,
-                action: #selector(navigationBarTapped(_:))
-            )
-            gestureRecognizer.cancelsTouchesInView = false
-            navigationBarGestureRecognizer = gestureRecognizer
-        }
-
-        if let gestureRecognizer = navigationBarGestureRecognizer {
-            navigationController?.navigationBar.addGestureRecognizer(gestureRecognizer)
-            navigationBarGestureRecognizer = gestureRecognizer
-        }
-    }
-
-    private func removeNavigationTapRecognizer() {
-        if let gestureRecognizer = navigationBarGestureRecognizer {
-            navigationController?.navigationBar.removeGestureRecognizer(gestureRecognizer)
-        }
-    }
-
-    @objc private func navigationBarTapped(_ sender: UITapGestureRecognizer) {
-        let location = sender.location(in: navigationController?.navigationBar)
-        let hitView = navigationController?.navigationBar.hitTest(location, with: nil)
-
-        // let the tap fall through if its on a button
-        guard !(hitView is UIControl) else {
-            return
-        }
-
-        // haptic feedback
-        let generator = UISelectionFeedbackGenerator()
-        generator.prepare()
-        generator.selectionChanged()
-
-        let controller = NavigationAlertController()
-        controller.setup(handler: navigationAlertControllerHandler(postType:))
-        controller.popoverPresentationController?.sourceView = navigationController?.navigationBar
-        present(controller, animated: true)
-    }
-
-    private func navigationAlertControllerHandler(postType: PostType) {
-        self.postType = postType
-
-        // haptic feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.prepare()
-        generator.notificationOccurred(.success)
-
-        // update title
-        setupTitle()
-
-        // reset tableview
-        self.posts = [Post]()
-        self.update(with: self.posts, animate: false)
-
-        fetchPostsWithReset()
     }
 }
 
