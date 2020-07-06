@@ -17,7 +17,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        preferredDisplayMode = .allVisible
+        preferredDisplayMode = .oneBesideSecondary
     }
 
     func splitViewController(_ splitViewController: UISplitViewController,
