@@ -27,16 +27,14 @@ class FeedViewController: UITableViewController {
     private var pageIndex = 1
     private var isFetching = false
 
-    private var notificationToken: NotificationToken?
-
-    private var navigationBarGestureRecognizer: UITapGestureRecognizer?
+    private var refreshToken: NotificationToken
 
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
         setupTheming()
-        setupAuthenticationObserver()
+        setupNotificationObservers()
         setupTableView()
         setupTitle()
         fetchPosts()
@@ -76,7 +74,6 @@ class FeedViewController: UITableViewController {
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
     }
 
-
     private func setupTitle() {
         let button = TitleButton()
         button.setTitleText(postType.title)
@@ -103,13 +100,12 @@ class FeedViewController: UITableViewController {
         title = postType.title
     }
 
-    private func setupAuthenticationObserver() {
-        notificationToken = NotificationCenter.default
-        .observe(name: Notification.Name.refreshRequired,
-                 object: nil,
-                 queue: .main
-        ) { _ in
-            self.fetchPostsWithReset()
+    private func setupNotificationObservers() {
+        notificationToken = NotificationCenter.default.observe(
+            name: Notification.Name.refreshRequired,
+            object: nil,
+            queue: .main) { _ in
+                self.fetchPostsWithReset()
         }
     }
 
