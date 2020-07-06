@@ -13,10 +13,8 @@ class ThumbnailImageView: UIImageView {
     func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
         setPlaceholder()
 
-        // TODO improve this URL construction
-        guard let url = url,
-            let thumbnailURL = URL(string: "https://thumbnail-extractor.herokuapp.com/?url=\(url.absoluteString)") else {
-                return nil
+        guard let url = url, let thumbnailURL = thumbnailURL(for: url) else {
+            return nil
         }
 
         let newSize = 60
@@ -45,12 +43,22 @@ class ThumbnailImageView: UIImageView {
     }
 
     private func setPlaceholder() {
-        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
-        let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
         DispatchQueue.main.async {
+            let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
+            let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
             self.contentMode = .center
             self.image = placeholderImage
         }
+    }
+
+    private func thumbnailURL(for url: URL) -> URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "hackers-thumbnails.azurewebsites.net"
+        components.path = "/api/FetchThumbnail"
+        let urlString = url.absoluteString
+        components.queryItems = [URLQueryItem(name: "url", value: urlString)]
+        return components.url
     }
 
     override var intrinsicContentSize: CGSize {
