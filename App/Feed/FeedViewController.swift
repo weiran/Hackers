@@ -15,13 +15,15 @@ import Kingfisher
 import Loaf
 import SwipeCellKit
 
-class FeedViewController: UITableViewController {
+class FeedViewController: UIViewController {
     var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
 
     private var posts = [Post]()
     private var dataSource: UITableViewDiffableDataSource<Section, Post>?
     var postType: PostType = .news
+
+    @IBOutlet var tableView: UITableView!
 
     private var peekedIndexPath: IndexPath?
     private var pageIndex = 1
@@ -109,6 +111,34 @@ class FeedViewController: UITableViewController {
         }
     }
 
+    func smoothlyDeselectRows() {
+        // Get the initially selected index paths, if any
+        let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
+
+        // Grab the transition coordinator responsible for the current transition
+        if let coordinator = transitionCoordinator {
+            // Animate alongside the master view controller's view
+            coordinator.animateAlongsideTransition(in: parent?.view, animation: { context in
+                // Deselect the cells, with animations enabled if this is an animated transition
+                selectedIndexPaths.forEach {
+                    self.tableView.deselectRow(at: $0, animated: context.isAnimated)
+                }
+            }, completion: { context in
+                // If the transition was cancel, reselect the rows that were selected before,
+                // so they are still selected the next time the same animation is triggered
+                if context.isCancelled {
+                    selectedIndexPaths.forEach {
+                        self.tableView.selectRow(at: $0, animated: false, scrollPosition: .none)
+                    }
+                }
+            })
+        } else { // If this isn't a transition coordinator, just deselect the rows without animating
+            selectedIndexPaths.forEach {
+                self.tableView.deselectRow(at: $0, animated: false)
+            }
+        }
+    }
+
     @IBAction func showNewSettings(_ sender: Any) {
         let settingsStore = SettingsStore()
         let hostingVC = UIHostingController(
@@ -183,8 +213,8 @@ extension FeedViewController { // table view data source
     }
 }
 
-extension FeedViewController { // table view delegate
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+extension FeedViewController: UITableViewDelegate { // table view delegate
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let buffer: CGFloat = 200
         let scrollPosition = scrollView.contentOffset.y
         let bottomPosition = scrollView.contentSize.height - scrollView.frame.size.height
@@ -194,7 +224,7 @@ extension FeedViewController { // table view delegate
         }
     }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let post = posts[indexPath.row]
         if postType == .jobs {
             didPressLinkButton(post)
@@ -290,6 +320,36 @@ extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
             self.navigateToComments()
         }
         return [viewCommentsPreviewAction]
+    }
+}
+
+extension FeedViewController { // smoothly deselect cells
+    func setupSmoothlyDeselectRows() {
+        // Get the initially selected index paths, if any
+        let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
+
+        // Grab the transition coordinator responsible for the current transition
+        if let coordinator = transitionCoordinator {
+            // Animate alongside the master view controller's view
+            coordinator.animateAlongsideTransition(in: parent?.view, animation: { context in
+                // Deselect the cells, with animations enabled if this is an animated transition
+                selectedIndexPaths.forEach {
+                    self.tableView.deselectRow(at: $0, animated: context.isAnimated)
+                }
+            }, completion: { context in
+                // If the transition was cancel, reselect the rows that were selected before,
+                // so they are still selected the next time the same animation is triggered
+                if context.isCancelled {
+                    selectedIndexPaths.forEach {
+                        self.tableView.selectRow(at: $0, animated: false, scrollPosition: .none)
+                    }
+                }
+            })
+        } else { // If this isn't a transition coordinator, just deselect the rows without animating
+            selectedIndexPaths.forEach {
+                self.tableView.deselectRow(at: $0, animated: false)
+            }
+        }
     }
 }
 

@@ -20,8 +20,10 @@ class ThumbnailImageView: UIImageView {
         let newSize = 60
         let thumbnailSize = CGFloat(newSize) * UIScreen.main.scale
         let thumbnailCGSize = CGSize(width: thumbnailSize, height: thumbnailSize)
-        let imageSizeProcessor = ResizingImageProcessor(referenceSize: thumbnailCGSize,
-                                                        mode: .aspectFill)
+        let imageSizeProcessor = ResizingImageProcessor(
+            referenceSize: thumbnailCGSize,
+            mode: .aspectFill
+        )
         let options: KingfisherOptionsInfo = [
             .processor(imageSizeProcessor)
         ]
@@ -31,10 +33,8 @@ class ThumbnailImageView: UIImageView {
         let task = KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
             switch result {
             case .success(let imageResult):
-                DispatchQueue.main.async {
-                    self.contentMode = .scaleAspectFill
-                    self.image = imageResult.image
-                }
+                self.contentMode = .scaleAspectFill
+                self.image = imageResult.image
             default: break
             }
         }
@@ -43,12 +43,10 @@ class ThumbnailImageView: UIImageView {
     }
 
     private func setPlaceholder() {
-        DispatchQueue.main.async {
-            let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
-            let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
-            self.contentMode = .center
-            self.image = placeholderImage
-        }
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
+        let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
+        self.contentMode = .center
+        self.image = placeholderImage
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
@@ -59,9 +57,5 @@ class ThumbnailImageView: UIImageView {
         let urlString = url.absoluteString
         components.queryItems = [URLQueryItem(name: "url", value: urlString)]
         return components.url
-    }
-
-    override var intrinsicContentSize: CGSize {
-        return CGSize(width: 60, height: 60)
     }
 }
