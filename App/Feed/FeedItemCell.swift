@@ -10,8 +10,8 @@ import UIKit
 import Kingfisher
 
 class FeedItemCell: UICollectionViewListCell {
-    @IBOutlet var thumbnailImageView: ThumbnailImageView!
     @IBOutlet var postTitleView: PostTitleView!
+    @IBOutlet var thumbnailImageView: ThumbnailImageView!
 
     private var thumbnailDownloadTask: DownloadTask?
 
@@ -28,7 +28,8 @@ class FeedItemCell: UICollectionViewListCell {
         super.updateConstraints()
 
         separatorLayoutGuide.leadingAnchor.constraint(
-            equalTo: postTitleView.leadingAnchor).isActive = true
+            equalTo: postTitleView.leadingAnchor
+        ).isActive = true
     }
 
     private func setupThumbnailGesture() {

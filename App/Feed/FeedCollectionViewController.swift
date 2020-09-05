@@ -40,7 +40,7 @@ class FeedCollectionViewController: UIViewController {
         }.done { _ in
             self.update(with: self.viewModel)
         }.catch { _ in
-
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }.finally {
             self.collectionView.refreshControl?.endRefreshing()
         }
@@ -81,7 +81,6 @@ extension FeedCollectionViewController {
 extension FeedCollectionViewController: UICollectionViewDelegate {
     private func setupCollectionView() {
         var config = UICollectionLayoutListConfiguration(appearance: .plain)
-
         config.leadingSwipeActionsConfigurationProvider = voteSwipeActionConfiguration(indexPath:)
 
         let refreshControl = UIRefreshControl()
@@ -97,39 +96,20 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
         let layout = UICollectionViewCompositionalLayout.list(using: config)
         collectionView.setCollectionViewLayout(layout, animated: false)
         collectionView.dataSource = dataSource
-    }
 
-    private func voteSwipeActionConfiguration(indexPath: IndexPath) -> UISwipeActionsConfiguration {
-        let post = self.viewModel.posts[indexPath.row]
-
-        let voteAction = UIContextualAction(
-            style: .normal,
-            title: "Upvote",
-            handler: { _, _, completion in
-                self.vote(on: post)
-                completion(true)
-            }
-        )
-
-        voteAction.image = UIImage(
-            systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up"
-        )
-        if !post.upvoted {
-            voteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
-        }
-
-        return UISwipeActionsConfiguration(actions: [voteAction])
+        collectionView.reloadData()
     }
 
     private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
         let reuseIdentifier = "FeedItemCell"
 
         return UICollectionViewDiffableDataSource(
-            collectionView: self.collectionView) { (collectionView, indexPath, post) in
+            collectionView: collectionView
+        ) { (collectionView, indexPath, post) in
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: reuseIdentifier,
                 for: indexPath
-            ) as? FeedItemCell else { return nil }
+            ) as? FeedItemCell else { fatalError("Couldn't dequeue cell \(reuseIdentifier)") }
 
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
@@ -229,6 +209,28 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
 }
 
 extension FeedCollectionViewController {
+    private func voteSwipeActionConfiguration(indexPath: IndexPath) -> UISwipeActionsConfiguration {
+        let post = self.viewModel.posts[indexPath.row]
+
+        let voteAction = UIContextualAction(
+            style: .normal,
+            title: "Upvote",
+            handler: { _, _, completion in
+                self.vote(on: post)
+                completion(true)
+            }
+        )
+
+        voteAction.image = UIImage(
+            systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up"
+        )
+        if !post.upvoted {
+            voteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+        }
+
+        return UISwipeActionsConfiguration(actions: [voteAction])
+    }
+
     private func vote(on post: Post) {
         let isUpvote = !post.upvoted
 
