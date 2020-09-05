@@ -39,6 +39,14 @@ class FeedViewModel {
         pageIndex = 1
         isFetching = false
     }
+
+    func vote(on post: Post, upvote: Bool) -> Promise<Void> {
+        if upvote {
+            return HackersKit.shared.upvote(post: post)
+        } else {
+            return HackersKit.shared.unvote(post: post)
+        }
+    }
 }
 
 extension FeedViewModel {

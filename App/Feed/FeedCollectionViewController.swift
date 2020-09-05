@@ -9,9 +9,12 @@
 import UIKit
 import PromiseKit
 import SafariServices
+import Loaf
 
 class FeedCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
+
+    var authenticationUIService: AuthenticationUIService?
 
     private lazy var dataSource = makeDataSource()
     private lazy var viewModel = FeedViewModel()
@@ -53,6 +56,10 @@ class FeedCollectionViewController: UIViewController {
     }
 }
 
+extension FeedCollectionViewController: Themed {
+    func applyTheme(_ theme: AppTheme) { }
+}
+
 extension FeedCollectionViewController {
     private func setupTitle() {
         let button = TitleButton()
@@ -73,10 +80,9 @@ extension FeedCollectionViewController {
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
     private func setupCollectionView() {
-        let config = UICollectionLayoutListConfiguration(appearance: .plain)
-        let layout = UICollectionViewCompositionalLayout.list(using: config)
-        collectionView.setCollectionViewLayout(layout, animated: false)
-        collectionView.dataSource = dataSource
+        var config = UICollectionLayoutListConfiguration(appearance: .plain)
+
+        config.leadingSwipeActionsConfigurationProvider = voteSwipeActionConfiguration(indexPath:)
 
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(
@@ -88,21 +94,65 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
 
         collectionView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
 
-        // seems to fix incorrectly sized cells on initial load
-        self.collectionView.reloadData()
+        let layout = UICollectionViewCompositionalLayout.list(using: config)
+        collectionView.setCollectionViewLayout(layout, animated: false)
+        collectionView.dataSource = dataSource
     }
 
-    private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
-        let reuseIdentifier = "FeedItemCell"
+    private func voteSwipeActionConfiguration(indexPath: IndexPath) -> UISwipeActionsConfiguration {
+        let voteOnPost: (Post, Bool) -> Void = { post, isUpvote in
+            guard let cell = self.collectionView.cellForItem(at: indexPath) as? FeedItemCell else { return }
+            post.upvoted = isUpvote
+            post.score += isUpvote ? 1 : -1
+            cell.postTitleView.post = post
+        }
 
         let upvoteAction = UIContextualAction(
             style: .normal,
             title: "Upvote",
             handler: { _, _, completion in
+                let post = self.viewModel.posts[indexPath.row]
+                let isUpvote = !post.upvoted
+
+                // optimistally update vote status
+                voteOnPost(post, isUpvote)
+
+                firstly {
+                    self.viewModel.vote(on: post, upvote: isUpvote)
+                }.catch { [weak self] error in
+                    // reset optimistic voting
+                    voteOnPost(post, !isUpvote)
+
+                    guard
+                        let error = error as? HackersKitError,
+                        let authenticationUIService = self?.authenticationUIService,
+                        let self = self else {
+                        return
+                    }
+
+                    switch error {
+                    case .unauthenticated:
+                        self.present(
+                            authenticationUIService.unauthenticatedAlertController(),
+                            animated: true
+                        )
+                    default:
+                        Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+                    }
+                }
+                
                 completion(true)
             }
         )
-        upvoteAction.image = UIImage(systemName: "chevron.up")
+
+        upvoteAction.image = UIImage(systemName: "arrow.up")
+        upvoteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+
+        return UISwipeActionsConfiguration(actions: [upvoteAction])
+    }
+
+    private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
+        let reuseIdentifier = "FeedItemCell"
 
         return UICollectionViewDiffableDataSource(
             collectionView: self.collectionView) { (collectionView, indexPath, post) in
@@ -119,10 +169,6 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             cell.linkPressedHandler = { post in
                 self.openURL(post.url)
             }
-
-            cell.leadingSwipeActionsConfiguration = UISwipeActionsConfiguration(
-                actions: [upvoteAction]
-            )
 
             return cell
         }
