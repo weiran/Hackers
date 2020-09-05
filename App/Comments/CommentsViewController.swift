@@ -132,8 +132,10 @@ class CommentsViewController: UITableViewController {
     }
 
     private func showShareSheet(url: URL, sender: UIBarButtonItem) {
-        let activityViewController = UIActivityViewController(activityItems: [url],
-                                                              applicationActivities: nil)
+        let activityViewController = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
         activityViewController.popoverPresentationController?.barButtonItem = sender
         present(activityViewController, animated: true, completion: nil)
     }
