@@ -185,38 +185,45 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 title: "Upvote",
                 image: UIImage(systemName: "arrow.up"),
                 identifier: UIAction.Identifier(rawValue: "upvote")
-            ) {_ in
-                print("button clicked..")
+            ) { _ in
+                self.vote(on: post)
             }
 
             let unvote = UIAction(
                 title: "Unvote",
                 image: UIImage(systemName: "arrow.uturn.down"),
                 identifier: UIAction.Identifier(rawValue: "unvote")
-            ) {_ in
-                print("button clicked..")
+            ) { _ in
+                self.vote(on: post)
             }
 
             let openLink = UIAction(
                 title: "Open Link",
                 image: UIImage(systemName: "safari"),
                 identifier: UIAction.Identifier(rawValue: "open.link")
-            ) {_ in
-                print("button clicked..")
+            ) { _ in
+                self.openURL(post.url)
             }
 
             let shareLink = UIAction(
                 title: "Share Link",
                 image: UIImage(systemName: "square.and.arrow.up"),
                 identifier: UIAction.Identifier(rawValue: "share.link")
-            ) {_ in
-                print("button clicked..")
+            ) { _ in
+                let url = post.url.host != nil ? post.url : post.hackerNewsURL
+                let activityViewController = UIActivityViewController(
+                    activityItems: [url],
+                    applicationActivities: nil
+                )
+                let cell = collectionView.cellForItem(at: indexPath)
+                activityViewController.popoverPresentationController?.sourceView = cell
+                self.present(activityViewController, animated: true, completion: nil)
             }
 
-            let vote = post.upvoted ? unvote : upvote
+            let voteMenu = post.upvoted ? unvote : upvote
             let linkMenu = UIMenu(title: "", options: .displayInline, children: [openLink, shareLink])
 
-            return UIMenu(title: "", image: nil, identifier: nil, children: [vote, linkMenu])
+            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu, linkMenu])
         }
     }
 }
