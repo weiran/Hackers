@@ -100,55 +100,25 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
     }
 
     private func voteSwipeActionConfiguration(indexPath: IndexPath) -> UISwipeActionsConfiguration {
-        let voteOnPost: (Post, Bool) -> Void = { post, isUpvote in
-            guard let cell = self.collectionView.cellForItem(at: indexPath) as? FeedItemCell else { return }
-            post.upvoted = isUpvote
-            post.score += isUpvote ? 1 : -1
-            cell.postTitleView.post = post
-        }
+        let post = self.viewModel.posts[indexPath.row]
 
-        let upvoteAction = UIContextualAction(
+        let voteAction = UIContextualAction(
             style: .normal,
             title: "Upvote",
             handler: { _, _, completion in
-                let post = self.viewModel.posts[indexPath.row]
-                let isUpvote = !post.upvoted
-
-                // optimistally update vote status
-                voteOnPost(post, isUpvote)
-
-                firstly {
-                    self.viewModel.vote(on: post, upvote: isUpvote)
-                }.catch { [weak self] error in
-                    // reset optimistic voting
-                    voteOnPost(post, !isUpvote)
-
-                    guard
-                        let error = error as? HackersKitError,
-                        let authenticationUIService = self?.authenticationUIService,
-                        let self = self else {
-                        return
-                    }
-
-                    switch error {
-                    case .unauthenticated:
-                        self.present(
-                            authenticationUIService.unauthenticatedAlertController(),
-                            animated: true
-                        )
-                    default:
-                        Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
-                    }
-                }
-                
+                self.vote(on: post)
                 completion(true)
             }
         )
 
-        upvoteAction.image = UIImage(systemName: "arrow.up")
-        upvoteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+        voteAction.image = UIImage(
+            systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up"
+        )
+        if !post.upvoted {
+            voteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+        }
 
-        return UISwipeActionsConfiguration(actions: [upvoteAction])
+        return UISwipeActionsConfiguration(actions: [voteAction])
     }
 
     private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
@@ -197,6 +167,100 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
     ) {
         if indexPath.row == viewModel.posts.count - 5 && !viewModel.isFetching {
             fetchFeedNextPage()
+        }
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        let post = viewModel.posts[indexPath.row]
+
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { _ in
+            let upvote = UIAction(
+                title: "Upvote",
+                image: UIImage(systemName: "arrow.up"),
+                identifier: UIAction.Identifier(rawValue: "upvote")
+            ) {_ in
+                print("button clicked..")
+            }
+
+            let unvote = UIAction(
+                title: "Unvote",
+                image: UIImage(systemName: "arrow.uturn.down"),
+                identifier: UIAction.Identifier(rawValue: "unvote")
+            ) {_ in
+                print("button clicked..")
+            }
+
+            let openLink = UIAction(
+                title: "Open Link",
+                image: UIImage(systemName: "safari"),
+                identifier: UIAction.Identifier(rawValue: "open.link")
+            ) {_ in
+                print("button clicked..")
+            }
+
+            let shareLink = UIAction(
+                title: "Share Link",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                identifier: UIAction.Identifier(rawValue: "share.link")
+            ) {_ in
+                print("button clicked..")
+            }
+
+            let vote = post.upvoted ? unvote : upvote
+            let linkMenu = UIMenu(title: "", options: .displayInline, children: [openLink, shareLink])
+
+            return UIMenu(title: "", image: nil, identifier: nil, children: [vote, linkMenu])
+        }
+    }
+}
+
+extension FeedCollectionViewController {
+    private func vote(on post: Post) {
+        let isUpvote = !post.upvoted
+
+        // optimistally update
+        updateVote(on: post, isUpvote: isUpvote)
+
+        firstly {
+            viewModel.vote(on: post, upvote: isUpvote)
+        }.catch { [weak self] error in
+            self?.updateVote(on: post, isUpvote: !isUpvote)
+            self?.handleVoteError(error: error)
+        }
+    }
+
+    private func updateVote(on post: Post, isUpvote: Bool) {
+        post.upvoted = isUpvote
+        post.score += isUpvote ? 1 : -1
+
+        if let index = viewModel.posts.firstIndex(of: post),
+           let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? FeedItemCell {
+            cell.postTitleView.post = post
+        }
+    }
+
+    private func handleVoteError(error: Error) {
+        guard
+            let error = error as? HackersKitError,
+            let authenticationUIService = self.authenticationUIService else {
+            return
+        }
+
+        switch error {
+        case .unauthenticated:
+            self.present(
+                authenticationUIService.unauthenticatedAlertController(),
+                animated: true
+            )
+        default:
+            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }
     }
 }
