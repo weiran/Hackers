@@ -11,7 +11,6 @@ import UIKit
 import SwiftUI
 import SafariServices
 import PromiseKit
-import Kingfisher
 import Loaf
 import SwipeCellKit
 

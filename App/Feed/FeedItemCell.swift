@@ -7,13 +7,10 @@
 //
 
 import UIKit
-import Kingfisher
 
 class FeedItemCell: UICollectionViewListCell {
     @IBOutlet var postTitleView: PostTitleView!
     @IBOutlet var thumbnailImageView: ThumbnailImageView!
-
-    private var thumbnailDownloadTask: DownloadTask?
 
     var linkPressedHandler: ((Post) -> Void)?
 
@@ -45,13 +42,11 @@ class FeedItemCell: UICollectionViewListCell {
     }
 
     func setImageWithPlaceholder(url: URL?) {
-        thumbnailDownloadTask = thumbnailImageView.setImageWithPlaceholder(url: url)
+        thumbnailImageView.setImageWithPlaceholder(url: url)
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-
-        thumbnailDownloadTask?.cancel()
+    func setPost(post: Post) {
+        postTitleView.post = post
     }
 }
 

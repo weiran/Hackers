@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import SwipeCellKit
-import Kingfisher
 
 protocol PostCellDelegate: class {
     func didTapThumbnail(_ sender: Any)
@@ -17,7 +16,6 @@ protocol PostCellDelegate: class {
 
 class PostCell: SwipeTableViewCell {
     weak var postDelegate: PostCellDelegate?
-    private var downloadTask: DownloadTask?
 
     @IBOutlet weak var postTitleView: PostTitleView!
     @IBOutlet weak var thumbnailImageView: ThumbnailImageView!
@@ -57,12 +55,7 @@ class PostCell: SwipeTableViewCell {
     }
 
     func setImageWithPlaceholder(url: URL?) {
-        downloadTask = thumbnailImageView.setImageWithPlaceholder(url: url)
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        downloadTask?.cancel()
+        thumbnailImageView.setImageWithPlaceholder(url: url!)
     }
 }
 

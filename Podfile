@@ -6,7 +6,6 @@ source 'https://cdn.cocoapods.org/' # For Travis
 target 'Hackers' do
   pod 'HNScraper', :git => 'https://github.com/weiran/HNScraper.git', :branch => 'master'
   pod 'PromiseKit/CorePromise'
-  pod 'Kingfisher'
   pod 'Loaf'
   pod 'SwipeCellKit'
   pod 'Swinject', '~> 2.6.2' # SwinjectStoryboard needs updating
@@ -14,6 +13,7 @@ target 'Hackers' do
   pod 'BulletinBoard'
   pod 'WhatsNewKit'
   pod 'SwiftSoup'
+  pod 'Nuke'
   
   pod 'SwiftLint'
 end

@@ -113,11 +113,12 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 fatalError("Couldn't dequeue cell \(reuseIdentifier)")
             }
 
+
+
+            cell.setPost(post: post)
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
             )
-
-            cell.postTitleView.post = post
             cell.linkPressedHandler = { post in
                 self.openURL(post.url)
             }

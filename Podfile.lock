@@ -2,10 +2,8 @@ PODS:
   - BulletinBoard (4.1.2)
   - DeviceKit (4.0.0)
   - HNScraper (0.2.2)
-  - Kingfisher (5.15.0):
-    - Kingfisher/Core (= 5.15.0)
-  - Kingfisher/Core (5.15.0)
   - Loaf (0.5.0)
+  - Nuke (9.1.2)
   - PromiseKit/CorePromise (6.13.1)
   - SwiftLint (0.40.1)
   - SwiftSoup (2.3.2)
@@ -19,8 +17,8 @@ DEPENDENCIES:
   - BulletinBoard
   - DeviceKit
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
-  - Kingfisher
   - Loaf
+  - Nuke
   - PromiseKit/CorePromise
   - SwiftLint
   - SwiftSoup
@@ -33,8 +31,8 @@ SPEC REPOS:
   trunk:
     - BulletinBoard
     - DeviceKit
-    - Kingfisher
     - Loaf
+    - Nuke
     - PromiseKit
     - SwiftLint
     - SwiftSoup
@@ -57,8 +55,8 @@ SPEC CHECKSUMS:
   BulletinBoard: 1c0cb191b6c6245d08f51bd2445f1e36414ec0ed
   DeviceKit: 8d3a6ce9f98c3a1a591a84b4edf69693c3552083
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
-  Kingfisher: 1acb67597a520c2d0310677e66d6e0af455ef757
   Loaf: 0800b444431366bc395d54267975d4ad4ad5c99c
+  Nuke: dd2e6be6a34c042a7861e190632781d11f253026
   PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
   SwiftLint: bbfed21bf4451dcbd0f5cdbee44a18e06cf91b12
   SwiftSoup: f97bc4e988c7729d6457f9642f974c617a6e2510
@@ -67,6 +65,6 @@ SPEC CHECKSUMS:
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
   WhatsNewKit: 1fe72bc0e0e13c8c47969da18de44f4c9b12767c
 
-PODFILE CHECKSUM: 4d79374218a0f2a60cd14be65bd425b62782e740
+PODFILE CHECKSUM: 52b90088cab90c44358c46cd2a92ab6bc5e52db7
 
 COCOAPODS: 1.10.0.beta.2

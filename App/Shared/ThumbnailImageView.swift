@@ -7,46 +7,39 @@
 //
 
 import UIKit
-import Kingfisher
+import Nuke
 
 class ThumbnailImageView: UIImageView {
-    func setImageWithPlaceholder(url: URL?) -> DownloadTask? {
-        setPlaceholder()
+    private lazy var placeholderImage: UIImage = getPlaceholderImage()
 
-        guard let url = url, let thumbnailURL = thumbnailURL(for: url) else {
+    func setImageWithPlaceholder(url: URL?) -> ImageRequest? {
+        guard
+            let url = url,
+            let thumbnailURL = thumbnailURL(for: url)
+        else {
+            image = placeholderImage
+            contentMode = .center
             return nil
         }
 
-        let newSize = 60
-        let thumbnailSize = CGFloat(newSize) * UIScreen.main.scale
-        let thumbnailCGSize = CGSize(width: thumbnailSize, height: thumbnailSize)
-        let imageSizeProcessor = ResizingImageProcessor(
-            referenceSize: thumbnailCGSize,
-            mode: .aspectFill
+        let options = ImageLoadingOptions(
+            placeholder: placeholderImage,
+            contentModes: .init(
+                success: .scaleAspectFill,
+                failure: .center,
+                placeholder: .center
+            )
         )
-        let options: KingfisherOptionsInfo = [
-            .processor(imageSizeProcessor)
-        ]
 
-        let resource = ImageResource(downloadURL: thumbnailURL)
+        let request = ImageRequest(url: thumbnailURL)
+        Nuke.loadImage(with: request, options: options, into: self)
 
-        let task = KingfisherManager.shared.retrieveImage(with: resource, options: options) { result in
-            switch result {
-            case .success(let imageResult):
-                self.contentMode = .scaleAspectFill
-                self.image = imageResult.image
-            default: break
-            }
-        }
-
-        return task
+        return request
     }
 
-    private func setPlaceholder() {
+    private func getPlaceholderImage() -> UIImage {
         let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
-        let placeholderImage = UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
-        self.contentMode = .center
-        self.image = placeholderImage
+        return UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
