@@ -146,7 +146,7 @@
         <!--Split View Controller-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
-                <splitViewController storyboardIdentifier="MainSplitViewController" id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController storyboardIdentifier="MainSplitViewController" preferredDisplayMode="beside" behavior="tile" id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
                         <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="AJJ-Nm-u6A"/>

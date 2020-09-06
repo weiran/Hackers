@@ -8,23 +8,10 @@
 
 import UIKit
 
-class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
+class MainSplitViewController: UISplitViewController {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupTheming()
-        delegate = self
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        preferredDisplayMode = .oneBesideSecondary
-    }
-
-    func splitViewController(_ splitViewController: UISplitViewController,
-                             collapseSecondary secondaryViewController: UIViewController,
-                             onto primaryViewController: UIViewController) -> Bool {
-        // only collapse the secondary onto the primary when it's the placeholder view
-        return secondaryViewController is EmptyViewController
     }
 }
 
