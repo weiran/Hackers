@@ -195,7 +195,6 @@ extension FeedViewController { // table view data source
             cell.delegate = self
 
             cell.postTitleView.post = post
-            cell.postTitleView.delegate = self
 
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
@@ -262,22 +261,22 @@ extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegat
     }
 }
 
-extension FeedViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
-    func didPressLinkButton(_ post: Post) {
-        if let safariViewController = SFSafariViewController.instance(
-            for: post.url,
-            previewActionItemsDelegate: self
-        ) {
-            navigationController?.present(safariViewController, animated: true)
-        }
-    }
-
+extension FeedViewController: PostCellDelegate { // cell actions
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
         if let indexPath = tableView.indexPathForRow(at: point) {
             let post = posts[indexPath.row]
             didPressLinkButton(post)
+        }
+    }
+
+    func didPressLinkButton(_ post: Post) {
+        if let safariViewController = SFSafariViewController.instance(
+            for: post.url,
+            previewActionItemsDelegate: self
+        ) {
+            navigationController?.present(safariViewController, animated: true)
         }
     }
 }
