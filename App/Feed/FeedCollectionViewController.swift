@@ -109,7 +109,9 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: reuseIdentifier,
                 for: indexPath
-            ) as? FeedItemCell else { fatalError("Couldn't dequeue cell \(reuseIdentifier)") }
+            ) as? FeedItemCell else {
+                fatalError("Couldn't dequeue cell \(reuseIdentifier)")
+            }
 
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
