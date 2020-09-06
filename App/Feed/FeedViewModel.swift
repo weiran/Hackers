@@ -28,7 +28,7 @@ class FeedViewModel {
 
         return firstly {
             HackersKit.shared.getPosts(type: postType, page: pageIndex)
-        }.map { posts in
+        }.done { posts in
             self.posts.append(contentsOf: posts)
             self.isFetching = false
         }
