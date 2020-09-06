@@ -37,7 +37,7 @@ class FeedCollectionViewController: UIViewController {
     private func fetchFeed(fetchNextPage: Bool = false) {
         firstly {
             viewModel.fetchFeed(fetchNextPage: fetchNextPage)
-        }.done { _ in
+        }.done {
             self.update(with: self.viewModel)
         }.catch { _ in
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
