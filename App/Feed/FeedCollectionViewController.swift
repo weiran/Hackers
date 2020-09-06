@@ -122,6 +122,10 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 self.openURL(post.url)
             }
 
+            // Fix for incorrectly sized cells on initial load
+            // Source: https://stackoverflow.com/questions/32593117/uicollectionviewcell-content-wrong-size-on-first-load
+            cell.layoutIfNeeded()
+
             return cell
         }
     }
