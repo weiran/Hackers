@@ -42,7 +42,7 @@ class FeedItemCell: UICollectionViewListCell {
     }
 
     func setImageWithPlaceholder(url: URL?) {
-        thumbnailImageView.setImageWithPlaceholder(url: url)
+        _ = thumbnailImageView.setImageWithPlaceholder(url: url)
     }
 
     func setPost(post: Post) {

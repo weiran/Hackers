@@ -18,13 +18,13 @@ private enum AssociatedKeys {
 // Preview action items
 extension SFSafariViewController {
     var previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? {
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName,
-                                     newValue, .OBJC_ASSOCIATION_ASSIGN)
-        }
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName)
                 as? SFSafariViewControllerPreviewActionItemsDelegate
+        }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName,
+                                     newValue, .OBJC_ASSOCIATION_ASSIGN)
         }
     }
 

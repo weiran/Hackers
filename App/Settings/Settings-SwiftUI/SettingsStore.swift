@@ -43,22 +43,22 @@ class SettingsStore: ObservableObject {
     }
 
     var theme: ThemeType {
+        get { return defaults.string(forKey: Keys.theme)
+            .flatMap { ThemeType(rawValue: $0) } ?? .system
+        }
         set {
             defaults.set(newValue.rawValue, forKey: Keys.theme)
             ThemeSwitcher.switchTheme()
         }
-        get { return defaults.string(forKey: Keys.theme)
-            .flatMap { ThemeType(rawValue: $0) } ?? .system
-        }
     }
 
     var safariReaderMode: Bool {
-        set { defaults.set(newValue, forKey: Keys.safariReaderMode) }
         get { return defaults.bool(forKey: Keys.safariReaderMode) }
+        set { defaults.set(newValue, forKey: Keys.safariReaderMode) }
     }
 
     var username: String? {
-        set { defaults.set(newValue, forKey: Keys.username) }
         get { return defaults.string(forKey: Keys.username) }
+        set { defaults.set(newValue, forKey: Keys.username) }
     }
 }

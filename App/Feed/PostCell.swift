@@ -55,7 +55,7 @@ class PostCell: SwipeTableViewCell {
     }
 
     func setImageWithPlaceholder(url: URL?) {
-        thumbnailImageView.setImageWithPlaceholder(url: url!)
+        _ = thumbnailImageView.setImageWithPlaceholder(url: url!)
     }
 }
 
