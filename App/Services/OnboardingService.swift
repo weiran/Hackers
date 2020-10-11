@@ -59,19 +59,14 @@ enum OnboardingService {
         configuration.titleView.titleMode = .scrolls
         return configuration
     }
-
+    
     private static func items() -> [WhatsNew.Item] {
-        let openInItem = WhatsNew.Item(
-            title: "Open in Hackers",
-            subtitle: "New share extension to open Hacker News links in Hackers.",
-            image: UIImage(systemName: "square.and.arrow.up")
+        let defaultBrowserItem = WhatsNew.Item(
+            title: "iOS 14 default browser",
+            subtitle: "With iOS 14 you can set your own default browser. Hackers can open links with your choice of browser instead of Safari. Try it out in settings.",
+            image: UIImage(systemName: "safari")
         )
-        let internalLinksItem = WhatsNew.Item(
-            title: "Directly open links",
-            subtitle: "Links to other Hacker News posts in comments open directly in the app.",
-            image: UIImage(systemName: "bubble.right")
-        )
-        return [openInItem, internalLinksItem]
+        return [defaultBrowserItem]
     }
 }
 
