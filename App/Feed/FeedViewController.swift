@@ -323,12 +323,9 @@ extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
                 return nil
         }
         let post = posts[indexPath.row]
-        if UIApplication.shared.canOpenURL(post.url) {
-            peekedIndexPath = indexPath
-            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
-        }
-        return nil
+        peekedIndexPath = indexPath
+        previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+        return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
     }
 
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,
