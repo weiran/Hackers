@@ -45,12 +45,22 @@ extension UserDefaults {
         set(enabled, forKey: UserDefaultsKeys.safariReaderMode.rawValue)
     }
 
+    var openInDefaultBrowser: Bool {
+        let openInDefaultBrowser = bool(forKey: UserDefaultsKeys.openInDefaultBrowser.rawValue)
+        return openInDefaultBrowser
+    }
+
+    func setOpenInDefaultBrowser(_ enabled: Bool) {
+        set(enabled, forKey: UserDefaultsKeys.openInDefaultBrowser.rawValue)
+    }
+
     func registerDefaults() {
         register(defaults: [
             UserDefaultsKeys.theme.rawValue: "light",
             UserDefaultsKeys.systemTheme.rawValue: true,
             UserDefaultsKeys.showThumbnails.rawValue: true,
-            UserDefaultsKeys.safariReaderMode.rawValue: false
+            UserDefaultsKeys.safariReaderMode.rawValue: false,
+            UserDefaultsKeys.openInDefaultBrowser.rawValue: false
         ])
     }
 }
@@ -59,5 +69,6 @@ enum UserDefaultsKeys: String {
     case theme
     case systemTheme
     case safariReaderMode
+    case openInDefaultBrowser
     case showThumbnails
 }

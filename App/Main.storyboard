@@ -744,6 +744,35 @@
                                             <outlet property="titleLabel" destination="wlj-6e-BYP" id="SZR-Oy-MSz"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO"  indentationLevel="1" indentationWidth="0.0" id="by2-0S-CnW" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="663" width="343" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="by2-0S-CnW" id="l0C-ZL-f1a">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Open in default browser" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcq-dD-Aiv">
+                                                    <rect key="frame" x="16" y="11.5" width="182" height="21"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g4G-LF-pRI">
+                                                    <rect key="frame" x="279" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="openInDefaultBrowserValueChanged:" destination="uZL-eS-tCe" eventType="valueChanged" id="FwL-Rv-ceU"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="g4G-LF-pRI" firstAttribute="centerY" secondItem="l0C-ZL-f1a" secondAttribute="centerY" id="FdW-9d-gTu"/>
+                                                <constraint firstAttribute="trailing" secondItem="g4G-LF-pRI" secondAttribute="trailing" constant="15" id="L0u-K4-B3N"/>
+                                                <constraint firstItem="dcq-dD-Aiv" firstAttribute="leading" secondItem="l0C-ZL-f1a" secondAttribute="leadingMargin" id="Rti-Y3-Fpa"/>
+                                                <constraint firstItem="dcq-dD-Aiv" firstAttribute="centerY" secondItem="l0C-ZL-f1a" secondAttribute="centerY" id="eUM-w5-Hsv"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -762,6 +791,7 @@
                     <connections>
                         <outlet property="accountLabel" destination="EN8-wt-Iug" id="dpg-ot-HmF"/>
                         <outlet property="darkModeSwitch" destination="Gqs-fj-YB0" id="4o0-Fp-3k0"/>
+                        <outlet property="openInDefaultBrowserSwitch" destination="g4G-LF-pRI" id="M9B-7A-i52"/>
                         <outlet property="safariReaderModeSwitch" destination="cmY-8P-GUK" id="6fh-TZ-GYa"/>
                         <outlet property="showThumbnailsSwitch" destination="5xy-Xy-ER7" id="DeA-4x-iv7"/>
                         <outlet property="systemSwitch" destination="uAe-yS-ppv" id="KgU-Qw-HqR"/>

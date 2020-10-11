@@ -36,4 +36,12 @@ extension UITableViewController {
             }
         }
     }
+
+    func openURL(url: URL, safariViewControllerAction: () -> Void) {
+        if UserDefaults.standard.openInDefaultBrowser {
+            UIApplication.shared.open(url)
+        } else {
+            safariViewControllerAction()
+        }
+    }
 }

@@ -22,6 +22,7 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var systemSwitch: UISwitch!
     @IBOutlet weak var showThumbnailsSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
+    @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
     @IBOutlet weak var versionLabel: UILabel!
 
     private var notificationToken: NotificationToken?
@@ -38,6 +39,7 @@ class SettingsViewController: UITableViewController {
         darkModeSwitch.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
+        openInDefaultBrowserSwitch.isOn = UserDefaults.standard.openInDefaultBrowser
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
         updateUsername()
         updateVersion()
@@ -85,6 +87,10 @@ class SettingsViewController: UITableViewController {
         UserDefaults.standard.setSafariReaderMode(sender.isOn)
     }
 
+    @IBAction func openInDefaultBrowserValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setOpenInDefaultBrowser(sender.isOn)
+    }
+
     @IBAction private func didPressDone(_ sender: Any) {
         dismiss(animated: true)
     }
@@ -110,8 +116,10 @@ extension SettingsViewController {
 
     private func showWebsite() {
         let url = URL(string: "https://github.com/weiran/hackers")!
-        if let safariViewController = SFSafariViewController.instance(for: url) {
-            present(safariViewController, animated: true)
+        openURL(url: url) {
+            if let safariViewController = SFSafariViewController.instance(for: url) {
+                present(safariViewController, animated: true)
+            }
         }
     }
 

@@ -287,11 +287,13 @@ extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegat
 
 extension FeedViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
     func didPressLinkButton(_ post: Post) {
-        if let safariViewController = SFSafariViewController.instance(
-            for: post.url,
-            previewActionItemsDelegate: self
-        ) {
-            navigationController?.present(safariViewController, animated: true)
+        openURL(url: post.url) {
+            if let safariViewController = SFSafariViewController.instance(
+                for: post.url,
+                previewActionItemsDelegate: self
+            ) {
+                navigationController?.present(safariViewController, animated: true)
+            }
         }
     }
 
