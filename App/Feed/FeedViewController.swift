@@ -40,6 +40,7 @@ class FeedViewController: UITableViewController {
         setupTableView()
         setupTitle()
         fetchPosts()
+        showOnboarding()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +82,12 @@ class FeedViewController: UITableViewController {
         dataSource = makeDataSource()
         tableView.dataSource = dataSource
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+    }
+
+    private func showOnboarding() {
+        if let onboardingVC = OnboardingService.onboardingViewController() {
+            present(onboardingVC, animated: true)
+        }
     }
 
     private func setupAuthenticationObserver() {
