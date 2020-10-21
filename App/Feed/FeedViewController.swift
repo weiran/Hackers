@@ -40,6 +40,7 @@ class FeedViewController: UITableViewController {
         setupTableView()
         setupTitle()
         fetchPosts()
+        showOnboarding()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +82,12 @@ class FeedViewController: UITableViewController {
         dataSource = makeDataSource()
         tableView.dataSource = dataSource
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
+    }
+
+    private func showOnboarding() {
+        if let onboardingVC = OnboardingService.onboardingViewController() {
+            present(onboardingVC, animated: true)
+        }
     }
 
     private func setupAuthenticationObserver() {
@@ -316,12 +323,9 @@ extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
                 return nil
         }
         let post = posts[indexPath.row]
-        if UIApplication.shared.canOpenURL(post.url) {
-            peekedIndexPath = indexPath
-            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
-        }
-        return nil
+        peekedIndexPath = indexPath
+        previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+        return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
     }
 
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,

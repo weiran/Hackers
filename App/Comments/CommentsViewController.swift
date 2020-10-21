@@ -262,9 +262,8 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0, indexPath.section == 0 {
-            guard let url = post?.url,
-                UIApplication.shared.canOpenURL(url) else {
-                    return
+            guard let url = post?.url else {
+                return
             }
             openURL(url: url) {
                 if let safariViewController = SFSafariViewController.instance(for: url) {

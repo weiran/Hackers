@@ -19,10 +19,12 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var darkModeLabel: UILabel!
     @IBOutlet weak var systemSwitch: UISwitch!
     @IBOutlet weak var showThumbnailsSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
+    @IBOutlet weak var openInDefaultBrowserLabel: UILabel!
     @IBOutlet weak var versionLabel: UILabel!
 
     private var notificationToken: NotificationToken?
@@ -37,10 +39,11 @@ class SettingsViewController: UITableViewController {
         setupTheming()
         systemSwitch.isOn = UserDefaults.standard.systemThemeEnabled
         darkModeSwitch.isEnabled = !systemSwitch.isOn
+        darkModeLabel.isEnabled = !systemSwitch.isOn
         darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
-        openInDefaultBrowserSwitch.isOn = UserDefaults.standard.openInDefaultBrowser
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
+        updateOpenInDefaultBrowser()
         updateUsername()
         updateVersion()
         notificationToken = NotificationCenter.default
@@ -67,10 +70,17 @@ class SettingsViewController: UITableViewController {
         }
     }
 
+    private func updateOpenInDefaultBrowser() {
+        openInDefaultBrowserSwitch.isOn = UserDefaults.standard.openInDefaultBrowser
+        safariReaderModeSwitch.isEnabled = !UserDefaults.standard.openInDefaultBrowser
+        openInDefaultBrowserLabel.isEnabled = !UserDefaults.standard.openInDefaultBrowser
+    }
+
     @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setSystemTheme(sender.isOn)
         ThemeSwitcher.switchTheme()
         darkModeSwitch.isEnabled = !sender.isOn
+        darkModeLabel.isEnabled = !sender.isOn
      }
 
     @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
@@ -89,6 +99,7 @@ class SettingsViewController: UITableViewController {
 
     @IBAction func openInDefaultBrowserValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setOpenInDefaultBrowser(sender.isOn)
+        updateOpenInDefaultBrowser()
     }
 
     @IBAction private func didPressDone(_ sender: Any) {

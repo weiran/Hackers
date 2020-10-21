@@ -35,12 +35,10 @@ class PostCell: SwipeTableViewCell {
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
         selected ? setSelectedBackground() : setUnselectedBackground()
     }
 
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-        super.setHighlighted(highlighted, animated: animated)
         highlighted ? setSelectedBackground() : setUnselectedBackground()
     }
 
