@@ -150,7 +150,7 @@
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
                         <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="AJJ-Nm-u6A"/>
-                        <segue destination="1Xz-Ly-pCg" kind="relationship" relationship="masterViewController" id="9uq-4d-wU6"/>
+                        <segue destination="1Xz-Ly-pCg" kind="relationship" relationship="masterViewController" id="KfT-SS-B7A"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -839,7 +839,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="9C1-Dg-Bnq" kind="relationship" relationship="rootViewController" id="cfc-Va-uL3"/>
+                        <segue destination="9C1-Dg-Bnq" kind="relationship" relationship="rootViewController" id="kuq-Id-6yf"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gLB-rF-S1g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -857,25 +857,20 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TbK-3S-fz3">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" sectionInsetReference="layoutMargins" id="QJg-kZ-ZC0">
-                                    <size key="itemSize" width="215" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
+                                <collectionViewLayout key="collectionViewLayout" id="DcV-nv-UmN"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" misplaced="YES" reuseIdentifier="FeedItemCell" translatesAutoresizingMaskIntoConstraints="NO" id="F8s-SJ-iCU" customClass="FeedItemCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="80" y="8" width="215" height="84"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FeedItemCell" translatesAutoresizingMaskIntoConstraints="NO" id="F8s-SJ-iCU" customClass="FeedItemCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="-2.5" y="0.0" width="380" height="100"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="09r-hL-AXx">
-                                            <rect key="frame" x="0.0" y="0.0" width="215" height="84"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="380" height="100"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="IZD-rI-0O3">
-                                                    <rect key="frame" x="16" y="12" width="183" height="104"/>
+                                                    <rect key="frame" x="16" y="12" width="348" height="76"/>
                                                     <subviews>
                                                         <imageView contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="gYg-eh-886" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
-                                                            <rect key="frame" x="0.0" y="22" width="60" height="60"/>
+                                                            <rect key="frame" x="0.0" y="8" width="60" height="60"/>
                                                             <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
                                                             <gestureRecognizers/>
@@ -890,19 +885,19 @@
                                                             </userDefinedRuntimeAttributes>
                                                         </imageView>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KkZ-FT-SJf" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                            <rect key="frame" x="72" y="31.5" width="111" height="41.5"/>
+                                                            <rect key="frame" x="72" y="17.5" width="276" height="41.5"/>
                                                             <subviews>
                                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="wTP-l5-fpy">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="111" height="41.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="276" height="41.5"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u9D-cO-MhN">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="111" height="20.5"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="276" height="20.5"/>
                                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t9V-w6-0wo">
-                                                                            <rect key="frame" x="0.0" y="25.5" width="111" height="16"/>
+                                                                            <rect key="frame" x="0.0" y="25.5" width="276" height="16"/>
                                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                                             <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <nil key="highlightedColor"/>
@@ -932,6 +927,7 @@
                                                 <constraint firstItem="IZD-rI-0O3" firstAttribute="top" secondItem="09r-hL-AXx" secondAttribute="topMargin" priority="999" constant="4" id="yN9-H5-d1r"/>
                                             </constraints>
                                         </collectionViewCellContentView>
+                                        <size key="customSize" width="380" height="100"/>
                                         <connections>
                                             <outlet property="postTitleView" destination="KkZ-FT-SJf" id="cWi-vE-gzF"/>
                                             <outlet property="thumbnailImageView" destination="gYg-eh-886" id="Ri6-zr-Ipt"/>

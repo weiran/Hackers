@@ -34,6 +34,22 @@ class FeedCollectionViewController: UIViewController {
         smoothlyDeselectItems(collectionView)
     }
 
+    private func setupTitle() {
+        let button = TitleButton()
+        button.setTitleText(viewModel.postType.title)
+        button.setupMenu()
+        button.handler = { postType in
+            self.viewModel.postType = postType
+            self.setupTitle()
+            self.viewModel.reset()
+            self.update(with: self.viewModel, animate: false)
+            self.fetchFeed()
+        }
+
+        navigationItem.titleView = button
+        title = viewModel.postType.title
+    }
+
     private func fetchFeed(fetchNextPage: Bool = false) {
         firstly {
             viewModel.fetchFeed(fetchNextPage: fetchNextPage)
@@ -58,24 +74,6 @@ class FeedCollectionViewController: UIViewController {
 
 extension FeedCollectionViewController: Themed {
     func applyTheme(_ theme: AppTheme) { }
-}
-
-extension FeedCollectionViewController {
-    private func setupTitle() {
-        let button = TitleButton()
-        button.setTitleText(viewModel.postType.title)
-        button.setupMenu()
-        button.handler = { postType in
-            self.viewModel.postType = postType
-            self.setupTitle()
-            self.viewModel.reset()
-            self.update(with: self.viewModel, animate: false)
-            self.fetchFeed()
-        }
-
-        navigationItem.titleView = button
-        title = viewModel.postType.title
-    }
 }
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
