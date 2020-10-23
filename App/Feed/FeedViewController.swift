@@ -39,6 +39,7 @@ class FeedViewController: UIViewController {
         setupTableView()
         setupTitle()
         fetchPosts()
+        showOnboarding()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -99,6 +100,12 @@ class FeedViewController: UIViewController {
 
         navigationItem.titleView = button
         title = postType.title
+    }
+
+    private func showOnboarding() {
+        if let onboardingVC = OnboardingService.onboardingViewController() {
+            present(onboardingVC, animated: true)
+        }
     }
 
     private func setupNotificationObservers() {
@@ -261,21 +268,23 @@ extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegat
 }
 
 extension FeedViewController: PostCellDelegate { // cell actions
+    func didPressLinkButton(_ post: Post) {
+        openURL(url: post.url) {
+            if let safariViewController = SFSafariViewController.instance(
+                for: post.url,
+                previewActionItemsDelegate: self
+            ) {
+                navigationController?.present(safariViewController, animated: true)
+            }
+        }
+    }
+
     func didTapThumbnail(_ sender: Any) {
         guard let tapGestureRecognizer = sender as? UITapGestureRecognizer else { return }
         let point = tapGestureRecognizer.location(in: tableView)
         if let indexPath = tableView.indexPathForRow(at: point) {
             let post = posts[indexPath.row]
             didPressLinkButton(post)
-        }
-    }
-
-    func didPressLinkButton(_ post: Post) {
-        if let safariViewController = SFSafariViewController.instance(
-            for: post.url,
-            previewActionItemsDelegate: self
-        ) {
-            navigationController?.present(safariViewController, animated: true)
         }
     }
 }
@@ -289,12 +298,9 @@ extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
                 return nil
         }
         let post = posts[indexPath.row]
-        if UIApplication.shared.canOpenURL(post.url) {
-            peekedIndexPath = indexPath
-            previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
-            return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
-        }
-        return nil
+        peekedIndexPath = indexPath
+        previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
+        return SFSafariViewController.instance(for: post.url, previewActionItemsDelegate: self)
     }
 
     func previewingContext(_ previewingContext: UIViewControllerPreviewing,

@@ -113,14 +113,16 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 fatalError("Couldn't dequeue cell \(reuseIdentifier)")
             }
 
-
-
             cell.setPost(post: post)
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
             )
             cell.linkPressedHandler = { post in
-                self.openURL(post.url)
+                self.openURL(url: post.url) {
+                    if let svc = SFSafariViewController.instance(for: post.url) {
+                        self.navigationController?.present(svc, animated: true)
+                    }
+                }
             }
 
             // Fix for incorrectly sized cells on initial load
@@ -141,7 +143,11 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if viewModel.postType == .jobs,
            let post = dataSource.itemIdentifier(for: indexPath) {
-            openURL(post.url)
+            self.openURL(url: post.url) {
+                if let svc = SFSafariViewController.instance(for: post.url) {
+                    self.navigationController?.present(svc, animated: true)
+                }
+            }
         } else {
             performSegue(withIdentifier: "ShowCommentsSegue", sender: collectionView)
         }
@@ -189,7 +195,11 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 image: UIImage(systemName: "safari"),
                 identifier: UIAction.Identifier(rawValue: "open.link")
             ) { _ in
-                self.openURL(post.url)
+                self.openURL(url: post.url) {
+                    if let svc = SFSafariViewController.instance(for: post.url) {
+                        self.navigationController?.present(svc, animated: true)
+                    }
+                }
             }
 
             let shareLink = UIAction(
@@ -282,12 +292,6 @@ extension FeedCollectionViewController {
 }
 
 extension FeedCollectionViewController {
-    private func openURL(_ url: URL) {
-        if let safariViewController = SFSafariViewController.instance(for: url) {
-            navigationController?.present(safariViewController, animated: true)
-        }
-    }
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowCommentsSegue",
            let navVC = segue.destination as? UINavigationController,
