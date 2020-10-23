@@ -150,7 +150,7 @@
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
                         <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="AJJ-Nm-u6A"/>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="Tu5-IB-YNF"/>
+                        <segue destination="1Xz-Ly-pCg" kind="relationship" relationship="masterViewController" id="9uq-4d-wU6"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
