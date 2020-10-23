@@ -96,8 +96,6 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
         let layout = UICollectionViewCompositionalLayout.list(using: config)
         collectionView.setCollectionViewLayout(layout, animated: false)
         collectionView.dataSource = dataSource
-
-        collectionView.reloadData()
     }
 
     private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
@@ -126,7 +124,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             }
 
             // Fix for incorrectly sized cells on initial load
-            // Source: https://stackoverflow.com/questions/32593117/uicollectionviewcell-content-wrong-size-on-first-load
+            // https://stackoverflow.com/questions/32593117/uicollectionviewcell-content-wrong-size-on-first-load
             cell.layoutIfNeeded()
 
             return cell
