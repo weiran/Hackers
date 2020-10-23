@@ -10,7 +10,7 @@ import XCTest
 import DeviceKit
 
 class HackersUITests: XCTestCase {
-    let feedCellName = "FeedItemCell"
+    let feedCellName = "PostCell" // FeedItemCell in new CV
     let commentCellName = "CommentCell"
 
     func launch(darkTheme: Bool = false) {
