@@ -28,7 +28,7 @@ class HackersUITests: XCTestCase {
         } else {
             app.launchArguments.append("light")
         }
-        
+
         app.launch()
     }
 
