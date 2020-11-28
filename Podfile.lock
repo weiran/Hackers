@@ -3,7 +3,7 @@ PODS:
   - DeviceKit (4.2.1)
   - HNScraper (0.2.2)
   - Loaf (0.7.0)
-  - Nuke (9.1.2)
+  - Nuke (9.1.3)
   - PromiseKit/CorePromise (6.13.1)
   - SwiftLint (0.41.0)
   - SwiftSoup (2.3.2)
@@ -56,7 +56,7 @@ SPEC CHECKSUMS:
   DeviceKit: cadb5ff25d45fe186778bf2d0fd2ea4750542189
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
-  Nuke: dd2e6be6a34c042a7861e190632781d11f253026
+  Nuke: ee78dff29ad68cfd70a292a7960952f72cc6af6a
   PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
   SwiftLint: c585ebd615d9520d7fbdbe151f527977b0534f1e
   SwiftSoup: f97bc4e988c7729d6457f9642f974c617a6e2510
