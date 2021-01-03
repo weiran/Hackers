@@ -59,7 +59,7 @@ enum OnboardingService {
         configuration.titleView.titleMode = .scrolls
         return configuration
     }
-    
+
     private static func items() -> [WhatsNew.Item] {
         let defaultBrowserItem = WhatsNew.Item(
             title: "iOS 14 default browser",
