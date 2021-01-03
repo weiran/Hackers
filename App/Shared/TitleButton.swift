@@ -1,19 +1,21 @@
 //
-//  TappableNavigationTitleView.swift
+//  TitleButton.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on 15/06/2020.
+//  Created by Weiran Zhang on 06/07/2020.
 //  Copyright © 2020 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
 
-class TappableNavigationTitleView: UILabel {
+class TitleButton: UIButton {
     private var titleText: String?
+    var handler: ((PostType) -> Void)?
 
     override func layoutSubviews() {
         super.layoutSubviews()
         setupTheming()
+        setupMenu()
     }
 
     func setTitleText(_ text: String) {
@@ -21,7 +23,7 @@ class TappableNavigationTitleView: UILabel {
 
         let symbolConfig = UIImage.SymbolConfiguration(
             pointSize: 10,
-            weight: .regular,
+            weight: .black,
             scale: .small
         )
 
@@ -39,17 +41,36 @@ class TappableNavigationTitleView: UILabel {
         let attributedString = NSMutableAttributedString(string: "\(text) ", attributes: attributes)
         attributedString.append(NSAttributedString(attachment: imageAttachment))
 
-        attributedText = attributedString
+        self.setAttributedTitle(attributedString, for: .normal)
     }
 
-    private func updateTitleText() {
-        if let titleText = titleText {
-            setTitleText(titleText)
+    func setupMenu() {
+        self.showsMenuAsPrimaryAction = true
+
+        let actions = PostType.allCases.map { postType -> UIAction in
+            let action = UIAction(
+                title: postType.title,
+                identifier: UIAction.Identifier(postType.rawValue),
+                handler: handleAction(sender:)
+            )
+            action.image = UIImage(systemName: postType.iconName)
+            return action
+        }
+
+        let menu = UIMenu(title: "", children: actions)
+        self.menu = menu
+    }
+
+    @objc private func handleAction(sender: UIAction) {
+        if let handler = handler,
+           let postType = PostType(rawValue: sender.identifier.rawValue) {
+            handler(postType)
         }
     }
 }
 
-extension TappableNavigationTitleView: Themed {
+extension TitleButton: Themed {
     func applyTheme(_ theme: AppTheme) {
+        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

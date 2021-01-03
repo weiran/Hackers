@@ -1,4 +1,4 @@
-name: Hackers
+name: CI
 
 on:
   push:
@@ -25,6 +25,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: AckeeCZ/load-xcode-version@1.0
     - name: Install Dependencies
       run: pod install --repo-update
     - name: Run UI Tests
@@ -38,6 +39,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: AckeeCZ/load-xcode-version@1.0
     - name: Install Dependencies
       run: pod install --repo-update
     - name: Build

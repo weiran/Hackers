@@ -11,11 +11,10 @@ import UIKit
 import SwiftUI
 import SafariServices
 import PromiseKit
-import Kingfisher
 import Loaf
 import SwipeCellKit
 
-class FeedViewController: UITableViewController {
+class FeedViewController: UIViewController {
     var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
 
@@ -23,20 +22,20 @@ class FeedViewController: UITableViewController {
     private var dataSource: UITableViewDiffableDataSource<Section, Post>?
     var postType: PostType = .news
 
+    @IBOutlet var tableView: UITableView!
+
     private var peekedIndexPath: IndexPath?
     private var pageIndex = 1
     private var isFetching = false
 
-    private var notificationToken: NotificationToken?
-
-    private var navigationBarGestureRecognizer: UITapGestureRecognizer?
+    private var refreshToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
         setupTheming()
-        setupAuthenticationObserver()
+        setupNotificationObservers()
         setupTableView()
         setupTitle()
         fetchPosts()
@@ -50,13 +49,6 @@ class FeedViewController: UITableViewController {
             // only deselect in compact size where the view isn't split
             smoothlyDeselectRows()
         }
-
-        prepareNavigationTapRecognizer()
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        removeNavigationTapRecognizer()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -84,19 +76,72 @@ class FeedViewController: UITableViewController {
         tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
     }
 
+    private func setupTitle() {
+        let button = TitleButton()
+        button.setTitleText(postType.title)
+        button.setupMenu()
+        button.handler = { postType in
+            self.postType = postType
+
+            // haptic feedback
+            let generator = UINotificationFeedbackGenerator()
+            generator.prepare()
+            generator.notificationOccurred(.success)
+
+            // update title
+            self.setupTitle()
+
+            // reset tableview
+            self.posts = [Post]()
+            self.update(with: self.posts, animate: false)
+
+            self.fetchPostsWithReset()
+        }
+
+        navigationItem.titleView = button
+        title = postType.title
+    }
+
     private func showOnboarding() {
         if let onboardingVC = OnboardingService.onboardingViewController() {
             present(onboardingVC, animated: true)
         }
     }
 
-    private func setupAuthenticationObserver() {
-        notificationToken = NotificationCenter.default
-        .observe(name: Notification.Name.refreshRequired,
-                 object: nil,
-                 queue: .main
-        ) { _ in
-            self.fetchPostsWithReset()
+    private func setupNotificationObservers() {
+        refreshToken = NotificationCenter.default.observe(
+            name: Notification.Name.refreshRequired,
+            object: nil,
+            queue: .main) { [weak self] _ in
+                self?.fetchPostsWithReset()
+        }
+    }
+
+    func smoothlyDeselectRows() {
+        // Get the initially selected index paths, if any
+        let selectedIndexPaths = tableView.indexPathsForSelectedRows ?? []
+
+        // Grab the transition coordinator responsible for the current transition
+        if let coordinator = transitionCoordinator {
+            // Animate alongside the master view controller's view
+            coordinator.animateAlongsideTransition(in: parent?.view, animation: { context in
+                // Deselect the cells, with animations enabled if this is an animated transition
+                selectedIndexPaths.forEach {
+                    self.tableView.deselectRow(at: $0, animated: context.isAnimated)
+                }
+            }, completion: { context in
+                // If the transition was cancel, reselect the rows that were selected before,
+                // so they are still selected the next time the same animation is triggered
+                if context.isCancelled {
+                    selectedIndexPaths.forEach {
+                        self.tableView.selectRow(at: $0, animated: false, scrollPosition: .none)
+                    }
+                }
+            })
+        } else { // If this isn't a transition coordinator, just deselect the rows without animating
+            selectedIndexPaths.forEach {
+                self.tableView.deselectRow(at: $0, animated: false)
+            }
         }
     }
 
@@ -139,75 +184,6 @@ extension FeedViewController { // post fetching
     }
 }
 
-extension FeedViewController { // post type selector
-    private func setupTitle() {
-        let titleLabel = TappableNavigationTitleView()
-        titleLabel.setTitleText(postType.title)
-        navigationItem.titleView = titleLabel
-        title = postType.title
-    }
-
-    private func prepareNavigationTapRecognizer() {
-        if navigationBarGestureRecognizer == nil {
-            let gestureRecognizer = UITapGestureRecognizer(
-                target: self,
-                action: #selector(navigationBarTapped(_:))
-            )
-            gestureRecognizer.cancelsTouchesInView = false
-            navigationBarGestureRecognizer = gestureRecognizer
-        }
-
-        if let gestureRecognizer = navigationBarGestureRecognizer {
-            navigationController?.navigationBar.addGestureRecognizer(gestureRecognizer)
-            navigationBarGestureRecognizer = gestureRecognizer
-        }
-    }
-
-    private func removeNavigationTapRecognizer() {
-        if let gestureRecognizer = navigationBarGestureRecognizer {
-            navigationController?.navigationBar.removeGestureRecognizer(gestureRecognizer)
-        }
-    }
-
-    @objc private func navigationBarTapped(_ sender: UITapGestureRecognizer) {
-        let location = sender.location(in: navigationController?.navigationBar)
-        let hitView = navigationController?.navigationBar.hitTest(location, with: nil)
-
-        // let the tap fall through if its on a button
-        guard !(hitView is UIControl) else {
-            return
-        }
-
-        // haptic feedback
-        let generator = UISelectionFeedbackGenerator()
-        generator.prepare()
-        generator.selectionChanged()
-
-        let controller = NavigationAlertController()
-        controller.setup(handler: navigationAlertControllerHandler(postType:))
-        controller.popoverPresentationController?.sourceView = navigationController?.navigationBar
-        present(controller, animated: true)
-    }
-
-    private func navigationAlertControllerHandler(postType: PostType) {
-        self.postType = postType
-
-        // haptic feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.prepare()
-        generator.notificationOccurred(.success)
-
-        // update title
-        setupTitle()
-
-        // reset tableview
-        self.posts = [Post]()
-        self.update(with: self.posts, animate: false)
-
-        fetchPostsWithReset()
-    }
-}
-
 extension FeedViewController { // table view data source
     enum Section: CaseIterable {
         case main
@@ -225,7 +201,6 @@ extension FeedViewController { // table view data source
             cell.delegate = self
 
             cell.postTitleView.post = post
-            cell.postTitleView.delegate = self
 
             cell.setImageWithPlaceholder(
                 url: UserDefaults.standard.showThumbnails ? post.url : nil
@@ -243,8 +218,8 @@ extension FeedViewController { // table view data source
     }
 }
 
-extension FeedViewController { // table view delegate
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+extension FeedViewController: UITableViewDelegate { // table view delegate
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let buffer: CGFloat = 200
         let scrollPosition = scrollView.contentOffset.y
         let bottomPosition = scrollView.contentSize.height - scrollView.frame.size.height
@@ -254,7 +229,7 @@ extension FeedViewController { // table view delegate
         }
     }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let post = posts[indexPath.row]
         if postType == .jobs {
             didPressLinkButton(post)
@@ -292,7 +267,7 @@ extension FeedViewController: SwipeTableViewCellDelegate { // swipe cell delegat
     }
 }
 
-extension FeedViewController: PostTitleViewDelegate, PostCellDelegate { // cell actions
+extension FeedViewController: PostCellDelegate { // cell actions
     func didPressLinkButton(_ post: Post) {
         openURL(url: post.url) {
             if let safariViewController = SFSafariViewController.instance(

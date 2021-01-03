@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -117,6 +118,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                     <connections>
+                        <outlet property="tableView" destination="AjT-wK-ps1" id="yZ2-kP-ACG"/>
                         <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowCommentsSegue" id="iEZ-lA-QBx"/>
                     </connections>
                 </tableViewController>
@@ -144,11 +146,11 @@
         <!--Split View Controller-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
-                <splitViewController storyboardIdentifier="MainSplitViewController" id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController storyboardIdentifier="MainSplitViewController" preferredDisplayMode="beside" behavior="tile" id="506-JC-FDt" userLabel="Split View Controller" customClass="MainSplitViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Item" id="4lO-eV-pKm"/>
                     <connections>
-                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="BNY-4g-r0C"/>
                         <segue destination="MT9-H2-VTX" kind="relationship" relationship="detailViewController" id="AJJ-Nm-u6A"/>
+                        <segue destination="2FT-kg-cd5" kind="relationship" relationship="masterViewController" id="mtf-gb-I6v"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fjX-J3-nmj" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -828,43 +830,151 @@
             </objects>
             <point key="canvasLocation" x="534" y="1397"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="ATY-4V-i88">
+            <objects>
+                <navigationController id="1Xz-Ly-pCg" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="214-FR-gRR">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="9C1-Dg-Bnq" kind="relationship" relationship="rootViewController" id="kuq-Id-6yf"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gLB-rF-S1g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1460" y="-184"/>
+        </scene>
+        <!--Feed Collection View Controller-->
+        <scene sceneID="1sg-bT-5qc">
+            <objects>
+                <viewController id="9C1-Dg-Bnq" customClass="FeedCollectionViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="z1E-eh-aOq">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TbK-3S-fz3">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="DcV-nv-UmN"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FeedItemCell" translatesAutoresizingMaskIntoConstraints="NO" id="F8s-SJ-iCU" customClass="FeedItemCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="-2.5" y="0.0" width="380" height="100"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="09r-hL-AXx">
+                                            <rect key="frame" x="0.0" y="0.0" width="380" height="100"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="IZD-rI-0O3">
+                                                    <rect key="frame" x="16" y="12" width="348" height="76"/>
+                                                    <subviews>
+                                                        <imageView contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="gYg-eh-886" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="8" width="60" height="60"/>
+                                                            <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <gestureRecognizers/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="60" id="6ve-QW-nNJ"/>
+                                                                <constraint firstAttribute="width" secondItem="gYg-eh-886" secondAttribute="height" multiplier="1:1" id="mAW-Rh-l8J"/>
+                                                            </constraints>
+                                                            <userDefinedRuntimeAttributes>
+                                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                    <real key="value" value="9"/>
+                                                                </userDefinedRuntimeAttribute>
+                                                            </userDefinedRuntimeAttributes>
+                                                        </imageView>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KkZ-FT-SJf" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
+                                                            <rect key="frame" x="72" y="17.5" width="276" height="41.5"/>
+                                                            <subviews>
+                                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="wTP-l5-fpy">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="276" height="41.5"/>
+                                                                    <subviews>
+                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u9D-cO-MhN">
+                                                                            <rect key="frame" x="0.0" y="0.0" width="276" height="20.5"/>
+                                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            <nil key="highlightedColor"/>
+                                                                        </label>
+                                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t9V-w6-0wo">
+                                                                            <rect key="frame" x="0.0" y="25.5" width="276" height="16"/>
+                                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                                            <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                            <nil key="highlightedColor"/>
+                                                                        </label>
+                                                                    </subviews>
+                                                                </stackView>
+                                                            </subviews>
+                                                            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <constraints>
+                                                                <constraint firstItem="wTP-l5-fpy" firstAttribute="top" secondItem="KkZ-FT-SJf" secondAttribute="top" id="17C-le-N6L"/>
+                                                                <constraint firstAttribute="bottom" secondItem="wTP-l5-fpy" secondAttribute="bottom" id="7BQ-Fs-5Kg"/>
+                                                                <constraint firstAttribute="trailing" secondItem="wTP-l5-fpy" secondAttribute="trailing" id="MJw-gz-L37"/>
+                                                                <constraint firstItem="wTP-l5-fpy" firstAttribute="leading" secondItem="KkZ-FT-SJf" secondAttribute="leading" id="fGc-x8-fSB"/>
+                                                            </constraints>
+                                                            <connections>
+                                                                <outlet property="metadataLabel" destination="t9V-w6-0wo" id="orm-W1-R8s"/>
+                                                                <outlet property="titleLabel" destination="u9D-cO-MhN" id="Lji-5Y-Yv1"/>
+                                                            </connections>
+                                                        </view>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="IZD-rI-0O3" firstAttribute="leading" secondItem="09r-hL-AXx" secondAttribute="leadingMargin" constant="8" id="uux-eb-X67"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="IZD-rI-0O3" secondAttribute="bottom" priority="999" constant="4" id="xe6-JW-aL5"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="IZD-rI-0O3" secondAttribute="trailing" constant="8" id="y7i-pA-kLA"/>
+                                                <constraint firstItem="IZD-rI-0O3" firstAttribute="top" secondItem="09r-hL-AXx" secondAttribute="topMargin" priority="999" constant="4" id="yN9-H5-d1r"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <size key="customSize" width="380" height="100"/>
+                                        <connections>
+                                            <outlet property="postTitleView" destination="KkZ-FT-SJf" id="cWi-vE-gzF"/>
+                                            <outlet property="thumbnailImageView" destination="gYg-eh-886" id="Ri6-zr-Ipt"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="delegate" destination="9C1-Dg-Bnq" id="YDZ-7W-XuR"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="qpf-jh-iww"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="TbK-3S-fz3" firstAttribute="leading" secondItem="z1E-eh-aOq" secondAttribute="leading" id="6M1-px-oKd"/>
+                            <constraint firstItem="TbK-3S-fz3" firstAttribute="bottom" secondItem="z1E-eh-aOq" secondAttribute="bottom" id="PFn-ST-gV5"/>
+                            <constraint firstItem="TbK-3S-fz3" firstAttribute="trailing" secondItem="z1E-eh-aOq" secondAttribute="trailing" id="Psc-nC-dc2"/>
+                            <constraint firstItem="TbK-3S-fz3" firstAttribute="top" secondItem="z1E-eh-aOq" secondAttribute="top" id="zcE-6x-aTb"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="R0f-7k-7Rn">
+                        <barButtonItem key="rightBarButtonItem" title="Settings" image="gear" catalog="system" id="5xR-Fq-96S">
+                            <connections>
+                                <segue destination="9fT-2D-AhL" kind="presentation" identifier="" id="CGm-Zg-Uck"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="collectionView" destination="TbK-3S-fz3" id="uzm-0s-mzd"/>
+                        <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowCommentsSegue" id="4qf-pu-K7j"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ipa-PZ-uow" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2360.8000000000002" y="-184.85757121439281"/>
+        </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="4qf-pu-K7j"/>
+        <segue reference="CGm-Zg-Uck"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <image name="LaunchIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
         <image name="gear" catalog="system" width="128" height="119"/>
         <image name="safari" catalog="system" width="128" height="121"/>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="tableCellGroupedBackgroundColor">
+        <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="tableCellGroupedBackgroundColor">

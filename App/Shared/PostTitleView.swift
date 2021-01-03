@@ -8,17 +8,11 @@
 
 import UIKit
 
-protocol PostTitleViewDelegate: class {
-    func didPressLinkButton(_ post: Post)
-}
-
 class PostTitleView: UIView, UIGestureRecognizerDelegate {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var metadataLabel: UILabel!
 
     var isTitleTapEnabled = false
-
-    weak var delegate: PostTitleViewDelegate?
 
     var post: Post? {
         didSet {
@@ -30,17 +24,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
 
     override open func layoutSubviews() {
         super.layoutSubviews()
+
         setupTheming()
-
-        let titleTapGestureRecognizer = UITapGestureRecognizer(target: self,
-                                                               action: #selector(didPressTitleText(_:)))
-        titleLabel.addGestureRecognizer(titleTapGestureRecognizer)
-    }
-
-    @objc private func didPressTitleText(_ sender: UITapGestureRecognizer) {
-        if isTitleTapEnabled, let delegate = self.delegate, let post = self.post {
-            delegate.didPressLinkButton(post)
-        }
     }
 
     private func domainLabelText(for post: Post) -> String {

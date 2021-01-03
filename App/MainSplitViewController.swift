@@ -8,18 +8,15 @@
 
 import UIKit
 
-class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
+class MainSplitViewController: UISplitViewController {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupTheming()
         delegate = self
     }
+}
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        preferredDisplayMode = .allVisible
-    }
-
+extension MainSplitViewController: UISplitViewControllerDelegate {
     func splitViewController(_ splitViewController: UISplitViewController,
                              collapseSecondary secondaryViewController: UIViewController,
                              onto primaryViewController: UIViewController) -> Bool {

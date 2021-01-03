@@ -24,5 +24,5 @@ final class NotificationToken: NSObject {
 }
 
 extension Notification.Name {
-    static let refreshRequired = NSNotification.Name(rawValue: "RefreshREquiredNotification")
+    static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
 }

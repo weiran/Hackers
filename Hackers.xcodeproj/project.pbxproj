@@ -51,7 +51,6 @@
 		249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */; };
 		249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */; };
 		249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */; };
-		249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
 		24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A422B508A40051EAFD /* OnboardingService.swift */; };
 		24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A622B521470051EAFD /* BounceExpansion.swift */; };
@@ -67,10 +66,16 @@
 		24CE5FF819435A90009D2677 /* PostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FF719435A90009D2677 /* PostCell.swift */; };
 		24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */; };
 		24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CEAA9C1F8917D60050DEDF /* ReviewController.swift */; };
+		24D1845924B336B60017E4F4 /* TitleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845824B336B60017E4F4 /* TitleButton.swift */; };
+		24D1845B24B35C390017E4F4 /* FeedItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845A24B35C390017E4F4 /* FeedItemCell.swift */; };
+		24D1845D24B35E7E0017E4F4 /* FeedCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845C24B35E7E0017E4F4 /* FeedCollectionViewController.swift */; };
+		24D1845F24B374780017E4F4 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845E24B374780017E4F4 /* FeedViewModel.swift */; };
+		24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */; };
 		24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */; };
 		24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* AppTheme.swift */; };
 		24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D811A41FF90A58000951C3 /* TouchableTextView.swift */; };
 		24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DFD28B19436E51007F61E7 /* CommentsViewController.swift */; };
+		24E390AA2542D7A9000DA7A8 /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E390A92542D7A9000DA7A8 /* UIViewControllerExtensions.swift */; };
 		24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E4F26019B4DA9900574B52 /* CommentDelegate.swift */; };
 		24EF5BF41C393D110012AA8A /* LaunchStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */; };
 		24F31A91249E6A6600E44AD2 /* NavigationAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F31A90249E6A6600E44AD2 /* NavigationAlertController.swift */; };
@@ -79,7 +84,6 @@
 		24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8C18AFB1150055F8DC /* UIKit.framework */; };
 		24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F39F9A18AFB1150055F8DC /* Images.xcassets */; };
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
-		24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
 		288B0D6127D9C12BD8FE062F /* Pods_HackersUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
@@ -177,7 +181,6 @@
 		249B8F8622A2B740002A9EC5 /* SwipeCellKitActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeCellKitActions.swift; sourceTree = "<group>"; };
 		249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBackgroundView.swift; sourceTree = "<group>"; };
 		249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TableViewBackgroundView.xib; sourceTree = "<group>"; };
-		249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableNavigationTitleView.swift; sourceTree = "<group>"; };
 		24ADA7E2206FAF2200C143F4 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
 		24B1A6A622B521470051EAFD /* BounceExpansion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceExpansion.swift; sourceTree = "<group>"; };
@@ -195,10 +198,16 @@
 		24CE5FF719435A90009D2677 /* PostCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCell.swift; sourceTree = "<group>"; };
 		24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		24CEAA9C1F8917D60050DEDF /* ReviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewController.swift; sourceTree = "<group>"; };
+		24D1845824B336B60017E4F4 /* TitleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleButton.swift; sourceTree = "<group>"; };
+		24D1845A24B35C390017E4F4 /* FeedItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemCell.swift; sourceTree = "<group>"; };
+		24D1845C24B35E7E0017E4F4 /* FeedCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCollectionViewController.swift; sourceTree = "<group>"; };
+		24D1845E24B374780017E4F4 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Deselection.swift"; sourceTree = "<group>"; };
 		24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+Authentication.swift"; sourceTree = "<group>"; };
 		24D6B8C91C1EDBFC00618422 /* AppTheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		24D811A41FF90A58000951C3 /* TouchableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchableTextView.swift; sourceTree = "<group>"; };
 		24DFD28B19436E51007F61E7 /* CommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsViewController.swift; sourceTree = "<group>"; };
+		24E390A92542D7A9000DA7A8 /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtensions.swift; sourceTree = "<group>"; };
 		24E4F26019B4DA9900574B52 /* CommentDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentDelegate.swift; sourceTree = "<group>"; };
 		24EF5BF31C393D110012AA8A /* LaunchStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchStoryboard.storyboard; sourceTree = "<group>"; };
 		24F31A90249E6A6600E44AD2 /* NavigationAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationAlertController.swift; sourceTree = "<group>"; };
@@ -210,7 +219,6 @@
 		24F39F9A18AFB1150055F8DC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		24F644FD24951D6400869504 /* Scanfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Scanfile; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
-		24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewControllerExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
 		5AB8A7BD5582ABED8906DB36 /* Pods_HackersUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HackersUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
@@ -353,12 +361,13 @@
 				24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */,
 				2464D212209DEFB100C7F8FC /* UINavigationControllerExtensions.swift */,
 				243271941F95EDA9008196DB /* StringExtensions.swift */,
-				24FF021E226CAAB5002EF8DD /* UITableViewControllerExtensions.swift */,
 				245DCAAF1CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift */,
 				249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */,
 				24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */,
 				2457FF76245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift */,
 				2457FF78245DCE60000FA160 /* UIAlertControllerExtensions.swift */,
+				24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */,
+				24E390A92542D7A9000DA7A8 /* UIViewControllerExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -393,7 +402,7 @@
 				241C32DD24950C05000876DC /* PostTitleView.swift */,
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
-				249E03362497F3F100F1FA60 /* TappableNavigationTitleView.swift */,
+				24D1845824B336B60017E4F4 /* TitleButton.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -432,6 +441,9 @@
 				24CE5FF319435061009D2677 /* FeedViewController.swift */,
 				24CE5FF719435A90009D2677 /* PostCell.swift */,
 				24F31A90249E6A6600E44AD2 /* NavigationAlertController.swift */,
+				24D1845C24B35E7E0017E4F4 /* FeedCollectionViewController.swift */,
+				24D1845E24B374780017E4F4 /* FeedViewModel.swift */,
+				24D1845A24B35C390017E4F4 /* FeedItemCell.swift */,
 			);
 			path = Feed;
 			sourceTree = "<group>";
@@ -470,7 +482,6 @@
 		24F39F7C18AFB1150055F8DC = {
 			isa = PBXGroup;
 			children = (
-				241E4036253B103100E3ED18 /* Hackers.entitlements */,
 				24F39F8E18AFB1150055F8DC /* App */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				241C32DB24950AB3000876DC /* Tests */,
@@ -529,8 +540,9 @@
 		24F39F8F18AFB1150055F8DC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */,
 				24F39F9018AFB1150055F8DC /* Hackers-Info.plist */,
+				24CC0DB6193D1935005AD417 /* Hackers2-Bridging-Header.h */,
+				241E4036253B103100E3ED18 /* Hackers.entitlements */,
 			);
 			path = "Supporting Files";
 			sourceTree = "<group>";
@@ -853,8 +865,8 @@
 				"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/BulletinBoard/BLTNBoard.framework",
 				"${BUILT_PRODUCTS_DIR}/HNScraper/HNScraper.framework",
-				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/Loaf/Loaf.framework",
+				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftSoup/SwiftSoup.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
@@ -866,8 +878,8 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLTNBoard.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HNScraper.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Loaf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftSoup.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
@@ -932,29 +944,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24D1845B24B35C390017E4F4 /* FeedItemCell.swift in Sources */,
 				2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24CE5FF419435061009D2677 /* FeedViewController.swift in Sources */,
 				24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */,
+				24E390AA2542D7A9000DA7A8 /* UIViewControllerExtensions.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2479E11522B69CF100D9F1A4 /* ThumbnailImageView.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
 				2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */,
+				24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */,
 				24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */,
 				2464D20F209DD8F400C7F8FC /* Weak.swift in Sources */,
 				24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */,
 				24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */,
 				24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */,
 				245DCAB01CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift in Sources */,
-				24FF021F226CAAB5002EF8DD /* UITableViewControllerExtensions.swift in Sources */,
+				24D1845F24B374780017E4F4 /* FeedViewModel.swift in Sources */,
 				2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */,
 				249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */,
 				2464D208209DD7B100C7F8FC /* AppThemeProvider.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
-				249E03372497F3F100F1FA60 /* TappableNavigationTitleView.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
@@ -974,12 +988,14 @@
 				24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */,
 				247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */,
 				241C32DE24950C05000876DC /* PostTitleView.swift in Sources */,
+				24D1845924B336B60017E4F4 /* TitleButton.swift in Sources */,
 				2457FF77245DCE0A000FA160 /* UIActivityViewControllerExtensions.swift in Sources */,
 				240F877622BE952200DC2485 /* ThemeSwitcher.swift in Sources */,
 				24DFD28C19436E51007F61E7 /* CommentsViewController.swift in Sources */,
 				2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */,
 				24F31A91249E6A6600E44AD2 /* NavigationAlertController.swift in Sources */,
 				24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */,
+				24D1845D24B35E7E0017E4F4 /* FeedCollectionViewController.swift in Sources */,
 				2464D206209DD27A00C7F8FC /* Theming.swift in Sources */,
 				249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */,
 				24B1A6A722B521470051EAFD /* BounceExpansion.swift in Sources */,
@@ -1047,7 +1063,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1080,7 +1096,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1111,7 +1127,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1146,7 +1162,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1177,7 +1193,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1210,7 +1226,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1271,7 +1287,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -1318,7 +1333,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
@@ -1331,18 +1345,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Hackers.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 90;
+				CURRENT_PROJECT_VERSION = 91;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.4.2;
+				MARKETING_VERSION = 4.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Prod Provisioning Profile";
@@ -1361,18 +1374,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Hackers.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 90;
+				CURRENT_PROJECT_VERSION = 91;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.4.2;
+				MARKETING_VERSION = 4.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Prod Provisioning Profile";

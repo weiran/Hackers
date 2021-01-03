@@ -16,6 +16,9 @@ extension SwinjectStoryboard {
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
             controller.swipeCellKitActions = resolver.resolve(SwipeCellKitActions.self)!
         }
+        container.storyboardInitCompleted(FeedCollectionViewController.self) { resolver, controller in
+            controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
+        }
         container.storyboardInitCompleted(CommentsViewController.self) { resolver, controller in
             controller.authenticationUIService = resolver.resolve(AuthenticationUIService.self)!
             controller.swipeCellKitActions = resolver.resolve(SwipeCellKitActions.self)!
