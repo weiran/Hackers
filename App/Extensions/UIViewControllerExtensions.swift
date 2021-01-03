@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 23/10/2020.
-//  Copyright © 2020 Glass Umbrella. All rights reserved.
+//  Copyright © 2020 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
