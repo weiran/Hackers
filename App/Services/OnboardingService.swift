@@ -62,9 +62,9 @@ enum OnboardingService {
 
     private static func items() -> [WhatsNew.Item] {
         let defaultBrowserItem = WhatsNew.Item(
-            title: "iOS 14 default browser",
-            subtitle: "With iOS 14 you can set your own default browser. Hackers can open links with your choice of browser instead of Safari. Try it out in settings.",
-            image: UIImage(systemName: "safari")
+            title: "Faster Thumbnails",
+            subtitle: "Thumbnail images now load way faster than before.",
+            image: UIImage(systemName: "bolt.fill")
         )
         return [defaultBrowserItem]
     }
@@ -81,7 +81,8 @@ struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
         return onboardingViewController as! UIViewControllerType
     }
 
-    func updateUIViewController(_ uiViewController: UIViewControllerType,
-                                context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
+    func updateUIViewController(
+        _ uiViewController: UIViewControllerType,
+        context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
     ) {}
 }

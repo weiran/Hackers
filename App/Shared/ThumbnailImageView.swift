@@ -45,7 +45,7 @@ class ThumbnailImageView: UIImageView {
     private func thumbnailURL(for url: URL) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
-        components.host = "hackers-thumbnails.azurewebsites.net"
+        components.host = "hackers-thumbnails.weiranzhang.com"
         components.path = "/api/FetchThumbnail"
         let urlString = url.absoluteString
         components.queryItems = [URLQueryItem(name: "url", value: urlString)]
