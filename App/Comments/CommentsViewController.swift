@@ -347,11 +347,14 @@ extension CommentsViewController {
             activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.comments")
             activity?.webpageURL = post.hackerNewsURL
         } else if case ActivityType.link(let webpageURL) = activityType {
+            guard UIApplication.shared.canOpenURL(webpageURL) else {
+                return
+            }
             activity = NSUserActivity(activityType: "com.weiranzhang.Hackers.link")
             activity?.webpageURL = webpageURL
         }
 
-        activity?.title = post.title + " | Hacker News"
+        activity?.title = post.title
         userActivity = activity
         userActivity?.becomeCurrent()
     }
