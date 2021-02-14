@@ -19,6 +19,7 @@ extension PostType {
         switch self {
         case .news: return "Top"
         case .ask: return "Ask"
+        case .show: return "Show"
         case .jobs: return "Jobs"
         case .newest: return "New"
         case .best: return "Best"
@@ -29,6 +30,7 @@ extension PostType {
         switch self {
         case .news: return "globe"
         case .ask: return "bubble.left"
+        case .show: return "eye"
         case .jobs: return "briefcase"
         case .newest: return "clock"
         case .best: return "rosette"

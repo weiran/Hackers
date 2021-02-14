@@ -117,7 +117,7 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		24C10C0124866D3F00B93F68 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
@@ -125,7 +125,7 @@
 				24C10BFD24866D3F00B93F68 /* HackersShareExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
