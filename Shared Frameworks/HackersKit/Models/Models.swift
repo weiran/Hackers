@@ -56,6 +56,7 @@ class Post: Hashable {
 enum PostType: String, CaseIterable {
     case news
     case ask
+    case show
     case jobs
     case newest
     case best
