@@ -62,9 +62,9 @@ enum OnboardingService {
 
     private static func items() -> [WhatsNew.Item] {
         let defaultBrowserItem = WhatsNew.Item(
-            title: "Faster Thumbnails",
-            subtitle: "Thumbnail images now load way faster than before.",
-            image: UIImage(systemName: "bolt.fill")
+            title: "Show HN",
+            subtitle: "Added Show HN to the categories list. Thanks @anosidium!",
+            image: UIImage(systemName: "eye")
         )
         return [defaultBrowserItem]
     }
