@@ -25,7 +25,7 @@ enum HtmlParser {
                     return nil
                 }
                 let postElements = Elements([titleElement, metadataElement])
-                return try self.post(from: postElements, type: type)
+                return try? self.post(from: postElements, type: type)
             }
             return posts
         }
