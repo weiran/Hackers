@@ -12,10 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install SwiftLint
-      run: brew install swiftlint
+    - uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.7.2'
     - name: Run SwiftLint
-      uses: maierj/fastlane-action@v1.4.0
+      uses: maierj/fastlane-action@v2.0.1
       with: 
         lane: 'lint'
         subdirectory: 'fastlane'
