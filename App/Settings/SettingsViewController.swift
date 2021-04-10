@@ -38,11 +38,6 @@ class SettingsViewController: UITableViewController {
                      object: nil, queue: .main) { _ in self.updateUsername() }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.tableView.scrollRectToVisible(CGRect(x: 0, y: 0, width: 1, height: 1), animated: true)
-    }
-
     private func updateUsername() {
         if sessionService?.authenticationState == .authenticated {
             usernameLabel.text = sessionService?.username
