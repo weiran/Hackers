@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="E3k-re-C3Q" customClass="ItemCell" customModule="Hackers" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="521" height="80"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="eYp-74-ryL">
+                <rect key="frame" x="0.0" y="0.0" width="521" height="80"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" contentMode="center" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="IXy-OH-SMO" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
+                        <rect key="frame" x="12" y="11.5" width="60" height="58"/>
+                        <color key="backgroundColor" name="groupedTableViewBackgroundColor"/>
+                        <color key="tintColor" name="textColor"/>
+                        <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="60" id="frg-py-ztf"/>
+                            <constraint firstAttribute="width" constant="60" id="yH7-aA-Pod"/>
+                        </constraints>
+                        <imageReference key="image" image="safari" catalog="system" symbolScale="medium" renderingMode="template"/>
+                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="36"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="9"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aSH-OD-WLZ">
+                        <rect key="frame" x="84" y="8" width="429" height="64"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfv-xi-8k2" userLabel="Title Label">
+                                <rect key="frame" x="0.0" y="8" width="429" height="25.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <color key="textColor" name="titleTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Metadata" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RY7-qH-CY5" userLabel="Metadata Label">
+                                <rect key="frame" x="0.0" y="37.5" width="429" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" name="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="wfv-xi-8k2" secondAttribute="trailing" id="9Ib-7G-f8U"/>
+                            <constraint firstItem="wfv-xi-8k2" firstAttribute="top" secondItem="aSH-OD-WLZ" secondAttribute="top" constant="8" id="Gmb-uA-QLJ"/>
+                            <constraint firstItem="RY7-qH-CY5" firstAttribute="top" secondItem="wfv-xi-8k2" secondAttribute="bottom" constant="4" id="IRs-4H-eZx"/>
+                            <constraint firstAttribute="bottom" secondItem="RY7-qH-CY5" secondAttribute="bottom" constant="9.5" id="WBx-SY-OG7"/>
+                            <constraint firstItem="wfv-xi-8k2" firstAttribute="leading" secondItem="aSH-OD-WLZ" secondAttribute="leading" id="nB2-8G-SPI"/>
+                            <constraint firstAttribute="trailing" secondItem="RY7-qH-CY5" secondAttribute="trailing" id="sFg-6N-Eog"/>
+                            <constraint firstItem="RY7-qH-CY5" firstAttribute="leading" secondItem="aSH-OD-WLZ" secondAttribute="leading" id="x0L-4z-JXA"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fhK-yg-YDC" userLabel="Separator">
+                        <rect key="frame" x="84" y="79.5" width="437" height="0.5"/>
+                        <color key="backgroundColor" name="separatorColor"/>
+                        <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="HZH-13-GMd"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <viewLayoutGuide key="safeArea" id="LqF-pK-LfI"/>
+                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                <gestureRecognizers/>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="fhK-yg-YDC" secondAttribute="bottom" id="0Uz-eY-1B4"/>
+                    <constraint firstItem="LqF-pK-LfI" firstAttribute="trailing" secondItem="aSH-OD-WLZ" secondAttribute="trailing" constant="8" id="HDg-H7-S7L"/>
+                    <constraint firstItem="fhK-yg-YDC" firstAttribute="leading" secondItem="LqF-pK-LfI" secondAttribute="leading" constant="84" id="Mbf-sR-tJd"/>
+                    <constraint firstItem="aSH-OD-WLZ" firstAttribute="leading" secondItem="IXy-OH-SMO" secondAttribute="trailing" constant="12" id="aW7-8d-dow"/>
+                    <constraint firstAttribute="bottom" secondItem="aSH-OD-WLZ" secondAttribute="bottom" constant="8" id="d4H-Bn-hov"/>
+                    <constraint firstItem="aSH-OD-WLZ" firstAttribute="top" secondItem="eYp-74-ryL" secondAttribute="top" constant="8" id="dIg-5t-br7"/>
+                    <constraint firstItem="IXy-OH-SMO" firstAttribute="leading" secondItem="LqF-pK-LfI" secondAttribute="leading" constant="12" id="gWo-zO-TnP"/>
+                    <constraint firstAttribute="trailing" secondItem="fhK-yg-YDC" secondAttribute="trailing" id="hk8-o1-69i"/>
+                    <constraint firstItem="IXy-OH-SMO" firstAttribute="centerY" secondItem="eYp-74-ryL" secondAttribute="centerY" id="ieu-Fo-68E"/>
+                </constraints>
+            </collectionViewCellContentView>
+            <gestureRecognizers/>
+            <edgeInsets key="layoutMargins" top="8" left="8" bottom="8" right="8"/>
+            <size key="customSize" width="521" height="100"/>
+            <connections>
+                <outlet property="metadataLabel" destination="RY7-qH-CY5" id="TNG-bA-BtA"/>
+                <outlet property="thumbnailImageView" destination="IXy-OH-SMO" id="cMo-1e-jKH"/>
+                <outlet property="titleLabel" destination="wfv-xi-8k2" id="2TC-BN-5Ln"/>
+            </connections>
+            <point key="canvasLocation" x="-60.14492753623189" y="-550.44642857142856"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="safari" catalog="system" width="128" height="121"/>
+        <namedColor name="groupedTableViewBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="separatorColor">
+            <color red="0.72941176470588232" green="0.72941176470588232" blue="0.72941176470588232" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="textColor">
+            <color red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="titleTextColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
