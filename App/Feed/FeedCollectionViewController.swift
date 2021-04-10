@@ -28,6 +28,7 @@ class FeedCollectionViewController: UIViewController {
         setupCollectionView()
         setupTitle()
         setupNotificationCenter()
+        showOnboarding()
 
         fetchFeed()
     }
@@ -81,6 +82,12 @@ class FeedCollectionViewController: UIViewController {
             queue: .main
         ) { [weak self] _ in
             self?.fetchFeedWithReset()
+        }
+    }
+
+    private func showOnboarding() {
+        if let onboardingVC = OnboardingService.onboardingViewController() {
+            present(onboardingVC, animated: true)
         }
     }
 }
