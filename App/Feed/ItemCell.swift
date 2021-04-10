@@ -18,6 +18,13 @@ class ItemCell: UICollectionViewListCell {
     var linkPressedHandler: ((Post) -> Void)?
     private var thumbnailGestureRecognizer: UITapGestureRecognizer?
 
+    override var isSelected: Bool {
+        didSet {
+            contentView.backgroundColor = isSelected ?
+                AppTheme.default.cellHighlightColor : AppTheme.default.backgroundColor
+        }
+    }
+
     func apply(post: Post) {
         self.post = post
 
@@ -30,7 +37,9 @@ class ItemCell: UICollectionViewListCell {
     func setupThumbnail(with url: URL?) {
         _ = thumbnailImageView.setImageWithPlaceholder(url: url)
     }
+}
 
+extension ItemCell {
     private func setupThumbnailGesture() {
         if thumbnailGestureRecognizer == nil {
             let thumbnailGestureRecognizer = UITapGestureRecognizer(
@@ -50,7 +59,9 @@ class ItemCell: UICollectionViewListCell {
             linkPressedHandler(post)
         }
     }
+}
 
+extension ItemCell {
     private func domainLabelText(for post: Post) -> String {
         guard
             let urlComponents = URLComponents(url: post.url, resolvingAgainstBaseURL: false),
