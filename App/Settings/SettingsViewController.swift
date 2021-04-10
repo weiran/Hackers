@@ -18,9 +18,6 @@ class SettingsViewController: UITableViewController {
 
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
-    @IBOutlet weak var darkModeSwitch: UISwitch!
-    @IBOutlet weak var darkModeLabel: UILabel!
-    @IBOutlet weak var systemSwitch: UISwitch!
     @IBOutlet weak var showThumbnailsSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
@@ -31,16 +28,6 @@ class SettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 13, *) {
-            systemSwitch.isEnabled = true
-        } else {
-            systemSwitch.isEnabled = false
-        }
-        setupTheming()
-        systemSwitch.isOn = UserDefaults.standard.systemThemeEnabled
-        darkModeSwitch.isEnabled = !systemSwitch.isOn
-        darkModeLabel.isEnabled = !systemSwitch.isOn
-        darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
         updateOpenInDefaultBrowser()
@@ -74,18 +61,6 @@ class SettingsViewController: UITableViewController {
         openInDefaultBrowserSwitch.isOn = UserDefaults.standard.openInDefaultBrowser
         safariReaderModeSwitch.isEnabled = !UserDefaults.standard.openInDefaultBrowser
         openInDefaultBrowserLabel.isEnabled = !UserDefaults.standard.openInDefaultBrowser
-    }
-
-    @IBAction private func systemThemeValueChanged(_ sender: UISwitch) {
-        UserDefaults.standard.setSystemTheme(sender.isOn)
-        ThemeSwitcher.switchTheme()
-        darkModeSwitch.isEnabled = !sender.isOn
-        darkModeLabel.isEnabled = !sender.isOn
-     }
-
-    @IBAction private func darkModeValueChanged(_ sender: UISwitch) {
-        UserDefaults.standard.setDarkMode(sender.isOn)
-        AppThemeProvider.shared.currentTheme = sender.isOn ? .dark : .light
     }
 
     @IBAction func showThumbnailsValueChanged(_ sender: UISwitch) {
@@ -165,12 +140,5 @@ extension SettingsViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController,
                                didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
-    }
-}
-
-extension SettingsViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.groupedTableViewBackgroundColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

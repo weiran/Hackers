@@ -23,7 +23,6 @@ class PostCell: SwipeTableViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        setupTheming()
         setupThumbnailGesture()
     }
 
@@ -41,11 +40,11 @@ class PostCell: SwipeTableViewCell {
     }
 
     private func setSelectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
+        backgroundColor = AppTheme.default.cellHighlightColor
     }
 
     private func setUnselectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
+        backgroundColor = AppTheme.default.backgroundColor
     }
 
     @objc private func didTapThumbnail(_ sender: Any) {
@@ -54,14 +53,5 @@ class PostCell: SwipeTableViewCell {
 
     func setImageWithPlaceholder(url: URL?) {
         _ = thumbnailImageView.setImageWithPlaceholder(url: url)
-    }
-}
-
-extension PostCell: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        backgroundColor = theme.backgroundColor
-        separatorView?.backgroundColor = theme.separatorColor
-        thumbnailImageView.backgroundColor = theme.groupedTableViewBackgroundColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

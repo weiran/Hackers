@@ -34,7 +34,6 @@ class FeedViewController: UIViewController {
         super.viewDidLoad()
         registerForPreviewing(with: self, sourceView: tableView)
 
-        setupTheming()
         setupNotificationObservers()
         setupTableView()
         setupTitle()
@@ -324,15 +323,5 @@ extension FeedViewController: UIViewControllerPreviewingDelegate, SFSafariViewCo
             self.navigateToComments()
         }
         return [viewCommentsPreviewAction]
-    }
-}
-
-extension FeedViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        tableView.refreshControl?.tintColor = theme.appTintColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

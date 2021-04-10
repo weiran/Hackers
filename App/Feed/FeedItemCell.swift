@@ -17,7 +17,6 @@ class FeedItemCell: UICollectionViewListCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        setupTheming()
         setupThumbnailGesture()
     }
 
@@ -47,12 +46,5 @@ class FeedItemCell: UICollectionViewListCell {
 
     func setPost(post: Post) {
         postTitleView.post = post
-    }
-}
-
-extension FeedItemCell: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        thumbnailImageView.backgroundColor = theme.groupedTableViewBackgroundColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

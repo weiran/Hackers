@@ -18,14 +18,8 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         didSet {
             guard let post = post else { return }
             titleLabel.text = post.title
-            metadataLabel.attributedText = metadataText(for: post, theme: themeProvider.currentTheme)
+            metadataLabel.attributedText = metadataText(for: post)
         }
-    }
-
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-
-        setupTheming()
     }
 
     private func domainLabelText(for post: Post) -> String {
@@ -42,20 +36,20 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         return host
     }
 
-    private func metadataText(for post: Post, theme: AppTheme) -> NSAttributedString {
-        let defaultAttributes = [NSAttributedString.Key.foregroundColor: theme.textColor]
+    private func metadataText(for post: Post) -> NSAttributedString {
+        let defaultAttributes = [NSAttributedString.Key.foregroundColor: AppTheme.default.textColor]
         var pointsAttributes = defaultAttributes
         var pointsTintColor: UIColor?
 
         if post.upvoted {
-            pointsAttributes = [NSAttributedString.Key.foregroundColor: theme.upvotedColor]
-            pointsTintColor = theme.upvotedColor
+            pointsAttributes = [NSAttributedString.Key.foregroundColor: AppTheme.default.upvotedColor]
+            pointsTintColor = AppTheme.default.upvotedColor
         }
 
         let pointsIconAttachment = textAttachment(for: "PointsIcon", tintColor: pointsTintColor)
         let pointsIconAttributedString = NSAttributedString(attachment: pointsIconAttachment)
 
-        let commentsIconAttachment = textAttachment(for: "CommentsIcon", tintColor: theme.textColor)
+        let commentsIconAttachment = textAttachment(for: "CommentsIcon", tintColor: AppTheme.default.textColor)
         let commentsIconAttributedString = NSAttributedString(attachment: commentsIconAttachment)
 
         let string = NSMutableAttributedString()
@@ -82,15 +76,5 @@ class PostTitleView: UIView, UIGestureRecognizerDelegate {
         attachment.image = image
         attachment.bounds = CGRect(x: 0, y: -2, width: image.size.width, height: image.size.height)
         return attachment
-    }
-}
-
-extension PostTitleView: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        titleLabel.textColor = theme.titleTextColor
-        if let post = post {
-            metadataLabel.attributedText = metadataText(for: post, theme: theme)
-        }
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

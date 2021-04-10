@@ -39,14 +39,11 @@ enum OnboardingService {
             )
         }
 
-        let theme = AppThemeProvider.shared.currentTheme
-        viewController?.overrideUserInterfaceStyle = theme.userInterfaceStyle
-
         return viewController
     }
 
     private static func configuration() -> WhatsNewViewController.Configuration {
-        let appTheme = AppThemeProvider.shared.currentTheme
+        let appTheme = AppTheme.default
         let theme = WhatsNewViewController.Theme { theme in
             theme.backgroundColor = appTheme.backgroundColor
             theme.titleView.titleColor = appTheme.titleTextColor

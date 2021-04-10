@@ -20,8 +20,7 @@ class AuthenticationUIService {
 
     func showAuthentication() {
         let manager = BLTNItemManager(rootItem: loginPage())
-        let theme = AppThemeProvider.shared.currentTheme
-        manager.backgroundColor = theme.backgroundColor
+        manager.backgroundColor = AppTheme.default.backgroundColor
         manager.backgroundViewStyle = .blurredDark
         bulletinManager = manager
         bulletinManager?.showBulletin(in: UIApplication.shared)
@@ -29,8 +28,7 @@ class AuthenticationUIService {
 
     private func displayActivityIndicator() {
         guard let bulletinManager = self.bulletinManager else { return }
-        let theme = AppThemeProvider.shared.currentTheme
-        bulletinManager.displayActivityIndicator(color: theme.textColor)
+        bulletinManager.displayActivityIndicator(color: AppTheme.default.textColor)
     }
 
     private func loginPage() -> AuthenticationBulletinPage {
@@ -92,11 +90,10 @@ class AuthenticationUIService {
     }
 
     private func themeAppearance(of item: BLTNPageItem) {
-        let theme = AppThemeProvider.shared.currentTheme
-        item.appearance.actionButtonColor = theme.appTintColor
-        item.appearance.alternativeButtonTitleColor = theme.appTintColor
-        item.appearance.titleTextColor = theme.titleTextColor
-        item.appearance.descriptionTextColor = theme.textColor
+        item.appearance.actionButtonColor = AppTheme.default.appTintColor
+        item.appearance.alternativeButtonTitleColor = AppTheme.default.appTintColor
+        item.appearance.titleTextColor = AppTheme.default.titleTextColor
+        item.appearance.descriptionTextColor = AppTheme.default.textColor
     }
 
     private func sendAuthenticationDidChangeNotification() {
@@ -105,10 +102,11 @@ class AuthenticationUIService {
 
     func unauthenticatedAlertController() -> UIAlertController {
         let unauthenticatedMessage = "You're not logged into Hacker News. Do you want to login now?"
-        let authenticationAlert = UIAlertController(title: "Not logged in",
-                                                    message: unauthenticatedMessage,
-                                                    preferredStyle: .alert,
-                                                    themed: true)
+        let authenticationAlert = UIAlertController(
+            title: "Not logged in",
+            message: unauthenticatedMessage,
+            preferredStyle: .alert
+        )
         authenticationAlert.addAction(UIAlertAction(title: "Not Now", style: .cancel, handler: nil))
         authenticationAlert.addAction(UIAlertAction(title: "Login", style: .default, handler: { _ in
             self.showAuthentication()

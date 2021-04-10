@@ -11,7 +11,6 @@ import UIKit
 class MainSplitViewController: UISplitViewController {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setupTheming()
         delegate = self
     }
 }
@@ -22,14 +21,5 @@ extension MainSplitViewController: UISplitViewControllerDelegate {
                              onto primaryViewController: UIViewController) -> Bool {
         // only collapse the secondary onto the primary when it's the placeholder view
         return secondaryViewController is EmptyViewController
-    }
-}
-
-extension MainSplitViewController: Themed {
-    // Using the MainSplitViewController as a place to handle global theme changes
-    open func applyTheme(_ theme: AppTheme) {
-        UITextView.appearance().tintColor = theme.appTintColor
-        UITabBar.appearance().tintColor = theme.appTintColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

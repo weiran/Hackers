@@ -21,15 +21,6 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("APPEARANCE")) {
-                    Picker(
-                        selection: $settings.theme,
-                        label: Text("Theme")
-                    ) {
-                        Text("System").tag(SettingsStore.ThemeType.system)
-                        Text("Light").tag(SettingsStore.ThemeType.light)
-                        Text("Dark").tag(SettingsStore.ThemeType.dark)
-                    }
-
                     Toggle(isOn: $settings.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
                     }

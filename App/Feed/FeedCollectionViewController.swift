@@ -30,7 +30,6 @@ class FeedCollectionViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         smoothlyDeselectItems(collectionView)
     }
 
@@ -70,10 +69,6 @@ class FeedCollectionViewController: UIViewController {
     @objc private func fetchFeedNextPage() {
         fetchFeed(fetchNextPage: true)
     }
-}
-
-extension FeedCollectionViewController: Themed {
-    func applyTheme(_ theme: AppTheme) { }
 }
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
@@ -238,7 +233,7 @@ extension FeedCollectionViewController {
             systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up"
         )
         if !post.upvoted {
-            voteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+            voteAction.backgroundColor = AppTheme.default.upvotedColor
         }
 
         return UISwipeActionsConfiguration(actions: [voteAction])

@@ -68,9 +68,7 @@ extension AppTheme {
         return viewController.traitCollection
     }
 
-    static let light = AppTheme.themeBuilder(.light)
-    static let dark = AppTheme.themeBuilder(.dark)
-    static var system: AppTheme {
+    static var `default`: AppTheme {
         AppTheme.themeBuilder()
     }
 }

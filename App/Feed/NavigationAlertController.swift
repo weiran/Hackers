@@ -12,7 +12,6 @@ class NavigationAlertController: UIAlertController {
     private var handler: ((_ postType: PostType) -> Void)?
 
     func setup(handler: @escaping (_ postType: PostType) -> Void) {
-        setupTheming()
         setupActions()
         self.handler = handler
     }

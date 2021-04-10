@@ -29,7 +29,8 @@ class TableViewBackgroundView: UIView {
     }
 
     override func layoutSubviews() {
-        setupTheming()
+        super.layoutSubviews()
+
         updateState()
     }
 
@@ -43,15 +44,6 @@ class TableViewBackgroundView: UIView {
             titleLabel.isHidden = false
             titleLabel.text = emptyTitle
         }
-    }
-}
-
-extension TableViewBackgroundView: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        backgroundColor = theme.backgroundColor
-        titleLabel.textColor = theme.textColor
-        activityIndicatorView.style = .medium
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 
