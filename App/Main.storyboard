@@ -10,140 +10,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Feed Controller-->
-        <scene sceneID="Jh0-BO-yhM">
-            <objects>
-                <tableViewController id="6t9-fC-JrD" userLabel="Feed Controller" customClass="FeedViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="AjT-wK-ps1">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="PostCell" rowHeight="77" id="ISt-5V-ba5" customClass="PostCell" customModule="Hackers" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="375" height="77"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ISt-5V-ba5" id="qV7-qk-OZs">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="77"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Hqt-ay-B4F">
-                                            <rect key="frame" x="15" y="11" width="345" height="55"/>
-                                            <subviews>
-                                                <imageView contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OFG-KR-Pd0" customClass="ThumbnailImageView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="55" height="55"/>
-                                                    <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <gestureRecognizers/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" secondItem="OFG-KR-Pd0" secondAttribute="height" multiplier="1:1" id="GwZ-k1-MWY"/>
-                                                        <constraint firstAttribute="height" constant="60" id="IAb-sw-Ctn"/>
-                                                    </constraints>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                            <real key="value" value="9"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
-                                                </imageView>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fNt-dt-R2Y" customClass="PostTitleView" customModule="Hackers" customModuleProvider="target">
-                                                    <rect key="frame" x="67" y="7" width="278" height="41.5"/>
-                                                    <subviews>
-                                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="u9g-AO-wgl">
-                                                            <rect key="frame" x="0.0" y="0.0" width="278" height="41.5"/>
-                                                            <subviews>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Title Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gUp-Yn-NeV">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="278" height="20.5"/>
-                                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
-                                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <nil key="highlightedColor"/>
-                                                                </label>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="1 point" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kzm-bv-9Fd">
-                                                                    <rect key="frame" x="0.0" y="25.5" width="278" height="16"/>
-                                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                                                                    <color key="textColor" red="0.33333333329999998" green="0.33333333329999998" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <nil key="highlightedColor"/>
-                                                                </label>
-                                                            </subviews>
-                                                        </stackView>
-                                                    </subviews>
-                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <constraints>
-                                                        <constraint firstItem="u9g-AO-wgl" firstAttribute="leading" secondItem="fNt-dt-R2Y" secondAttribute="leading" id="19H-BC-JTN"/>
-                                                        <constraint firstItem="u9g-AO-wgl" firstAttribute="top" secondItem="fNt-dt-R2Y" secondAttribute="top" id="C5B-Bd-XR4"/>
-                                                        <constraint firstAttribute="trailing" secondItem="u9g-AO-wgl" secondAttribute="trailing" id="qfR-31-En8"/>
-                                                        <constraint firstAttribute="bottom" secondItem="u9g-AO-wgl" secondAttribute="bottom" id="qrf-Rl-ej7"/>
-                                                    </constraints>
-                                                    <connections>
-                                                        <outlet property="metadataLabel" destination="Kzm-bv-9Fd" id="nuR-c8-CJ7"/>
-                                                        <outlet property="titleLabel" destination="gUp-Yn-NeV" id="fnB-7X-qO5"/>
-                                                    </connections>
-                                                </view>
-                                            </subviews>
-                                        </stackView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="Hqt-ay-B4F" secondAttribute="trailing" constant="15" id="4gf-e4-vSw"/>
-                                        <constraint firstItem="Hqt-ay-B4F" firstAttribute="top" secondItem="qV7-qk-OZs" secondAttribute="topMargin" id="dzi-hq-Tbj"/>
-                                        <constraint firstItem="Hqt-ay-B4F" firstAttribute="leading" secondItem="qV7-qk-OZs" secondAttribute="leading" constant="15" id="wza-Ed-bqQ"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="Hqt-ay-B4F" secondAttribute="bottom" id="z4t-hn-RvJ"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                                <accessibility key="accessibilityConfiguration" identifier="PostCell"/>
-                                <gestureRecognizers/>
-                                <inset key="separatorInset" minX="88" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <connections>
-                                    <outlet property="postTitleView" destination="fNt-dt-R2Y" id="Xg6-38-hok"/>
-                                    <outlet property="thumbnailImageView" destination="OFG-KR-Pd0" id="i8s-bN-Xew"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="delegate" destination="6t9-fC-JrD" id="IoO-Tz-pXH"/>
-                        </connections>
-                    </tableView>
-                    <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Hacker News" id="lRO-C4-ESL">
-                        <barButtonItem key="leftBarButtonItem" enabled="NO" id="bNI-1N-WK2">
-                            <connections>
-                                <action selector="showNewSettings:" destination="6t9-fC-JrD" id="VDf-Ao-txm"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="gear" catalog="system" id="onC-T5-IAt">
-                            <connections>
-                                <segue destination="9fT-2D-AhL" kind="presentation" modalPresentationStyle="formSheet" id="RIp-Wm-4ds"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
-                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="XS1-ZM-tYj">
-                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </refreshControl>
-                    <connections>
-                        <outlet property="tableView" destination="AjT-wK-ps1" id="yZ2-kP-ACG"/>
-                        <segue destination="PXZ-r3-pvU" kind="showDetail" identifier="ShowCommentsSegue" id="iEZ-lA-QBx"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ac0-3E-Nwr" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2361" y="546"/>
-        </scene>
-        <!--Feed Navigation Controller-->
-        <scene sceneID="1am-tW-4v5">
-            <objects>
-                <navigationController id="2FT-kg-cd5" userLabel="Feed Navigation Controller" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="aiG-Km-7Il"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="o2Y-R6-LxE">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="6t9-fC-JrD" kind="relationship" relationship="rootViewController" id="Wxy-EO-kga"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3Ha-yD-7zR" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1460" y="549"/>
-        </scene>
         <!--Split View Controller-->
         <scene sceneID="z9h-ZJ-BPa">
             <objects>
@@ -186,7 +52,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X9u-DC-PJL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-396" y="1397"/>
+            <point key="canvasLocation" x="534" y="1397"/>
         </scene>
         <!--Comments View Controller-->
         <scene sceneID="xDu-IX-6YL">
@@ -437,7 +303,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZK9-xq-FV6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1460" y="1396.5517241379312"/>
+            <point key="canvasLocation" x="4074" y="546"/>
         </scene>
         <!--Settings Navigation Controller-->
         <scene sceneID="CQx-j9-MSt">
@@ -760,7 +626,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f1v-Sb-1TZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="534" y="1397"/>
+            <point key="canvasLocation" x="3225" y="546"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ATY-4V-i88">
@@ -776,7 +642,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gLB-rF-S1g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1460" y="-184"/>
+            <point key="canvasLocation" x="1460" y="546"/>
         </scene>
         <!--Feed Collection View Controller-->
         <scene sceneID="1sg-bT-5qc">
@@ -894,13 +760,9 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ipa-PZ-uow" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2360.8000000000002" y="-184.85757121439281"/>
+            <point key="canvasLocation" x="2361" y="546"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="4qf-pu-K7j"/>
-        <segue reference="CGm-Zg-Uck"/>
-    </inferredMetricsTieBreakers>
     <resources>
         <image name="LaunchIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
