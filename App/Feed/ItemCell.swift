@@ -23,9 +23,12 @@ class ItemCell: UICollectionViewListCell {
 
         titleLabel.text = post.title
         metadataLabel.attributedText = metadataText(for: post)
-        _ = thumbnailImageView.setImageWithPlaceholder(url: post.url)
 
         setupThumbnailGesture()
+    }
+
+    func setupThumbnail(with url: URL?) {
+        _ = thumbnailImageView.setImageWithPlaceholder(url: url)
     }
 
     private func setupThumbnailGesture() {

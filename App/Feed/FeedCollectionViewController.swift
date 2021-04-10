@@ -19,6 +19,7 @@ class FeedCollectionViewController: UIViewController {
     private lazy var dataSource = makeDataSource()
     private lazy var viewModel = FeedViewModel()
 
+    private var refreshToken: NotificationToken?
     private let cellIdentifier = "ItemCell"
 
     override func viewDidLoad() {
@@ -26,6 +27,7 @@ class FeedCollectionViewController: UIViewController {
 
         setupCollectionView()
         setupTitle()
+        setupNotificationCenter()
 
         fetchFeed()
     }
@@ -71,6 +73,16 @@ class FeedCollectionViewController: UIViewController {
     @objc private func fetchFeedNextPage() {
         fetchFeed(fetchNextPage: true)
     }
+
+    private func setupNotificationCenter() {
+        refreshToken = NotificationCenter.default.observe(
+            name: Notification.Name.refreshRequired,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.fetchFeedWithReset()
+        }
+    }
 }
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
@@ -111,6 +123,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             }
 
             cell.apply(post: post)
+            cell.setupThumbnail(with: UserDefaults.standard.showThumbnails ? post.url : nil)
 
             cell.linkPressedHandler = { post in
                 self.openURL(url: post.url) {
