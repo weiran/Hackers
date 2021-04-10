@@ -10,7 +10,6 @@ import XCTest
 import DeviceKit
 
 class HackersUITests: XCTestCase {
-    let feedCellName = "PostCell" // FeedItemCell in new CV
     let commentCellName = "CommentCell"
 
     func launch(darkTheme: Bool = false) {
@@ -38,10 +37,11 @@ class HackersUITests: XCTestCase {
     func testScreenshotUltimate() {
         launch()
 
-        let tablesQuery = XCUIApplication().tables
-        XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: feedCellName).element))
+        let collectionViewsQuery = XCUIApplication().collectionViews
+        XCTAssertTrue(waitForElementToAppear(collectionViewsQuery.cells.firstMatch))
 
         if Device.current.isPad {
+            let tablesQuery = XCUIApplication().tables
             tablesQuery.cells.firstMatch.tap()
             XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: commentCellName).element))
         }
@@ -52,12 +52,11 @@ class HackersUITests: XCTestCase {
     func testScreenshotComments() {
         launch()
 
-        let tablesQuery = XCUIApplication().tables
-        let postCell = tablesQuery.cells.matching(identifier: feedCellName).element
-        XCTAssertTrue(waitForElementToAppear(postCell))
-        postCell.firstMatch.tap()
+        let itemCell = XCUIApplication().collectionViews.cells.firstMatch
+        XCTAssertTrue(waitForElementToAppear(itemCell))
+        itemCell.firstMatch.tap()
 
-        let commentCell = tablesQuery.cells.matching(identifier: commentCellName).element
+        let commentCell = XCUIApplication().tables.cells.matching(identifier: commentCellName).element
         XCTAssertTrue(waitForElementToAppear(commentCell))
 
         if !Device.current.isPad {
@@ -68,10 +67,11 @@ class HackersUITests: XCTestCase {
     func testScreenshotDark() {
         launch(darkTheme: true)
 
-        let tablesQuery = XCUIApplication().tables
-        XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: feedCellName).element))
+        let collectionViewsQuery = XCUIApplication().collectionViews
+        XCTAssertTrue(waitForElementToAppear(collectionViewsQuery.cells.firstMatch))
 
         if Device.current.isPad {
+            let tablesQuery = XCUIApplication().tables
             tablesQuery.cells.firstMatch.tap()
             XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: commentCellName).element))
         }
@@ -82,7 +82,7 @@ class HackersUITests: XCTestCase {
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
-        let result = XCTWaiter().wait(for: [expectation], timeout: 30)
+        let result = XCTWaiter().wait(for: [expectation], timeout: 5)
         return result == .completed
     }
 }
