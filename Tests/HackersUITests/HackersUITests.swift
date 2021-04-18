@@ -22,13 +22,8 @@ class HackersUITests: XCTestCase {
         ]
 
         // set theme
-        app.launchArguments.append("-systemTheme")
-        app.launchArguments.append("false")
-        app.launchArguments.append("-theme")
         if darkTheme {
-            app.launchArguments.append("dark")
-        } else {
-            app.launchArguments.append("light")
+            app.launchArguments.append("darkMode")
         }
 
         app.launch()

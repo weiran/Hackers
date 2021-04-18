@@ -33,6 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.tintColor = AppTheme.default.appTintColor
         window?.makeKeyAndVisible()
 
+        if ProcessInfo.processInfo.arguments.contains("darkMode") {
+            window?.overrideUserInterfaceStyle = .dark
+        }
+
         // setup NavigationService
         navigationService = SwinjectStoryboard.getService()
         navigationService?.mainSplitViewController = mainSplitViewController
