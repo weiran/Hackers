@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-ruby@v1
       with:
-        ruby-version: '2.7.2'
+        ruby-version: '2.7.x'
     - name: Run SwiftLint
       uses: maierj/fastlane-action@v2.0.1
       with: 
