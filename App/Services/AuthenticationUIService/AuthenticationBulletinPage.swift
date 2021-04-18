@@ -23,14 +23,20 @@ class AuthenticationBulletinPage: BLTNPageItem {
         usernameTextField.autocorrectionType = .no
         usernameTextField.autocapitalizationType = .none
         usernameTextField.returnKeyType = .next
-        usernameTextField.attributedPlaceholder = themedAttributedString(for: "Username", color: AppTheme.default.lightTextColor)
+        usernameTextField.attributedPlaceholder = themedAttributedString(
+            for: "Username",
+            color: AppTheme.default.lightTextColor
+        )
 
         let passwordTextField = textField(with: AppTheme.default)
         passwordTextField.delegate = self
         passwordTextField.isSecureTextEntry = true
         passwordTextField.textContentType = .password
         passwordTextField.returnKeyType = .done
-        passwordTextField.attributedPlaceholder = themedAttributedString(for: "Password", color: AppTheme.default.lightTextColor)
+        passwordTextField.attributedPlaceholder = themedAttributedString(
+            for: "Password",
+            color: AppTheme.default.lightTextColor
+        )
 
         self.usernameTextField = usernameTextField
         self.passwordTextField = passwordTextField
