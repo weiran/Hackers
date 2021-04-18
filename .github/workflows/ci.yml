@@ -26,11 +26,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7.3'
     - uses: AckeeCZ/load-xcode-version@1.0
     - name: Install Dependencies
       run: pod install --repo-update
     - name: Run UI Tests
-      uses: maierj/fastlane-action@v1.4.0
+      uses: maierj/fastlane-action@v2.0.1
       with: 
         lane: 'test'
         subdirectory: 'fastlane'
@@ -40,11 +43,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7.3'
     - uses: AckeeCZ/load-xcode-version@1.0
     - name: Install Dependencies
       run: pod install --repo-update
     - name: Build
-      uses: maierj/fastlane-action@v1.4.0
+      uses: maierj/fastlane-action@v2.0.1
       with: 
         lane: 'build'
         subdirectory: 'fastlane'
