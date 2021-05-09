@@ -14,7 +14,6 @@ class SettingsStore: ObservableObject {
     var didChange = PassthroughSubject<Void, Never>()
 
     private enum Keys {
-        static let theme = "theme"
         static let safariReaderMode = "safariReaderMode"
         static let username = "username"
     }
@@ -26,7 +25,6 @@ class SettingsStore: ObservableObject {
         self.defaults = defaults
 
         defaults.register(defaults: [
-            Keys.theme: ThemeType.system.rawValue,
             Keys.safariReaderMode: false
         ])
 
@@ -34,22 +32,6 @@ class SettingsStore: ObservableObject {
             .publisher(for: UserDefaults.didChangeNotification)
             .map { _ in () }
             .subscribe(didChange)
-    }
-
-    enum ThemeType: String, CaseIterable {
-        case system
-        case dark
-        case light
-    }
-
-    var theme: ThemeType {
-        get { return defaults.string(forKey: Keys.theme)
-            .flatMap { ThemeType(rawValue: $0) } ?? .system
-        }
-        set {
-            defaults.set(newValue.rawValue, forKey: Keys.theme)
-            ThemeSwitcher.switchTheme()
-        }
     }
 
     var safariReaderMode: Bool {

@@ -17,22 +17,26 @@ class AuthenticationBulletinPage: BLTNPageItem {
     }
 
     override func makeViewsUnderDescription(with interfaceBuilder: BLTNInterfaceBuilder) -> [UIView]? {
-        let theme = AppThemeProvider.shared.currentTheme
-
-        let usernameTextField = textField(with: theme)
+        let usernameTextField = textField(with: AppTheme.default)
         usernameTextField.delegate = self
         usernameTextField.textContentType = .username
         usernameTextField.autocorrectionType = .no
         usernameTextField.autocapitalizationType = .none
         usernameTextField.returnKeyType = .next
-        usernameTextField.attributedPlaceholder = themedAttributedString(for: "Username", color: theme.lightTextColor)
+        usernameTextField.attributedPlaceholder = themedAttributedString(
+            for: "Username",
+            color: AppTheme.default.lightTextColor
+        )
 
-        let passwordTextField = textField(with: theme)
+        let passwordTextField = textField(with: AppTheme.default)
         passwordTextField.delegate = self
         passwordTextField.isSecureTextEntry = true
         passwordTextField.textContentType = .password
         passwordTextField.returnKeyType = .done
-        passwordTextField.attributedPlaceholder = themedAttributedString(for: "Password", color: theme.lightTextColor)
+        passwordTextField.attributedPlaceholder = themedAttributedString(
+            for: "Password",
+            color: AppTheme.default.lightTextColor
+        )
 
         self.usernameTextField = usernameTextField
         self.passwordTextField = passwordTextField

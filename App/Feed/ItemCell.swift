@@ -1,27 +1,67 @@
 //
-//  PostTitleView.swift
+//  ItemCell.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on 12/07/2015.
-//  Copyright © 2015 Weiran Zhang. All rights reserved.
+//  Created by Weiran Zhang on 10/04/2021.
+//  Copyright © 2021 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
+import Nuke
 
-class PostTitleView: UIView, UIGestureRecognizerDelegate {
-    @IBOutlet var titleLabel: UILabel!
-    @IBOutlet var metadataLabel: UILabel!
+class ItemCell: UICollectionViewListCell {
+    @IBOutlet weak var thumbnailImageView: ThumbnailImageView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var metadataLabel: UILabel!
 
-    var isTitleTapEnabled = false
+    var post: Post?
+    var linkPressedHandler: ((Post) -> Void)?
+    private var thumbnailGestureRecognizer: UITapGestureRecognizer?
 
-    var post: Post? {
+    override var isSelected: Bool {
         didSet {
-            guard let post = post else { return }
-            titleLabel.text = post.title
-            metadataLabel.attributedText = metadataText(for: post)
+            contentView.backgroundColor = isSelected ?
+                AppTheme.default.cellHighlightColor : AppTheme.default.backgroundColor
         }
     }
 
+    func apply(post: Post) {
+        self.post = post
+
+        titleLabel.text = post.title
+        metadataLabel.attributedText = metadataText(for: post)
+
+        setupThumbnailGesture()
+    }
+
+    func setupThumbnail(with url: URL?) {
+        _ = thumbnailImageView.setImageWithPlaceholder(url: url)
+    }
+}
+
+extension ItemCell {
+    private func setupThumbnailGesture() {
+        if thumbnailGestureRecognizer == nil {
+            let thumbnailGestureRecognizer = UITapGestureRecognizer(
+                target: self,
+                action: #selector(didTapThumbnail(_:))
+            )
+            thumbnailGestureRecognizer.cancelsTouchesInView = true
+            thumbnailImageView.addGestureRecognizer(thumbnailGestureRecognizer)
+
+            self.thumbnailGestureRecognizer = thumbnailGestureRecognizer
+        }
+    }
+
+    @objc private func didTapThumbnail(_ sender: Any) {
+        if let linkPressedHandler = linkPressedHandler,
+           let post = post {
+            linkPressedHandler(post)
+        }
+    }
+}
+
+extension ItemCell {
     private func domainLabelText(for post: Post) -> String {
         guard
             let urlComponents = URLComponents(url: post.url, resolvingAgainstBaseURL: false),

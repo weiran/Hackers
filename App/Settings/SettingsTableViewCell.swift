@@ -10,19 +10,4 @@ import UIKit
 
 class SettingsTableViewCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        setupTheming()
-    }
-}
-
-extension SettingsTableViewCell: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        titleLabel?.textColor = theme.titleTextColor
-        textLabel?.textColor = theme.titleTextColor
-        detailTextLabel?.textColor = theme.textColor
-        backgroundColor = theme.groupedTableViewCellBackgroundColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
-    }
 }

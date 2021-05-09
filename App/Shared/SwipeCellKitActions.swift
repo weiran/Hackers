@@ -10,7 +10,7 @@ import UIKit
 import SwipeCellKit
 import Loaf
 
-class SwipeCellKitActions: Themed {
+class SwipeCellKitActions {
     private let authenticationUIService: AuthenticationUIService
 
     init(authenticationUIService: AuthenticationUIService) {
@@ -56,7 +56,7 @@ class SwipeCellKitActions: Themed {
                     .catch(errorHandler)
             }
         }
-        upvoteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
+        upvoteAction.backgroundColor = AppTheme.default.upvotedColor
         upvoteAction.textColor = .white
 
         let iconImage = UIImage(named: "PointsIcon")!.withTintColor(.white)
@@ -75,7 +75,7 @@ class SwipeCellKitActions: Themed {
         let voteOnComment: (Comment, Bool) -> Void = { comment, isUpvote in
             guard let cell = tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
             comment.upvoted = isUpvote
-            cell.updateCommentContent(with: comment, theme: self.themeProvider.currentTheme)
+            cell.updateCommentContent(with: comment)
         }
 
         let errorHandler: (Error) -> Void = { error in
@@ -104,7 +104,7 @@ class SwipeCellKitActions: Themed {
                     .catch(errorHandler)
             }
         }
-        voteAction.backgroundColor = themeProvider.currentTheme.upvotedColor
+        voteAction.backgroundColor = AppTheme.default.upvotedColor
         voteAction.textColor = .white
 
         let iconImage = UIImage(named: "PointsIcon")!.withTintColor(.white)
@@ -112,8 +112,4 @@ class SwipeCellKitActions: Themed {
 
         return [voteAction]
     }
-}
-
-extension SwipeCellKitActions {
-    func applyTheme(_ theme: AppTheme) {}
 }

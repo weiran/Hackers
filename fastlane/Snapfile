@@ -1,16 +1,10 @@
-# Uncomment the lines below you want to change by removing the # in the beginning
-
 # A list of devices you want to take the screenshots from
 devices([
   "iPhone SE (2nd generation)",
-  "iPhone 8 Plus",
-  "iPhone 11 Pro",
-  "iPhone 11 Pro Max",
-  "iPhone 11",
-  "iPad Pro (9.7-inch)",
-  "iPad Air (3rd generation)",
+  "iPhone 12 Pro"
+  "iPhone 12 Pro Max",
+  "iPad (8th generation)",
   "iPad Pro (11-inch) (2nd generation)",
-  "iPad Pro (12.9-inch) (2nd generation)",
   "iPad Pro (12.9-inch) (4th generation)"
 ])
 
@@ -20,7 +14,7 @@ scheme("Hackers")
 # Where should the resulting screenshots be stored?
 output_directory("./fastlane/screenshots")
 
-# remove the '#' to clear all previously generated screenshots before creating new ones
+# clear all previously generated screenshots before creating new ones
 # clear_previous_screenshots(true)
 
 # workspace "../Hackers.xcworkspace"

@@ -11,6 +11,9 @@ import WhatsNewKit
 
 enum OnboardingService {
     static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
+        // disable onbording
+        return nil
+
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
@@ -39,14 +42,11 @@ enum OnboardingService {
             )
         }
 
-        let theme = AppThemeProvider.shared.currentTheme
-        viewController?.overrideUserInterfaceStyle = theme.userInterfaceStyle
-
         return viewController
     }
 
     private static func configuration() -> WhatsNewViewController.Configuration {
-        let appTheme = AppThemeProvider.shared.currentTheme
+        let appTheme = AppTheme.default
         let theme = WhatsNewViewController.Theme { theme in
             theme.backgroundColor = appTheme.backgroundColor
             theme.titleView.titleColor = appTheme.titleTextColor

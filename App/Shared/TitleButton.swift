@@ -14,7 +14,6 @@ class TitleButton: UIButton {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        setupTheming()
         setupMenu()
     }
 
@@ -32,7 +31,7 @@ class TitleButton: UIButton {
             systemName: "chevron.down",
             withConfiguration: symbolConfig
         )?.withTintColor(
-            AppThemeProvider.shared.currentTheme.titleTextColor
+            AppTheme.default.titleTextColor
         ).withBaselineOffset(
             fromBottom: -UIFont.systemFontSize / 4
         )
@@ -66,11 +65,5 @@ class TitleButton: UIButton {
            let postType = PostType(rawValue: sender.identifier.rawValue) {
             handler(postType)
         }
-    }
-}
-
-extension TitleButton: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

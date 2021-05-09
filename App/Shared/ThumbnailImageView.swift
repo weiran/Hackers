@@ -38,7 +38,7 @@ class ThumbnailImageView: UIImageView {
     }
 
     private func getPlaceholderImage() -> UIImage {
-        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium, scale: .large)
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 36, weight: .medium, scale: .medium)
         return UIImage(systemName: "safari", withConfiguration: symbolConfiguration)!
     }
 

@@ -36,8 +36,6 @@ class CommentsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTheming()
-
         load()
     }
 
@@ -111,7 +109,7 @@ class CommentsViewController: UITableViewController {
         }
 
         let alertController = UIAlertController(
-            title: nil, message: nil, preferredStyle: .actionSheet, themed: true)
+            title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.popoverPresentationController?.barButtonItem = sender
 
         let postLinkAction = UIAlertAction(
@@ -202,7 +200,7 @@ extension CommentsViewController {
         ) as! CommentTableViewCell
 
         let isPostAuthor = comment.by == post?.by ?? ""
-        cell.updateCommentContent(with: comment, theme: themeProvider.currentTheme, isPostAuthor: isPostAuthor)
+        cell.updateCommentContent(with: comment, isPostAuthor: isPostAuthor)
         cell.commentDelegate = self
         cell.delegate = self
 
@@ -240,7 +238,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
             self.toggleCellVisibilityForCell(IndexPath(row: index, section: 1))
         }
-        collapseAction.backgroundColor = themeProvider.currentTheme.appTintColor
+        collapseAction.backgroundColor = AppTheme.default.appTintColor
         collapseAction.textColor = .white
 
         let iconImage = UIImage(named: "UpIcon")!.withTintColor(.white)
@@ -322,15 +320,6 @@ extension CommentsViewController: CommentDelegate {
         if scrollToCell && scrollIfCellCovered {
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
-    }
-}
-
-// MARK: - Themed
-extension CommentsViewController: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        view.backgroundColor = theme.backgroundColor
-        tableView.separatorColor = theme.separatorColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }
 

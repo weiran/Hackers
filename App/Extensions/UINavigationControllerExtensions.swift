@@ -8,23 +8,9 @@
 
 import UIKit
 
-extension UINavigationController: Themed {
+extension UINavigationController {
     override open func viewDidLoad() {
         super.viewDidLoad()
-        setupTheming()
         navigationBar.setValue(true, forKey: "hidesShadow")
-    }
-
-    func applyTheme(_ theme: AppTheme) {
-        navigationBar.tintColor = theme.appTintColor
-        let titleTextAttributes = [
-            NSAttributedString.Key.foregroundColor: theme.titleTextColor
-        ]
-        navigationBar.titleTextAttributes = titleTextAttributes
-        navigationBar.largeTitleTextAttributes = titleTextAttributes
-        DispatchQueue.main.async {
-            self.setNeedsStatusBarAppearanceUpdate()
-        }
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
     }
 }

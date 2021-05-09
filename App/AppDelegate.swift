@@ -30,7 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             identifier: "MainSplitViewController"
         ) as MainSplitViewController
         window?.rootViewController = mainSplitViewController
+        window?.tintColor = AppTheme.default.appTintColor
         window?.makeKeyAndVisible()
+
+        if ProcessInfo.processInfo.arguments.contains("darkMode") {
+            window?.overrideUserInterfaceStyle = .dark
+        }
 
         // setup NavigationService
         navigationService = SwinjectStoryboard.getService()
@@ -42,9 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // init default settings
         UserDefaults.standard.registerDefaults()
-
-        // setup theming
-        ThemeSwitcher.switchTheme()
     }
 
     func application(
@@ -77,12 +79,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             parameters[$0.name] = $0.value
         }
         return parameters
-    }
-
-    func applicationDidBecomeActive(_ application: UIApplication) {
-        // Update the theme every time the app is active in case the system
-        // appearance has changed. We're not using traitCollectionDidChange
-        // as it doesn't get called reliably on an appearance change (iOS 13.4.1)
-        ThemeSwitcher.switchTheme()
     }
 }

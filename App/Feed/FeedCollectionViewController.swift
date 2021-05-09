@@ -19,18 +19,22 @@ class FeedCollectionViewController: UIViewController {
     private lazy var dataSource = makeDataSource()
     private lazy var viewModel = FeedViewModel()
 
+    private var refreshToken: NotificationToken?
+    private let cellIdentifier = "ItemCell"
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupCollectionView()
         setupTitle()
+        setupNotificationCenter()
+        showOnboarding()
 
         fetchFeed()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         smoothlyDeselectItems(collectionView)
     }
 
@@ -70,16 +74,29 @@ class FeedCollectionViewController: UIViewController {
     @objc private func fetchFeedNextPage() {
         fetchFeed(fetchNextPage: true)
     }
-}
 
-extension FeedCollectionViewController: Themed {
-    func applyTheme(_ theme: AppTheme) { }
+    private func setupNotificationCenter() {
+        refreshToken = NotificationCenter.default.observe(
+            name: Notification.Name.refreshRequired,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.fetchFeedWithReset()
+        }
+    }
+
+    private func showOnboarding() {
+        if let onboardingVC = OnboardingService.onboardingViewController() {
+            present(onboardingVC, animated: true)
+        }
+    }
 }
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
     private func setupCollectionView() {
         var config = UICollectionLayoutListConfiguration(appearance: .plain)
         config.leadingSwipeActionsConfigurationProvider = voteSwipeActionConfiguration(indexPath:)
+        config.showsSeparators = false
 
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(
@@ -91,28 +108,30 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
 
         collectionView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
 
+        collectionView.register(
+            UINib(nibName: cellIdentifier, bundle: nil),
+            forCellWithReuseIdentifier: cellIdentifier
+        )
+
         let layout = UICollectionViewCompositionalLayout.list(using: config)
         collectionView.setCollectionViewLayout(layout, animated: false)
         collectionView.dataSource = dataSource
     }
 
     private func makeDataSource() -> UICollectionViewDiffableDataSource<FeedViewModel.Section, Post> {
-        let reuseIdentifier = "FeedItemCell"
-
         return UICollectionViewDiffableDataSource(
             collectionView: collectionView
         ) { (collectionView, indexPath, post) in
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: reuseIdentifier,
+                withReuseIdentifier: self.cellIdentifier,
                 for: indexPath
-            ) as? FeedItemCell else {
-                fatalError("Couldn't dequeue cell \(reuseIdentifier)")
+            ) as? ItemCell else {
+                fatalError("Couldn't dequeue cell \(self.cellIdentifier)")
             }
 
-            cell.setPost(post: post)
-            cell.setImageWithPlaceholder(
-                url: UserDefaults.standard.showThumbnails ? post.url : nil
-            )
+            cell.apply(post: post)
+            cell.setupThumbnail(with: UserDefaults.standard.showThumbnails ? post.url : nil)
+
             cell.linkPressedHandler = { post in
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
@@ -120,10 +139,6 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                     }
                 }
             }
-
-            // Fix for incorrectly sized cells on initial load
-            // https://stackoverflow.com/questions/32593117/uicollectionviewcell-content-wrong-size-on-first-load
-            cell.layoutIfNeeded()
 
             return cell
         }
@@ -227,18 +242,22 @@ extension FeedCollectionViewController {
 
         let voteAction = UIContextualAction(
             style: .normal,
-            title: "Upvote",
+            title: nil,
             handler: { _, _, completion in
                 self.vote(on: post)
                 completion(true)
             }
         )
 
-        voteAction.image = UIImage(
-            systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up"
-        )
+        if post.upvoted {
+            // unvote
+            voteAction.image = UIImage(systemName: "arrow.uturn.down")
+        } else {
+            voteAction.image = UIImage(systemName: "arrow.up")
+        }
+
         if !post.upvoted {
-            voteAction.backgroundColor = self.themeProvider.currentTheme.upvotedColor
+            voteAction.backgroundColor = AppTheme.default.upvotedColor
         }
 
         return UISwipeActionsConfiguration(actions: [voteAction])
@@ -263,8 +282,8 @@ extension FeedCollectionViewController {
         post.score += isUpvote ? 1 : -1
 
         if let index = viewModel.posts.firstIndex(of: post),
-           let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? FeedItemCell {
-            cell.postTitleView.post = post
+           let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? ItemCell {
+            cell.apply(post: post)
         }
     }
 

@@ -37,22 +37,6 @@ protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
 
-// Theming
-extension SFSafariViewController: Themed {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        setupTheming()
-    }
-
-    func applyTheme(_ theme: AppTheme) {
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
-        preferredControlTintColor = theme.appTintColor
-        preferredBarTintColor = theme.backgroundColor
-        view.backgroundColor = theme.backgroundColor
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
-    }
-}
-
 extension SFSafariViewController {
     static func instance(
         for url: URL,

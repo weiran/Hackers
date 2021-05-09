@@ -30,11 +30,14 @@ class CommentTableViewCell: SwipeTableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        setupTheming()
-        contentView.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                                action: #selector(CommentTableViewCell.cellTapped)))
+        contentView.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(CommentTableViewCell.cellTapped)
+            )
+        )
         upvoteIconImageView?.image = UIImage(named: "PointsIcon")?
-            .withTintColor(themeProvider.currentTheme.upvotedColor)
+            .withTintColor(AppTheme.default.upvotedColor)
     }
 
     @objc private func cellTapped() {
@@ -48,7 +51,7 @@ class CommentTableViewCell: SwipeTableViewCell {
         leftPaddingConstraint.constant = padding
     }
 
-    func updateCommentContent(with comment: Comment, theme: AppTheme, isPostAuthor: Bool? = nil) {
+    func updateCommentContent(with comment: Comment, isPostAuthor: Bool? = nil) {
         self.comment = comment
 
         let isCollapsed = comment.visibility != .visible
@@ -61,7 +64,7 @@ class CommentTableViewCell: SwipeTableViewCell {
 
         if let isPostAuthor = isPostAuthor {
             self.isPostAuthor = isPostAuthor
-            self.applyAuthorLabelTheme(theme)
+            self.applyAuthorLabelTheme()
         }
 
         if let commentTextView = commentTextView, comment.visibility == .visible {
@@ -74,7 +77,7 @@ class CommentTableViewCell: SwipeTableViewCell {
                                                  value: commentFont,
                                                  range: commentRange)
             commentAttributedString.addAttribute(NSAttributedString.Key.foregroundColor,
-                                                 value: theme.textColor,
+                                                 value: AppTheme.default.textColor,
                                                  range: commentRange)
 
             commentTextView.attributedText = commentAttributedString
@@ -144,36 +147,15 @@ extension CommentTableViewCell {
     }
 
     private func setSelectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.cellHighlightColor
+        backgroundColor = AppTheme.default.cellHighlightColor
     }
 
     private func setUnselectedBackground() {
-        backgroundColor = AppThemeProvider.shared.currentTheme.backgroundColor
-    }
-}
-
-extension CommentTableViewCell: Themed {
-    func applyTheme(_ theme: AppTheme) {
-        backgroundColor = theme.backgroundColor
-        if commentTextView != nil {
-            commentTextView.tintColor = theme.appTintColor
-        }
-        if authorLabel != nil {
-            authorLabel.textColor = theme.titleTextColor
-        }
-        if datePostedLabel != nil {
-            datePostedLabel.textColor = theme.lightTextColor
-        }
-        if separatorView != nil {
-            separatorView.backgroundColor = theme.separatorColor
-        }
-        if let comment = self.comment {
-            updateCommentContent(with: comment, theme: theme)
-        }
-        overrideUserInterfaceStyle = theme.userInterfaceStyle
+        backgroundColor = AppTheme.default.backgroundColor
     }
 
-    private func applyAuthorLabelTheme(_ theme: AppTheme) {
-        authorLabel.textColor = self.isPostAuthor ? theme.appTintColor : theme.titleTextColor
+    private func applyAuthorLabelTheme() {
+        authorLabel.textColor = self.isPostAuthor ? AppTheme.default.appTintColor : AppTheme.default.titleTextColor
     }
+
 }
