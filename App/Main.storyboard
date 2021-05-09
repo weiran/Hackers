@@ -109,7 +109,7 @@
                                                             </subviews>
                                                         </stackView>
                                                     </subviews>
-                                                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="bottom" secondItem="siM-Zi-8Sk" secondAttribute="bottom" id="IfM-6g-Qkh"/>
                                                         <constraint firstItem="siM-Zi-8Sk" firstAttribute="top" secondItem="fFz-HF-Y5S" secondAttribute="top" id="hqz-Uy-Fb7"/>
@@ -617,7 +617,6 @@
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="Cqb-Ra-RJu">
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="tintColor" red="0.31631141899999998" green="0.0" blue="0.89039719100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </toolbar>
                     <connections>
                         <segue destination="evu-Yh-MGy" kind="relationship" relationship="rootViewController" id="3AD-rl-MDq"/>
