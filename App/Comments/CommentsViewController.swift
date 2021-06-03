@@ -215,6 +215,11 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                    editActionsForRowAt indexPath: IndexPath,
                    for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard let post = self.post else { return nil }
+
+        if !UserDefaults.standard.swipeActionsEnabled {
+            return nil
+        }
+
         switch (orientation, indexPath.section) {
         case (.left, 0):
             return swipeCellKitActions?.voteAction(post: post, tableView: tableView,

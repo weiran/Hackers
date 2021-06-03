@@ -26,6 +26,7 @@ class FeedCollectionViewController: UIViewController {
         super.viewDidLoad()
 
         setupCollectionView()
+        setupCollectionViewListConfiguration()
         setupTitle()
         setupNotificationCenter()
         showOnboarding()
@@ -67,6 +68,7 @@ class FeedCollectionViewController: UIViewController {
     }
 
     @objc private func fetchFeedWithReset() {
+        setupCollectionViewListConfiguration()
         viewModel.reset()
         fetchFeed()
     }
@@ -93,11 +95,21 @@ class FeedCollectionViewController: UIViewController {
 }
 
 extension FeedCollectionViewController: UICollectionViewDelegate {
-    private func setupCollectionView() {
+
+    private func setupCollectionViewListConfiguration() {
         var config = UICollectionLayoutListConfiguration(appearance: .plain)
-        config.leadingSwipeActionsConfigurationProvider = voteSwipeActionConfiguration(indexPath:)
+
+        if UserDefaults.standard.swipeActionsEnabled {
+            config.leadingSwipeActionsConfigurationProvider = voteSwipeActionConfiguration(indexPath:)
+        }
+
         config.showsSeparators = false
 
+        let layout = UICollectionViewCompositionalLayout.list(using: config)
+        collectionView.setCollectionViewLayout(layout, animated: false)
+    }
+
+    private func setupCollectionView() {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(
             self,
@@ -113,8 +125,6 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             forCellWithReuseIdentifier: cellIdentifier
         )
 
-        let layout = UICollectionViewCompositionalLayout.list(using: config)
-        collectionView.setCollectionViewLayout(layout, animated: false)
         collectionView.dataSource = dataSource
     }
 

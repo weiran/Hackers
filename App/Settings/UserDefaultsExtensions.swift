@@ -45,6 +45,15 @@ extension UserDefaults {
         set(enabled, forKey: UserDefaultsKeys.safariReaderMode.rawValue)
     }
 
+    var swipeActionsEnabled: Bool {
+        let swipeActionsSetting = bool(forKey: UserDefaultsKeys.swipeActions.rawValue)
+        return swipeActionsSetting
+    }
+
+    func setSwipeActions(_ enabled: Bool) {
+        set(enabled, forKey: UserDefaultsKeys.swipeActions.rawValue)
+    }
+
     var openInDefaultBrowser: Bool {
         let openInDefaultBrowser = bool(forKey: UserDefaultsKeys.openInDefaultBrowser.rawValue)
         return openInDefaultBrowser
@@ -59,6 +68,7 @@ extension UserDefaults {
             UserDefaultsKeys.theme.rawValue: "light",
             UserDefaultsKeys.systemTheme.rawValue: true,
             UserDefaultsKeys.showThumbnails.rawValue: true,
+            UserDefaultsKeys.swipeActions.rawValue: true,
             UserDefaultsKeys.safariReaderMode.rawValue: false,
             UserDefaultsKeys.openInDefaultBrowser.rawValue: false
         ])
@@ -71,4 +81,5 @@ enum UserDefaultsKeys: String {
     case safariReaderMode
     case openInDefaultBrowser
     case showThumbnails
+    case swipeActions
 }
