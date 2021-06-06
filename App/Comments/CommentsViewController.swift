@@ -209,6 +209,124 @@ extension CommentsViewController {
     // swiftlint:enable force_cast
 }
 
+// long taps
+extension CommentsViewController {
+    override func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let comment = comments?[indexPath.row], let post = post else { return nil }
+        let actionOnPost = indexPath.section == 0
+        let upvoted = actionOnPost ? post.upvoted : comment.upvoted
+
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { _ in
+            let voteAction: () -> Void = {
+                if actionOnPost {
+                    self.vote(on: post, at: indexPath)
+                } else {
+                    self.vote(on: comment, for: post, at: indexPath)
+                }
+            }
+
+            let upvote = UIAction(
+                title: "Upvote",
+                image: UIImage(systemName: "arrow.up"),
+                identifier: UIAction.Identifier(rawValue: "upvote")
+            ) { _ in
+                voteAction()
+            }
+
+            let unvote = UIAction(
+                title: "Unvote",
+                image: UIImage(systemName: "arrow.uturn.down"),
+                identifier: UIAction.Identifier(rawValue: "unvote")
+            ) { _ in
+                voteAction()
+            }
+
+            let voteMenu = upvoted ? unvote : upvote
+            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu])
+        }
+    }
+
+    private func vote(on post: Post, at indexPath: IndexPath) {
+        let voteOnPost: (Post, Bool) -> Void = { post, isUpvote in
+            guard let cell = self.tableView.cellForRow(at: indexPath) as? PostCell else { return }
+            post.upvoted = isUpvote
+            post.score += isUpvote ? 1 : -1
+            cell.postTitleView.post = post
+        }
+
+        let errorHandler: (Error) -> Void = { error in
+            guard let error = error as? HackersKitError else { return }
+            switch error {
+            case .unauthenticated:
+                self.present(
+                    self.authenticationUIService!.unauthenticatedAlertController(),
+                    animated: true
+                )
+            default:
+                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            }
+
+            // revert to the previous post state
+            voteOnPost(post, !post.upvoted)
+        }
+
+        let upvoted = post.upvoted
+        voteOnPost(post, !post.upvoted)
+        if upvoted {
+            HackersKit.shared
+                .unvote(post: post)
+                .catch(errorHandler)
+        } else {
+            HackersKit.shared
+                .upvote(post: post)
+                .catch(errorHandler)
+        }
+    }
+
+    private func vote(on comment: Comment, for post: Post, at indexPath: IndexPath) {
+        let voteOnComment: (Comment, Bool) -> Void = { comment, isUpvote in
+            guard let cell = self.tableView.cellForRow(at: indexPath) as? CommentTableViewCell else { return }
+            comment.upvoted = isUpvote
+            cell.updateCommentContent(with: comment)
+        }
+
+        let errorHandler: (Error) -> Void = { error in
+            guard let error = error as? HackersKitError else { return }
+            switch error {
+            case .unauthenticated:
+                self.present(
+                    self.authenticationUIService!.unauthenticatedAlertController(),
+                    animated: true
+                )
+            default:
+                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            }
+
+            // revert to the previous post state
+            voteOnComment(comment, !comment.upvoted)
+        }
+
+        let upvoted = comment.upvoted
+        voteOnComment(comment, !comment.upvoted)
+        if upvoted {
+            HackersKit.shared
+                .unvote(comment: comment, for: post)
+                .catch(errorHandler)
+        } else {
+            HackersKit.shared
+                .upvote(comment: comment, for: post)
+                .catch(errorHandler)
+        }
+    }
+}
+
 // MARK: - SwipeTableViewCellDelegate
 extension CommentsViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView,
@@ -222,16 +340,25 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
         switch (orientation, indexPath.section) {
         case (.left, 0):
-            return swipeCellKitActions?.voteAction(post: post, tableView: tableView,
-                                                   indexPath: indexPath, viewController: self)
+            return swipeCellKitActions?.voteAction(
+                post: post,
+                tableView: tableView,
+                indexPath: indexPath,
+                viewController: self
+            )
 
         case (.right, 1):
             return collapseAction()
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
-            return swipeCellKitActions?.voteAction(comment: comment, post: post, tableView: tableView,
-                                                   indexPath: indexPath, viewController: self)
+            return swipeCellKitActions?.voteAction(
+                comment: comment,
+                post: post,
+                tableView: tableView,
+                indexPath: indexPath,
+                viewController: self
+            )
 
         default: return nil
         }
