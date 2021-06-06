@@ -11,9 +11,6 @@ import WhatsNewKit
 
 enum OnboardingService {
     static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
-        // disable onbording
-        return nil
-
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
@@ -62,9 +59,9 @@ enum OnboardingService {
 
     private static func items() -> [WhatsNew.Item] {
         let defaultBrowserItem = WhatsNew.Item(
-            title: "Show HN",
-            subtitle: "Added Show HN to the categories list. Thanks @anosidium!",
-            image: UIImage(systemName: "eye")
+            title: "Disable swipe gestures",
+            subtitle: "Added a setting to disable all swipe gestures, you can long tap for a menu instead. Thanks to @ballwood for the contribution.",
+            image: UIImage(systemName: "hand.draw.fill")
         )
         return [defaultBrowserItem]
     }
