@@ -109,7 +109,6 @@
                                                             </subviews>
                                                         </stackView>
                                                     </subviews>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="bottom" secondItem="siM-Zi-8Sk" secondAttribute="bottom" id="IfM-6g-Qkh"/>
                                                         <constraint firstItem="siM-Zi-8Sk" firstAttribute="top" secondItem="fFz-HF-Y5S" secondAttribute="top" id="hqz-Uy-Fb7"/>
@@ -720,7 +719,7 @@
         <image name="LaunchIcon" width="128" height="128"/>
         <image name="PointsIcon" width="14" height="14"/>
         <image name="gear" catalog="system" width="128" height="119"/>
-        <image name="safari" catalog="system" width="32" height="32"/>
+        <image name="safari" catalog="system" width="128" height="121"/>
         <namedColor name="groupedTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
