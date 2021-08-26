@@ -485,7 +485,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark theme" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zuq-Dh-6af" userLabel="Dark mode">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Theme" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zuq-Dh-6af" userLabel="Dark mode">
                                                     <rect key="frame" x="16" y="13.5" width="100" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="100" id="1Yp-kb-ODw"/>
@@ -495,7 +495,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="3Zj-xX-PqU">
-                                                    <rect key="frame" x="119" y="7" width="208" height="31"/>
+                                                    <rect key="frame" x="131" y="7" width="197" height="31"/>
                                                     <segments>
                                                         <segment title="System"/>
                                                         <segment title="Light"/>
@@ -507,11 +507,9 @@
                                                 </segmentedControl>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="3Zj-xX-PqU" secondAttribute="trailing" constant="15" id="08z-cq-Erf"/>
                                                 <constraint firstItem="zuq-Dh-6af" firstAttribute="centerY" secondItem="ToO-pc-tHX" secondAttribute="centerY" id="8wM-f0-CSv"/>
                                                 <constraint firstItem="3Zj-xX-PqU" firstAttribute="centerY" secondItem="zuq-Dh-6af" secondAttribute="centerY" id="G1E-Yh-IW2"/>
-                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="leading" secondItem="zuq-Dh-6af" secondAttribute="trailing" constant="3" id="agU-Ff-j8n"/>
-                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="trailing" secondItem="ToO-pc-tHX" secondAttribute="trailingMargin" id="dmn-Pz-LAv"/>
-                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="leading" secondItem="ToO-pc-tHX" secondAttribute="leading" constant="119" id="kDr-dV-LeD"/>
                                                 <constraint firstItem="3Zj-xX-PqU" firstAttribute="top" secondItem="ToO-pc-tHX" secondAttribute="topMargin" constant="-4" id="oGl-SD-hUn"/>
                                                 <constraint firstItem="zuq-Dh-6af" firstAttribute="leading" secondItem="ToO-pc-tHX" secondAttribute="leadingMargin" id="pSi-3j-Zod"/>
                                             </constraints>
