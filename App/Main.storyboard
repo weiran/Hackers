@@ -485,26 +485,34 @@
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="J2k-5M-t9S" userLabel="Dark Mode Switch">
-                                                    <rect key="frame" x="278" y="6.5" width="51" height="31"/>
-                                                    <connections>
-                                                        <action selector="toggleDarkMode:" destination="uZL-eS-tCe" eventType="valueChanged" id="h9s-a6-5oz"/>
-                                                    </connections>
-                                                </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark theme" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zuq-Dh-6af" userLabel="Dark mode">
-                                                    <rect key="frame" x="16" y="13.5" width="114" height="17"/>
+                                                    <rect key="frame" x="16" y="13.5" width="100" height="17"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="114" id="1Yp-kb-ODw"/>
+                                                        <constraint firstAttribute="width" constant="100" id="1Yp-kb-ODw"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="3Zj-xX-PqU">
+                                                    <rect key="frame" x="119" y="7" width="208" height="31"/>
+                                                    <segments>
+                                                        <segment title="System"/>
+                                                        <segment title="Light"/>
+                                                        <segment title="Dark"/>
+                                                    </segments>
+                                                    <connections>
+                                                        <action selector="toggleDarkMode:" destination="uZL-eS-tCe" eventType="valueChanged" id="jDv-qr-ehp"/>
+                                                    </connections>
+                                                </segmentedControl>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="J2k-5M-t9S" firstAttribute="centerY" secondItem="ToO-pc-tHX" secondAttribute="centerY" id="3xh-RU-afy"/>
                                                 <constraint firstItem="zuq-Dh-6af" firstAttribute="centerY" secondItem="ToO-pc-tHX" secondAttribute="centerY" id="8wM-f0-CSv"/>
-                                                <constraint firstAttribute="trailing" secondItem="J2k-5M-t9S" secondAttribute="trailing" constant="16" id="JlE-lZ-EEq" userLabel="trailing = Dark Mode Switch.trailing + 15"/>
+                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="centerY" secondItem="zuq-Dh-6af" secondAttribute="centerY" id="G1E-Yh-IW2"/>
+                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="leading" secondItem="zuq-Dh-6af" secondAttribute="trailing" constant="3" id="agU-Ff-j8n"/>
+                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="trailing" secondItem="ToO-pc-tHX" secondAttribute="trailingMargin" id="dmn-Pz-LAv"/>
+                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="leading" secondItem="ToO-pc-tHX" secondAttribute="leading" constant="119" id="kDr-dV-LeD"/>
+                                                <constraint firstItem="3Zj-xX-PqU" firstAttribute="top" secondItem="ToO-pc-tHX" secondAttribute="topMargin" constant="-4" id="oGl-SD-hUn"/>
                                                 <constraint firstItem="zuq-Dh-6af" firstAttribute="leading" secondItem="ToO-pc-tHX" secondAttribute="leadingMargin" id="pSi-3j-Zod"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -652,12 +660,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="accountLabel" destination="EN8-wt-Iug" id="dpg-ot-HmF"/>
-                        <outlet property="darkModeSwitch" destination="J2k-5M-t9S" id="urb-9z-3zh"/>
                         <outlet property="openInDefaultBrowserLabel" destination="wlj-6e-BYP" id="eel-LZ-2Jz"/>
                         <outlet property="openInDefaultBrowserSwitch" destination="g4G-LF-pRI" id="M9B-7A-i52"/>
                         <outlet property="safariReaderModeSwitch" destination="cmY-8P-GUK" id="6fh-TZ-GYa"/>
                         <outlet property="showThumbnailsSwitch" destination="5xy-Xy-ER7" id="DeA-4x-iv7"/>
                         <outlet property="swipeActionsSwitch" destination="VQH-5Z-1Ir" id="hl6-Y0-Z63"/>
+                        <outlet property="themeSegmentedControl" destination="3Zj-xX-PqU" id="4HW-G7-EGw"/>
                         <outlet property="usernameLabel" destination="PDK-aN-wRW" id="lDn-Zb-2N1"/>
                         <outlet property="versionLabel" destination="vai-hd-k76" id="t8A-MH-SCD"/>
                     </connections>

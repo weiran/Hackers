@@ -24,14 +24,20 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserLabel: UILabel!
     @IBOutlet weak var versionLabel: UILabel!
-    @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var themeSegmentedControl: UISegmentedControl!
     private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
-        darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
+        if UserDefaults.standard.systemThemeEnabled {
+            themeSegmentedControl.actionForSegment(at: 0)
+        } else if UserDefaults.standard.darkModeEnabled {
+            themeSegmentedControl.actionForSegment(at: 2)
+        } else {
+            themeSegmentedControl.actionForSegment(at: 1)
+        }
         swipeActionsSwitch.isOn = UserDefaults.standard.swipeActionsEnabled
         updateOpenInDefaultBrowser()
         updateUsername()
@@ -61,16 +67,23 @@ class SettingsViewController: UITableViewController {
         openInDefaultBrowserLabel.isEnabled = !UserDefaults.standard.openInDefaultBrowser
     }
 
-    @IBAction func toggleDarkMode(_ sender: UISwitch) {
-        UserDefaults.standard.setDarkMode(sender.isOn)
-        if sender.isOn {
-            UIApplication.shared.windows.forEach { window in
-                window.overrideUserInterfaceStyle = .dark
-            }
-        } else {
+    @IBAction func toggleDarkMode(_ sender: UISegmentedControl) {
+        switch sender.selectedSegmentIndex {
+        case 0:
+            UserDefaults.standard.setSystemTheme(true)
+            break;
+        case 1:
+            UserDefaults.standard.setDarkMode(false)
             UIApplication.shared.windows.forEach { window in
                 window.overrideUserInterfaceStyle = .light
             }
+            break;
+        default:
+            UserDefaults.standard.setDarkMode(true)
+            UIApplication.shared.windows.forEach { window in
+                window.overrideUserInterfaceStyle = .dark
+            }
+            break;
         }
     }
 
