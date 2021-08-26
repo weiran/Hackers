@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol CommentDelegate: class {
+protocol CommentDelegate: AnyObject {
     func commentTapped(_ sender: UITableViewCell)
     func linkTapped(_ url: URL, sender: UITextView)
     func internalLinkTapped(postId: Int, url: URL, sender: UITextView)

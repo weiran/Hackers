@@ -206,7 +206,7 @@ extension HNScraperShim { // authentication
     }
 }
 
-protocol HNScraperShimAuthenticationDelegate: class {
+protocol HNScraperShimAuthenticationDelegate: AnyObject {
     func didAuthenticate(user: User, cookie: HTTPCookie)
 }
 
