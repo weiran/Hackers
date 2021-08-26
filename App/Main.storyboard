@@ -327,7 +327,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="HBZ-Wx-9of">
-                            <rect key="frame" x="0.0" y="651" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="695" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version 3.0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vai-hd-k76">
@@ -478,8 +478,39 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Interface" id="gib-U9-aJ3" userLabel="Feed">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="XYf-0N-FG9" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="euz-uI-cfQ" userLabel="Settings Table View Cell" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
                                         <rect key="frame" x="16" y="407" width="343" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="euz-uI-cfQ" id="ToO-pc-tHX">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="J2k-5M-t9S" userLabel="Dark Mode Switch">
+                                                    <rect key="frame" x="278" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="toggleDarkMode:" destination="uZL-eS-tCe" eventType="valueChanged" id="h9s-a6-5oz"/>
+                                                    </connections>
+                                                </switch>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dark theme" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zuq-Dh-6af" userLabel="Dark mode">
+                                                    <rect key="frame" x="16" y="13.5" width="114" height="17"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="114" id="1Yp-kb-ODw"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="J2k-5M-t9S" firstAttribute="centerY" secondItem="ToO-pc-tHX" secondAttribute="centerY" id="3xh-RU-afy"/>
+                                                <constraint firstItem="zuq-Dh-6af" firstAttribute="centerY" secondItem="ToO-pc-tHX" secondAttribute="centerY" id="8wM-f0-CSv"/>
+                                                <constraint firstAttribute="trailing" secondItem="J2k-5M-t9S" secondAttribute="trailing" constant="16" id="JlE-lZ-EEq" userLabel="trailing = Dark Mode Switch.trailing + 15"/>
+                                                <constraint firstItem="zuq-Dh-6af" firstAttribute="leading" secondItem="ToO-pc-tHX" secondAttribute="leadingMargin" id="pSi-3j-Zod"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="XYf-0N-FG9" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="451" width="343" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="XYf-0N-FG9" id="QjQ-cP-q8a">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
@@ -511,7 +542,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="ila-G7-nJ9" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="451" width="343" height="44"/>
+                                        <rect key="frame" x="16" y="495" width="343" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ila-G7-nJ9" id="pfP-AY-HJQ">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
@@ -544,7 +575,7 @@
                             <tableViewSection headerTitle="Reading" id="1AH-ih-fLT">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="by2-0S-CnW" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="545" width="343" height="44"/>
+                                        <rect key="frame" x="16" y="589" width="343" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="by2-0S-CnW" id="l0C-ZL-f1a">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
@@ -573,7 +604,7 @@
                                         <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="SLb-pc-dXs" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="589" width="343" height="44"/>
+                                        <rect key="frame" x="16" y="633" width="343" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SLb-pc-dXs" id="6r6-dg-b6u">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
@@ -621,6 +652,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="accountLabel" destination="EN8-wt-Iug" id="dpg-ot-HmF"/>
+                        <outlet property="darkModeSwitch" destination="J2k-5M-t9S" id="urb-9z-3zh"/>
                         <outlet property="openInDefaultBrowserLabel" destination="wlj-6e-BYP" id="eel-LZ-2Jz"/>
                         <outlet property="openInDefaultBrowserSwitch" destination="g4G-LF-pRI" id="M9B-7A-i52"/>
                         <outlet property="safariReaderModeSwitch" destination="cmY-8P-GUK" id="6fh-TZ-GYa"/>

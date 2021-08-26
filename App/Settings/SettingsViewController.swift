@@ -24,13 +24,14 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserLabel: UILabel!
     @IBOutlet weak var versionLabel: UILabel!
-
+    @IBOutlet weak var darkModeSwitch: UISwitch!
     private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
+        darkModeSwitch.isOn = UserDefaults.standard.darkModeEnabled
         swipeActionsSwitch.isOn = UserDefaults.standard.swipeActionsEnabled
         updateOpenInDefaultBrowser()
         updateUsername()
@@ -58,6 +59,19 @@ class SettingsViewController: UITableViewController {
         openInDefaultBrowserSwitch.isOn = UserDefaults.standard.openInDefaultBrowser
         safariReaderModeSwitch.isEnabled = !UserDefaults.standard.openInDefaultBrowser
         openInDefaultBrowserLabel.isEnabled = !UserDefaults.standard.openInDefaultBrowser
+    }
+
+    @IBAction func toggleDarkMode(_ sender: UISwitch) {
+        UserDefaults.standard.setDarkMode(sender.isOn)
+        if sender.isOn {
+            UIApplication.shared.windows.forEach { window in
+                window.overrideUserInterfaceStyle = .dark
+            }
+        } else {
+            UIApplication.shared.windows.forEach { window in
+                window.overrideUserInterfaceStyle = .light
+            }
+        }
     }
 
     @IBAction func showThumbnailsValueChanged(_ sender: UISwitch) {
