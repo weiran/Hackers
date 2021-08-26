@@ -66,24 +66,27 @@ class SettingsViewController: UITableViewController {
         safariReaderModeSwitch.isEnabled = !UserDefaults.standard.openInDefaultBrowser
         openInDefaultBrowserLabel.isEnabled = !UserDefaults.standard.openInDefaultBrowser
     }
+    
+    private func overrideUserInterfaceStyle(with style: UIUserInterfaceStyle) {
+        UIApplication.shared.windows.forEach { window in
+            window.overrideUserInterfaceStyle = style
+        }
+    }
 
     @IBAction func toggleDarkMode(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0:
             UserDefaults.standard.setSystemTheme(true)
-            break;
-        case 1:
             UserDefaults.standard.setDarkMode(false)
-            UIApplication.shared.windows.forEach { window in
-                window.overrideUserInterfaceStyle = .light
-            }
-            break;
+            overrideUserInterfaceStyle(with: .unspecified)
+        case 1:
+            UserDefaults.standard.setSystemTheme(false)
+            UserDefaults.standard.setDarkMode(false)
+            overrideUserInterfaceStyle(with: .light)
         default:
+            UserDefaults.standard.setSystemTheme(false)
             UserDefaults.standard.setDarkMode(true)
-            UIApplication.shared.windows.forEach { window in
-                window.overrideUserInterfaceStyle = .dark
-            }
-            break;
+            overrideUserInterfaceStyle(with: .dark)
         }
     }
 
