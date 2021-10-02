@@ -60,7 +60,11 @@ enum OnboardingService {
     private static func items() -> [WhatsNew.Item] {
         let defaultBrowserItem = WhatsNew.Item(
             title: "Disable swipe gestures",
-            subtitle: "Added a setting to disable all swipe gestures, you can long tap for a menu instead. Thanks to @ballwood for the contribution.",
+            subtitle:
+                """
+                Added a setting to disable all swipe gestures, you can long tap for a menu instead.
+                Thanks to @ballwood for the contribution.
+                """,
             image: UIImage(systemName: "hand.draw.fill")
         )
         return [defaultBrowserItem]
