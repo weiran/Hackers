@@ -25,7 +25,7 @@ enum HtmlParser {
                     return nil
                 }
                 let postElements = Elements([titleElement, metadataElement])
-                return try? self.post(from: postElements, type: type)
+                return try self.post(from: postElements, type: type)
             }
             return posts
         }
@@ -42,8 +42,8 @@ enum HtmlParser {
         guard let id = Int(try postElement.attr("id")) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
         }
-        let title = try postElement.select(".storylink").text()
-        let urlString = try postElement.select(".storylink").attr("href")
+        let urlString = try postElement.select(".titlelink").attr("href")
+        let title = try postElement.select(".titlelink").text()
         guard let url = URL(string: urlString) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
         }
