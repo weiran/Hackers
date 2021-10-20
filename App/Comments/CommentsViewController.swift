@@ -348,7 +348,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             )
 
         case (.right, 1):
-            return collapseAction()
+            return [collapseAction(), shareAction()]
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
@@ -364,7 +364,31 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         }
     }
 
-    private func collapseAction() -> [SwipeAction] {
+    private func shareAction() -> SwipeAction {
+        let shareAction = SwipeAction(style: .default, title: "Share") { [weak self] _, indexPath in
+            guard let strongSelf = self else {
+                return
+            }
+            let comment = strongSelf.commentsController.visibleComments[indexPath.row]
+            let url = comment.hackerNewsURL
+            let activityViewController = UIActivityViewController(
+                activityItems: [url],
+                applicationActivities: nil
+            )
+            let cell = strongSelf.tableView.cellForRow(at: indexPath)
+            activityViewController.popoverPresentationController?.sourceView = cell
+            strongSelf.present(activityViewController, animated: true, completion: nil)
+        }
+        shareAction.backgroundColor = .systemGreen
+        shareAction.textColor = .white
+
+        let iconImage = UIImage(systemName: "square.and.arrow.up")!.withTintColor(.white)
+        shareAction.image = iconImage
+
+        return shareAction
+    }
+
+    private func collapseAction() -> SwipeAction {
         let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
             let comment = self.commentsController.visibleComments[indexPath.row]
             guard let index = self.commentsController.indexOfVisibleRootComment(of: comment) else { return }
@@ -376,7 +400,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         let iconImage = UIImage(named: "UpIcon")!.withTintColor(.white)
         collapseAction.image = iconImage
 
-        return [collapseAction]
+        return collapseAction
     }
 
     func tableView(_ tableView: UITableView,
