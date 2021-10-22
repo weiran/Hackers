@@ -10,7 +10,7 @@ import XCTest
 import DeviceKit
 
 class HackersUITests: XCTestCase {
-    let commentCellName = "CommentCell"
+    let commentCellName = "OpenCommentCell"
 
     func launch(darkTheme: Bool = false) {
         let app = XCUIApplication()
