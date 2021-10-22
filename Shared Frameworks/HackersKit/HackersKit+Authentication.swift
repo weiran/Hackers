@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-protocol HackerNewsAuthenticationDelegate: class {
+protocol HackerNewsAuthenticationDelegate: AnyObject {
     func didAuthenticate(user: User)
 }
 

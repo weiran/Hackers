@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SwipeCellKit
 
-protocol PostCellDelegate: class {
+protocol PostCellDelegate: AnyObject {
     func didTapThumbnail(_ sender: Any)
 }
 
