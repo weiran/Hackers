@@ -31,7 +31,6 @@ class CommentsViewController: UITableViewController {
     }
     private let commentsController = CommentsController()
 
-
     @IBOutlet var loadingView: UIView!
     private var notificationToken: NotificationToken?
 
