@@ -31,11 +31,13 @@ class CommentsViewController: UITableViewController {
     }
     private let commentsController = CommentsController()
 
+
     @IBOutlet var loadingView: UIView!
     private var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupCollectionView()
         load()
     }
 
@@ -43,7 +45,7 @@ class CommentsViewController: UITableViewController {
         tearDownHandoff()
     }
 
-    private func load(showSpinner: Bool = true) {
+    @objc private func load(showSpinner: Bool = true) {
         if showSpinner {
             tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
         }
@@ -61,6 +63,7 @@ class CommentsViewController: UITableViewController {
             Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
         }.finally {
             self.tableView.backgroundView = nil
+            self.refreshControl?.endRefreshing()
         }
     }
 
@@ -481,6 +484,17 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
+
+    private func setupCollectionView() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(
+            self,
+            action: #selector(load),
+            for: .valueChanged
+        )
+        self.refreshControl = refreshControl
+    }
+
     private func setupHandoff(with post: Post?, activityType: ActivityType) {
         guard let post = post else {
             return
