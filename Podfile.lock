@@ -1,11 +1,11 @@
 PODS:
   - BulletinBoard (5.0.0)
-  - DeviceKit (4.5.0)
+  - DeviceKit (4.5.2)
   - HNScraper (0.2.2)
   - Loaf (0.7.0)
-  - Nuke (10.4.1)
+  - Nuke (10.5.1)
   - PromiseKit/CorePromise (6.15.3)
-  - SwiftLint (0.44.0)
+  - SwiftLint (0.45.0)
   - SwiftSoup (2.3.3)
   - Swinject (2.6.2)
   - SwinjectStoryboard (2.2.0):
@@ -53,12 +53,12 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   BulletinBoard: dba77053c2a7b64953f63073f7534165af2edd21
-  DeviceKit: b68cded46afdaefc5d2253d631d441ba7049a7fe
+  DeviceKit: c622fc19f795f3e0b4d75d6d11b26604338cdab3
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
-  Nuke: fa2d83b3ee99bb88eccc62ab6c7590e207b50096
+  Nuke: 6ae28db7d24c07d040bcc52f6957b32dac23e91b
   PromiseKit: 3b2b6995e51a954c46dbc550ce3da44fbfb563c5
-  SwiftLint: e96c0a8c770c7ebbc4d36c55baf9096bb65c4584
+  SwiftLint: e5c7f1fba68eccfc51509d5b2ce1699f5502e0c7
   SwiftSoup: 8e4844e785a975744f2c2606f8b3844ef67eb259
   Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
