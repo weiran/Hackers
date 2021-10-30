@@ -33,7 +33,7 @@ extension SFSafariViewController {
     }
 }
 
-protocol SFSafariViewControllerPreviewActionItemsDelegate: class {
+protocol SFSafariViewControllerPreviewActionItemsDelegate: AnyObject {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
 

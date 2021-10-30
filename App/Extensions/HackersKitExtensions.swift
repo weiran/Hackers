@@ -37,3 +37,9 @@ extension PostType {
         }
     }
 }
+
+extension Comment {
+    var hackerNewsURL: URL {
+        return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
+    }
+}
