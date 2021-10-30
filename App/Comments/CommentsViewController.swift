@@ -248,8 +248,18 @@ extension CommentsViewController {
                 voteAction()
             }
 
+            let share = UIAction(
+                title: "Share",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                identifier: UIAction.Identifier(rawValue: "share.comment")
+            ) { [weak self] _ in
+                self?.shareComment(at: indexPath)
+            }
+
             let voteMenu = upvoted ? unvote : upvote
-            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu])
+            let shareMenu = UIMenu(title: "", options: .displayInline, children: [share])
+
+            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu, shareMenu])
         }
     }
 
@@ -366,18 +376,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
     private func shareAction() -> SwipeAction {
         let shareAction = SwipeAction(style: .default, title: "Share") { [weak self] _, indexPath in
-            guard let strongSelf = self else {
-                return
-            }
-            let comment = strongSelf.commentsController.visibleComments[indexPath.row]
-            let url = comment.hackerNewsURL
-            let activityViewController = UIActivityViewController(
-                activityItems: [url],
-                applicationActivities: nil
-            )
-            let cell = strongSelf.tableView.cellForRow(at: indexPath)
-            activityViewController.popoverPresentationController?.sourceView = cell
-            strongSelf.present(activityViewController, animated: true, completion: nil)
+            self?.shareComment(at: indexPath)
         }
         shareAction.backgroundColor = .systemGreen
         shareAction.textColor = .white
@@ -386,6 +385,18 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         shareAction.image = iconImage
 
         return shareAction
+    }
+
+    private func shareComment(at indexPath: IndexPath) {
+        let comment = self.commentsController.visibleComments[indexPath.row]
+        let url = comment.hackerNewsURL
+        let activityViewController = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
+        let cell = self.tableView.cellForRow(at: indexPath)
+        activityViewController.popoverPresentationController?.sourceView = cell
+        self.present(activityViewController, animated: true, completion: nil)
     }
 
     private func collapseAction() -> SwipeAction {
