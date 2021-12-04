@@ -8,6 +8,7 @@
 
 import UIKit
 import SwinjectStoryboard
+import Nuke
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -22,6 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
+        if ProcessInfo.processInfo.arguments.contains("darkMode") {
+            window?.overrideUserInterfaceStyle = .dark
+        }
 
         // setup window and entry point
         window = UIWindow()
@@ -33,10 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.tintColor = AppTheme.default.appTintColor
         window?.makeKeyAndVisible()
 
-        if ProcessInfo.processInfo.arguments.contains("darkMode") {
-            window?.overrideUserInterfaceStyle = .dark
-        }
-
         // setup NavigationService
         navigationService = SwinjectStoryboard.getService()
         navigationService?.mainSplitViewController = mainSplitViewController
@@ -47,6 +47,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // init default settings
         UserDefaults.standard.registerDefaults()
+
+        // setup Nuke
+        DataLoader.sharedUrlCache.diskCapacity = 1024 * 1024 * 100 // 100MB
     }
 
     func application(
