@@ -36,12 +36,22 @@ class CommentsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCollectionView()
+        setupRefreshControl()
         load()
     }
 
     deinit {
         tearDownHandoff()
+    }
+
+    private func setupRefreshControl() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(
+            self,
+            action: #selector(load),
+            for: .valueChanged
+        )
+        self.refreshControl = refreshControl
     }
 
     @objc private func load(showSpinner: Bool = true) {
@@ -360,7 +370,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             )
 
         case (.right, 1):
-            return [collapseAction(), shareAction()]
+            return [collapseAction()]
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
@@ -374,19 +384,6 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
 
         default: return nil
         }
-    }
-
-    private func shareAction() -> SwipeAction {
-        let shareAction = SwipeAction(style: .default, title: "Share") { [weak self] _, indexPath in
-            self?.shareComment(at: indexPath)
-        }
-        shareAction.backgroundColor = .systemGreen
-        shareAction.textColor = .white
-
-        let iconImage = UIImage(systemName: "square.and.arrow.up")!.withTintColor(.white)
-        shareAction.image = iconImage
-
-        return shareAction
     }
 
     private func shareComment(at indexPath: IndexPath) {
@@ -494,17 +491,6 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-
-    private func setupCollectionView() {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(
-            self,
-            action: #selector(load),
-            for: .valueChanged
-        )
-        self.refreshControl = refreshControl
-    }
-
     private func setupHandoff(with post: Post?, activityType: ActivityType) {
         guard let post = post else {
             return
