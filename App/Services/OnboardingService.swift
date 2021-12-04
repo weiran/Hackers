@@ -58,12 +58,22 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let defaultBrowserItem = WhatsNew.Item(
-            title: "Disable swipe gestures",
-            subtitle: "Added a setting to disable all swipe gestures, you can long tap for a menu instead. Thanks to @ballwood for the contribution.",
-            image: UIImage(systemName: "hand.draw.fill")
+        let pullToRefreshItem = WhatsNew.Item(
+            title: "Pull to refresh comments",
+            subtitle: "Thanks @ballwood.",
+            image: UIImage(systemName: "arrow.clockwise")
         )
-        return [defaultBrowserItem]
+        let shareCommentItem = WhatsNew.Item(
+            title: "Share comments",
+            subtitle: "Long press on a comment to share a direct link.",
+            image: UIImage(systemName: "bubble.left")
+        )
+        let bugfixesItem = WhatsNew.Item(
+            title: "Fixes and improvements",
+            subtitle: "Feedback emails work with third party email apps.\n\nThumbnail cache size limited to 100MB.",
+            image: UIImage(systemName: "checkmark.seal")
+        )
+        return [pullToRefreshItem, shareCommentItem, bugfixesItem]
     }
 }
 

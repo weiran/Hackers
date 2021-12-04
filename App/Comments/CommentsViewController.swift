@@ -36,12 +36,22 @@ class CommentsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCollectionView()
+        setupRefreshControl()
         load()
     }
 
     deinit {
         tearDownHandoff()
+    }
+
+    private func setupRefreshControl() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(
+            self,
+            action: #selector(load),
+            for: .valueChanged
+        )
+        self.refreshControl = refreshControl
     }
 
     @objc private func load(showSpinner: Bool = true) {
@@ -250,8 +260,18 @@ extension CommentsViewController {
                 voteAction()
             }
 
+            let share = UIAction(
+                title: "Share",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                identifier: UIAction.Identifier(rawValue: "share.comment")
+            ) { [weak self] _ in
+                self?.shareComment(at: indexPath)
+            }
+
             let voteMenu = upvoted ? unvote : upvote
-            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu])
+            let shareMenu = UIMenu(title: "", options: .displayInline, children: [share])
+
+            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu, shareMenu])
         }
     }
 
@@ -350,7 +370,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             )
 
         case (.right, 1):
-            return [collapseAction(), shareAction()]
+            return [collapseAction()]
 
         case (.left, 1):
             let comment = commentsController.visibleComments[indexPath.row]
@@ -366,28 +386,16 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         }
     }
 
-    private func shareAction() -> SwipeAction {
-        let shareAction = SwipeAction(style: .default, title: "Share") { [weak self] _, indexPath in
-            guard let strongSelf = self else {
-                return
-            }
-            let comment = strongSelf.commentsController.visibleComments[indexPath.row]
-            let url = comment.hackerNewsURL
-            let activityViewController = UIActivityViewController(
-                activityItems: [url],
-                applicationActivities: nil
-            )
-            let cell = strongSelf.tableView.cellForRow(at: indexPath)
-            activityViewController.popoverPresentationController?.sourceView = cell
-            strongSelf.present(activityViewController, animated: true, completion: nil)
-        }
-        shareAction.backgroundColor = .systemGreen
-        shareAction.textColor = .white
-
-        let iconImage = UIImage(systemName: "square.and.arrow.up")!.withTintColor(.white)
-        shareAction.image = iconImage
-
-        return shareAction
+    private func shareComment(at indexPath: IndexPath) {
+        let comment = self.commentsController.visibleComments[indexPath.row]
+        let url = comment.hackerNewsURL
+        let activityViewController = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
+        let cell = self.tableView.cellForRow(at: indexPath)
+        activityViewController.popoverPresentationController?.sourceView = cell
+        self.present(activityViewController, animated: true, completion: nil)
     }
 
     private func collapseAction() -> SwipeAction {
@@ -483,17 +491,6 @@ extension CommentsViewController: CommentDelegate {
 
 // MARK: - Handoff
 extension CommentsViewController {
-
-    private func setupCollectionView() {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(
-            self,
-            action: #selector(load),
-            for: .valueChanged
-        )
-        self.refreshControl = refreshControl
-    }
-
     private func setupHandoff(with post: Post?, activityType: ActivityType) {
         guard let post = post else {
             return

@@ -8,7 +8,7 @@ target 'Hackers' do
   pod 'PromiseKit/CorePromise'
   pod 'Loaf'
   pod 'SwipeCellKit'
-  pod 'Swinject', '~> 2.6.2' # SwinjectStoryboard needs updating
+  pod 'Swinject'
   pod 'SwinjectStoryboard'
   pod 'BulletinBoard'
   pod 'WhatsNewKit'
