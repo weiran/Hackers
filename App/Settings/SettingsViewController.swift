@@ -118,14 +118,24 @@ extension SettingsViewController {
     }
 
     private func sendFeedbackEmail() {
+        let appVersion = self.appVersion() ?? ""
+        let emailAddress = "weiran@zhang.me.uk"
+        let subject = "Feedback for Hackers \(appVersion)"
+
         if MFMailComposeViewController.canSendMail() {
-            let appVersion = self.appVersion() ?? ""
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
-            mail.setToRecipients(["weiran@zhang.me.uk"])
-            mail.setSubject("Feedback for Hackers \(appVersion)")
+            mail.setToRecipients([emailAddress])
+            mail.setSubject(subject)
             mail.setMessageBody("", isHTML: true)
             present(mail, animated: true)
+        } else {
+            let mailtoString = "mailto:\(emailAddress)?subject=\(subject)"
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let mailtoURL = URL(string: mailtoString)!
+            if UIApplication.shared.canOpenURL(mailtoURL) {
+                UIApplication.shared.open(mailtoURL, options: [:])
+            }
         }
     }
 
