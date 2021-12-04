@@ -3,13 +3,13 @@ PODS:
   - DeviceKit (4.5.2)
   - HNScraper (0.2.2)
   - Loaf (0.7.0)
-  - Nuke (10.5.1)
+  - Nuke (10.5.2)
   - PromiseKit/CorePromise (6.15.3)
-  - SwiftLint (0.45.0)
+  - SwiftLint (0.45.1)
   - SwiftSoup (2.3.3)
-  - Swinject (2.6.2)
-  - SwinjectStoryboard (2.2.0):
-    - Swinject (~> 2.6)
+  - Swinject (2.7.1)
+  - SwinjectStoryboard (2.2.2):
+    - Swinject (~> 2.7.1)
   - SwipeCellKit (2.7.1)
   - WhatsNewKit (1.3.7)
 
@@ -22,7 +22,7 @@ DEPENDENCIES:
   - PromiseKit/CorePromise
   - SwiftLint
   - SwiftSoup
-  - Swinject (~> 2.6.2)
+  - Swinject
   - SwinjectStoryboard
   - SwipeCellKit
   - WhatsNewKit
@@ -56,15 +56,15 @@ SPEC CHECKSUMS:
   DeviceKit: c622fc19f795f3e0b4d75d6d11b26604338cdab3
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
-  Nuke: 6ae28db7d24c07d040bcc52f6957b32dac23e91b
+  Nuke: 62d6d401e2b3ce553151a6f5e2f9332878710fbd
   PromiseKit: 3b2b6995e51a954c46dbc550ce3da44fbfb563c5
-  SwiftLint: e5c7f1fba68eccfc51509d5b2ce1699f5502e0c7
+  SwiftLint: 06ac37e4d38c7068e0935bb30cda95f093bec761
   SwiftSoup: 8e4844e785a975744f2c2606f8b3844ef67eb259
-  Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
-  SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
+  Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
+  SwinjectStoryboard: 240ce371396da09a4c43c72ee5c148108500e184
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
   WhatsNewKit: c87028c4059dccd113495422801914cc53f6aab0
 
-PODFILE CHECKSUM: 52b90088cab90c44358c46cd2a92ab6bc5e52db7
+PODFILE CHECKSUM: 01446ada016a8c363277039b82b7b1c2962beffe
 
 COCOAPODS: 1.11.2
