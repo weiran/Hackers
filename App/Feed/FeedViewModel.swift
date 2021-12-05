@@ -11,6 +11,7 @@ import PromiseKit
 
 class FeedViewModel {
     var posts: [Post] = []
+    var postIds: Set<Int> = Set()
     var postType: PostType = .news
     var pageIndex = 1
     var isFetching = false
@@ -29,13 +30,17 @@ class FeedViewModel {
         return firstly {
             HackersKit.shared.getPosts(type: postType, page: pageIndex)
         }.done { posts in
-            self.posts.append(contentsOf: posts)
+            let newPosts = posts.filter { !self.postIds.contains($0.id) }
+            let newPostIds = newPosts.map { $0.id }
+            self.posts.append(contentsOf: newPosts)
+            self.postIds.formUnion(newPostIds)
             self.isFetching = false
         }
     }
 
     func reset() {
         posts = []
+        postIds = Set()
         pageIndex = 1
         isFetching = false
     }
