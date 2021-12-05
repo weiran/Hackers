@@ -4,7 +4,10 @@ platform :ios do
   desc "Generate new screenshots"
   lane :screenshots do
     capture_screenshots(workspace: "Hackers.xcworkspace", scheme: "Hackers")
-    frameit(path: "./fastlane/screenshots/")
+    frameit(
+      path: "./fastlane/screenshots/",
+      override_status_bar: true
+    )
     # upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
   end
 
