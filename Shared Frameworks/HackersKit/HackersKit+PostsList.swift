@@ -11,9 +11,9 @@ import PromiseKit
 import SwiftSoup
 
 extension HackersKit {
-    func getPosts(type: PostType, page: Int = 1) -> Promise<[Post]> {
+    func getPosts(type: PostType, page: Int = 1, nextId: Int = 0) -> Promise<[Post]> {
         firstly {
-            fetchPostsHtml(type: type, page: page)
+            fetchPostsHtml(type: type, page: page, nextId: nextId)
         }.map { html in
             try HtmlParser.postsTableElement(from: html)
         }.compactMap { tableElement in
@@ -21,8 +21,13 @@ extension HackersKit {
         }
     }
 
-    private func fetchPostsHtml(type: PostType, page: Int) -> Promise<String> {
-        let url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
+    private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) -> Promise<String> {
+        var url: URL
+        if type == .newest || type == .jobs {
+            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)")!
+        } else {
+            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
+        }
         return fetchHtml(url: url)
     }
 }
