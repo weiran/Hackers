@@ -1,30 +1,45 @@
 {
     "device_frame_version": "latest",
     "default": {
-        "title": {
+        "keyword": {
             "color": "#FFFFFF",
-            "font": "./assets/SF-Pro-Display-Bold.otf"
+            "font": "./assets/SF-Pro-Display-Bold.otf",
+            "font_size": 68
+        },
+        "title": {
+            "color": "#d5d5d5",
+            "font": "./assets/SF-Pro-Display-Light.otf",
+            "font_size": 52
         },
         "background": "./assets/background.png",
         "padding": 50,
-        "font_scale_factor": 0.06,
-        "frame": "BLACK"
+        "frame": "BLACK",
+        "stack_title" : true
     },
     "data": [
         {
             "filter": "Ultimate",
+            "keyword": {
+                "text": "Beautiful App for Hacker News"
+            },
             "title": {
-                "text": "The ultimate Hacker News app"
+                "text": "Designed to feel at home on iOS"
             }
         },
         {
             "filter": "Comments",
+            "keyword": {
+                "text": "Breakthrough Comments"
+            },
             "title": {
-                "text": "Elegant threaded comments"
+                "text": "Swipe to collpase and vote"
             }
         },
         {
             "filter": "Dark",
+            "keyword": {
+                "text": "Native Dark Mode"
+            },
             "title": {
                 "text": "True black dark mode"
             }  
