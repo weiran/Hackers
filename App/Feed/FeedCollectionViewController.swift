@@ -162,8 +162,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if viewModel.postType == .jobs,
-           let post = dataSource.itemIdentifier(for: indexPath) {
+        if viewModel.postType == .jobs, let post = dataSource.itemIdentifier(for: indexPath), !post.url.absoluteString.starts(with: "item?id=") {
             self.openURL(url: post.url) {
                 if let svc = SFSafariViewController.instance(for: post.url) {
                     self.navigationController?.present(svc, animated: true)
