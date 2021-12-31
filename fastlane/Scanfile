@@ -3,7 +3,7 @@
 
 scheme("HackersUITests")
 # devices(["iPhone 12 Pro", "iPad Pro (11-inch) (2nd generation)"])
-devices(["iPhone 12"])
+devices(["iPhone 13 Pro"])
 
 # Enable skip_build to skip debug builds for faster test performance
 skip_build(true)

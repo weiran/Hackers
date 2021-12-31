@@ -23,9 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
-        if ProcessInfo.processInfo.arguments.contains("darkMode") {
-            window?.overrideUserInterfaceStyle = .dark
-        }
 
         // setup window and entry point
         window = UIWindow()
@@ -36,6 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = mainSplitViewController
         window?.tintColor = AppTheme.default.appTintColor
         window?.makeKeyAndVisible()
+        
+        if ProcessInfo.processInfo.arguments.contains("darkMode") {
+            window?.overrideUserInterfaceStyle = .dark
+        }
 
         // setup NavigationService
         navigationService = SwinjectStoryboard.getService()
