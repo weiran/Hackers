@@ -11,6 +11,9 @@ import WhatsNewKit
 
 enum OnboardingService {
     static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
+        // disable "whats new" for bugfix releases
+        return nil
+
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
