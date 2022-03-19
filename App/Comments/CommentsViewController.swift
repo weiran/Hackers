@@ -228,7 +228,7 @@ extension CommentsViewController {
         contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        guard let comment = comments?[indexPath.row], let post = post else { return nil }
+        guard let comment = comments?[safe: indexPath.row], let post = post else { return nil }
         let actionOnPost = indexPath.section == 0
         let upvoted = actionOnPost ? post.upvoted : comment.upvoted
 

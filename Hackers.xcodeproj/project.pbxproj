@@ -17,6 +17,7 @@
 		2419D038248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		241C32DE24950C05000876DC /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241C32DD24950C05000876DC /* PostTitleView.swift */; };
 		243271951F95EDA9008196DB /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243271941F95EDA9008196DB /* StringExtensions.swift */; };
+		243C182B2780A8370018359D /* CollectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C182A2780A8370018359D /* CollectionExtensions.swift */; };
 		245345EF22466EA8001AF1CE /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345EE22466EA8001AF1CE /* HackersUITests.swift */; };
 		245345FB22466F75001AF1CE /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245345F722466F71001AF1CE /* SnapshotHelper.swift */; };
 		2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2454B9031F655426005A98C7 /* EmptyViewController.swift */; };
@@ -134,6 +135,7 @@
 		241C32DD24950C05000876DC /* PostTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTitleView.swift; sourceTree = "<group>"; };
 		241E4036253B103100E3ED18 /* Hackers.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hackers.entitlements; sourceTree = "<group>"; };
 		243271941F95EDA9008196DB /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		243C182A2780A8370018359D /* CollectionExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtensions.swift; sourceTree = "<group>"; };
 		245345EC22466EA8001AF1CE /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		245345EE22466EA8001AF1CE /* HackersUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersUITests.swift; sourceTree = "<group>"; };
 		245345F022466EA8001AF1CE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -345,6 +347,7 @@
 				24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */,
 				24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */,
 				24E390A92542D7A9000DA7A8 /* UIViewControllerExtensions.swift */,
+				243C182A2780A8370018359D /* CollectionExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -952,6 +955,7 @@
 				2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
 				24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */,
+				243C182B2780A8370018359D /* CollectionExtensions.swift in Sources */,
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
 				2457F04524696EB000F3E7A4 /* HackersKit.swift in Sources */,
 				24A13DC92621F36F002235A8 /* ItemCell.swift in Sources */,
