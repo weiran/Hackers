@@ -11,9 +11,6 @@ import WhatsNewKit
 
 enum OnboardingService {
     static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
-        // disable "whats new" for bugfix releases
-        return nil
-
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return nil
         }
@@ -61,22 +58,12 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let pullToRefreshItem = WhatsNew.Item(
-            title: "Pull to refresh comments",
-            subtitle: "Thanks @ballwood.",
-            image: UIImage(systemName: "arrow.clockwise")
+        let loginExperienceItem = WhatsNew.Item(
+            title: "New Login",
+            subtitle: "Improved login experience with password manager support.",
+            image: UIImage(systemName: "lock.shield.fill")
         )
-        let shareCommentItem = WhatsNew.Item(
-            title: "Share comments",
-            subtitle: "Long press on a comment to share a direct link.",
-            image: UIImage(systemName: "bubble.left")
-        )
-        let bugfixesItem = WhatsNew.Item(
-            title: "Fixes and improvements",
-            subtitle: "Feedback emails work with third party email apps.\n\nThumbnail cache size limited to 100MB.",
-            image: UIImage(systemName: "checkmark.seal")
-        )
-        return [pullToRefreshItem, shareCommentItem, bugfixesItem]
+        return [loginExperienceItem]
     }
 }
 
@@ -87,7 +74,7 @@ struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
         context: UIViewControllerRepresentableContext<OnboardingViewControllerWrapper>
     ) -> UIViewControllerType {
         let onboardingViewController = OnboardingService.onboardingViewController(forceShow: true)!
-        // swiftlint:disable force_cast
+        // swiftlint:disable:next force_cast
         return onboardingViewController as! UIViewControllerType
     }
 
