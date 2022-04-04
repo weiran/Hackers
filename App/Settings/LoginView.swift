@@ -76,8 +76,11 @@ struct LoginView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button {
                         presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Text("Done")
+                            .bold()
                     }
                 }
             }
