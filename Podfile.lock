@@ -5,7 +5,7 @@ PODS:
   - Loaf (0.7.0)
   - Nuke (10.7.1)
   - PromiseKit/CorePromise (6.17.0)
-  - SwiftLint (0.46.5)
+  - SwiftLint (0.47.0)
   - SwiftSoup (2.3.8)
   - Swinject (2.7.1)
   - SwinjectStoryboard (2.2.2):
@@ -58,7 +58,7 @@ SPEC CHECKSUMS:
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
   Nuke: 279f17a599fd1c83cf51de5e0e1f2db143a287b0
   PromiseKit: 996202d4cae72b7801b312abef4cd2f995b2978a
-  SwiftLint: 2c16e8fa99dac2e440dc0c70ea74d2532048f6cf
+  SwiftLint: d41cc46a2ae58ac6d9f26954bc89f1d72e71fdef
   SwiftSoup: ba8ea2c91151881a298cba4b0628ef31e835a77f
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   SwinjectStoryboard: 240ce371396da09a4c43c72ee5c148108500e184
