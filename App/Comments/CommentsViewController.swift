@@ -14,7 +14,6 @@ import PromiseKit
 import Loaf
 
 class CommentsViewController: UITableViewController {
-    var authenticationUIService: AuthenticationUIService?
     var swipeCellKitActions: SwipeCellKitActions?
     var navigationService: NavigationService?
 
@@ -288,7 +287,7 @@ extension CommentsViewController {
             switch error {
             case .unauthenticated:
                 self.present(
-                    self.authenticationUIService!.unauthenticatedAlertController(),
+                    AuthenticationHelper.unauthenticatedAlertController(self),
                     animated: true
                 )
             default:
@@ -324,7 +323,7 @@ extension CommentsViewController {
             switch error {
             case .unauthenticated:
                 self.present(
-                    self.authenticationUIService!.unauthenticatedAlertController(),
+                    AuthenticationHelper.unauthenticatedAlertController(self),
                     animated: true
                 )
             default:

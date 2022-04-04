@@ -3,7 +3,7 @@
 //  Hackers
 //
 //  Created by Weiran Zhang on 04/04/2022.
-//  Copyright © 2022 Glass Umbrella. All rights reserved.
+//  Copyright © 2022 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI
@@ -22,55 +22,64 @@ struct LoginView: View {
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        VStack {
-            Text("Login to Hacker News")
-                .font(.largeTitle)
-                .padding(.bottom, 30)
+        NavigationView {
+            VStack {
+                Text("Login to Hacker News")
+                    .font(.largeTitle)
+                    .padding(.bottom, 30)
 
-            TextField("Username", text: $username)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .textFieldStyle(RoundedTextField())
-                .textContentType(.username)
+                TextField("Username", text: $username)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .textFieldStyle(RoundedTextField())
+                    .textContentType(.username)
 
-            SecureField("Password", text: $password)
-                .textFieldStyle(RoundedTextField())
-                .textContentType(.password)
+                SecureField("Password", text: $password)
+                    .textFieldStyle(RoundedTextField())
+                    .textContentType(.password)
 
-            Text("Hackers never stores your password")
-                .foregroundColor(Color.secondary)
-                .font(.footnote)
+                Text("Hackers never stores your password")
+                    .foregroundColor(Color.secondary)
+                    .font(.footnote)
 
-            Button("Login") {
-                isAuthenticating = true
-                sessionService.authenticate(username: username, password: password)
-                    .done { _ in
-                        presentationMode.wrappedValue.dismiss()
-                    }.ensure {
-                        NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
-                        isAuthenticating = false
-                    }.catch { _ in
-                        showAlert = true
-                        password = ""
+                Button("Login") {
+                    isAuthenticating = true
+                    sessionService.authenticate(username: username, password: password)
+                        .done { _ in
+                            presentationMode.wrappedValue.dismiss()
+                        }.ensure {
+                            NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                            isAuthenticating = false
+                        }.catch { _ in
+                            showAlert = true
+                            password = ""
+                        }
+                }.buttonStyle(FilledButton())
+                    .padding(.top, 30)
+                    .disabled(isAuthenticating)
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("Login Failed"),
+                            message: Text("Error logging into Hacker News, check your username and password.")
+                        )
                     }
-            }.buttonStyle(FilledButton())
-                .padding(.top, 30)
-                .disabled(isAuthenticating)
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("Login Failed"),
-                        message: Text("Error logging into Hacker News, check your username and password.")
-                    )
-                }
 
-            LabelledDivider(label: "or")
+                LabelledDivider(label: "or")
 
-            Link(destination: URL(string: "https://news.ycombinator.com/login")!) {
-                HStack {
-                    Text("Register on Hacker News")
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                Link(destination: URL(string: "https://news.ycombinator.com/login")!) {
+                    HStack {
+                        Text("Register on Hacker News")
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                    }
+                    .padding()
                 }
-                .padding()
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
             }
         }
     }
@@ -103,12 +112,11 @@ struct FilledButton: ButtonStyle {
 }
 
 struct LabelledDivider: View {
-
     let label: String
     let horizontalPadding: CGFloat
     let color: Color
 
-    init(label: String, horizontalPadding: CGFloat = 20, color: Color = .gray) {
+    init(label: String, horizontalPadding: CGFloat = 20, color: Color = .secondary) {
         self.label = label
         self.horizontalPadding = horizontalPadding
         self.color = color
@@ -127,35 +135,8 @@ struct LabelledDivider: View {
     }
 }
 
-@propertyWrapper
-struct Inject<Component> {
-    let wrappedValue: Component
-    init() {
-        self.wrappedValue = Resolver.shared.resolve(Component.self)
-    }
-}
-
-class Resolver {
-    static let shared = Resolver()
-    private let container = buildContainer()
-
-    func resolve<T>(_ type: T.Type) -> T {
-        container.resolve(T.self)!
-    }
-}
-
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
     }
-}
-
-func buildContainer() -> Container {
-    let container = SwinjectStoryboard.defaultContainer
-
-    container.register(SessionService.self) { _ in
-        return SessionService()
-    }.inObjectScope(.container)
-
-    return container
 }

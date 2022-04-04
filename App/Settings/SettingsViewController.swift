@@ -15,7 +15,6 @@ import Loaf
 
 class SettingsViewController: UITableViewController {
     var sessionService: SessionService?
-    var authenticationUIService: AuthenticationUIService?
 
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
@@ -145,11 +144,7 @@ extension SettingsViewController {
     }
 
     private func login() {
-        let loginView = LoginView()
-        let loginHC = UIHostingController(rootView: loginView)
-        present(loginHC, animated: true)
-
-        //authenticationUIService?.showAuthentication()
+        AuthenticationHelper.showLoginView(self)
     }
 }
 
