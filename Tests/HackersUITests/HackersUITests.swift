@@ -32,13 +32,16 @@ class HackersUITests: XCTestCase {
     func testScreenshotUltimate() {
         launch()
 
-        let collectionViewsQuery = XCUIApplication().collectionViews
-        XCTAssertTrue(waitForElementToAppear(collectionViewsQuery.cells.firstMatch))
+        let itemCell = XCUIApplication().collectionViews.cells.firstMatch
+        XCTAssertTrue(waitForElementToAppear(itemCell))
 
         if Device.current.isPad {
-            let tablesQuery = XCUIApplication().tables
-            tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: commentCellName).element))
+            itemCell.firstMatch.tap()
+
+            let commentsTable = XCUIApplication().tables["CommentsTableView"]
+            XCTAssertTrue(commentsTable.waitForExistence(timeout: 10))
+            XCTAssertTrue(waitForElementToAppear(commentsTable.cells[commentCellName]))
+            commentsTable.cells.allElementsBoundByIndex[1].tap()
         }
 
         snapshot("Ultimate")
@@ -51,8 +54,10 @@ class HackersUITests: XCTestCase {
         XCTAssertTrue(waitForElementToAppear(itemCell))
         itemCell.firstMatch.tap()
 
-        let commentCell = XCUIApplication().tables.cells.matching(identifier: commentCellName).element
-        XCTAssertTrue(waitForElementToAppear(commentCell))
+        let commentsTable = XCUIApplication().tables["CommentsTableView"]
+        XCTAssertTrue(commentsTable.waitForExistence(timeout: 10))
+        XCTAssertTrue(waitForElementToAppear(commentsTable.cells[commentCellName]))
+        commentsTable.cells.allElementsBoundByIndex[1].tap()
 
         if !Device.current.isPad {
             snapshot("Comments")
@@ -62,13 +67,16 @@ class HackersUITests: XCTestCase {
     func testScreenshotDark() {
         launch(darkTheme: true)
 
-        let collectionViewsQuery = XCUIApplication().collectionViews
-        XCTAssertTrue(waitForElementToAppear(collectionViewsQuery.cells.firstMatch))
+        let itemCell = XCUIApplication().collectionViews.cells.firstMatch
+        XCTAssertTrue(waitForElementToAppear(itemCell))
 
         if Device.current.isPad {
-            let tablesQuery = XCUIApplication().tables
-            tablesQuery.cells.firstMatch.tap()
-            XCTAssertTrue(waitForElementToAppear(tablesQuery.cells.matching(identifier: commentCellName).element))
+            itemCell.firstMatch.tap()
+
+            let commentsTable = XCUIApplication().tables["CommentsTableView"]
+            XCTAssertTrue(commentsTable.waitForExistence(timeout: 10))
+            XCTAssertTrue(waitForElementToAppear(commentsTable.cells[commentCellName]))
+            commentsTable.cells.allElementsBoundByIndex[1].tap()
         }
 
         snapshot("Dark")
