@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 import SafariServices
 import MessageUI
 import PromiseKit
@@ -144,7 +145,11 @@ extension SettingsViewController {
     }
 
     private func login() {
-        authenticationUIService?.showAuthentication()
+        let loginView = LoginView()
+        let loginHC = UIHostingController(rootView: loginView)
+        present(loginHC, animated: true)
+
+        //authenticationUIService?.showAuthentication()
     }
 }
 

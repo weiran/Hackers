@@ -37,6 +37,7 @@
 		2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */; };
 		2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD62247C12540088CA2B /* HNScraperShim.swift */; };
 		2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */; };
+		2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D427FAEBFC007504C6 /* LoginView.swift */; };
 		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
 		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
@@ -160,6 +161,7 @@
 		2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+CommentVoting.swift"; sourceTree = "<group>"; };
 		2481BD62247C12540088CA2B /* HNScraperShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNScraperShim.swift; sourceTree = "<group>"; };
 		2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostVoting.swift"; sourceTree = "<group>"; };
+		2486D7D427FAEBFC007504C6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
 		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
@@ -359,6 +361,7 @@
 				2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */,
 				2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */,
 				2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */,
+				2486D7D427FAEBFC007504C6 /* LoginView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -745,7 +748,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\n  marketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -763,11 +766,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\n  marketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		244DE6BB1E599EB6005B441E /* TODO as Warnings */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -775,13 +778,13 @@
 			name = "TODO as Warnings";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \n  xargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \n  perl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
+			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \nxargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \nperl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
 		};
 		249B8F8022A29B2E002A9EC5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -794,7 +797,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  \"${PODS_ROOT}/SwiftLint/swiftlint\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -934,6 +937,7 @@
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
 				2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */,
 				24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */,
+				2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */,
 				24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */,
 				24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */,
 				24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */,

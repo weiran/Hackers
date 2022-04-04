@@ -20,3 +20,5 @@ identifier_name:
   excluded:
       - id
       - by
+  allowed_symbols:
+    - _body
