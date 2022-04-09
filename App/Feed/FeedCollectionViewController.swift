@@ -14,8 +14,6 @@ import Loaf
 class FeedCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
 
-    var authenticationUIService: AuthenticationUIService?
-
     private lazy var dataSource = makeDataSource()
     private lazy var viewModel = FeedViewModel()
 
@@ -299,16 +297,14 @@ extension FeedCollectionViewController {
     }
 
     private func handleVoteError(error: Error) {
-        guard
-            let error = error as? HackersKitError,
-            let authenticationUIService = self.authenticationUIService else {
+        guard let error = error as? HackersKitError else {
             return
         }
 
         switch error {
         case .unauthenticated:
             self.present(
-                authenticationUIService.unauthenticatedAlertController(),
+                AuthenticationHelper.unauthenticatedAlertController(self),
                 animated: true
             )
         default:

@@ -10,7 +10,6 @@ target 'Hackers' do
   pod 'SwipeCellKit'
   pod 'Swinject'
   pod 'SwinjectStoryboard'
-  pod 'BulletinBoard'
   pod 'WhatsNewKit'
   pod 'SwiftSoup'
   pod 'Nuke'

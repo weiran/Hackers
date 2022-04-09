@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 import SafariServices
 import MessageUI
 import PromiseKit
@@ -14,7 +15,6 @@ import Loaf
 
 class SettingsViewController: UITableViewController {
     var sessionService: SessionService?
-    var authenticationUIService: AuthenticationUIService?
 
     @IBOutlet weak var accountLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
@@ -144,7 +144,7 @@ extension SettingsViewController {
     }
 
     private func login() {
-        authenticationUIService?.showAuthentication()
+        AuthenticationHelper.showLoginView(self)
     }
 }
 

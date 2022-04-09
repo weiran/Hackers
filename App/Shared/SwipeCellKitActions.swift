@@ -11,12 +11,6 @@ import SwipeCellKit
 import Loaf
 
 class SwipeCellKitActions {
-    private let authenticationUIService: AuthenticationUIService
-
-    init(authenticationUIService: AuthenticationUIService) {
-        self.authenticationUIService = authenticationUIService
-    }
-
     func voteAction(
         post: Post,
         tableView: UITableView,
@@ -34,7 +28,10 @@ class SwipeCellKitActions {
             guard let error = error as? HackersKitError else { return }
             switch error {
             case .unauthenticated:
-                viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
+                viewController.present(
+                    AuthenticationHelper.unauthenticatedAlertController(viewController),
+                    animated: true
+                )
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()
             }
@@ -82,7 +79,10 @@ class SwipeCellKitActions {
             guard let error = error as? HackersKitError else { return }
             switch error {
             case .unauthenticated:
-                viewController.present(self.authenticationUIService.unauthenticatedAlertController(), animated: true)
+                viewController.present(
+                    AuthenticationHelper.unauthenticatedAlertController(viewController),
+                    animated: true
+                )
             default:
                 Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()
             }

@@ -37,8 +37,9 @@
 		2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */; };
 		2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD62247C12540088CA2B /* HNScraperShim.swift */; };
 		2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */; };
-		24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */; };
-		24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */; };
+		2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D427FAEBFC007504C6 /* LoginView.swift */; };
+		2486D7D727FB0A26007504C6 /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */; };
+		2486D7D927FB0DC9007504C6 /* SwinjectSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */; };
 		249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A7E31194374550059C079 /* CommentTableViewCell.swift */; };
 		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
 		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
@@ -160,8 +161,9 @@
 		2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+CommentVoting.swift"; sourceTree = "<group>"; };
 		2481BD62247C12540088CA2B /* HNScraperShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNScraperShim.swift; sourceTree = "<group>"; };
 		2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostVoting.swift"; sourceTree = "<group>"; };
-		24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationUIService.swift; sourceTree = "<group>"; };
-		24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationBulletinPage.swift; sourceTree = "<group>"; };
+		2486D7D427FAEBFC007504C6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
+		2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectSwiftUI.swift; sourceTree = "<group>"; };
 		249A7E31194374550059C079 /* CommentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentTableViewCell.swift; sourceTree = "<group>"; };
 		249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationToken.swift; sourceTree = "<group>"; };
 		249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterExtensions.swift; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 			isa = PBXGroup;
 			children = (
 				24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */,
+				2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */,
 				24CEAA9A1F8916970050DEDF /* UIViewExtensions.swift */,
 				2464D212209DEFB100C7F8FC /* UINavigationControllerExtensions.swift */,
 				243271941F95EDA9008196DB /* StringExtensions.swift */,
@@ -359,17 +362,9 @@
 				2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */,
 				2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */,
 				2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */,
+				2486D7D427FAEBFC007504C6 /* LoginView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		24993C58229C76EA00AF1891 /* AuthenticationUIService */ = {
-			isa = PBXGroup;
-			children = (
-				24993C54229C2BD400AF1891 /* AuthenticationUIService.swift */,
-				24993C56229C768700AF1891 /* AuthenticationBulletinPage.swift */,
-			);
-			path = AuthenticationUIService;
 			sourceTree = "<group>";
 		};
 		249B8F8122A2A474002A9EC5 /* Shared */ = {
@@ -529,10 +524,10 @@
 		24FF0219226C99B1002EF8DD /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				24993C58229C76EA00AF1891 /* AuthenticationUIService */,
 				2477BDE4227D9D8200771FE2 /* SessionService.swift */,
 				24B1A6A422B508A40051EAFD /* OnboardingService.swift */,
 				247C9C78248BC35000AF4E60 /* NavigationService.swift */,
+				2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -745,7 +740,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\n  marketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersShareExtension/Info.plist\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -763,11 +758,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\nmarketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\n  marketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		244DE6BB1E599EB6005B441E /* TODO as Warnings */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -775,13 +770,13 @@
 			name = "TODO as Warnings";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \n  xargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \n  perl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
+			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \nxargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \nperl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
 		};
 		249B8F8022A29B2E002A9EC5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -794,7 +789,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
+			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  \"${PODS_ROOT}/SwiftLint/swiftlint\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -843,7 +838,6 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/BulletinBoard/BLTNBoard.framework",
 				"${BUILT_PRODUCTS_DIR}/HNScraper/HNScraper.framework",
 				"${BUILT_PRODUCTS_DIR}/Loaf/Loaf.framework",
 				"${BUILT_PRODUCTS_DIR}/Nuke/Nuke.framework",
@@ -856,7 +850,6 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLTNBoard.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HNScraper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Loaf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nuke.framework",
@@ -927,13 +920,13 @@
 				2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
-				24993C57229C768700AF1891 /* AuthenticationBulletinPage.swift in Sources */,
 				24E390AA2542D7A9000DA7A8 /* UIViewControllerExtensions.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
 				2479E11522B69CF100D9F1A4 /* ThumbnailImageView.swift in Sources */,
 				2454B9041F655426005A98C7 /* EmptyViewController.swift in Sources */,
 				2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */,
 				24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */,
+				2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */,
 				24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */,
 				24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */,
 				24CEAA9B1F8916970050DEDF /* UIViewExtensions.swift in Sources */,
@@ -944,16 +937,17 @@
 				249B8F8722A2B740002A9EC5 /* SwipeCellKitActions.swift in Sources */,
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
-				24993C55229C2BD400AF1891 /* AuthenticationUIService.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
+				2486D7D727FB0A26007504C6 /* AuthenticationHelper.swift in Sources */,
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */,
 				24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
+				2486D7D927FB0DC9007504C6 /* SwinjectSwiftUI.swift in Sources */,
 				24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */,
 				243C182B2780A8370018359D /* CollectionExtensions.swift in Sources */,
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
@@ -1324,7 +1318,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 110;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1332,7 +1326,7 @@
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.6.7;
+				MARKETING_VERSION = 4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Dev Profile";
@@ -1354,7 +1348,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 110;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1362,7 +1356,7 @@
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 4.6.7;
+				MARKETING_VERSION = 4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Prod Profile";
