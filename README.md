@@ -14,7 +14,7 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 * Upvote posts and comments
 * Open In Hackers share extension
 
-<img src="https://is5-ssl.mzstatic.com/image/thumb/Purple115/v4/14/98/59/149859fe-f4e3-0a12-d7fb-2d3383efdf45/mzl.ebnguksi.png/460x0w.jpg" width="350">
+<img src="https://user-images.githubusercontent.com/1109819/162569111-f05c2511-99fa-40ba-80f1-b11774fc4611.png" width="350">
 
 ## Open Source
 
@@ -54,11 +54,10 @@ I use several open source projects in Hackers, in no particular order:
 * [CocoaPods](https://github.com/CocoaPods/CocoaPods)
 * [HNScraper](https://github.com/tsucres/HNScraper)
 * [PromiseKit](https://github.com/mxcl/PromiseKit)
-* [Kingfisher](https://github.com/onevcat/Kingfisher)
+* [Nuke](https://github.com/kean/Nuke)
 * [Loaf](https://github.com/schmidyy/Loaf)
 * [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
 * [Swinject](https://github.com/Swinject/Swinject)
-* [BulletinBoard](https://github.com/alexaubry/BulletinBoard)
 * [SwiftLint](https://github.com/realm/SwiftLint)
 * [DeviceKit](https://github.com/devicekit/DeviceKit)
 * [WhatsNewKit](https://github.com/SvenTiigi/WhatsNewKit)
