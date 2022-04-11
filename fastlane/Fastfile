@@ -16,6 +16,7 @@ platform :ios do
 
   desc "Run Tests"
   lane :test do
+    reset_simulator_contents
     scan(
       scheme: "HackersUITests",
       derived_data_path: "scan_derived_data" # https://github.com/fastlane/fastlane/issues/15768

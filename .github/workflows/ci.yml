@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    runs-on: macos-11
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
         subdirectory: 'fastlane'
 
   test:
-    runs-on: macos-11
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -39,7 +39,7 @@ jobs:
         subdirectory: 'fastlane'
 
   build:
-    runs-on: macos-11
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
