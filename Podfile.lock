@@ -3,9 +3,9 @@ PODS:
   - HNScraper (0.2.2)
   - Loaf (0.7.0)
   - Nuke (10.7.1)
-  - PromiseKit/CorePromise (6.17.0)
-  - SwiftLint (0.47.0)
-  - SwiftSoup (2.3.8)
+  - PromiseKit/CorePromise (6.17.1)
+  - SwiftLint (0.47.1)
+  - SwiftSoup (2.4.3)
   - Swinject (2.7.1)
   - SwinjectStoryboard (2.2.2):
     - Swinject (~> 2.7.1)
@@ -53,9 +53,9 @@ SPEC CHECKSUMS:
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
   Nuke: 279f17a599fd1c83cf51de5e0e1f2db143a287b0
-  PromiseKit: 996202d4cae72b7801b312abef4cd2f995b2978a
-  SwiftLint: d41cc46a2ae58ac6d9f26954bc89f1d72e71fdef
-  SwiftSoup: ba8ea2c91151881a298cba4b0628ef31e835a77f
+  PromiseKit: ee485df3d4dc570594d7e7aecae6352697dc6a4c
+  SwiftLint: f80f1be7fa96d30e0aa68e58d45d4ea1ccaac519
+  SwiftSoup: 3384f2e618cfc1b3cbc7852c16692fe8de13fb8f
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   SwinjectStoryboard: 240ce371396da09a4c43c72ee5c148108500e184
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
