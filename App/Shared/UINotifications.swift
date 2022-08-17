@@ -8,10 +8,16 @@
 
 import Foundation
 import Drops
+import UIKit
 
-struct UINotifications {
+enum UINotifications {
     static func showError() {
-        let drops = Drops()
-        drops.show(Drop(title: "Couldn't connect to Hacker News"))
+        let error = Drop(
+            title: "Couldn't connect to Hacker News",
+            icon: UIImage.init(systemName: "exclamationmark.circle.fill"),
+            position: .bottom
+        )
+
+        Drops.show(error)
     }
 }
