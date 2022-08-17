@@ -9,7 +9,6 @@
 import UIKit
 import PromiseKit
 import SafariServices
-import Loaf
 
 class FeedCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -59,7 +58,7 @@ class FeedCollectionViewController: UIViewController {
         }.done {
             self.update(with: self.viewModel, animate: fetchNextPage == true)
         }.catch { _ in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            UINotifications.showError()
         }.finally {
             self.collectionView.refreshControl?.endRefreshing()
         }
@@ -308,7 +307,7 @@ extension FeedCollectionViewController {
                 animated: true
             )
         default:
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            UINotifications.showError()
         }
     }
 }

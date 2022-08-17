@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
+		2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2406B37A28ACF8C700CB396B /* UINotifications.swift */; };
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
 		24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24191F8C1944C991003C0D98 /* CommentsController.swift */; };
 		2419D02324898DF700740184 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02224898DF700740184 /* Media.xcassets */; };
@@ -124,6 +126,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2406B37A28ACF8C700CB396B /* UINotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINotifications.swift; sourceTree = "<group>"; };
 		240C5BDF18D267C70011177A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		24191F8C1944C991003C0D98 /* CommentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
@@ -248,6 +251,7 @@
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
 				DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */,
+				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +382,7 @@
 				24B1A6A622B521470051EAFD /* BounceExpansion.swift */,
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
 				24D1845824B336B60017E4F4 /* TitleButton.swift */,
+				2406B37A28ACF8C700CB396B /* UINotifications.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -622,6 +627,9 @@
 				2419D02B24898DF700740184 /* PBXTargetDependency */,
 			);
 			name = Hackers;
+			packageProductDependencies = (
+				2406B37828ACF72F00CB396B /* Drops */,
+			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
 			productType = "com.apple.product-type.application";
@@ -670,6 +678,9 @@
 				Base,
 			);
 			mainGroup = 24F39F7C18AFB1150055F8DC;
+			packageReferences = (
+				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
+			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -919,6 +930,7 @@
 			files = (
 				2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */,
 				249A7E32194374550059C079 /* CommentTableViewCell.swift in Sources */,
+				2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */,
 				24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */,
 				24E390AA2542D7A9000DA7A8 /* UIViewControllerExtensions.swift in Sources */,
 				24E4F26119B4DA9900574B52 /* CommentDelegate.swift in Sources */,
@@ -1031,7 +1043,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 4.6.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1066,7 +1082,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MARKETING_VERSION = 4.6.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1098,7 +1118,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = co.weiran.HackersUITests;
@@ -1133,7 +1157,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = co.weiran.HackersUITests;
@@ -1164,7 +1192,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.HackersShareExtension;
@@ -1197,7 +1229,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.HackersShareExtension;
@@ -1304,7 +1340,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1325,7 +1362,10 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
@@ -1355,7 +1395,10 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 4.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
@@ -1417,6 +1460,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/omaralbeik/Drops";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2406B37828ACF72F00CB396B /* Drops */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */;
+			productName = Drops;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 24F39F7D18AFB1150055F8DC /* Project object */;
 }

@@ -11,7 +11,6 @@ import SwiftUI
 import SafariServices
 import MessageUI
 import PromiseKit
-import Loaf
 
 class SettingsViewController: UITableViewController {
     var sessionService: SessionService?
