@@ -8,6 +8,15 @@
         "revision" : "5bb17db61630bd64a1d4adfae8009049b548d8e6",
         "version" : "1.5.0"
       }
+    },
+    {
+      "identity" : "promisekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/PromiseKit",
+      "state" : {
+        "revision" : "ed3192004c0b00b4b3d7baa9578ee655c66faae3",
+        "version" : "6.18.0"
+      }
     }
   ],
   "version" : 2

@@ -5,7 +5,6 @@ source 'https://cdn.cocoapods.org/' # For Travis
 
 target 'Hackers' do
   pod 'HNScraper', :git => 'https://github.com/weiran/HNScraper.git', :branch => 'master'
-  pod 'PromiseKit/CorePromise'
   pod 'SwipeCellKit'
   pod 'Swinject'
   pod 'SwinjectStoryboard'
