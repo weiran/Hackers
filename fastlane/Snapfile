@@ -19,7 +19,5 @@ output_directory("./fastlane/screenshots")
 # clear all previously generated screenshots before creating new ones
 # clear_previous_screenshots(true)
 
-# workspace "../Hackers.xcworkspace"
-
 # For more information about all available options run
 # fastlane action snapshot
