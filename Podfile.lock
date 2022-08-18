@@ -8,7 +8,6 @@ PODS:
 DEPENDENCIES:
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
   - SwiftLint
-  - Swinject
   - SwinjectStoryboard
 
 SPEC REPOS:
@@ -33,6 +32,6 @@ SPEC CHECKSUMS:
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   SwinjectStoryboard: 240ce371396da09a4c43c72ee5c148108500e184
 
-PODFILE CHECKSUM: 7286b55b0d1a0aa7aa3227d55be548f337f61968
+PODFILE CHECKSUM: 22f82877c1e7798442d94ef6020169447ceffebb
 
 COCOAPODS: 1.11.3

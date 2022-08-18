@@ -54,6 +54,7 @@
 		249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8922A2C9B3002A9EC5 /* TableViewBackgroundView.swift */; };
 		249B8F8C22A2CA6F002A9EC5 /* TableViewBackgroundView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 249B8F8B22A2CA6F002A9EC5 /* TableViewBackgroundView.xib */; };
 		24A0C9AF28AE348A009A1ED4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9AE28AE348A009A1ED4 /* DeviceKit */; };
+		24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9B128AE3523009A1ED4 /* Swinject */; };
 		24A13DC32621EFD6002235A8 /* ItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24A13DC22621EFD6002235A8 /* ItemCell.xib */; };
 		24A13DC92621F36F002235A8 /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A13DC82621F36F002235A8 /* ItemCell.swift */; };
 		24ADA7E3206FAF2200C143F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24ADA7E2206FAF2200C143F4 /* Main.storyboard */; };
@@ -254,6 +255,7 @@
 				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
+				24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */,
 				DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */,
@@ -639,6 +641,7 @@
 				2406B38328AD07BE00CB396B /* Nuke */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
+				24A0C9B128AE3523009A1ED4 /* Swinject */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -696,6 +699,7 @@
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
 				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -1480,6 +1484,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1517,6 +1529,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
 			productName = DeviceKit;
+		};
+		24A0C9B128AE3523009A1ED4 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
