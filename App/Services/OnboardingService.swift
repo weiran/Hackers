@@ -58,12 +58,12 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let loginExperienceItem = WhatsNew.Item(
-            title: "New Login",
-            subtitle: "Improved login experience with password manager support.",
-            image: UIImage(systemName: "lock.shield.fill")
+        let notificationsItem = WhatsNew.Item(
+            title: "New Notifications",
+            subtitle: "New and improved in app notifications widget.",
+            image: UIImage(systemName: "bell.badge.fill")
         )
-        return [loginExperienceItem]
+        return [notificationsItem]
     }
 }
 

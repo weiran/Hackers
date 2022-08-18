@@ -6,6 +6,7 @@
 //  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
+import Foundation
 import SwinjectStoryboard
 
 extension SwinjectStoryboard {

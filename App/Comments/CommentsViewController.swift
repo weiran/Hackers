@@ -11,7 +11,6 @@ import UIKit
 import SafariServices
 import SwipeCellKit
 import PromiseKit
-import Loaf
 
 class CommentsViewController: UITableViewController {
     var swipeCellKitActions: SwipeCellKitActions?
@@ -68,7 +67,7 @@ class CommentsViewController: UITableViewController {
             self.comments = comments
             self.tableView.reloadData()
         }.catch { error in
-            Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+            UINotifications.showError()
         }.finally {
             self.tableView.backgroundView = nil
             self.refreshControl?.endRefreshing()
@@ -291,7 +290,7 @@ extension CommentsViewController {
                     animated: true
                 )
             default:
-                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+                UINotifications.showError()
             }
 
             // revert to the previous post state
@@ -327,7 +326,7 @@ extension CommentsViewController {
                     animated: true
                 )
             default:
-                Loaf("Error connecting to Hacker News", state: .error, sender: self).show()
+                UINotifications.showError()
             }
 
             // revert to the previous post state

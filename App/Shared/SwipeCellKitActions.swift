@@ -8,7 +8,6 @@
 
 import UIKit
 import SwipeCellKit
-import Loaf
 
 class SwipeCellKitActions {
     func voteAction(
@@ -33,7 +32,7 @@ class SwipeCellKitActions {
                     animated: true
                 )
             default:
-                Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()
+                UINotifications.showError()
             }
 
             // revert to the previous post state
@@ -84,7 +83,7 @@ class SwipeCellKitActions {
                     animated: true
                 )
             default:
-                Loaf("Error connecting to Hacker News", state: .error, sender: viewController).show()
+                UINotifications.showError()
             }
 
             // revert to the previous post state
