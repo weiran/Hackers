@@ -55,6 +55,15 @@
       }
     },
     {
+      "identity" : "swinjectstoryboard",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Swinject/SwinjectStoryboard",
+      "state" : {
+        "revision" : "a39bd7abe7e7427f9a0929a402cf2d1916fa5d50",
+        "version" : "2.2.2"
+      }
+    },
+    {
       "identity" : "swipecellkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwipeCellKit/SwipeCellKit",
