@@ -26,7 +26,7 @@ platform :ios do
   desc "Build"
   lane :build do |options|
     xcodebuild(
-      workspace: "Hackers.xcworkspace",
+      project: "Hackers.xcodeproj",
       scheme: "Hackers",
       configuration: "Debug",
       clean: options[:clean],

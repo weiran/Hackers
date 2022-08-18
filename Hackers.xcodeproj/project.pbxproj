@@ -35,6 +35,7 @@
 		2464D21B209E1FA100C7F8FC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21A209E1FA100C7F8FC /* SettingsViewController.swift */; };
 		2464D21D209E208800C7F8FC /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21C209E208800C7F8FC /* SettingsTableViewCell.swift */; };
 		2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */; };
+		2471B88D28AE55110086B573 /* HNScraper in Frameworks */ = {isa = PBXBuildFile; productRef = 2471B88C28AE55110086B573 /* HNScraper */; };
 		2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2477BDE4227D9D8200771FE2 /* SessionService.swift */; };
 		2479E11522B69CF100D9F1A4 /* ThumbnailImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */; };
 		247C9C79248BC35000AF4E60 /* NavigationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247C9C78248BC35000AF4E60 /* NavigationService.swift */; };
@@ -90,7 +91,6 @@
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
-		DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -218,10 +218,7 @@
 		24F644FD24951D6400869504 /* Scanfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Scanfile; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
-		5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.debug.xcconfig"; sourceTree = "<group>"; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
-		9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hackers.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hackers/Pods-Hackers.release.xcconfig"; sourceTree = "<group>"; };
-		F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hackers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,12 +254,12 @@
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
 				24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */,
-				DF68752992A90A126C292CD9 /* Pods_Hackers.framework in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */,
 				2406B38428AD07BE00CB396B /* Nuke in Frameworks */,
 				24A0C9B528AE35DB009A1ED4 /* SwinjectStoryboard in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
+				2471B88D28AE55110086B573 /* HNScraper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,7 +478,6 @@
 				24F39F8618AFB1150055F8DC /* Products */,
 				241387A51945A6E100D71220 /* README.md */,
 				245345F622466F71001AF1CE /* fastlane */,
-				B3F2CA75243DF4B690830D93 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -502,7 +498,6 @@
 				24F39F8818AFB1150055F8DC /* Foundation.framework */,
 				24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */,
 				24F39F8C18AFB1150055F8DC /* UIKit.framework */,
-				F0376FCAAF4C3EBA38572A82 /* Pods_Hackers.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -545,15 +540,6 @@
 				2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		B3F2CA75243DF4B690830D93 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */,
-				9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */,
-			);
-			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -620,11 +606,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 24F39FB118AFB1150055F8DC /* Build configuration list for PBXNativeTarget "Hackers" */;
 			buildPhases = (
-				32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */,
 				24F39F8118AFB1150055F8DC /* Sources */,
 				24F39F8218AFB1150055F8DC /* Frameworks */,
 				24F39F8318AFB1150055F8DC /* Resources */,
-				46C1D99CBFD349F8D40A6170 /* [CP] Embed Pods Frameworks */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 				249B8F8022A29B2E002A9EC5 /* ShellScript */,
 				24C10C0124866D3F00B93F68 /* Embed App Extensions */,
@@ -645,6 +629,7 @@
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
 				24A0C9B128AE3523009A1ED4 /* Swinject */,
 				24A0C9B428AE35DB009A1ED4 /* SwinjectStoryboard */,
+				2471B88C28AE55110086B573 /* HNScraper */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -699,11 +684,12 @@
 				2406B37C28AD041800CB396B /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */,
-				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
-				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
-				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */,
+				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */,
+				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */,
 				24A0C9B328AE35DB009A1ED4 /* XCRemoteSwiftPackageReference "SwinjectStoryboard" */,
+				2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -825,42 +811,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  \"swiftlint\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
-		};
-		32F4D363AD3C2A95650B70E3 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Hackers-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		46C1D99CBFD349F8D40A6170 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/HNScraper/HNScraper.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HNScraper.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hackers/Pods-Hackers-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1314,7 +1264,6 @@
 		};
 		24F39FB218AFB1150055F8DC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B9C6ECB6751D2AF6D93515D /* Pods-Hackers.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1347,7 +1296,6 @@
 		};
 		24F39FB318AFB1150055F8DC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9D41F6A856DA1B6671301AAD /* Pods-Hackers.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1460,7 +1408,7 @@
 				minimumVersion = 9.0.0;
 			};
 		};
-		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
@@ -1476,7 +1424,15 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
+		2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weiran/HNScraper.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
 			requirement = {
@@ -1484,7 +1440,7 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -1525,7 +1481,7 @@
 		};
 		2406B38628AD083500CB396B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */;
 			productName = SwiftSoup;
 		};
 		2406B38928AD08CC00CB396B /* WhatsNewKit */ = {
@@ -1533,14 +1489,19 @@
 			package = 2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */;
 			productName = WhatsNewKit;
 		};
+		2471B88C28AE55110086B573 /* HNScraper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */;
+			productName = HNScraper;
+		};
 		24A0C9AE28AE348A009A1ED4 /* DeviceKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
+			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */;
 			productName = DeviceKit;
 		};
 		24A0C9B128AE3523009A1ED4 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */;
+			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */;
 			productName = Swinject;
 		};
 		24A0C9B428AE35DB009A1ED4 /* SwinjectStoryboard */ = {
