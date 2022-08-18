@@ -1,5 +1,5 @@
 excluded:
-  - Pods
+  - scan_derived_data
   - fastlane
 opt_in_rules:
   - convenience_type

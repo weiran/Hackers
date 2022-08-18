@@ -36,11 +36,6 @@ Or install the [latest beta version from TestFlight][4].
 * You can follow [Hackers' progress on my blogs tagged Hackers](http://weiran.co/?tag=hackers).
 * You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
-## How to build
-
-1. Install [CocoaPods](https://cocoapods.org), you can use RubyGems: `gem install cocoapods`.
-2. Install dependencies, in the project's root folder run `pod install`.
-3. Open the workspace file (`Hackers.xcworkspace`) in Xcode 11.5 or later and build.
 
 ## Generate screenshots
 
@@ -51,7 +46,6 @@ Or install the [latest beta version from TestFlight][4].
 
 I use several open source projects in Hackers, in no particular order:
 
-* [CocoaPods](https://github.com/CocoaPods/CocoaPods)
 * [HNScraper](https://github.com/tsucres/HNScraper)
 * [PromiseKit](https://github.com/mxcl/PromiseKit)
 * [Nuke](https://github.com/kean/Nuke)

@@ -93,7 +93,7 @@ struct RoundedTextField: TextFieldStyle {
         configuration
             .padding(.all, 10)
             .overlay(
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.secondary, lineWidth: 0.5)
             )
             .padding(.horizontal, 20)
@@ -104,12 +104,13 @@ struct FilledButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
+            .font(.headline)
             .padding()
             .padding(.horizontal, 50)
             .frame(maxWidth: .infinity)
             .foregroundColor(Color.white)
             .background(Color.accentColor)
-            .cornerRadius(5)
+            .cornerRadius(15)
             .padding(.horizontal, 20)
     }
 }
