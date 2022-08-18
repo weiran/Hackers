@@ -7,7 +7,6 @@ target 'Hackers' do
   pod 'HNScraper', :git => 'https://github.com/weiran/HNScraper.git', :branch => 'master'
   pod 'Swinject'
   pod 'SwinjectStoryboard'
-  pod 'WhatsNewKit'
   
   pod 'SwiftLint'
 end
