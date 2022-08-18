@@ -10,7 +10,3 @@ target 'Hackers' do
   
   pod 'SwiftLint'
 end
-
-target 'HackersUITests' do
-  pod 'DeviceKit'
-end

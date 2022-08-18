@@ -1,5 +1,4 @@
 PODS:
-  - DeviceKit (4.6.1)
   - HNScraper (0.2.2)
   - SwiftLint (0.48.0)
   - Swinject (2.7.1)
@@ -7,7 +6,6 @@ PODS:
     - Swinject (~> 2.7.1)
 
 DEPENDENCIES:
-  - DeviceKit
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
   - SwiftLint
   - Swinject
@@ -15,7 +13,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - DeviceKit
     - SwiftLint
     - Swinject
     - SwinjectStoryboard
@@ -31,12 +28,11 @@ CHECKOUT OPTIONS:
     :git: https://github.com/weiran/HNScraper.git
 
 SPEC CHECKSUMS:
-  DeviceKit: 316f28290430467278b8a0d1c895968efa9e16e2
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
   SwiftLint: 284cea64b6187c5d6bd83e9a548a64104d546447
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   SwinjectStoryboard: 240ce371396da09a4c43c72ee5c148108500e184
 
-PODFILE CHECKSUM: b72f0ae7efc0205026634cd5404378169005f402
+PODFILE CHECKSUM: 7286b55b0d1a0aa7aa3227d55be548f337f61968
 
 COCOAPODS: 1.11.3

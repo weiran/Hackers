@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "devicekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/devicekit/DeviceKit.git",
+      "state" : {
+        "revision" : "8e2432f99915c6aa03d73b50152bf64dc87d0813",
+        "version" : "4.6.1"
+      }
+    },
+    {
       "identity" : "drops",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/omaralbeik/Drops",
