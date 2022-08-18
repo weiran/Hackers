@@ -1,14 +1,8 @@
 PODS:
   - HNScraper (0.2.2)
-  - SwiftLint (0.48.0)
 
 DEPENDENCIES:
   - HNScraper (from `https://github.com/weiran/HNScraper.git`, branch `master`)
-  - SwiftLint
-
-SPEC REPOS:
-  trunk:
-    - SwiftLint
 
 EXTERNAL SOURCES:
   HNScraper:
@@ -22,8 +16,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   HNScraper: d96632c361238905f2886f83675e75f2153b4dc4
-  SwiftLint: 284cea64b6187c5d6bd83e9a548a64104d546447
 
-PODFILE CHECKSUM: 86561e379aa6e563352bc111ecd0d19ec16c1271
+PODFILE CHECKSUM: d4c1b6a1a6c18d626a6c924b1c1b7220c27efbf8
 
 COCOAPODS: 1.11.3
