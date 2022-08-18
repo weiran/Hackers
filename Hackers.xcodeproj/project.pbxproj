@@ -684,12 +684,12 @@
 				2406B37C28AD041800CB396B /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */,
-				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */,
+				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
-				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */,
-				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */,
+				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */,
 				24A0C9B328AE35DB009A1ED4 /* XCRemoteSwiftPackageReference "SwinjectStoryboard" */,
-				2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */,
+				2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -1270,7 +1270,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 110;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1281,7 +1281,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.7;
+				MARKETING_VERSION = 4.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Dev Profile";
@@ -1302,7 +1302,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 110;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1313,7 +1313,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.7;
+				MARKETING_VERSION = 4.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.weiranzhang.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "Hackers Prod Profile";
@@ -1408,7 +1408,7 @@
 				minimumVersion = 9.0.0;
 			};
 		};
-		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */ = {
+		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
@@ -1424,7 +1424,7 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */ = {
+		2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/weiran/HNScraper.git";
 			requirement = {
@@ -1432,7 +1432,7 @@
 				kind = branch;
 			};
 		};
-		24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */ = {
+		24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
 			requirement = {
@@ -1440,7 +1440,7 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */ = {
+		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -1481,7 +1481,7 @@
 		};
 		2406B38628AD083500CB396B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup.git" */;
+			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
 		};
 		2406B38928AD08CC00CB396B /* WhatsNewKit */ = {
@@ -1491,17 +1491,17 @@
 		};
 		2471B88C28AE55110086B573 /* HNScraper */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper.git" */;
+			package = 2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */;
 			productName = HNScraper;
 		};
 		24A0C9AE28AE348A009A1ED4 /* DeviceKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit.git" */;
+			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
 			productName = DeviceKit;
 		};
 		24A0C9B128AE3523009A1ED4 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject.git" */;
+			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
 		24A0C9B428AE35DB009A1ED4 /* SwinjectStoryboard */ = {
