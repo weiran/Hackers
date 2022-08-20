@@ -50,6 +50,7 @@ struct LoginView: View {
                         }.ensure {
                             NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
                             isAuthenticating = false
+                            UINotifications.showSuccess("Logged in as \(username)")
                         }.catch { _ in
                             showAlert = true
                             password = ""
@@ -85,6 +86,7 @@ struct LoginView: View {
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

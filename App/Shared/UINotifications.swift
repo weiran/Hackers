@@ -20,4 +20,14 @@ enum UINotifications {
 
         Drops.show(error)
     }
+
+    static func showSuccess(_ text: String) {
+        let drop = Drop(
+            title: text,
+            icon: UIImage.init(systemName: "checkmark.circle.fill"),
+            position: .bottom
+        )
+
+        Drops.show(drop)
+    }
 }

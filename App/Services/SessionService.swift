@@ -30,6 +30,7 @@ class SessionService {
             HackersKit.shared.login(username: username, password: password)
         }.done { user in
             self.user = user
+            UserDefaults.standard.set(user.username, forKey: "username")
             seal.fulfill(.authenticated)
         }.catch { error in
             seal.reject(error)
@@ -41,12 +42,5 @@ class SessionService {
     enum AuthenticationState {
         case authenticated
         case notAuthenticated
-    }
-}
-
-extension SessionService: HNScraperShimAuthenticationDelegate {
-    func didAuthenticate(user: User, cookie: HTTPCookie) {
-        self.user = user
-        UserDefaults.standard.set(user.username, forKey: "username")
     }
 }
