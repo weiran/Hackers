@@ -20,19 +20,10 @@ struct Inject<Component> {
 
 class Resolver {
     static let shared = Resolver()
-    private let container = buildContainer()
+    // shared the container used by SwinjectStoryboard
+    private let container = SwinjectStoryboard.defaultContainer
 
     func resolve<T>(_ type: T.Type) -> T {
         container.resolve(T.self)!
     }
-}
-
-func buildContainer() -> Container {
-    let container = SwinjectStoryboard.defaultContainer
-
-    container.register(SessionService.self) { _ in
-        return SessionService()
-    }.inObjectScope(.container)
-
-    return container
 }

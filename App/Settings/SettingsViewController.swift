@@ -36,7 +36,9 @@ class SettingsViewController: UITableViewController {
         updateVersion()
         notificationToken = NotificationCenter.default
             .observe(name: Notification.Name.refreshRequired,
-                     object: nil, queue: .main) { _ in self.updateUsername() }
+                     object: nil, queue: .main) { _ in
+                self.updateUsername()
+            }
     }
 
     private func updateUsername() {

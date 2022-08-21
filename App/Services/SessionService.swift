@@ -39,6 +39,10 @@ class SessionService {
         return promise
     }
 
+    func unauthenticate() {
+        HackersKit.shared.logout()
+    }
+
     enum AuthenticationState {
         case authenticated
         case notAuthenticated
