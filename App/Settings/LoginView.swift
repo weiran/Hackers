@@ -12,69 +12,109 @@ import SwinjectStoryboard
 import PromiseKit
 
 struct LoginView: View {
+    @State var isAuthenticated: Bool
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var isAuthenticating = false
     @State private var showAlert = false
 
-    @Inject private var sessionService: SessionService
+    private var sessionService: SessionService
 
     @Environment(\.presentationMode) var presentationMode
 
+    init() {
+        // can't use @Inject for SessionService here as it runs after init
+        sessionService = SwinjectStoryboard.defaultContainer.resolve(SessionService.self)!
+        _isAuthenticated = State(
+            initialValue: sessionService.authenticationState == .authenticated
+        )
+    }
+
+    @ViewBuilder
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Login to Hacker News")
-                    .font(.largeTitle)
-                    .padding(.bottom, 30)
+            if isAuthenticated == false {
+                VStack {
+                    Text("Login to Hacker News")
+                        .font(.largeTitle)
+                        .padding(.bottom, 30)
 
-                TextField("Username", text: $username)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .textFieldStyle(RoundedTextField())
-                    .textContentType(.username)
+                    TextField("Username", text: $username)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .textFieldStyle(RoundedTextField())
+                        .textContentType(.username)
 
-                SecureField("Password", text: $password)
-                    .textFieldStyle(RoundedTextField())
-                    .textContentType(.password)
+                    SecureField("Password", text: $password)
+                        .textFieldStyle(RoundedTextField())
+                        .textContentType(.password)
 
-                Text("Hackers never stores your password")
-                    .foregroundColor(Color.secondary)
-                    .font(.footnote)
+                    Text("Hackers never stores your password")
+                        .foregroundColor(Color.secondary)
+                        .font(.footnote)
 
-                Button("Login") {
-                    isAuthenticating = true
-                    sessionService.authenticate(username: username, password: password)
-                        .done { _ in
-                            presentationMode.wrappedValue.dismiss()
-                        }.ensure {
-                            NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
-                            isAuthenticating = false
-                        }.catch { _ in
-                            showAlert = true
-                            password = ""
+                    Button("Login") {
+                        isAuthenticating = true
+                        sessionService.authenticate(username: username, password: password)
+                            .done { _ in
+                                isAuthenticated = true
+                                UINotifications.showSuccess("Logged in as \(username)")
+                                presentationMode.wrappedValue.dismiss()
+                            }.ensure {
+                                NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                                isAuthenticating = false
+                            }.catch { _ in
+                                showAlert = true
+                                password = ""
+                            }
+                    }.buttonStyle(FilledButton())
+                        .padding(.top, 30)
+                        .disabled(isAuthenticating)
+                        .alert(isPresented: $showAlert) {
+                            Alert(
+                                title: Text("Login Failed"),
+                                message: Text("Error logging into Hacker News, check your username and password and try again.")
+                            )
                         }
-                }.buttonStyle(FilledButton())
-                    .padding(.top, 30)
-                    .disabled(isAuthenticating)
-                    .alert(isPresented: $showAlert) {
-                        Alert(
-                            title: Text("Login Failed"),
-                            message: Text("Error logging into Hacker News, check your username and password.")
-                        )
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            presentationMode.wrappedValue.dismiss()
+                        } label: {
+                            Text("Done")
+                                .bold()
+                        }
                     }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        presentationMode.wrappedValue.dismiss()
-                    } label: {
-                        Text("Done")
-                            .bold()
+                }
+            } else {
+                VStack {
+                    Text("Logged in as")
+                        .font(.title)
+                    Text(sessionService.username ?? "")
+                        .font(.title)
+                        .bold()
+                        .padding(.bottom, 30)
+
+                    Button("Log out") {
+                        sessionService.unauthenticate()
+                        isAuthenticated = false
+                        NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                    }.buttonStyle(FilledButton())
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            presentationMode.wrappedValue.dismiss()
+                        } label: {
+                            Text("Done")
+                                .bold()
+                        }
                     }
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -131,6 +171,8 @@ struct LabelledDivider: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        let view = LoginView()
+        view.isAuthenticated = true
+        return view
     }
 }
