@@ -76,16 +76,6 @@ struct LoginView: View {
                                 message: Text("Error logging into Hacker News, check your username and password and try again.")
                             )
                         }
-
-                    LabelledDivider(label: "or")
-
-                    Link(destination: URL(string: "https://news.ycombinator.com/login")!) {
-                        HStack {
-                            Text("Register on Hacker News")
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                        }
-                        .padding()
-                    }
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
