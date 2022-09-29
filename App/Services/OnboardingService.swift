@@ -15,6 +15,9 @@ enum OnboardingService {
             return nil
         }
 
+        // disable onboarding
+        return nil
+
         let whatsNew = WhatsNew(
             title: "What's New in Hackers",
             items: items()

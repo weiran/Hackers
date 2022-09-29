@@ -42,8 +42,8 @@ enum HtmlParser {
         guard let id = Int(try postElement.attr("id")) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
         }
-        let urlString = try postElement.select(".titlelink").attr("href")
-        let title = try postElement.select(".titlelink").text()
+        let urlString = try postElement.select(".titleline").select("a").attr("href")
+        let title = try postElement.select(".titleline").text()
         guard let url = URL(string: urlString) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
         }
