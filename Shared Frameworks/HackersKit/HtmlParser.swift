@@ -43,7 +43,7 @@ enum HtmlParser {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post ID")
         }
         let urlString = try postElement.select(".titleline").select("a").attr("href")
-        let title = try postElement.select(".titleline").select("a").text()
+        let title = try postElement.select(".titleline").select("a").first()!.text()
         guard let url = URL(string: urlString) else {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse post URL")
         }
