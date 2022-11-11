@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -610,7 +610,7 @@
 				24F39F8218AFB1150055F8DC /* Frameworks */,
 				24F39F8318AFB1150055F8DC /* Resources */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
-				249B8F8022A29B2E002A9EC5 /* ShellScript */,
+				249B8F8022A29B2E002A9EC5 /* Run Script */,
 				24C10C0124866D3F00B93F68 /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -747,6 +747,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		2419D03D248AC2A300740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -765,6 +766,7 @@
 		};
 		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -795,8 +797,9 @@
 			shellPath = /bin/sh;
 			shellScript = "KEYWORDS=\"TODO:|FIXME:|\\?\\?\\?:|\\!\\!\\!:\"\nfind \".\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -not -path \"./Pods/*\" -print0 | \nxargs -0 egrep --with-filename --line-number --only-matching \"($KEYWORDS).*\\$\" | \nperl -p -e \"s/($KEYWORDS)/ warning: \\$1/\"\n";
 		};
-		249B8F8022A29B2E002A9EC5 /* ShellScript */ = {
+		249B8F8022A29B2E002A9EC5 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 12;
 			files = (
 			);
@@ -804,6 +807,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
