@@ -19,7 +19,7 @@
 		2419D02324898DF700740184 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02224898DF700740184 /* Media.xcassets */; };
 		2419D02524898DF700740184 /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D02424898DF700740184 /* ActionViewController.swift */; };
 		2419D02824898DF700740184 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02624898DF700740184 /* MainInterface.storyboard */; };
-		2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2419D037248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		2419D038248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		241C32DE24950C05000876DC /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241C32DD24950C05000876DC /* PostTitleView.swift */; };
@@ -66,7 +66,7 @@
 		24B982DF22BE65FF000D8913 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B982DE22BE65FF000D8913 /* SettingsStore.swift */; };
 		24C10BF624866D3F00B93F68 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C10BF524866D3F00B93F68 /* ShareViewController.swift */; };
 		24C10BF924866D3F00B93F68 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 24C10BF724866D3F00B93F68 /* MainInterface.storyboard */; };
-		24C10BFD24866D3F00B93F68 /* HackersShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 24C10BF324866D3F00B93F68 /* HackersShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		24C10BFD24866D3F00B93F68 /* HackersShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 24C10BF324866D3F00B93F68 /* HackersShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24C10C082486DB0700B93F68 /* HtmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C10C072486DB0700B93F68 /* HtmlParser.swift */; };
 		24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C20D381A7E42D5005B759B /* MainSplitViewController.swift */; };
 		24CE5FED19434BDC009D2677 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24CE5FEC19434BDC009D2677 /* AppDelegate.swift */; };
@@ -118,16 +118,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		24C10C0124866D3F00B93F68 /* Embed App Extensions */ = {
+		24C10C0124866D3F00B93F68 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed App Extensions */,
-				24C10BFD24866D3F00B93F68 /* HackersShareExtension.appex in Embed App Extensions */,
+				2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed Foundation Extensions */,
+				24C10BFD24866D3F00B93F68 /* HackersShareExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -611,7 +611,7 @@
 				24F39F8318AFB1150055F8DC /* Resources */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 				249B8F8022A29B2E002A9EC5 /* Run Script */,
-				24C10C0124866D3F00B93F68 /* Embed App Extensions */,
+				24C10C0124866D3F00B93F68 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -643,7 +643,7 @@
 			attributes = {
 				CLASSPREFIX = GU;
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1410;
 				ORGANIZATIONNAME = "Glass Umbrella";
 				TargetAttributes = {
 					2419D01F24898DF700740184 = {
