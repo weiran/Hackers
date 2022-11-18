@@ -79,7 +79,7 @@ enum HtmlParser {
         let document = try SwiftSoup.parse(html)
 
         guard let parentTable = try document
-            .select("table#hnmain tr:nth-of-type(3) table")
+            .select("table#hnmain tr:nth-of-type(4) table")
             .first() else {
                 throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post element")
         }
