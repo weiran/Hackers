@@ -17,7 +17,7 @@ enum HtmlParser {
             let post = try self.post(from: postElements, type: type)
             post.text = self.postText(from: tableElement)
             return [post]
-        } else if tableElement.hasClass("itemlist") {
+        } else {
             // post list
             let titleElements = try tableElement.select("tr.athing")
             let posts = try titleElements.compactMap { titleElement -> Post? in
@@ -79,7 +79,7 @@ enum HtmlParser {
         let document = try SwiftSoup.parse(html)
 
         guard let parentTable = try document
-            .select("table.itemlist, table.fatitem")
+            .select("table#hnmain tr:nth-of-type(3) table, table#hnmain tr:nth-of-type(4) table")
             .first() else {
                 throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post element")
         }
