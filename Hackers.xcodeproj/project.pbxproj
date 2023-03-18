@@ -91,6 +91,7 @@
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
+		CFC59BF029C5EE5700E93A49 /* DanilUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC59BEF29C5EE5700E93A49 /* DanilUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -219,6 +220,7 @@
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		CFC59BEF29C5EE5700E93A49 /* DanilUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanilUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -290,6 +292,7 @@
 		241C32DB24950AB3000876DC /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CF32593E29C5EDD5003C103E /* DanilUITest */,
 				245345ED22466EA8001AF1CE /* HackersUITests */,
 			);
 			path = Tests;
@@ -540,6 +543,14 @@
 				2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		CF32593E29C5EDD5003C103E /* DanilUITest */ = {
+			isa = PBXGroup;
+			children = (
+				CFC59BEF29C5EE5700E93A49 /* DanilUITests.swift */,
+			);
+			path = DanilUITest;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -834,6 +845,7 @@
 			files = (
 				245345EF22466EA8001AF1CE /* HackersUITests.swift in Sources */,
 				245345FB22466F75001AF1CE /* SnapshotHelper.swift in Sources */,
+				CFC59BF029C5EE5700E93A49 /* DanilUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
