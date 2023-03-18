@@ -30,19 +30,11 @@ class DanilUITests: XCTestCase {
     }
 
 
-
-
-
-
-
-
-    // TODO: done
     func testOpenSecondPostAndCheckFirstComment() {
         launch()
 
         let itemCell = XCUIApplication().collectionViews.cells.element(boundBy: 1)
         XCTAssertTrue(waitForElementToAppear(itemCell))
-    
         itemCell.firstMatch.tap()
 
         let commentsTable = XCUIApplication().tables["CommentsTableView"]
@@ -50,29 +42,32 @@ class DanilUITests: XCTestCase {
         XCTAssertTrue(commentsTable.cells.allElementsBoundByIndex[0].exists)
     }
 
-
-
-
-
+    
     // FIXME: не работает
     func testTypeLoginAndPasswordFields() {
-        launch()
+        let app = XCUIApplication()
+        setupSnapshot(app, waitForAnimations: false)
+        app.launchArguments = [
+            "disableReviewPrompts",
+            "skipAnimations",
+            "disableOnboarding"
+        ]
+
+        app.launch()
 
         let itemCell = XCUIApplication().collectionViews.cells.firstMatch
         let setting = XCUIApplication().navigationBars.buttons["Settings"]
         setting.tap()
 
-        let itemCell2 = XCUIApplication().collectionViews.cells.firstMatch
-        let loginButton = XCUIApplication().buttons[""]
+        let loginButton = XCUIApplication().tables.cells.staticTexts["Account"]
+        print(loginButton)
         loginButton.tap()
-        XCTAssertTrue(loginButton.waitForExistence(timeout: 10))
+        let loginButton2 = XCUIApplication().buttons["l2"]
+        let loginButton3 = XCUIApplication().buttons["l3"]
+        XCTAssertTrue(false)
     }
 
 
-
-
-
-    // TODO: done
     func testOpenSpecificNamePost() {
         launch()
 
@@ -92,19 +87,31 @@ class DanilUITests: XCTestCase {
         XCTAssertTrue(findPost, "Post not found")
     }
 
-
-    // FIXME: не работает
     func testCheckExistPostWithImageStub() {
-        launch()
-    
-        //let itemCell = XCUIApplication().collectionViews.cells.
-    
-        //XCTAssertTrue(XCUIApplication().collectionViews.cells.staticTexts[postName].exists)
+        let app = XCUIApplication()
+        setupSnapshot(app, waitForAnimations: false)
+        app.launchArguments = [
+            "disableReviewPrompts",
+            "skipAnimations",
+            "disableOnboarding"
+        ]
+
+        app.launch()
+
+        var findStub = false
+        let expectedPostName = "Build Your Own"
+        XCTAssertTrue(XCUIApplication().collectionViews.cells.firstMatch.waitForExistence(timeout: 10))
+        let countCells = XCUIApplication().collectionViews.cells.count
+        for ind in 0...countCells {
+            let currentPostName = XCUIApplication().collectionViews.cells.element(boundBy: ind).images["safari"]
+            if currentPostName.exists {
+                print("Stub in post №  \(ind + 1)")
+                findStub = true
+                break
+            }
+        }
+        XCTAssertTrue(findStub, "Stub not found")
     }
-
-
-
-
 
 
 
