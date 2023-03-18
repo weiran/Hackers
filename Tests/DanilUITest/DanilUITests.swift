@@ -15,10 +15,10 @@ class DanilUITests: XCTestCase {
 
         app.launch()
     }
-    
-    
-    
-    
+
+
+
+
     // FIXME: не работает
     func testCheckOpenSettingsScreen() {
         launch()
@@ -28,21 +28,21 @@ class DanilUITests: XCTestCase {
         setting.tap()
         XCTAssertTrue(XCUIApplication().staticTexts["Hackers, By Weiran Zhang"].exists)
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     // TODO: done
     func testOpenSecondPostAndCheckFirstComment() {
         launch()
 
         let itemCell = XCUIApplication().collectionViews.cells.element(boundBy: 1)
         XCTAssertTrue(waitForElementToAppear(itemCell))
-        
+    
         itemCell.firstMatch.tap()
 
         let commentsTable = XCUIApplication().tables["CommentsTableView"]
@@ -61,46 +61,53 @@ class DanilUITests: XCTestCase {
         let itemCell = XCUIApplication().collectionViews.cells.firstMatch
         let setting = XCUIApplication().navigationBars.buttons["Settings"]
         setting.tap()
-        
+
         let itemCell2 = XCUIApplication().collectionViews.cells.firstMatch
         let loginButton = XCUIApplication().buttons[""]
         loginButton.tap()
         XCTAssertTrue(loginButton.waitForExistence(timeout: 10))
     }
-    
-    
-    
-    
-    
-    // FIXME: не работает
+
+
+
+
+
+    // TODO: done
     func testOpenSpecificNamePost() {
         launch()
-        
-        let postName = "How to own your own Docker Registry address"
-        
-        XCTAssertTrue(XCUIApplication().collectionViews.cells.staticTexts[postName].exists)
+
+        var findPost = false
+        let expectedPostName = "Build Your Own Redis with C/C++"
+        XCTAssertTrue(XCUIApplication().collectionViews.cells.firstMatch.waitForExistence(timeout: 10))
+        let countCells = XCUIApplication().collectionViews.cells.count
+        for ind in 0...countCells {
+            let currentPostName = XCUIApplication().collectionViews.cells.element(boundBy: ind).staticTexts.element(boundBy: 0).label
+            print(currentPostName)
+            if currentPostName == expectedPostName {
+                XCUIApplication().collectionViews.cells.element(boundBy: ind).tap()
+                findPost = true
+                break
+            }
+        }
+        XCTAssertTrue(findPost, "Post not found")
     }
-    
-    
-    
-    
-    
-    
+
+
     // FIXME: не работает
     func testCheckExistPostWithImageStub() {
         launch()
-        
+    
         //let itemCell = XCUIApplication().collectionViews.cells.
-        
+    
         //XCTAssertTrue(XCUIApplication().collectionViews.cells.staticTexts[postName].exists)
     }
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     func waitForElementToAppear(_ element: XCUIElement) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
@@ -108,5 +115,3 @@ class DanilUITests: XCTestCase {
         return result == .completed
     }
 }
-
-
