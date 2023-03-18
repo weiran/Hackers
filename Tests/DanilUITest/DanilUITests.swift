@@ -1,11 +1,3 @@
-//
-//  HackersUITests.swift
-//  HackersUITests
-//
-//  Created by Weiran Zhang on 23/03/2019.
-//  Copyright © 2019 Weiran Zhang. All rights reserved.
-//
-
 import XCTest
 import DeviceKit
 
@@ -21,13 +13,13 @@ class DanilUITests: XCTestCase {
             "disableOnboarding"
         ]
 
-        if darkTheme {
-            app.launchArguments.append("darkMode")
-        }
-
         app.launch()
     }
     
+    
+    
+    
+    // FIXME: не работает
     func testCheckOpenSettingsScreen() {
         launch()
 
@@ -41,6 +33,10 @@ class DanilUITests: XCTestCase {
     
     
     
+    
+    
+    
+    // TODO: done
     func testOpenSecondPostAndCheckFirstComment() {
         launch()
 
@@ -53,12 +49,12 @@ class DanilUITests: XCTestCase {
         XCTAssertTrue(commentsTable.waitForExistence(timeout: 10))
         XCTAssertTrue(commentsTable.cells.allElementsBoundByIndex[0].exists)
     }
-    
-    
-    
-    
 
-    
+
+
+
+
+    // FIXME: не работает
     func testTypeLoginAndPasswordFields() {
         launch()
 
@@ -72,6 +68,11 @@ class DanilUITests: XCTestCase {
         XCTAssertTrue(loginButton.waitForExistence(timeout: 10))
     }
     
+    
+    
+    
+    
+    // FIXME: не работает
     func testOpenSpecificNamePost() {
         launch()
         
@@ -80,6 +81,12 @@ class DanilUITests: XCTestCase {
         XCTAssertTrue(XCUIApplication().collectionViews.cells.staticTexts[postName].exists)
     }
     
+    
+    
+    
+    
+    
+    // FIXME: не работает
     func testCheckExistPostWithImageStub() {
         launch()
         
