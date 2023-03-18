@@ -21,7 +21,6 @@ class DanilUITests: XCTestCase {
             "disableOnboarding"
         ]
 
-        // set theme
         if darkTheme {
             app.launchArguments.append("darkMode")
         }
