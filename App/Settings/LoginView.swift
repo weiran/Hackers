@@ -44,10 +44,12 @@ struct LoginView: View {
                         .disableAutocorrection(true)
                         .textFieldStyle(RoundedTextField())
                         .textContentType(.username)
+                        .accessibilityIdentifier("loginField")
 
                     SecureField("Password", text: $password)
                         .textFieldStyle(RoundedTextField())
                         .textContentType(.password)
+                        .accessibilityIdentifier("passwordField")
 
                     Text("Hackers never stores your password")
                         .foregroundColor(Color.secondary)
