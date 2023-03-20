@@ -71,25 +71,32 @@ class DanilUITests: XCTestCase {
 
     // #TODO: в самом начале свайпаю, чтобы посты подгрузились. В идеале конечно делать один свап и сразу чекать, но чет не очень получилось, в следущюем тесте попробовал как раз
     func testOpenSpecificNamePost() {
-        launch()
+        let app = XCUIApplication()
+        setupSnapshot(app, waitForAnimations: false)
+        app.launchArguments = [
+            "disableReviewPrompts",
+            "skipAnimations",
+            "disableOnboarding"
+        ]
 
+        app.launch()
+
+        let expectedPostName = "Reassessing relative temporal lobe size in anthropoids and modern humans"
+        let maxCountSwipe = 3
         var findPost = false
-        let expectedPostName = "Radio Man, Autograph King"
-        var currentPostNumber = 0
 
-        XCUIApplication().swipeUp()
-        XCUIApplication().swipeUp()
-        XCUIApplication().swipeUp()
+        let commentsTable = XCUIApplication().collectionViews.firstMatch
+        XCTAssertTrue(commentsTable.waitForExistence(timeout: 10))
 
-        while (!findPost) {
-            let currentPostName = XCUIApplication().collectionViews.cells.element(boundBy: currentPostNumber).staticTexts.element(boundBy: 0).label
-            if currentPostName == expectedPostName {
-                XCUIApplication().collectionViews.cells.element(boundBy: currentPostNumber).tap()
+        for _ in 0...maxCountSwipe {
+            if (XCUIApplication().cells.staticTexts[expectedPostName].exists) {
                 findPost = true
+                XCUIApplication().cells.staticTexts[expectedPostName].tap()
                 break
             }
-            currentPostNumber += 1
+            XCUIApplication().swipeUp()
         }
+
         XCTAssertTrue(findPost, "Post not found")
     }
 
