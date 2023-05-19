@@ -114,7 +114,7 @@ class CommentsViewController: UITableViewController {
         guard post.url.host != nil else {
             // hostless url means its an internal Hacker News link
             // can also check postType but this is more future proof
-            self.showShareSheet(url: post.hackerNewsURL, sender: sender)
+            self.showShareSheet(url: post.hackerNewsURL, title: post.title, sender: sender)
             return
         }
 
@@ -124,13 +124,13 @@ class CommentsViewController: UITableViewController {
 
         let postLinkAction = UIAlertAction(
             title: "Article Link", style: .default) { _ in
-                self.showShareSheet(url: post.url, sender: sender)
+                self.showShareSheet(url: post.url, title: post.title, sender: sender)
         }
         alertController.addAction(postLinkAction)
 
         let hackerNewsLinkAction = UIAlertAction(
             title: "Hacker News Link", style: .default) { _ in
-                self.showShareSheet(url: post.hackerNewsURL, sender: sender)
+                self.showShareSheet(url: post.hackerNewsURL, title: post.title, sender: sender)
         }
         alertController.addAction(hackerNewsLinkAction)
 
@@ -139,12 +139,13 @@ class CommentsViewController: UITableViewController {
         present(alertController, animated: true)
     }
 
-    private func showShareSheet(url: URL, sender: UIBarButtonItem) {
+    private func showShareSheet(url: URL, title: String, sender: UIBarButtonItem) {
         let activityViewController = UIActivityViewController(
             activityItems: [url],
             applicationActivities: nil
         )
         activityViewController.popoverPresentationController?.barButtonItem = sender
+        activityViewController.setValue(title, forKey: "subject")
         present(activityViewController, animated: true, completion: nil)
     }
 }
