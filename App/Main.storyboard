@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="506-JC-FDt">
-    <device id="retina4_7" orientation="portrait" appearance="dark"/>
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
@@ -313,10 +313,10 @@
             </objects>
             <point key="canvasLocation" x="4074" y="546"/>
         </scene>
-        <!--Select Text-->
+        <!--Select Text Navigation Controller-->
         <scene sceneID="x8d-A2-KEL">
             <objects>
-                <navigationController title="Select Text" id="ozE-fK-sDZ" sceneMemberID="viewController">
+                <navigationController title="Select Text" id="ozE-fK-sDZ" userLabel="Select Text Navigation Controller" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="vl6-C0-1Os">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
