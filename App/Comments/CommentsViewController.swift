@@ -65,6 +65,7 @@ class CommentsViewController: UITableViewController {
             return self.loadComments(for: post)
         }.done { comments in
             self.comments = comments
+			self.post?.commentsCount = comments.count
             self.tableView.reloadData()
         }.catch { error in
             UINotifications.showError()

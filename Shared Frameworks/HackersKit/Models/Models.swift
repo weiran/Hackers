@@ -13,7 +13,7 @@ class Post: Hashable {
     let url: URL
     let title: String
     let age: String
-    let commentsCount: Int
+    var commentsCount: Int
     let by: String
     var score: Int
     let postType: PostType
