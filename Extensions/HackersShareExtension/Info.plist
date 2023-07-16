@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>4.7.12</string>
+	<string>4.8.0</string>
 	<key>CFBundleVersion</key>
-	<string>122</string>
+	<string>123</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
