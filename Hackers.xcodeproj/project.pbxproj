@@ -1409,7 +1409,7 @@
 			repositoryURL = "https://github.com/kean/Nuke";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
+				minimumVersion = 10.0.0;
 			};
 		};
 		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
@@ -1441,7 +1441,7 @@
 			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
+				minimumVersion = 5.0.0;
 			};
 		};
 		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
