@@ -306,10 +306,75 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="ozE-fK-sDZ" kind="presentation" identifier="ShowTextSelectionSegue" id="IIR-lL-SMT"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZK9-xq-FV6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4074" y="546"/>
+        </scene>
+        <!--Select Text Navigation Controller-->
+        <scene sceneID="x8d-A2-KEL">
+            <objects>
+                <navigationController title="Select Text" id="ozE-fK-sDZ" userLabel="Select Text Navigation Controller" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="vl6-C0-1Os">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="iMC-4m-ZPQ" kind="relationship" relationship="rootViewController" id="mSf-15-Jv5"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UQC-fj-N50" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4073" y="1397"/>
+        </scene>
+        <!--Text Selection View Controller-->
+        <scene sceneID="Kxi-mw-q0c">
+            <objects>
+                <viewController id="iMC-4m-ZPQ" customClass="TextSelectionViewController" customModule="Hackers" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="qem-z7-MD4">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" contentInsetAdjustmentBehavior="always" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ex9-nV-QsL">
+                                <rect key="frame" x="0.0" y="56" width="375" height="591"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" name="appTintColor"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+                                <color key="textColor" name="titleTextColor"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6GH-Me-8qr"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="ex9-nV-QsL" firstAttribute="top" secondItem="6GH-Me-8qr" secondAttribute="top" id="28R-Oy-9el"/>
+                            <constraint firstItem="6GH-Me-8qr" firstAttribute="trailing" secondItem="ex9-nV-QsL" secondAttribute="trailing" id="8M0-uA-971"/>
+                            <constraint firstItem="6GH-Me-8qr" firstAttribute="bottom" secondItem="ex9-nV-QsL" secondAttribute="bottom" id="8cC-rF-95T"/>
+                            <constraint firstItem="ex9-nV-QsL" firstAttribute="leading" secondItem="6GH-Me-8qr" secondAttribute="leading" id="sBQ-UH-2BG"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="as6-0R-MHp">
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="vLV-wD-oKW">
+                            <color key="tintColor" name="titleTextColor"/>
+                            <connections>
+                                <action selector="didPressDone:" destination="iMC-4m-ZPQ" id="mLe-QH-ihC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="string" keyPath="title" value="Select Text"/>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <outlet property="commentTextView" destination="ex9-nV-QsL" id="7Xb-R8-d1q"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T4Z-We-8aE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4916" y="1397"/>
         </scene>
         <!--Settings Navigation Controller-->
         <scene sceneID="CQx-j9-MSt">
@@ -728,6 +793,9 @@
         <image name="PointsIcon" width="14" height="14"/>
         <image name="gear" catalog="system" width="128" height="122"/>
         <image name="safari" catalog="system" width="128" height="123"/>
+        <namedColor name="appTintColor">
+            <color red="0.396078431372549" green="0.074509803921568626" blue="0.89803921568627454" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="groupedTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
