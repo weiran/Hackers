@@ -16,7 +16,7 @@ enum OnboardingService {
         }
 
         // disable onboarding
-        return nil
+        // return nil
 
         let whatsNew = WhatsNew(
             title: "What's New in Hackers",
@@ -61,12 +61,12 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let notificationsItem = WhatsNew.Item(
-            title: "New Notifications",
-            subtitle: "New and improved in app notifications widget.",
-            image: UIImage(systemName: "bell.badge.fill")
+        let clipboardItem = WhatsNew.Item(
+            title: "Copy Comments",
+            subtitle: "Copy the text of comments to your clipboard. Thanks @BeIllegalBeagle.",
+            image: UIImage(systemName: "list.bullet.clipboard.fill")
         )
-        return [notificationsItem]
+        return [clipboardItem]
     }
 }
 
