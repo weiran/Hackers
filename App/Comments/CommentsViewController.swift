@@ -268,10 +268,26 @@ extension CommentsViewController {
                 self?.shareComment(at: indexPath)
             }
 
+            let copy = UIAction(
+                title: "Copy",
+                image: UIImage(systemName: "doc.on.doc"),
+                identifier: UIAction.Identifier(rawValue: "copy.comment")
+            ) { [weak self] _ in
+                self?.copyComment(at: indexPath)
+            }
+
+            let selectText = UIAction(
+                title: "Select Text",
+                image: UIImage(systemName: "selection.pin.in.out"),
+                identifier: UIAction.Identifier(rawValue: "select.comment")
+            ) { [weak self] _ in
+                self?.selectCommentText(at: indexPath)
+            }
+
             let voteMenu = upvoted ? unvote : upvote
             let shareMenu = UIMenu(title: "", options: .displayInline, children: [share])
 
-            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu, shareMenu])
+            return UIMenu(title: "", image: nil, identifier: nil, children: [voteMenu, copy, selectText, shareMenu])
         }
     }
 
@@ -398,6 +414,17 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         self.present(activityViewController, animated: true, completion: nil)
     }
 
+    private func selectCommentText(at indexPath: IndexPath) {
+        let comment = self.commentsController.visibleComments[indexPath.row]
+        performSegue(withIdentifier: "ShowTextSelectionSegue", sender: comment.text)
+    }
+    
+    private func copyComment(at indexPath: IndexPath) {
+        let comment = self.commentsController.visibleComments[indexPath.row]
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = comment.text.parseToAttributedString().string
+    }
+    
     private func collapseAction() -> SwipeAction {
         let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
             let comment = self.commentsController.visibleComments[indexPath.row]
@@ -516,5 +543,16 @@ extension CommentsViewController {
 
     private func tearDownHandoff() {
         userActivity?.invalidate()
+    }
+}
+
+extension CommentsViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let comment = sender as? String,
+           segue.identifier == "ShowTextSelectionSegue",
+           let navVC = segue.destination as? UINavigationController,
+           let textSelectionViewController = navVC.children.first as? TextSelectionViewController {
+            textSelectionViewController.comment = comment
+        }
     }
 }

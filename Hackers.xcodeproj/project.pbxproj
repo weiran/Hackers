@@ -91,6 +91,7 @@
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
+		8B782E032A5AB01C00FD6B39 /* TextSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -219,6 +220,7 @@
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSelectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -444,6 +446,7 @@
 				2454B9031F655426005A98C7 /* EmptyViewController.swift */,
 				24D811A41FF90A58000951C3 /* TouchableTextView.swift */,
 				24191F8C1944C991003C0D98 /* CommentsController.swift */,
+				8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */,
 			);
 			path = Comments;
 			sourceTree = "<group>";
@@ -878,6 +881,7 @@
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */,
 				24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */,
+				8B782E032A5AB01C00FD6B39 /* TextSelectionViewController.swift in Sources */,
 				24C20D391A7E42D5005B759B /* MainSplitViewController.swift in Sources */,
 				2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */,
 				24CE5FF819435A90009D2677 /* PostCell.swift in Sources */,
