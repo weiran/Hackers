@@ -1,6 +1,7 @@
 excluded:
   - scan_derived_data
   - fastlane
+  - vendor
 opt_in_rules:
   - convenience_type
   - empty_count
