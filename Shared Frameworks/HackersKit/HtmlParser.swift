@@ -22,14 +22,13 @@ enum HtmlParser {
             let titleElements = try tableElement.select("tr.athing")
             let posts = try titleElements.compactMap { titleElement -> Post? in
                 guard let metadataElement = try titleElement.nextElementSibling() else {
-                    return nil
+                    throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post elements")
                 }
                 let postElements = Elements([titleElement, metadataElement])
                 return try? self.post(from: postElements, type: type)
             }
             return posts
         }
-        throw Exception.Error(type: .SelectorParseException, Message: "Couldn't find post elements")
     }
 
     static func post(from elements: Elements, type: PostType) throws -> Post {

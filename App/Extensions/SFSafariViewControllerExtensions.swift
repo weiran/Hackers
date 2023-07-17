@@ -17,10 +17,10 @@ private enum AssociatedKeys {
 
 // Preview action items
 extension SFSafariViewController {
-    var previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? {
+    var previewActionItemsDelegate: SFSafariPreviewActionItemsDelegate? {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName)
-                as? SFSafariViewControllerPreviewActionItemsDelegate
+                as? SFSafariPreviewActionItemsDelegate
         }
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.PreviewActionItemsDelegateName,
@@ -33,14 +33,14 @@ extension SFSafariViewController {
     }
 }
 
-protocol SFSafariViewControllerPreviewActionItemsDelegate: AnyObject {
+protocol SFSafariPreviewActionItemsDelegate: AnyObject {
     func safariViewControllerPreviewActionItems(_ controller: SFSafariViewController) -> [UIPreviewActionItem]
 }
 
 extension SFSafariViewController {
     static func instance(
         for url: URL,
-        previewActionItemsDelegate: SFSafariViewControllerPreviewActionItemsDelegate? = nil
+        previewActionItemsDelegate: SFSafariPreviewActionItemsDelegate? = nil
     ) -> SFSafariViewController? {
         if WKWebView.handlesURLScheme(url.scheme ?? "") == false {
             return nil

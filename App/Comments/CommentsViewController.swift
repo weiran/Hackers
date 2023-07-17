@@ -67,7 +67,7 @@ class CommentsViewController: UITableViewController {
             self.comments = comments
             self.post?.commentsCount = comments.count
             self.tableView.reloadData()
-        }.catch { error in
+        }.catch { _ in
             UINotifications.showError()
         }.finally {
             self.tableView.backgroundView = nil
@@ -223,11 +223,9 @@ extension CommentsViewController {
 
 // long taps
 extension CommentsViewController {
-    override func tableView(
-        _ tableView: UITableView,
-        contextMenuConfigurationForRowAt indexPath: IndexPath,
-        point: CGPoint
-    ) -> UIContextMenuConfiguration? {
+    override func tableView(_ tableView: UITableView,
+                            contextMenuConfigurationForRowAt indexPath: IndexPath,
+                            point: CGPoint) -> UIContextMenuConfiguration? {
         guard let comment = comments?[safe: indexPath.row], let post = post else { return nil }
         let actionOnPost = indexPath.section == 0
         let upvoted = actionOnPost ? post.upvoted : comment.upvoted
@@ -248,41 +246,31 @@ extension CommentsViewController {
                 title: "Upvote",
                 image: UIImage(systemName: "arrow.up"),
                 identifier: UIAction.Identifier(rawValue: "upvote")
-            ) { _ in
-                voteAction()
-            }
+            ) { _ in voteAction() }
 
             let unvote = UIAction(
                 title: "Unvote",
                 image: UIImage(systemName: "arrow.uturn.down"),
                 identifier: UIAction.Identifier(rawValue: "unvote")
-            ) { _ in
-                voteAction()
-            }
+            ) { _ in voteAction() }
 
             let share = UIAction(
                 title: "Share",
                 image: UIImage(systemName: "square.and.arrow.up"),
                 identifier: UIAction.Identifier(rawValue: "share.comment")
-            ) { [weak self] _ in
-                self?.shareComment(at: indexPath)
-            }
+            ) { [weak self] _ in self?.shareComment(at: indexPath) }
 
             let copy = UIAction(
                 title: "Copy",
                 image: UIImage(systemName: "doc.on.doc"),
                 identifier: UIAction.Identifier(rawValue: "copy.comment")
-            ) { [weak self] _ in
-                self?.copyComment(at: indexPath)
-            }
+            ) { [weak self] _ in self?.copyComment(at: indexPath) }
 
             let selectText = UIAction(
                 title: "Select Text",
                 image: UIImage(systemName: "selection.pin.in.out"),
                 identifier: UIAction.Identifier(rawValue: "select.comment")
-            ) { [weak self] _ in
-                self?.selectCommentText(at: indexPath)
-            }
+            ) { [weak self] _ in self?.selectCommentText(at: indexPath) }
 
             let voteMenu = upvoted ? unvote : upvote
             let shareMenu = UIMenu(title: "", options: .displayInline, children: [share])
@@ -418,13 +406,13 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
         let comment = self.commentsController.visibleComments[indexPath.row]
         performSegue(withIdentifier: "ShowTextSelectionSegue", sender: comment.text)
     }
-    
+
     private func copyComment(at indexPath: IndexPath) {
         let comment = self.commentsController.visibleComments[indexPath.row]
         let pasteboard = UIPasteboard.general
         pasteboard.string = comment.text.parseToAttributedString().string
     }
-    
+
     private func collapseAction() -> SwipeAction {
         let collapseAction = SwipeAction(style: .default, title: "Collapse") { _, indexPath in
             let comment = self.commentsController.visibleComments[indexPath.row]

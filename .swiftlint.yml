@@ -9,7 +9,6 @@ opt_in_rules:
   - first_where
   - modifier_order
   - toggle_bool
-  - unused_declaration
   - overridden_super_call
 type_name:
   excluded:
