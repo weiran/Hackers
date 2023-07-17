@@ -30,6 +30,7 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7.3'
+        bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@1.0
     - name: Run UI Tests
       uses: maierj/fastlane-action@v3.0.0
@@ -45,6 +46,7 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7.3'
+        bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@1.0
     - name: Build
       uses: maierj/fastlane-action@v3.0.0
