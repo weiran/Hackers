@@ -24,7 +24,7 @@ extension String {
 
     func parseToAttributedString() -> NSMutableAttributedString {
         let paragraphIdentifier = "PARAGRAPH_NEED_NEW_LINES_HERE"
-        
+
         // swiftlint:disable unused_optional_binding
         guard let document = try? SwiftSoup.parse(self),
               let _ = try? document.select("p").before(paragraphIdentifier),
@@ -32,7 +32,7 @@ extension String {
             return NSMutableAttributedString()
         }
         // swiftlint:enable unused_optional_binding
-        
+
         return NSMutableAttributedString(string: text.replacingOccurrences(of: paragraphIdentifier + " ", with: "\n\n"))
     }
 }

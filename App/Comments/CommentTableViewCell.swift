@@ -124,12 +124,12 @@ extension CommentTableViewCell: UITextViewDelegate {
 extension CommentTableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        selected ? setSelectedBackground() : setUnselectedBackground()
+        if selected { setSelectedBackground() } else { setUnselectedBackground() }
     }
 
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        highlighted ? setSelectedBackground() : setUnselectedBackground()
+        if highlighted { setSelectedBackground() } else { setUnselectedBackground() }
     }
 
     private func setSelectedBackground() {

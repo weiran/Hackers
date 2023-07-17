@@ -1,6 +1,7 @@
 excluded:
   - scan_derived_data
   - fastlane
+  - vendor
 opt_in_rules:
   - convenience_type
   - empty_count
@@ -9,7 +10,6 @@ opt_in_rules:
   - first_where
   - modifier_order
   - toggle_bool
-  - unused_declaration
   - overridden_super_call
 type_name:
   excluded:

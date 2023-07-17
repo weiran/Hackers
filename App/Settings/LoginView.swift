@@ -73,7 +73,8 @@ struct LoginView: View {
                         .alert(isPresented: $showAlert) {
                             Alert(
                                 title: Text("Login Failed"),
-                                message: Text("Error logging into Hacker News, check your username and password and try again.")
+                                message:
+                                    Text("Failed logging into Hacker News, check your username or password.")
                             )
                         }
                 }
