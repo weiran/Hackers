@@ -1398,7 +1398,7 @@
 			repositoryURL = "https://github.com/mxcl/PromiseKit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
+				minimumVersion = 8.0.0;
 			};
 		};
 		2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
