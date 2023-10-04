@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 import SafariServices
 import SwipeCellKit
-import PromiseKit
 
 class CommentsViewController: UITableViewController {
     var swipeCellKitActions: SwipeCellKitActions?
@@ -57,43 +56,44 @@ class CommentsViewController: UITableViewController {
             tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
         }
 
-        firstly {
-            loadPost()
-        }.then { (post) -> Promise<[Comment]> in
-            self.post = post
-            self.setupHandoff(with: post, activityType: .comments)
-            return self.loadComments(for: post)
-        }.done { comments in
-            self.comments = comments
-            self.post?.commentsCount = comments.count
-            self.tableView.reloadData()
-        }.catch { _ in
-            UINotifications.showError()
-        }.finally {
+        Task { @MainActor [weak self] in
+            guard let self = self else {
+                return
+            }
+            do {
+                let post = try await self.loadPost()
+                self.post = post
+                self.setupHandoff(with: post, activityType: .comments)
+                let comments = try await self.loadComments(for: post)
+                self.comments = comments
+                self.post?.commentsCount = comments.count
+                self.tableView.reloadData()
+            } catch {
+                UINotifications.showError()
+            }
             self.tableView.backgroundView = nil
             self.refreshControl?.endRefreshing()
         }
     }
 
-    private func loadPost() -> Promise<Post> {
+    private func loadPost() async throws -> Post {
         if let post = self.post {
-            return Promise.value(post)
+            return post
         }
-        return HackersKit.shared.getPost(id: postId!, includeAllComments: true)
+        return try await HackersKit.shared.getPost(id: postId!, includeAllComments: true).async()
     }
 
-    private func loadComments(for post: Post) -> Promise<[Comment]> {
+    private func loadComments(for post: Post) async throws -> [Comment] {
         // if it already has comments then use those
         if let comments = post.comments {
-            return Promise.value(comments)
+            return comments
         }
 
         // otherwise always try to fetch comments
-        return firstly {
-            HackersKit.shared.getPost(id: post.id, includeAllComments: true)
-        }.map { post in
+        return try await Task {
+            let post = try await HackersKit.shared.getPost(id: post.id, includeAllComments: true).async()
             return post.comments ?? []
-        }
+        }.value
     }
 
     private func observeNotifications() {
