@@ -10,7 +10,6 @@ import UIKit
 import SwiftUI
 import SafariServices
 import MessageUI
-import PromiseKit
 
 class SettingsViewController: UITableViewController {
     var sessionService: SessionService?

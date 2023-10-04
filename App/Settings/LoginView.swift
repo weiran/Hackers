@@ -9,7 +9,6 @@
 import SwiftUI
 import Swinject
 import SwinjectStoryboard
-import PromiseKit
 
 struct LoginView: View {
     @State var isAuthenticated: Bool

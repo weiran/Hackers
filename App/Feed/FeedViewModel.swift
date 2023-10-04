@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PromiseKit
 
 class FeedViewModel {
     var posts: [Post] = []
@@ -17,9 +16,9 @@ class FeedViewModel {
     var lastPostId = 0
     var isFetching = false
 
-    func fetchFeed(fetchNextPage: Bool = false) -> Promise<Void> {
+    func fetchFeed(fetchNextPage: Bool = false) async throws {
         guard !isFetching else {
-            return Promise.value(())
+            return
         }
 
         if fetchNextPage {
@@ -32,15 +31,17 @@ class FeedViewModel {
 
         isFetching = true
 
-        return firstly {
-            HackersKit.shared.getPosts(type: postType, page: pageIndex, nextId: lastPostId)
-        }.done { posts in
+        return try await Task { @MainActor [weak self] in
+            guard let self = self else {
+                return
+            }
+            let posts = try await HackersKit.shared.getPosts(type: postType, page: pageIndex, nextId: lastPostId).async()
             let newPosts = posts.filter { !self.postIds.contains($0.id) }
             let newPostIds = newPosts.map { $0.id }
             self.posts.append(contentsOf: newPosts)
             self.postIds.formUnion(newPostIds)
             self.isFetching = false
-        }
+        }.value
     }
 
     func reset() {
@@ -51,12 +52,14 @@ class FeedViewModel {
         isFetching = false
     }
 
-    func vote(on post: Post, upvote: Bool) -> Promise<Void> {
-        if upvote {
-            return HackersKit.shared.upvote(post: post)
-        } else {
-            return HackersKit.shared.unvote(post: post)
-        }
+    func vote(on post: Post, upvote: Bool) async throws {
+        try await Task {
+            if upvote {
+                return try await HackersKit.shared.upvote(post: post).async()
+            } else {
+                return try await HackersKit.shared.unvote(post: post).async()
+            }
+        }.value
     }
 }
 
