@@ -140,6 +140,12 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             cell.setupThumbnail(with: UserDefaults.standard.showThumbnails ? post.url : nil)
 
             cell.linkPressedHandler = { post in
+                guard !post.url.absoluteString.starts(with: "item?id=") else {
+                    self.collectionView.selectItem(at: indexPath, animated: true)
+                    self.performSegue(withIdentifier: "ShowCommentsSegue", sender: self)
+                    return
+                }
+
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
                         self.navigationController?.present(svc, animated: true)
