@@ -15,6 +15,7 @@ import PromiseKit
 class CommentsViewController: UITableViewController {
     var swipeCellKitActions: SwipeCellKitActions?
     var navigationService: NavigationService?
+    var showPost: Bool = true
 
     private enum ActivityType {
         case comments
@@ -35,6 +36,11 @@ class CommentsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupRefreshControl()
+
+        if !showPost {
+            setupNavigation()
+        }
+
         load()
     }
 
@@ -164,7 +170,7 @@ extension CommentsViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return post == nil ? 0 : 1
+        case 0: return post == nil || !showPost ? 0 : 1
         default: return commentsController.visibleComments.count
         }
     }
@@ -448,7 +454,11 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
             }
             openURL(url: url) {
                 if let safariViewController = SFSafariViewController.instance(for: url) {
-                    present(safariViewController, animated: true)
+                    present(safariViewController, animated: true) {
+                        if let post = self.post {
+                            _ = DraggableCommentsButton(for: safariViewController, and: post)
+                        }
+                    }
                 }
             }
             setupHandoff(with: post, activityType: .link(url: url))
@@ -467,7 +477,11 @@ extension CommentsViewController: CommentDelegate {
     func linkTapped(_ url: URL, sender: UITextView) {
         openURL(url: url) {
             if let safariViewController = SFSafariViewController.instance(for: url) {
-                present(safariViewController, animated: true)
+                present(safariViewController, animated: true) {
+                    if let post = self.post {
+                        _ = DraggableCommentsButton(for: safariViewController, and: post)
+                    }
+                }
             }
         }
         setupHandoff(with: post, activityType: .link(url: url))
@@ -542,5 +556,18 @@ extension CommentsViewController {
            let textSelectionViewController = navVC.children.first as? TextSelectionViewController {
             textSelectionViewController.comment = comment
         }
+    }
+}
+
+// MARK: - Navigation setup for presented controller
+extension CommentsViewController {
+    private func setupNavigation() {
+        title = "Comments"
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissSelf))
+        navigationItem.leftBarButtonItem = doneButton
+    }
+
+    @objc private func dismissSelf() {
+        dismiss(animated: true)
     }
 }

@@ -90,6 +90,7 @@
 		24F39F9B18AFB1150055F8DC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F39F9A18AFB1150055F8DC /* Images.xcassets */; };
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
+		3AD2F1862C34131E0034C399 /* DraggableCommentsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD2F1852C34131E0034C399 /* DraggableCommentsButton.swift */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
 		8B782E032A5AB01C00FD6B39 /* TextSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */; };
 /* End PBXBuildFile section */
@@ -219,6 +220,7 @@
 		24F644FD24951D6400869504 /* Scanfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Scanfile; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
+		3AD2F1852C34131E0034C399 /* DraggableCommentsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableCommentsButton.swift; sourceTree = "<group>"; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSelectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -393,6 +395,7 @@
 				2479E11422B69CF100D9F1A4 /* ThumbnailImageView.swift */,
 				24D1845824B336B60017E4F4 /* TitleButton.swift */,
 				2406B37A28ACF8C700CB396B /* UINotifications.swift */,
+				3AD2F1852C34131E0034C399 /* DraggableCommentsButton.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -876,6 +879,7 @@
 				24191F8D1944C991003C0D98 /* CommentsController.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				2464D213209DEFB100C7F8FC /* UINavigationControllerExtensions.swift in Sources */,
+				3AD2F1862C34131E0034C399 /* DraggableCommentsButton.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8A22A2C9B3002A9EC5 /* TableViewBackgroundView.swift in Sources */,
 				2486D7D727FB0A26007504C6 /* AuthenticationHelper.swift in Sources */,
