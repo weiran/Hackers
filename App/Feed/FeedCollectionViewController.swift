@@ -148,7 +148,9 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
 
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
-                        self.navigationController?.present(svc, animated: true)
+                        self.navigationController?.present(svc, animated: true) {
+                            _ = DraggableCommentsButton(for: svc, and: post)
+                        }
                     }
                 }
             }
@@ -170,7 +172,9 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
            !post.url.absoluteString.starts(with: "item?id=") { // self job posts should show comments
             self.openURL(url: post.url) {
                 if let svc = SFSafariViewController.instance(for: post.url) {
-                    self.navigationController?.present(svc, animated: true)
+                    self.navigationController?.present(svc, animated: true) {
+                        _ = DraggableCommentsButton(for: svc, and: post)
+                    }
                 }
             }
         } else {
@@ -222,7 +226,9 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             ) { _ in
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
-                        self.navigationController?.present(svc, animated: true)
+                        self.navigationController?.present(svc, animated: true) {
+                            _ = DraggableCommentsButton(for: svc, and: post)
+                        }
                     }
                 }
             }
