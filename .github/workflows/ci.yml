@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run SwiftLint
-      run: fastlane line
+      run: fastlane lint
 
   test:
     runs-on: macos-15
