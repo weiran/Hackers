@@ -18,6 +18,8 @@ jobs:
         bundler-cache: true
     - name: Install SwiftLint
       run: brew install swiftlint
+    - name: Update Fastlane
+      run: gem update fastlane
     - name: Run SwiftLint
       uses: maierj/fastlane-action@v3.1.0
       with: 
@@ -34,6 +36,8 @@ jobs:
         ruby-version: '2.7.3'
         bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@v1
+    - name: Update Fastlane
+      run: gem update fastlane
     - name: Run UI Tests
       uses: maierj/fastlane-action@v3.1.0
       with: 
@@ -50,6 +54,8 @@ jobs:
         ruby-version: '2.7.3'
         bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@v1
+    - name: Update Fastlane
+      run: gem update fastlane
     - name: Build
       uses: maierj/fastlane-action@v3.1.0
       with: 
