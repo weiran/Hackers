@@ -16,6 +16,8 @@ jobs:
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
+    - name: Install SwiftLint
+      run: brew install swiftlint
     - name: Run SwiftLint
       uses: maierj/fastlane-action@v3.1.0
       with: 
