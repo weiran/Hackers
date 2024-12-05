@@ -33,4 +33,4 @@ jobs:
     - uses: actions/checkout@v4
     - uses: AckeeCZ/load-xcode-version@v1
     - name: Build
-      run: bundle exec fastlane test
+      run: bundle exec fastlane build
