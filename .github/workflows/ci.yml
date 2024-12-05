@@ -15,36 +15,22 @@ jobs:
     - name: Install SwiftLint
       run: brew install swiftlint
     - name: Run SwiftLint
-      run: fastlane lint
+      run: bundle exec fastlane lint
 
   test:
     runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.3.5'
-        bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@v1
     - name: Run UI Tests
-      uses: maierj/fastlane-action@v3.1.0
-      with: 
-        lane: 'test'
-        subdirectory: 'fastlane'
+      run: bundle exec fastlane test
 
   build:
     runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.3.5'
-        bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@v1
     - name: Build
-      uses: maierj/fastlane-action@v3.1.0
-      with: 
-        lane: 'build'
-        subdirectory: 'fastlane'
+      run: bundle exec fastlane test
