@@ -11,8 +11,8 @@ jobs:
     runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@v3.1
+    - uses: ruby/setup-ruby@v1.0
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
@@ -23,11 +23,11 @@ jobs:
         subdirectory: 'fastlane'
 
   test:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@v3.1
+    - uses: ruby/setup-ruby@v1.0
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
@@ -39,11 +39,11 @@ jobs:
         subdirectory: 'fastlane'
 
   build:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@v3.1
+    - uses: ruby/setup-ruby@v1.0
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
