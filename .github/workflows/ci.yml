@@ -17,7 +17,7 @@ jobs:
         ruby-version: '2.7.3'
         bundler-cache: true
     - name: Run SwiftLint
-      uses: maierj/fastlane-action@v3
+      uses: maierj/fastlane-action@v3.1.0
       with: 
         lane: 'lint'
         subdirectory: 'fastlane'
@@ -33,7 +33,7 @@ jobs:
         bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@1
     - name: Run UI Tests
-      uses: maierj/fastlane-action@v3
+      uses: maierj/fastlane-action@v3.1.0
       with: 
         lane: 'test'
         subdirectory: 'fastlane'
@@ -49,7 +49,7 @@ jobs:
         bundler-cache: true
     - uses: AckeeCZ/load-xcode-version@1
     - name: Build
-      uses: maierj/fastlane-action@v3
+      uses: maierj/fastlane-action@v3.1.0
       with: 
         lane: 'build'
         subdirectory: 'fastlane'
