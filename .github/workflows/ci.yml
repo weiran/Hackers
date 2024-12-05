@@ -8,48 +8,29 @@ on:
 
 jobs:
   lint:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.7.3'
-        bundler-cache: true
+    - uses: actions/checkout@v4
+    - name: Install SwiftLint
+      run: brew install swiftlint
     - name: Run SwiftLint
-      uses: maierj/fastlane-action@v3.0.0
-      with: 
-        lane: 'lint'
-        subdirectory: 'fastlane'
+      run: fastlane lint
 
   test:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.7.3'
-        bundler-cache: true
-    - uses: AckeeCZ/load-xcode-version@1.0
+    - uses: actions/checkout@v4
+    - uses: AckeeCZ/load-xcode-version@v1
     - name: Run UI Tests
-      uses: maierj/fastlane-action@v3.0.0
-      with: 
-        lane: 'test'
-        subdirectory: 'fastlane'
+      run: fastlane test
 
   build:
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.7.3'
-        bundler-cache: true
-    - uses: AckeeCZ/load-xcode-version@1.0
+    - uses: actions/checkout@v4
+    - uses: AckeeCZ/load-xcode-version@v1
     - name: Build
-      uses: maierj/fastlane-action@v3.0.0
-      with: 
-        lane: 'build'
-        subdirectory: 'fastlane'
+      run: fastlane build

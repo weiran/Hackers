@@ -120,6 +120,7 @@ struct LoginView: View {
 }
 
 struct RoundedTextField: TextFieldStyle {
+    // swiftlint:disable:next identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(.all, 10)
