@@ -11,8 +11,8 @@ jobs:
     runs-on: macos-15
 
     steps:
-    - uses: actions/checkout
-    - uses: ruby/setup-ruby
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
@@ -26,8 +26,8 @@ jobs:
     runs-on: macos-15
 
     steps:
-    - uses: actions/checkout
-    - uses: ruby/setup-ruby
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
@@ -42,8 +42,8 @@ jobs:
     runs-on: macos-15
 
     steps:
-    - uses: actions/checkout
-    - uses: ruby/setup-ruby
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.7.3'
         bundler-cache: true
