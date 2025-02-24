@@ -6,12 +6,17 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Install SwiftLint
       run: brew install swiftlint
     - name: Run SwiftLint
@@ -31,6 +36,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - uses: AckeeCZ/load-xcode-version@v1
     - name: Build
       run: fastlane build
