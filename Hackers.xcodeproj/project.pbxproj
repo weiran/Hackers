@@ -853,7 +853,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 125;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
@@ -866,7 +866,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.6.4;
+				MARKETING_VERSION = 4.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.HackersActionExtension;
@@ -895,7 +895,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 125;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
@@ -908,7 +908,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.6.4;
+				MARKETING_VERSION = 4.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.HackersActionExtension;
@@ -1112,7 +1112,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 124;
+				CURRENT_PROJECT_VERSION = 125;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1125,7 +1125,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.8.1;
+				MARKETING_VERSION = 4.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1148,7 +1148,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 124;
+				CURRENT_PROJECT_VERSION = 125;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -1161,7 +1161,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.8.1;
+				MARKETING_VERSION = 4.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
