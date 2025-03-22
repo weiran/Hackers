@@ -61,12 +61,17 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let clipboardItem = WhatsNew.Item(
-            title: "Copy Comments",
-            subtitle: "Copy the text of comments to your clipboard. Thanks @BeIllegalBeagle.",
-            image: UIImage(systemName: "list.bullet.clipboard.fill")
+        let commentsItem = WhatsNew.Item(
+            title: "Comments Button",
+            subtitle: "While viewing a post, added a button that goes straight to the comments. Thanks @stanno-ios.",
+            image: UIImage(systemName: "bubble.left.circle")
         )
-        return [clipboardItem]
+        let thumbnailsTapItem = WhatsNew.Item(
+            title: "Tappable Thumbnails",
+            subtitle: "Thumbnails for self posts are now tappable. Thanks @claucambra.",
+            image: UIImage(systemName: "doc.text.below.ecg")
+        )
+        return [commentsItem, thumbnailsTapItem]
     }
 }
 
