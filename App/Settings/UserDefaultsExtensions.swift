@@ -50,6 +50,14 @@ extension UserDefaults {
         return swipeActionsSetting
     }
 
+    var showCommentsButton: Bool {
+        return bool(forKey: UserDefaultsKeys.showCommentsButton.rawValue)
+    }
+
+    func setShowCommentsButton(_ enabled: Bool) {
+        set(enabled, forKey: UserDefaultsKeys.showCommentsButton.rawValue)
+    }
+
     func setSwipeActions(_ enabled: Bool) {
         set(enabled, forKey: UserDefaultsKeys.swipeActions.rawValue)
     }
@@ -69,6 +77,7 @@ extension UserDefaults {
             UserDefaultsKeys.systemTheme.rawValue: true,
             UserDefaultsKeys.showThumbnails.rawValue: true,
             UserDefaultsKeys.swipeActions.rawValue: true,
+            UserDefaultsKeys.showCommentsButton.rawValue: true,
             UserDefaultsKeys.safariReaderMode.rawValue: false,
             UserDefaultsKeys.openInDefaultBrowser.rawValue: false
         ])
@@ -82,4 +91,5 @@ enum UserDefaultsKeys: String {
     case openInDefaultBrowser
     case showThumbnails
     case swipeActions
+    case showCommentsButton
 }

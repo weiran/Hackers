@@ -149,7 +149,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
                         self.navigationController?.present(svc, animated: true) {
-                            _ = DraggableCommentsButton(for: svc, and: post)
+                            DraggableCommentsButton.attachTo(svc, with: post)
                         }
                     }
                 }
@@ -173,7 +173,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
             self.openURL(url: post.url) {
                 if let svc = SFSafariViewController.instance(for: post.url) {
                     self.navigationController?.present(svc, animated: true) {
-                        _ = DraggableCommentsButton(for: svc, and: post)
+                        DraggableCommentsButton.attachTo(svc, with: post)
                     }
                 }
             }
@@ -227,7 +227,7 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
                 self.openURL(url: post.url) {
                     if let svc = SFSafariViewController.instance(for: post.url) {
                         self.navigationController?.present(svc, animated: true) {
-                            _ = DraggableCommentsButton(for: svc, and: post)
+                            DraggableCommentsButton.attachTo(svc, with: post)
                         }
                     }
                 }

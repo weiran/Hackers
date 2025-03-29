@@ -19,6 +19,7 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var showThumbnailsSwitch: UISwitch!
     @IBOutlet weak var swipeActionsSwitch: UISwitch!
+    @IBOutlet weak var showCommentsSwitch: UISwitch!
     @IBOutlet weak var safariReaderModeSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserSwitch: UISwitch!
     @IBOutlet weak var openInDefaultBrowserLabel: UILabel!
@@ -31,6 +32,7 @@ class SettingsViewController: UITableViewController {
         safariReaderModeSwitch.isOn = UserDefaults.standard.safariReaderModeEnabled
         showThumbnailsSwitch.isOn = UserDefaults.standard.showThumbnails
         swipeActionsSwitch.isOn = UserDefaults.standard.swipeActionsEnabled
+        showCommentsSwitch.isOn = UserDefaults.standard.showCommentsButton
         updateOpenInDefaultBrowser()
         updateUsername()
         updateVersion()
@@ -69,6 +71,10 @@ class SettingsViewController: UITableViewController {
     @IBAction func swipeActionsValueChanged(_ sender: UISwitch) {
         UserDefaults.standard.setSwipeActions(sender.isOn)
         NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+    }
+
+    @IBAction func showCommentsButtonValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.setShowCommentsButton(sender.isOn)
     }
 
     @IBAction func safariReaderModelValueChanged(_ sender: UISwitch) {
