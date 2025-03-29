@@ -456,7 +456,7 @@ extension CommentsViewController: SwipeTableViewCellDelegate {
                 if let safariViewController = SFSafariViewController.instance(for: url) {
                     present(safariViewController, animated: true) {
                         if let post = self.post {
-                            _ = DraggableCommentsButton(for: safariViewController, and: post)
+                            DraggableCommentsButton.attachTo(safariViewController, with: post)
                         }
                     }
                 }
@@ -479,7 +479,7 @@ extension CommentsViewController: CommentDelegate {
             if let safariViewController = SFSafariViewController.instance(for: url) {
                 present(safariViewController, animated: true) {
                     if let post = self.post {
-                        _ = DraggableCommentsButton(for: safariViewController, and: post)
+                        DraggableCommentsButton.attachTo(safariViewController, with: post)
                     }
                 }
             }

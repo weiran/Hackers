@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="506-JC-FDt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="506-JC-FDt">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -400,7 +400,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="HBZ-Wx-9of">
-                            <rect key="frame" x="0.0" y="665.5" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="708.5" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version 3.0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vai-hd-k76">
@@ -549,7 +549,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Interface" id="gib-U9-aJ3" userLabel="Feed">
+                            <tableViewSection headerTitle="Interface" id="gib-U9-aJ3">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="XYf-0N-FG9" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
                                         <rect key="frame" x="16" y="417" width="343" height="43.5"/>
@@ -612,12 +612,41 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="qDm-pP-SGz" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="504" width="343" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qDm-pP-SGz" id="vn0-ve-cJv">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Quick Comments Button" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ioj-Ec-SOh">
+                                                    <rect key="frame" x="16" y="11.5" width="232.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dXF-NT-TuU">
+                                                    <rect key="frame" x="279" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="showCommentsButtonValueChanged:" destination="uZL-eS-tCe" eventType="valueChanged" id="X67-mz-rXr"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="ioj-Ec-SOh" firstAttribute="centerY" secondItem="vn0-ve-cJv" secondAttribute="centerY" id="5N9-5n-Bml"/>
+                                                <constraint firstAttribute="trailing" secondItem="dXF-NT-TuU" secondAttribute="trailing" constant="15" id="C4R-iU-0h8"/>
+                                                <constraint firstItem="ioj-Ec-SOh" firstAttribute="leading" secondItem="vn0-ve-cJv" secondAttribute="leadingMargin" id="Zzf-cE-YA4"/>
+                                                <constraint firstItem="dXF-NT-TuU" firstAttribute="centerY" secondItem="vn0-ve-cJv" secondAttribute="centerY" id="gZ3-LY-6Fj"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Reading" id="1AH-ih-fLT">
+                            <tableViewSection headerTitle="Browser" id="1AH-ih-fLT" userLabel="Browser">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="by2-0S-CnW" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="560" width="343" height="43.5"/>
+                                        <rect key="frame" x="16" y="603.5" width="343" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="by2-0S-CnW" id="l0C-ZL-f1a">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="43.5"/>
@@ -646,14 +675,14 @@
                                         <color key="backgroundColor" systemColor="tableCellGroupedBackgroundColor"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="SLb-pc-dXs" customClass="SettingsTableViewCell" customModule="Hackers" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="603.5" width="343" height="44"/>
+                                        <rect key="frame" x="16" y="647" width="343" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SLb-pc-dXs" id="6r6-dg-b6u">
-                                            <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Open Safari in Reader Mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wlj-6e-BYP">
-                                                    <rect key="frame" x="16" y="12" width="213" height="20.5"/>
+                                                    <rect key="frame" x="16" y="11.5" width="213" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -697,6 +726,7 @@
                         <outlet property="openInDefaultBrowserLabel" destination="wlj-6e-BYP" id="eel-LZ-2Jz"/>
                         <outlet property="openInDefaultBrowserSwitch" destination="g4G-LF-pRI" id="M9B-7A-i52"/>
                         <outlet property="safariReaderModeSwitch" destination="cmY-8P-GUK" id="6fh-TZ-GYa"/>
+                        <outlet property="showCommentsSwitch" destination="dXF-NT-TuU" id="bE9-HY-PyA"/>
                         <outlet property="showThumbnailsSwitch" destination="5xy-Xy-ER7" id="DeA-4x-iv7"/>
                         <outlet property="swipeActionsSwitch" destination="VQH-5Z-1Ir" id="hl6-Y0-Z63"/>
                         <outlet property="usernameLabel" destination="PDK-aN-wRW" id="lDn-Zb-2N1"/>

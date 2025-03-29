@@ -133,3 +133,10 @@ class DraggableCommentsButton: UIButton {
     }
 }
 
+extension DraggableCommentsButton {
+    public static func attachTo(_ parentVc: UIViewController, with post: Post) {
+        if UserDefaults.standard.showCommentsButton {
+            _ = DraggableCommentsButton(for: parentVc, and: post)
+        }
+    }
+}
