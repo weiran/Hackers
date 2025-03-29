@@ -62,14 +62,14 @@ enum OnboardingService {
 
     private static func items() -> [WhatsNew.Item] {
         let commentsItem = WhatsNew.Item(
-            title: "Comments Button",
-            subtitle: "While viewing a post, added a button that goes straight to the comments. Thanks @stanno-ios.",
+            title: "Comments Button Toggle",
+            subtitle: "The quick comments button can be toggled off in settings.",
             image: UIImage(systemName: "bubble.left.circle")
         )
         let thumbnailsTapItem = WhatsNew.Item(
-            title: "Tappable Thumbnails",
-            subtitle: "Thumbnails for self posts are now tappable. Thanks @claucambra.",
-            image: UIImage(systemName: "doc.text.below.ecg")
+            title: "Fixed Share Extension",
+            subtitle: "The 'Open in Hackers' share extension now works in iOS 18.",
+            image: UIImage(systemName: "square.and.arrow.up")
         )
         return [commentsItem, thumbnailsTapItem]
     }

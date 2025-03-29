@@ -832,7 +832,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 126;
+				CURRENT_PROJECT_VERSION = 128;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -844,7 +844,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 4.9.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.ActionExtension;
@@ -871,7 +871,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 126;
+				CURRENT_PROJECT_VERSION = 128;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -883,7 +883,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 4.9.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.ActionExtension;
@@ -1085,7 +1085,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 126;
+				CURRENT_PROJECT_VERSION = 128;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1097,7 +1097,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 4.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1118,7 +1118,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 126;
+				CURRENT_PROJECT_VERSION = 128;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1130,7 +1130,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 4.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
