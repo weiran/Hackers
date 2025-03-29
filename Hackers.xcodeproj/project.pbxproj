@@ -19,7 +19,6 @@
 		2419D02324898DF700740184 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02224898DF700740184 /* Media.xcassets */; };
 		2419D02524898DF700740184 /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D02424898DF700740184 /* ActionViewController.swift */; };
 		2419D02824898DF700740184 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2419D02624898DF700740184 /* MainInterface.storyboard */; };
-		2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2419D038248AB03700740184 /* OpenInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2419D035248AAFDF00740184 /* OpenInViewController.swift */; };
 		241C32DE24950C05000876DC /* PostTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241C32DD24950C05000876DC /* PostTitleView.swift */; };
 		243271951F95EDA9008196DB /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243271941F95EDA9008196DB /* StringExtensions.swift */; };
@@ -73,6 +72,7 @@
 		24D1845D24B35E7E0017E4F4 /* FeedCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845C24B35E7E0017E4F4 /* FeedCollectionViewController.swift */; };
 		24D1845F24B374780017E4F4 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845E24B374780017E4F4 /* FeedViewModel.swift */; };
 		24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */; };
+		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */; };
 		24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* AppTheme.swift */; };
 		24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D811A41FF90A58000951C3 /* TouchableTextView.swift */; };
@@ -92,13 +92,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2419D02A24898DF700740184 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2419D01F24898DF700740184;
-			remoteInfo = HackersActionExtension;
-		};
 		245345F122466EA8001AF1CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
@@ -106,19 +99,26 @@
 			remoteGlobalIDString = 24F39F8418AFB1150055F8DC;
 			remoteInfo = Hackers;
 		};
+		24D1E48A2D981085005F1038 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2419D01F24898DF700740184;
+			remoteInfo = HackersActionExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		24C10C0124866D3F00B93F68 /* Embed Foundation Extensions */ = {
+		24D1E4892D98106C005F1038 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
+			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				2419D02C24898DF700740184 /* HackersActionExtension.appex in Embed Foundation Extensions */,
+				24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed App Extensions */,
 			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 1;
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -520,7 +520,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2419D02F24898DF700740184 /* Build configuration list for PBXNativeTarget "HackersActionExtension" */;
 			buildPhases = (
-				2419D03E248AC2CA00740184 /* Update Version Numbers */,
 				2419D01C24898DF700740184 /* Sources */,
 				2419D01D24898DF700740184 /* Frameworks */,
 				2419D01E24898DF700740184 /* Resources */,
@@ -564,12 +563,12 @@
 				24F39F8318AFB1150055F8DC /* Resources */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 				249B8F8022A29B2E002A9EC5 /* Run Script */,
-				24C10C0124866D3F00B93F68 /* Embed Foundation Extensions */,
+				24D1E4892D98106C005F1038 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				2419D02B24898DF700740184 /* PBXTargetDependency */,
+				24D1E48B2D981085005F1038 /* PBXTargetDependency */,
 			);
 			name = Hackers;
 			packageProductDependencies = (
@@ -678,25 +677,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2419D03E248AC2CA00740184 /* Update Version Numbers */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Update Version Numbers";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  buildNumber=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"PROJECT_VERSION = ([0-9a-f\\-]+)\")\n  marketingVersion=$(xcodebuild -showBuildSettings -project Hackers.xcodeproj | pcregrep -o1 \"MARKETING_VERSION = ([0-9a-f\\-.]+)\")\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $marketingVersion\" \"$SRCROOT/Extensions/HackersActionExtension/Info.plist\"\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
-		};
 		244DE6BB1E599EB6005B441E /* TODO as Warnings */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 8;
@@ -816,15 +796,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2419D02B24898DF700740184 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2419D01F24898DF700740184 /* HackersActionExtension */;
-			targetProxy = 2419D02A24898DF700740184 /* PBXContainerItemProxy */;
-		};
 		245345F222466EA8001AF1CE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 24F39F8418AFB1150055F8DC /* Hackers */;
 			targetProxy = 245345F122466EA8001AF1CE /* PBXContainerItemProxy */;
+		};
+		24D1E48B2D981085005F1038 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2419D01F24898DF700740184 /* HackersActionExtension */;
+			targetProxy = 24D1E48A2D981085005F1038 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

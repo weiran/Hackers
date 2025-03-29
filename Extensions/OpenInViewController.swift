@@ -45,14 +45,20 @@ class OpenInViewController: UIViewController {
     func error() { }
 
     /// Specifically crafted `openURL` to work with shared extensions
-    /// https://stackoverflow.com/a/44499373/33137
-    @objc func openURL(_ url: URL) {
+    /// https://stackoverflow.com/a/79077875
+    @objc @discardableResult func openURL(_ url: URL) -> Bool {
         var responder: UIResponder? = self
         while responder != nil {
             if let application = responder as? UIApplication {
-                application.perform(#selector(openURL(_:)), with: url)
+                if #available(iOS 18.0, *) {
+                    application.open(url, options: [:], completionHandler: nil)
+                    return true
+                } else {
+                    return application.perform(#selector(openURL(_:)), with: url) != nil
+                }
             }
             responder = responder?.next
         }
+        return false
     }
 }
