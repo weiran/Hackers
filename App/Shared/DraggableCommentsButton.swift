@@ -15,10 +15,10 @@ class DraggableCommentsButton: UIButton {
 
     private lazy var countLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 11)
+        label.font = .systemFont(ofSize: 12, weight: .bold)
         label.text = String(post.commentsCount)
-        label.textColor = .white
-        label.backgroundColor = .red
+        label.textColor = AppTheme.default.lightTextColor
+        label.backgroundColor = AppTheme.default.appTintColor
         label.cornerRadius = 12.5
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
@@ -45,8 +45,11 @@ class DraggableCommentsButton: UIButton {
 
     private func setupLayout() {
         layer.cornerRadius = 25
-        backgroundColor = UIColor.lightGray.withAlphaComponent(0.6)
-        setImage(UIImage(systemName: "message"), for: .normal)
+        backgroundColor = UIColor.lightGray.withAlphaComponent(0.8)
+        setImage(UIImage(
+            systemName: "message",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        ), for: .normal)
         imageView?.contentMode = .scaleToFill
         imageView?.tintColor = .white
         isOpaque = true
@@ -130,5 +133,13 @@ class DraggableCommentsButton: UIButton {
             animations: animation,
             completion: nil
         )
+    }
+}
+
+extension DraggableCommentsButton {
+    public static func attachTo(_ parentVc: UIViewController, with post: Post) {
+        if UserDefaults.standard.showCommentsButton {
+            _ = DraggableCommentsButton(for: parentVc, and: post)
+        }
     }
 }
