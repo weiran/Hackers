@@ -77,7 +77,7 @@ extension UserDefaults {
             UserDefaultsKeys.systemTheme.rawValue: true,
             UserDefaultsKeys.showThumbnails.rawValue: true,
             UserDefaultsKeys.swipeActions.rawValue: true,
-            UserDefaultsKeys.showCommentsButton.rawValue: true,
+            UserDefaultsKeys.showCommentsButton.rawValue: false,
             UserDefaultsKeys.safariReaderMode.rawValue: false,
             UserDefaultsKeys.openInDefaultBrowser.rawValue: false
         ])
