@@ -84,7 +84,7 @@ class DraggableCommentsButton: UIButton {
     }
 
     private func constrainSelf() {
-        topAnchor.constraint(equalTo: parentVc.view.safeAreaLayoutGuide.topAnchor, constant: (66)).isActive = true
+        bottomAnchor.constraint(equalTo: parentVc.view.safeAreaLayoutGuide.bottomAnchor, constant: -60).isActive = true
         trailingAnchor.constraint(equalTo: parentVc.view.trailingAnchor, constant: -16).isActive = true
         heightAnchor.constraint(equalToConstant: 50).isActive = true
         widthAnchor.constraint(equalToConstant: 50).isActive = true
