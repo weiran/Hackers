@@ -101,11 +101,9 @@ extension CommentTableViewCell: UITextViewDelegate {
                     if
                         let host = URL.host,
                         host.contains("news.ycombinator.com"),
-                        let range = URL.absoluteString.range(of: "id="),
-                        let id = Int(
-                            URL.absoluteString[range.upperBound...]
-                                .trimmingCharacters(in: .whitespaces)
-                            ) {
+                        let components = URLComponents(url: URL, resolvingAgainstBaseURL: true),
+                        let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
+                        let id = Int(idString) {
                         commentDelegate.internalLinkTapped(postId: id, url: URL, sender: textView)
                     } else {
                         commentDelegate.linkTapped(URL, sender: textView)
