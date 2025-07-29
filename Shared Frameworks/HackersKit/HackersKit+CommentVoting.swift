@@ -7,14 +7,13 @@
 //
 
 import Foundation
-import PromiseKit
 
 extension HackersKit {
-    func upvote(comment: Comment, for post: Post) -> Promise<Void> {
-        scraperShim.upvote(comment: comment, for: post)
+    func upvote(comment: Comment, for post: Post) async throws {
+        try await scraperShim.upvote(comment: comment, for: post)
     }
 
-    func unvote(comment: Comment, for post: Post) -> Promise<Void> {
-        scraperShim.unvote(comment: comment, for: post)
+    func unvote(comment: Comment, for post: Post) async throws {
+        try await scraperShim.unvote(comment: comment, for: post)
     }
 }

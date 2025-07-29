@@ -7,15 +7,14 @@
 //
 
 import Foundation
-import PromiseKit
 
 protocol HackerNewsAuthenticationDelegate: AnyObject {
     func didAuthenticate(user: User)
 }
 
 extension HackersKit {
-    func login(username: String, password: String) -> Promise<User> {
-        scraperShim.login(username: username, password: password)
+    func login(username: String, password: String) async throws -> User {
+        return try await scraperShim.login(username: username, password: password)
     }
 
     func logout() {

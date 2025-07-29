@@ -8,7 +8,6 @@
 
 import Foundation
 import HNScraper
-import PromiseKit
 
 class HNScraperShim {
     weak var authenticationDelegate: HNScraperShimAuthenticationDelegate?
@@ -26,81 +25,73 @@ class HNScraperShim {
 }
 
 extension HNScraperShim { // posts
-    func upvote(post: Post) -> Promise<Void> {
-        return firstly {
-            getPost(id: post.id)
-        }.then { post in
-            self.scraperUpvote(post: post)
-        }
+    func upvote(post: Post) async throws {
+        let hnPost = try await getPost(id: post.id)
+        try await scraperUpvote(post: hnPost)
     }
 
-    func unvote(post: Post) -> Promise<Void> {
-        return firstly {
-            getPost(id: post.id)
-        }.then { post in
-            self.scraperUnvote(post: post)
-        }
+    func unvote(post: Post) async throws {
+        let hnPost = try await getPost(id: post.id)
+        try await scraperUnvote(post: hnPost)
     }
 
-    private func getPost(id: Int) -> Promise<HNPost> {
-        let (promise, seal) = Promise<HNPost>.pending()
-        HNScraper.shared.getPost(ById: String(id)) { (post, _, error) in
-            if let post = post {
-                seal.fulfill(post)
-            } else if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.reject(HackersKitError.scraperError)
+    private func getPost(id: Int) async throws -> HNPost {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.getPost(ById: String(id)) { (post, _, error) in
+                if let post = post {
+                    continuation.resume(returning: post)
+                } else if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume(throwing: HackersKitError.scraperError)
+                }
             }
         }
-        return promise
     }
 
-    private func scraperUpvote(post: HNPost) -> Promise<Void> {
-        let (promise, seal) = Promise<Void>.pending()
-        HNScraper.shared.upvote(Post: post) { error in
-            if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.fulfill(())
+    private func scraperUpvote(post: HNPost) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.upvote(Post: post) { error in
+                if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume()
+                }
             }
         }
-        return promise
     }
 
-    private func scraperUnvote(post: HNPost) -> Promise<Void> {
-        let (promise, seal) = Promise<Void>.pending()
-        HNScraper.shared.unvote(Post: post) { error in
-            if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.fulfill(())
+    private func scraperUnvote(post: HNPost) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.unvote(Post: post) { error in
+                if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume()
+                }
             }
         }
-        return promise
     }
 }
 
 extension HNScraperShim { // comments
-    func upvote(comment: Comment, for post: Post) -> Promise<Void> {
+    func upvote(comment: Comment, for post: Post) async throws {
         if comment.upvoteLink != nil {
             let hnComment = self.hnComment(for: comment)
-            return scraperUpvote(comment: hnComment)
+            try await scraperUpvote(comment: hnComment)
         } else {
-            return getComment(id: comment.id, for: post).then { comment in
-                return self.scraperUpvote(comment: comment)
-            }
+            let hnComment = try await getComment(id: comment.id, for: post)
+            try await scraperUpvote(comment: hnComment)
         }
     }
 
-    func unvote(comment: Comment, for post: Post) -> Promise<Void> {
+    func unvote(comment: Comment, for post: Post) async throws {
         if comment.upvoteLink != nil {
             let hnComment = self.hnComment(for: comment)
-            return scraperUnvote(comment: hnComment)
+            try await scraperUnvote(comment: hnComment)
         } else {
-            return getComment(id: comment.id, for: post).then { comment in
-                return self.scraperUpvote(comment: comment)
-            }
+            let hnComment = try await getComment(id: comment.id, for: post)
+            try await scraperUnvote(comment: hnComment)
         }
     }
 
@@ -111,23 +102,21 @@ extension HNScraperShim { // comments
         return hnComment
     }
 
-    private func getComment(id: Int, for post: Post) -> Promise<HNComment> {
-        let (promise, seal) = Promise<HNComment>.pending()
-
-        HNScraper.shared.getComments(ByPostId: String(post.id)) { (_, comments, error) in
-            if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                let comment = self.firstComment(in: comments, for: id)
-                if let comment = comment {
-                    seal.fulfill(comment)
+    private func getComment(id: Int, for post: Post) async throws -> HNComment {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.getComments(ByPostId: String(post.id)) { (_, comments, error) in
+                if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
                 } else {
-                    seal.reject(HackersKitError.scraperError)
+                    let comment = self.firstComment(in: comments, for: id)
+                    if let comment = comment {
+                        continuation.resume(returning: comment)
+                    } else {
+                        continuation.resume(throwing: HackersKitError.scraperError)
+                    }
                 }
             }
         }
-
-        return promise
     }
 
     /// Recursively search the comment tree for a specific `Comment` by `id`
@@ -146,46 +135,46 @@ extension HNScraperShim { // comments
         return nil
     }
 
-    private func scraperUpvote(comment: HNComment) -> Promise<Void> {
-        let (promise, seal) = Promise<Void>.pending()
-        HNScraper.shared.upvote(Comment: comment) { error in
-            if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.fulfill(())
+    private func scraperUpvote(comment: HNComment) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.upvote(Comment: comment) { error in
+                if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume()
+                }
             }
         }
-        return promise
     }
 
-    private func scraperUnvote(comment: HNComment) -> Promise<Void> {
-        let (promise, seal) = Promise<Void>.pending()
-        HNScraper.shared.unvote(Comment: comment) { error in
-            if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.fulfill(())
+    private func scraperUnvote(comment: HNComment) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNScraper.shared.unvote(Comment: comment) { error in
+                if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume()
+                }
             }
         }
-        return promise
     }
 }
 
 extension HNScraperShim { // authentication
-    func login(username: String, password: String) -> Promise<User> {
-        let (promise, seal) = Promise<User>.pending()
-        HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
-        HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
-            if let user = user, cookie != nil {
-                let user = User(username: user.username, karma: user.karma, joined: user.age)
-                seal.fulfill(user)
-            } else if let error = error {
-                seal.reject(self.convert(error: error))
-            } else {
-                seal.reject(HackersKitAuthenticationError.unknown)
+    func login(username: String, password: String) async throws -> User {
+        return try await withCheckedThrowingContinuation { continuation in
+            HNLogin.shared.logout() // need to logout first otherwise will always get current logged in session
+            HNLogin.shared.login(username: username, psw: password) { (user, cookie, error) in
+                if let user = user, cookie != nil {
+                    let user = User(username: user.username, karma: user.karma, joined: user.age)
+                    continuation.resume(returning: user)
+                } else if let error = error {
+                    continuation.resume(throwing: self.convert(error: error))
+                } else {
+                    continuation.resume(throwing: HackersKitAuthenticationError.unknown)
+                }
             }
         }
-        return promise
     }
 
     func logout() {

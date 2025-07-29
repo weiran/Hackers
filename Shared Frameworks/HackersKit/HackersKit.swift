@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 class HackersKit {
     static let shared = HackersKit()
@@ -21,19 +20,13 @@ class HackersKit {
         scraperShim.authenticationDelegate = self
     }
 
-    internal func fetchHtml(url: URL) -> Promise<String> {
-        let (promise, seal) = Promise<String>.pending()
-
-        session.dataTask(with: url) { data, _, error in
-            if let data = data, let html = String(bytes: data, encoding: .utf8) {
-                seal.fulfill(html)
-            } else if let error = error {
-                seal.reject(error)
-            } else {
-                seal.reject(HackersKitError.requestFailure)
-            }
-        }.resume()
-
-        return promise
+    internal func fetchHtml(url: URL) async throws -> String {
+        let (data, _) = try await session.data(from: url)
+        
+        guard let html = String(bytes: data, encoding: .utf8) else {
+            throw HackersKitError.requestFailure
+        }
+        
+        return html
     }
 }

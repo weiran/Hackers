@@ -7,21 +7,16 @@
 //
 
 import Foundation
-import PromiseKit
 import SwiftSoup
 
 extension HackersKit {
-    func getPosts(type: PostType, page: Int = 1, nextId: Int = 0) -> Promise<[Post]> {
-        firstly {
-            fetchPostsHtml(type: type, page: page, nextId: nextId)
-        }.map { html in
-            try HtmlParser.postsTableElement(from: html)
-        }.compactMap { tableElement in
-            try HtmlParser.posts(from: tableElement, type: type)
-        }
+    func getPosts(type: PostType, page: Int = 1, nextId: Int = 0) async throws -> [Post] {
+        let html = try await fetchPostsHtml(type: type, page: page, nextId: nextId)
+        let tableElement = try HtmlParser.postsTableElement(from: html)
+        return try HtmlParser.posts(from: tableElement, type: type)
     }
 
-    private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) -> Promise<String> {
+    private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         var url: URL
         if type == .newest || type == .jobs {
             url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)")!
@@ -30,6 +25,6 @@ extension HackersKit {
         } else {
             url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
         }
-        return fetchHtml(url: url)
+        return try await fetchHtml(url: url)
     }
 }
