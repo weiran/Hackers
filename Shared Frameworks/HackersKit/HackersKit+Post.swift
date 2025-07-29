@@ -30,29 +30,13 @@ extension HackersKit {
         }
 
         // get the post text for AskHN
-        let postTableElement = try HtmlParser.postsTableElement(from: html)
-        if let post = try HtmlParser.posts(from: postTableElement, type: .news).first,
-            let postComment = self.postComment(from: post) {
+        if let postComment = try? HtmlParser.postComment(from: html) {
             comments.insert(postComment, at: 0)
         }
 
         return comments
     }
 
-    private func postComment(from post: Post) -> Comment? {
-        if let text = post.text {
-            return Comment(
-                id: post.id,
-                age: post.age,
-                text: text,
-                by: post.by,
-                level: 0,
-                upvoted: post.upvoted
-            )
-        }
-
-        return nil
-    }
 
     /// Optionally recursively fetch post comments over pages
     private func fetchPostHtml(

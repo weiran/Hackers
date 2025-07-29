@@ -96,6 +96,12 @@ enum HtmlParser {
 
     static func comment(from element: Element) throws -> Comment {
         let text = try commentText(from: element.select(".commtext"))
+
+        // Skip empty comments (deleted comments, etc.)
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw Exception.Error(type: .SelectorParseException, Message: "Comment text is empty")
+        }
+
         let age = try element.select(".age").text()
         let user = try element.select(".hnuser").text()
         guard let id = try Int(element.select(".comtr").attr("id")) else {
@@ -156,6 +162,35 @@ enum HtmlParser {
         }
 
         return try elements.html()
+    }
+
+    static func postComment(from html: String) throws -> Comment? {
+        let document = try SwiftSoup.parse(html)
+        let toptextElements = try document.select(".toptext")
+        let toptextContent = try toptextElements.text().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !toptextContent.isEmpty else {
+            return nil
+        }
+        
+        let postTableElement = try postsTableElement(from: html)
+        guard let post = try posts(from: postTableElement, type: .news).first else {
+            return nil
+        }
+        
+        if let text = post.text,
+           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return Comment(
+                id: post.id,
+                age: post.age,
+                text: text,
+                by: post.by,
+                level: 0,
+                upvoted: post.upvoted
+            )
+        }
+        
+        return nil
     }
 
     /// Returns any text content in the post, or otherwise nil
