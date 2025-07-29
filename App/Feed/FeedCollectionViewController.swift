@@ -187,7 +187,8 @@ extension FeedCollectionViewController: UICollectionViewDelegate {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
-        if indexPath.row == viewModel.posts.count - 5 && !viewModel.isFetching {
+        let remainingItems = viewModel.posts.count - indexPath.row - 1
+        if remainingItems <= 5 && remainingItems >= 0 && !viewModel.isFetching {
             fetchFeedNextPage()
         }
     }
