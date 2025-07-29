@@ -61,17 +61,17 @@ enum OnboardingService {
     }
 
     private static func items() -> [WhatsNew.Item] {
-        let commentsItem = WhatsNew.Item(
-            title: "Comments Button Toggle",
-            subtitle: "The quick comments button can be toggled off in settings.",
-            image: UIImage(systemName: "bubble.left.circle")
+        let activeCategory = WhatsNew.Item(
+            title: "Active Category Added",
+            subtitle: "Browse the most actively discussed stories with the new Active feed category.",
+            image: UIImage(systemName: "flame")
         )
-        let thumbnailsTapItem = WhatsNew.Item(
-            title: "Fixed Share Extension",
-            subtitle: "The 'Open in Hackers' share extension now works in iOS 18.",
-            image: UIImage(systemName: "square.and.arrow.up")
+        let stabilityFixes = WhatsNew.Item(
+            title: "Stability Improvements",
+            subtitle: "Fixed crashes when tapping comment permalinks and improved feed pagination.",
+            image: UIImage(systemName: "checkmark.shield")
         )
-        return [commentsItem, thumbnailsTapItem]
+        return [activeCategory, stabilityFixes]
     }
 }
 
