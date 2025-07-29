@@ -42,14 +42,19 @@ class SwipeCellKitActions {
         let upvoteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
-            if upvoted {
-                HackersKit.shared
-                    .unvote(post: post)
-                    .catch(errorHandler)
-            } else {
-                HackersKit.shared
-                    .upvote(post: post)
-                    .catch(errorHandler)
+            
+            Task {
+                do {
+                    if upvoted {
+                        try await HackersKit.shared.unvote(post: post)
+                    } else {
+                        try await HackersKit.shared.upvote(post: post)
+                    }
+                } catch {
+                    await MainActor.run {
+                        errorHandler(error)
+                    }
+                }
             }
         }
         upvoteAction.backgroundColor = AppTheme.default.upvotedColor
@@ -93,14 +98,19 @@ class SwipeCellKitActions {
         let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = comment.upvoted
             voteOnComment(comment, !comment.upvoted)
-            if upvoted {
-                HackersKit.shared
-                    .unvote(comment: comment, for: post)
-                    .catch(errorHandler)
-            } else {
-                HackersKit.shared
-                    .upvote(comment: comment, for: post)
-                    .catch(errorHandler)
+            
+            Task {
+                do {
+                    if upvoted {
+                        try await HackersKit.shared.unvote(comment: comment, for: post)
+                    } else {
+                        try await HackersKit.shared.upvote(comment: comment, for: post)
+                    }
+                } catch {
+                    await MainActor.run {
+                        errorHandler(error)
+                    }
+                }
             }
         }
         voteAction.backgroundColor = AppTheme.default.upvotedColor

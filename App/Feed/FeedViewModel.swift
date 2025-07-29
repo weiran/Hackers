@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PromiseKit
 
 class FeedViewModel {
     var posts: [Post] = []
@@ -17,9 +16,9 @@ class FeedViewModel {
     var lastPostId = 0
     var isFetching = false
 
-    func fetchFeed(fetchNextPage: Bool = false) -> Promise<Void> {
+    func fetchFeed(fetchNextPage: Bool = false) async throws {
         guard !isFetching else {
-            return Promise.value(())
+            return
         }
 
         if fetchNextPage {
@@ -32,14 +31,16 @@ class FeedViewModel {
 
         isFetching = true
 
-        return firstly {
-            HackersKit.shared.getPosts(type: postType, page: pageIndex, nextId: lastPostId)
-        }.done { posts in
+        do {
+            let posts = try await HackersKit.shared.getPosts(type: postType, page: pageIndex, nextId: lastPostId)
             let newPosts = posts.filter { !self.postIds.contains($0.id) }
             let newPostIds = newPosts.map { $0.id }
             self.posts.append(contentsOf: newPosts)
             self.postIds.formUnion(newPostIds)
             self.isFetching = false
+        } catch {
+            self.isFetching = false
+            throw error
         }
     }
 
@@ -51,11 +52,11 @@ class FeedViewModel {
         isFetching = false
     }
 
-    func vote(on post: Post, upvote: Bool) -> Promise<Void> {
+    func vote(on post: Post, upvote: Bool) async throws {
         if upvote {
-            return HackersKit.shared.upvote(post: post)
+            try await HackersKit.shared.upvote(post: post)
         } else {
-            return HackersKit.shared.unvote(post: post)
+            try await HackersKit.shared.unvote(post: post)
         }
     }
 }

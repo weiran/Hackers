@@ -9,7 +9,6 @@
 import SwiftUI
 import Swinject
 import SwinjectStoryboard
-import PromiseKit
 
 struct LoginView: View {
     @State var isAuthenticated: Bool
@@ -55,18 +54,24 @@ struct LoginView: View {
 
                     Button("Login") {
                         isAuthenticating = true
-                        sessionService.authenticate(username: username, password: password)
-                            .done { _ in
-                                isAuthenticated = true
-                                UINotifications.showSuccess("Logged in as \(username)")
-                                presentationMode.wrappedValue.dismiss()
-                            }.ensure {
-                                NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
-                                isAuthenticating = false
-                            }.catch { _ in
-                                showAlert = true
-                                password = ""
+                        Task {
+                            do {
+                                _ = try await sessionService.authenticate(username: username, password: password)
+                                await MainActor.run {
+                                    isAuthenticated = true
+                                    UINotifications.showSuccess("Logged in as \(username)")
+                                    presentationMode.wrappedValue.dismiss()
+                                    NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                                    isAuthenticating = false
+                                }
+                            } catch {
+                                await MainActor.run {
+                                    showAlert = true
+                                    password = ""
+                                    isAuthenticating = false
+                                }
                             }
+                        }
                     }.buttonStyle(FilledButton())
                         .padding(.top, 30)
                         .disabled(isAuthenticating)

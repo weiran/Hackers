@@ -10,7 +10,6 @@ import Foundation
 import UIKit
 import SafariServices
 import SwipeCellKit
-import PromiseKit
 
 class CommentsViewController: UITableViewController {
     var swipeCellKitActions: SwipeCellKitActions?
@@ -63,43 +62,39 @@ class CommentsViewController: UITableViewController {
             tableView.backgroundView = TableViewBackgroundView.loadingBackgroundView()
         }
 
-        firstly {
-            loadPost()
-        }.then { (post) -> Promise<[Comment]> in
-            self.post = post
-            self.setupHandoff(with: post, activityType: .comments)
-            return self.loadComments(for: post)
-        }.done { comments in
-            self.comments = comments
-            self.post?.commentsCount = comments.count
-            self.tableView.reloadData()
-        }.catch { _ in
-            UINotifications.showError()
-        }.finally {
+        Task { @MainActor in
+            do {
+                let post = try await loadPost()
+                self.post = post
+                self.setupHandoff(with: post, activityType: .comments)
+                let comments = try await loadComments(for: post)
+                self.comments = comments
+                self.post?.commentsCount = comments.count
+                self.tableView.reloadData()
+            } catch {
+                UINotifications.showError()
+            }
             self.tableView.backgroundView = nil
             self.refreshControl?.endRefreshing()
         }
     }
 
-    private func loadPost() -> Promise<Post> {
+    private func loadPost() async throws -> Post {
         if let post = self.post {
-            return Promise.value(post)
+            return post
         }
-        return HackersKit.shared.getPost(id: postId!, includeAllComments: true)
+        return try await HackersKit.shared.getPost(id: postId!, includeAllComments: true)
     }
 
-    private func loadComments(for post: Post) -> Promise<[Comment]> {
+    private func loadComments(for post: Post) async throws -> [Comment] {
         // if it already has comments then use those
         if let comments = post.comments {
-            return Promise.value(comments)
+            return comments
         }
 
         // otherwise always try to fetch comments
-        return firstly {
-            HackersKit.shared.getPost(id: post.id, includeAllComments: true)
-        }.map { post in
-            return post.comments ?? []
-        }
+        let post = try await HackersKit.shared.getPost(id: post.id, includeAllComments: true)
+        return post.comments ?? []
     }
 
     private func observeNotifications() {
@@ -311,14 +306,19 @@ extension CommentsViewController {
 
         let upvoted = post.upvoted
         voteOnPost(post, !post.upvoted)
-        if upvoted {
-            HackersKit.shared
-                .unvote(post: post)
-                .catch(errorHandler)
-        } else {
-            HackersKit.shared
-                .upvote(post: post)
-                .catch(errorHandler)
+        
+        Task {
+            do {
+                if upvoted {
+                    try await HackersKit.shared.unvote(post: post)
+                } else {
+                    try await HackersKit.shared.upvote(post: post)
+                }
+            } catch {
+                await MainActor.run {
+                    errorHandler(error)
+                }
+            }
         }
     }
 
@@ -347,14 +347,19 @@ extension CommentsViewController {
 
         let upvoted = comment.upvoted
         voteOnComment(comment, !comment.upvoted)
-        if upvoted {
-            HackersKit.shared
-                .unvote(comment: comment, for: post)
-                .catch(errorHandler)
-        } else {
-            HackersKit.shared
-                .upvote(comment: comment, for: post)
-                .catch(errorHandler)
+        
+        Task {
+            do {
+                if upvoted {
+                    try await HackersKit.shared.unvote(comment: comment, for: post)
+                } else {
+                    try await HackersKit.shared.upvote(comment: comment, for: post)
+                }
+            } catch {
+                await MainActor.run {
+                    errorHandler(error)
+                }
+            }
         }
     }
 }

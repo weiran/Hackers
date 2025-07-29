@@ -7,20 +7,16 @@
 //
 
 import Foundation
-import PromiseKit
 import SwiftSoup
 
 extension HackersKit {
-    func getPost(id: Int, includeAllComments: Bool = false) -> Promise<Post> {
-        firstly {
-            fetchPostHtml(id: id, recursive: includeAllComments)
-        }.map { html in
-            let document = try SwiftSoup.parse(html)
-            let post = try HtmlParser.post(from: document.select(".fatitem"), type: .news)
-            let comments = try self.comments(from: html)
-            post.comments = comments
-            return post
-        }
+    func getPost(id: Int, includeAllComments: Bool = false) async throws -> Post {
+        let html = try await fetchPostHtml(id: id, recursive: includeAllComments)
+        let document = try SwiftSoup.parse(html)
+        let post = try HtmlParser.post(from: document.select(".fatitem"), type: .news)
+        let comments = try self.comments(from: html)
+        post.comments = comments
+        return post
     }
 
     private func comments(from html: String) throws -> [Comment] {
@@ -44,19 +40,19 @@ extension HackersKit {
         page: Int = 1,
         recursive: Bool = true,
         workingHtml: String = ""
-    ) -> Promise<String> {
+    ) async throws -> String {
         guard let url = hackerNewsURL(id: id, page: page) else {
-            return Promise(error: Exception.Error(type: .MalformedURLException, Message: "Internal error"))
+            throw HackersKitError.requestFailure
         }
 
-        return fetchHtml(url: url).then { html -> Promise<String> in
-            let document = try SwiftSoup.parse(html)
-            let moreLinkExists = try !document.select("a.morelink").isEmpty()
-            if moreLinkExists && recursive {
-                return self.fetchPostHtml(id: id, page: page + 1, workingHtml: html)
-            } else {
-                return Promise.value(workingHtml + html)
-            }
+        let html = try await fetchHtml(url: url)
+        let document = try SwiftSoup.parse(html)
+        let moreLinkExists = try !document.select("a.morelink").isEmpty()
+        
+        if moreLinkExists && recursive {
+            return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: html)
+        } else {
+            return workingHtml + html
         }
     }
 

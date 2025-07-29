@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 class SessionService {
     private var user: User?
@@ -23,20 +22,11 @@ class SessionService {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
 
-    func authenticate(username: String, password: String) -> Promise<AuthenticationState> {
-        let (promise, seal) = Promise<AuthenticationState>.pending()
-
-        firstly {
-            HackersKit.shared.login(username: username, password: password)
-        }.done { user in
-            self.user = user
-            UserDefaults.standard.set(user.username, forKey: "username")
-            seal.fulfill(.authenticated)
-        }.catch { error in
-            seal.reject(error)
-        }
-
-        return promise
+    func authenticate(username: String, password: String) async throws -> AuthenticationState {
+        let user = try await HackersKit.shared.login(username: username, password: password)
+        self.user = user
+        UserDefaults.standard.set(user.username, forKey: "username")
+        return .authenticated
     }
 
     func unauthenticate() {

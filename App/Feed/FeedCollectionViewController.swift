@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PromiseKit
 import SafariServices
 
 class FeedCollectionViewController: UIViewController {
@@ -53,13 +52,13 @@ class FeedCollectionViewController: UIViewController {
     }
 
     private func fetchFeed(fetchNextPage: Bool = false) {
-        firstly {
-            viewModel.fetchFeed(fetchNextPage: fetchNextPage)
-        }.done {
-            self.update(with: self.viewModel, animate: fetchNextPage == true)
-        }.catch { _ in
-            UINotifications.showError()
-        }.finally {
+        Task { @MainActor in
+            do {
+                try await viewModel.fetchFeed(fetchNextPage: fetchNextPage)
+                self.update(with: self.viewModel, animate: fetchNextPage == true)
+            } catch {
+                UINotifications.showError()
+            }
             self.collectionView.refreshControl?.endRefreshing()
         }
     }
@@ -290,11 +289,15 @@ extension FeedCollectionViewController {
         // optimistally update
         updateVote(on: post, isUpvote: isUpvote)
 
-        firstly {
-            viewModel.vote(on: post, upvote: isUpvote)
-        }.catch { [weak self] error in
-            self?.updateVote(on: post, isUpvote: !isUpvote)
-            self?.handleVoteError(error: error)
+        Task {
+            do {
+                try await viewModel.vote(on: post, upvote: isUpvote)
+            } catch {
+                await MainActor.run { [weak self] in
+                    self?.updateVote(on: post, isUpvote: !isUpvote)
+                    self?.handleVoteError(error: error)
+                }
+            }
         }
     }
 
