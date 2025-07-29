@@ -23,6 +23,7 @@ extension PostType {
         case .jobs: return "Jobs"
         case .newest: return "New"
         case .best: return "Best"
+        case .active: return "Active"
         }
     }
 
@@ -34,6 +35,7 @@ extension PostType {
         case .jobs: return "briefcase"
         case .newest: return "clock"
         case .best: return "rosette"
+        case .active: return "bolt"
         }
     }
 }
