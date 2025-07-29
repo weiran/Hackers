@@ -4,11 +4,7 @@
 <dict>
     <key>method</key>
     <string>app-store</string>
-    <key>uploadBitcode</key>
-    <false/>
     <key>uploadSymbols</key>
     <true/>
-    <key>compileBitcode</key>
-    <false/>
 </dict>
 </plist>
