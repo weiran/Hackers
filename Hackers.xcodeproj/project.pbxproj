@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2406B37A28ACF8C700CB396B /* UINotifications.swift */; };
-		2406B37E28AD041800CB396B /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37D28AD041800CB396B /* PromiseKit */; };
 		2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38028AD070B00CB396B /* SwipeCellKit */; };
 		2406B38428AD07BE00CB396B /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38328AD07BE00CB396B /* Nuke */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
@@ -249,7 +248,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */,
-				2406B37E28AD041800CB396B /* PromiseKit in Frameworks */,
 				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
@@ -617,7 +615,6 @@
 			name = Hackers;
 			packageProductDependencies = (
 				2406B37828ACF72F00CB396B /* Drops */,
-				2406B37D28AD041800CB396B /* PromiseKit */,
 				2406B38028AD070B00CB396B /* SwipeCellKit */,
 				2406B38328AD07BE00CB396B /* Nuke */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
@@ -670,7 +667,6 @@
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			packageReferences = (
 				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
-				2406B37C28AD041800CB396B /* XCRemoteSwiftPackageReference "PromiseKit" */,
 				2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
@@ -1340,14 +1336,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		2406B37C28AD041800CB396B /* XCRemoteSwiftPackageReference "PromiseKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mxcl/PromiseKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
-			};
-		};
 		2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit";
@@ -1419,11 +1407,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */;
 			productName = Drops;
-		};
-		2406B37D28AD041800CB396B /* PromiseKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2406B37C28AD041800CB396B /* XCRemoteSwiftPackageReference "PromiseKit" */;
-			productName = PromiseKit;
 		};
 		2406B38028AD070B00CB396B /* SwipeCellKit */ = {
 			isa = XCSwiftPackageProductDependency;

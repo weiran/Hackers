@@ -1,4 +1,5 @@
 {
+  "originHash" : "529a3cd5ee4773f468a260885fac51c44cc7d5d2f61da161fb79770aa7fd3000",
   "pins" : [
     {
       "identity" : "devicekit",
@@ -34,15 +35,6 @@
       "state" : {
         "revision" : "a002b7fd786f2df2ed4333fe73a9727499fd9d97",
         "version" : "10.11.2"
-      }
-    },
-    {
-      "identity" : "promisekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/PromiseKit",
-      "state" : {
-        "revision" : "8a98e31a47854d3180882c8068cc4d9381bf382d",
-        "version" : "6.22.1"
       }
     },
     {
@@ -91,5 +83,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
