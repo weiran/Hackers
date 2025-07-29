@@ -8,7 +8,6 @@
 
 import Testing
 @testable import Hackers
-import PromiseKit
 
 class HackersTests {
     let sessionService: SessionService
@@ -17,12 +16,9 @@ class HackersTests {
         sessionService = SessionService()
     }
 
-    @Test func testAuthenticate() {
-        firstly {
-            sessionService.authenticate(username: "hackerstestuser", password: "hackerspassword")
-        }.done { authenticationState in
-            #expect(authenticationState == .authenticated, "Authentication failed")
-        }
+    @Test func testAuthenticate() async throws {
+        let authenticationState = try await sessionService.authenticate(username: "hackerstestuser", password: "hackerspassword")
+        #expect(authenticationState == .authenticated, "Authentication failed")
     }
 
     @Test func testUnauthenticate() {
