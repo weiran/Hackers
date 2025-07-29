@@ -25,6 +25,8 @@ extension HackersKit {
         var url: URL
         if type == .newest || type == .jobs {
             url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)")!
+        } else if type == .active {
+            url = URL(string: "https://news.ycombinator.com/active?p=\(page)")!
         } else {
             url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
         }
