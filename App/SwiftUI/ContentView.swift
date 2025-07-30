@@ -14,16 +14,9 @@ struct ContentView: View {
     @EnvironmentObject private var settingsStore: SettingsStore
     
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             FeedView()
                 .environmentObject(navigationStore)
-        } detail: {
-            if let selectedPost = navigationStore.selectedPost {
-                CommentsView(post: selectedPost)
-                    .environmentObject(navigationStore)
-            } else {
-                EmptyStateView()
-            }
         }
         .accentColor(Color(UIColor(named: "appTintColor")!))
         .sheet(isPresented: $navigationStore.showingLogin) {

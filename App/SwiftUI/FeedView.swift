@@ -28,6 +28,7 @@ struct FeedView: View {
                             ForEach(viewModel.posts, id: \.id) { post in
                                 PostRowView(
                                     post: post, 
+                                    navigationStore: navigationStore,
                                     onVote: { post in
                                         Task {
                                             await handleVote(post: post)
@@ -37,7 +38,7 @@ struct FeedView: View {
                                         handleLinkTap(post: post)
                                     },
                                     onCommentsTap: { post in
-                                        navigationStore.showPost(post)
+                                        // This callback is no longer needed since we use NavigationLink
                                     }
                                 )
                                 .onAppear {
@@ -214,71 +215,72 @@ struct PostRowView: View {
     let onVote: ((Post) -> Void)?
     let onLinkTap: ((Post) -> Void)?
     let onCommentsTap: ((Post) -> Void)?
+    let navigationStore: NavigationStore
     
-    init(post: Post, onVote: ((Post) -> Void)? = nil, onLinkTap: ((Post) -> Void)? = nil, onCommentsTap: ((Post) -> Void)? = nil) {
+    init(post: Post, navigationStore: NavigationStore, onVote: ((Post) -> Void)? = nil, onLinkTap: ((Post) -> Void)? = nil, onCommentsTap: ((Post) -> Void)? = nil) {
         self.post = post
+        self.navigationStore = navigationStore
         self.onVote = onVote
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Thumbnail with proper loading
-            ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-            
-            VStack(alignment: .leading, spacing: 4) {
-                // Title
-                Text(post.title)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
+        NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
+            HStack(spacing: 12) {
+                // Thumbnail with proper loading
+                ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                    .frame(width: 44, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 
-                // Metadata row
-                HStack(spacing: 8) {
-                    HStack(spacing: 2) {
-                        Text("\(post.score)")
-                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                        Image(systemName: "arrow.up")
-                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                            .font(.system(size: 10))
+                VStack(alignment: .leading, spacing: 4) {
+                    // Title
+                    Text(post.title)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    
+                    // Metadata row
+                    HStack(spacing: 8) {
+                        HStack(spacing: 2) {
+                            Text("\(post.score)")
+                                .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                            Image(systemName: "arrow.up")
+                                .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                .font(.system(size: 10))
+                        }
+                        
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 2) {
+                            Text("\(post.commentsCount)")
+                                .foregroundColor(.secondary)
+                            Image(systemName: "message")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 10))
+                        }
+                        
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        
+                        if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
+                            Text(host)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("self")
+                                .foregroundColor(.secondary)
+                        }
                     }
-                    
-                    Text("•")
-                        .foregroundColor(.secondary)
-                    
-                    HStack(spacing: 2) {
-                        Text("\(post.commentsCount)")
-                            .foregroundColor(.secondary)
-                        Image(systemName: "message")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: 10))
-                    }
-                    
-                    Text("•")
-                        .foregroundColor(.secondary)
-                    
-                    if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
-                        Text(host)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("self")
-                            .foregroundColor(.secondary)
-                    }
+                    .font(.system(size: 13))
                 }
-                .font(.system(size: 13))
+                
+                Spacer()
             }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onCommentsTap?(post)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
         }
     }
 }

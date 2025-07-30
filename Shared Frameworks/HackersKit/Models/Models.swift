@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Post: Hashable {
+class Post: Hashable, Identifiable {
     let id: Int
     let url: URL
     let title: String

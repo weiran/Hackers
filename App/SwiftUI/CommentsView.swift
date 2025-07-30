@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SafariServices
 
 struct CommentsView: View {
     let post: Post
@@ -15,55 +16,36 @@ struct CommentsView: View {
     @State private var isLoading = false
     @State private var currentPost: Post
     @State private var commentsController = CommentsController()
+    @State private var showingVoteError = false
+    @State private var voteErrorMessage = ""
+    @State private var showingShareSheet = false
+    @State private var shareURL: URL?
+    @State private var shareTitle: String = ""
+    @State private var showingPostShareOptions = false
+    @State private var refreshTrigger = false // Used to force SwiftUI updates
+    @Environment(\.dismiss) private var dismiss
     
     init(post: Post) {
         self.post = post
         self._currentPost = State(initialValue: post)
     }
     
+    // Computed property that filters visible comments
+    private var visibleComments: [Comment] {
+        _ = refreshTrigger // Force dependency on refreshTrigger
+        return commentsController.visibleComments
+    }
+    
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                // Post header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(currentPost.title)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color(UIColor(named: "titleTextColor")!))
-                    
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.up")
-                                .foregroundColor(currentPost.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                            Text("\(currentPost.score)")
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "message")
-                                .foregroundColor(.secondary)
-                            Text("\(currentPost.commentsCount)")
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Text("by \(currentPost.by)")
-                            .foregroundColor(.secondary)
-                        
-                        Spacer()
-                        
-                        Text(currentPost.age)
-                            .foregroundColor(.secondary)
-                    }
-                    .font(.caption)
-                    
-                    if let text = currentPost.text, !text.isEmpty {
-                        Text(text)
-                            .padding(.top, 8)
-                            .foregroundColor(Color(UIColor(named: "textColor")!))
-                    }
-                }
-                .padding()
-                .background(Color(.systemGroupedBackground))
+                // Post header with thumbnail and voting
+                PostHeaderView(
+                    post: currentPost,
+                    onVote: { await handlePostVote() },
+                    onLinkTap: { handleLinkTap() },
+                    onShare: { showingPostShareOptions = true }
+                )
                 
                 Divider()
                 
@@ -74,20 +56,87 @@ struct CommentsView: View {
                 } else if comments.isEmpty {
                     EmptyStateView("No comments yet")
                 } else {
-                    List(commentsController.visibleComments, id: \.id) { comment in
-                        CommentRowView(comment: comment) {
-                            toggleCommentVisibility(comment)
+                    List(visibleComments, id: \.id) { comment in
+                        CommentRowView(
+                            comment: comment,
+                            post: currentPost,
+                            onToggle: { toggleCommentVisibility(comment) },
+                            onVote: { await handleCommentVote(comment) },
+                            onShare: { shareComment(comment) },
+                            onCopy: { copyComment(comment) }
+                        )
+                        .contextMenu {
+                            CommentContextMenu(
+                                comment: comment,
+                                onVote: { Task { await handleCommentVote(comment) } },
+                                onShare: { shareComment(comment) },
+                                onCopy: { copyComment(comment) }
+                            )
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            if UserDefaults.standard.swipeActionsEnabled {
+                                Button {
+                                    Task { await handleCommentVote(comment) }
+                                } label: {
+                                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                                }
+                                .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                            }
+                        }
+                        .swipeActions(edge: .trailing) {
+                            if UserDefaults.standard.swipeActionsEnabled {
+                                Button {
+                                    if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
+                                        let rootComment = commentsController.visibleComments[rootIndex]
+                                        toggleCommentVisibility(rootComment)
+                                    }
+                                } label: {
+                                    Image(systemName: "minus.circle")
+                                }
+                                .tint(Color(UIColor(named: "appTintColor")!))
+                            }
                         }
                     }
                     .listStyle(.plain)
                 }
             }
-            .navigationBarHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        if currentPost.url.host != nil {
+                            Button("Article Link") {
+                                sharePost(url: currentPost.url, title: currentPost.title)
+                            }
+                            Button("Hacker News Link") {
+                                sharePost(url: currentPost.hackerNewsURL, title: currentPost.title)
+                            }
+                        } else {
+                            Button("Hacker News Link") {
+                                sharePost(url: currentPost.hackerNewsURL, title: currentPost.title)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
             .refreshable {
                 await loadComments()
             }
             .task {
                 await loadComments()
+            }
+            .alert("Vote Error", isPresented: $showingVoteError) {
+                Button("OK") { }
+            } message: {
+                Text(voteErrorMessage)
             }
         }
     }
@@ -110,6 +159,7 @@ struct CommentsView: View {
             comments = loadedComments
             commentsController.comments = loadedComments
             currentPost.commentsCount = loadedComments.count
+            refreshTrigger.toggle() // Ensure visibleComments updates
         } catch {
             print("Error loading comments: \(error)")
             // TODO: Show error state
@@ -119,31 +169,199 @@ struct CommentsView: View {
     }
     
     private func toggleCommentVisibility(_ comment: Comment) {
-        let _ = commentsController.toggleChildrenVisibility(of: comment)
-        // Trigger UI update by reassigning the comments array
-        comments = commentsController.comments
+        withAnimation(.easeInOut(duration: 0.2)) {
+            let _ = commentsController.toggleChildrenVisibility(of: comment)
+            // Force SwiftUI to re-evaluate visibleComments
+            refreshTrigger.toggle()
+        }
+    }
+    
+    @MainActor
+    private func handlePostVote() async {
+        let isUpvote = !currentPost.upvoted
+        
+        // Optimistically update UI
+        currentPost.upvoted = isUpvote
+        currentPost.score += isUpvote ? 1 : -1
+        
+        do {
+            if isUpvote {
+                try await HackersKit.shared.upvote(post: currentPost)
+            } else {
+                try await HackersKit.shared.unvote(post: currentPost)
+            }
+        } catch {
+            // Revert optimistic update
+            currentPost.upvoted = !isUpvote
+            currentPost.score += isUpvote ? -1 : 1
+            
+            handleVoteError(error)
+        }
+    }
+    
+    @MainActor
+    private func handleCommentVote(_ comment: Comment) async {
+        let isUpvote = !comment.upvoted
+        
+        // Optimistically update UI
+        comment.upvoted = isUpvote
+        
+        do {
+            if isUpvote {
+                try await HackersKit.shared.upvote(comment: comment, for: currentPost)
+            } else {
+                try await HackersKit.shared.unvote(comment: comment, for: currentPost)
+            }
+        } catch {
+            // Revert optimistic update
+            comment.upvoted = !isUpvote
+            
+            handleVoteError(error)
+        }
+    }
+    
+    private func handleVoteError(_ error: Error) {
+        if let hackersError = error as? HackersKitError {
+            switch hackersError {
+            case .unauthenticated:
+                navigationStore.showLogin()
+            default:
+                voteErrorMessage = "Failed to vote. Please try again."
+                showingVoteError = true
+            }
+        } else {
+            voteErrorMessage = "Failed to vote. Please try again."
+            showingVoteError = true
+        }
+    }
+    
+    private func handleLinkTap() {
+        guard !currentPost.url.absoluteString.starts(with: "item?id=") else { return }
+        
+        if let svc = SFSafariViewController.instance(for: currentPost.url) {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = windowScene.windows.first?.rootViewController {
+                rootVC.present(svc, animated: true) {
+                    DraggableCommentsButton.attachTo(svc, with: currentPost)
+                }
+            }
+        }
+    }
+    
+    private func sharePost(url: URL, title: String) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            activityVC.setValue(title, forKey: "subject")
+            
+            if let popover = activityVC.popoverPresentationController {
+                popover.sourceView = rootVC.view
+                popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
+                popover.permittedArrowDirections = []
+            }
+            
+            rootVC.present(activityVC, animated: true)
+        }
+    }
+    
+    private func shareComment(_ comment: Comment) {
+        sharePost(url: comment.hackerNewsURL, title: "Comment by \(comment.by)")
+    }
+    
+    private func copyComment(_ comment: Comment) {
+        UIPasteboard.general.string = comment.text.strippingHTML()
+    }
+}
+
+struct PostHeaderView: View {
+    let post: Post
+    let onVote: () async -> Void
+    let onLinkTap: () -> Void
+    let onShare: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                // Thumbnail
+                ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .onTapGesture {
+                        onLinkTap()
+                    }
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(post.title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                        .lineLimit(3)
+                        .onTapGesture {
+                            onLinkTap()
+                        }
+                    
+                    HStack(spacing: 8) {
+                        Button {
+                            Task { await onVote() }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.up")
+                                    .font(.system(size: 12))
+                                Text("\(post.score)")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                        }
+                        
+                        HStack(spacing: 4) {
+                            Image(systemName: "message")
+                                .font(.system(size: 12))
+                            Text("\(post.commentsCount)")
+                                .font(.system(size: 14))
+                        }
+                        .foregroundColor(.secondary)
+                        
+                        Text("by \(post.by)")
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
+                        
+                        Spacer()
+                        
+                        Text(post.age)
+                            .font(.system(size: 14))
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            
+            if let text = post.text, !text.isEmpty {
+                HTMLText(htmlString: text)
+                    .foregroundColor(.primary)
+                    .padding(.top, 4)
+            }
+        }
+        .padding()
+        .background(Color(.systemGroupedBackground))
     }
 }
 
 struct CommentRowView: View {
     let comment: Comment
+    let post: Post
     let onToggle: () -> Void
-    
-    init(comment: Comment, onToggle: @escaping () -> Void = {}) {
-        self.comment = comment
-        self.onToggle = onToggle
-    }
+    let onVote: () async -> Void
+    let onShare: () -> Void
+    let onCopy: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(comment.by)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
                 
                 Text(comment.age)
-                    .font(.caption)
+                    .font(.system(size: 13))
                     .foregroundColor(.secondary)
                 
                 Spacer()
@@ -151,13 +369,13 @@ struct CommentRowView: View {
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color(UIColor(named: "upvotedColor")!))
-                        .font(.caption)
+                        .font(.system(size: 14))
                 }
                 
                 // Show visibility indicator
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.right")
-                        .font(.caption2)
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
             }
@@ -165,21 +383,55 @@ struct CommentRowView: View {
             // Only show full text if comment is visible
             if comment.visibility == .visible {
                 HTMLText(htmlString: comment.text)
-                    .foregroundColor(Color(UIColor(named: "textColor")!))
+                    .foregroundColor(.primary)
             } else if comment.visibility == .compact {
-                Text("...")
+                Text("[collapsed]")
                     .foregroundColor(.secondary)
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .italic()
             }
         }
         .padding(.leading, CGFloat(comment.level * 16))
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
         }
         .opacity(comment.visibility == .hidden ? 0 : 1)
         .frame(height: comment.visibility == .hidden ? 0 : nil)
+    }
+}
+
+struct CommentContextMenu: View {
+    let comment: Comment
+    let onVote: () -> Void
+    let onShare: () -> Void
+    let onCopy: () -> Void
+    
+    var body: some View {
+        Group {
+            Button {
+                onVote()
+            } label: {
+                Label(comment.upvoted ? "Unvote" : "Upvote", 
+                      systemImage: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+            }
+            
+            Button {
+                onCopy()
+            } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            
+            Divider()
+            
+            Button {
+                onShare()
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+        }
     }
 }
 
@@ -200,14 +452,18 @@ extension String {
             .replacingOccurrences(of: "&gt;", with: ">")
             .replacingOccurrences(of: "&quot;", with: "\"")
             .replacingOccurrences(of: "&#x27;", with: "'")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
     }
 }
+
+// ThumbnailView is imported from FeedView.swift
 
 #Preview {
     let samplePost = Post(
         id: 1,
         url: URL(string: "https://ycombinator.com")!,
-        title: "Sample Post Title",
+        title: "Sample Post Title with a longer title that might wrap to multiple lines",
         age: "2 hours ago",
         commentsCount: 42,
         by: "user123",
