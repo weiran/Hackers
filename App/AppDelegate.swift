@@ -10,12 +10,10 @@ import UIKit
 import SwinjectStoryboard
 import Nuke
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
+class AppDelegate: NSObject, UIApplicationDelegate {
     var navigationService: NavigationService?
 
-    func applicationDidFinishLaunching(_ application: UIApplication) {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // process args for testing
         if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
             ReviewController.disablePrompts = true
@@ -23,24 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
-
-        // setup window and entry point
-        window = UIWindow()
-        let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        let mainSplitViewController = storyboard.instantiateViewController(
-            identifier: "MainSplitViewController"
-        ) as MainSplitViewController
-        window?.rootViewController = mainSplitViewController
-        window?.tintColor = AppTheme.default.appTintColor
-        window?.makeKeyAndVisible()
-
-        if ProcessInfo.processInfo.arguments.contains("darkMode") {
-            window?.overrideUserInterfaceStyle = .dark
-        }
-
-        // setup NavigationService
-        navigationService = SwinjectStoryboard.getService()
-        navigationService?.mainSplitViewController = mainSplitViewController
 
         // setup review prompt
         ReviewController.incrementLaunchCounter()
@@ -51,6 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // setup Nuke
         DataLoader.sharedUrlCache.diskCapacity = 1024 * 1024 * 100 // 100MB
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
     }
 
     func application(
@@ -69,7 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             case "item":
                 if let idString = parameters["id"],
                     let id = Int(idString) {
-                    navigationService?.showPost(id: id)
+                    // TODO: Handle navigation to post in SwiftUI
+                    print("Navigate to post ID: \(id)")
                 }
             default: break
             }

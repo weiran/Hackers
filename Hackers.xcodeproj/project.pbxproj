@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20B79255672720AA91988C90 /* NavigationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */; };
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2406B37A28ACF8C700CB396B /* UINotifications.swift */; };
 		2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38028AD070B00CB396B /* SwipeCellKit */; };
@@ -86,8 +87,14 @@
 		24FF021D226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */; };
 		24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */; };
 		3AD2F1862C34131E0034C399 /* DraggableCommentsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD2F1852C34131E0034C399 /* DraggableCommentsButton.swift */; };
+		5521C77D0F3BC76CD766FA05 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FF36346105E44DF11C7C07 /* FeedView.swift */; };
+		5F0FA228A57AF829713FA0A3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46615BF15AE7EA97C4EB6BBC /* ContentView.swift */; };
+		643029C8B133DB1D14A12B69 /* CommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40E450D9860043A78D92D5A /* CommentsView.swift */; };
 		698FE7B523EE5FE300F5828C /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 698FE7B423EE5FE300F5828C /* Colors.xcassets */; };
+		76BB2EB6145EC6ADC14245CF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */; };
 		8B782E032A5AB01C00FD6B39 /* TextSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */; };
+		E37839F7DC2412121CA56D36 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035637A66121679B942722F /* EmptyStateView.swift */; };
+		F9ACBDCE9E043BE81ABF46D7 /* HackersApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -211,13 +218,30 @@
 		24F644FD24951D6400869504 /* Scanfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Scanfile; sourceTree = "<group>"; };
 		24FF021C226C9BEA002EF8DD /* SwinjectStoryboardExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectStoryboardExtensions.swift; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
+		29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HackersApp.swift; path = App/HackersApp.swift; sourceTree = SOURCE_ROOT; };
 		3AD2F1852C34131E0034C399 /* DraggableCommentsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableCommentsButton.swift; sourceTree = "<group>"; };
+		46615BF15AE7EA97C4EB6BBC /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = App/SwiftUI/ContentView.swift; sourceTree = SOURCE_ROOT; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		89FF36346105E44DF11C7C07 /* FeedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeedView.swift; path = App/SwiftUI/FeedView.swift; sourceTree = SOURCE_ROOT; };
 		8B782E022A5AB01C00FD6B39 /* TextSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSelectionViewController.swift; sourceTree = "<group>"; };
+		9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = App/SceneDelegate.swift; sourceTree = SOURCE_ROOT; };
+		C035637A66121679B942722F /* EmptyStateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmptyStateView.swift; path = App/SwiftUI/EmptyStateView.swift; sourceTree = SOURCE_ROOT; };
+		D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NavigationStore.swift; path = App/SwiftUI/NavigationStore.swift; sourceTree = SOURCE_ROOT; };
+		F40E450D9860043A78D92D5A /* CommentsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommentsView.swift; path = App/SwiftUI/CommentsView.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		24C03D5E2E003EB8002B6ED5 /* HackersTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = HackersTests; sourceTree = "<group>"; };
+		24C03D5E2E003EB8002B6ED5 /* HackersTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = HackersTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -468,6 +492,13 @@
 				24F39F8618AFB1150055F8DC /* Products */,
 				241387A51945A6E100D71220 /* README.md */,
 				245345F622466F71001AF1CE /* fastlane */,
+				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
+				89FF36346105E44DF11C7C07 /* FeedView.swift */,
+				F40E450D9860043A78D92D5A /* CommentsView.swift */,
+				C035637A66121679B942722F /* EmptyStateView.swift */,
+				D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */,
+				29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */,
+				9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -507,6 +538,9 @@
 				2464D209209DD8AE00C7F8FC /* Extensions */,
 				249B8F8122A2A474002A9EC5 /* Shared */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
+				ABD9A18B67FB6E883477C2C5 /* SwiftUI */,
+				29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */,
+				9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -530,6 +564,18 @@
 				2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		ABD9A18B67FB6E883477C2C5 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
+				89FF36346105E44DF11C7C07 /* FeedView.swift */,
+				F40E450D9860043A78D92D5A /* CommentsView.swift */,
+				C035637A66121679B942722F /* EmptyStateView.swift */,
+				D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */,
+			);
+			name = SwiftUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -590,8 +636,6 @@
 				24C03D5E2E003EB8002B6ED5 /* HackersTests */,
 			);
 			name = HackersTests;
-			packageProductDependencies = (
-			);
 			productName = HackersTests;
 			productReference = 24C03D5D2E003EB8002B6ED5 /* HackersTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -849,6 +893,13 @@
 				2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */,
 				24C10C082486DB0700B93F68 /* HtmlParser.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
+				5F0FA228A57AF829713FA0A3 /* ContentView.swift in Sources */,
+				5521C77D0F3BC76CD766FA05 /* FeedView.swift in Sources */,
+				643029C8B133DB1D14A12B69 /* CommentsView.swift in Sources */,
+				E37839F7DC2412121CA56D36 /* EmptyStateView.swift in Sources */,
+				20B79255672720AA91988C90 /* NavigationStore.swift in Sources */,
+				F9ACBDCE9E043BE81ABF46D7 /* HackersApp.swift in Sources */,
+				76BB2EB6145EC6ADC14245CF /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -902,7 +953,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -941,7 +992,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Extensions/HackersActionExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -979,7 +1030,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1020,7 +1071,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1227,7 +1278,7 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1260,7 +1311,7 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
