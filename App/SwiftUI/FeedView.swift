@@ -147,6 +147,7 @@ struct FeedView: View {
                 Text(voteErrorMessage)
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     @MainActor
