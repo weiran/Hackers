@@ -90,8 +90,12 @@ struct SettingsView: View {
 
     private var versionLabel: some View {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-        return Text("Version \(appVersion ?? "1.0")")
-            .foregroundColor(.gray)
+        return HStack {
+            Spacer()
+            Text("Version \(appVersion ?? "1.0")")
+                .foregroundColor(.gray)
+            Spacer()
+        }
     }
 }
 
