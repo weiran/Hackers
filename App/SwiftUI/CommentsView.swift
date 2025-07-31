@@ -48,75 +48,75 @@ struct CommentsView: View {
                 } else if comments.isEmpty {
                     EmptyStateView("No comments yet")
                 } else {
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            PostHeaderView(
-                                post: currentPost,
-                                onVote: { await handlePostVote() },
-                                onLinkTap: { handleLinkTap() },
-                                onShare: { showingPostShareOptions = true }
+                    List {
+                        PostHeaderView(
+                            post: currentPost,
+                            onVote: { await handlePostVote() },
+                            onLinkTap: { handleLinkTap() },
+                            onShare: { showingPostShareOptions = true }
+                        )
+                        .id("header")
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ViewOffsetKey.self,
+                                value: geometry.frame(in: .global).minY
                             )
-                            .id("header")
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(
-                                    key: ViewOffsetKey.self,
-                                    value: geometry.frame(in: .global).minY
-                                )
-                            })
-                            .onPreferenceChange(ViewOffsetKey.self) { offset in
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    // Show title when header scrolls above navigation bar (approximately)
-                                    showTitle = offset < 100
-                                }
+                        })
+                        .onPreferenceChange(ViewOffsetKey.self) { offset in
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                // Show title when header scrolls above navigation bar (approximately)
+                                showTitle = offset < 100
                             }
-                            .listRowInsets(EdgeInsets())
+                        }
 
-                            ForEach(visibleComments, id: \.id) { comment in
-                                CommentRowView(
+                        ForEach(visibleComments, id: \.id) { comment in
+                            CommentRowView(
+                                comment: comment,
+                                post: currentPost,
+                                onToggle: { toggleCommentVisibility(comment) },
+                                onVote: { await handleCommentVote(comment) },
+                                onShare: { shareComment(comment) },
+                                onCopy: { copyComment(comment) }
+                            )
+                            .contextMenu {
+                                CommentContextMenu(
                                     comment: comment,
-                                    post: currentPost,
-                                    onToggle: { toggleCommentVisibility(comment) },
-                                    onVote: { await handleCommentVote(comment) },
+                                    onVote: { Task { await handleCommentVote(comment) } },
                                     onShare: { shareComment(comment) },
                                     onCopy: { copyComment(comment) }
                                 )
-                                .contextMenu {
-                                    CommentContextMenu(
-                                        comment: comment,
-                                        onVote: { Task { await handleCommentVote(comment) } },
-                                        onShare: { shareComment(comment) },
-                                        onCopy: { copyComment(comment) }
-                                    )
-                                }
-                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                    if UserDefaults.standard.swipeActionsEnabled {
-                                        Button {
-                                            Task { await handleCommentVote(comment) }
-                                        } label: {
-                                            Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
-                                        }
-                                        .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                if UserDefaults.standard.swipeActionsEnabled {
+                                    Button {
+                                        Task { await handleCommentVote(comment) }
+                                    } label: {
+                                        Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                                     }
+                                    .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
                                 }
-                                .swipeActions(edge: .trailing) {
-                                    if UserDefaults.standard.swipeActionsEnabled {
-                                        Button {
-                                            if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
-                                                let rootComment = commentsController.visibleComments[rootIndex]
-                                                toggleCommentVisibility(rootComment)
-                                            }
-                                        } label: {
-                                            Image(systemName: "minus.circle")
+                            }
+                            .swipeActions(edge: .trailing) {
+                                if UserDefaults.standard.swipeActionsEnabled {
+                                    Button {
+                                        if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
+                                            let rootComment = commentsController.visibleComments[rootIndex]
+                                            toggleCommentVisibility(rootComment)
                                         }
-                                        .tint(Color(UIColor(named: "appTintColor")!))
+                                    } label: {
+                                        Image(systemName: "minus.circle")
                                     }
+                                    .tint(Color(UIColor(named: "appTintColor")!))
                                 }
                             }
                         }
+                        .listRowInsets(EdgeInsets()) // Remove default insets
+                        .listRowBackground(Color.clear) // Remove background
+                        .listRowSeparator(.hidden) // Hide separators
                     }
+                    .listStyle(.plain)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
@@ -135,7 +135,7 @@ struct CommentsView: View {
                     .offset(y: showTitle ? 0 : 20)
                     .animation(.easeInOut(duration: 0.3), value: showTitle)
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         if currentPost.url.host != nil {
@@ -166,6 +166,7 @@ struct CommentsView: View {
             } message: {
                 Text(voteErrorMessage)
             }
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
@@ -389,7 +390,7 @@ struct CommentRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Divider()
-                .padding(.bottom, 2)
+                .padding(.bottom, 6)
 
             HStack {
                 Text(comment.by)
@@ -420,17 +421,20 @@ struct CommentRowView: View {
             if comment.visibility == .visible {
                 HTMLText(htmlString: comment.text)
                     .foregroundColor(.primary)
+                    .padding(.bottom, 16)
+            } else {
+                // it's here to maintain row height consistency with List animations
+                Spacer()
             }
         }
         .padding(.leading, CGFloat(comment.level * 16))
         .padding(.horizontal)
-        .padding(.bottom, 12)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
         }
-        .opacity(comment.visibility == .hidden ? 0 : 1)
-        .frame(height: comment.visibility == .hidden ? 0 : nil)
+        // fix row height animations with List: https://stackoverflow.com/questions/65612622/swift-ui-list-animation-for-expanding-cells-with-dynamic-heights
+        .id(String(comment.id) + String(comment.visibility.rawValue))
     }
 }
 
