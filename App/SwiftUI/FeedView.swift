@@ -233,7 +233,7 @@ struct PostRowView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(post.title)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.headline)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
 
@@ -244,7 +244,7 @@ struct PostRowView: View {
                                 .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                             Image(systemName: "arrow.up")
                                 .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                                .font(.system(size: 10))
+                                .font(.caption2)
                         }
 
                         Text("•")
@@ -255,7 +255,7 @@ struct PostRowView: View {
                                 .foregroundColor(.secondary)
                             Image(systemName: "message")
                                 .foregroundColor(.secondary)
-                                .font(.system(size: 10))
+                                .font(.caption2)
                         }
 
                         if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
@@ -266,7 +266,7 @@ struct PostRowView: View {
                                 .lineLimit(1)
                         }
                     }
-                    .font(.system(size: 13))
+                    .font(.subheadline)
                 }
             }
         }

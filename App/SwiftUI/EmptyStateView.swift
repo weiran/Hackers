@@ -18,7 +18,7 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "doc.text")
-                .font(.system(size: 60))
+                .font(.largeTitle)
                 .foregroundColor(.secondary)
 
             Text(message)

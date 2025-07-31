@@ -321,7 +321,7 @@ struct PostHeaderView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(post.title)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.headline)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -339,7 +339,7 @@ struct PostHeaderView: View {
                                     .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                                 Image(systemName: "arrow.up")
                                     .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                                    .font(.system(size: 10))
+                                    .font(.caption2)
                             }
                         }
 
@@ -351,7 +351,7 @@ struct PostHeaderView: View {
                                 .foregroundColor(.secondary)
                             Image(systemName: "message")
                                 .foregroundColor(.secondary)
-                                .font(.system(size: 10))
+                                .font(.caption2)
                         }
 
                         if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
@@ -362,7 +362,7 @@ struct PostHeaderView: View {
                                 .lineLimit(1)
                         }
                     }
-                    .font(.system(size: 13))
+                    .font(.subheadline)
                 }
             }
 
@@ -374,6 +374,7 @@ struct PostHeaderView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
+        .padding(.bottom, 12)
     }
 }
 
@@ -388,14 +389,15 @@ struct CommentRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Divider()
+                .padding(.bottom, 2)
 
             HStack {
                 Text(comment.by)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.headline)
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
 
                 Text(comment.age)
-                    .font(.system(size: 13))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
 
                 Spacer()
@@ -403,13 +405,13 @@ struct CommentRowView: View {
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color(UIColor(named: "upvotedColor")!))
-                        .font(.system(size: 14))
+                        .font(.body)
                 }
 
                 // Show visibility indicator
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
@@ -421,8 +423,8 @@ struct CommentRowView: View {
             }
         }
         .padding(.leading, CGFloat(comment.level * 16))
-        .padding(.vertical, 8)
         .padding(.horizontal)
+        .padding(.bottom, 12)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
