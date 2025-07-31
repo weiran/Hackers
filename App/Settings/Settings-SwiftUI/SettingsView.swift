@@ -19,7 +19,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section {
+                Section(footer: versionLabel) {
                     HStack {
                         Image(uiImage: Bundle.main.icon ?? UIImage())
                             .resizable()
@@ -70,10 +70,6 @@ struct SettingsView: View {
                     Toggle(isOn: $settings.openInDefaultBrowser) {
                         Text("Open in System Browser")
                     }
-                }
-
-                Section {
-                    versionLabel
                 }
             }
             .listStyle(GroupedListStyle())
