@@ -65,18 +65,7 @@ struct FeedView: View {
                                         }
                                     )
                                 }
-                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                    if UserDefaults.standard.swipeActionsEnabled {
-                                        Button {
-                                            Task {
-                                                await handleVote(post: post)
-                                            }
-                                        } label: {
-                                            Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
-                                        }
-                                        .tint(post.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
-                                    }
-                                }
+                                
                             }
                         }
                         .listStyle(.plain)
@@ -215,7 +204,7 @@ struct FeedView: View {
 }
 
 struct PostRowView: View {
-    let post: Post
+    @ObservedObject var post: Post
     let onVote: ((Post) -> Void)?
     let onLinkTap: ((Post) -> Void)?
     let onCommentsTap: ((Post) -> Void)?
@@ -279,6 +268,16 @@ struct PostRowView: View {
                     }
                     .font(.system(size: 13))
                 }
+            }
+        }
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            if UserDefaults.standard.swipeActionsEnabled {
+                Button {
+                    onVote?(post)
+                } label: {
+                    Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+                }
+                .tint(post.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
             }
         }
     }

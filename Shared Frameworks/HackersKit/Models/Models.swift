@@ -7,17 +7,18 @@
 //
 
 import Foundation
+import Combine
 
-class Post: Hashable, Identifiable {
+class Post: ObservableObject, Hashable, Identifiable {
     let id: Int
     let url: URL
     let title: String
     let age: String
     var commentsCount: Int
     let by: String
-    var score: Int
+    @Published var score: Int
     let postType: PostType
-    var upvoted = false
+    @Published var upvoted = false
     var text: String?
 
     var comments: [Comment]?
