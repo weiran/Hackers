@@ -24,7 +24,7 @@ struct CommentsView: View {
     @State private var showingPostShareOptions = false
     @State private var refreshTrigger = false // Used to force SwiftUI updates
     @State private var showTitle = false
-    @State private var scrollOffset: CGFloat = 0
+    @State private var headerHeight: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
     init(post: Post) {
@@ -56,6 +56,20 @@ struct CommentsView: View {
                                 onLinkTap: { handleLinkTap() },
                                 onShare: { showingPostShareOptions = true }
                             )
+                            .id("header")
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(
+                                    key: ViewOffsetKey.self,
+                                    value: geometry.frame(in: .global).minY
+                                )
+                            })
+                            .onPreferenceChange(ViewOffsetKey.self) { offset in
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    // Show title when header scrolls above navigation bar (approximately)
+                                    showTitle = offset < 100
+                                }
+                            }
+                            .listRowInsets(EdgeInsets())
 
                             ForEach(visibleComments, id: \.id) { comment in
                                 CommentRowView(
@@ -100,17 +114,6 @@ struct CommentsView: View {
                             }
                         }
                     }
-                    .background(GeometryReader { geometry in
-                        Color.clear.preference(key: ScrollOffsetPreferenceKey.self, 
-                                             value: geometry.frame(in: .named("scrollView")).minY)
-                    })
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                        scrollOffset = -value
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            showTitle = scrollOffset > 100
-                        }
-                    }
-                    .coordinateSpace(name: "scrollView")
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -305,7 +308,7 @@ struct PostHeaderView: View {
     let onShare: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
                 // Thumbnail with proper loading
                 ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
@@ -321,6 +324,7 @@ struct PostHeaderView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .onTapGesture {
                             onLinkTap()
                         }
@@ -368,7 +372,8 @@ struct PostHeaderView: View {
                     .padding(.top, 4)
             }
         }
-        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
     }
 }
 
@@ -417,7 +422,7 @@ struct CommentRowView: View {
         }
         .padding(.leading, CGFloat(comment.level * 16))
         .padding(.vertical, 8)
-        .padding(.horizontal, 12)
+        .padding(.horizontal)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
@@ -574,9 +579,17 @@ extension String {
         .environmentObject(NavigationStore())
 }
 
-struct ScrollOffsetPreferenceKey: PreferenceKey {
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
+struct HeaderHeightKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        value = max(value, nextValue())
     }
 }
