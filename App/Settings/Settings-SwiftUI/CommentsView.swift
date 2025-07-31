@@ -15,12 +15,12 @@ struct CommentsView: View {
     @State private var isLoading = false
     @State private var currentPost: Post
     @State private var commentsController = CommentsController()
-    
+
     init(post: Post) {
         self.post = post
         self._currentPost = State(initialValue: post)
     }
-    
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -30,7 +30,7 @@ struct CommentsView: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(Color(UIColor(named: "titleTextColor")!))
-                    
+
                     HStack(spacing: 12) {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.up")
@@ -38,24 +38,24 @@ struct CommentsView: View {
                             Text("\(currentPost.score)")
                                 .foregroundColor(.secondary)
                         }
-                        
+
                         HStack(spacing: 4) {
                             Image(systemName: "message")
                                 .foregroundColor(.secondary)
                             Text("\(currentPost.commentsCount)")
                                 .foregroundColor(.secondary)
                         }
-                        
+
                         Text("by \(currentPost.by)")
                             .foregroundColor(.secondary)
-                        
+
                         Spacer()
-                        
+
                         Text(currentPost.age)
                             .foregroundColor(.secondary)
                     }
                     .font(.caption)
-                    
+
                     if let text = currentPost.text, !text.isEmpty {
                         Text(text)
                             .padding(.top, 8)
@@ -64,9 +64,9 @@ struct CommentsView: View {
                 }
                 .padding()
                 .background(Color(.systemGroupedBackground))
-                
+
                 Divider()
-                
+
                 // Comments section
                 if isLoading {
                     ProgressView("Loading comments...")
@@ -91,10 +91,10 @@ struct CommentsView: View {
             }
         }
     }
-    
+
     private func loadComments() async {
         isLoading = true
-        
+
         do {
             // Load post with comments if not already loaded
             let postWithComments: Post
@@ -104,7 +104,7 @@ struct CommentsView: View {
             } else {
                 postWithComments = currentPost
             }
-            
+
             // Set comments
             let loadedComments = postWithComments.comments ?? []
             comments = loadedComments
@@ -114,10 +114,10 @@ struct CommentsView: View {
             print("Error loading comments: \(error)")
             // TODO: Show error state
         }
-        
+
         isLoading = false
     }
-    
+
     private func toggleCommentVisibility(_ comment: Comment) {
         let _ = commentsController.toggleChildrenVisibility(of: comment)
         // Trigger UI update by reassigning the comments array
@@ -128,12 +128,12 @@ struct CommentsView: View {
 struct CommentRowView: View {
     let comment: Comment
     let onToggle: () -> Void
-    
+
     init(comment: Comment, onToggle: @escaping () -> Void = {}) {
         self.comment = comment
         self.onToggle = onToggle
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -141,19 +141,19 @@ struct CommentRowView: View {
                     .font(.caption)
                     .fontWeight(.medium)
                     .foregroundColor(.secondary)
-                
+
                 Text(comment.age)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color(UIColor(named: "upvotedColor")!))
                         .font(.caption)
                 }
-                
+
                 // Show visibility indicator
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.right")
@@ -161,7 +161,7 @@ struct CommentRowView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             // Only show full text if comment is visible
             if comment.visibility == .visible {
                 HTMLText(comment.text)
@@ -186,7 +186,7 @@ struct CommentRowView: View {
 // Simple HTML text view for now - can be enhanced later
 struct HTMLText: View {
     let htmlString: String
-    
+
     var body: some View {
         Text(htmlString.strippingHTML())
     }
@@ -215,7 +215,7 @@ extension String {
         postType: .news,
         upvoted: false
     )
-    
+
     CommentsView(post: samplePost)
         .environmentObject(NavigationStore())
 }

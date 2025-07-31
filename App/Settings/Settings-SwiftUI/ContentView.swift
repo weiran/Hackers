@@ -12,7 +12,7 @@ import UIKit
 struct ContentView: View {
     @StateObject private var navigationStore = NavigationStore()
     @EnvironmentObject private var settingsStore: SettingsStore
-    
+
     var body: some View {
         NavigationSplitView {
             FeedView()

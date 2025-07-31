@@ -31,10 +31,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         // setup Nuke
         DataLoader.sharedUrlCache.diskCapacity = 1024 * 1024 * 100 // 100MB
-        
+
         return true
     }
-    
+
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         sceneConfig.delegateClass = SceneDelegate.self

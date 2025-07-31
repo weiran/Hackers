@@ -16,7 +16,7 @@ struct FeedView: View {
     @State private var selectedPostType: PostType = .news
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -27,7 +27,7 @@ struct FeedView: View {
                     List {
                             ForEach(viewModel.posts, id: \.id) { post in
                                 PostRowView(
-                                    post: post, 
+                                    post: post,
                                     navigationStore: navigationStore,
                                     onVote: { post in
                                         Task {
@@ -117,7 +117,7 @@ struct FeedView: View {
                         }
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
                         navigationStore.showLogin()
@@ -125,7 +125,7 @@ struct FeedView: View {
                         Image(systemName: "person.circle")
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         navigationStore.showSettings()
@@ -144,22 +144,22 @@ struct FeedView: View {
             }
         }
     }
-    
+
     @MainActor
     private func handleVote(post: Post) async {
         let isUpvote = !post.upvoted
-        
+
         // Optimistically update UI
         post.upvoted = isUpvote
         post.score += isUpvote ? 1 : -1
-        
+
         do {
             try await viewModel.vote(on: post, upvote: isUpvote)
         } catch {
             // Revert optimistic update
             post.upvoted = !isUpvote
             post.score += isUpvote ? -1 : 1
-            
+
             if let hackersError = error as? HackersKitError {
                 switch hackersError {
                 case .unauthenticated:
@@ -174,13 +174,13 @@ struct FeedView: View {
             }
         }
     }
-    
+
     private func handleLinkTap(post: Post) {
         guard !post.url.absoluteString.starts(with: "item?id=") else {
             navigationStore.showPost(post)
             return
         }
-        
+
         if let svc = SFSafariViewController.instance(for: post.url) {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootVC = windowScene.windows.first?.rootViewController {
@@ -190,25 +190,24 @@ struct FeedView: View {
             }
         }
     }
-    
+
     private func sharePost(_ post: Post) {
         let url = post.url.host != nil ? post.url : post.hackerNewsURL
-        
+
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootVC = windowScene.windows.first?.rootViewController {
             let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            
+
             if let popover = activityVC.popoverPresentationController {
                 popover.sourceView = rootVC.view
                 popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
                 popover.permittedArrowDirections = []
             }
-            
+
             rootVC.present(activityVC, animated: true)
         }
     }
 }
-
 
 struct PostRowView: View {
     let post: Post
@@ -216,7 +215,7 @@ struct PostRowView: View {
     let onLinkTap: ((Post) -> Void)?
     let onCommentsTap: ((Post) -> Void)?
     let navigationStore: NavigationStore
-    
+
     init(post: Post, navigationStore: NavigationStore, onVote: ((Post) -> Void)? = nil, onLinkTap: ((Post) -> Void)? = nil, onCommentsTap: ((Post) -> Void)? = nil) {
         self.post = post
         self.navigationStore = navigationStore
@@ -224,7 +223,7 @@ struct PostRowView: View {
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
     }
-    
+
     var body: some View {
         NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
             HStack(spacing: 12) {
@@ -232,7 +231,7 @@ struct PostRowView: View {
                 ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
                     .frame(width: 44, height: 44)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(post.title)
@@ -240,7 +239,7 @@ struct PostRowView: View {
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                    
+
                     // Metadata row
                     HStack(spacing: 8) {
                         HStack(spacing: 2) {
@@ -250,10 +249,10 @@ struct PostRowView: View {
                                 .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                                 .font(.system(size: 10))
                         }
-                        
+
                         Text("•")
                             .foregroundColor(.secondary)
-                        
+
                         HStack(spacing: 2) {
                             Text("\(post.commentsCount)")
                                 .foregroundColor(.secondary)
@@ -261,10 +260,10 @@ struct PostRowView: View {
                                 .foregroundColor(.secondary)
                                 .font(.system(size: 10))
                         }
-                        
+
                         Text("•")
                             .foregroundColor(.secondary)
-                        
+
                         if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
                             Text(host)
                                 .foregroundColor(.secondary)
@@ -275,7 +274,7 @@ struct PostRowView: View {
                     }
                     .font(.system(size: 13))
                 }
-                
+
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -290,18 +289,18 @@ struct PostContextMenu: View {
     let onVote: (Post) -> Void
     let onOpenLink: (Post) -> Void
     let onShare: (Post) -> Void
-    
+
     var body: some View {
         Group {
             Button {
                 onVote(post)
             } label: {
-                Label(post.upvoted ? "Unvote" : "Upvote", 
+                Label(post.upvoted ? "Unvote" : "Upvote",
                       systemImage: post.upvoted ? "arrow.uturn.down" : "arrow.up")
             }
-            
+
             Divider()
-            
+
             if !post.url.absoluteString.starts(with: "item?id=") {
                 Button {
                     onOpenLink(post)
@@ -309,7 +308,7 @@ struct PostContextMenu: View {
                     Label("Open Link", systemImage: "safari")
                 }
             }
-            
+
             Button {
                 onShare(post)
             } label: {
@@ -324,7 +323,7 @@ class SwiftUIFeedViewModel: ObservableObject {
     @Published var posts: [Post] = []
     @Published var isLoading = false
     @Published var isLoadingMore = false
-    
+
     var postType: PostType = .news {
         didSet {
             if postType != oldValue {
@@ -332,17 +331,17 @@ class SwiftUIFeedViewModel: ObservableObject {
             }
         }
     }
-    
+
     private let feedViewModel = FeedViewModel()
-    
+
     @MainActor
     func loadFeed() async {
         guard !isLoading else { return }
-        
+
         isLoading = true
         feedViewModel.postType = postType
         feedViewModel.reset()
-        
+
         do {
             try await feedViewModel.fetchFeed()
             posts = feedViewModel.posts
@@ -350,26 +349,26 @@ class SwiftUIFeedViewModel: ObservableObject {
             print("Error loading feed: \(error)")
             // TODO: Add error state handling
         }
-        
+
         isLoading = false
     }
-    
+
     @MainActor
     func loadNextPage() async {
         guard !isLoading && !isLoadingMore && !feedViewModel.isFetching else { return }
-        
+
         isLoadingMore = true
-        
+
         do {
             try await feedViewModel.fetchFeed(fetchNextPage: true)
             posts = feedViewModel.posts
         } catch {
             print("Error loading next page: \(error)")
         }
-        
+
         isLoadingMore = false
     }
-    
+
     func vote(on post: Post, upvote: Bool) async throws {
         try await feedViewModel.vote(on: post, upvote: upvote)
     }
@@ -377,7 +376,7 @@ class SwiftUIFeedViewModel: ObservableObject {
 
 struct ThumbnailView: View {
     let url: URL?
-    
+
     private func thumbnailURL(for url: URL) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
@@ -387,7 +386,7 @@ struct ThumbnailView: View {
         components.queryItems = [URLQueryItem(name: "url", value: urlString)]
         return components.url
     }
-    
+
     private var placeholderImage: some View {
         Image(systemName: "safari")
             .font(.title2)
@@ -395,7 +394,7 @@ struct ThumbnailView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.secondary.opacity(0.1))
     }
-    
+
     var body: some View {
         if let url = url, let thumbnailURL = thumbnailURL(for: url) {
             AsyncImage(url: thumbnailURL) { image in

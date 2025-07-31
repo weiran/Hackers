@@ -42,7 +42,7 @@ class SwipeCellKitActions {
         let upvoteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = post.upvoted
             voteOnPost(post, !post.upvoted)
-            
+
             Task {
                 do {
                     if upvoted {
@@ -98,7 +98,7 @@ class SwipeCellKitActions {
         let voteAction = SwipeAction(style: .default, title: "Up") { _, _ in
             let upvoted = comment.upvoted
             voteOnComment(comment, !comment.upvoted)
-            
+
             Task {
                 do {
                     if upvoted {

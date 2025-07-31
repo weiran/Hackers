@@ -306,7 +306,7 @@ extension CommentsViewController {
 
         let upvoted = post.upvoted
         voteOnPost(post, !post.upvoted)
-        
+
         Task {
             do {
                 if upvoted {
@@ -347,7 +347,7 @@ extension CommentsViewController {
 
         let upvoted = comment.upvoted
         voteOnComment(comment, !comment.upvoted)
-        
+
         Task {
             do {
                 if upvoted {

@@ -10,17 +10,17 @@ import SwiftUI
 
 struct EmptyStateView: View {
     let message: String
-    
+
     init(_ message: String = "Select a post to read") {
         self.message = message
     }
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "doc.text")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
-            
+
             Text(message)
                 .font(.title2)
                 .foregroundColor(.secondary)

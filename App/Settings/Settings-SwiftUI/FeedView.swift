@@ -13,7 +13,7 @@ struct FeedView: View {
     @StateObject private var viewModel = SwiftUIFeedViewModel()
     @EnvironmentObject private var navigationStore: NavigationStore
     @State private var selectedPostType: PostType = .news
-    
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -25,7 +25,7 @@ struct FeedView: View {
                             await viewModel.loadFeed()
                         }
                     }
-                
+
                 if viewModel.isLoading && viewModel.posts.isEmpty {
                     ProgressView("Loading...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -51,7 +51,7 @@ struct FeedView: View {
                         Image(systemName: "person.circle")
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         navigationStore.showSettings()
@@ -69,7 +69,7 @@ struct FeedView: View {
 
 struct PostTypePicker: View {
     @Binding var selectedPostType: PostType
-    
+
     var body: some View {
         Picker("Post Type", selection: $selectedPostType) {
             ForEach(PostType.allCases, id: \.self) { postType in
@@ -84,13 +84,13 @@ struct PostTypePicker: View {
 
 struct PostRowView: View {
     let post: Post
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(post.title)
                 .font(.headline)
                 .foregroundColor(Color(UIColor(named: "titleTextColor")!))
-            
+
             HStack(spacing: 12) {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.up")
@@ -98,19 +98,19 @@ struct PostRowView: View {
                     Text("\(post.score)")
                         .foregroundColor(.secondary)
                 }
-                
+
                 HStack(spacing: 4) {
                     Image(systemName: "message")
                         .foregroundColor(.secondary)
                     Text("\(post.commentsCount)")
                         .foregroundColor(.secondary)
                 }
-                
+
                 Text("by \(post.by)")
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 Text(post.age)
                     .foregroundColor(.secondary)
             }
@@ -124,23 +124,23 @@ struct PostRowView: View {
 class SwiftUIFeedViewModel: ObservableObject {
     @Published var posts: [Post] = []
     @Published var isLoading = false
-    
+
     var postType: PostType = .news
     private let feedViewModel = FeedViewModel()
-    
+
     @MainActor
     func loadFeed() async {
         isLoading = true
         feedViewModel.postType = postType
         feedViewModel.reset()
-        
+
         do {
             try await feedViewModel.fetchFeed()
             posts = feedViewModel.posts
         } catch {
             print("Error loading feed: \(error)")
         }
-        
+
         isLoading = false
     }
 }

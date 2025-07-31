@@ -24,18 +24,18 @@ struct CommentsView: View {
     @State private var showingPostShareOptions = false
     @State private var refreshTrigger = false // Used to force SwiftUI updates
     @Environment(\.dismiss) private var dismiss
-    
+
     init(post: Post) {
         self.post = post
         self._currentPost = State(initialValue: post)
     }
-    
+
     // Computed property that filters visible comments
     private var visibleComments: [Comment] {
         _ = refreshTrigger // Force dependency on refreshTrigger
         return commentsController.visibleComments
     }
-    
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -46,9 +46,9 @@ struct CommentsView: View {
                     onLinkTap: { handleLinkTap() },
                     onShare: { showingPostShareOptions = true }
                 )
-                
+
                 Divider()
-                
+
                 // Comments section
                 if isLoading {
                     ProgressView("Loading comments...")
@@ -107,7 +107,7 @@ struct CommentsView: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         if currentPost.url.host != nil {
@@ -140,10 +140,10 @@ struct CommentsView: View {
             }
         }
     }
-    
+
     private func loadComments() async {
         isLoading = true
-        
+
         do {
             // Load post with comments if not already loaded
             let postWithComments: Post
@@ -153,7 +153,7 @@ struct CommentsView: View {
             } else {
                 postWithComments = currentPost
             }
-            
+
             // Set comments
             let loadedComments = postWithComments.comments ?? []
             comments = loadedComments
@@ -164,10 +164,10 @@ struct CommentsView: View {
             print("Error loading comments: \(error)")
             // TODO: Show error state
         }
-        
+
         isLoading = false
     }
-    
+
     private func toggleCommentVisibility(_ comment: Comment) {
         withAnimation(.easeInOut(duration: 0.2)) {
             let _ = commentsController.toggleChildrenVisibility(of: comment)
@@ -175,15 +175,15 @@ struct CommentsView: View {
             refreshTrigger.toggle()
         }
     }
-    
+
     @MainActor
     private func handlePostVote() async {
         let isUpvote = !currentPost.upvoted
-        
+
         // Optimistically update UI
         currentPost.upvoted = isUpvote
         currentPost.score += isUpvote ? 1 : -1
-        
+
         do {
             if isUpvote {
                 try await HackersKit.shared.upvote(post: currentPost)
@@ -194,18 +194,18 @@ struct CommentsView: View {
             // Revert optimistic update
             currentPost.upvoted = !isUpvote
             currentPost.score += isUpvote ? -1 : 1
-            
+
             handleVoteError(error)
         }
     }
-    
+
     @MainActor
     private func handleCommentVote(_ comment: Comment) async {
         let isUpvote = !comment.upvoted
-        
+
         // Optimistically update UI
         comment.upvoted = isUpvote
-        
+
         do {
             if isUpvote {
                 try await HackersKit.shared.upvote(comment: comment, for: currentPost)
@@ -215,11 +215,11 @@ struct CommentsView: View {
         } catch {
             // Revert optimistic update
             comment.upvoted = !isUpvote
-            
+
             handleVoteError(error)
         }
     }
-    
+
     private func handleVoteError(_ error: Error) {
         if let hackersError = error as? HackersKitError {
             switch hackersError {
@@ -234,10 +234,10 @@ struct CommentsView: View {
             showingVoteError = true
         }
     }
-    
+
     private func handleLinkTap() {
         guard !currentPost.url.absoluteString.starts(with: "item?id=") else { return }
-        
+
         if let svc = SFSafariViewController.instance(for: currentPost.url) {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootVC = windowScene.windows.first?.rootViewController {
@@ -247,27 +247,27 @@ struct CommentsView: View {
             }
         }
     }
-    
+
     private func sharePost(url: URL, title: String) {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootVC = windowScene.windows.first?.rootViewController {
             let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
             activityVC.setValue(title, forKey: "subject")
-            
+
             if let popover = activityVC.popoverPresentationController {
                 popover.sourceView = rootVC.view
                 popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
                 popover.permittedArrowDirections = []
             }
-            
+
             rootVC.present(activityVC, animated: true)
         }
     }
-    
+
     private func shareComment(_ comment: Comment) {
         sharePost(url: comment.hackerNewsURL, title: "Comment by \(comment.by)")
     }
-    
+
     private func copyComment(_ comment: Comment) {
         UIPasteboard.general.string = comment.text.strippingHTML()
     }
@@ -278,7 +278,7 @@ struct PostHeaderView: View {
     let onVote: () async -> Void
     let onLinkTap: () -> Void
     let onShare: () -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
@@ -289,7 +289,7 @@ struct PostHeaderView: View {
                     .onTapGesture {
                         onLinkTap()
                     }
-                
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text(post.title)
                         .font(.headline)
@@ -299,7 +299,7 @@ struct PostHeaderView: View {
                         .onTapGesture {
                             onLinkTap()
                         }
-                    
+
                     HStack(spacing: 8) {
                         Button {
                             Task { await onVote() }
@@ -312,7 +312,7 @@ struct PostHeaderView: View {
                             }
                             .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                         }
-                        
+
                         HStack(spacing: 4) {
                             Image(systemName: "message")
                                 .font(.system(size: 12))
@@ -320,20 +320,20 @@ struct PostHeaderView: View {
                                 .font(.system(size: 14))
                         }
                         .foregroundColor(.secondary)
-                        
+
                         Text("by \(post.by)")
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
-                        
+
                         Spacer()
-                        
+
                         Text(post.age)
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
                     }
                 }
             }
-            
+
             if let text = post.text, !text.isEmpty {
                 HTMLText(htmlString: text)
                     .foregroundColor(.primary)
@@ -352,26 +352,26 @@ struct CommentRowView: View {
     let onVote: () async -> Void
     let onShare: () -> Void
     let onCopy: () -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(comment.by)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
-                
+
                 Text(comment.age)
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color(UIColor(named: "upvotedColor")!))
                         .font(.system(size: 14))
                 }
-                
+
                 // Show visibility indicator
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.right")
@@ -379,7 +379,7 @@ struct CommentRowView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             // Only show full text if comment is visible
             if comment.visibility == .visible {
                 HTMLText(htmlString: comment.text)
@@ -408,24 +408,24 @@ struct CommentContextMenu: View {
     let onVote: () -> Void
     let onShare: () -> Void
     let onCopy: () -> Void
-    
+
     var body: some View {
         Group {
             Button {
                 onVote()
             } label: {
-                Label(comment.upvoted ? "Unvote" : "Upvote", 
+                Label(comment.upvoted ? "Unvote" : "Upvote",
                       systemImage: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
             }
-            
+
             Button {
                 onCopy()
             } label: {
                 Label("Copy", systemImage: "doc.on.doc")
             }
-            
+
             Divider()
-            
+
             Button {
                 onShare()
             } label: {
@@ -438,7 +438,7 @@ struct CommentContextMenu: View {
 // Simple HTML text view for now - can be enhanced later
 struct HTMLText: View {
     let htmlString: String
-    
+
     var body: some View {
         Text(htmlString.strippingHTML())
     }
@@ -471,7 +471,7 @@ extension String {
         postType: .news,
         upvoted: false
     )
-    
+
     CommentsView(post: samplePost)
         .environmentObject(NavigationStore())
 }

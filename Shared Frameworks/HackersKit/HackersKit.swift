@@ -22,11 +22,11 @@ class HackersKit {
 
     internal func fetchHtml(url: URL) async throws -> String {
         let (data, _) = try await session.data(from: url)
-        
+
         guard let html = String(bytes: data, encoding: .utf8) else {
             throw HackersKitError.requestFailure
         }
-        
+
         return html
     }
 }

@@ -33,7 +33,6 @@ extension HackersKit {
         return comments
     }
 
-
     /// Optionally recursively fetch post comments over pages
     private func fetchPostHtml(
         id: Int,
@@ -48,7 +47,7 @@ extension HackersKit {
         let html = try await fetchHtml(url: url)
         let document = try SwiftSoup.parse(html)
         let moreLinkExists = try !document.select("a.morelink").isEmpty()
-        
+
         if moreLinkExists && recursive {
             return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: html)
         } else {

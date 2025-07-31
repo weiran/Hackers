@@ -11,10 +11,10 @@ import SwiftUI
 @main
 struct HackersApp: App {
     @StateObject private var settingsStore = SettingsStore()
-    
+
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
     var body: some Scene {
         WindowGroup {
             MainContentView()
@@ -24,7 +24,7 @@ struct HackersApp: App {
                 }
         }
     }
-    
+
     private func setupAppearance() {
         // Apply app-wide appearance settings
         if let appTintColor = UIColor(named: "appTintColor") {

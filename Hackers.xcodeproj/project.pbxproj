@@ -482,11 +482,6 @@
 				24F39F8618AFB1150055F8DC /* Products */,
 				241387A51945A6E100D71220 /* README.md */,
 				245345F622466F71001AF1CE /* fastlane */,
-				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
-				89FF36346105E44DF11C7C07 /* FeedView.swift */,
-				F40E450D9860043A78D92D5A /* CommentsView.swift */,
-				C035637A66121679B942722F /* EmptyStateView.swift */,
-				D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */,
 				29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */,
 				9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */,
 			);
@@ -557,6 +552,11 @@
 		ABD9A18B67FB6E883477C2C5 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				F40E450D9860043A78D92D5A /* CommentsView.swift */,
+				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
+				C035637A66121679B942722F /* EmptyStateView.swift */,
+				89FF36346105E44DF11C7C07 /* FeedView.swift */,
+				D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */,
 			);
 			name = SwiftUI;
 			sourceTree = "<group>";

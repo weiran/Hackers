@@ -168,16 +168,16 @@ enum HtmlParser {
         let document = try SwiftSoup.parse(html)
         let toptextElements = try document.select(".toptext")
         let toptextContent = try toptextElements.text().trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         guard !toptextContent.isEmpty else {
             return nil
         }
-        
+
         let postTableElement = try postsTableElement(from: html)
         guard let post = try posts(from: postTableElement, type: .news).first else {
             return nil
         }
-        
+
         if let text = post.text,
            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return Comment(
@@ -189,7 +189,7 @@ enum HtmlParser {
                 upvoted: post.upvoted
             )
         }
-        
+
         return nil
     }
 
