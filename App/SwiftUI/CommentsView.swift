@@ -493,7 +493,7 @@ struct HTMLText: View {
         let linkPattern = "<a\\s+(?:[^>]*?\\s+)?href=([\"'])(.*?)\\1[^>]*?>(.*?)</a>"
         guard let regex = try? NSRegularExpression(pattern: linkPattern,
                                                   options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
-            attributedText = AttributedString(processedHTML.strippingHTML())
+            attributedText = AttributedString(processedHTML.strippingHTML().addingParagraphBreaks())
             return
         }
 
@@ -507,7 +507,7 @@ struct HTMLText: View {
             // Add text before the link
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
-                let beforeText = nsString.substring(with: beforeRange).strippingHTML()
+                let beforeText = nsString.substring(with: beforeRange).strippingHTML().addingParagraphBreaks()
                 result += AttributedString(beforeText)
             }
 
@@ -534,13 +534,13 @@ struct HTMLText: View {
         // Add remaining text after last link
         if lastEnd < nsString.length {
             let remainingRange = NSRange(location: lastEnd, length: nsString.length - lastEnd)
-            let remainingText = nsString.substring(with: remainingRange).strippingHTML()
+            let remainingText = nsString.substring(with: remainingRange).strippingHTML().addingParagraphBreaks()
             result += AttributedString(remainingText)
         }
 
-        // If no links were found, just strip HTML
+        // If no links were found, just strip HTML and add paragraph breaks
         if matches.isEmpty {
-            result = AttributedString(processedHTML.strippingHTML())
+            result = AttributedString(processedHTML.strippingHTML().addingParagraphBreaks())
         }
 
         attributedText = result
@@ -557,6 +557,10 @@ extension String {
             .replacingOccurrences(of: "&#x27;", with: "'")
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&nbsp;", with: " ")
+    }
+    
+    func addingParagraphBreaks() -> String {
+        return self.replacingOccurrences(of: "\n", with: "\n\n")
     }
 }
 
