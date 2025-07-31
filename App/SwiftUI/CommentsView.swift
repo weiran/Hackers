@@ -125,7 +125,7 @@ struct CommentsView: View {
                             .frame(width: 33, height: 33)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                         Text(currentPost.title)
-                            .font(.subheadline)
+                            .font(.headline)
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
@@ -133,6 +133,7 @@ struct CommentsView: View {
                         handleLinkTap()
                     }
                     .opacity(showTitle ? 1.0 : 0.0)
+                    .offset(y: showTitle ? 0 : 20)
                     .animation(.easeInOut(duration: 0.3), value: showTitle)
                 }
                 
