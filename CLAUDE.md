@@ -1,7 +1,7 @@
 # Bash Commands
-* To build: fastlane build
-* To test: fastlane test
-* To lint: fastlane lint
+* To build: bundle exec fastlane build
+* To test: bundle exec fastlane test
+* To lint: bundle exec fastlane lint
 
 # Coding Guidelines
 * Aim to build all functionality using SwiftUI unless there is a feature that is only supported in UIKit.
