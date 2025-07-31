@@ -24,7 +24,7 @@ struct CommentsView: View {
     @State private var showingPostShareOptions = false
     @State private var refreshTrigger = false // Used to force SwiftUI updates
     @State private var showTitle = false
-    @State private var headerHeight: CGFloat = 0
+    @State private var scrollOffset: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
     init(post: Post) {
@@ -48,28 +48,14 @@ struct CommentsView: View {
                 } else if comments.isEmpty {
                     EmptyStateView("No comments yet")
                 } else {
-                    ScrollViewReader { proxy in
-                        List {
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
                             PostHeaderView(
                                 post: currentPost,
                                 onVote: { await handlePostVote() },
                                 onLinkTap: { handleLinkTap() },
                                 onShare: { showingPostShareOptions = true }
                             )
-                            .id("header")
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(
-                                    key: ViewOffsetKey.self,
-                                    value: geometry.frame(in: .global).minY
-                                )
-                            })
-                            .onPreferenceChange(ViewOffsetKey.self) { offset in
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    // Show title when header scrolls above navigation bar (approximately)
-                                    showTitle = offset < 100
-                                }
-                            }
-                            .listRowInsets(EdgeInsets())
 
                             ForEach(visibleComments, id: \.id) { comment in
                                 CommentRowView(
@@ -113,8 +99,18 @@ struct CommentsView: View {
                                 }
                             }
                         }
-                        .listStyle(.plain)
                     }
+                    .background(GeometryReader { geometry in
+                        Color.clear.preference(key: ScrollOffsetPreferenceKey.self, 
+                                             value: geometry.frame(in: .named("scrollView")).minY)
+                    })
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        scrollOffset = -value
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showTitle = scrollOffset > 100
+                        }
+                    }
+                    .coordinateSpace(name: "scrollView")
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -386,6 +382,8 @@ struct CommentRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Divider()
+
             HStack {
                 Text(comment.by)
                     .font(.system(size: 14, weight: .medium))
@@ -418,8 +416,8 @@ struct CommentRowView: View {
             }
         }
         .padding(.leading, CGFloat(comment.level * 16))
-        .padding(.vertical, 4)
-        .padding(.horizontal, 4)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
@@ -576,17 +574,9 @@ extension String {
         .environmentObject(NavigationStore())
 }
 
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
-    static var defaultValue = CGFloat.zero
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value += nextValue()
-    }
-}
-
-struct HeaderHeightKey: PreferenceKey {
+struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
+        value = nextValue()
     }
 }
