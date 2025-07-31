@@ -61,7 +61,8 @@ struct LoginView: View {
                                     isAuthenticated = true
                                     UINotifications.showSuccess("Logged in as \(username)")
                                     presentationMode.wrappedValue.dismiss()
-                                    NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                                    NotificationCenter.default.post(name: Notification.Name.refreshRequired,
+                                                                    object: nil)
                                     isAuthenticating = false
                                 }
                             } catch {
@@ -79,7 +80,9 @@ struct LoginView: View {
                             Alert(
                                 title: Text("Login Failed"),
                                 message:
-                                    Text("Failed logging into Hacker News, check your username or password.")
+                                    Text(
+                                        "Failed logging into Hacker News, check your username or password."
+                                    )
                             )
                         }
                 }

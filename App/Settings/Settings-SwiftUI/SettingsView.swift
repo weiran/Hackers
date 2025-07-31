@@ -34,22 +34,18 @@ struct SettingsView: View {
                         Text("Send Feedback")
                     }
                     .disabled(!MFMailComposeViewController.canSendMail())
-                    .sheet(isPresented: $showMailView) {
-                        MailView(result: self.$mailResult)
-                    }
-                    Button { self.showOnboarding = true } label: {
+                    .sheet(isPresented: $showMailView) { MailView(result: self.$mailResult) }
+                    Button(action: { self.showOnboarding = true }) {
                         Text("Show What's New")
-                    }.sheet(isPresented: $showOnboarding) {
-                        OnboardingViewControllerWrapper()
                     }
+                    .sheet(isPresented: $showOnboarding) { OnboardingViewControllerWrapper() }
                 }
 
                 Section(header: Text("LOGIN")) {
-                    Button { self.showLogin = true } label: {
+                    Button(action: { self.showLogin = true }) {
                         Text("Account")
-                    }.sheet(isPresented: $showLogin) {
-                        LoginView()
                     }
+                    .sheet(isPresented: $showLogin) { LoginView() }
                 }
 
                 Section(header: Text("APPEARANCE")) {

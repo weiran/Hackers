@@ -17,7 +17,8 @@ class HackersTests {
     }
 
     @Test func testAuthenticate() async throws {
-        let authenticationState = try await sessionService.authenticate(username: "hackerstestuser", password: "hackerspassword")
+        let authenticationState = try await sessionService.authenticate(username: "hackerstestuser",
+                                                                         password: "hackerspassword")
         #expect(authenticationState == .authenticated, "Authentication failed")
     }
 

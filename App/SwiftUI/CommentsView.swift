@@ -170,7 +170,7 @@ struct CommentsView: View {
 
     private func toggleCommentVisibility(_ comment: Comment) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            let _ = commentsController.toggleChildrenVisibility(of: comment)
+            _ = commentsController.toggleChildrenVisibility(of: comment)
             // Force SwiftUI to re-evaluate visibleComments
             refreshTrigger.toggle()
         }

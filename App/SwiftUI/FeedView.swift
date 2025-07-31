@@ -37,7 +37,7 @@ struct FeedView: View {
                                     onLinkTap: { post in
                                         handleLinkTap(post: post)
                                     },
-                                    onCommentsTap: { post in
+                                    onCommentsTap: { _ in
                                         // This callback is no longer needed since we use NavigationLink
                                     }
                                 )
@@ -221,7 +221,11 @@ struct PostRowView: View {
     let onCommentsTap: ((Post) -> Void)?
     let navigationStore: NavigationStore
 
-    init(post: Post, navigationStore: NavigationStore, onVote: ((Post) -> Void)? = nil, onLinkTap: ((Post) -> Void)? = nil, onCommentsTap: ((Post) -> Void)? = nil) {
+    init(post: Post,
+         navigationStore: NavigationStore,
+         onVote: ((Post) -> Void)? = nil,
+         onLinkTap: ((Post) -> Void)? = nil,
+         onCommentsTap: ((Post) -> Void)? = nil) {
         self.post = post
         self.navigationStore = navigationStore
         self.onVote = onVote

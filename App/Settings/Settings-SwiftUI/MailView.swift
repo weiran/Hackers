@@ -17,8 +17,8 @@ struct MailView: UIViewControllerRepresentable {
         }
 
         func mailComposeController(_ controller: MFMailComposeViewController,
-                               didFinishWith mailComposeResult: MFMailComposeResult,
-                               error: Error?) {
+                                   didFinishWith result: MFMailComposeResult,
+                                   error: Error?) {
             defer {
                 $presentation.wrappedValue.dismiss()
             }
@@ -26,7 +26,7 @@ struct MailView: UIViewControllerRepresentable {
                 self.result = .failure(error!)
                 return
             }
-            self.result = .success(mailComposeResult)
+            self.result = .success(result)
         }
     }
 
@@ -41,5 +41,5 @@ struct MailView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: MFMailComposeViewController,
-                              context: UIViewControllerRepresentableContext<MailView>) {}
+                                context: UIViewControllerRepresentableContext<MailView>) {}
 }
