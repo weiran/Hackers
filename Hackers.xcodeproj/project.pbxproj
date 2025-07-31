@@ -73,7 +73,7 @@
 		24D1845D24B35E7E0017E4F4 /* FeedCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845C24B35E7E0017E4F4 /* FeedCollectionViewController.swift */; };
 		24D1845F24B374780017E4F4 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1845E24B374780017E4F4 /* FeedViewModel.swift */; };
 		24D1846124B396BD0017E4F4 /* UIViewController+Deselection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D1846024B396BD0017E4F4 /* UIViewController+Deselection.swift */; };
-		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */; };
 		24D6B8CA1C1EDBFC00618422 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D6B8C91C1EDBFC00618422 /* AppTheme.swift */; };
 		24D811A51FF90A58000951C3 /* TouchableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D811A41FF90A58000951C3 /* TouchableTextView.swift */; };
@@ -123,15 +123,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		24D1E4892D98106C005F1038 /* Embed App Extensions */ = {
+		24D1E4892D98106C005F1038 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed App Extensions */,
+				24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -635,7 +635,7 @@
 				24F39F8318AFB1150055F8DC /* Resources */,
 				244DE6BB1E599EB6005B441E /* TODO as Warnings */,
 				249B8F8022A29B2E002A9EC5 /* Run Script */,
-				24D1E4892D98106C005F1038 /* Embed App Extensions */,
+				24D1E4892D98106C005F1038 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -666,7 +666,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				CLASSPREFIX = GU;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = "Glass Umbrella";
 				TargetAttributes = {
 					2419D01F24898DF700740184 = {
@@ -1198,6 +1198,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 			};
 			name = Debug;
 		};
@@ -1244,6 +1245,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
