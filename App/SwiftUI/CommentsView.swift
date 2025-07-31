@@ -47,8 +47,6 @@ struct CommentsView: View {
                     onShare: { showingPostShareOptions = true }
                 )
 
-                Divider()
-
                 // Comments section
                 if isLoading {
                     ProgressView("Loading comments...")
