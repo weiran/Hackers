@@ -64,7 +64,7 @@ struct CommentsView: View {
                                 )
                             })
                             .onPreferenceChange(ViewOffsetKey.self) { offset in
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
                                     // Show title when header scrolls above navigation bar (approximately)
                                     showTitle = offset < 100
                                 }
@@ -198,7 +198,7 @@ struct CommentsView: View {
     }
 
     private func toggleCommentVisibility(_ comment: Comment) {
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withAnimation(.easeInOut(duration: 0.3)) {
             _ = commentsController.toggleChildrenVisibility(of: comment)
             // Force SwiftUI to re-evaluate visibleComments
             refreshTrigger.toggle()
