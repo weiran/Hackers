@@ -13,4 +13,4 @@
 # Testing Procedure
 * After making code changes, always test that the app still builds.
 * If the app builds, run it on the simulator with MCP.
-* If the change is to any part of the UI, take a screeshot of the simulator on that part of the app and verify the change has indeed been implemented correctly.
+<!-- * If the change is to any part of the UI, take a screeshot of the simulator on that part of the app and verify the change has indeed been implemented correctly. -->
