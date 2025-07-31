@@ -102,11 +102,11 @@ struct CommentsView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button("Done") {
+//                        dismiss()
+//                    }
+//                }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -282,55 +282,58 @@ struct PostHeaderView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                // Thumbnail
+                // Thumbnail with proper loading
                 ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                    .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .frame(width: 55, height: 55)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                     .onTapGesture {
                         onLinkTap()
                     }
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
+                    // Title
                     Text(post.title)
-                        .font(.headline)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.primary)
-                        .lineLimit(3)
+                        .multilineTextAlignment(.leading)
                         .onTapGesture {
                             onLinkTap()
                         }
 
-                    HStack(spacing: 8) {
+                    // Metadata row
+                    HStack(spacing: 3) {
                         Button {
                             Task { await onVote() }
                         } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.up")
-                                    .font(.system(size: 12))
+                            HStack(spacing: 0) {
                                 Text("\(post.score)")
-                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                Image(systemName: "arrow.up")
+                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                    .font(.system(size: 10))
                             }
-                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                         }
 
-                        HStack(spacing: 4) {
-                            Image(systemName: "message")
-                                .font(.system(size: 12))
+                        Text("•")
+                            .foregroundColor(.secondary)
+
+                        HStack(spacing: 0) {
                             Text("\(post.commentsCount)")
-                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                            Image(systemName: "message")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 10))
                         }
-                        .foregroundColor(.secondary)
 
-                        Text("by \(post.by)")
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
-
-                        Spacer()
-
-                        Text(post.age)
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
+                        if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
+                            Text("•")
+                                .foregroundColor(.secondary)
+                            Text(host)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
                     }
+                    .font(.system(size: 13))
                 }
             }
 
@@ -341,7 +344,6 @@ struct PostHeaderView: View {
             }
         }
         .padding()
-        .background(Color(.systemGroupedBackground))
     }
 }
 
@@ -384,16 +386,11 @@ struct CommentRowView: View {
             if comment.visibility == .visible {
                 HTMLText(htmlString: comment.text)
                     .foregroundColor(.primary)
-            } else if comment.visibility == .compact {
-                Text("[collapsed]")
-                    .foregroundColor(.secondary)
-                    .font(.system(size: 13))
-                    .italic()
             }
         }
         .padding(.leading, CGFloat(comment.level * 16))
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .padding(.horizontal, 4)
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()

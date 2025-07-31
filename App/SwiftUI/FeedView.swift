@@ -98,6 +98,7 @@ struct FeedView: View {
                                 }
                             } label: {
                                 HStack {
+                                    Image(systemName: postType.iconName)
                                     Text(postType.displayName)
                                     if postType == selectedPostType {
                                         Spacer()
@@ -108,6 +109,9 @@ struct FeedView: View {
                         }
                     } label: {
                         HStack(spacing: 4) {
+                            Image(systemName: selectedPostType.iconName)
+                                .font(.headline)
+                                .foregroundColor(.primary)
                             Text(selectedPostType.displayName)
                                 .font(.headline)
                                 .foregroundColor(.primary)
@@ -260,16 +264,12 @@ struct PostRowView: View {
                                 .font(.system(size: 10))
                         }
 
-                        Text("•")
-                            .foregroundColor(.secondary)
-
                         if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
+                            Text("•")
+                                .foregroundColor(.secondary)
                             Text(host)
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
-                        } else {
-                            Text("self")
-                                .foregroundColor(.secondary)
                         }
                     }
                     .font(.system(size: 13))
