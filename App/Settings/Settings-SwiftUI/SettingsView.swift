@@ -13,20 +13,30 @@ struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
     @State private var showOnboarding = false
-    @State private var showLogin = false
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
 
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("HACKERS")) {
+                Section {
+                    HStack {
+                        Image(uiImage: Bundle.main.icon ?? UIImage())
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 80, height: 80)
+                        VStack(alignment: .leading) {
+                            Text("Hackers")
+                                .font(.title)
+                            Text("By Weiran Zhang")
+                        }
+                    }
                     Button(action: {
                         if let url = URL(string: "https://github.com/weiran/hackers") {
                             UIApplication.shared.open(url)
                         }
                     }) {
-                        Text("Website")
+                        Text("Hackers on GitHub")
                     }
                     Button(action: {
                         self.showMailView.toggle()
@@ -41,14 +51,7 @@ struct SettingsView: View {
                     .sheet(isPresented: $showOnboarding) { OnboardingViewControllerWrapper() }
                 }
 
-                Section(header: Text("LOGIN")) {
-                    Button(action: { self.showLogin = true }) {
-                        Text("Account")
-                    }
-                    .sheet(isPresented: $showLogin) { LoginView() }
-                }
-
-                Section(header: Text("APPEARANCE")) {
+                Section(header: Text("Appearance")) {
                     Toggle(isOn: $settings.showThumbnails) {
                         Text("Show Thumbnails")
                     }
@@ -58,12 +61,14 @@ struct SettingsView: View {
                     Toggle(isOn: $settings.showComments) {
                         Text("Show Comments Button")
                     }
+                }
+
+                Section(header: Text("Behaviour")) {
                     Toggle(isOn: $settings.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
                     }
-                    .disabled(settings.openInDefaultBrowser)
                     Toggle(isOn: $settings.openInDefaultBrowser) {
-                        Text("Open in Default Browser")
+                        Text("Open in System Browser")
                     }
                 }
 
@@ -91,6 +96,18 @@ struct SettingsView: View {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
         return Text("Version \(appVersion ?? "1.0")")
             .foregroundColor(.gray)
+    }
+}
+
+extension Bundle {
+    public var icon: UIImage? {
+        if let icons = infoDictionary?["CFBundleIcons"] as? [String: Any],
+            let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
+            let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
+            let lastIcon = iconFiles.last {
+            return UIImage(named: lastIcon)
+        }
+        return nil
     }
 }
 
