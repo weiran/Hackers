@@ -23,6 +23,8 @@ struct CommentsView: View {
     @State private var shareTitle: String = ""
     @State private var showingPostShareOptions = false
     @State private var refreshTrigger = false // Used to force SwiftUI updates
+    @State private var showTitle = false
+    @State private var headerHeight: CGFloat = 0
     @Environment(\.dismiss) private var dismiss
 
     init(post: Post) {
@@ -39,14 +41,6 @@ struct CommentsView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                // Post header with thumbnail and voting
-                PostHeaderView(
-                    post: currentPost,
-                    onVote: { await handlePostVote() },
-                    onLinkTap: { handleLinkTap() },
-                    onShare: { showingPostShareOptions = true }
-                )
-
                 // Comments section
                 if isLoading {
                     ProgressView("Loading comments...")
@@ -54,58 +48,94 @@ struct CommentsView: View {
                 } else if comments.isEmpty {
                     EmptyStateView("No comments yet")
                 } else {
-                    List(visibleComments, id: \.id) { comment in
-                        CommentRowView(
-                            comment: comment,
-                            post: currentPost,
-                            onToggle: { toggleCommentVisibility(comment) },
-                            onVote: { await handleCommentVote(comment) },
-                            onShare: { shareComment(comment) },
-                            onCopy: { copyComment(comment) }
-                        )
-                        .contextMenu {
-                            CommentContextMenu(
-                                comment: comment,
-                                onVote: { Task { await handleCommentVote(comment) } },
-                                onShare: { shareComment(comment) },
-                                onCopy: { copyComment(comment) }
+                    ScrollViewReader { proxy in
+                        List {
+                            PostHeaderView(
+                                post: currentPost,
+                                onVote: { await handlePostVote() },
+                                onLinkTap: { handleLinkTap() },
+                                onShare: { showingPostShareOptions = true }
                             )
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            if UserDefaults.standard.swipeActionsEnabled {
-                                Button {
-                                    Task { await handleCommentVote(comment) }
-                                } label: {
-                                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                            .id("header")
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(
+                                    key: ViewOffsetKey.self,
+                                    value: geometry.frame(in: .global).minY
+                                )
+                            })
+                            .onPreferenceChange(ViewOffsetKey.self) { offset in
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    // Show title when header scrolls above navigation bar (approximately)
+                                    showTitle = offset < 100
                                 }
-                                .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
                             }
-                        }
-                        .swipeActions(edge: .trailing) {
-                            if UserDefaults.standard.swipeActionsEnabled {
-                                Button {
-                                    if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
-                                        let rootComment = commentsController.visibleComments[rootIndex]
-                                        toggleCommentVisibility(rootComment)
+                            .listRowInsets(EdgeInsets())
+
+                            ForEach(visibleComments, id: \.id) { comment in
+                                CommentRowView(
+                                    comment: comment,
+                                    post: currentPost,
+                                    onToggle: { toggleCommentVisibility(comment) },
+                                    onVote: { await handleCommentVote(comment) },
+                                    onShare: { shareComment(comment) },
+                                    onCopy: { copyComment(comment) }
+                                )
+                                .contextMenu {
+                                    CommentContextMenu(
+                                        comment: comment,
+                                        onVote: { Task { await handleCommentVote(comment) } },
+                                        onShare: { shareComment(comment) },
+                                        onCopy: { copyComment(comment) }
+                                    )
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    if UserDefaults.standard.swipeActionsEnabled {
+                                        Button {
+                                            Task { await handleCommentVote(comment) }
+                                        } label: {
+                                            Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                                        }
+                                        .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
                                     }
-                                } label: {
-                                    Image(systemName: "minus.circle")
                                 }
-                                .tint(Color(UIColor(named: "appTintColor")!))
+                                .swipeActions(edge: .trailing) {
+                                    if UserDefaults.standard.swipeActionsEnabled {
+                                        Button {
+                                            if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
+                                                let rootComment = commentsController.visibleComments[rootIndex]
+                                                toggleCommentVisibility(rootComment)
+                                            }
+                                        } label: {
+                                            Image(systemName: "minus.circle")
+                                        }
+                                        .tint(Color(UIColor(named: "appTintColor")!))
+                                    }
+                                }
                             }
                         }
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-//                ToolbarItem(placement: .navigationBarLeading) {
-//                    Button("Done") {
-//                        dismiss()
-//                    }
-//                }
-
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                            .frame(width: 33, height: 33)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        Text(currentPost.title)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                    .onTapGesture {
+                        handleLinkTap()
+                    }
+                    .opacity(showTitle ? 1.0 : 0.0)
+                    .animation(.easeInOut(duration: 0.3), value: showTitle)
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         if currentPost.url.host != nil {
@@ -138,7 +168,7 @@ struct CommentsView: View {
             }
         }
     }
-
+    
     private func loadComments() async {
         isLoading = true
 
@@ -543,4 +573,19 @@ extension String {
 
     CommentsView(post: samplePost)
         .environmentObject(NavigationStore())
+}
+
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
+struct HeaderHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }
