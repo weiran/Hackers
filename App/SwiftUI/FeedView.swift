@@ -229,7 +229,7 @@ struct PostRowView: View {
             HStack(spacing: 12) {
                 // Thumbnail with proper loading
                 ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                    .frame(width: 44, height: 44)
+                    .frame(width: 55, height: 55)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -237,12 +237,11 @@ struct PostRowView: View {
                     Text(post.title)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.primary)
-                        .lineLimit(2)
                         .multilineTextAlignment(.leading)
 
                     // Metadata row
-                    HStack(spacing: 8) {
-                        HStack(spacing: 2) {
+                    HStack(spacing: 3) {
+                        HStack(spacing: 0) {
                             Text("\(post.score)")
                                 .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
                             Image(systemName: "arrow.up")
@@ -253,7 +252,7 @@ struct PostRowView: View {
                         Text("•")
                             .foregroundColor(.secondary)
 
-                        HStack(spacing: 2) {
+                        HStack(spacing: 0) {
                             Text("\(post.commentsCount)")
                                 .foregroundColor(.secondary)
                             Image(systemName: "message")
@@ -267,6 +266,7 @@ struct PostRowView: View {
                         if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
                             Text(host)
                                 .foregroundColor(.secondary)
+                                .lineLimit(1)
                         } else {
                             Text("self")
                                 .foregroundColor(.secondary)
@@ -274,12 +274,7 @@ struct PostRowView: View {
                     }
                     .font(.system(size: 13))
                 }
-
-                Spacer()
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .contentShape(Rectangle())
         }
     }
 }
