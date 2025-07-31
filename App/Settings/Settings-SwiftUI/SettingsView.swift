@@ -7,26 +7,36 @@
 //
 
 import SwiftUI
+import MessageUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
-    @State var showOnboarding = false
+    @State private var showOnboarding = false
+    @State private var showLogin = false
+    @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
+    @State private var showMailView = false
 
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("LOGIN")) {
-                    Text("Account")
-                }
-
-                Section(header: Text("APPEARANCE")) {
-                    Toggle(isOn: $settings.safariReaderMode) {
-                        Text("Open Safari in Reader Mode")
+                Section(header: Text("HACKERS")) {
+                    Button(action: {
+                        if let url = URL(string: "https://github.com/weiran/hackers") {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        Text("Website")
                     }
-                }
-
-                Section(header: Text("MORE")) {
+                    Button(action: {
+                        self.showMailView.toggle()
+                    }) {
+                        Text("Send Feedback")
+                    }
+                    .disabled(!MFMailComposeViewController.canSendMail())
+                    .sheet(isPresented: $showMailView) {
+                        MailView(result: self.$mailResult)
+                    }
                     Button(action: {
                         self.showOnboarding = true
                     }, label: {
@@ -34,6 +44,39 @@ struct SettingsView: View {
                     }).sheet(isPresented: $showOnboarding) {
                         OnboardingViewControllerWrapper()
                     }
+                }
+
+                Section(header: Text("LOGIN")) {
+                    Button(action: {
+                        self.showLogin = true
+                    }) {
+                        Text("Account")
+                    }.sheet(isPresented: $showLogin) {
+                        LoginView()
+                    }
+                }
+
+                Section(header: Text("APPEARANCE")) {
+                    Toggle(isOn: $settings.showThumbnails) {
+                        Text("Show Thumbnails")
+                    }
+                    Toggle(isOn: $settings.swipeActions) {
+                        Text("Enable Swipe Actions")
+                    }
+                    Toggle(isOn: $settings.showComments) {
+                        Text("Show Comments Button")
+                    }
+                    Toggle(isOn: $settings.safariReaderMode) {
+                        Text("Open Safari in Reader Mode")
+                    }
+                    .disabled(settings.openInDefaultBrowser)
+                    Toggle(isOn: $settings.openInDefaultBrowser) {
+                        Text("Open in Default Browser")
+                    }
+                }
+
+                Section {
+                    versionLabel
                 }
             }
             .listStyle(GroupedListStyle())
@@ -50,6 +93,12 @@ struct SettingsView: View {
                 )
             )
         }
+    }
+
+    private var versionLabel: some View {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        return Text("Version \(appVersion ?? "1.0")")
+            .foregroundColor(.gray)
     }
 }
 
