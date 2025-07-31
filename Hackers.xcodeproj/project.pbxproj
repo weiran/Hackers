@@ -231,17 +231,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		24C03D5E2E003EB8002B6ED5 /* HackersTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = HackersTests;
-			sourceTree = "<group>";
-		};
+		24C03D5E2E003EB8002B6ED5 /* HackersTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = HackersTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -539,8 +529,6 @@
 				249B8F8122A2A474002A9EC5 /* Shared */,
 				24F39F8F18AFB1150055F8DC /* Supporting Files */,
 				ABD9A18B67FB6E883477C2C5 /* SwiftUI */,
-				29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */,
-				9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -569,11 +557,6 @@
 		ABD9A18B67FB6E883477C2C5 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
-				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
-				89FF36346105E44DF11C7C07 /* FeedView.swift */,
-				F40E450D9860043A78D92D5A /* CommentsView.swift */,
-				C035637A66121679B942722F /* EmptyStateView.swift */,
-				D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */,
 			);
 			name = SwiftUI;
 			sourceTree = "<group>";
@@ -1278,7 +1261,7 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1311,7 +1294,7 @@
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
 				INFOPLIST_FILE = "App/Supporting Files/Hackers-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

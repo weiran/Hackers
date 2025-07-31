@@ -9,7 +9,7 @@
 import SwiftUI
 import UIKit
 
-struct ContentView: View {
+struct MainContentView: View {
     @StateObject private var navigationStore = NavigationStore()
     @EnvironmentObject private var settingsStore: SettingsStore
     
@@ -30,6 +30,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    MainContentView()
         .environmentObject(SettingsStore())
 }

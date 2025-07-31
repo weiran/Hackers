@@ -17,7 +17,7 @@ struct HackersApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainContentView()
                 .environmentObject(settingsStore)
                 .onAppear {
                     setupAppearance()

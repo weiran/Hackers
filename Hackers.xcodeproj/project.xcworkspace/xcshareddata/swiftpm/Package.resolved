@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/devicekit/DeviceKit.git",
       "state" : {
-        "revision" : "691fe8112cca20ebf0020a1709d4e0205400311c",
-        "version" : "5.0.0"
+        "revision" : "513b9d7e7a1bd46504a1009bbab943b75ce2f195",
+        "version" : "5.6.0"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/omaralbeik/Drops",
       "state" : {
-        "revision" : "f4eabe3e4e5da69e5205a69a5ddc0effd4a90519",
-        "version" : "1.6.1"
+        "revision" : "a183ee6f79f21c940092a19c2cba756555422371",
+        "version" : "1.7.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup.git",
       "state" : {
-        "revision" : "8b6cf29eead8841a1fa7822481cb3af4ddaadba6",
-        "version" : "2.6.1"
+        "revision" : "a81b1a5ac933dee8c6cfccf05d5ffcc5eb8c7ec4",
+        "version" : "2.10.0"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Swinject/Swinject.git",
       "state" : {
-        "revision" : "8bc503e60965298984fb58cf47b71c541449fe2a",
-        "version" : "2.8.3"
+        "revision" : "be9dbcc7b86811bc131539a20c6f9c2d3e56919f",
+        "version" : "2.9.1"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Swinject/SwinjectStoryboard",
       "state" : {
-        "revision" : "a39bd7abe7e7427f9a0929a402cf2d1916fa5d50",
-        "version" : "2.2.2"
+        "revision" : "e4498ce2dfe37e1ca9d2d20af06fcc087507561c",
+        "version" : "2.2.3"
       }
     },
     {
