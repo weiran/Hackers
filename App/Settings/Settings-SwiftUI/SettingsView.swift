@@ -14,7 +14,7 @@ struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
     @State private var showOnboarding = false
     @State private var showLogin = false
-    @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
+    @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
 
     var body: some View {
@@ -37,19 +37,15 @@ struct SettingsView: View {
                     .sheet(isPresented: $showMailView) {
                         MailView(result: self.$mailResult)
                     }
-                    Button(action: {
-                        self.showOnboarding = true
-                    }, label: {
+                    Button { self.showOnboarding = true } label: {
                         Text("Show What's New")
-                    }).sheet(isPresented: $showOnboarding) {
+                    }.sheet(isPresented: $showOnboarding) {
                         OnboardingViewControllerWrapper()
                     }
                 }
 
                 Section(header: Text("LOGIN")) {
-                    Button(action: {
-                        self.showLogin = true
-                    }) {
+                    Button { self.showLogin = true } label: {
                         Text("Account")
                     }.sheet(isPresented: $showLogin) {
                         LoginView()
