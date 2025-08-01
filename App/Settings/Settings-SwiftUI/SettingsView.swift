@@ -11,13 +11,13 @@ import MessageUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsStore
-    @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss) private var dismiss
     @State private var showOnboarding = false
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(footer: versionLabel) {
                     HStack {
@@ -35,19 +35,19 @@ struct SettingsView: View {
                         if let url = URL(string: "https://github.com/weiran/hackers") {
                             UIApplication.shared.open(url)
                         }
-                    }) {
+                    }, label: {
                         Text("Hackers on GitHub")
-                    }
+                    })
                     Button(action: {
                         self.showMailView.toggle()
-                    }) {
+                    }, label: {
                         Text("Send Feedback")
-                    }
+                    })
                     .disabled(!MFMailComposeViewController.canSendMail())
                     .sheet(isPresented: $showMailView) { MailView(result: self.$mailResult) }
-                    Button(action: { self.showOnboarding = true }) {
+                    Button(action: { self.showOnboarding = true }, label: {
                         Text("Show What's New")
-                    }
+                    })
                     .sheet(isPresented: $showOnboarding) { OnboardingViewControllerWrapper() }
                 }
 
@@ -77,7 +77,7 @@ struct SettingsView: View {
             .navigationBarItems(trailing:
                 Button(
                     action: {
-                        self.presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     },
                     label: {
                         Text("Close")

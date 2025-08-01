@@ -169,7 +169,7 @@ struct CommentsView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
     }
-    
+
     private func loadComments() async {
         isLoading = true
 
@@ -433,7 +433,8 @@ struct CommentRowView: View {
         .onTapGesture {
             onToggle()
         }
-        // fix row height animations with List: https://stackoverflow.com/questions/65612622/swift-ui-list-animation-for-expanding-cells-with-dynamic-heights
+        // fix row height animations with List:
+        // https://stackoverflow.com/questions/65612622/swift-ui-list-animation-for-expanding-cells-with-dynamic-heights
         .id(String(comment.id) + String(comment.visibility.rawValue))
     }
 }
@@ -479,7 +480,7 @@ struct HTMLText: View {
             .onAppear {
                 parseHTMLText()
             }
-            .onChange(of: htmlString) { _ in
+            .onChange(of: htmlString) {
                 parseHTMLText()
             }
     }
@@ -564,7 +565,7 @@ extension String {
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&nbsp;", with: " ")
     }
-    
+
     func addingParagraphBreaks() -> String {
         return self.replacingOccurrences(of: "\n", with: "\n\n")
     }

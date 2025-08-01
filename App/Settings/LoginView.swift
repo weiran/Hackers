@@ -19,7 +19,7 @@ struct LoginView: View {
 
     private var sessionService: SessionService
 
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     init() {
         // can't use @Inject for SessionService here as it runs after init
@@ -31,7 +31,7 @@ struct LoginView: View {
 
     @ViewBuilder
     var body: some View {
-        NavigationView {
+        NavigationStack {
             if isAuthenticated == false {
                 VStack {
                     Text("Login to Hacker News")
@@ -60,7 +60,7 @@ struct LoginView: View {
                                 await MainActor.run {
                                     isAuthenticated = true
                                     UINotifications.showSuccess("Logged in as \(username)")
-                                    presentationMode.wrappedValue.dismiss()
+                                    dismiss()
                                     NotificationCenter.default.post(name: Notification.Name.refreshRequired,
                                                                     object: nil)
                                     isAuthenticating = false
@@ -89,7 +89,7 @@ struct LoginView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         } label: {
                             Text("Done")
                                 .bold()
@@ -114,7 +114,7 @@ struct LoginView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         } label: {
                             Text("Done")
                                 .bold()
@@ -123,7 +123,6 @@ struct LoginView: View {
                 }
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

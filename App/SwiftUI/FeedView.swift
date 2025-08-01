@@ -65,7 +65,7 @@ struct FeedView: View {
                                         }
                                     )
                                 }
-                                
+
                             }
                         }
                         .listStyle(.plain)
