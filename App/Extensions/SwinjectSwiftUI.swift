@@ -8,7 +8,6 @@
 
 import SwiftUI
 import Swinject
-import SwinjectStoryboard
 
 @propertyWrapper
 struct Inject<Component> {
@@ -20,8 +19,19 @@ struct Inject<Component> {
 
 class Resolver {
     static let shared = Resolver()
-    // shared the container used by SwinjectStoryboard
-    private let container = SwinjectStoryboard.defaultContainer
+    private let container: Container
+
+    init() {
+        container = Container()
+        setupDependencies()
+    }
+
+    private func setupDependencies() {
+        // Register services with Swinject container
+        container.register(SessionService.self) { _ in
+            SessionService()
+        }.inObjectScope(.container)
+    }
 
     func resolve<T>(_ type: T.Type) -> T {
         container.resolve(T.self)!

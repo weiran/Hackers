@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 class DraggableCommentsButton: UIButton {
     private var post: Post
@@ -91,18 +92,15 @@ class DraggableCommentsButton: UIButton {
     }
 
     @objc private func buttonAction() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let commentsVc = storyboard.instantiateViewController(
-            withIdentifier: "CommentsViewController"
-        ) as? CommentsViewController
+        // Present SwiftUI CommentsView instead of UIKit CommentsViewController
+        let navigationStore = NavigationStore()
+        let commentsView = CommentsView(post: post)
+            .environmentObject(navigationStore)
 
-        if let cvc = commentsVc {
-            cvc.postId = post.id
-            cvc.showPost = false
-            cvc.post = post
-            let navigationController = UINavigationController(rootViewController: cvc)
-            self.parentVc.present(navigationController, animated: true, completion: nil)
-        }
+        let hostingController = UIHostingController(rootView: commentsView)
+        let navigationController = UINavigationController(rootViewController: hostingController)
+
+        self.parentVc.present(navigationController, animated: true, completion: nil)
     }
 
     @objc private func dragHandler(gesture: UIPanGestureRecognizer) {

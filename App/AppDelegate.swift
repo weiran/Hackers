@@ -7,11 +7,9 @@
 //
 
 import UIKit
-import SwinjectStoryboard
 import Nuke
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    var navigationService: NavigationService?
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

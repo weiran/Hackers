@@ -1,5 +1,5 @@
 {
-  "originHash" : "529a3cd5ee4773f468a260885fac51c44cc7d5d2f61da161fb79770aa7fd3000",
+  "originHash" : "3cc236a9dfcbbe0e5657302aa4bd9989a2eddd6af11cb1425c04aba28783be71",
   "pins" : [
     {
       "identity" : "devicekit",
@@ -53,15 +53,6 @@
       "state" : {
         "revision" : "be9dbcc7b86811bc131539a20c6f9c2d3e56919f",
         "version" : "2.9.1"
-      }
-    },
-    {
-      "identity" : "swinjectstoryboard",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Swinject/SwinjectStoryboard",
-      "state" : {
-        "revision" : "e4498ce2dfe37e1ca9d2d20af06fcc087507561c",
-        "version" : "2.2.3"
       }
     },
     {

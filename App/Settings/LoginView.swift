@@ -8,7 +8,6 @@
 
 import SwiftUI
 import Swinject
-import SwinjectStoryboard
 
 struct LoginView: View {
     @State var isAuthenticated: Bool
@@ -23,7 +22,7 @@ struct LoginView: View {
 
     init() {
         // can't use @Inject for SessionService here as it runs after init
-        sessionService = SwinjectStoryboard.defaultContainer.resolve(SessionService.self)!
+        sessionService = Resolver.shared.resolve(SessionService.self)
         _isAuthenticated = State(
             initialValue: sessionService.authenticationState == .authenticated
         )
