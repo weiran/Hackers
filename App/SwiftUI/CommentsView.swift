@@ -315,9 +315,6 @@ struct PostHeaderView: View {
                 ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
                     .frame(width: 55, height: 55)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .onTapGesture {
-                        onLinkTap()
-                    }
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
@@ -326,9 +323,6 @@ struct PostHeaderView: View {
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .onTapGesture {
-                            onLinkTap()
-                        }
 
                     // Metadata row
                     HStack(spacing: 3) {
@@ -365,6 +359,10 @@ struct PostHeaderView: View {
                     }
                     .font(.subheadline)
                 }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onLinkTap()
             }
 
             if let text = post.text, !text.isEmpty {
