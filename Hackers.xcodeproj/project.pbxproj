@@ -10,7 +10,6 @@
 		20B79255672720AA91988C90 /* NavigationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */; };
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2406B37A28ACF8C700CB396B /* UINotifications.swift */; };
-		2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38028AD070B00CB396B /* SwipeCellKit */; };
 		2406B38428AD07BE00CB396B /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38328AD07BE00CB396B /* Nuke */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38928AD08CC00CB396B /* WhatsNewKit */; };
@@ -217,7 +216,6 @@
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
 				24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
-				2406B38128AD070B00CB396B /* SwipeCellKit in Frameworks */,
 				2406B38428AD07BE00CB396B /* Nuke in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
 				2471B88D28AE55110086B573 /* HNScraper in Frameworks */,
@@ -558,7 +556,6 @@
 			name = Hackers;
 			packageProductDependencies = (
 				2406B37828ACF72F00CB396B /* Drops */,
-				2406B38028AD070B00CB396B /* SwipeCellKit */,
 				2406B38328AD07BE00CB396B /* Nuke */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
@@ -609,7 +606,6 @@
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			packageReferences = (
 				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
-				2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
@@ -1163,7 +1159,6 @@
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_OBJC_BRIDGING_HEADER = "App/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1196,7 +1191,6 @@
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_OBJC_BRIDGING_HEADER = "App/Supporting Files/Hackers2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -1262,14 +1256,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 		2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke";
@@ -1325,11 +1311,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */;
 			productName = Drops;
-		};
-		2406B38028AD070B00CB396B /* SwipeCellKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2406B37F28AD070B00CB396B /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
-			productName = SwipeCellKit;
 		};
 		2406B38328AD07BE00CB396B /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
