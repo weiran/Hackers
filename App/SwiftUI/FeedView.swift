@@ -16,6 +16,7 @@ struct FeedView: View {
     @State private var selectedPostType: PostType = .news
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""
+    @State private var showingAuthenticationDialog = false
 
     var body: some View {
         NavigationStack {
@@ -65,7 +66,9 @@ struct FeedView: View {
                                         }
                                     )
                                 }
-
+                                .authenticationDialog(isPresented: $showingAuthenticationDialog) {
+                                    navigationStore.showLogin()
+                                }
                             }
                         }
                         .listStyle(.plain)
@@ -157,7 +160,7 @@ struct FeedView: View {
             if let hackersError = error as? HackersKitError {
                 switch hackersError {
                 case .unauthenticated:
-                    navigationStore.showLogin()
+                    showingAuthenticationDialog = true
                 default:
                     voteErrorMessage = "Failed to vote. Please try again."
                     showingVoteError = true

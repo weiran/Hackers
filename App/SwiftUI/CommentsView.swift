@@ -18,6 +18,7 @@ struct CommentsView: View {
     @State private var commentsController = CommentsController()
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""
+    @State private var showingAuthenticationDialog = false
     @State private var showingShareSheet = false
     @State private var shareURL: URL?
     @State private var shareTitle: String = ""
@@ -108,6 +109,9 @@ struct CommentsView: View {
                                     }
                                     .tint(Color(UIColor(named: "appTintColor")!))
                                 }
+                            }
+                            .authenticationDialog(isPresented: $showingAuthenticationDialog) {
+                                navigationStore.showLogin()
                             }
                         }
                         .listRowInsets(EdgeInsets()) // Remove default insets
@@ -253,7 +257,7 @@ struct CommentsView: View {
         if let hackersError = error as? HackersKitError {
             switch hackersError {
             case .unauthenticated:
-                navigationStore.showLogin()
+                showingAuthenticationDialog = true
             default:
                 voteErrorMessage = "Failed to vote. Please try again."
                 showingVoteError = true

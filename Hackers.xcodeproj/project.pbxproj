@@ -36,10 +36,10 @@
 		2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */; };
 		2481D3912E3BB33D0001A972 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481D3902E3BB33D0001A972 /* MailView.swift */; };
 		2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D427FAEBFC007504C6 /* LoginView.swift */; };
-		2486D7D727FB0A26007504C6 /* AuthenticationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */; };
 		2486D7D927FB0DC9007504C6 /* SwinjectSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */; };
 		24889DF32E3CE7DE0021EC06 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889DF22E3CE7DE0021EC06 /* CommentsController.swift */; };
 		24889DFD2E3CE95D0021EC06 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889DFC2E3CE95D0021EC06 /* UIViewExtensions.swift */; };
+		24889E072E3CED9B0021EC06 /* AuthenticationDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889E062E3CED9B0021EC06 /* AuthenticationDialog.swift */; };
 		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
 		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
 		24A0C9AF28AE348A009A1ED4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9AE28AE348A009A1ED4 /* DeviceKit */; };
@@ -142,10 +142,10 @@
 		2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostVoting.swift"; sourceTree = "<group>"; };
 		2481D3902E3BB33D0001A972 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		2486D7D427FAEBFC007504C6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationHelper.swift; sourceTree = "<group>"; };
 		2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectSwiftUI.swift; sourceTree = "<group>"; };
 		24889DF22E3CE7DE0021EC06 /* CommentsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		24889DFC2E3CE95D0021EC06 /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
+		24889E062E3CED9B0021EC06 /* AuthenticationDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationDialog.swift; sourceTree = "<group>"; };
 		249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationToken.swift; sourceTree = "<group>"; };
 		249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterExtensions.swift; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
@@ -169,14 +169,14 @@
 		24F644FD24951D6400869504 /* Scanfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Scanfile; sourceTree = "<group>"; };
 		24FFFF5923362C7800D009EF /* HackersKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersKitExtensions.swift; sourceTree = "<group>"; };
 		29EA3148CE5B8AFF3AF111F8 /* HackersApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HackersApp.swift; path = App/HackersApp.swift; sourceTree = SOURCE_ROOT; };
-		46615BF15AE7EA97C4EB6BBC /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = App/SwiftUI/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		46615BF15AE7EA97C4EB6BBC /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = SwiftUI/ContentView.swift; sourceTree = "<group>"; };
 		4743B2D1B73179395C7C79BE /* DraggableCommentsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableCommentsButton.swift; sourceTree = "<group>"; };
 		698FE7B423EE5FE300F5828C /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
-		89FF36346105E44DF11C7C07 /* FeedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeedView.swift; path = App/SwiftUI/FeedView.swift; sourceTree = SOURCE_ROOT; };
+		89FF36346105E44DF11C7C07 /* FeedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeedView.swift; path = SwiftUI/FeedView.swift; sourceTree = "<group>"; };
 		9ED8CBBB41A194CF7E827B93 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = App/SceneDelegate.swift; sourceTree = SOURCE_ROOT; };
-		C035637A66121679B942722F /* EmptyStateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmptyStateView.swift; path = App/SwiftUI/EmptyStateView.swift; sourceTree = SOURCE_ROOT; };
-		D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NavigationStore.swift; path = App/SwiftUI/NavigationStore.swift; sourceTree = SOURCE_ROOT; };
-		F40E450D9860043A78D92D5A /* CommentsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommentsView.swift; path = App/SwiftUI/CommentsView.swift; sourceTree = SOURCE_ROOT; };
+		C035637A66121679B942722F /* EmptyStateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmptyStateView.swift; path = SwiftUI/EmptyStateView.swift; sourceTree = "<group>"; };
+		D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NavigationStore.swift; path = SwiftUI/NavigationStore.swift; sourceTree = "<group>"; };
+		F40E450D9860043A78D92D5A /* CommentsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommentsView.swift; path = SwiftUI/CommentsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -458,7 +458,6 @@
 			children = (
 				2477BDE4227D9D8200771FE2 /* SessionService.swift */,
 				24B1A6A422B508A40051EAFD /* OnboardingService.swift */,
-				2486D7D627FB0A26007504C6 /* AuthenticationHelper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -466,6 +465,7 @@
 		ABD9A18B67FB6E883477C2C5 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				24889E062E3CED9B0021EC06 /* AuthenticationDialog.swift */,
 				F40E450D9860043A78D92D5A /* CommentsView.swift */,
 				46615BF15AE7EA97C4EB6BBC /* ContentView.swift */,
 				C035637A66121679B942722F /* EmptyStateView.swift */,
@@ -741,7 +741,6 @@
 				2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
-				2486D7D727FB0A26007504C6 /* AuthenticationHelper.swift in Sources */,
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */,
 				24D330CA248BAC4C00A2AA10 /* HackersKit+Authentication.swift in Sources */,
@@ -769,6 +768,7 @@
 				F9ACBDCE9E043BE81ABF46D7 /* HackersApp.swift in Sources */,
 				2481D3912E3BB33D0001A972 /* MailView.swift in Sources */,
 				76BB2EB6145EC6ADC14245CF /* SceneDelegate.swift in Sources */,
+				24889E072E3CED9B0021EC06 /* AuthenticationDialog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
