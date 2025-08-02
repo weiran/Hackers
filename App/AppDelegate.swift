@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Nuke
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 
@@ -27,9 +26,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         // init default settings
         UserDefaults.standard.registerDefaults()
-
-        // setup Nuke
-        DataLoader.sharedUrlCache.diskCapacity = 1024 * 1024 * 100 // 100MB
 
         return true
     }

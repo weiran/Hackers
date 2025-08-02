@@ -10,7 +10,6 @@
 		20B79255672720AA91988C90 /* NavigationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64C53EE5DA03202EF0AF4CB /* NavigationStore.swift */; };
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B37B28ACF8C700CB396B /* UINotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2406B37A28ACF8C700CB396B /* UINotifications.swift */; };
-		2406B38428AD07BE00CB396B /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38328AD07BE00CB396B /* Nuke */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38928AD08CC00CB396B /* WhatsNewKit */; };
 		240C5BE018D267C70011177A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 240C5BDF18D267C70011177A /* Icons.xcassets */; };
@@ -26,7 +25,6 @@
 		245DCAB01CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 245DCAAF1CD4DA2A00152AA3 /* SFSafariViewControllerExtensions.swift */; };
 		24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24628BAC21E6897700BDEEF9 /* AppFont.swift */; };
 		2464D21F209E27FE00C7F8FC /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2464D21E209E27FE00C7F8FC /* UserDefaultsExtensions.swift */; };
-		2471B88D28AE55110086B573 /* HNScraper in Frameworks */ = {isa = PBXBuildFile; productRef = 2471B88C28AE55110086B573 /* HNScraper */; };
 		2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2477BDE4227D9D8200771FE2 /* SessionService.swift */; };
 		2481BD5B247C0FFB0088CA2B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5A247C0FFB0088CA2B /* Models.swift */; };
 		2481BD5D247C10330088CA2B /* HackersKit+PostsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */; };
@@ -41,7 +39,6 @@
 		24889E4F2E3CFAC40021EC06 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889E4D2E3CFAC40021EC06 /* NetworkManager.swift */; };
 		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
 		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
-		24A0C9AF28AE348A009A1ED4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9AE28AE348A009A1ED4 /* DeviceKit */; };
 		24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9B128AE3523009A1ED4 /* Swinject */; };
 		24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1A6A422B508A40051EAFD /* OnboardingService.swift */; };
 		24B982DD22BE65E2000D8913 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B982DC22BE65E2000D8913 /* SettingsView.swift */; };
@@ -193,7 +190,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24A0C9AF28AE348A009A1ED4 /* DeviceKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,9 +210,7 @@
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
 				24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
-				2406B38428AD07BE00CB396B /* Nuke in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
-				2471B88D28AE55110086B573 /* HNScraper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,7 +501,6 @@
 			);
 			name = HackersUITests;
 			packageProductDependencies = (
-				24A0C9AE28AE348A009A1ED4 /* DeviceKit */,
 			);
 			productName = HackersUITests;
 			productReference = 245345EC22466EA8001AF1CE /* HackersUITests.xctest */;
@@ -553,11 +546,9 @@
 			name = Hackers;
 			packageProductDependencies = (
 				2406B37828ACF72F00CB396B /* Drops */,
-				2406B38328AD07BE00CB396B /* Nuke */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
 				24A0C9B128AE3523009A1ED4 /* Swinject */,
-				2471B88C28AE55110086B573 /* HNScraper */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -603,12 +594,9 @@
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			packageReferences = (
 				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
-				2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
-				24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */,
 				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */,
-				2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -1252,14 +1240,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kean/Nuke";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.0;
-			};
-		};
 		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
@@ -1274,22 +1254,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
-			};
-		};
-		2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weiran/HNScraper.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/devicekit/DeviceKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
 			};
 		};
 		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
@@ -1308,11 +1272,6 @@
 			package = 2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */;
 			productName = Drops;
 		};
-		2406B38328AD07BE00CB396B /* Nuke */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2406B38228AD07BE00CB396B /* XCRemoteSwiftPackageReference "Nuke" */;
-			productName = Nuke;
-		};
 		2406B38628AD083500CB396B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
@@ -1322,16 +1281,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */;
 			productName = WhatsNewKit;
-		};
-		2471B88C28AE55110086B573 /* HNScraper */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2471B88B28AE55110086B573 /* XCRemoteSwiftPackageReference "HNScraper" */;
-			productName = HNScraper;
-		};
-		24A0C9AE28AE348A009A1ED4 /* DeviceKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9AB28AE3247009A1ED4 /* XCRemoteSwiftPackageReference "DeviceKit" */;
-			productName = DeviceKit;
 		};
 		24A0C9B128AE3523009A1ED4 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;

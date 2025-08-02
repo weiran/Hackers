@@ -1,15 +1,6 @@
 {
-  "originHash" : "928abb3719c483357b0709c61895c8e54d325b2f123ca1d73095c955f2acb63b",
+  "originHash" : "e97199ecb5697f9e3b891464546770326a64a5f41aa9dfdadc670b350d9112d1",
   "pins" : [
-    {
-      "identity" : "devicekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/devicekit/DeviceKit.git",
-      "state" : {
-        "revision" : "513b9d7e7a1bd46504a1009bbab943b75ce2f195",
-        "version" : "5.6.0"
-      }
-    },
     {
       "identity" : "drops",
       "kind" : "remoteSourceControl",
@@ -17,24 +8,6 @@
       "state" : {
         "revision" : "a183ee6f79f21c940092a19c2cba756555422371",
         "version" : "1.7.0"
-      }
-    },
-    {
-      "identity" : "hnscraper",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/weiran/HNScraper.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "154827472088f2e4e007572dffe8b23ac21a322b"
-      }
-    },
-    {
-      "identity" : "nuke",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kean/Nuke",
-      "state" : {
-        "revision" : "a002b7fd786f2df2ed4333fe73a9727499fd9d97",
-        "version" : "10.11.2"
       }
     },
     {
