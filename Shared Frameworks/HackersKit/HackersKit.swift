@@ -11,22 +11,17 @@ import Foundation
 class HackersKit {
     static let shared = HackersKit()
 
-    let session = URLSession(configuration: .default)
-    let scraperShim = HNScraperShim()
+    let networkManager = NetworkManager()
 
     weak var authenticationDelegate: HackerNewsAuthenticationDelegate?
 
-    init() {
-        scraperShim.authenticationDelegate = self
-    }
+    internal let urlBase = "https://news.ycombinator.com/"
 
     internal func fetchHtml(url: URL) async throws -> String {
-        let (data, _) = try await session.data(from: url)
-
-        guard let html = String(bytes: data, encoding: .utf8) else {
-            throw HackersKitError.requestFailure
-        }
-
-        return html
+        return try await networkManager.get(url: url)
     }
+}
+
+protocol HackerNewsAuthenticationDelegate: AnyObject {
+    func didAuthenticate(user: User)
 }

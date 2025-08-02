@@ -32,14 +32,13 @@
 		2481BD5D247C10330088CA2B /* HackersKit+PostsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */; };
 		2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD5E247C103B0088CA2B /* HackersKit+Post.swift */; };
 		2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */; };
-		2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD62247C12540088CA2B /* HNScraperShim.swift */; };
-		2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */; };
 		2481D3912E3BB33D0001A972 /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2481D3902E3BB33D0001A972 /* MailView.swift */; };
 		2486D7D527FAEBFC007504C6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D427FAEBFC007504C6 /* LoginView.swift */; };
 		2486D7D927FB0DC9007504C6 /* SwinjectSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */; };
 		24889DF32E3CE7DE0021EC06 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889DF22E3CE7DE0021EC06 /* CommentsController.swift */; };
 		24889DFD2E3CE95D0021EC06 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889DFC2E3CE95D0021EC06 /* UIViewExtensions.swift */; };
 		24889E072E3CED9B0021EC06 /* AuthenticationDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889E062E3CED9B0021EC06 /* AuthenticationDialog.swift */; };
+		24889E4F2E3CFAC40021EC06 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24889E4D2E3CFAC40021EC06 /* NetworkManager.swift */; };
 		249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */; };
 		249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */; };
 		24A0C9AF28AE348A009A1ED4 /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9AE28AE348A009A1ED4 /* DeviceKit */; };
@@ -138,14 +137,13 @@
 		2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostsList.swift"; sourceTree = "<group>"; };
 		2481BD5E247C103B0088CA2B /* HackersKit+Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+Post.swift"; sourceTree = "<group>"; };
 		2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+CommentVoting.swift"; sourceTree = "<group>"; };
-		2481BD62247C12540088CA2B /* HNScraperShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HNScraperShim.swift; sourceTree = "<group>"; };
-		2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HackersKit+PostVoting.swift"; sourceTree = "<group>"; };
 		2481D3902E3BB33D0001A972 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		2486D7D427FAEBFC007504C6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		2486D7D827FB0DC9007504C6 /* SwinjectSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwinjectSwiftUI.swift; sourceTree = "<group>"; };
 		24889DF22E3CE7DE0021EC06 /* CommentsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
 		24889DFC2E3CE95D0021EC06 /* UIViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtensions.swift; sourceTree = "<group>"; };
 		24889E062E3CED9B0021EC06 /* AuthenticationDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationDialog.swift; sourceTree = "<group>"; };
+		24889E4D2E3CFAC40021EC06 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		249B8F8222A2A48B002A9EC5 /* NotificationToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationToken.swift; sourceTree = "<group>"; };
 		249B8F8422A2A519002A9EC5 /* NotificationCenterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterExtensions.swift; sourceTree = "<group>"; };
 		24B1A6A422B508A40051EAFD /* OnboardingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingService.swift; sourceTree = "<group>"; };
@@ -290,11 +288,10 @@
 				2457F04424696EB000F3E7A4 /* HackersKit.swift */,
 				2481BD5C247C10330088CA2B /* HackersKit+PostsList.swift */,
 				2481BD5E247C103B0088CA2B /* HackersKit+Post.swift */,
-				2481BD64247C1B380088CA2B /* HackersKit+PostVoting.swift */,
 				2481BD60247C11AE0088CA2B /* HackersKit+CommentVoting.swift */,
 				24D330C9248BAC4C00A2AA10 /* HackersKit+Authentication.swift */,
 				24C10C072486DB0700B93F68 /* HtmlParser.swift */,
-				2481BD62247C12540088CA2B /* HNScraperShim.swift */,
+				24889E4D2E3CFAC40021EC06 /* NetworkManager.swift */,
 			);
 			path = HackersKit;
 			sourceTree = "<group>";
@@ -740,6 +737,7 @@
 				24D1845F24B374780017E4F4 /* FeedViewModel.swift in Sources */,
 				2481BD5F247C103B0088CA2B /* HackersKit+Post.swift in Sources */,
 				24CEAA9D1F8917D60050DEDF /* ReviewController.swift in Sources */,
+				24889E4F2E3CFAC40021EC06 /* NetworkManager.swift in Sources */,
 				24B1A6A522B508A40051EAFD /* OnboardingService.swift in Sources */,
 				249B8F8322A2A48B002A9EC5 /* NotificationToken.swift in Sources */,
 				2481BD61247C11AE0088CA2B /* HackersKit+CommentVoting.swift in Sources */,
@@ -751,13 +749,11 @@
 				243C182B2780A8370018359D /* CollectionExtensions.swift in Sources */,
 				24628BAD21E6897700BDEEF9 /* AppFont.swift in Sources */,
 				2457F04524696EB000F3E7A4 /* HackersKit.swift in Sources */,
-				2481BD65247C1B380088CA2B /* HackersKit+PostVoting.swift in Sources */,
 				24FFFF5A23362C7800D009EF /* HackersKitExtensions.swift in Sources */,
 				2477BDE5227D9D8200771FE2 /* SessionService.swift in Sources */,
 				249B8F8522A2A519002A9EC5 /* NotificationCenterExtensions.swift in Sources */,
 				EAD58D35A67AE9162C2D73A5 /* DraggableCommentsButton.swift in Sources */,
 				2481BD5D247C10330088CA2B /* HackersKit+PostsList.swift in Sources */,
-				2481BD63247C12540088CA2B /* HNScraperShim.swift in Sources */,
 				24C10C082486DB0700B93F68 /* HtmlParser.swift in Sources */,
 				243271951F95EDA9008196DB /* StringExtensions.swift in Sources */,
 				5F0FA228A57AF829713FA0A3 /* ContentView.swift in Sources */,

@@ -19,6 +19,7 @@ class Post: ObservableObject, Hashable, Identifiable {
     @Published var score: Int
     let postType: PostType
     @Published var upvoted = false
+    var voteLinks: (upvote: URL?, unvote: URL?)?
     var text: String?
 
     var comments: [Comment]?
@@ -72,6 +73,7 @@ class Comment: Hashable {
     var level: Int
     var upvoteLink: String?
     var upvoted = false
+    var voteLinks: (upvote: URL?, unvote: URL?)?
 
     // UI properties
     var visibility = CommentVisibilityType.visible
@@ -121,7 +123,7 @@ class User {
 
 enum HackersKitError: Error {
     case requestFailure
-    case scraperError // internal failure from HNScraper
+    case scraperError
     case unauthenticated // tried an request that requires authentication when unauthenticated
     case authenticationError(error: HackersKitAuthenticationError)
 }

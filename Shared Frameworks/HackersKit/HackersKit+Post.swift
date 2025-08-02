@@ -68,4 +68,24 @@ extension HackersKit {
 
         return components.url
     }
+
+    func upvote(post: Post) async throws {
+        guard
+            let upvoteURL = post.voteLinks?.upvote,
+            let realURL = URL(string: urlBase + upvoteURL.absoluteString)
+        else {
+            throw HackersKitError.scraperError
+        }
+        _ = try await networkManager.get(url: realURL)
+    }
+
+    func unvote(post: Post) async throws {
+        guard
+            let unvoteURL = post.voteLinks?.unvote,
+            let realURL = URL(string: urlBase + unvoteURL.absoluteString)
+        else {
+            throw HackersKitError.scraperError
+        }
+        _ = try await networkManager.get(url: realURL)
+    }
 }

@@ -8,26 +8,30 @@
 
 import Foundation
 
-protocol HackerNewsAuthenticationDelegate: AnyObject {
-    func didAuthenticate(user: User)
-}
-
 extension HackersKit {
     func login(username: String, password: String) async throws -> User {
-        return try await scraperShim.login(username: username, password: password)
+        let url = URL(string: "https://news.ycombinator.com/login")!
+        let body = "acct=\(username)&pw=\(password)"
+
+        do {
+            let html = try await networkManager.post(url: url, body: body)
+            let user = User(
+                username: username,
+                karma: 0,
+                joined: Date()
+            )
+            authenticationDelegate?.didAuthenticate(user: user)
+            return user
+        } catch let error {
+            throw HackersKitAuthenticationError.badCredentials
+        }
     }
 
     func logout() {
-        scraperShim.logout()
+        networkManager.clearCookies()
     }
 
     func isAuthenticated() -> Bool {
-        scraperShim.isAuthenticated()
-    }
-}
-
-extension HackersKit: HNScraperShimAuthenticationDelegate {
-    func didAuthenticate(user: User, cookie: HTTPCookie) {
-        authenticationDelegate?.didAuthenticate(user: user)
+        return networkManager.containsCookie(for: URL(string: self.urlBase)!)
     }
 }
