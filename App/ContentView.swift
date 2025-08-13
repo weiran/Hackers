@@ -14,11 +14,18 @@ struct MainContentView: View {
     @EnvironmentObject private var settingsStore: SettingsStore
 
     var body: some View {
-        NavigationStack {
-            FeedView()
-                .environmentObject(navigationStore)
+        Group {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                AdaptiveSplitView()
+                    .environmentObject(navigationStore)
+            } else {
+                NavigationStack {
+                    FeedView()
+                        .environmentObject(navigationStore)
+                }
+            }
         }
-        .accentColor(Color(UIColor(named: "appTintColor")!))
+        .accentColor(.accentColor)
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView()
         }
@@ -26,6 +33,38 @@ struct MainContentView: View {
             SettingsView()
                 .environmentObject(settingsStore)
         }
+    }
+}
+
+struct AdaptiveSplitView: View {
+    @EnvironmentObject private var navigationStore: NavigationStore
+    
+    var body: some View {
+        NavigationSplitView {
+            // Sidebar - FeedView
+            FeedView(isSidebar: true)
+                .environmentObject(navigationStore)
+                .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
+        } detail: {
+            // Detail - CommentsView or empty state
+            if let selectedPost = navigationStore.selectedPost {
+                CommentsView(post: selectedPost)
+                    .environmentObject(navigationStore)
+            } else {
+                EmptyDetailView()
+            }
+        }
+    }
+}
+
+struct EmptyDetailView: View {
+    var body: some View {
+        ContentUnavailableView {
+            Label("Select a Post", systemImage: "doc.text")
+        } description: {
+            Text("Choose a post from the sidebar to view its comments and details")
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

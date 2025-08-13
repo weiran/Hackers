@@ -17,19 +17,37 @@ struct FeedView: View {
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""
     @State private var showingAuthenticationDialog = false
+    
+    let isSidebar: Bool
+    
+    init(isSidebar: Bool = false) {
+        self.isSidebar = isSidebar
+    }
 
+    private var selectionBinding: Binding<Int?> {
+        isSidebar ? Binding(
+            get: { navigationStore.selectedPost?.id },
+            set: { newPostId in
+                if let postId = newPostId,
+                   let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
+                    navigationStore.showPost(selectedPost)
+                }
+            }
+        ) : .constant(nil)
+    }
+    
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.posts.isEmpty {
-                    ProgressView("Loading...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List {
+            if viewModel.isLoading && viewModel.posts.isEmpty {
+                ProgressView("Loading...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List(selection: selectionBinding) {
                             ForEach(viewModel.posts, id: \.id) { post in
                                 PostRowView(
                                     post: post,
                                     navigationStore: navigationStore,
+                                    isSidebar: isSidebar,
                                     onVote: { post in
                                         Task {
                                             await handleVote(post: post)
@@ -75,9 +93,9 @@ struct FeedView: View {
                         .refreshable {
                             await viewModel.loadFeed()
                         }
-                }
             }
-            .toolbar {
+        }
+        .toolbar {
                 ToolbarItem(placement: .principal) {
                     Menu {
                         ForEach(PostType.allCases, id: \.self) { postType in
@@ -138,10 +156,9 @@ struct FeedView: View {
             } message: {
                 Text(voteErrorMessage)
             }
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
+    
     @MainActor
     private func handleVote(post: Post) async {
         let isUpvote = !post.upvoted
@@ -212,64 +229,32 @@ struct PostRowView: View {
     let onLinkTap: ((Post) -> Void)?
     let onCommentsTap: ((Post) -> Void)?
     let navigationStore: NavigationStore
+    let isSidebar: Bool
 
     init(post: Post,
          navigationStore: NavigationStore,
+         isSidebar: Bool = false,
          onVote: ((Post) -> Void)? = nil,
          onLinkTap: ((Post) -> Void)? = nil,
          onCommentsTap: ((Post) -> Void)? = nil) {
         self.post = post
         self.navigationStore = navigationStore
+        self.isSidebar = isSidebar
         self.onVote = onVote
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
     }
 
     var body: some View {
-        NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
-            HStack(spacing: 12) {
-                // Thumbnail with proper loading
-                ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                    .frame(width: 55, height: 55)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    // Title
-                    Text(post.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .multilineTextAlignment(.leading)
-
-                    // Metadata row
-                    HStack(spacing: 3) {
-                        HStack(spacing: 0) {
-                            Text("\(post.score)")
-                                .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                            Image(systemName: "arrow.up")
-                                .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                                .font(.caption2)
-                        }
-
-                        Text("•")
-                            .foregroundColor(.secondary)
-
-                        HStack(spacing: 0) {
-                            Text("\(post.commentsCount)")
-                                .foregroundColor(.secondary)
-                            Image(systemName: "message")
-                                .foregroundColor(.secondary)
-                                .font(.caption2)
-                        }
-
-                        if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
-                            Text("•")
-                                .foregroundColor(.secondary)
-                            Text(host)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                    }
-                    .font(.subheadline)
+        Group {
+            if isSidebar {
+                // For iPad sidebar - just use tag for List selection
+                postContent
+                    .tag(post.id)
+            } else {
+                // For iPhone - use NavigationLink
+                NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
+                    postContent
                 }
             }
         }
@@ -281,6 +266,54 @@ struct PostRowView: View {
                     Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
                 .tint(post.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+            }
+        }
+    }
+    
+    private var postContent: some View {
+        HStack(spacing: 12) {
+            // Thumbnail with proper loading
+            ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                .frame(width: 55, height: 55)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+            VStack(alignment: .leading, spacing: 4) {
+                // Title
+                Text(post.title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.leading)
+
+                // Metadata row
+                HStack(spacing: 3) {
+                    HStack(spacing: 0) {
+                        Text("\(post.score)")
+                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                        Image(systemName: "arrow.up")
+                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                            .font(.caption2)
+                    }
+
+                    Text("•")
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 0) {
+                        Text("\(post.commentsCount)")
+                            .foregroundColor(.secondary)
+                        Image(systemName: "message")
+                            .foregroundColor(.secondary)
+                            .font(.caption2)
+                    }
+
+                    if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        Text(host)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                .font(.subheadline)
             }
         }
     }

@@ -500,7 +500,8 @@ struct HTMLText: View {
         let linkPattern = "<a\\s+(?:[^>]*?\\s+)?href=([\"'])(.*?)\\1[^>]*?>(.*?)</a>"
         guard let regex = try? NSRegularExpression(pattern: linkPattern,
                                                   options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
-            attributedText = AttributedString(processedHTML.strippingHTML().addingParagraphBreaks())
+            let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
+            attributedText = AttributedString(trimmedText)
             return
         }
 
@@ -547,7 +548,8 @@ struct HTMLText: View {
 
         // If no links were found, just strip HTML and add paragraph breaks
         if matches.isEmpty {
-            result = AttributedString(processedHTML.strippingHTML().addingParagraphBreaks())
+            let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
+            result = AttributedString(trimmedText)
         }
 
         attributedText = result
@@ -564,10 +566,12 @@ extension String {
             .replacingOccurrences(of: "&#x27;", with: "'")
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&nbsp;", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     func addingParagraphBreaks() -> String {
         return self.replacingOccurrences(of: "\n", with: "\n\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
