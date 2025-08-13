@@ -10,8 +10,8 @@ import Foundation
 import SwiftUI
 
 /// A class responsible for parsing HTML content in comments
-class CommentHTMLParser {
-    
+enum CommentHTMLParser {
+
     /// Parses HTML text into an AttributedString
     /// - Parameter htmlString: The raw HTML string to parse
     /// - Returns: An AttributedString with parsed content, or nil if parsing fails
@@ -19,7 +19,7 @@ class CommentHTMLParser {
         guard !htmlString.isEmpty else {
             return AttributedString("")
         }
-        
+
         let processedHTML = htmlString
             .replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&lt;", with: "<")
@@ -28,7 +28,7 @@ class CommentHTMLParser {
             .replacingOccurrences(of: "&#x27;", with: "'")
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&nbsp;", with: " ")
-        
+
         // Extract links and create attributed string
         var result = AttributedString()
         let linkPattern = "<a\\\\s+(?:[^>]*?\\\\s+)?href=([\\\"'])(.*?)\\\\1[^>]*?>(.*?)</a>"
@@ -37,13 +37,13 @@ class CommentHTMLParser {
             let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
             return AttributedString(trimmedText)
         }
-        
+
         let nsString = processedHTML as NSString
         let matches = regex.matches(in: processedHTML, options: [],
                                     range: NSRange(location: 0, length: nsString.length))
-        
+
         var lastEnd = 0
-        
+
         for match in matches {
             // Add text before the link
             if match.range.location > lastEnd {
@@ -51,15 +51,15 @@ class CommentHTMLParser {
                 let beforeText = nsString.substring(with: beforeRange).strippingHTML().addingParagraphBreaks()
                 result += AttributedString(beforeText)
             }
-            
+
             // Extract URL and link text
             let urlRange = match.range(at: 2)
             let textRange = match.range(at: 3)
-            
+
             if urlRange.location != NSNotFound && textRange.location != NSNotFound {
                 let urlString = nsString.substring(with: urlRange)
                 let linkText = nsString.substring(with: textRange).strippingHTML()
-                
+
                 var linkAttributedString = AttributedString(linkText)
                 if let url = URL(string: urlString) {
                     linkAttributedString.link = url
@@ -68,23 +68,23 @@ class CommentHTMLParser {
                 }
                 result += linkAttributedString
             }
-            
+
             lastEnd = match.range.location + match.range.length
         }
-        
+
         // Add remaining text after last link
         if lastEnd < nsString.length {
             let remainingRange = NSRange(location: lastEnd, length: nsString.length - lastEnd)
             let remainingText = nsString.substring(with: remainingRange).strippingHTML().addingParagraphBreaks()
             result += AttributedString(remainingText)
         }
-        
+
         // If no links were found, just strip HTML and add paragraph breaks
         if matches.isEmpty {
             let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
             result = AttributedString(trimmedText)
         }
-        
+
         return result
     }
 }
@@ -101,7 +101,7 @@ extension String {
             .replacingOccurrences(of: "&nbsp;", with: " ")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    
+
     func addingParagraphBreaks() -> String {
         return self.replacingOccurrences(of: "\n", with: "\n\n")
             .trimmingCharacters(in: .whitespacesAndNewlines)
