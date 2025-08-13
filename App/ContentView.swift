@@ -50,6 +50,7 @@ struct AdaptiveSplitView: View {
             if let selectedPost = navigationStore.selectedPost {
                 CommentsView(post: selectedPost)
                     .environmentObject(navigationStore)
+                    .id(selectedPost.id) // Add id to force re-render when post changes
             } else {
                 EmptyDetailView()
             }

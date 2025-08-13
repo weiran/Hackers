@@ -157,7 +157,7 @@ struct FeedView: View {
                 Text(voteErrorMessage)
             }
             .navigationBarTitleDisplayMode(.inline)
-        }
+    }
     
     @MainActor
     private func handleVote(post: Post) async {
