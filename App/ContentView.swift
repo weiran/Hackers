@@ -38,7 +38,7 @@ struct MainContentView: View {
 
 struct AdaptiveSplitView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
-    
+
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView

@@ -14,7 +14,7 @@ extension HackersKit {
         let body = "acct=\(username)&pw=\(password)"
 
         do {
-            let html = try await networkManager.post(url: url, body: body)
+            let _ = try await networkManager.post(url: url, body: body)
             let user = User(
                 username: username,
                 karma: 0,

@@ -17,9 +17,9 @@ struct FeedView: View {
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""
     @State private var showingAuthenticationDialog = false
-    
+
     let isSidebar: Bool
-    
+
     init(isSidebar: Bool = false) {
         self.isSidebar = isSidebar
     }
@@ -35,7 +35,7 @@ struct FeedView: View {
             }
         ) : .constant(nil)
     }
-    
+
     var body: some View {
         NavigationStack {
             if viewModel.isLoading && viewModel.posts.isEmpty {
@@ -158,7 +158,7 @@ struct FeedView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
     }
-    
+
     @MainActor
     private func handleVote(post: Post) async {
         let isUpvote = !post.upvoted
@@ -269,7 +269,7 @@ struct PostRowView: View {
             }
         }
     }
-    
+
     private var postContent: some View {
         HStack(spacing: 12) {
             // Thumbnail with proper loading
