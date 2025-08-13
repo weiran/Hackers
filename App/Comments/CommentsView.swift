@@ -66,7 +66,7 @@ struct CommentsView: View {
                         .onPreferenceChange(ViewOffsetKey.self) { offset in
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 // Show title when header scrolls above navigation bar (approximately)
-                                showTitle = offset < 100
+                                showTitle = offset < 50
                             }
                         }
 
@@ -376,8 +376,6 @@ struct PostHeaderView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
-        .padding(.bottom, 12)
     }
 }
 
