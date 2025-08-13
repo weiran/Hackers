@@ -10,7 +10,6 @@
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38928AD08CC00CB396B /* WhatsNewKit */; };
-		24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 24A0C9B128AE3523009A1ED4 /* Swinject */; };
 		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -138,7 +137,6 @@
 				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
-				24A0C9B228AE3523009A1ED4 /* Swinject in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
 			);
@@ -277,7 +275,6 @@
 				2406B37828ACF72F00CB396B /* Drops */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
-				24A0C9B128AE3523009A1ED4 /* Swinject */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -325,7 +322,6 @@
 				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
-				24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -926,14 +922,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Swinject/Swinject.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -951,11 +939,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */;
 			productName = WhatsNewKit;
-		};
-		24A0C9B128AE3523009A1ED4 /* Swinject */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 24A0C9B028AE3523009A1ED4 /* XCRemoteSwiftPackageReference "Swinject" */;
-			productName = Swinject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

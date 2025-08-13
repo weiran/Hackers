@@ -24,7 +24,7 @@ The app has already begun its SwiftUI journey with several components implemente
 - Custom SwiftUI components: `RoundedTextField`, `FilledButton`, `LabelledDivider`
 
 **🔄 Hybrid Components:**
-- `SwinjectSwiftUI.swift` - Dependency injection bridge for SwiftUI
+- `SessionService+DependencyInjection.swift` - Dependency injection for SessionService using singleton pattern
 
 **❌ Still UIKit-based:**
 - Main app structure (Storyboard-based)
@@ -60,8 +60,8 @@ The app has already begun its SwiftUI journey with several components implemente
    - Set up deep linking infrastructure
 
 3. **Dependency Injection Integration**
-   - Extend `SwinjectSwiftUI.swift` for broader SwiftUI support
-   - Create SwiftUI-compatible service containers
+   - Implement native Swift 6 singleton pattern for services
+   - Create `SessionService+DependencyInjection.swift` for service initialization
    - Establish `@EnvironmentObject` patterns
 
 ### Phase 2: Core Views Migration (Weeks 3-6)
@@ -189,17 +189,15 @@ struct FeedView: View {
 ### Dependency Injection Pattern
 
 ```swift
-// Extend existing Swinject integration
-extension View {
-    func inject<T>(_ serviceType: T.Type) -> T {
-        return SwinjectStoryboard.defaultContainer.resolve(serviceType)!
-    }
+// Native Swift 6 dependency injection with singleton pattern
+extension SessionService {
+    static let shared = SessionService()
 }
 
 // Usage in SwiftUI views
 struct FeedView: View {
-    private let sessionService = inject(SessionService.self)
-    private let navigationService = inject(NavigationService.self)
+    private let sessionService = SessionService.shared
+    private let navigationService = NavigationService.shared
 }
 ```
 

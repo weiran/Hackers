@@ -49,7 +49,6 @@ I use several open source projects in Hackers, in no particular order:
 * [Drops](https://github.com/omaralbeik/Drops)
 * [SwiftSoup](https://github.com/scinfu/SwiftSoup.git)
 * [WhatsNewKit](https://github.com/SvenTiigi/WhatsNewKit)
-* [Swinject](https://github.com/Swinject/Swinject)
 
 ---
 <p align="center">

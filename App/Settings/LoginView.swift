@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import Swinject
 
 struct LoginView: View {
     @State var isAuthenticated: Bool
@@ -16,13 +15,12 @@ struct LoginView: View {
     @State private var isAuthenticating = false
     @State private var showAlert = false
 
-    private var sessionService: SessionService
+    private let sessionService = SessionService.shared
 
     @Environment(\.dismiss) var dismiss
 
     init() {
         // can't use @Inject for SessionService here as it runs after init
-        sessionService = Resolver.shared.resolve(SessionService.self)
         _isAuthenticated = State(
             initialValue: sessionService.authenticationState == .authenticated
         )
