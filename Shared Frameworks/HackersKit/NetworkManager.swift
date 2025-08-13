@@ -32,7 +32,10 @@ class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskDelegate {
     }
 
     func containsCookie(for url: URL) -> Bool {
-        return HTTPCookieStorage.shared.cookies(for: url) != nil
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: url) else {
+            return false
+        }
+        return !cookies.isEmpty
     }
 
     func urlSession(
