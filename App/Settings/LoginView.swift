@@ -90,8 +90,7 @@ struct LoginView: View {
                         Button {
                             dismiss()
                         } label: {
-                            Text("Done")
-                                .bold()
+                            Image(systemName: "xmark")
                         }
                     }
                 }
@@ -115,8 +114,7 @@ struct LoginView: View {
                         Button {
                             dismiss()
                         } label: {
-                            Text("Done")
-                                .bold()
+                            Image(systemName: "xmark")
                         }
                     }
                 }

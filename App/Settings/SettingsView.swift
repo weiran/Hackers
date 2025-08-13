@@ -80,8 +80,7 @@ struct SettingsView: View {
                         dismiss()
                     },
                     label: {
-                        Text("Close")
-                            .bold()
+                        Image(systemName: "xmark")
                     }
                 )
             )
