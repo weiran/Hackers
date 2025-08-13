@@ -43,120 +43,120 @@ struct FeedView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(selection: selectionBinding) {
-                            ForEach(viewModel.posts, id: \.id) { post in
-                                PostRowView(
-                                    post: post,
-                                    navigationStore: navigationStore,
-                                    isSidebar: isSidebar,
-                                    onVote: { post in
-                                        Task {
-                                            await handleVote(post: post)
-                                        }
-                                    },
-                                    onLinkTap: { post in
-                                        handleLinkTap(post: post)
-                                    },
-                                    onCommentsTap: { _ in
-                                        // This callback is no longer needed since we use NavigationLink
-                                    }
-                                )
-                                .onAppear {
-                                    // Load next page when near end
-                                    if post == viewModel.posts.last {
-                                        Task {
-                                            await viewModel.loadNextPage()
-                                        }
-                                    }
+                    ForEach(viewModel.posts, id: \.id) { post in
+                        PostRowView(
+                            post: post,
+                            navigationStore: navigationStore,
+                            isSidebar: isSidebar,
+                            onVote: { post in
+                                Task {
+                                    await handleVote(post: post)
                                 }
-                                .contextMenu {
-                                    PostContextMenu(
-                                        post: post,
-                                        onVote: { post in
-                                            Task {
-                                                await handleVote(post: post)
-                                            }
-                                        },
-                                        onOpenLink: { post in
-                                            handleLinkTap(post: post)
-                                        },
-                                        onShare: { post in
-                                            sharePost(post)
-                                        }
-                                    )
-                                }
-                                .authenticationDialog(isPresented: $showingAuthenticationDialog) {
-                                    navigationStore.showLogin()
+                            },
+                            onLinkTap: { post in
+                                handleLinkTap(post: post)
+                            },
+                            onCommentsTap: { _ in
+                                // This callback is no longer needed since we use NavigationLink
+                            }
+                        )
+                        .onAppear {
+                            // Load next page when near end
+                            if post == viewModel.posts.last {
+                                Task {
+                                    await viewModel.loadNextPage()
                                 }
                             }
                         }
-                        .listStyle(.plain)
-                        .refreshable {
-                            await viewModel.loadFeed()
+                        .contextMenu {
+                            PostContextMenu(
+                                post: post,
+                                onVote: { post in
+                                    Task {
+                                        await handleVote(post: post)
+                                    }
+                                },
+                                onOpenLink: { post in
+                                    handleLinkTap(post: post)
+                                },
+                                onShare: { post in
+                                    sharePost(post)
+                                }
+                            )
                         }
+                        .authenticationDialog(isPresented: $showingAuthenticationDialog) {
+                            navigationStore.showLogin()
+                        }
+                    }
+                }
+                .listStyle(.plain)
+                .refreshable {
+                    await viewModel.loadFeed()
+                }
             }
         }
         .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Menu {
-                        ForEach(PostType.allCases, id: \.self) { postType in
-                            Button {
-                                selectedPostType = postType
-                                navigationStore.selectPostType(postType)
-                                viewModel.postType = postType
-                                Task {
-                                    await viewModel.loadFeed()
-                                }
-                            } label: {
-                                HStack {
-                                    Image(systemName: postType.iconName)
-                                    Text(postType.displayName)
-                                    if postType == selectedPostType {
-                                        Spacer()
-                                        Image(systemName: "checkmark")
-                                    }
+            ToolbarItem(placement: .principal) {
+                Menu {
+                    ForEach(PostType.allCases, id: \.self) { postType in
+                        Button {
+                            selectedPostType = postType
+                            navigationStore.selectPostType(postType)
+                            viewModel.postType = postType
+                            Task {
+                                await viewModel.loadFeed()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: postType.iconName)
+                                Text(postType.displayName)
+                                if postType == selectedPostType {
+                                    Spacer()
+                                    Image(systemName: "checkmark")
                                 }
                             }
                         }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: selectedPostType.iconName)
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            Text(selectedPostType.displayName)
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            Image(systemName: "chevron.down")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: selectedPostType.iconName)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text(selectedPostType.displayName)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Image(systemName: "chevron.down")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
+            }
 
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        navigationStore.showLogin()
-                    } label: {
-                        Image(systemName: "person.circle")
-                    }
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    navigationStore.showLogin()
+                } label: {
+                    Image(systemName: "person.circle")
                 }
+            }
 
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        navigationStore.showSettings()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    navigationStore.showSettings()
+                } label: {
+                    Image(systemName: "gear")
                 }
             }
-            .task { @Sendable in
-                await viewModel.loadFeed()
-            }
-            .alert("Vote Error", isPresented: $showingVoteError) {
-                Button("OK") { }
-            } message: {
-                Text(voteErrorMessage)
-            }
-            .navigationBarTitleDisplayMode(.inline)
+        }
+        .task { @Sendable in
+            await viewModel.loadFeed()
+        }
+        .alert("Vote Error", isPresented: $showingVoteError) {
+            Button("OK") { }
+        } message: {
+            Text(voteErrorMessage)
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     @MainActor
