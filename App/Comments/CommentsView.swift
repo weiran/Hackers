@@ -107,7 +107,6 @@ struct CommentsView: View {
                                     } label: {
                                         Image(systemName: "minus.circle")
                                     }
-                                    .tint(Color(UIColor(named: "appTintColor")!))
                                 }
                             }
                             .authenticationDialog(isPresented: $showingAuthenticationDialog) {
@@ -189,9 +188,24 @@ struct CommentsView: View {
 
             // Set comments
             let loadedComments = postWithComments.comments ?? []
-            comments = loadedComments
-            commentsController.comments = loadedComments
-            currentPost.commentsCount = loadedComments.count
+            
+            // Bulk parse HTML content for all comments in background while preserving order
+            var parsedComments: [Comment] = []
+            for comment in loadedComments {
+                // Parse each comment in background but maintain order
+                let parsedComment = await withCheckedContinuation { continuation in
+                    Task {
+                        var updatedComment = comment
+                        updatedComment.parsedText = CommentHTMLParser.parseHTMLText(comment.text)
+                        continuation.resume(returning: updatedComment)
+                    }
+                }
+                parsedComments.append(parsedComment)
+            }
+            
+            comments = parsedComments
+            commentsController.comments = parsedComments
+            currentPost.commentsCount = parsedComments.count
             refreshTrigger.toggle() // Ensure visibleComments updates
         } catch {
             print("Error loading comments: \(error)")
@@ -369,8 +383,10 @@ struct PostHeaderView: View {
                 onLinkTap()
             }
 
-            if let text = post.text, !text.isEmpty {
-                HTMLText(htmlString: text)
+            if let text = post.text,
+               !text.isEmpty,
+               let parsedText = CommentHTMLParser.parseHTMLText(text) {
+                Text(parsedText)
                     .foregroundColor(.primary)
                     .padding(.top, 4)
             }
@@ -417,11 +433,18 @@ struct CommentRowView: View {
                 }
             }
 
-            // Only show full text if comment is visible
+            // Use pre-parsed content instead of parsing on render
             if comment.visibility == .visible {
-                HTMLText(htmlString: comment.text)
-                    .foregroundColor(.primary)
-                    .padding(.bottom, 16)
+                if let parsedText = comment.parsedText {
+                    Text(parsedText)
+                        .foregroundColor(.primary)
+                        .padding(.bottom, 16)
+                } else {
+                    // Fallback for comments without parsed text
+                    Text(comment.text)
+                        .foregroundColor(.primary)
+                        .padding(.bottom, 16)
+                }
             } else {
                 // it's here to maintain row height consistency with List animations
                 Spacer()
@@ -468,110 +491,6 @@ struct CommentContextMenu: View {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
         }
-    }
-}
-
-struct HTMLText: View {
-    let htmlString: String
-    @State private var attributedText: AttributedString = AttributedString()
-
-    var body: some View {
-        Text(attributedText)
-            .onAppear {
-                parseHTMLText()
-            }
-            .onChange(of: htmlString) {
-                parseHTMLText()
-            }
-    }
-
-    private func parseHTMLText() {
-        let processedHTML = htmlString
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "&lt;", with: "<")
-            .replacingOccurrences(of: "&gt;", with: ">")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .replacingOccurrences(of: "&#x27;", with: "'")
-            .replacingOccurrences(of: "&#39;", with: "'")
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-
-        // Extract links and create attributed string
-        var result = AttributedString()
-        let linkPattern = "<a\\s+(?:[^>]*?\\s+)?href=([\"'])(.*?)\\1[^>]*?>(.*?)</a>"
-        guard let regex = try? NSRegularExpression(pattern: linkPattern,
-                                                  options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
-            let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
-            attributedText = AttributedString(trimmedText)
-            return
-        }
-
-        let nsString = processedHTML as NSString
-        let matches = regex.matches(in: processedHTML, options: [],
-                                    range: NSRange(location: 0, length: nsString.length))
-
-        var lastEnd = 0
-
-        for match in matches {
-            // Add text before the link
-            if match.range.location > lastEnd {
-                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
-                let beforeText = nsString.substring(with: beforeRange).strippingHTML().addingParagraphBreaks()
-                result += AttributedString(beforeText)
-            }
-
-            // Extract URL and link text
-            let urlRange = match.range(at: 2)
-            let textRange = match.range(at: 3)
-
-            if urlRange.location != NSNotFound && textRange.location != NSNotFound {
-                let urlString = nsString.substring(with: urlRange)
-                let linkText = nsString.substring(with: textRange).strippingHTML()
-
-                var linkAttributedString = AttributedString(linkText)
-                if let url = URL(string: urlString) {
-                    linkAttributedString.link = url
-                    linkAttributedString.foregroundColor = .blue
-                    linkAttributedString.underlineStyle = .single
-                }
-                result += linkAttributedString
-            }
-
-            lastEnd = match.range.location + match.range.length
-        }
-
-        // Add remaining text after last link
-        if lastEnd < nsString.length {
-            let remainingRange = NSRange(location: lastEnd, length: nsString.length - lastEnd)
-            let remainingText = nsString.substring(with: remainingRange).strippingHTML().addingParagraphBreaks()
-            result += AttributedString(remainingText)
-        }
-
-        // If no links were found, just strip HTML and add paragraph breaks
-        if matches.isEmpty {
-            let trimmedText = processedHTML.strippingHTML().addingParagraphBreaks()
-            result = AttributedString(trimmedText)
-        }
-
-        attributedText = result
-    }
-}
-
-extension String {
-    func strippingHTML() -> String {
-        return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "&lt;", with: "<")
-            .replacingOccurrences(of: "&gt;", with: ">")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .replacingOccurrences(of: "&#x27;", with: "'")
-            .replacingOccurrences(of: "&#39;", with: "'")
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func addingParagraphBreaks() -> String {
-        return self.replacingOccurrences(of: "\n", with: "\n\n")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

@@ -77,6 +77,9 @@ class Comment: Hashable {
 
     // UI properties
     var visibility = CommentVisibilityType.visible
+    
+    // Parsed HTML content for performance
+    var parsedText: AttributedString?
 
     init(
         id: Int,
