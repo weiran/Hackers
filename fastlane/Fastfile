@@ -1,33 +1,13 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Generate new screenshots"
-  lane :screenshots do
-    capture_screenshots(
-      workspace: "Hackers.xcworkspace", 
-      scheme: "Hackers",
-      override_status_bar: true
-    )
-    frameit(
-      path: "./fastlane/screenshots/"
-    )
-    # upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
-  end
-
   desc "Run Unit Tests"
   lane :test do
-    xcodebuild(
-      xcargs: "test",
-      project: "Hackers.xcodeproj",
-      scheme: "HackersTests",
-      destination: "platform=iOS Simulator,name=iPhone 16 Pro"
-    )
-    # run_tests(scheme: "HackersTests") - run_tests doesn't print output to console
+    run_tests(scheme: "HackersTests")
   end
 
   desc "Run UI Tests"
   lane :uitest do
-    reset_simulator_contents
     run_tests(scheme: "HackersUITests")
   end
 
