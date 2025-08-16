@@ -283,16 +283,7 @@ struct CommentsView: View {
     }
 
     private func handleLinkTap() {
-        guard !currentPost.url.absoluteString.starts(with: "item?id=") else { return }
-
-        if let svc = SFSafariViewController.instance(for: currentPost.url) {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let rootVC = windowScene.windows.first?.rootViewController {
-                rootVC.present(svc, animated: true) {
-                    DraggableCommentsButton.attachTo(svc, with: currentPost)
-                }
-            }
-        }
+        LinkOpener.openURL(currentPost.url, with: currentPost)
     }
 
     private func sharePost(url: URL, title: String) {

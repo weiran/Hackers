@@ -195,14 +195,7 @@ struct FeedView: View {
             return
         }
 
-        if let svc = SFSafariViewController.instance(for: post.url) {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let rootVC = windowScene.windows.first?.rootViewController {
-                rootVC.present(svc, animated: true) {
-                    DraggableCommentsButton.attachTo(svc, with: post)
-                }
-            }
-        }
+        LinkOpener.openURL(post.url, with: post)
     }
 
     private func sharePost(_ post: Post) {
