@@ -18,8 +18,8 @@ class DraggableCommentsButton: UIButton {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         label.text = String(post.commentsCount)
-        label.textColor = AppTheme.default.titleTextColor
-        label.backgroundColor = AppTheme.default.cellHighlightColor
+//        label.textColor = AppTheme.default.titleTextColor
+//        label.backgroundColor = AppTheme.default.cellHighlightColor
         label.cornerRadius = 12.5
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true

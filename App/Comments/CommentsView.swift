@@ -384,8 +384,8 @@ struct PostHeaderView: View {
             }
 
             if let text = post.text,
-               !text.isEmpty,
-               let parsedText = CommentHTMLParser.parseHTMLText(text) {
+               !text.isEmpty {
+               let parsedText = CommentHTMLParser.parseHTMLText(text)
                 Text(parsedText)
                     .foregroundColor(.primary)
                     .padding(.top, 4)
