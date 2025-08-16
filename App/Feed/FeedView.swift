@@ -272,10 +272,14 @@ struct PostRowView: View {
 
     private var postContent: some View {
         HStack(spacing: 12) {
-            // Thumbnail with proper loading
+            // Thumbnail with proper loading - tapping opens URL
             ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
                 .frame(width: 55, height: 55)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onLinkTap?(post)
+                }
 
             VStack(alignment: .leading, spacing: 4) {
                 // Title
