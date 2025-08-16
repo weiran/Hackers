@@ -153,3 +153,6 @@ iOSInjectionProject/
 # End of https://www.toptal.com/developers/gitignore/api/macos,swift,fastlane,xcode
 scan_derived_data
 .env
+CLAUDE.md
+GEMINI.md
+QWEN.md
