@@ -6,6 +6,8 @@
 //  Copyright © 2024 Glass Umbrella. All rights reserved.
 //
 
+// swiftlint:disable file_length type_body_length line_length
+
 import Testing
 import Foundation
 @testable import Hackers
@@ -73,6 +75,13 @@ struct CommentHTMLParserTests {
         #expect(resultString.contains("this link"), "Link text should be preserved")
         #expect(!resultString.contains("<a"), "HTML tags should be removed")
         #expect(!resultString.contains("href"), "HTML attributes should be removed")
+        
+        // Verify the link has proper URL attribute
+        let linkRange = resultString.range(of: "this link")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.upperBound))
+        let linkAttributes = result[start..<end]
+        #expect(linkAttributes.link?.absoluteString == "https://example.com", "Link should have correct URL")
     }
 
     @Test("Link parsing - multiple links")
@@ -293,6 +302,182 @@ struct CommentHTMLParserTests {
         #expect(resultString == expected, "All newlines should be normalized to spaces when no paragraph tags are present")
     }
 
+    // MARK: - Bold Formatting Tests
+
+    @Test("Bold formatting - basic bold tag")
+    func testBasicBoldFormatting() {
+        let input = "This is <b>bold text</b> in a sentence."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "This is bold text in a sentence.", "Bold text content should be preserved")
+
+        // Check that bold formatting is applied
+        let boldRange = resultString.range(of: "bold text")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.upperBound))
+        let attributes = result[start..<end]
+        #expect(attributes.font != nil, "Bold text should have font attribute")
+    }
+
+    @Test("Bold formatting - multiple bold tags")
+    func testMultipleBoldFormatting() {
+        let input = "First <b>bold</b> and second <b>bold</b> text."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "First bold and second bold text.", "Multiple bold texts should be processed correctly")
+        #expect(!resultString.contains("<b>"), "Bold tags should be removed")
+    }
+
+    @Test("Bold formatting - bold with attributes")
+    func testBoldFormattingWithAttributes() {
+        let input = "Text with <b class=\"highlight\" id=\"test\">bold styling</b> here."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with bold styling here.", "Bold text with attributes should be processed correctly")
+        #expect(!resultString.contains("class"), "Bold tag attributes should be removed")
+    }
+
+    @Test("Bold formatting - nested in other content")
+    func testBoldFormattingNested() {
+        let input = "Check <a href=\"https://example.com\">this <b>bold link</b></a> out."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Check this bold link out.", "Bold text within links should be processed")
+    }
+
+    // MARK: - Italic Formatting Tests
+
+    @Test("Italic formatting - basic italic tag")
+    func testBasicItalicFormatting() {
+        let input = "This is <i>italic text</i> in a sentence."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "This is italic text in a sentence.", "Italic text content should be preserved")
+
+        // Check that italic formatting is applied
+        let italicRange = resultString.range(of: "italic text")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.upperBound))
+        let attributes = result[start..<end]
+        #expect(attributes.font != nil, "Italic text should have font attribute")
+    }
+
+    @Test("Italic formatting - multiple italic tags")
+    func testMultipleItalicFormatting() {
+        let input = "First <i>italic</i> and second <i>italic</i> text."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "First italic and second italic text.", "Multiple italic texts should be processed correctly")
+        #expect(!resultString.contains("<i>"), "Italic tags should be removed")
+    }
+
+    @Test("Italic formatting - italic with attributes")
+    func testItalicFormattingWithAttributes() {
+        let input = "Text with <i class=\"emphasis\" style=\"color: blue\">italic styling</i> here."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with italic styling here.", "Italic text with attributes should be processed correctly")
+        #expect(!resultString.contains("class"), "Italic tag attributes should be removed")
+    }
+
+    @Test("Italic formatting - nested in other content")
+    func testItalicFormattingNested() {
+        let input = "Check <a href=\"https://example.com\">this <i>italic link</i></a> out."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Check this italic link out.", "Italic text within links should be processed")
+    }
+
+    // MARK: - Combined Formatting Tests
+
+    @Test("Combined formatting - bold and italic together")
+    func testBoldAndItalicTogether() {
+        let input = "Text with <b>bold</b> and <i>italic</i> formatting."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with bold and italic formatting.", "Bold and italic should both be processed")
+        #expect(!resultString.contains("<b>"), "Bold tags should be removed")
+        #expect(!resultString.contains("<i>"), "Italic tags should be removed")
+    }
+
+    @Test("Combined formatting - nested bold and italic")
+    func testNestedBoldAndItalic() {
+        let input = "This has <b>bold with <i>nested italic</i> text</b> content."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "This has bold with nested italic text content.", "Nested formatting should be processed correctly")
+    }
+
+    @Test("Combined formatting - bold, italic, and links")
+    func testBoldItalicAndLinks() {
+        let input = "Check <a href=\"https://example.com\"><b>bold</b> and <i>italic</i> link</a> here."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Check bold and italic link here.", "Bold, italic, and links should all be processed")
+        #expect(!resultString.contains("<"), "No HTML tags should remain")
+        
+        // Verify the link is detected and has URL attribute
+        let linkRange = resultString.range(of: "bold and italic link")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.upperBound))
+        let linkAttributes = result[start..<end]
+        #expect(linkAttributes.link != nil, "Link text should have URL attribute")
+    }
+
+    @Test("Combined formatting - in paragraphs")
+    func testFormattingInParagraphs() {
+        let input = "<p>First paragraph with <b>bold</b> text.</p><p>Second paragraph with <i>italic</i> text.</p>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("bold"), "Bold text should be preserved in paragraphs")
+        #expect(resultString.contains("italic"), "Italic text should be preserved in paragraphs")
+        #expect(resultString.contains("\n\n"), "Paragraph spacing should be maintained")
+        #expect(!resultString.contains("<"), "No HTML tags should remain")
+    }
+
+    // MARK: - Formatting Edge Cases
+
+    @Test("Formatting edge cases - empty bold tag")
+    func testEmptyBoldTag() {
+        let input = "Text with <b></b> empty bold tag."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with empty bold tag.", "Empty bold tags should be removed without affecting content")
+    }
+
+    @Test("Formatting edge cases - empty italic tag")
+    func testEmptyItalicTag() {
+        let input = "Text with <i></i> empty italic tag."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with empty italic tag.", "Empty italic tags should be removed without affecting content")
+    }
+
+    @Test("Formatting edge cases - malformed bold tag")
+    func testMalformedBoldTag() {
+        let input = "Text with <b>unclosed bold tag."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("unclosed bold tag"), "Malformed bold tags should not break parsing")
+    }
+
+    @Test("Formatting edge cases - malformed italic tag")
+    func testMalformedItalicTag() {
+        let input = "Text with <i>unclosed italic tag."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("unclosed italic tag"), "Malformed italic tags should not break parsing")
+    }
+
+    @Test("Formatting edge cases - bold and italic with entities")
+    func testFormattingWithEntities() {
+        let input = "Code: <b>if (x &lt; y)</b> and <i>result &amp;&amp; true</i>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("if (x < y)"), "HTML entities in bold text should be decoded")
+        #expect(resultString.contains("result && true"), "HTML entities in italic text should be decoded")
+    }
+
     // MARK: - String Extension Tests
 
     @Test("String extension - strippingHTML")
@@ -308,5 +493,13 @@ struct CommentHTMLParserTests {
         let input = "  <p>  Content  </p>  "
         let result = input.strippingHTML()
         #expect(result == "Content", "String extension should trim whitespace")
+    }
+
+    @Test("String extension - strippingHTML with formatting")
+    func testStringExtensionStrippingHTMLWithFormatting() {
+        let input = "<p>Text with <b>bold</b> and <i>italic</i> formatting.</p>"
+        let result = input.strippingHTML()
+        let expected = "Text with bold and italic formatting."
+        #expect(result == expected, "String extension should strip formatting tags while preserving text")
     }
 }

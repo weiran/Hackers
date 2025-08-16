@@ -38,6 +38,24 @@ enum CommentHTMLParser {
             fatalError("Invalid regex pattern: \(error)")
         }
     }()
+    
+    private static let boldRegex: NSRegularExpression = {
+        let pattern = "<b\\b[^>]*>(.*?)</b>"
+        do {
+            return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        } catch {
+            fatalError("Invalid regex pattern: \(error)")
+        }
+    }()
+    
+    private static let italicRegex: NSRegularExpression = {
+        let pattern = "<i\\b[^>]*>(.*?)</i>"
+        do {
+            return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        } catch {
+            fatalError("Invalid regex pattern: \(error)")
+        }
+    }()
     private static let paragraphRegex: NSRegularExpression = {
         let pattern = #"<p\b[^>]*>(.*?)</p>"#
         do {
@@ -169,44 +187,40 @@ enum CommentHTMLParser {
         return spacing
     }
 
-    /// Processes links within a text block
+    /// Processes links and formatting within a text block
     private static func processLinksInText(_ text: String) -> AttributedString {
         var result = AttributedString()
         let range = NSRange(location: 0, length: text.utf16.count)
         let matches = linkRegex.matches(in: text, range: range)
         guard !matches.isEmpty else {
-            // No links found - normalize whitespace for non-paragraph content
-            return AttributedString(stripHTMLTagsAndNormalizeWhitespace(text))
+            // No links found - process formatting tags and return
+            return processFormattingTags(text)
         }
 
         var lastEnd = 0
         let nsString = text as NSString
         for match in matches {
-            // Add text before the link
+            // Add text before the link (with formatting processing)
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
-                if !cleanText.isEmpty {
-                    result += AttributedString(cleanText)
-                }
+                let formattedBeforeText = processFormattingTags(beforeText)
+                result += formattedBeforeText
             }
 
-            // Extract and process link
-            if let linkComponent = extractLinkComponent(from: match, in: nsString) {
+            // Extract and process link (the link text itself may contain formatting)
+            if let linkComponent = extractLinkComponentWithFormatting(from: match, in: nsString) {
                 result += linkComponent
             }
 
             lastEnd = NSMaxRange(match.range)
         }
 
-        // Add remaining text after last link
+        // Add remaining text after last link (with formatting processing)
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
-            if !cleanText.isEmpty {
-                result += AttributedString(cleanText)
-            }
+            let formattedRemainingText = processFormattingTags(remainingText)
+            result += formattedRemainingText
         }
 
         return result
@@ -256,11 +270,154 @@ enum CommentHTMLParser {
         return linkAttributedString
     }
 
+    /// Extracts and creates an attributed link component with formatting support
+    private static func extractLinkComponentWithFormatting(from match: NSTextCheckingResult,
+                                                           in nsString: NSString) -> AttributedString? {
+        guard match.numberOfRanges >= 4 else { return nil }
+
+        let urlRange = match.range(at: 2)
+        let textRange = match.range(at: 3)
+
+        guard urlRange.location != NSNotFound,
+              textRange.location != NSNotFound else { return nil }
+
+        let urlString = nsString.substring(with: urlRange)
+        let linkText = nsString.substring(with: textRange)
+
+        guard !linkText.isEmpty else { return nil }
+
+        // Process formatting within the link text
+        var linkAttributedString = processFormattingTags(linkText)
+
+        if let url = URL(string: urlString) {
+            // Apply link attributes to the entire range
+            let fullRange = linkAttributedString.startIndex..<linkAttributedString.endIndex
+            linkAttributedString[fullRange].link = url
+            linkAttributedString[fullRange].foregroundColor = AppTheme.default.appTintColor
+            linkAttributedString[fullRange].underlineStyle = .single
+        }
+
+        return linkAttributedString
+    }
+
     /// Strips HTML tags using pre-compiled regex for better performance
     static func stripHTMLTags(_ text: String) -> String {
         let range = NSRange(location: 0, length: text.utf16.count)
         return htmlTagRegex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
     }
+    
+    /// Processes formatting tags (bold and italic) and returns an AttributedString
+    private static func processFormattingTags(_ text: String) -> AttributedString {
+        // Process bold tags first, then italic tags
+        let boldProcessed = processBoldTags(text)
+        return processItalicTags(boldProcessed)
+    }
+    
+    /// Processes <b> tags for bold formatting
+    private static func processBoldTags(_ text: String) -> AttributedString {
+        let range = NSRange(location: 0, length: text.utf16.count)
+        let matches = boldRegex.matches(in: text, range: range)
+        
+        guard !matches.isEmpty else {
+            return AttributedString(stripHTMLTagsAndNormalizeWhitespace(text))
+        }
+        
+        var result = AttributedString()
+        var lastEnd = 0
+        let nsString = text as NSString
+        
+        for match in matches {
+            // Add text before the bold tag
+            if match.range.location > lastEnd {
+                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
+                let beforeText = nsString.substring(with: beforeRange)
+                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
+                if !cleanText.isEmpty {
+                    result += AttributedString(cleanText)
+                }
+            }
+            
+            // Process bold content
+            let contentRange = match.range(at: 1)
+            if contentRange.location != NSNotFound {
+                let boldContent = nsString.substring(with: contentRange)
+                let cleanBoldText = stripHTMLTagsAndNormalizeWhitespace(boldContent)
+                if !cleanBoldText.isEmpty {
+                    var boldAttributedString = AttributedString(cleanBoldText)
+                    boldAttributedString.inlinePresentationIntent = .stronglyEmphasized
+                    boldAttributedString.font = .body.bold()
+                    result += boldAttributedString
+                }
+            }
+            
+            lastEnd = NSMaxRange(match.range)
+        }
+        
+        // Add remaining text after last bold tag
+        if lastEnd < nsString.length {
+            let remainingText = nsString.substring(from: lastEnd)
+            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            if !cleanText.isEmpty {
+                result += AttributedString(cleanText)
+            }
+        }
+        
+        return result
+    }
+    
+    /// Processes <i> tags for italic formatting on an AttributedString
+    private static func processItalicTags(_ attributedText: AttributedString) -> AttributedString {
+        let text = String(attributedText.characters)
+        let range = NSRange(location: 0, length: text.utf16.count)
+        let matches = italicRegex.matches(in: text, range: range)
+        
+        guard !matches.isEmpty else {
+            return attributedText
+        }
+        
+        var result = AttributedString()
+        var lastEnd = 0
+        let nsString = text as NSString
+        
+        for match in matches {
+            // Add text before the italic tag
+            if match.range.location > lastEnd {
+                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
+                let beforeText = nsString.substring(with: beforeRange)
+                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
+                if !cleanText.isEmpty {
+                    result += AttributedString(cleanText)
+                }
+            }
+            
+            // Process italic content
+            let contentRange = match.range(at: 1)
+            if contentRange.location != NSNotFound {
+                let italicContent = nsString.substring(with: contentRange)
+                let cleanItalicText = stripHTMLTagsAndNormalizeWhitespace(italicContent)
+                if !cleanItalicText.isEmpty {
+                    var italicAttributedString = AttributedString(cleanItalicText)
+                    italicAttributedString.inlinePresentationIntent = .emphasized
+                    italicAttributedString.font = .body.italic()
+                    result += italicAttributedString
+                }
+            }
+            
+            lastEnd = NSMaxRange(match.range)
+        }
+        
+        // Add remaining text after last italic tag
+        if lastEnd < nsString.length {
+            let remainingText = nsString.substring(from: lastEnd)
+            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            if !cleanText.isEmpty {
+                result += AttributedString(cleanText)
+            }
+        }
+        
+        return result
+    }
+    
     
     /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)
     /// Use this for non-paragraph content where newlines should not be preserved
