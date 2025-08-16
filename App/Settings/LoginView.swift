@@ -7,8 +7,6 @@
 //
 
 import SwiftUI
-import Swinject
-import SwinjectStoryboard
 
 struct LoginView: View {
     @State var isAuthenticated: Bool
@@ -17,13 +15,12 @@ struct LoginView: View {
     @State private var isAuthenticating = false
     @State private var showAlert = false
 
-    private var sessionService: SessionService
+    private let sessionService = SessionService.shared
 
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     init() {
         // can't use @Inject for SessionService here as it runs after init
-        sessionService = SwinjectStoryboard.defaultContainer.resolve(SessionService.self)!
         _isAuthenticated = State(
             initialValue: sessionService.authenticationState == .authenticated
         )
@@ -31,7 +28,7 @@ struct LoginView: View {
 
     @ViewBuilder
     var body: some View {
-        NavigationView {
+        NavigationStack {
             if isAuthenticated == false {
                 VStack {
                     Text("Login to Hacker News")
@@ -60,8 +57,9 @@ struct LoginView: View {
                                 await MainActor.run {
                                     isAuthenticated = true
                                     UINotifications.showSuccess("Logged in as \(username)")
-                                    presentationMode.wrappedValue.dismiss()
-                                    NotificationCenter.default.post(name: Notification.Name.refreshRequired, object: nil)
+                                    dismiss()
+                                    NotificationCenter.default.post(name: Notification.Name.refreshRequired,
+                                                                    object: nil)
                                     isAuthenticating = false
                                 }
                             } catch {
@@ -79,17 +77,18 @@ struct LoginView: View {
                             Alert(
                                 title: Text("Login Failed"),
                                 message:
-                                    Text("Failed logging into Hacker News, check your username or password.")
+                                    Text(
+                                        "Failed logging into Hacker News, check your username or password."
+                                    )
                             )
                         }
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         } label: {
-                            Text("Done")
-                                .bold()
+                            Image(systemName: "xmark")
                         }
                     }
                 }
@@ -111,16 +110,14 @@ struct LoginView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         } label: {
-                            Text("Done")
-                                .bold()
+                            Image(systemName: "xmark")
                         }
                     }
                 }
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

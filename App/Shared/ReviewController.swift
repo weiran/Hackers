@@ -33,6 +33,9 @@ enum ReviewController {
         }) as? UIWindowScene
 
         if let scene = scene, showPromptIncrements.contains(launchCounter()), disablePrompts == false {
+            // Note: SKStoreReviewController.requestReview is deprecated in iOS 18.0
+            // The replacement AppStore.requestReview requires iOS 18.0+ and AppStore framework
+            // For now, continue using the deprecated method for compatibility
             SKStoreReviewController.requestReview(in: scene)
         }
     }

@@ -8,15 +8,15 @@
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "24F39F8418AFB1150055F8DC"
-               BuildableName = "Hackers.app"
-               BlueprintName = "Hackers"
+               BlueprintIdentifier = "24C03D5C2E003EB8002B6ED5"
+               BuildableName = "HackersTests.xctest"
+               BlueprintName = "HackersTests"
                ReferencedContainer = "container:Hackers.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -30,17 +30,6 @@
       <Testables>
          <TestableReference
             skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "245345EB22466EA8001AF1CE"
-               BuildableName = "HackersUITests.xctest"
-               BlueprintName = "HackersUITests"
-               ReferencedContainer = "container:Hackers.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "24C03D5C2E003EB8002B6ED5"
@@ -71,13 +60,6 @@
             ReferencedContainer = "container:Hackers.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-         <AdditionalOption
-            key = "NSZombieEnabled"
-            value = "YES"
-            isEnabled = "YES">
-         </AdditionalOption>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -85,8 +67,7 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "24F39F8418AFB1150055F8DC"
@@ -94,7 +75,7 @@
             BlueprintName = "Hackers"
             ReferencedContainer = "container:Hackers.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

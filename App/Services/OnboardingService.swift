@@ -48,12 +48,8 @@ enum OnboardingService {
     private static func configuration() -> WhatsNewViewController.Configuration {
         let appTheme = AppTheme.default
         let theme = WhatsNewViewController.Theme { theme in
-            theme.backgroundColor = appTheme.backgroundColor
-            theme.titleView.titleColor = appTheme.titleTextColor
             theme.completionButton.backgroundColor = appTheme.appTintColor
             theme.completionButton.titleColor = .white
-            theme.itemsView.titleColor = appTheme.titleTextColor
-            theme.itemsView.subtitleColor = appTheme.textColor
         }
         var configuration = WhatsNewViewController.Configuration(theme: theme)
         configuration.titleView.titleMode = .scrolls
