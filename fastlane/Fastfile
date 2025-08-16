@@ -14,12 +14,20 @@ platform :ios do
     # upload_to_app_store(skip_binary_upload: true, skip_metadata: true)
   end
 
-  desc "Run Tests"
+  desc "Run Unit Tests"
   lane :test do
+    run_tests(
+      project: "Hackers.xcodeproj",
+      scheme: "Hackers",
+      only_testing: ["HackersTests"]
+    )
+  end
+
+  desc "Run UI Tests"
+  lane :uitest do
     reset_simulator_contents
-    scan(
-      scheme: "HackersUITests",
-      derived_data_path: "scan_derived_data" # https://github.com/fastlane/fastlane/issues/15768
+    run_tests(
+      scheme: "HackersUITests"
     )
   end
 
