@@ -65,18 +65,18 @@ enum PostType: String, CaseIterable {
     case active
 }
 
-class Comment: Hashable {
+class Comment: ObservableObject, Hashable {
     let id: Int
     let age: String
     let text: String
     let by: String
     var level: Int
     var upvoteLink: String?
-    var upvoted = false
+    @Published var upvoted = false
     var voteLinks: (upvote: URL?, unvote: URL?)?
 
     // UI properties
-    var visibility = CommentVisibilityType.visible
+    @Published var visibility = CommentVisibilityType.visible
     
     // Parsed HTML content for performance
     var parsedText: AttributedString?

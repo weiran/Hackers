@@ -118,7 +118,15 @@ struct CommentsView: View {
                                     },
                                     onVote: { await handleCommentVote(comment) },
                                     onShare: { shareComment(comment) },
-                                    onCopy: { copyComment(comment) }
+                                    onCopy: { copyComment(comment) },
+                                    onHide: {
+                                        if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
+                                            let rootComment = commentsController.visibleComments[rootIndex]
+                                            toggleCommentVisibility(rootComment) { id in
+                                                proxy.scrollTo(id, anchor: .top)
+                                            }
+                                        }
+                                    }
                                 )
                                 .id("comment-\(comment.id)")
                                 .background(GeometryReader { geometry in
@@ -139,30 +147,6 @@ struct CommentsView: View {
                                         onShare: { shareComment(comment) },
                                         onCopy: { copyComment(comment) }
                                     )
-                                }
-                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                    if UserDefaults.standard.swipeActionsEnabled {
-                                        Button {
-                                            Task { await handleCommentVote(comment) }
-                                        } label: {
-                                            Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
-                                        }
-                                        .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
-                                    }
-                                }
-                                .swipeActions(edge: .trailing) {
-                                    if UserDefaults.standard.swipeActionsEnabled {
-                                        Button {
-                                            if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
-                                                let rootComment = commentsController.visibleComments[rootIndex]
-                                                toggleCommentVisibility(rootComment) { id in
-                                                    proxy.scrollTo(id, anchor: .top)
-                                                }
-                                            }
-                                        } label: {
-                                            Image(systemName: "minus.circle")
-                                        }
-                                    }
                                 }
                                 .authenticationDialog(isPresented: $showingAuthenticationDialog) {
                                     navigationStore.showLogin()
@@ -399,12 +383,13 @@ struct CommentsView: View {
 
 
 struct CommentRowView: View {
-    let comment: Comment
+    @ObservedObject var comment: Comment
     let post: Post
     let onToggle: () -> Void
     let onVote: () async -> Void
     let onShare: () -> Void
     let onCopy: () -> Void
+    let onHide: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -459,6 +444,25 @@ struct CommentRowView: View {
         .onTapGesture {
             onToggle()
         }
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            if UserDefaults.standard.swipeActionsEnabled {
+                Button {
+                    Task { await onVote() }
+                } label: {
+                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                }
+                .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            if UserDefaults.standard.swipeActionsEnabled {
+                Button {
+                    onHide()
+                } label: {
+                    Image(systemName: "minus.circle")
+                }
+            }
+        }
         // fix row height animations with List:
         // https://stackoverflow.com/questions/65612622/swift-ui-list-animation-for-expanding-cells-with-dynamic-heights
         .id(String(comment.id) + String(comment.visibility.rawValue))
@@ -466,7 +470,7 @@ struct CommentRowView: View {
 }
 
 struct CommentContextMenu: View {
-    let comment: Comment
+    @ObservedObject var comment: Comment
     let onVote: () -> Void
     let onShare: () -> Void
     let onCopy: () -> Void
