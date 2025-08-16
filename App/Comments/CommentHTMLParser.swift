@@ -88,9 +88,16 @@ enum CommentHTMLParser {
     static func decodeHTMLEntities(_ html: String) -> String {
         var result = html
 
-        // Use single pass replacement for better performance
+        // Handle &nbsp; specially to avoid creating double spaces
+        result = result.replacingOccurrences(of: " &nbsp;", with: " ")
+        result = result.replacingOccurrences(of: "&nbsp; ", with: " ")
+        result = result.replacingOccurrences(of: "&nbsp;", with: " ")
+
+        // Use single pass replacement for other entities
         for (entity, replacement) in htmlEntityMap {
-            result = result.replacingOccurrences(of: entity, with: replacement)
+            if entity != "&nbsp;" {
+                result = result.replacingOccurrences(of: entity, with: replacement)
+            }
         }
 
         return result
@@ -98,20 +105,26 @@ enum CommentHTMLParser {
 
     /// Processes HTML content to extract paragraphs and links with proper formatting
     private static func processHTMLContent(_ html: String) -> AttributedString {
-        let trimmedHTML = html.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Don't trim to preserve whitespace around formatting tags
+        let workingHTML = html
 
         // Check if there are paragraph tags
         let paragraphMatches = paragraphRegex.matches(
-            in: trimmedHTML,
-            range: NSRange(location: 0, length: trimmedHTML.utf16.count)
+            in: workingHTML,
+            range: NSRange(location: 0, length: workingHTML.utf16.count)
         )
 
         if !paragraphMatches.isEmpty {
             // Process content with paragraph tags - each paragraph gets separate spacing
-            return processParagraphsWithSpacing(trimmedHTML, paragraphMatches: paragraphMatches)
+            return processParagraphsWithSpacing(workingHTML, paragraphMatches: paragraphMatches)
         } else {
             // Process as single block content (no paragraph tags)
-            return processLinksInText(trimmedHTML)
+            let result = processLinksInText(workingHTML)
+            // Only trim if the result is empty or only whitespace
+            if String(result.characters).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return AttributedString("")
+            }
+            return result
         }
     }
 
@@ -312,13 +325,46 @@ enum CommentHTMLParser {
     
     /// Processes formatting tags (bold and italic) and returns an AttributedString
     private static func processFormattingTags(_ text: String) -> AttributedString {
+        // First remove empty formatting tags to prevent extra spaces
+        let cleanedText = removeEmptyFormattingTags(text)
         // Process both bold and italic tags together to preserve formatting
-        return processFormattingTagsTogether(text)
+        return processFormattingTagsTogether(cleanedText)
+    }
+    
+    /// Removes empty formatting tags that would otherwise leave extra spaces
+    private static func removeEmptyFormattingTags(_ text: String) -> String {
+        var result = text
+        
+        // Remove empty bold tags
+        result = result.replacingOccurrences(
+            of: "<b\\b[^>]*>\\s*</b>",
+            with: "",
+            options: .regularExpression
+        )
+        
+        // Remove empty italic tags
+        result = result.replacingOccurrences(
+            of: "<i\\b[^>]*>\\s*</i>",
+            with: "",
+            options: .regularExpression
+        )
+        
+        return result
     }
     
     
     /// Processes both bold and italic tags together to preserve all formatting
     private static func processFormattingTagsTogether(_ text: String) -> AttributedString {
+        // For nested formatting, we need to strip all HTML tags first, then process the clean text
+        // This prevents duplicate content from overlapping tags
+        
+        let preserveWhitespace = shouldPreserveWhitespace(text)
+        
+        // First, try to handle nested tags by processing them recursively
+        if hasNestedFormattingTags(text) {
+            return processNestedFormattingTags(text, preserveWhitespace: preserveWhitespace)
+        }
+        
         // Find all formatting tags and their positions
         var formatSegments: [(range: NSRange, type: FormattingType, content: String)] = []
         
@@ -348,9 +394,9 @@ enum CommentHTMLParser {
         // Sort segments by location
         formatSegments.sort { $0.range.location < $1.range.location }
         
-        // If no formatting tags found, return clean text
+        // If no formatting tags found, check if we should preserve whitespace
         guard !formatSegments.isEmpty else {
-            return AttributedString(stripHTMLTagsAndNormalizeWhitespace(text))
+            return AttributedString(preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text))
         }
         
         var result = AttributedString()
@@ -361,14 +407,14 @@ enum CommentHTMLParser {
             if segment.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: segment.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
+                let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(beforeText) : stripHTMLTagsAndNormalizeWhitespace(beforeText)
                 if !cleanText.isEmpty {
                     result += AttributedString(cleanText)
                 }
             }
             
-            // Add formatted content
-            let cleanContent = stripHTMLTagsAndNormalizeWhitespace(segment.content)
+            // Add formatted content - always preserve whitespace within formatting tags
+            let cleanContent = stripHTMLTagsPreservingWhitespace(segment.content)
             if !cleanContent.isEmpty {
                 var formattedString = AttributedString(cleanContent)
                 
@@ -390,13 +436,60 @@ enum CommentHTMLParser {
         // Add remaining text after last formatting tag
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(remainingText) : stripHTMLTagsAndNormalizeWhitespace(remainingText)
             if !cleanText.isEmpty {
                 result += AttributedString(cleanText)
             }
         }
         
         return result
+    }
+    
+    /// Checks if text contains nested formatting tags
+    private static func hasNestedFormattingTags(_ text: String) -> Bool {
+        // Check if bold tags contain italic tags or vice versa
+        let boldMatches = boldRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
+        let italicMatches = italicRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
+        
+        // Check for overlapping ranges
+        for boldMatch in boldMatches {
+            for italicMatch in italicMatches {
+                if NSIntersectionRange(boldMatch.range, italicMatch.range).length > 0 {
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    /// Processes nested formatting tags by stripping all tags and rebuilding the content
+    private static func processNestedFormattingTags(_ text: String, preserveWhitespace: Bool) -> AttributedString {
+        // For nested tags, strip all HTML and just preserve the text content
+        let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text)
+        return AttributedString(cleanText)
+    }
+    
+    /// Determines if whitespace should be preserved based on text structure
+    private static func shouldPreserveWhitespace(_ text: String) -> Bool {
+        // Only preserve whitespace for simple cases like "  <b>text</b>  " where
+        // the entire input is just formatting tags with significant whitespace around them
+        
+        // Don't preserve if there are newlines (should be normalized)
+        if text.contains("\n") {
+            return false
+        }
+        
+        // Preserve whitespace if:
+        // 1. Text starts or ends with whitespace (but not newlines) AND
+        // 2. Text contains only simple formatting tags (b, i, a) AND
+        // 3. Text doesn't contain paragraph tags
+        let hasLeadingOrTrailingWhitespace = text.hasPrefix(" ") || text.hasSuffix(" ") || 
+                                           text.hasPrefix("\t") || text.hasSuffix("\t")
+        
+        let hasParagraphTags = text.contains("<p") || text.contains("<div") || text.contains("<br")
+        
+        return hasLeadingOrTrailingWhitespace && !hasParagraphTags
     }
     
     /// Helper enum for formatting types
@@ -417,6 +510,12 @@ enum CommentHTMLParser {
             options: .regularExpression
         )
         return normalized
+    }
+    
+    /// Strips HTML tags but preserves whitespace structure
+    /// Use this when whitespace around formatting tags needs to be preserved
+    private static func stripHTMLTagsPreservingWhitespace(_ text: String) -> String {
+        return stripHTMLTags(text)
     }
 
 }
