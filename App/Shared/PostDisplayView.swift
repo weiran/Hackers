@@ -61,9 +61,21 @@ struct PostDisplayView: View {
                     // Metadata row
                     HStack(spacing: 3) {
                         if showVoteButton {
-                            Button {
-                                Task { await onVote?() }
-                            } label: {
+                            // Only show vote button if we can actually vote/unvote
+                            if !post.upvoted || post.voteLinks?.unvote != nil {
+                                Button {
+                                    Task { await onVote?() }
+                                } label: {
+                                    HStack(spacing: 0) {
+                                        Text("\(post.score)")
+                                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                        Image(systemName: "arrow.up")
+                                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                            .font(.caption2)
+                                    }
+                                }
+                            } else {
+                                // Show non-interactive vote display when upvoted but no unvote link
                                 HStack(spacing: 0) {
                                     Text("\(post.score)")
                                         .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
@@ -132,11 +144,21 @@ struct PostContextMenu: View {
 
     var body: some View {
         Group {
-            Button {
-                onVote()
-            } label: {
-                Label(post.upvoted ? "Unvote" : "Upvote",
-                      systemImage: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+            if post.upvoted {
+                // Only show unvote if unvote link is available
+                if post.voteLinks?.unvote != nil {
+                    Button {
+                        onVote()
+                    } label: {
+                        Label("Unvote", systemImage: "arrow.uturn.down")
+                    }
+                }
+            } else {
+                Button {
+                    onVote()
+                } label: {
+                    Label("Upvote", systemImage: "arrow.up")
+                }
             }
 
             Divider()

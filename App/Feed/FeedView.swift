@@ -253,12 +253,25 @@ struct PostRowView: View {
         }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
             if UserDefaults.standard.swipeActionsEnabled {
-                Button {
-                    onVote?(post)
-                } label: {
-                    Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+                if post.upvoted {
+                    // Only show unvote if unvote link is available
+                    if post.voteLinks?.unvote != nil {
+                        Button {
+                            onVote?(post)
+                        } label: {
+                            Image(systemName: "arrow.uturn.down")
+                        }
+                        .tint(.secondary)
+                    }
+                } else {
+                    // Show upvote button
+                    Button {
+                        onVote?(post)
+                    } label: {
+                        Image(systemName: "arrow.up")
+                    }
+                    .tint(Color(UIColor(named: "upvotedColor")!))
                 }
-                .tint(post.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
             }
         }
     }
