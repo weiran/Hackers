@@ -33,7 +33,11 @@ enum CommentHTMLParser {
 
     private static let htmlTagRegex: NSRegularExpression = {
         do {
-            return try NSRegularExpression(pattern: "<[^>]+>", options: [])
+            // More specific regex that matches actual HTML tags:
+            // - Opening tags: <tagname> or <tagname attributes>
+            // - Closing tags: </tagname>
+            // - Self-closing tags: <tagname/> or <tagname attributes/>
+            return try NSRegularExpression(pattern: "</?[a-zA-Z][a-zA-Z0-9]*[^<>]*>", options: [])
         } catch {
             fatalError("Invalid regex pattern: \(error)")
         }
