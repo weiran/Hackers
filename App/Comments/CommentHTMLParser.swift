@@ -308,28 +308,54 @@ enum CommentHTMLParser {
     
     /// Processes formatting tags (bold and italic) and returns an AttributedString
     private static func processFormattingTags(_ text: String) -> AttributedString {
-        // Process bold tags first, then italic tags
-        let boldProcessed = processBoldTags(text)
-        return processItalicTags(boldProcessed)
+        // Process both bold and italic tags together to preserve formatting
+        return processFormattingTagsTogether(text)
     }
     
-    /// Processes <b> tags for bold formatting
-    private static func processBoldTags(_ text: String) -> AttributedString {
-        let range = NSRange(location: 0, length: text.utf16.count)
-        let matches = boldRegex.matches(in: text, range: range)
+    
+    /// Processes both bold and italic tags together to preserve all formatting
+    private static func processFormattingTagsTogether(_ text: String) -> AttributedString {
+        // Find all formatting tags and their positions
+        var formatSegments: [(range: NSRange, type: FormattingType, content: String)] = []
         
-        guard !matches.isEmpty else {
+        let nsString = text as NSString
+        let fullRange = NSRange(location: 0, length: text.utf16.count)
+        
+        // Find bold tags
+        let boldMatches = boldRegex.matches(in: text, range: fullRange)
+        for match in boldMatches {
+            let contentRange = match.range(at: 1)
+            if contentRange.location != NSNotFound {
+                let content = nsString.substring(with: contentRange)
+                formatSegments.append((range: match.range, type: .bold, content: content))
+            }
+        }
+        
+        // Find italic tags
+        let italicMatches = italicRegex.matches(in: text, range: fullRange)
+        for match in italicMatches {
+            let contentRange = match.range(at: 1)
+            if contentRange.location != NSNotFound {
+                let content = nsString.substring(with: contentRange)
+                formatSegments.append((range: match.range, type: .italic, content: content))
+            }
+        }
+        
+        // Sort segments by location
+        formatSegments.sort { $0.range.location < $1.range.location }
+        
+        // If no formatting tags found, return clean text
+        guard !formatSegments.isEmpty else {
             return AttributedString(stripHTMLTagsAndNormalizeWhitespace(text))
         }
         
         var result = AttributedString()
         var lastEnd = 0
-        let nsString = text as NSString
         
-        for match in matches {
-            // Add text before the bold tag
-            if match.range.location > lastEnd {
-                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
+        for segment in formatSegments {
+            // Add text before the formatting tag
+            if segment.range.location > lastEnd {
+                let beforeRange = NSRange(location: lastEnd, length: segment.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
                 let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
                 if !cleanText.isEmpty {
@@ -337,23 +363,27 @@ enum CommentHTMLParser {
                 }
             }
             
-            // Process bold content
-            let contentRange = match.range(at: 1)
-            if contentRange.location != NSNotFound {
-                let boldContent = nsString.substring(with: contentRange)
-                let cleanBoldText = stripHTMLTagsAndNormalizeWhitespace(boldContent)
-                if !cleanBoldText.isEmpty {
-                    var boldAttributedString = AttributedString(cleanBoldText)
-                    boldAttributedString.inlinePresentationIntent = .stronglyEmphasized
-                    boldAttributedString.font = .body.bold()
-                    result += boldAttributedString
+            // Add formatted content
+            let cleanContent = stripHTMLTagsAndNormalizeWhitespace(segment.content)
+            if !cleanContent.isEmpty {
+                var formattedString = AttributedString(cleanContent)
+                
+                switch segment.type {
+                case .bold:
+                    formattedString.inlinePresentationIntent = .stronglyEmphasized
+                    formattedString.font = .body.bold()
+                case .italic:
+                    formattedString.inlinePresentationIntent = .emphasized
+                    formattedString.font = .body.italic()
                 }
+                
+                result += formattedString
             }
             
-            lastEnd = NSMaxRange(match.range)
+            lastEnd = NSMaxRange(segment.range)
         }
         
-        // Add remaining text after last bold tag
+        // Add remaining text after last formatting tag
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
             let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
@@ -365,57 +395,10 @@ enum CommentHTMLParser {
         return result
     }
     
-    /// Processes <i> tags for italic formatting on an AttributedString
-    private static func processItalicTags(_ attributedText: AttributedString) -> AttributedString {
-        let text = String(attributedText.characters)
-        let range = NSRange(location: 0, length: text.utf16.count)
-        let matches = italicRegex.matches(in: text, range: range)
-        
-        guard !matches.isEmpty else {
-            return attributedText
-        }
-        
-        var result = AttributedString()
-        var lastEnd = 0
-        let nsString = text as NSString
-        
-        for match in matches {
-            // Add text before the italic tag
-            if match.range.location > lastEnd {
-                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
-                let beforeText = nsString.substring(with: beforeRange)
-                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
-                if !cleanText.isEmpty {
-                    result += AttributedString(cleanText)
-                }
-            }
-            
-            // Process italic content
-            let contentRange = match.range(at: 1)
-            if contentRange.location != NSNotFound {
-                let italicContent = nsString.substring(with: contentRange)
-                let cleanItalicText = stripHTMLTagsAndNormalizeWhitespace(italicContent)
-                if !cleanItalicText.isEmpty {
-                    var italicAttributedString = AttributedString(cleanItalicText)
-                    italicAttributedString.inlinePresentationIntent = .emphasized
-                    italicAttributedString.font = .body.italic()
-                    result += italicAttributedString
-                }
-            }
-            
-            lastEnd = NSMaxRange(match.range)
-        }
-        
-        // Add remaining text after last italic tag
-        if lastEnd < nsString.length {
-            let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
-            if !cleanText.isEmpty {
-                result += AttributedString(cleanText)
-            }
-        }
-        
-        return result
+    /// Helper enum for formatting types
+    private enum FormattingType {
+        case bold
+        case italic
     }
     
     
