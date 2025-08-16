@@ -16,19 +16,19 @@ platform :ios do
 
   desc "Run Unit Tests"
   lane :test do
-    run_tests(
+    xcodebuild(
+      xcargs: "test",
       project: "Hackers.xcodeproj",
-      scheme: "Hackers",
-      only_testing: ["HackersTests"]
+      scheme: "HackersTests",
+      destination: "platform=iOS Simulator,name=iPhone 16 Pro"
     )
+    # run_tests(scheme: "HackersTests") - run_tests doesn't print output to console
   end
 
   desc "Run UI Tests"
   lane :uitest do
     reset_simulator_contents
-    run_tests(
-      scheme: "HackersUITests"
-    )
+    run_tests(scheme: "HackersUITests")
   end
 
   desc "Build"
