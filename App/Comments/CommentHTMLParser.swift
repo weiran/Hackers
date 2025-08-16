@@ -412,7 +412,7 @@ enum CommentHTMLParser {
             with: " ", 
             options: .regularExpression
         )
-        return normalized.trimmingCharacters(in: .whitespacesAndNewlines)
+        return normalized
     }
 
 }
