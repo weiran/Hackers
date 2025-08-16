@@ -195,7 +195,7 @@ struct FeedView: View {
             return
         }
 
-        LinkOpener.openURL(post.url, with: post)
+        LinkOpener.openURL(post.url, with: post, showCommentsButton: true)
     }
 
     private func sharePost(_ post: Post) {

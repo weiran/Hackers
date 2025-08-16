@@ -10,7 +10,7 @@ import UIKit
 import SafariServices
 
 struct LinkOpener {
-    static func openURL(_ url: URL, with post: Post? = nil) {
+    static func openURL(_ url: URL, with post: Post? = nil, showCommentsButton: Bool = false) {
         guard !url.absoluteString.starts(with: "item?id=") else { return }
 
         if UserDefaults.standard.openInDefaultBrowser {
@@ -22,7 +22,7 @@ struct LinkOpener {
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let rootVC = windowScene.windows.first?.rootViewController {
                     rootVC.present(svc, animated: true) {
-                        if let post = post {
+                        if let post = post, showCommentsButton {
                             CommentsButton.attachTo(svc, with: post)
                         }
                     }
