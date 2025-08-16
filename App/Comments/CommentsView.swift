@@ -46,11 +46,12 @@ struct CommentsView: View {
                 // Comments section
                 ScrollViewReader { proxy in
                     List {
-                        PostHeaderView(
+                        PostDisplayView(
                             post: currentPost,
+                            showVoteButton: true,
+                            showPostText: true,
                             onVote: { await handlePostVote() },
-                            onLinkTap: { handleLinkTap() },
-                            onShare: { showingPostShareOptions = true }
+                            onLinkTap: { handleLinkTap() }
                         )
                         .padding()
                         .id("header")
@@ -65,6 +66,24 @@ struct CommentsView: View {
                                 // Show title when header scrolls above navigation bar (approximately)
                                 showTitle = offset < 50
                             }
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            if UserDefaults.standard.swipeActionsEnabled {
+                                Button {
+                                    Task { await handlePostVote() }
+                                } label: {
+                                    Image(systemName: currentPost.upvoted ? "arrow.uturn.down" : "arrow.up")
+                                }
+                                .tint(currentPost.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                            }
+                        }
+                        .contextMenu {
+                            PostContextMenu(
+                                post: currentPost,
+                                onVote: { Task { await handlePostVote() } },
+                                onOpenLink: { handleLinkTap() },
+                                onShare: { showingPostShareOptions = true }
+                            )
                         }
                         .plainListRow()
 
@@ -378,80 +397,6 @@ struct CommentsView: View {
     }
 }
 
-struct PostHeaderView: View {
-    let post: Post
-    let onVote: () async -> Void
-    let onLinkTap: () -> Void
-    let onShare: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                // Thumbnail with proper loading
-                ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                    .frame(width: 55, height: 55)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    // Title
-                    Text(post.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    // Metadata row
-                    HStack(spacing: 3) {
-                        Button {
-                            Task { await onVote() }
-                        } label: {
-                            HStack(spacing: 0) {
-                                Text("\(post.score)")
-                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                                Image(systemName: "arrow.up")
-                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                                    .font(.caption2)
-                            }
-                        }
-
-                        Text("•")
-                            .foregroundColor(.secondary)
-
-                        HStack(spacing: 0) {
-                            Text("\(post.commentsCount)")
-                                .foregroundColor(.secondary)
-                            Image(systemName: "message")
-                                .foregroundColor(.secondary)
-                                .font(.caption2)
-                        }
-
-                        if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
-                            Text("•")
-                                .foregroundColor(.secondary)
-                            Text(host)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                    }
-                    .font(.subheadline)
-                }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                onLinkTap()
-            }
-
-            if let text = post.text,
-               !text.isEmpty {
-               let parsedText = CommentHTMLParser.parseHTMLText(text)
-                Text(parsedText)
-                    .foregroundColor(.primary)
-                    .padding(.top, 4)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
 
 struct CommentRowView: View {
     let comment: Comment
@@ -613,3 +558,4 @@ extension View {
         modifier(PlainListRowStyle())
     }
 }
+

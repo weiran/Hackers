@@ -71,15 +71,15 @@ struct FeedView: View {
                         .contextMenu {
                             PostContextMenu(
                                 post: post,
-                                onVote: { post in
+                                onVote: {
                                     Task {
                                         await handleVote(post: post)
                                     }
                                 },
-                                onOpenLink: { post in
+                                onOpenLink: {
                                     handleLinkTap(post: post)
                                 },
-                                onShare: { post in
+                                onShare: {
                                     sharePost(post)
                                 }
                             )
@@ -264,91 +264,15 @@ struct PostRowView: View {
     }
 
     private var postContent: some View {
-        HStack(spacing: 12) {
-            // Thumbnail with proper loading - tapping opens URL
-            ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
-                .frame(width: 55, height: 55)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    onLinkTap?(post)
-                }
-
-            VStack(alignment: .leading, spacing: 4) {
-                // Title
-                Text(post.title)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.leading)
-
-                // Metadata row
-                HStack(spacing: 3) {
-                    HStack(spacing: 0) {
-                        Text("\(post.score)")
-                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                        Image(systemName: "arrow.up")
-                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
-                            .font(.caption2)
-                    }
-
-                    Text("•")
-                        .foregroundColor(.secondary)
-
-                    HStack(spacing: 0) {
-                        Text("\(post.commentsCount)")
-                            .foregroundColor(.secondary)
-                        Image(systemName: "message")
-                            .foregroundColor(.secondary)
-                            .font(.caption2)
-                    }
-
-                    if let host = post.url.host, !post.url.absoluteString.starts(with: "item?id=") {
-                        Text("•")
-                            .foregroundColor(.secondary)
-                        Text(host)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                .font(.subheadline)
-            }
-        }
+        PostDisplayView(
+            post: post,
+            showVoteButton: false,
+            showPostText: false,
+            onLinkTap: { onLinkTap?(post) }
+        )
     }
 }
 
-struct PostContextMenu: View {
-    let post: Post
-    let onVote: (Post) -> Void
-    let onOpenLink: (Post) -> Void
-    let onShare: (Post) -> Void
-
-    var body: some View {
-        Group {
-            Button {
-                onVote(post)
-            } label: {
-                Label(post.upvoted ? "Unvote" : "Upvote",
-                      systemImage: post.upvoted ? "arrow.uturn.down" : "arrow.up")
-            }
-
-            Divider()
-
-            if !post.url.absoluteString.starts(with: "item?id=") {
-                Button {
-                    onOpenLink(post)
-                } label: {
-                    Label("Open Link", systemImage: "safari")
-                }
-            }
-
-            Button {
-                onShare(post)
-            } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
-        }
-    }
-}
 
 // SwiftUI-compatible FeedViewModel
 class SwiftUIFeedViewModel: ObservableObject {
@@ -406,41 +330,6 @@ class SwiftUIFeedViewModel: ObservableObject {
     }
 }
 
-struct ThumbnailView: View {
-    let url: URL?
-
-    private func thumbnailURL(for url: URL) -> URL? {
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "hackers-thumbnails.weiranzhang.com"
-        components.path = "/api/FetchThumbnail"
-        let urlString = url.absoluteString
-        components.queryItems = [URLQueryItem(name: "url", value: urlString)]
-        return components.url
-    }
-
-    private var placeholderImage: some View {
-        Image(systemName: "safari")
-            .font(.title2)
-            .foregroundColor(.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.secondary.opacity(0.1))
-    }
-
-    var body: some View {
-        if let url = url, let thumbnailURL = thumbnailURL(for: url) {
-            AsyncImage(url: thumbnailURL) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                placeholderImage
-            }
-        } else {
-            placeholderImage
-        }
-    }
-}
 
 extension PostType {
     var displayName: String {
