@@ -23,7 +23,7 @@ struct LinkOpener {
                    let rootVC = windowScene.windows.first?.rootViewController {
                     rootVC.present(svc, animated: true) {
                         if let post = post {
-                            DraggableCommentsButton.attachTo(svc, with: post)
+                            CommentsButton.attachTo(svc, with: post)
                         }
                     }
                 }
