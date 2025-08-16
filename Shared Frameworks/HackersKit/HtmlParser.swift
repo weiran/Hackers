@@ -31,15 +31,37 @@ enum HtmlParser {
         }
     }
 
-    static func voteLinks(from elements: Elements) throws -> (upvote: URL?, unvote: URL?) {
-        let voteLinkElements = try elements.select(".votelinks a")
+    static func voteLinks(from elements: Elements) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) {
+        let voteLinkElements = try elements.select("a")
         let upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
-        let unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
+        
+        // Look for unvote link by ID first, then by text content
+        var unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
+        if unvoteLink == nil {
+            unvoteLink = try voteLinkElements.first { try $0.text().lowercased() == "unvote" }
+        }
 
         let upvoteURL = try upvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
         let unvoteURL = try unvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
 
-        return (upvote: upvoteURL, unvote: unvoteURL)
+        // Determine if the item is upvoted based on:
+        // 1. Presence of unvote link (by ID or text)
+        // 2. Presence of upvote link with "nosee" class
+        var upvoted = false
+        
+        // Check for unvote link (indicates already upvoted)
+        let hasUnvote = unvoteLink != nil
+        
+        // Check for upvote link with "nosee" class (also indicates already upvoted)
+        var hasUpvoteWithNosee = false
+        if let upvoteElement = upvoteLink {
+            let hasNosee = (try? upvoteElement.classNames().contains("nosee")) ?? false
+            hasUpvoteWithNosee = hasNosee
+        }
+        
+        upvoted = hasUnvote || hasUpvoteWithNosee
+
+        return (upvote: upvoteURL, unvote: unvoteURL, upvoted: upvoted)
     }
 
     static func post(from elements: Elements, type: PostType) throws -> Post {
@@ -65,15 +87,9 @@ enum HtmlParser {
         let age = try metadataElement.select(".age").text()
         let commentsCount = try self.commentsCount(from: metadataElement)
 
-        var upvoted = false
-        let voteLinks = try self.voteLinks(from: postElement.select(".votelinks"))
-        if let voteLink = try? postElement.select(".votelinks a").first(where: { $0.hasAttr("id") }) {
-            let hasUnvote = try voteLink.attr("id").starts(with: "un_")
-            let hasUpvote = try voteLink.attr("id").starts(with: "up_")
-            let hasNosee = try voteLink.classNames().contains("nosee")
-
-            upvoted = hasUnvote || (hasUpvote && hasNosee)
-        }
+        let voteLinksResult = try self.voteLinks(from: postElement.select(".votelinks"))
+        let voteLinks = (upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+        let upvoted = voteLinksResult.upvoted
 
         let post = Post(
             id: id,
@@ -124,12 +140,9 @@ enum HtmlParser {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse comment indent width")
         }
         let level = indentWidth / 40
-        let voteLinks = try self.voteLinks(from: element.select(".votelinks"))
-        var upvoted = false
-        if let voteLinkElements = try? element.select(".votelinks a").filter({ $0.hasAttr("id") }) {
-            let hasUnvote = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") } != nil
-            upvoted = hasUnvote
-        }
+        let voteLinksResult = try self.voteLinks(from: element.getAllElements())
+        let voteLinks = (upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+        let upvoted = voteLinksResult.upvoted
 
         let comment = Comment(id: id, age: age, text: text, by: user, level: level, upvoted: upvoted)
         comment.voteLinks = voteLinks
