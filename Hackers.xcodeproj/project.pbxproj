@@ -87,6 +87,8 @@
 		241E7A542E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				HackersTests/CommentHTMLParserTests.swift,
+				HackersTests/CommentHTMLParserWhitespaceTests.swift,
 				HackersTests/HackersTests.swift,
 			);
 			target = 24C03D5C2E003EB8002B6ED5 /* HackersTests */;
