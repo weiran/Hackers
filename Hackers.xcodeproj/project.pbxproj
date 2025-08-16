@@ -89,7 +89,6 @@
 			membershipExceptions = (
 				HackersTests/CommentHTMLParserTests.swift,
 				HackersTests/CommentHTMLParserWhitespaceTests.swift,
-				HackersTests/HackersTests.swift,
 			);
 			target = 24C03D5C2E003EB8002B6ED5 /* HackersTests */;
 		};
