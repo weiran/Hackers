@@ -247,6 +247,52 @@ struct CommentHTMLParserTests {
         #expect(resultString.contains("after"), "Text after empty paragraph should be preserved")
     }
 
+    // MARK: - Newline Handling Tests
+
+    @Test("Newline handling - text with newlines but no paragraphs")
+    func testNewlineHandlingWithoutParagraphs() {
+        let input = "Line one\nLine two\nLine three"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Line one Line two Line three", "Newlines should be converted to spaces when no paragraph tags are present")
+    }
+
+    @Test("Newline handling - links with newlines")
+    func testNewlineHandlingInLinks() {
+        let input = "Check out <a href=\"https://example.com\">this\nlink\ntext</a> here"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Check out this link text here", "Newlines in link text should be converted to spaces")
+    }
+
+    @Test("Newline handling - text before and after links")
+    func testNewlineHandlingAroundLinks() {
+        let input = "Text\nwith\nnewlines <a href=\"https://example.com\">link</a> more\ntext\nhere"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "Text with newlines link more text here", "Newlines around links should be converted to spaces")
+    }
+
+    @Test("Newline handling - only paragraphs should create newlines")
+    func testOnlyParagraphsCreateNewlines() {
+        let input = "Text\nbefore\n<p>Paragraph\ncontent\nhere</p>\nText\nafter"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("Text before"), "Text before paragraph should normalize newlines")
+        #expect(resultString.contains("Text after"), "Text after paragraph should normalize newlines")
+        #expect(resultString.contains("\n\n"), "Only paragraph spacing should create newlines")
+        // The paragraph content itself may preserve some formatting, but the spacing around it should be normalized
+    }
+
+    @Test("Newline handling - complex HTML with multiple elements")
+    func testComplexHTMLNewlineHandling() {
+        let input = "Start\ntext\n<div>Some\ndiv\ncontent</div>\nMiddle\ntext\n<span>span\ncontent</span>\nEnd\ntext"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        let expected = "Start text Some div content Middle text span content End text"
+        #expect(resultString == expected, "All newlines should be normalized to spaces when no paragraph tags are present")
+    }
+
     // MARK: - String Extension Tests
 
     @Test("String extension - strippingHTML")

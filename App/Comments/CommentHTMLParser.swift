@@ -175,8 +175,8 @@ enum CommentHTMLParser {
         let range = NSRange(location: 0, length: text.utf16.count)
         let matches = linkRegex.matches(in: text, range: range)
         guard !matches.isEmpty else {
-            // No links found
-            return AttributedString(stripHTMLTags(text))
+            // No links found - normalize whitespace for non-paragraph content
+            return AttributedString(stripHTMLTagsAndNormalizeWhitespace(text))
         }
 
         var lastEnd = 0
@@ -186,8 +186,10 @@ enum CommentHTMLParser {
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let cleanText = stripHTMLTags(beforeText)
-                result += AttributedString(cleanText)
+                let cleanText = stripHTMLTagsAndNormalizeWhitespace(beforeText)
+                if !cleanText.isEmpty {
+                    result += AttributedString(cleanText)
+                }
             }
 
             // Extract and process link
@@ -201,8 +203,10 @@ enum CommentHTMLParser {
         // Add remaining text after last link
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = stripHTMLTags(remainingText)
-            result += AttributedString(cleanText)
+            let cleanText = stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            if !cleanText.isEmpty {
+                result += AttributedString(cleanText)
+            }
         }
 
         return result
@@ -237,9 +241,9 @@ enum CommentHTMLParser {
 
         let urlString = nsString.substring(with: urlRange)
         let linkText = nsString.substring(with: textRange)
-        let cleanLinkText = stripHTMLTags(linkText)
+        let cleanLinkText = stripHTMLTagsAndNormalizeWhitespace(linkText)
 
-        guard !cleanLinkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        guard !cleanLinkText.isEmpty else { return nil }
 
         var linkAttributedString = AttributedString(cleanLinkText)
 
@@ -256,6 +260,19 @@ enum CommentHTMLParser {
     static func stripHTMLTags(_ text: String) -> String {
         let range = NSRange(location: 0, length: text.utf16.count)
         return htmlTagRegex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
+    }
+    
+    /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)
+    /// Use this for non-paragraph content where newlines should not be preserved
+    private static func stripHTMLTagsAndNormalizeWhitespace(_ text: String) -> String {
+        let tagsRemoved = stripHTMLTags(text)
+        // Replace any sequence of whitespace characters (including newlines) with single spaces
+        let normalized = tagsRemoved.replacingOccurrences(
+            of: "\\s+", 
+            with: " ", 
+            options: .regularExpression
+        )
+        return normalized.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
 }
