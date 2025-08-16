@@ -26,6 +26,7 @@ struct CommentsView: View {
     @State private var refreshTrigger = false // Used to force SwiftUI updates
     @State private var showTitle = false
     @State private var headerHeight: CGFloat = 0
+    @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @Environment(\.dismiss) private var dismiss
 
     init(post: Post) {
@@ -49,75 +50,95 @@ struct CommentsView: View {
                 } else if comments.isEmpty {
                     EmptyStateView("No comments yet")
                 } else {
-                    List {
-                        PostHeaderView(
-                            post: currentPost,
-                            onVote: { await handlePostVote() },
-                            onLinkTap: { handleLinkTap() },
-                            onShare: { showingPostShareOptions = true }
-                        )
-                        .id("header")
-                        .background(GeometryReader { geometry in
-                            Color.clear.preference(
-                                key: ViewOffsetKey.self,
-                                value: geometry.frame(in: .global).minY
-                            )
-                        })
-                        .onPreferenceChange(ViewOffsetKey.self) { offset in
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                // Show title when header scrolls above navigation bar (approximately)
-                                showTitle = offset < 50
-                            }
-                        }
-
-                        ForEach(visibleComments, id: \.id) { comment in
-                            CommentRowView(
-                                comment: comment,
+                    ScrollViewReader { proxy in
+                        List {
+                            PostHeaderView(
                                 post: currentPost,
-                                onToggle: { toggleCommentVisibility(comment) },
-                                onVote: { await handleCommentVote(comment) },
-                                onShare: { shareComment(comment) },
-                                onCopy: { copyComment(comment) }
+                                onVote: { await handlePostVote() },
+                                onLinkTap: { handleLinkTap() },
+                                onShare: { showingPostShareOptions = true }
                             )
-                            .contextMenu {
-                                CommentContextMenu(
+                            .id("header")
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(
+                                    key: ViewOffsetKey.self,
+                                    value: geometry.frame(in: .global).minY
+                                )
+                            })
+                            .onPreferenceChange(ViewOffsetKey.self) { offset in
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    // Show title when header scrolls above navigation bar (approximately)
+                                    showTitle = offset < 50
+                                }
+                            }
+
+                            ForEach(visibleComments, id: \.id) { comment in
+                                CommentRowView(
                                     comment: comment,
-                                    onVote: { Task { await handleCommentVote(comment) } },
+                                    post: currentPost,
+                                    onToggle: { 
+                                        toggleCommentVisibility(comment) { id in
+                                            proxy.scrollTo(id, anchor: .top)
+                                        }
+                                    },
+                                    onVote: { await handleCommentVote(comment) },
                                     onShare: { shareComment(comment) },
                                     onCopy: { copyComment(comment) }
                                 )
-                            }
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                if UserDefaults.standard.swipeActionsEnabled {
-                                    Button {
-                                        Task { await handleCommentVote(comment) }
-                                    } label: {
-                                        Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                                .id("comment-\(comment.id)")
+                                .background(GeometryReader { geometry in
+                                    Color.clear.preference(
+                                        key: CommentPositionKey.self,
+                                        value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global))
+                                    )
+                                })
+                                .onPreferenceChange(CommentPositionKey.self) { position in
+                                    if let position = position {
+                                        visibleCommentPositions[position.id] = position.frame
                                     }
-                                    .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
                                 }
-                            }
-                            .swipeActions(edge: .trailing) {
-                                if UserDefaults.standard.swipeActionsEnabled {
-                                    Button {
-                                        if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
-                                            let rootComment = commentsController.visibleComments[rootIndex]
-                                            toggleCommentVisibility(rootComment)
+                                .contextMenu {
+                                    CommentContextMenu(
+                                        comment: comment,
+                                        onVote: { Task { await handleCommentVote(comment) } },
+                                        onShare: { shareComment(comment) },
+                                        onCopy: { copyComment(comment) }
+                                    )
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                    if UserDefaults.standard.swipeActionsEnabled {
+                                        Button {
+                                            Task { await handleCommentVote(comment) }
+                                        } label: {
+                                            Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                                         }
-                                    } label: {
-                                        Image(systemName: "minus.circle")
+                                        .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
                                     }
                                 }
+                                .swipeActions(edge: .trailing) {
+                                    if UserDefaults.standard.swipeActionsEnabled {
+                                        Button {
+                                            if let rootIndex = commentsController.indexOfVisibleRootComment(of: comment) {
+                                                let rootComment = commentsController.visibleComments[rootIndex]
+                                                toggleCommentVisibility(rootComment) { id in
+                                                    proxy.scrollTo(id, anchor: .top)
+                                                }
+                                            }
+                                        } label: {
+                                            Image(systemName: "minus.circle")
+                                        }
+                                    }
+                                }
+                                .authenticationDialog(isPresented: $showingAuthenticationDialog) {
+                                    navigationStore.showLogin()
+                                }
                             }
-                            .authenticationDialog(isPresented: $showingAuthenticationDialog) {
-                                navigationStore.showLogin()
-                            }
+                            .listRowInsets(EdgeInsets()) // Remove default insets
+                            .listRowBackground(Color.clear) // Remove background
+                            .listRowSeparator(.hidden) // Hide separators
                         }
-                        .listRowInsets(EdgeInsets()) // Remove default insets
-                        .listRowBackground(Color.clear) // Remove background
-                        .listRowSeparator(.hidden) // Hide separators
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                 }
             }
             .toolbar {
@@ -215,12 +236,43 @@ struct CommentsView: View {
         isLoading = false
     }
 
-    private func toggleCommentVisibility(_ comment: Comment) {
+    private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
         withAnimation(.easeInOut(duration: 0.3)) {
-            _ = commentsController.toggleChildrenVisibility(of: comment)
+            let (_, newVisibility) = commentsController.toggleChildrenVisibility(of: comment)
             // Force SwiftUI to re-evaluate visibleComments
             refreshTrigger.toggle()
+            
+            // Only scroll when collapsing comments (newVisibility == .hidden means children were hidden)
+            if newVisibility == .hidden {
+                // Check if the comment is currently visible on screen
+                let isCommentVisible = isCommentVisibleOnScreen(comment)
+                
+                // Only scroll if the comment is not visible
+                if !isCommentVisible {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        scrollTo("comment-\(comment.id)")
+                    }
+                }
+            }
         }
+    }
+    
+    private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
+        guard let commentFrame = visibleCommentPositions[comment.id] else {
+            return false
+        }
+        
+        // Get the screen bounds
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return false
+        }
+        
+        let screenBounds = window.bounds
+        
+        // Check if the top of the comment is within the visible screen area
+        // We only consider it visible if the top edge is on screen
+        return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
     }
 
     @MainActor
@@ -516,5 +568,18 @@ struct HeaderHeightKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
+    }
+}
+
+struct CommentPosition: Equatable {
+    let id: Int
+    let frame: CGRect
+}
+
+struct CommentPositionKey: PreferenceKey {
+    typealias Value = CommentPosition?
+    static var defaultValue: CommentPosition? = nil
+    static func reduce(value: inout CommentPosition?, nextValue: () -> CommentPosition?) {
+        value = nextValue() ?? value
     }
 }
