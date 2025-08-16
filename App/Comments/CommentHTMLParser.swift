@@ -77,13 +77,13 @@ enum CommentHTMLParser {
     /// Processes HTML content to extract paragraphs and links with proper formatting
     private static func processHTMLContent(_ html: String) -> AttributedString {
         let trimmedHTML = html.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         // Check if there are paragraph tags
         let paragraphMatches = paragraphRegex.matches(
             in: trimmedHTML,
             range: NSRange(location: 0, length: trimmedHTML.utf16.count)
         )
-        
+
         if !paragraphMatches.isEmpty {
             // Process content with paragraph tags - each paragraph gets separate spacing
             return processParagraphsWithSpacing(trimmedHTML, paragraphMatches: paragraphMatches)
@@ -92,13 +92,16 @@ enum CommentHTMLParser {
             return processLinksInText(trimmedHTML)
         }
     }
-    
+
     /// Processes content with paragraph tags, creating proper spacing between paragraphs
-    private static func processParagraphsWithSpacing(_ html: String, paragraphMatches: [NSTextCheckingResult]) -> AttributedString {
+    private static func processParagraphsWithSpacing(
+        _ html: String,
+        paragraphMatches: [NSTextCheckingResult]
+    ) -> AttributedString {
         var result = AttributedString()
         let nsString = html as NSString
         var lastEnd = 0
-        
+
         for (index, match) in paragraphMatches.enumerated() {
             // Add text before the paragraph (if any)
             if match.range.location > lastEnd {
@@ -115,27 +118,27 @@ enum CommentHTMLParser {
                     result += beforeAttributedText
                 }
             }
-            
+
             // Process paragraph content
             let paragraphContentRange = match.range(at: 1)
             if paragraphContentRange.location != NSNotFound {
                 let paragraphContent = nsString.substring(with: paragraphContentRange)
                 var paragraphAttributedString = processLinksInText(paragraphContent)
-                
+
                 // Apply paragraph styling
                 paragraphAttributedString = applyParagraphStyling(paragraphAttributedString)
-                
+
                 // Add spacing between paragraphs (except for the first one)
                 if index > 0 || !result.characters.isEmpty {
                     result += createParagraphSpacing()
                 }
-                
+
                 result += paragraphAttributedString
             }
-            
+
             lastEnd = NSMaxRange(match.range)
         }
-        
+
         // Add remaining text after last paragraph (if any)
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
@@ -149,21 +152,20 @@ enum CommentHTMLParser {
                 result += remainingAttributedText
             }
         }
-        
+
         return result
     }
-    
+
     /// Creates proper paragraph spacing with larger line height
     private static func createParagraphSpacing() -> AttributedString {
         var spacing = AttributedString("\n\n")
-        
+
         // Apply larger line height to the spacing to create more visual separation
         let spacingStyle = NSMutableParagraphStyle()
         spacingStyle.lineHeightMultiple = 1.0 // Normal line height but double newlines create the space
-        
         let fullRange = spacing.startIndex..<spacing.endIndex
         spacing[fullRange].paragraphStyle = spacingStyle
-        
+
         return spacing
     }
 
