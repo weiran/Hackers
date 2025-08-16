@@ -44,34 +44,50 @@ struct CommentsView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 // Comments section
-                if isLoading {
-                    ProgressView("Loading comments...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if comments.isEmpty {
-                    EmptyStateView("No comments yet")
-                } else {
-                    ScrollViewReader { proxy in
-                        List {
-                            PostHeaderView(
-                                post: currentPost,
-                                onVote: { await handlePostVote() },
-                                onLinkTap: { handleLinkTap() },
-                                onShare: { showingPostShareOptions = true }
+                ScrollViewReader { proxy in
+                    List {
+                        PostHeaderView(
+                            post: currentPost,
+                            onVote: { await handlePostVote() },
+                            onLinkTap: { handleLinkTap() },
+                            onShare: { showingPostShareOptions = true }
+                        )
+                        .padding()
+                        .id("header")
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ViewOffsetKey.self,
+                                value: geometry.frame(in: .global).minY
                             )
-                            .id("header")
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(
-                                    key: ViewOffsetKey.self,
-                                    value: geometry.frame(in: .global).minY
-                                )
-                            })
-                            .onPreferenceChange(ViewOffsetKey.self) { offset in
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    // Show title when header scrolls above navigation bar (approximately)
-                                    showTitle = offset < 50
-                                }
+                        })
+                        .onPreferenceChange(ViewOffsetKey.self) { offset in
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                // Show title when header scrolls above navigation bar (approximately)
+                                showTitle = offset < 50
                             }
+                        }
+                        .plainListRow()
 
+                        if isLoading {
+                            VStack {
+                                Spacer()
+                                ProgressView()
+                                Text("Loading comments...")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .plainListRow()
+                        } else if comments.isEmpty {
+                            Text("No comments yet")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                            .plainListRow()
+                        } else {
                             ForEach(visibleComments, id: \.id) { comment in
                                 CommentRowView(
                                     comment: comment,
@@ -132,13 +148,11 @@ struct CommentsView: View {
                                 .authenticationDialog(isPresented: $showingAuthenticationDialog) {
                                     navigationStore.showLogin()
                                 }
+                                .plainListRow()
                             }
-                            .listRowInsets(EdgeInsets()) // Remove default insets
-                            .listRowBackground(Color.clear) // Remove background
-                            .listRowSeparator(.hidden) // Hide separators
                         }
-                        .listStyle(.plain)
                     }
+                    .listStyle(.plain)
                 }
             }
             .toolbar {
@@ -216,9 +230,10 @@ struct CommentsView: View {
                 // Parse each comment in background but maintain order
                 let parsedComment = await withCheckedContinuation { continuation in
                     Task {
-                        var updatedComment = comment
-                        updatedComment.parsedText = CommentHTMLParser.parseHTMLText(comment.text)
-                        continuation.resume(returning: updatedComment)
+                        let updatedComment = comment
+                        var mutableComment = updatedComment
+                        mutableComment.parsedText = CommentHTMLParser.parseHTMLText(comment.text)
+                        continuation.resume(returning: mutableComment)
                     }
                 }
                 parsedComments.append(parsedComment)
@@ -581,5 +596,20 @@ struct CommentPositionKey: PreferenceKey {
     static var defaultValue: CommentPosition? = nil
     static func reduce(value: inout CommentPosition?, nextValue: () -> CommentPosition?) {
         value = nextValue() ?? value
+    }
+}
+
+struct PlainListRowStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+    }
+}
+
+extension View {
+    func plainListRow() -> some View {
+        modifier(PlainListRowStyle())
     }
 }
