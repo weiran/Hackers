@@ -268,7 +268,8 @@ struct PostRowView: View {
             post: post,
             showVoteButton: false,
             showPostText: false,
-            onLinkTap: { onLinkTap?(post) }
+            onLinkTap: { onLinkTap?(post) },
+            onThumbnailTap: { onLinkTap?(post) }
         )
     }
 }

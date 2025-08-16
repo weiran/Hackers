@@ -14,19 +14,22 @@ struct PostDisplayView: View {
     let showPostText: Bool
     let onVote: (() async -> Void)?
     let onLinkTap: () -> Void
+    let onThumbnailTap: (() -> Void)?
     
     init(
         post: Post,
         showVoteButton: Bool = false,
         showPostText: Bool = false,
         onVote: (() async -> Void)? = nil,
-        onLinkTap: @escaping () -> Void
+        onLinkTap: @escaping () -> Void,
+        onThumbnailTap: (() -> Void)? = nil
     ) {
         self.post = post
         self.showVoteButton = showVoteButton
         self.showPostText = showPostText
         self.onVote = onVote
         self.onLinkTap = onLinkTap
+        self.onThumbnailTap = onThumbnailTap
     }
     
     var body: some View {
@@ -39,8 +42,11 @@ struct PostDisplayView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if showVoteButton {
-                            // Only add thumbnail tap in comments view
+                            // Comments view - thumbnail taps to open link
                             onLinkTap()
+                        } else if let onThumbnailTap = onThumbnailTap {
+                            // Feed view - thumbnail has specific tap behavior
+                            onThumbnailTap()
                         }
                     }
 
