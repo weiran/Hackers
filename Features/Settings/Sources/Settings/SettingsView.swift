@@ -1,7 +1,7 @@
 import SwiftUI
 import MessageUI
 
-public struct SettingsView: View {
+public struct CleanSettingsView: View {
     @State private var viewModel = SettingsViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showOnboarding = false

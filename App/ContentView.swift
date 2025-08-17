@@ -20,12 +20,21 @@ struct MainContentView: View {
                     .environmentObject(navigationStore)
             } else {
                 NavigationStack {
-                    FeedView()
-                        .environmentObject(navigationStore)
-                        .navigationDestination(item: $navigationStore.selectedPost) { post in
-                            CommentsView(post: post)
-                                .environmentObject(navigationStore)
-                        }
+                    if AppConfiguration.shared.useCleanFeed {
+                        CleanFeedViewWrapper()
+                            .environmentObject(navigationStore)
+                            .navigationDestination(item: $navigationStore.selectedPost) { post in
+                                CommentsView(post: post)
+                                    .environmentObject(navigationStore)
+                            }
+                    } else {
+                        FeedView()
+                            .environmentObject(navigationStore)
+                            .navigationDestination(item: $navigationStore.selectedPost) { post in
+                                CommentsView(post: post)
+                                    .environmentObject(navigationStore)
+                            }
+                    }
                 }
             }
         }
@@ -34,8 +43,13 @@ struct MainContentView: View {
             LoginView()
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
-            SettingsView()
-                .environmentObject(settingsStore)
+            if AppConfiguration.shared.useCleanSettings {
+                CleanSettingsViewWrapper()
+                    .environmentObject(settingsStore)
+            } else {
+                SettingsView()
+                    .environmentObject(settingsStore)
+            }
         }
     }
 }
@@ -46,9 +60,15 @@ struct AdaptiveSplitView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
-            FeedView(isSidebar: true)
-                .environmentObject(navigationStore)
-                .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
+            if AppConfiguration.shared.useCleanFeed {
+                CleanFeedViewWrapper(isSidebar: true)
+                    .environmentObject(navigationStore)
+                    .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
+            } else {
+                FeedView(isSidebar: true)
+                    .environmentObject(navigationStore)
+                    .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
+            }
         } detail: {
             // Detail - CommentsView or empty state
             NavigationStack {

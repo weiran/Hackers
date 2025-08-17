@@ -14,50 +14,65 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
 
     public init(userDefaults: UserDefaultsProtocol = UserDefaults.standard) {
         self.userDefaults = userDefaults
+        registerDefaults()
+    }
+    
+    private func registerDefaults() {
+        // Register default values for fresh installs
+        // Note: This only sets defaults for keys that don't exist yet
+        if let userDefaults = userDefaults as? UserDefaults {
+            userDefaults.register(defaults: [
+                "showThumbnails": true,      // Default to true
+                "swipeActions": true,        // Default to true
+                "safariReaderMode": false,
+                "showCommentsButton": false,
+                "openInDefaultBrowser": false
+            ])
+        }
     }
 
     public var safariReaderMode: Bool {
         get {
-            userDefaults.bool(forKey: "SafariReaderMode")
+            userDefaults.bool(forKey: "safariReaderMode")
         }
         set {
-            userDefaults.set(newValue, forKey: "SafariReaderMode")
+            userDefaults.set(newValue, forKey: "safariReaderMode")
         }
     }
 
     public var showThumbnails: Bool {
         get {
-            userDefaults.bool(forKey: "ShowThumbnails")
+            userDefaults.bool(forKey: "showThumbnails")
         }
         set {
-            userDefaults.set(newValue, forKey: "ShowThumbnails")
+            userDefaults.set(newValue, forKey: "showThumbnails")
         }
     }
 
     public var swipeActions: Bool {
         get {
-            userDefaults.bool(forKey: "SwipeActionsEnabled")
+            userDefaults.bool(forKey: "swipeActions")
         }
         set {
-            userDefaults.set(newValue, forKey: "SwipeActionsEnabled")
+            userDefaults.set(newValue, forKey: "swipeActions")
         }
     }
 
     public var showComments: Bool {
         get {
-            userDefaults.bool(forKey: "ShowCommentsButton")
+            userDefaults.bool(forKey: "showCommentsButton")
         }
         set {
-            userDefaults.set(newValue, forKey: "ShowCommentsButton")
+            userDefaults.set(newValue, forKey: "showCommentsButton")
         }
     }
 
     public var openInDefaultBrowser: Bool {
         get {
-            userDefaults.bool(forKey: "OpenInDefaultBrowser")
+            userDefaults.bool(forKey: "openInDefaultBrowser")
         }
         set {
-            userDefaults.set(newValue, forKey: "OpenInDefaultBrowser")
+            userDefaults.set(newValue, forKey: "openInDefaultBrowser")
         }
     }
 }
