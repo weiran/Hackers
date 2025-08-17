@@ -10,7 +10,7 @@ import SwiftUI
 import UIKit
 
 struct MainContentView: View {
-    @StateObject private var navigationStore = NavigationStore()
+    @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var settingsStore: SettingsStore
 
     var body: some View {
@@ -22,6 +22,10 @@ struct MainContentView: View {
                 NavigationStack {
                     FeedView()
                         .environmentObject(navigationStore)
+                        .navigationDestination(item: $navigationStore.selectedPost) { post in
+                            CommentsView(post: post)
+                                .environmentObject(navigationStore)
+                        }
                 }
             }
         }
@@ -47,12 +51,14 @@ struct AdaptiveSplitView: View {
                 .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {
             // Detail - CommentsView or empty state
-            if let selectedPost = navigationStore.selectedPost {
-                CommentsView(post: selectedPost)
-                    .environmentObject(navigationStore)
-                    .id(selectedPost.id) // Add id to force re-render when post changes
-            } else {
-                EmptyDetailView()
+            NavigationStack {
+                if let selectedPost = navigationStore.selectedPost {
+                    CommentsView(post: selectedPost)
+                        .environmentObject(navigationStore)
+                        .id(selectedPost.id) // Add id to force re-render when post changes
+                } else {
+                    EmptyDetailView()
+                }
             }
         }
     }
@@ -72,4 +78,5 @@ struct EmptyDetailView: View {
 #Preview {
     MainContentView()
         .environmentObject(SettingsStore())
+        .environmentObject(NavigationStore())
 }

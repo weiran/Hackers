@@ -245,10 +245,11 @@ struct PostRowView: View {
                 postContent
                     .tag(post.id)
             } else {
-                // For iPhone - use NavigationLink
-                NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
-                    postContent
-                }
+                // For iPhone - use tap gesture to trigger navigation
+                postContent
+                    .onTapGesture {
+                        navigationStore.showPost(post)
+                    }
             }
         }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {

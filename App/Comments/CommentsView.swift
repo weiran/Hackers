@@ -9,6 +9,12 @@
 import SwiftUI
 import SafariServices
 
+// Wrapper to make post ID identifiable for navigation
+struct PostNavigation: Identifiable, Hashable {
+    let id: Int
+}
+
+// swiftlint:disable:next type_body_length
 struct CommentsView: View {
     let post: Post
     @EnvironmentObject private var navigationStore: NavigationStore
@@ -27,7 +33,10 @@ struct CommentsView: View {
     @State private var showTitle = false
     @State private var headerHeight: CGFloat = 0
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
+    @State private var navigateToPost: PostNavigation?
+    @State private var hasLoadedComments = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     init(post: Post) {
         self.post = post
@@ -41,8 +50,7 @@ struct CommentsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
                 // Comments section
                 ScrollViewReader { proxy in
                     List {
@@ -111,7 +119,7 @@ struct CommentsView: View {
                                 CommentRowView(
                                     comment: comment,
                                     post: currentPost,
-                                    onToggle: { 
+                                    onToggle: {
                                         toggleCommentVisibility(comment) { id in
                                             proxy.scrollTo(id, anchor: .top)
                                         }
@@ -161,7 +169,7 @@ struct CommentsView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? currentPost.url : nil)
                             .frame(width: 33, height: 33)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                         Text(currentPost.title)
@@ -197,10 +205,13 @@ struct CommentsView: View {
                 }
             }
             .refreshable {
-                await loadComments()
+                await loadComments(forceReload: true)
             }
-            .task {
-                await loadComments()
+            .task(id: post.id) {
+                // Only load if we haven't loaded comments for this post yet
+                if !hasLoadedComments {
+                    await loadComments()
+                }
             }
             .alert("Vote Error", isPresented: $showingVoteError) {
                 Button("OK") { }
@@ -208,16 +219,52 @@ struct CommentsView: View {
                 Text(voteErrorMessage)
             }
             .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $navigateToPost) { postNav in
+            // Create a temporary post for navigation
+            let tempPost = Post(
+                id: postNav.id,
+                url: URL(string: "https://news.ycombinator.com/item?id=\(postNav.id)")!,
+                title: "Loading...",
+                age: "",
+                commentsCount: 0,
+                by: "",
+                score: 0,
+                postType: .news,
+                upvoted: false
+            )
+            CommentsView(post: tempPost)
+                .environmentObject(navigationStore)
+                .id(postNav.id) // Force unique identity for each CommentsView
         }
+        .environment(\.openURL, OpenURLAction { url in
+            // Check if it's a Hacker News item URL
+            if url.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
+               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+               let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
+               let id = Int(idString) {
+                // Navigate to the post's comments
+                navigateToPost = PostNavigation(id: id)
+                return .handled
+            }
+
+            // For all other URLs, open them normally
+            LinkOpener.openURL(url)
+            return .handled
+        })
     }
 
-    private func loadComments() async {
+    private func loadComments(forceReload: Bool = false) async {
+        // Skip loading if we already have comments and not forcing reload
+        if hasLoadedComments && !forceReload && !comments.isEmpty {
+            return
+        }
+
         isLoading = true
 
         do {
-            // Load post with comments if not already loaded
+            // Load post with comments if not already loaded or forcing reload
             let postWithComments: Post
-            if currentPost.comments == nil {
+            if currentPost.comments == nil || forceReload {
                 postWithComments = try await HackersKit.shared.getPost(id: currentPost.id, includeAllComments: true)
                 currentPost = postWithComments
             } else {
@@ -226,7 +273,7 @@ struct CommentsView: View {
 
             // Set comments
             let loadedComments = postWithComments.comments ?? []
-            
+
             // Bulk parse HTML content for all comments in background while preserving order
             var parsedComments: [Comment] = []
             for comment in loadedComments {
@@ -241,11 +288,12 @@ struct CommentsView: View {
                 }
                 parsedComments.append(parsedComment)
             }
-            
+
             comments = parsedComments
             commentsController.comments = parsedComments
             currentPost.commentsCount = parsedComments.count
             refreshTrigger.toggle() // Ensure visibleComments updates
+            hasLoadedComments = true // Mark that we've loaded comments
         } catch {
             print("Error loading comments: \(error)")
             // TODO: Show error state
@@ -259,12 +307,12 @@ struct CommentsView: View {
             let (_, newVisibility) = commentsController.toggleChildrenVisibility(of: comment)
             // Force SwiftUI to re-evaluate visibleComments
             refreshTrigger.toggle()
-            
+
             // Only scroll when collapsing comments (newVisibility == .hidden means children were hidden)
             if newVisibility == .hidden {
                 // Check if the comment is currently visible on screen
                 let isCommentVisible = isCommentVisibleOnScreen(comment)
-                
+
                 // Only scroll if the comment is not visible
                 if !isCommentVisible {
                     withAnimation(.easeInOut(duration: 0.3)) {
@@ -274,20 +322,20 @@ struct CommentsView: View {
             }
         }
     }
-    
+
     private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
         guard let commentFrame = visibleCommentPositions[comment.id] else {
             return false
         }
-        
+
         // Get the screen bounds
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return false
         }
-        
+
         let screenBounds = window.bounds
-        
+
         // Check if the top of the comment is within the visible screen area
         // We only consider it visible if the top edge is on screen
         return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
@@ -398,7 +446,8 @@ struct CommentRowView: View {
 
             HStack {
                 Text(comment.by)
-                    .font(.headline)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
 
                 Text(comment.age)
@@ -562,4 +611,5 @@ extension View {
         modifier(PlainListRowStyle())
     }
 }
+
 
