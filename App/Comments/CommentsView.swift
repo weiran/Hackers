@@ -169,7 +169,7 @@ struct CommentsView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack {
-                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? post.url : nil)
+                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? currentPost.url : nil)
                             .frame(width: 33, height: 33)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                         Text(currentPost.title)
