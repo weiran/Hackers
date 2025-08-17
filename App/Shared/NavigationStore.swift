@@ -80,7 +80,7 @@ class NavigationStore: ObservableObject {
         return parameters
     }
     
-    private func navigateToPost(withId id: Int) {
+    func navigateToPost(withId id: Int) {
         // Store the pending post ID to be handled when posts are loaded
         pendingPostId = id
         

@@ -28,6 +28,7 @@ struct CommentsView: View {
     @State private var headerHeight: CGFloat = 0
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     init(post: Post) {
         self.post = post
@@ -209,6 +210,21 @@ struct CommentsView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
+        .environment(\.openURL, OpenURLAction { url in
+            // Check if it's a Hacker News item URL
+            if url.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
+               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+               let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
+               let id = Int(idString) {
+                // Navigate to the post's comments
+                navigationStore.navigateToPost(withId: id)
+                return .handled
+            }
+            
+            // For all other URLs, open them normally
+            LinkOpener.openURL(url)
+            return .handled
+        })
     }
 
     private func loadComments() async {
