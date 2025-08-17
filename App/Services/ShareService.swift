@@ -7,9 +7,8 @@ import SwiftUI
 class ShareService: ObservableObject {
     static let shared = ShareService()
     private let presentationService = PresentationService.shared
-    
+
     private init() {}
-    
     /// Shares items using the system share sheet
     /// - Parameters:
     ///   - items: Array of items to share (URLs, strings, images, etc.)
@@ -26,12 +25,12 @@ class ShareService: ObservableObject {
             activityItems: items,
             applicationActivities: nil
         )
-        
+
         // Set subject if provided (for email sharing)
         if let subject = subject {
             activityVC.setValue(subject, forKey: "subject")
         }
-        
+
         // Configure popover for iPad
         if let popover = activityVC.popoverPresentationController {
             presentationService.configurePopover(
@@ -40,10 +39,10 @@ class ShareService: ObservableObject {
                 sourceRect: sourceRect
             )
         }
-        
+
         presentationService.present(activityVC)
     }
-    
+
     /// Shares a URL with an optional title
     /// - Parameters:
     ///   - url: The URL to share
@@ -51,14 +50,14 @@ class ShareService: ObservableObject {
     func shareURL(_ url: URL, title: String? = nil) {
         share(items: [url], subject: title)
     }
-    
+
     /// Shares a post from the feed
     /// - Parameter post: The post to share
     func sharePost(_ post: Post) {
         let url = post.url.host != nil ? post.url : post.hackerNewsURL
         shareURL(url, title: post.title)
     }
-    
+
     /// Shares a comment
     /// - Parameter comment: The comment to share
     func shareComment(_ comment: Comment) {
@@ -72,7 +71,7 @@ struct ShareableModifier: ViewModifier {
     let items: [Any]
     let subject: String?
     @State private var isPresented = false
-    
+
     func body(content: Content) -> some View {
         content
             .onTapGesture {

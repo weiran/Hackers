@@ -416,7 +416,6 @@ struct CommentsView: View {
     }
 }
 
-
 struct CommentRowView: View {
     @ObservedObject var comment: Comment
     let post: Post
@@ -578,7 +577,7 @@ struct CommentPosition: Equatable {
 
 struct CommentPositionKey: PreferenceKey {
     typealias Value = CommentPosition?
-    static var defaultValue: CommentPosition? = nil
+    static var defaultValue: CommentPosition?
     static func reduce(value: inout CommentPosition?, nextValue: () -> CommentPosition?) {
         value = nextValue() ?? value
     }
@@ -598,5 +597,3 @@ extension View {
         modifier(PlainListRowStyle())
     }
 }
-
-

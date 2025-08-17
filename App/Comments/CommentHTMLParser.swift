@@ -399,7 +399,10 @@ enum CommentHTMLParser {
 
         // If no formatting tags found, check if we should preserve whitespace
         guard !formatSegments.isEmpty else {
-            return AttributedString(preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text))
+            let stripped = preserveWhitespace
+                ? stripHTMLTagsPreservingWhitespace(text)
+                : stripHTMLTagsAndNormalizeWhitespace(text)
+            return AttributedString(stripped)
         }
 
         var result = AttributedString()
@@ -410,7 +413,9 @@ enum CommentHTMLParser {
             if segment.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: segment.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(beforeText) : stripHTMLTagsAndNormalizeWhitespace(beforeText)
+                let cleanText = preserveWhitespace
+                    ? stripHTMLTagsPreservingWhitespace(beforeText)
+                    : stripHTMLTagsAndNormalizeWhitespace(beforeText)
                 if !cleanText.isEmpty {
                     result += AttributedString(cleanText)
                 }
@@ -439,7 +444,9 @@ enum CommentHTMLParser {
         // Add remaining text after last formatting tag
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(remainingText) : stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            let cleanText = preserveWhitespace
+                ? stripHTMLTagsPreservingWhitespace(remainingText)
+                : stripHTMLTagsAndNormalizeWhitespace(remainingText)
             if !cleanText.isEmpty {
                 result += AttributedString(cleanText)
             }
@@ -469,7 +476,9 @@ enum CommentHTMLParser {
     /// Processes nested formatting tags by stripping all tags and rebuilding the content
     private static func processNestedFormattingTags(_ text: String, preserveWhitespace: Bool) -> AttributedString {
         // For nested tags, strip all HTML and just preserve the text content
-        let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text)
+        let cleanText = preserveWhitespace
+            ? stripHTMLTagsPreservingWhitespace(text)
+            : stripHTMLTagsAndNormalizeWhitespace(text)
         return AttributedString(cleanText)
     }
 

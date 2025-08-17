@@ -81,7 +81,8 @@ final class SettingsViewTests: XCTestCase {
         // Test that we can create a mail compose view controller
         // This might fail in simulator/test environment, which is expected
         do {
-            let viewController = mailView.makeUIViewController(context: mailView.makeCoordinator() as! MailView.Coordinator)
+            let context = mailView.makeCoordinator() as! MailView.Coordinator
+            let viewController = mailView.makeUIViewController(context: context)
             XCTAssertNotNil(viewController)
         } catch {
             // Expected to fail in test environment
