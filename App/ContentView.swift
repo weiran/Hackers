@@ -22,6 +22,10 @@ struct MainContentView: View {
                 NavigationStack {
                     FeedView()
                         .environmentObject(navigationStore)
+                        .navigationDestination(item: $navigationStore.selectedPost) { post in
+                            CommentsView(post: post)
+                                .environmentObject(navigationStore)
+                        }
                 }
             }
         }
