@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   lint:
-    runs-on: macos-16
+    runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       run: fastlane lint
 
   test:
-    runs-on: macos-16
+    runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
       run: fastlane test
 
   build:
-    runs-on: macos-16
+    runs-on: macos-15
 
     steps:
     - uses: actions/checkout@v4
