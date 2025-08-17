@@ -27,6 +27,7 @@ struct CommentsView: View {
     @State private var showTitle = false
     @State private var headerHeight: CGFloat = 0
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
+    @State private var navigateToPostId: Int?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -42,8 +43,7 @@ struct CommentsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
                 // Comments section
                 ScrollViewReader { proxy in
                     List {
@@ -209,6 +209,26 @@ struct CommentsView: View {
                 Text(voteErrorMessage)
             }
             .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: Binding(
+            get: { navigateToPostId != nil },
+            set: { if !$0 { navigateToPostId = nil } }
+        )) {
+            if let postId = navigateToPostId {
+                // Create a temporary post for navigation
+                let tempPost = Post(
+                    id: postId,
+                    url: URL(string: "https://news.ycombinator.com/item?id=\(postId)")!,
+                    title: "Loading...",
+                    age: "",
+                    commentsCount: 0,
+                    by: "",
+                    score: 0,
+                    postType: .news,
+                    upvoted: false
+                )
+                CommentsView(post: tempPost)
+                    .environmentObject(navigationStore)
+            }
         }
         .environment(\.openURL, OpenURLAction { url in
             // Check if it's a Hacker News item URL
@@ -217,7 +237,7 @@ struct CommentsView: View {
                let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
                let id = Int(idString) {
                 // Navigate to the post's comments
-                navigationStore.navigateToPost(withId: id)
+                navigateToPostId = id
                 return .handled
             }
             
