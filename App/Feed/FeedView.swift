@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UIKit
 import SafariServices
 
 struct FeedView: View {
@@ -199,20 +198,7 @@ struct FeedView: View {
     }
 
     private func sharePost(_ post: Post) {
-        let url = post.url.host != nil ? post.url : post.hackerNewsURL
-
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-
-            if let popover = activityVC.popoverPresentationController {
-                popover.sourceView = rootVC.view
-                popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
-                popover.permittedArrowDirections = []
-            }
-
-            rootVC.present(activityVC, animated: true)
-        }
+        ShareService.shared.sharePost(post)
     }
 }
 
@@ -271,7 +257,7 @@ struct PostRowView: View {
                     } label: {
                         Image(systemName: "arrow.up")
                     }
-                    .tint(Color(UIColor(named: "upvotedColor")!))
+                    .tint(Color("upvotedColor"))
                 }
             }
         }

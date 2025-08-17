@@ -12,7 +12,7 @@ extension HackersKit {
     func upvote(comment: Comment, for post: Post) async throws {
         guard
             let upvoteURL = comment.voteLinks?.upvote,
-            let realURL = URL(string: urlBase + upvoteURL.absoluteString)
+            let realURL = URLs.fullURL(from: upvoteURL.absoluteString)
         else {
             throw HackersKitError.scraperError
         }
@@ -22,7 +22,7 @@ extension HackersKit {
     func unvote(comment: Comment, for post: Post) async throws {
         guard
             let unvoteURL = comment.voteLinks?.unvote,
-            let realURL = URL(string: urlBase + unvoteURL.absoluteString)
+            let realURL = URLs.fullURL(from: unvoteURL.absoluteString)
         else {
             throw HackersKitError.scraperError
         }
@@ -30,7 +30,7 @@ extension HackersKit {
     }
 
     private func getComment(id: Int, for post: Post) async throws -> Comment {
-        let url = URL(string: "https://news.ycombinator.com/item?id=\(post.id)")!
+        let url = URLs.post(id: post.id)
         let html = try await networkManager.get(url: url)
         let commentElements = try HtmlParser.commentElements(from: html)
         let comments = try commentElements.map { try HtmlParser.comment(from: $0) }

@@ -82,7 +82,7 @@ struct CommentsView: View {
                                 } label: {
                                     Image(systemName: currentPost.upvoted ? "arrow.uturn.down" : "arrow.up")
                                 }
-                                .tint(currentPost.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                                .tint(currentPost.upvoted ? .secondary : Color("upvotedColor"))
                             }
                         }
                         .contextMenu {
@@ -223,7 +223,7 @@ struct CommentsView: View {
             // Create a temporary post for navigation
             let tempPost = Post(
                 id: postNav.id,
-                url: URL(string: "https://news.ycombinator.com/item?id=\(postNav.id)")!,
+                url: URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(postNav.id)")!,
                 title: "Loading...",
                 age: "",
                 commentsCount: 0,
@@ -238,7 +238,7 @@ struct CommentsView: View {
         }
         .environment(\.openURL, OpenURLAction { url in
             // Check if it's a Hacker News item URL
-            if url.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
+            if url.host?.localizedCaseInsensitiveCompare(HackerNewsConstants.host) == .orderedSame,
                let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
                let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
                let id = Int(idString) {
@@ -329,8 +329,7 @@ struct CommentsView: View {
         }
 
         // Get the screen bounds
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
+        guard let window = PresentationService.shared.windowScene?.windows.first else {
             return false
         }
 
@@ -405,23 +404,11 @@ struct CommentsView: View {
     }
 
     private func sharePost(url: URL, title: String) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            activityVC.setValue(title, forKey: "subject")
-
-            if let popover = activityVC.popoverPresentationController {
-                popover.sourceView = rootVC.view
-                popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
-                popover.permittedArrowDirections = []
-            }
-
-            rootVC.present(activityVC, animated: true)
-        }
+        ShareService.shared.shareURL(url, title: title)
     }
 
     private func shareComment(_ comment: Comment) {
-        sharePost(url: comment.hackerNewsURL, title: "Comment by \(comment.by)")
+        ShareService.shared.shareComment(comment)
     }
 
     private func copyComment(_ comment: Comment) {
@@ -458,7 +445,7 @@ struct CommentRowView: View {
 
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
-                        .foregroundColor(Color(UIColor(named: "upvotedColor")!))
+                        .foregroundColor(Color("upvotedColor"))
                         .font(.body)
                 }
 
@@ -500,7 +487,7 @@ struct CommentRowView: View {
                 } label: {
                     Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
-                .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
             }
         }
         .swipeActions(edge: .trailing) {

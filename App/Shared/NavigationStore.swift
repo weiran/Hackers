@@ -88,7 +88,7 @@ class NavigationStore: ObservableObject {
         // This will be replaced with the actual post data when loaded
         let tempPost = Post(
             id: id,
-            url: URL(string: "https://news.ycombinator.com/item?id=\(id)")!,
+            url: URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!,
             title: "Loading...",
             age: "",
             commentsCount: 0,

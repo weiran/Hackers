@@ -9,6 +9,7 @@
 import UIKit
 import SafariServices
 
+@MainActor
 struct LinkOpener {
     static func openURL(_ url: URL, with post: Post? = nil, showCommentsButton: Bool = false) {
         guard !url.absoluteString.starts(with: "item?id=") else { return }
@@ -19,12 +20,9 @@ struct LinkOpener {
         } else {
             // Open in internal Safari view controller
             if let svc = SFSafariViewController.instance(for: url) {
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let rootVC = windowScene.windows.first?.rootViewController {
-                    rootVC.present(svc, animated: true) {
-                        if let post = post, showCommentsButton {
-                            CommentsButton.attachTo(svc, with: post)
-                        }
+                PresentationService.shared.present(svc) {
+                    if let post = post, showCommentsButton {
+                        CommentsButton.attachTo(svc, with: post)
                     }
                 }
             }

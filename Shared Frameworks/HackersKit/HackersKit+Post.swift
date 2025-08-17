@@ -40,9 +40,7 @@ extension HackersKit {
         recursive: Bool = true,
         workingHtml: String = ""
     ) async throws -> String {
-        guard let url = hackerNewsURL(id: id, page: page) else {
-            throw HackersKitError.requestFailure
-        }
+        let url = URLs.post(id: id, page: page)
 
         let html = try await fetchHtml(url: url)
         let document = try SwiftSoup.parse(html)
@@ -55,24 +53,11 @@ extension HackersKit {
         }
     }
 
-    private func hackerNewsURL(id: Int, page: Int) -> URL? {
-        var components = URLComponents()
-
-        components.scheme = "https"
-        components.host = "news.ycombinator.com"
-        components.path = "/item"
-        components.queryItems = [
-            URLQueryItem(name: "id", value: String(id)),
-            URLQueryItem(name: "p", value: String(page))
-        ]
-
-        return components.url
-    }
 
     func upvote(post: Post) async throws {
         guard
             let upvoteURL = post.voteLinks?.upvote,
-            let realURL = URL(string: urlBase + upvoteURL.absoluteString)
+            let realURL = URLs.fullURL(from: upvoteURL.absoluteString)
         else {
             throw HackersKitError.scraperError
         }
@@ -82,7 +67,7 @@ extension HackersKit {
     func unvote(post: Post) async throws {
         guard
             let unvoteURL = post.voteLinks?.unvote,
-            let realURL = URL(string: urlBase + unvoteURL.absoluteString)
+            let realURL = URLs.fullURL(from: unvoteURL.absoluteString)
         else {
             throw HackersKitError.scraperError
         }
