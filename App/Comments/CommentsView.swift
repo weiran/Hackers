@@ -82,7 +82,7 @@ struct CommentsView: View {
                                 } label: {
                                     Image(systemName: currentPost.upvoted ? "arrow.uturn.down" : "arrow.up")
                                 }
-                                .tint(currentPost.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                                .tint(currentPost.upvoted ? .secondary : Color("upvotedColor"))
                             }
                         }
                         .contextMenu {
@@ -458,7 +458,7 @@ struct CommentRowView: View {
 
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
-                        .foregroundColor(Color(UIColor(named: "upvotedColor")!))
+                        .foregroundColor(Color("upvotedColor"))
                         .font(.body)
                 }
 
@@ -500,7 +500,7 @@ struct CommentRowView: View {
                 } label: {
                     Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
-                .tint(comment.upvoted ? .secondary : Color(UIColor(named: "upvotedColor")!))
+                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
             }
         }
         .swipeActions(edge: .trailing) {

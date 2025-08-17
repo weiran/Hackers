@@ -33,18 +33,19 @@ struct CommentsButton: View {
 extension CommentsButton {
     static func attachTo(_ parentViewController: UIViewController, with post: Post) {
         guard UserDefaults.standard.showCommentsButton else { return }
-        
-        let commentsButton = CommentsButton(post: post) {
+
+        let commentsButton = CommentsButton(post: post) { [weak parentViewController] in
+            guard let parentViewController = parentViewController else { return }
             let navigationStore = NavigationStore()
             let commentsView = CommentsView(post: post)
                 .environmentObject(navigationStore)
-            
+
             let hostingController = UIHostingController(rootView: commentsView)
             let navigationController = UINavigationController(rootViewController: hostingController)
-            
+
             parentViewController.present(navigationController, animated: true)
         }
-        
+
         let hostingController = UIHostingController(rootView: commentsButton)
         hostingController.view.backgroundColor = .clear
         

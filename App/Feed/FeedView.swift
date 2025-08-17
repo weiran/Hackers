@@ -271,7 +271,7 @@ struct PostRowView: View {
                     } label: {
                         Image(systemName: "arrow.up")
                     }
-                    .tint(Color(UIColor(named: "upvotedColor")!))
+                    .tint(Color("upvotedColor"))
                 }
             }
         }

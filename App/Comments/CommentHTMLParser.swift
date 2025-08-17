@@ -278,7 +278,11 @@ enum CommentHTMLParser {
 
         var linkAttributedString = AttributedString(cleanLinkText)
 
-        if let url = URL(string: urlString) {
+        var resolvedURL = URL(string: urlString)
+        if resolvedURL?.scheme == nil, let base = URL(string: "https://news.ycombinator.com") {
+            resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
+        }
+        if let url = resolvedURL {
             linkAttributedString.link = url
             linkAttributedString.foregroundColor = AppTheme.default.appTintColor
             linkAttributedString.underlineStyle = .single

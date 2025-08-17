@@ -68,9 +68,9 @@ struct PostDisplayView: View {
                                 } label: {
                                     HStack(spacing: 0) {
                                         Text("\(post.score)")
-                                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                            .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                         Image(systemName: "arrow.up")
-                                            .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                            .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                             .font(.caption2)
                                     }
                                 }
@@ -78,18 +78,18 @@ struct PostDisplayView: View {
                                 // Show non-interactive vote display when upvoted but no unvote link
                                 HStack(spacing: 0) {
                                     Text("\(post.score)")
-                                        .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                        .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                     Image(systemName: "arrow.up")
-                                        .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                        .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                         .font(.caption2)
                                 }
                             }
                         } else {
                             HStack(spacing: 0) {
                                 Text("\(post.score)")
-                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                    .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                 Image(systemName: "arrow.up")
-                                    .foregroundColor(post.upvoted ? Color(UIColor(named: "upvotedColor")!) : .secondary)
+                                    .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
                                     .font(.caption2)
                             }
                         }
