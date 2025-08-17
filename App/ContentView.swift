@@ -10,7 +10,7 @@ import SwiftUI
 import UIKit
 
 struct MainContentView: View {
-    @StateObject private var navigationStore = NavigationStore()
+    @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var settingsStore: SettingsStore
 
     var body: some View {
@@ -72,4 +72,5 @@ struct EmptyDetailView: View {
 #Preview {
     MainContentView()
         .environmentObject(SettingsStore())
+        .environmentObject(NavigationStore())
 }
