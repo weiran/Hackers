@@ -447,6 +447,7 @@ struct CommentRowView: View {
             HStack {
                 Text(comment.by)
                     .font(.subheadline)
+                    .fontWeight(.bold)
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
 
                 Text(comment.age)
