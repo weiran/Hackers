@@ -10,12 +10,12 @@ import Foundation
 
 class HackersKit {
     static let shared = HackersKit()
+    static let hackerNewsBaseURL = "https://news.ycombinator.com"
+    static let hackerNewsHost = "news.ycombinator.com"
 
     let networkManager = NetworkManager()
 
     weak var authenticationDelegate: HackerNewsAuthenticationDelegate?
-
-    internal let urlBase = "https://news.ycombinator.com/"
 
     internal func fetchHtml(url: URL) async throws -> String {
         return try await networkManager.get(url: url)

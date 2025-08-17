@@ -223,7 +223,7 @@ struct CommentsView: View {
             // Create a temporary post for navigation
             let tempPost = Post(
                 id: postNav.id,
-                url: URL(string: "https://news.ycombinator.com/item?id=\(postNav.id)")!,
+                url: URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(postNav.id)")!,
                 title: "Loading...",
                 age: "",
                 commentsCount: 0,
@@ -238,7 +238,7 @@ struct CommentsView: View {
         }
         .environment(\.openURL, OpenURLAction { url in
             // Check if it's a Hacker News item URL
-            if url.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
+            if url.host?.localizedCaseInsensitiveCompare(HackerNewsConstants.host) == .orderedSame,
                let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
                let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
                let id = Int(idString) {

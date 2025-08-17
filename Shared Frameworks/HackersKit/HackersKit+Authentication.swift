@@ -10,7 +10,7 @@ import Foundation
 
 extension HackersKit {
     func login(username: String, password: String) async throws -> User {
-        let url = URL(string: "https://news.ycombinator.com/login")!
+        let url = URLs.login
         let body = "acct=\(username)&pw=\(password)"
 
         do {
@@ -32,6 +32,6 @@ extension HackersKit {
     }
 
     func isAuthenticated() -> Bool {
-        return networkManager.containsCookie(for: URL(string: self.urlBase)!)
+        return networkManager.containsCookie(for: URL(string: HackersKit.hackerNewsBaseURL)!)
     }
 }

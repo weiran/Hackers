@@ -279,7 +279,7 @@ enum CommentHTMLParser {
         var linkAttributedString = AttributedString(cleanLinkText)
 
         var resolvedURL = URL(string: urlString)
-        if resolvedURL?.scheme == nil, let base = URL(string: "https://news.ycombinator.com") {
+        if resolvedURL?.scheme == nil, let base = URL(string: HackerNewsConstants.baseURL) {
             resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
         }
         if let url = resolvedURL {
