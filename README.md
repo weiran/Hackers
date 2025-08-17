@@ -8,7 +8,7 @@ Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimi
 
 * Thumbnails generated for posts
 * Collapsable comments threads
-* iOS 13 dark mode
+* Dark mode
 * Full iPad multitasking support
 * Safari View Controller
 * Upvote posts and comments
@@ -46,14 +46,8 @@ Or install the [latest beta version from TestFlight][4].
 
 I use several open source projects in Hackers, in no particular order:
 
-* [HNScraper](https://github.com/tsucres/HNScraper)
-* [PromiseKit](https://github.com/mxcl/PromiseKit)
-* [Nuke](https://github.com/kean/Nuke)
-* [Loaf](https://github.com/schmidyy/Loaf)
-* [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit)
-* [Swinject](https://github.com/Swinject/Swinject)
-* [SwiftLint](https://github.com/realm/SwiftLint)
-* [DeviceKit](https://github.com/devicekit/DeviceKit)
+* [Drops](https://github.com/omaralbeik/Drops)
+* [SwiftSoup](https://github.com/scinfu/SwiftSoup.git)
 * [WhatsNewKit](https://github.com/SvenTiigi/WhatsNewKit)
 
 ---

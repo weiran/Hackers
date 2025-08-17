@@ -23,16 +23,18 @@ enum ReviewController {
         return UserDefaults.standard.integer(forKey: LaunchCounter)
     }
 
+    @MainActor
     static func requestReview() {
         if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
             return
         }
 
-        let scene = UIApplication.shared.connectedScenes.first(where: {
-            $0.activationState == .foregroundActive
-        }) as? UIWindowScene
-
-        if let scene = scene, showPromptIncrements.contains(launchCounter()), disablePrompts == false {
+        if let scene = PresentationService.shared.windowScene,
+           showPromptIncrements.contains(launchCounter()),
+           disablePrompts == false {
+            // Note: SKStoreReviewController.requestReview is deprecated in iOS 18.0
+            // The replacement AppStore.requestReview requires iOS 18.0+ and AppStore framework
+            // For now, continue using the deprecated method for compatibility
             SKStoreReviewController.requestReview(in: scene)
         }
     }

@@ -31,6 +31,39 @@ enum HtmlParser {
         }
     }
 
+    static func voteLinks(from elements: Elements) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) {
+        let voteLinkElements = try elements.select("a")
+        let upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
+        
+        // Look for unvote link by ID first, then by text content
+        var unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
+        if unvoteLink == nil {
+            unvoteLink = try voteLinkElements.first { try $0.text().lowercased() == "unvote" }
+        }
+
+        let upvoteURL = try upvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
+        let unvoteURL = try unvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
+
+        // Determine if the item is upvoted based on:
+        // 1. Presence of unvote link (by ID or text)
+        // 2. Presence of upvote link with "nosee" class
+        var upvoted = false
+        
+        // Check for unvote link (indicates already upvoted)
+        let hasUnvote = unvoteLink != nil
+        
+        // Check for upvote link with "nosee" class (also indicates already upvoted)
+        var hasUpvoteWithNosee = false
+        if let upvoteElement = upvoteLink {
+            let hasNosee = (try? upvoteElement.classNames().contains("nosee")) ?? false
+            hasUpvoteWithNosee = hasNosee
+        }
+        
+        upvoted = hasUnvote || hasUpvoteWithNosee
+
+        return (upvote: upvoteURL, unvote: unvoteURL, upvoted: upvoted)
+    }
+
     static func post(from elements: Elements, type: PostType) throws -> Post {
         let rows = try elements.select("tr")
         guard
@@ -54,17 +87,11 @@ enum HtmlParser {
         let age = try metadataElement.select(".age").text()
         let commentsCount = try self.commentsCount(from: metadataElement)
 
-        var upvoted = false
-        let voteLink = try? postElement.select(".votelinks a").first { $0.hasAttr("id") }
-        if let voteLink = voteLink {
-            let hasUnvote = try voteLink.attr("id").starts(with: "un_")
-            let hasUpvote = try voteLink.attr("id").starts(with: "up_")
-            let hasNosee = try voteLink.classNames().contains("nosee")
+        let voteLinksResult = try self.voteLinks(from: postElement.select(".votelinks"))
+        let voteLinks = (upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+        let upvoted = voteLinksResult.upvoted
 
-            upvoted = hasUnvote || (hasUpvote && hasNosee)
-        }
-
-        return Post(
+        let post = Post(
             id: id,
             url: url,
             title: title,
@@ -75,6 +102,8 @@ enum HtmlParser {
             postType: type,
             upvoted: upvoted
         )
+        post.voteLinks = voteLinks
+        return post
     }
 
     static func postsTableElement(from html: String) throws -> Element {
@@ -111,16 +140,12 @@ enum HtmlParser {
             throw Exception.Error(type: .SelectorParseException, Message: "Couldn't parse comment indent width")
         }
         let level = indentWidth / 40
-        let upvoteLink = try element.select(".votelinks a").attr("href")
-        var upvoted = false
-        let voteLinks = try? element.select("a").filter { $0.hasAttr("id") }
-        if let voteLinks = voteLinks {
-            let hasUnvote = try voteLinks.first { try $0.attr("id").starts(with: "un_") } != nil
-            upvoted = hasUnvote
-        }
+        let voteLinksResult = try self.voteLinks(from: element.getAllElements())
+        let voteLinks = (upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+        let upvoted = voteLinksResult.upvoted
 
         let comment = Comment(id: id, age: age, text: text, by: user, level: level, upvoted: upvoted)
-        comment.upvoteLink = upvoteLink
+        comment.voteLinks = voteLinks
         return comment
     }
 
@@ -168,16 +193,16 @@ enum HtmlParser {
         let document = try SwiftSoup.parse(html)
         let toptextElements = try document.select(".toptext")
         let toptextContent = try toptextElements.text().trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         guard !toptextContent.isEmpty else {
             return nil
         }
-        
+
         let postTableElement = try postsTableElement(from: html)
         guard let post = try posts(from: postTableElement, type: .news).first else {
             return nil
         }
-        
+
         if let text = post.text,
            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return Comment(
@@ -189,7 +214,7 @@ enum HtmlParser {
                 upvoted: post.upvoted
             )
         }
-        
+
         return nil
     }
 
@@ -237,5 +262,26 @@ enum HtmlParser {
 
     private static func safeGet(_ elements: Elements, index: Int) -> Element? {
         return elements.indices.contains(index) ? elements.get(index) : nil
+    }
+
+    static func user(from html: String) throws -> User {
+        let document = try SwiftSoup.parse(html)
+        guard let karmaElement = try document.select("#karma").first(),
+              let karmaString = try? karmaElement.text(),
+              let karma = Int(karmaString),
+              let usernameElement = try document.select("#me").first(),
+              let username = try? usernameElement.text(),
+              let createdElement = try document.select("td:contains(created)").first()?.nextElementSibling(),
+              let createdString = try? createdElement.text(),
+              let createdDate = ISO8601DateFormatter().date(from: createdString) else {
+            throw HackersKitError.scraperError
+        }
+
+        return User(username: username, karma: karma, joined: createdDate)
+    }
+
+    static func string(for query: String, from html: String) throws -> String? {
+        let document = try SwiftSoup.parse(html)
+        return try document.select(query).val()
     }
 }

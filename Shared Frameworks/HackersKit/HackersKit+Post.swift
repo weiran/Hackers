@@ -33,7 +33,6 @@ extension HackersKit {
         return comments
     }
 
-
     /// Optionally recursively fetch post comments over pages
     private func fetchPostHtml(
         id: Int,
@@ -41,14 +40,12 @@ extension HackersKit {
         recursive: Bool = true,
         workingHtml: String = ""
     ) async throws -> String {
-        guard let url = hackerNewsURL(id: id, page: page) else {
-            throw HackersKitError.requestFailure
-        }
+        let url = URLs.post(id: id, page: page)
 
         let html = try await fetchHtml(url: url)
         let document = try SwiftSoup.parse(html)
         let moreLinkExists = try !document.select("a.morelink").isEmpty()
-        
+
         if moreLinkExists && recursive {
             return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: html)
         } else {
@@ -56,17 +53,24 @@ extension HackersKit {
         }
     }
 
-    private func hackerNewsURL(id: Int, page: Int) -> URL? {
-        var components = URLComponents()
 
-        components.scheme = "https"
-        components.host = "news.ycombinator.com"
-        components.path = "/item"
-        components.queryItems = [
-            URLQueryItem(name: "id", value: String(id)),
-            URLQueryItem(name: "p", value: String(page))
-        ]
+    func upvote(post: Post) async throws {
+        guard
+            let upvoteURL = post.voteLinks?.upvote,
+            let realURL = URLs.fullURL(from: upvoteURL.absoluteString)
+        else {
+            throw HackersKitError.scraperError
+        }
+        _ = try await networkManager.get(url: realURL)
+    }
 
-        return components.url
+    func unvote(post: Post) async throws {
+        guard
+            let unvoteURL = post.voteLinks?.unvote,
+            let realURL = URLs.fullURL(from: unvoteURL.absoluteString)
+        else {
+            throw HackersKitError.scraperError
+        }
+        _ = try await networkManager.get(url: realURL)
     }
 }

@@ -7,17 +7,19 @@
 //
 
 import Foundation
+import Combine
 
-class Post: Hashable {
+class Post: ObservableObject, Hashable, Identifiable {
     let id: Int
     let url: URL
     let title: String
     let age: String
     var commentsCount: Int
     let by: String
-    var score: Int
+    @Published var score: Int
     let postType: PostType
-    var upvoted = false
+    @Published var upvoted = false
+    var voteLinks: (upvote: URL?, unvote: URL?)?
     var text: String?
 
     var comments: [Comment]?
@@ -63,17 +65,21 @@ enum PostType: String, CaseIterable {
     case active
 }
 
-class Comment: Hashable {
+class Comment: ObservableObject, Hashable {
     let id: Int
     let age: String
     let text: String
     let by: String
     var level: Int
     var upvoteLink: String?
-    var upvoted = false
+    @Published var upvoted = false
+    var voteLinks: (upvote: URL?, unvote: URL?)?
 
     // UI properties
-    var visibility = CommentVisibilityType.visible
+    @Published var visibility = CommentVisibilityType.visible
+    
+    // Parsed HTML content for performance
+    var parsedText: AttributedString?
 
     init(
         id: Int,
@@ -120,7 +126,7 @@ class User {
 
 enum HackersKitError: Error {
     case requestFailure
-    case scraperError // internal failure from HNScraper
+    case scraperError
     case unauthenticated // tried an request that requires authentication when unauthenticated
     case authenticationError(error: HackersKitAuthenticationError)
 }

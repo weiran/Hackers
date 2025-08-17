@@ -1,40 +1,13 @@
 {
-  "originHash" : "529a3cd5ee4773f468a260885fac51c44cc7d5d2f61da161fb79770aa7fd3000",
+  "originHash" : "ae0cdaf157cc21a4c8522a1c98871d65f92a0cf95e4c56416fa59c056ce548e3",
   "pins" : [
-    {
-      "identity" : "devicekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/devicekit/DeviceKit.git",
-      "state" : {
-        "revision" : "691fe8112cca20ebf0020a1709d4e0205400311c",
-        "version" : "5.0.0"
-      }
-    },
     {
       "identity" : "drops",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/omaralbeik/Drops",
       "state" : {
-        "revision" : "f4eabe3e4e5da69e5205a69a5ddc0effd4a90519",
-        "version" : "1.6.1"
-      }
-    },
-    {
-      "identity" : "hnscraper",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/weiran/HNScraper.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "154827472088f2e4e007572dffe8b23ac21a322b"
-      }
-    },
-    {
-      "identity" : "nuke",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kean/Nuke",
-      "state" : {
-        "revision" : "a002b7fd786f2df2ed4333fe73a9727499fd9d97",
-        "version" : "10.11.2"
+        "revision" : "a183ee6f79f21c940092a19c2cba756555422371",
+        "version" : "1.7.0"
       }
     },
     {
@@ -42,35 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup.git",
       "state" : {
-        "revision" : "8b6cf29eead8841a1fa7822481cb3af4ddaadba6",
-        "version" : "2.6.1"
-      }
-    },
-    {
-      "identity" : "swinject",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Swinject/Swinject.git",
-      "state" : {
-        "revision" : "8bc503e60965298984fb58cf47b71c541449fe2a",
-        "version" : "2.8.3"
-      }
-    },
-    {
-      "identity" : "swinjectstoryboard",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Swinject/SwinjectStoryboard",
-      "state" : {
-        "revision" : "a39bd7abe7e7427f9a0929a402cf2d1916fa5d50",
-        "version" : "2.2.2"
-      }
-    },
-    {
-      "identity" : "swipecellkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwipeCellKit/SwipeCellKit",
-      "state" : {
-        "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
-        "version" : "2.7.1"
+        "revision" : "a81b1a5ac933dee8c6cfccf05d5ffcc5eb8c7ec4",
+        "version" : "2.10.0"
       }
     },
     {

@@ -8,9 +8,14 @@
 
 import Foundation
 
+struct HackerNewsConstants {
+    static let baseURL = "https://news.ycombinator.com"
+    static let host = "news.ycombinator.com"
+}
+
 extension Post {
     var hackerNewsURL: URL {
-        return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
+        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }
 
@@ -42,6 +47,6 @@ extension PostType {
 
 extension Comment {
     var hackerNewsURL: URL {
-        return URL(string: "https://news.ycombinator.com/item?id=\(id)")!
+        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }

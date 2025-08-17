@@ -17,14 +17,7 @@ extension HackersKit {
     }
 
     private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
-        var url: URL
-        if type == .newest || type == .jobs {
-            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)")!
-        } else if type == .active {
-            url = URL(string: "https://news.ycombinator.com/active?p=\(page)")!
-        } else {
-            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
-        }
+        let url = URLs.postsList(type: type, page: page, nextId: nextId)
         return try await fetchHtml(url: url)
     }
 }
