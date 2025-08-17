@@ -10,7 +10,7 @@ let package = Package(
         .library(
             name: "DesignSystem",
             targets: ["DesignSystem"]
-        ),
+        )
     ],
     targets: [
         .target(
@@ -19,6 +19,6 @@ let package = Package(
         .testTarget(
             name: "DesignSystemTests",
             dependencies: ["DesignSystem"]
-        ),
+        )
     ]
 )

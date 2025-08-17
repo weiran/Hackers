@@ -15,7 +15,7 @@ struct PostDisplayView: View {
     let onVote: (() async -> Void)?
     let onLinkTap: () -> Void
     let onThumbnailTap: (() -> Void)?
-    
+
     init(
         post: Post,
         showVoteButton: Bool = false,
@@ -31,7 +31,7 @@ struct PostDisplayView: View {
         self.onLinkTap = onLinkTap
         self.onThumbnailTap = onThumbnailTap
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {

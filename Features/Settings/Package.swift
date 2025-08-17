@@ -10,11 +10,11 @@ let package = Package(
         .library(
             name: "Settings",
             targets: ["Settings"]
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../../Domain"),
-        .package(path: "../../Shared"),
+        .package(path: "../../Shared")
     ],
     targets: [
         .target(
@@ -25,6 +25,6 @@ let package = Package(
             name: "SettingsTests",
             dependencies: ["Settings"],
             path: "Tests"
-        ),
+        )
     ]
 )

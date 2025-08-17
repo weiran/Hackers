@@ -6,20 +6,20 @@ import SwiftUI
 @MainActor
 class PresentationService: ObservableObject {
     static let shared = PresentationService()
-    
+
     private init() {}
-    
+
     /// Gets the current window scene
     var windowScene: UIWindowScene? {
         UIApplication.shared.connectedScenes
             .first { $0.activationState == .foregroundActive } as? UIWindowScene
     }
-    
+
     /// Gets the root view controller of the current window
     var rootViewController: UIViewController? {
         windowScene?.windows.first?.rootViewController
     }
-    
+
     /// Presents a view controller from the root view controller
     /// - Parameters:
     ///   - viewController: The view controller to present
@@ -34,10 +34,10 @@ class PresentationService: ObservableObject {
             print("Warning: No root view controller available for presentation")
             return
         }
-        
+
         rootVC.present(viewController, animated: animated, completion: completion)
     }
-    
+
     /// Configures a popover presentation controller for iPad
     /// - Parameters:
     ///   - popover: The popover presentation controller to configure
@@ -50,9 +50,9 @@ class PresentationService: ObservableObject {
     ) {
         let view = sourceView ?? rootViewController?.view
         guard let presentingView = view else { return }
-        
+
         popover.sourceView = presentingView
-        
+
         if let rect = sourceRect {
             popover.sourceRect = rect
         } else {

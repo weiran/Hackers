@@ -5,6 +5,6 @@ import SwiftUI
 
 public struct DesignSystem {
     public static let shared = DesignSystem()
-    
+
     private init() {}
 }

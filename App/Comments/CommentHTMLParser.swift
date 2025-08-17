@@ -42,7 +42,7 @@ enum CommentHTMLParser {
             fatalError("Invalid regex pattern: \(error)")
         }
     }()
-    
+
     private static let boldRegex: NSRegularExpression = {
         let pattern = "<b\\b[^>]*>(.*?)</b>"
         do {
@@ -51,7 +51,7 @@ enum CommentHTMLParser {
             fatalError("Invalid regex pattern: \(error)")
         }
     }()
-    
+
     private static let italicRegex: NSRegularExpression = {
         let pattern = "<i\\b[^>]*>(.*?)</i>"
         do {
@@ -326,7 +326,7 @@ enum CommentHTMLParser {
         let range = NSRange(location: 0, length: text.utf16.count)
         return htmlTagRegex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
     }
-    
+
     /// Processes formatting tags (bold and italic) and returns an AttributedString
     private static func processFormattingTags(_ text: String) -> AttributedString {
         // First remove empty formatting tags to prevent extra spaces
@@ -334,47 +334,46 @@ enum CommentHTMLParser {
         // Process both bold and italic tags together to preserve formatting
         return processFormattingTagsTogether(cleanedText)
     }
-    
+
     /// Removes empty formatting tags that would otherwise leave extra spaces
     private static func removeEmptyFormattingTags(_ text: String) -> String {
         var result = text
-        
+
         // Remove empty bold tags
         result = result.replacingOccurrences(
             of: "<b\\b[^>]*>\\s*</b>",
             with: "",
             options: .regularExpression
         )
-        
+
         // Remove empty italic tags
         result = result.replacingOccurrences(
             of: "<i\\b[^>]*>\\s*</i>",
             with: "",
             options: .regularExpression
         )
-        
+
         return result
     }
-    
-    
+
     /// Processes both bold and italic tags together to preserve all formatting
     private static func processFormattingTagsTogether(_ text: String) -> AttributedString {
         // For nested formatting, we need to strip all HTML tags first, then process the clean text
         // This prevents duplicate content from overlapping tags
-        
+
         let preserveWhitespace = shouldPreserveWhitespace(text)
-        
+
         // First, try to handle nested tags by processing them recursively
         if hasNestedFormattingTags(text) {
             return processNestedFormattingTags(text, preserveWhitespace: preserveWhitespace)
         }
-        
+
         // Find all formatting tags and their positions
         var formatSegments: [(range: NSRange, type: FormattingType, content: String)] = []
-        
+
         let nsString = text as NSString
         let fullRange = NSRange(location: 0, length: text.utf16.count)
-        
+
         // Find bold tags
         let boldMatches = boldRegex.matches(in: text, range: fullRange)
         for match in boldMatches {
@@ -384,7 +383,7 @@ enum CommentHTMLParser {
                 formatSegments.append((range: match.range, type: .bold, content: content))
             }
         }
-        
+
         // Find italic tags
         let italicMatches = italicRegex.matches(in: text, range: fullRange)
         for match in italicMatches {
@@ -394,18 +393,18 @@ enum CommentHTMLParser {
                 formatSegments.append((range: match.range, type: .italic, content: content))
             }
         }
-        
+
         // Sort segments by location
         formatSegments.sort { $0.range.location < $1.range.location }
-        
+
         // If no formatting tags found, check if we should preserve whitespace
         guard !formatSegments.isEmpty else {
             return AttributedString(preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text))
         }
-        
+
         var result = AttributedString()
         var lastEnd = 0
-        
+
         for segment in formatSegments {
             // Add text before the formatting tag
             if segment.range.location > lastEnd {
@@ -416,12 +415,12 @@ enum CommentHTMLParser {
                     result += AttributedString(cleanText)
                 }
             }
-            
+
             // Add formatted content - always preserve whitespace within formatting tags
             let cleanContent = stripHTMLTagsPreservingWhitespace(segment.content)
             if !cleanContent.isEmpty {
                 var formattedString = AttributedString(cleanContent)
-                
+
                 switch segment.type {
                 case .bold:
                     formattedString.inlinePresentationIntent = .stronglyEmphasized
@@ -430,13 +429,13 @@ enum CommentHTMLParser {
                     formattedString.inlinePresentationIntent = .emphasized
                     formattedString.font = .body.italic()
                 }
-                
+
                 result += formattedString
             }
-            
+
             lastEnd = NSMaxRange(segment.range)
         }
-        
+
         // Add remaining text after last formatting tag
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
@@ -445,16 +444,16 @@ enum CommentHTMLParser {
                 result += AttributedString(cleanText)
             }
         }
-        
+
         return result
     }
-    
+
     /// Checks if text contains nested formatting tags
     private static func hasNestedFormattingTags(_ text: String) -> Bool {
         // Check if bold tags contain italic tags or vice versa
         let boldMatches = boldRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
         let italicMatches = italicRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-        
+
         // Check for overlapping ranges
         for boldMatch in boldMatches {
             for italicMatch in italicMatches {
@@ -463,59 +462,58 @@ enum CommentHTMLParser {
                 }
             }
         }
-        
+
         return false
     }
-    
+
     /// Processes nested formatting tags by stripping all tags and rebuilding the content
     private static func processNestedFormattingTags(_ text: String, preserveWhitespace: Bool) -> AttributedString {
         // For nested tags, strip all HTML and just preserve the text content
         let cleanText = preserveWhitespace ? stripHTMLTagsPreservingWhitespace(text) : stripHTMLTagsAndNormalizeWhitespace(text)
         return AttributedString(cleanText)
     }
-    
+
     /// Determines if whitespace should be preserved based on text structure
     private static func shouldPreserveWhitespace(_ text: String) -> Bool {
         // Only preserve whitespace for simple cases like "  <b>text</b>  " where
         // the entire input is just formatting tags with significant whitespace around them
-        
+
         // Don't preserve if there are newlines (should be normalized)
         if text.contains("\n") {
             return false
         }
-        
+
         // Preserve whitespace if:
         // 1. Text starts or ends with whitespace (but not newlines) AND
         // 2. Text contains only simple formatting tags (b, i, a) AND
         // 3. Text doesn't contain paragraph tags
-        let hasLeadingOrTrailingWhitespace = text.hasPrefix(" ") || text.hasSuffix(" ") || 
+        let hasLeadingOrTrailingWhitespace = text.hasPrefix(" ") || text.hasSuffix(" ") ||
                                            text.hasPrefix("\t") || text.hasSuffix("\t")
-        
+
         let hasParagraphTags = text.contains("<p") || text.contains("<div") || text.contains("<br")
-        
+
         return hasLeadingOrTrailingWhitespace && !hasParagraphTags
     }
-    
+
     /// Helper enum for formatting types
     private enum FormattingType {
         case bold
         case italic
     }
-    
-    
+
     /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)
     /// Use this for non-paragraph content where newlines should not be preserved
     private static func stripHTMLTagsAndNormalizeWhitespace(_ text: String) -> String {
         let tagsRemoved = stripHTMLTags(text)
         // Replace any sequence of whitespace characters (including newlines) with single spaces
         let normalized = tagsRemoved.replacingOccurrences(
-            of: "\\s+", 
-            with: " ", 
+            of: "\\s+",
+            with: " ",
             options: .regularExpression
         )
         return normalized
     }
-    
+
     /// Strips HTML tags but preserves whitespace structure
     /// Use this when whitespace around formatting tags needs to be preserved
     private static func stripHTMLTagsPreservingWhitespace(_ text: String) -> String {

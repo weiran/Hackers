@@ -36,7 +36,7 @@ struct HackersApp: App {
             UIView.appearance().tintColor = appTintColor
         }
     }
-    
+
     private func handleOpenURL(_ url: URL) {
         navigationStore.handleOpenURL(url)
     }

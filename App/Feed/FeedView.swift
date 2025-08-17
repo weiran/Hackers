@@ -274,7 +274,6 @@ struct PostRowView: View {
     }
 }
 
-
 // SwiftUI-compatible FeedViewModel
 class SwiftUIFeedViewModel: ObservableObject {
     @Published var posts: [Post] = []
@@ -330,7 +329,6 @@ class SwiftUIFeedViewModel: ObservableObject {
         try await feedViewModel.vote(on: post, upvote: upvote)
     }
 }
-
 
 extension PostType {
     var displayName: String {

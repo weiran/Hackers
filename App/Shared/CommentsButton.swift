@@ -48,11 +48,11 @@ extension CommentsButton {
 
         let hostingController = UIHostingController(rootView: commentsButton)
         hostingController.view.backgroundColor = .clear
-        
+
         parentViewController.addChild(hostingController)
         parentViewController.view.addSubview(hostingController.view)
         hostingController.didMove(toParent: parentViewController)
-        
+
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hostingController.view.topAnchor.constraint(equalTo: parentViewController.view.topAnchor),

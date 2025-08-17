@@ -1,5 +1,3 @@
-// swiftlint:disable force_cast
-
 import XCTest
 @testable import Settings
 

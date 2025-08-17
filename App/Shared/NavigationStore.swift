@@ -48,9 +48,9 @@ class NavigationStore: ObservableObject {
         selectedPostType = postType
         clearSelection()
     }
-    
+
     // MARK: - Deep Linking
-    
+
     func handleOpenURL(_ url: URL) {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier,
               let scheme = url.scheme,
@@ -58,9 +58,9 @@ class NavigationStore: ObservableObject {
               let view = url.host else {
             return
         }
-        
+
         let parameters = parseParameters(from: url)
-        
+
         switch view {
         case "item":
             if let idString = parameters["id"],
@@ -71,7 +71,7 @@ class NavigationStore: ObservableObject {
             break
         }
     }
-    
+
     private func parseParameters(from url: URL) -> [String: String] {
         var parameters: [String: String] = [:]
         URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.forEach {
@@ -79,11 +79,11 @@ class NavigationStore: ObservableObject {
         }
         return parameters
     }
-    
+
     func navigateToPost(withId id: Int) {
         // Store the pending post ID to be handled when posts are loaded
         pendingPostId = id
-        
+
         // Create a temporary post object for immediate navigation
         // This will be replaced with the actual post data when loaded
         let tempPost = Post(
@@ -97,7 +97,7 @@ class NavigationStore: ObservableObject {
             postType: .news,
             upvoted: false
         )
-        
+
         showPost(tempPost)
     }
 }

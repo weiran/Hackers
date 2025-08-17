@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct HackerNewsConstants {
+enum HackerNewsConstants {
     static let baseURL = "https://news.ycombinator.com"
     static let host = "news.ycombinator.com"
 }

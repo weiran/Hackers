@@ -7,10 +7,11 @@ public protocol NetworkManagerProtocol: Sendable {
     func containsCookie(for url: URL) -> Bool
 }
 
-public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskDelegate, NetworkManagerProtocol, Sendable {
+public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskDelegate,
+    NetworkManagerProtocol, Sendable {
     private let session: URLSession
 
-    public override init() {
+    override public init() {
         self.session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
         super.init()
     }

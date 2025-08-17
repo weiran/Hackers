@@ -10,7 +10,7 @@ import UIKit
 import SafariServices
 
 @MainActor
-struct LinkOpener {
+enum LinkOpener {
     static func openURL(_ url: URL, with post: Post? = nil, showCommentsButton: Bool = false) {
         guard !url.absoluteString.starts(with: "item?id=") else { return }
 
