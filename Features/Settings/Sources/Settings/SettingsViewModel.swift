@@ -3,10 +3,10 @@ import Domain
 import Shared
 
 @Observable
-public class SettingsViewModel: Sendable {
-    private let settingsUseCase: SettingsUseCase
+public final class SettingsViewModel: @unchecked Sendable {
+    private var settingsUseCase: any SettingsUseCase
 
-    public init(settingsUseCase: SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
+    public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
         self.settingsUseCase = settingsUseCase
     }
 

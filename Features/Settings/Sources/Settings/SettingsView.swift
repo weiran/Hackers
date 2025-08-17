@@ -116,11 +116,14 @@ struct MailView: UIViewControllerRepresentable {
         }
 
         func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-            defer { controller.dismiss(animated: true) }
-            if let error = error {
-                parent.result = .failure(error)
-            } else {
-                parent.result = .success(result)
+            let parentCopy = parent
+            Task { @MainActor in
+                controller.dismiss(animated: true)
+                if let error = error {
+                    parentCopy.result = .failure(error)
+                } else {
+                    parentCopy.result = .success(result)
+                }
             }
         }
     }

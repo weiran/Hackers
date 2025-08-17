@@ -11,6 +11,7 @@
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38928AD08CC00CB396B /* WhatsNewKit */; };
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
+		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
 		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -136,6 +137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */,
+				241E7B492E51D1C80013EEA1 /* Settings in Frameworks */,
 				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
@@ -279,6 +281,7 @@
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				2406B38928AD08CC00CB396B /* WhatsNewKit */,
 				241E7B402E511BC20013EEA1 /* Data */,
+				241E7B482E51D1C80013EEA1 /* Settings */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -328,6 +331,7 @@
 				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
 				241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */,
 				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
+				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -912,6 +916,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = DesignSystem;
 		};
+		241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Settings;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -960,6 +968,10 @@
 		241E7B402E511BC20013EEA1 /* Data */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Data;
+		};
+		241E7B482E51D1C80013EEA1 /* Settings */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Settings;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
