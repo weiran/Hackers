@@ -9,6 +9,11 @@
 import SwiftUI
 import SafariServices
 
+// Wrapper to make post ID identifiable for navigation
+struct PostNavigation: Identifiable, Hashable {
+    let id: Int
+}
+
 struct CommentsView: View {
     let post: Post
     @EnvironmentObject private var navigationStore: NavigationStore
@@ -27,7 +32,7 @@ struct CommentsView: View {
     @State private var showTitle = false
     @State private var headerHeight: CGFloat = 0
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
-    @State private var navigateToPostId: Int?
+    @State private var navigateToPost: PostNavigation?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -209,26 +214,22 @@ struct CommentsView: View {
                 Text(voteErrorMessage)
             }
             .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: Binding(
-            get: { navigateToPostId != nil },
-            set: { if !$0 { navigateToPostId = nil } }
-        )) {
-            if let postId = navigateToPostId {
-                // Create a temporary post for navigation
-                let tempPost = Post(
-                    id: postId,
-                    url: URL(string: "https://news.ycombinator.com/item?id=\(postId)")!,
-                    title: "Loading...",
-                    age: "",
-                    commentsCount: 0,
-                    by: "",
-                    score: 0,
-                    postType: .news,
-                    upvoted: false
-                )
-                CommentsView(post: tempPost)
-                    .environmentObject(navigationStore)
-            }
+        .navigationDestination(item: $navigateToPost) { postNav in
+            // Create a temporary post for navigation
+            let tempPost = Post(
+                id: postNav.id,
+                url: URL(string: "https://news.ycombinator.com/item?id=\(postNav.id)")!,
+                title: "Loading...",
+                age: "",
+                commentsCount: 0,
+                by: "",
+                score: 0,
+                postType: .news,
+                upvoted: false
+            )
+            CommentsView(post: tempPost)
+                .environmentObject(navigationStore)
+                .id(postNav.id) // Force unique identity for each CommentsView
         }
         .environment(\.openURL, OpenURLAction { url in
             // Check if it's a Hacker News item URL
@@ -237,7 +238,7 @@ struct CommentsView: View {
                let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
                let id = Int(idString) {
                 // Navigate to the post's comments
-                navigateToPostId = id
+                navigateToPost = PostNavigation(id: id)
                 return .handled
             }
             
