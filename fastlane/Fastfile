@@ -30,6 +30,6 @@ platform :ios do
 
   desc "Lint"
   lane :lint do
-    swiftlint
+    swiftlint(config_file: ".swiftlint.yml")
   end
 end

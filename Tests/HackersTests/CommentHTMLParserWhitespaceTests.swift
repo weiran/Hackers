@@ -6,7 +6,7 @@
 //  Copyright © 2024 Glass Umbrella. All rights reserved.
 //
 
-// swiftlint:disable file_length type_body_length line_length
+// swiftlint:disable file_length type_body_length line_length force_cast
 
 import Testing
 import Foundation

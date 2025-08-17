@@ -6,6 +6,8 @@
 //  Copyright © 2019 Weiran Zhang. All rights reserved.
 //
 
+// swiftlint:disable force_cast
+
 import XCTest
 
 class HackersUITests: XCTestCase {
