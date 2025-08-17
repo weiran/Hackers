@@ -33,7 +33,7 @@ struct SettingsView: View {
                     }
                     Button(action: {
                         if let url = URL(string: "https://github.com/weiran/hackers") {
-                            UIApplication.shared.open(url)
+                            LinkOpener.openURL(url)
                         }
                     }, label: {
                         Text("Hackers on GitHub")

@@ -329,8 +329,7 @@ struct CommentsView: View {
         }
 
         // Get the screen bounds
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
+        guard let window = PresentationService.shared.windowScene?.windows.first else {
             return false
         }
 
@@ -405,23 +404,11 @@ struct CommentsView: View {
     }
 
     private func sharePost(url: URL, title: String) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            activityVC.setValue(title, forKey: "subject")
-
-            if let popover = activityVC.popoverPresentationController {
-                popover.sourceView = rootVC.view
-                popover.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
-                popover.permittedArrowDirections = []
-            }
-
-            rootVC.present(activityVC, animated: true)
-        }
+        ShareService.shared.shareURL(url, title: title)
     }
 
     private func shareComment(_ comment: Comment) {
-        sharePost(url: comment.hackerNewsURL, title: "Comment by \(comment.by)")
+        ShareService.shared.shareComment(comment)
     }
 
     private func copyComment(_ comment: Comment) {
