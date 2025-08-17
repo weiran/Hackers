@@ -14,9 +14,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Domain",
-            path: ".",
-            exclude: ["Tests"]
+            name: "Domain"
         ),
         .testTarget(
             name: "DomainTests",

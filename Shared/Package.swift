@@ -20,9 +20,7 @@ let package = Package(
     targets: [
         .target(
             name: "Shared",
-            dependencies: ["Domain", "Data", "Networking"],
-            path: ".",
-            exclude: ["Tests"]
+            dependencies: ["Domain", "Data", "Networking"]
         ),
         .testTarget(
             name: "SharedTests",

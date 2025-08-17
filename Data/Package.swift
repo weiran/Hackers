@@ -20,9 +20,7 @@ let package = Package(
     targets: [
         .target(
             name: "Data",
-            dependencies: ["Domain", "Networking", "SwiftSoup"],
-            path: ".",
-            exclude: ["Tests"]
+            dependencies: ["Domain", "Networking", "SwiftSoup"]
         ),
         .testTarget(
             name: "DataTests",

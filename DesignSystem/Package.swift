@@ -14,8 +14,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "DesignSystem",
-            path: "."
+            name: "DesignSystem"
         ),
         .testTarget(
             name: "DesignSystemTests",
