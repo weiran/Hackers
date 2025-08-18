@@ -168,21 +168,21 @@ struct CommentsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    if showTitle {
-                        HStack {
-                            ThumbnailView(url: UserDefaults.standard.showThumbnails ? currentPost.url : nil)
-                                .frame(width: 33, height: 33)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                            Text(currentPost.title)
-                                .font(.headline)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                        }
-                        .onTapGesture {
-                            handleLinkTap()
-                        }
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    HStack {
+                        ThumbnailView(url: UserDefaults.standard.showThumbnails ? currentPost.url : nil)
+                            .frame(width: 33, height: 33)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        Text(currentPost.title)
+                            .font(.headline)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
+                    .onTapGesture {
+                        handleLinkTap()
+                    }
+                    .opacity(showTitle ? 1.0 : 0.0)
+                    .offset(y: showTitle ? 0 : 20)
+                    .animation(.easeInOut(duration: 0.3), value: showTitle)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
