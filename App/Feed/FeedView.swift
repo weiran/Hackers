@@ -63,6 +63,11 @@ struct FeedView: View {
                                 // iPad: Use tag for List selection, which triggers navigation via selectionBinding
                                 rowView
                                     .tag(post.id)
+                                    .background(
+                                        selectionBinding.wrappedValue == post.id 
+                                            ? Color(UIColor.systemGray4).opacity(0.5)
+                                            : Color.clear
+                                    )
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
                                 NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
@@ -100,7 +105,8 @@ struct FeedView: View {
                     }
                 }
                 .listStyle(.plain)
-                .tint(Color(UIColor.systemGray3))
+                .tint(isSidebar ? Color.clear : Color(UIColor.systemGray3))
+                .environment(\.defaultMinListRowHeight, 0)
                 .refreshable {
                     await viewModel.loadFeed()
                 }
