@@ -100,6 +100,7 @@ struct FeedView: View {
                     }
                 }
                 .listStyle(.plain)
+                .tint(Color(UIColor.systemGray3))
                 .refreshable {
                     await viewModel.loadFeed()
                 }
