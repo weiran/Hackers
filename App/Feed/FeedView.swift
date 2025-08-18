@@ -60,13 +60,9 @@ struct FeedView: View {
                         
                         Group {
                             if isSidebar {
-                                // iPad: Use tag for selection, tap gesture for navigation
+                                // iPad: Use tag for List selection, which triggers navigation via selectionBinding
                                 rowView
                                     .tag(post.id)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        navigationStore.showPost(post)
-                                    }
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
                                 NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
