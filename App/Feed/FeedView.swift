@@ -43,22 +43,48 @@ struct FeedView: View {
             } else {
                 List(selection: selectionBinding) {
                     ForEach(viewModel.posts, id: \.id) { post in
-                        PostRowView(
-                            post: post,
-                            navigationStore: navigationStore,
-                            isSidebar: isSidebar,
-                            onVote: { post in
-                                Task {
-                                    await handleVote(post: post)
+                        Group {
+                            if isSidebar {
+                                // iPad: Use tag for selection, tap gesture for navigation
+                                PostRowView(
+                                    post: post,
+                                    navigationStore: navigationStore,
+                                    isSidebar: isSidebar,
+                                    onVote: { post in
+                                        Task {
+                                            await handleVote(post: post)
+                                        }
+                                    },
+                                    onLinkTap: { post in
+                                        handleLinkTap(post: post)
+                                    },
+                                    onCommentsTap: { _ in }
+                                )
+                                .tag(post.id)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    navigationStore.showPost(post)
                                 }
-                            },
-                            onLinkTap: { post in
-                                handleLinkTap(post: post)
-                            },
-                            onCommentsTap: { _ in
-                                // This callback is no longer needed since we use NavigationLink
+                            } else {
+                                // iPhone: Use NavigationLink for proper row behavior
+                                NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
+                                    PostRowView(
+                                        post: post,
+                                        navigationStore: navigationStore,
+                                        isSidebar: isSidebar,
+                                        onVote: { post in
+                                            Task {
+                                                await handleVote(post: post)
+                                            }
+                                        },
+                                        onLinkTap: { post in
+                                            handleLinkTap(post: post)
+                                        },
+                                        onCommentsTap: { _ in }
+                                    )
+                                }
                             }
-                        )
+                        }
                         .onAppear {
                             // Load next page when near end
                             if post == viewModel.posts.last {
@@ -225,42 +251,30 @@ struct PostRowView: View {
     }
 
     var body: some View {
-        Group {
-            if isSidebar {
-                // For iPad sidebar - just use tag for List selection
-                postContent
-                    .tag(post.id)
-            } else {
-                // For iPhone - use tap gesture to trigger navigation
-                postContent
-                    .onTapGesture {
-                        navigationStore.showPost(post)
-                    }
-            }
-        }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            if UserDefaults.standard.swipeActionsEnabled {
-                if post.upvoted {
-                    // Only show unvote if unvote link is available
-                    if post.voteLinks?.unvote != nil {
+        postContent
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                if UserDefaults.standard.swipeActionsEnabled {
+                    if post.upvoted {
+                        // Only show unvote if unvote link is available
+                        if post.voteLinks?.unvote != nil {
+                            Button {
+                                onVote?(post)
+                            } label: {
+                                Image(systemName: "arrow.uturn.down")
+                            }
+                            .tint(.secondary)
+                        }
+                    } else {
+                        // Show upvote button
                         Button {
                             onVote?(post)
                         } label: {
-                            Image(systemName: "arrow.uturn.down")
+                            Image(systemName: "arrow.up")
                         }
-                        .tint(.secondary)
+                        .tint(Color("upvotedColor"))
                     }
-                } else {
-                    // Show upvote button
-                    Button {
-                        onVote?(post)
-                    } label: {
-                        Image(systemName: "arrow.up")
-                    }
-                    .tint(Color("upvotedColor"))
                 }
             }
-        }
     }
 
     private var postContent: some View {

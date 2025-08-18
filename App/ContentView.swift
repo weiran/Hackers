@@ -30,10 +30,7 @@ struct MainContentView: View {
                     } else {
                         FeedView()
                             .environmentObject(navigationStore)
-                            .navigationDestination(item: $navigationStore.selectedPost) { post in
-                                CommentsView(post: post)
-                                    .environmentObject(navigationStore)
-                            }
+                            // Navigation is now handled by NavigationLink in FeedView
                     }
                 }
             }

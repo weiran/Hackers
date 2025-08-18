@@ -40,15 +40,18 @@ struct PostDisplayView: View {
                     .frame(width: 55, height: 55)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .contentShape(Rectangle())
-                    .onTapGesture {
-                        if showVoteButton {
-                            // Comments view - thumbnail taps to open link
-                            onLinkTap()
-                        } else if let onThumbnailTap = onThumbnailTap {
-                            // Feed view - thumbnail has specific tap behavior
-                            onThumbnailTap()
-                        }
-                    }
+                    .highPriorityGesture(
+                        TapGesture()
+                            .onEnded { _ in
+                                if showVoteButton {
+                                    // Comments view - thumbnail taps to open link
+                                    onLinkTap()
+                                } else if let onThumbnailTap = onThumbnailTap {
+                                    // Feed view - thumbnail has specific tap behavior
+                                    onThumbnailTap()
+                                }
+                            }
+                    )
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
