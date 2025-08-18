@@ -31,6 +31,7 @@ struct CommentsView: View {
     @State private var showingPostShareOptions = false
     @State private var refreshTrigger = false // Used to force SwiftUI updates
     @State private var showTitle = false
+    @State private var hasInitializedTitleVisibility = false
     @State private var headerHeight: CGFloat = 0
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var navigateToPost: PostNavigation?
@@ -70,9 +71,15 @@ struct CommentsView: View {
                             )
                         })
                         .onPreferenceChange(ViewOffsetKey.self) { offset in
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                // Show title when header scrolls above navigation bar (approximately)
+                            if !hasInitializedTitleVisibility {
+                                // On first load, set without animation to prevent flash
                                 showTitle = offset < 50
+                                hasInitializedTitleVisibility = true
+                            } else {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    // Show title when header scrolls above navigation bar (approximately)
+                                    showTitle = offset < 50
+                                }
                             }
                         }
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -180,9 +187,9 @@ struct CommentsView: View {
                     .onTapGesture {
                         handleLinkTap()
                     }
-                    .opacity(showTitle ? 1.0 : 0.0)
+                    .opacity(hasInitializedTitleVisibility ? (showTitle ? 1.0 : 0.0) : 0.0)
                     .offset(y: showTitle ? 0 : 20)
-                    .animation(.easeInOut(duration: 0.3), value: showTitle)
+                    .animation(hasInitializedTitleVisibility ? .easeInOut(duration: 0.3) : nil, value: showTitle)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
