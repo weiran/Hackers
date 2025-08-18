@@ -43,45 +43,34 @@ struct FeedView: View {
             } else {
                 List(selection: selectionBinding) {
                     ForEach(viewModel.posts, id: \.id) { post in
+                        let rowView = PostRowView(
+                            post: post,
+                            navigationStore: navigationStore,
+                            isSidebar: isSidebar,
+                            onVote: { post in
+                                Task {
+                                    await handleVote(post: post)
+                                }
+                            },
+                            onLinkTap: { post in
+                                handleLinkTap(post: post)
+                            },
+                            onCommentsTap: { _ in }
+                        )
+                        
                         Group {
                             if isSidebar {
                                 // iPad: Use tag for selection, tap gesture for navigation
-                                PostRowView(
-                                    post: post,
-                                    navigationStore: navigationStore,
-                                    isSidebar: isSidebar,
-                                    onVote: { post in
-                                        Task {
-                                            await handleVote(post: post)
-                                        }
-                                    },
-                                    onLinkTap: { post in
-                                        handleLinkTap(post: post)
-                                    },
-                                    onCommentsTap: { _ in }
-                                )
-                                .tag(post.id)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    navigationStore.showPost(post)
-                                }
+                                rowView
+                                    .tag(post.id)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        navigationStore.showPost(post)
+                                    }
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
                                 NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
-                                    PostRowView(
-                                        post: post,
-                                        navigationStore: navigationStore,
-                                        isSidebar: isSidebar,
-                                        onVote: { post in
-                                            Task {
-                                                await handleVote(post: post)
-                                            }
-                                        },
-                                        onLinkTap: { post in
-                                            handleLinkTap(post: post)
-                                        },
-                                        onCommentsTap: { _ in }
-                                    )
+                                    rowView
                                 }
                             }
                         }
