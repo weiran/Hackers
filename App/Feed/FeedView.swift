@@ -24,7 +24,19 @@ struct FeedView: View {
     }
 
     private var selectionBinding: Binding<Int?> {
-        .constant(nil)
+        if isSidebar {
+            Binding(
+                get: { navigationStore.selectedPost?.id },
+                set: { newPostId in
+                    if let postId = newPostId,
+                       let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
+                        navigationStore.showPost(selectedPost)
+                    }
+                }
+            )
+        } else {
+            .constant(nil)
+        }
     }
 
     var body: some View {
@@ -33,7 +45,7 @@ struct FeedView: View {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(selection: isSidebar ? .constant(nil) : selectionBinding) {
+                List(selection: selectionBinding) {
                     ForEach(viewModel.posts, id: \.id) { post in
                         let rowView = PostRowView(
                             post: post,
@@ -52,17 +64,9 @@ struct FeedView: View {
                         
                         Group {
                             if isSidebar {
-                                // iPad: Manual selection handling without List selection
+                                // iPad: Use native List selection with tag
                                 rowView
-                                    .background(
-                                        navigationStore.selectedPost?.id == post.id 
-                                            ? Color(UIColor.systemGray5)
-                                            : Color.clear
-                                    )
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        navigationStore.showPost(post)
-                                    }
+                                    .tag(post.id)
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
                                 NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
