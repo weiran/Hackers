@@ -24,15 +24,7 @@ struct FeedView: View {
     }
 
     private var selectionBinding: Binding<Int?> {
-        isSidebar ? Binding(
-            get: { navigationStore.selectedPost?.id },
-            set: { newPostId in
-                if let postId = newPostId,
-                   let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
-                    navigationStore.showPost(selectedPost)
-                }
-            }
-        ) : .constant(nil)
+        .constant(nil)
     }
 
     var body: some View {
@@ -41,7 +33,7 @@ struct FeedView: View {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(selection: selectionBinding) {
+                List(selection: isSidebar ? .constant(nil) : selectionBinding) {
                     ForEach(viewModel.posts, id: \.id) { post in
                         let rowView = PostRowView(
                             post: post,
@@ -60,14 +52,17 @@ struct FeedView: View {
                         
                         Group {
                             if isSidebar {
-                                // iPad: Use tag for List selection, which triggers navigation via selectionBinding
+                                // iPad: Manual selection handling without List selection
                                 rowView
-                                    .tag(post.id)
                                     .background(
-                                        selectionBinding.wrappedValue == post.id 
-                                            ? Color(UIColor.systemGray4).opacity(0.5)
+                                        navigationStore.selectedPost?.id == post.id 
+                                            ? Color(UIColor.systemGray5)
                                             : Color.clear
                                     )
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        navigationStore.showPost(post)
+                                    }
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
                                 NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
@@ -105,8 +100,6 @@ struct FeedView: View {
                     }
                 }
                 .listStyle(.plain)
-                .tint(isSidebar ? Color.clear : Color(UIColor.systemGray3))
-                .environment(\.defaultMinListRowHeight, 0)
                 .refreshable {
                     await viewModel.loadFeed()
                 }
