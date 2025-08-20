@@ -12,7 +12,7 @@ struct AppConfiguration {
     
     // Feature flags for clean architecture migration
     // Set to true once the modules are added to Xcode project
-    let useCleanFeed = false
+    let useCleanFeed = true
     let useCleanSettings = true
     let useCleanComments = false // Not migrated yet
     
