@@ -478,6 +478,99 @@ struct CommentHTMLParserTests {
         #expect(resultString.contains("result && true"), "HTML entities in italic text should be decoded")
     }
 
+    // MARK: - Code Block Tests
+    
+    @Test("Code block parsing - basic pre/code block")
+    func testBasicCodeBlockParsing() {
+        let input = "Here is some code: <pre><code>function hello() {\n  return \"world\";\n}</code></pre> And more text."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("function hello()"), "Code block content should be preserved")
+        #expect(resultString.contains("return \"world\""), "Code block content should include nested lines")
+        #expect(!resultString.contains("<pre>"), "Pre tags should be removed")
+        #expect(!resultString.contains("<code>"), "Code tags should be removed")
+        // Check that there is paragraph spacing (double newlines) somewhere before the code
+        #expect(resultString.contains("\n\nfunction hello()"), "Code blocks should have paragraph spacing before them")
+        // The text after might not have spacing if it's considered part of the same block
+        #expect(resultString.contains("And more text"), "Text after code block should be preserved")
+    }
+    
+    @Test("Code block parsing - with HTML entities")
+    func testCodeBlockWithHTMLEntities() {
+        let input = "<pre><code>if (x &lt; y &amp;&amp; z &gt; w) {\n  return &quot;success&quot;;\n}</code></pre>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("if (x < y && z > w)"), "HTML entities in code blocks should be decoded")
+        #expect(resultString.contains("return \"success\""), "Quoted strings in code blocks should be decoded")
+    }
+    
+    @Test("Code block parsing - multiple code blocks")
+    func testMultipleCodeBlocks() {
+        let input = "First block: <pre><code>const a = 1;</code></pre> Second block: <pre><code>const b = 2;</code></pre>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("const a = 1"), "First code block should be preserved")
+        #expect(resultString.contains("const b = 2"), "Second code block should be preserved")
+    }
+    
+    @Test("Inline code parsing - basic inline code")
+    func testBasicInlineCodeParsing() {
+        let input = "Use the <code>getData()</code> function to retrieve data."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("getData()"), "Inline code content should be preserved")
+        #expect(!resultString.contains("<code>"), "Code tags should be removed")
+    }
+    
+    @Test("Inline code parsing - with HTML entities")
+    func testInlineCodeWithHTMLEntities() {
+        let input = "Check if <code>x &lt; y &amp;&amp; z &gt; w</code> is true."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("x < y && z > w"), "HTML entities in inline code should be decoded")
+    }
+    
+    @Test("Mixed code formatting - code blocks and inline code")
+    func testMixedCodeFormatting() {
+        let input = "Use <code>foo()</code> like this:\n<pre><code>function foo() {\n  return bar();\n}</code></pre>\nThen call <code>bar()</code>."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("foo()"), "First inline code should be preserved")
+        #expect(resultString.contains("function foo()"), "Code block should be preserved")
+        #expect(resultString.contains("bar()"), "Last inline code should be preserved")
+    }
+    
+    @Test("Code with other formatting - bold and italic with code")
+    func testCodeWithOtherFormatting() {
+        let input = "This is <b>bold</b>, <i>italic</i>, and <code>code</code> text."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString == "This is bold, italic, and code text.", "All formatting should be processed correctly")
+    }
+    
+    @Test("Code blocks in paragraphs")
+    func testCodeBlocksInParagraphs() {
+        let input = "<p>First paragraph with text.</p><p><pre><code>const example = true;</code></pre></p><p>Last paragraph.</p>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("const example = true"), "Code block in paragraph should be preserved")
+        #expect(resultString.contains("First paragraph"), "First paragraph should be preserved")
+        #expect(resultString.contains("Last paragraph"), "Last paragraph should be preserved")
+    }
+    
+    @Test("Code block paragraph spacing")
+    func testCodeBlockParagraphSpacing() {
+        let input = "Text before code block.<pre><code>const code = 123;</code></pre>Text after code block."
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        // Should have paragraph spacing (double newline) before code block
+        #expect(resultString.contains("block.\n\nconst code"), "Code block should have paragraph spacing before it")
+        // Should have single line spacing after code block
+        #expect(resultString.contains("123;\nText after"), "Code block should have single line spacing after it")
+        // Should NOT have double newlines after the code
+        #expect(!resultString.contains("123;\n\nText"), "Should not have double newlines after code block")
+    }
+
     // MARK: - String Extension Tests
 
     @Test("String extension - strippingHTML")

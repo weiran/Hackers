@@ -9,6 +9,8 @@
 import Foundation
 import SwiftUI
 
+// swiftlint:disable type_body_length
+
 /// High-performance HTML parser optimized for comment content
 enum CommentHTMLParser {
 
@@ -69,6 +71,24 @@ enum CommentHTMLParser {
         }
     }()
 
+    private static let codeBlockRegex: NSRegularExpression = {
+        let pattern = #"<pre>\s*<code>(.*?)</code>\s*</pre>"#
+        do {
+            return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        } catch {
+            fatalError("Invalid regex pattern: \(error)")
+        }
+    }()
+
+    private static let inlineCodeRegex: NSRegularExpression = {
+        let pattern = #"<code\b[^>]*>(.*?)</code>"#
+        do {
+            return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
+        } catch {
+            fatalError("Invalid regex pattern: \(error)")
+        }
+    }()
+
     // MARK: - Public Interface
 
     /// Parses HTML text into an AttributedString with optimized performance
@@ -108,6 +128,15 @@ enum CommentHTMLParser {
         // Don't trim to preserve whitespace around formatting tags
         let workingHTML = html
 
+        // Check if there are code blocks that need processing
+        let codeBlockRange = NSRange(location: 0, length: workingHTML.utf16.count)
+        let codeBlockMatches = codeBlockRegex.matches(in: workingHTML, range: codeBlockRange)
+        
+        if !codeBlockMatches.isEmpty {
+            // Process code blocks and return the result
+            return processCodeBlocks(workingHTML)
+        }
+
         // Check if there are paragraph tags
         let paragraphMatches = paragraphRegex.matches(
             in: workingHTML,
@@ -126,6 +155,74 @@ enum CommentHTMLParser {
             }
             return result
         }
+    }
+
+    /// Processes code blocks (pre/code tags) and returns an AttributedString with the code blocks already formatted
+    private static func processCodeBlocks(_ html: String) -> AttributedString {
+        var result = AttributedString()
+        let nsString = html as NSString
+        let range = NSRange(location: 0, length: html.utf16.count)
+        
+        // Find all code blocks
+        let codeBlockMatches = codeBlockRegex.matches(in: html, range: range)
+        
+        guard !codeBlockMatches.isEmpty else {
+            // No code blocks, process normally
+            return processLinksInText(html)
+        }
+        
+        var lastEnd = 0
+        
+        for (index, match) in codeBlockMatches.enumerated() {
+            // Add and process text before the code block
+            if match.range.location > lastEnd {
+                let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
+                let beforeText = nsString.substring(with: beforeRange)
+                // Process links and formatting in text before code block
+                let processedText = processLinksInText(beforeText)
+                if !String(processedText.characters).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    result += processedText
+                }
+            }
+            
+            // Extract and format the code block content
+            let codeContentRange = match.range(at: 1)
+            if codeContentRange.location != NSNotFound {
+                let codeContent = nsString.substring(with: codeContentRange)
+                // Decode HTML entities in the code content
+                let decodedCode = decodeHTMLEntities(codeContent)
+                
+                // Create formatted code block
+                var codeAttributedString = AttributedString(decodedCode)
+                
+                // Apply monospace font
+                let fullRange = codeAttributedString.startIndex..<codeAttributedString.endIndex
+                codeAttributedString[fullRange].font = .system(.body, design: .monospaced)
+                
+                // Add paragraph spacing before code block (like <p> tags)
+                // Only add spacing if there's content before this code block
+                if !result.characters.isEmpty {
+                    result += createParagraphSpacing()
+                }
+                
+                result += codeAttributedString
+                
+                // Add single line spacing after code block (not double)
+                result += AttributedString("\n")
+            }
+            
+            lastEnd = NSMaxRange(match.range)
+        }
+        
+        // Add and process remaining text after last code block
+        if lastEnd < nsString.length {
+            let remainingText = nsString.substring(from: lastEnd)
+            let processedText = processLinksInText(remainingText)
+            // Always add remaining text, even if it starts with whitespace
+            result += processedText
+        }
+        
+        return result
     }
 
     /// Processes content with paragraph tags, creating proper spacing between paragraphs
@@ -327,11 +424,11 @@ enum CommentHTMLParser {
         return htmlTagRegex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
     }
 
-    /// Processes formatting tags (bold and italic) and returns an AttributedString
+    /// Processes formatting tags (bold, italic, and inline code) and returns an AttributedString
     private static func processFormattingTags(_ text: String) -> AttributedString {
         // First remove empty formatting tags to prevent extra spaces
         let cleanedText = removeEmptyFormattingTags(text)
-        // Process both bold and italic tags together to preserve formatting
+        // Process bold, italic, and inline code tags together to preserve formatting
         return processFormattingTagsTogether(cleanedText)
     }
 
@@ -356,7 +453,7 @@ enum CommentHTMLParser {
         return result
     }
 
-    /// Processes both bold and italic tags together to preserve all formatting
+    /// Processes bold, italic, and inline code tags together to preserve all formatting
     private static func processFormattingTagsTogether(_ text: String) -> AttributedString {
         // For nested formatting, we need to strip all HTML tags first, then process the clean text
         // This prevents duplicate content from overlapping tags
@@ -391,6 +488,16 @@ enum CommentHTMLParser {
             if contentRange.location != NSNotFound {
                 let content = nsString.substring(with: contentRange)
                 formatSegments.append((range: match.range, type: .italic, content: content))
+            }
+        }
+        
+        // Find inline code tags (not within pre tags)
+        let inlineCodeMatches = inlineCodeRegex.matches(in: text, range: fullRange)
+        for match in inlineCodeMatches {
+            let contentRange = match.range(at: 1)
+            if contentRange.location != NSNotFound {
+                let content = nsString.substring(with: contentRange)
+                formatSegments.append((range: match.range, type: .code, content: content))
             }
         }
 
@@ -433,6 +540,8 @@ enum CommentHTMLParser {
                 case .italic:
                     formattedString.inlinePresentationIntent = .emphasized
                     formattedString.font = .body.italic()
+                case .code:
+                    formattedString.font = .system(.body, design: .monospaced)
                 }
 
                 result += formattedString
@@ -508,6 +617,7 @@ enum CommentHTMLParser {
     private enum FormattingType {
         case bold
         case italic
+        case code
     }
 
     /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)
