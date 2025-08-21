@@ -23,9 +23,14 @@ struct MainContentView: View {
                     if AppConfiguration.shared.useCleanFeed {
                         CleanFeedViewWrapper()
                             .environmentObject(navigationStore)
-                            .navigationDestination(item: $navigationStore.selectedPost) { post in
-                                CommentsView(post: post)
-                                    .environmentObject(navigationStore)
+                            .navigationDestination(item: $navigationStore.selectedHackersKitPost) { post in
+                                if AppConfiguration.shared.useCleanComments {
+                                    CleanCommentsViewWrapper(post: post)
+                                        .environmentObject(navigationStore)
+                                } else {
+                                    CommentsView(post: post)
+                                        .environmentObject(navigationStore)
+                                }
                             }
                     } else {
                         FeedView()
@@ -69,10 +74,16 @@ struct AdaptiveSplitView: View {
         } detail: {
             // Detail - CommentsView or empty state
             NavigationStack {
-                if let selectedPost = navigationStore.selectedPost {
-                    CommentsView(post: selectedPost)
-                        .environmentObject(navigationStore)
-                        .id(selectedPost.id) // Add id to force re-render when post changes
+                if let selectedPost = navigationStore.selectedHackersKitPost {
+                    if AppConfiguration.shared.useCleanComments {
+                        CleanCommentsViewWrapper(post: selectedPost)
+                            .environmentObject(navigationStore)
+                            .id(selectedPost.id) // Add id to force re-render when post changes
+                    } else {
+                        CommentsView(post: selectedPost)
+                            .environmentObject(navigationStore)
+                            .id(selectedPost.id) // Add id to force re-render when post changes
+                    }
                 } else {
                     EmptyDetailView()
                 }

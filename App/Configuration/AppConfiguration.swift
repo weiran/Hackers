@@ -14,7 +14,7 @@ struct AppConfiguration {
     // Set to true once the modules are added to Xcode project
     let useCleanFeed = true
     let useCleanSettings = true
-    let useCleanComments = false // Not migrated yet
+    let useCleanComments = true // Migrated to clean architecture
     
     private init() {}
 }

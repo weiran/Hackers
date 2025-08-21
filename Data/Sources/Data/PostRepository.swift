@@ -20,9 +20,20 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     }
 
     public func getPost(id: Int) async throws -> Post {
-        let html = try await fetchPostHtml(id: id, recursive: false)
+        let html = try await fetchPostHtml(id: id, recursive: true)
         let document = try SwiftSoup.parse(html)
-        let post = try post(from: document.select(".fatitem"), type: .news)
+        
+        // Get the fatitem table element
+        guard let fatitemTable = try document.select("table.fatitem").first() else {
+            throw HackersKitError.scraperError
+        }
+        
+        // Parse the post from the fatitem table
+        let posts = try self.posts(from: fatitemTable, type: .news)
+        guard let post = posts.first else {
+            throw HackersKitError.scraperError
+        }
+        
         let comments = try self.comments(from: html)
         var postWithComments = post
         postWithComments.comments = comments
@@ -134,7 +145,14 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
 
     private func posts(from tableElement: Element, type: PostType) throws -> [Post] {
         if tableElement.hasClass("fatitem") {
-            let postElements = try tableElement.select("tr")
+            // For single post pages, we need to get only the first two tr elements
+            let allRows = try tableElement.select("tr")
+            guard allRows.size() >= 2 else {
+                throw HackersKitError.scraperError
+            }
+            let titleElement = try allRows.get(0)
+            let metadataElement = try allRows.get(1)
+            let postElements = Elements([titleElement, metadataElement])
             let post = try self.post(from: postElements, type: type)
             return [post]
         } else {
@@ -151,7 +169,11 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     }
 
     private func post(from elements: Elements, type: PostType) throws -> Post {
-        let titleElement = try elements.first()!
+        guard elements.size() >= 2 else {
+            throw HackersKitError.scraperError
+        }
+        
+        let titleElement = try elements.get(0)
         let metadataElement = try elements.get(1)
 
         let id = Int(try titleElement.attr("id")) ?? 0
@@ -206,7 +228,65 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     }
 
     private func comments(from html: String) throws -> [Domain.Comment] {
-        // Simplified comment parsing - would need full implementation from CommentHTMLParser
-        return []
+        let document = try SwiftSoup.parse(html)
+        let commentElements = try document.select(".comtr")
+        
+        return commentElements.compactMap { element in
+            do {
+                return try parseComment(from: element)
+            } catch {
+                // Skip comments that can't be parsed (deleted, etc.)
+                return nil
+            }
+        }
+    }
+    
+    private func parseComment(from element: Element) throws -> Domain.Comment {
+        let text = try commentText(from: element.select(".commtext"))
+        
+        // Skip empty comments (deleted comments, etc.)
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw HackersKitError.scraperError
+        }
+        
+        let age = try element.select(".age").text()
+        let user = try element.select(".hnuser").text()
+        guard let id = try Int(element.select(".comtr").attr("id")) else {
+            throw HackersKitError.scraperError
+        }
+        guard let indentWidth = try Int(element.select(".ind img").attr("width")) else {
+            throw HackersKitError.scraperError
+        }
+        let level = indentWidth / 40
+        let voteLinksResult = try self.voteLinks(from: element)
+        let upvoted = voteLinksResult.upvoted
+        
+        return Domain.Comment(
+            id: id,
+            age: age,
+            text: text,
+            by: user,
+            level: level,
+            upvoted: upvoted,
+            voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+        )
+    }
+    
+    private func commentText(from elements: Elements) throws -> String {
+        // Clear reply link from text
+        if let replyElement = try? elements.select(".reply") {
+            try replyElement.html("")
+        }
+        
+        // Parse links from href attribute rather than truncated text
+        if let links = try? elements.select("a") {
+            try links.forEach { link in
+                if let url = try? link.attr("href") {
+                    try link.html(url)
+                }
+            }
+        }
+        
+        return try elements.html()
     }
 }

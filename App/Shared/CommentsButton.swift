@@ -37,8 +37,9 @@ extension CommentsButton {
         let commentsButton = CommentsButton(post: post) { [weak parentViewController] in
             guard let parentViewController = parentViewController else { return }
             let navigationStore = NavigationStore()
-            let commentsView = CommentsView(post: post)
-                .environmentObject(navigationStore)
+            let commentsView: AnyView = AppConfiguration.shared.useCleanComments
+                ? AnyView(CleanCommentsViewWrapper(post: post).environmentObject(navigationStore))
+                : AnyView(CommentsView(post: post).environmentObject(navigationStore))
 
             let hostingController = UIHostingController(rootView: commentsView)
             let navigationController = UINavigationController(rootViewController: hostingController)

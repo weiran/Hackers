@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 public struct VoteLinks: Sendable, Hashable {
     public let upvote: URL?
@@ -63,16 +64,16 @@ public enum PostType: String, CaseIterable, Sendable {
     case active
 }
 
-public struct Comment: Sendable, Hashable {
+public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
     public let id: Int
     public let age: String
     public let text: String
     public let by: String
     public var level: Int
     public var upvoteLink: String?
-    public var upvoted: Bool
+    @Published public var upvoted: Bool
     public var voteLinks: VoteLinks?
-    public var visibility: CommentVisibilityType
+    @Published public var visibility: CommentVisibilityType
     public var parsedText: AttributedString?
 
     public init(
@@ -97,6 +98,14 @@ public struct Comment: Sendable, Hashable {
         self.voteLinks = voteLinks
         self.visibility = visibility
         self.parsedText = parsedText
+    }
+    
+    public static func == (lhs: Comment, rhs: Comment) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

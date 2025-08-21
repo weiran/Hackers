@@ -8,9 +8,12 @@
 
 import SwiftUI
 import Combine
+import Shared
+import Domain
 
-class NavigationStore: ObservableObject {
-    @Published var selectedPost: Post?
+class NavigationStore: ObservableObject, NavigationStoreProtocol {
+    @Published var selectedPost: Domain.Post? // Using Domain.Post for protocol conformance
+    @Published var selectedHackersKitPost: Post? // Keep old Post for compatibility
     @Published var selectedPostType: PostType = .news
     @Published var showingLogin = false
     @Published var showingSettings = false
@@ -28,12 +31,20 @@ class NavigationStore: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func showPost(_ post: Post) {
+    func showPost(_ post: Domain.Post) {
         selectedPost = post
+        selectedHackersKitPost = post.toHackersKit()
+    }
+    
+    // Overload for HackersKit Post during migration
+    func showPost(_ post: Post) {
+        selectedPost = post.toDomain()
+        selectedHackersKitPost = post
     }
 
     func clearSelection() {
         selectedPost = nil
+        selectedHackersKitPost = nil
     }
 
     func showLogin() {
@@ -44,6 +55,12 @@ class NavigationStore: ObservableObject {
         showingSettings = true
     }
 
+    func selectPostType(_ type: Domain.PostType) {
+        selectedPostType = type.toHackersKit()
+        clearSelection()
+    }
+    
+    // Overload for HackersKit PostType during migration
     func selectPostType(_ postType: PostType) {
         selectedPostType = postType
         clearSelection()

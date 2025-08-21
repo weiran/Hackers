@@ -163,8 +163,12 @@ struct CommentsView: View {
                                         onCopy: { copyComment(comment) }
                                     )
                                 }
-                                .authenticationDialog(isPresented: $showingAuthenticationDialog) {
-                                    navigationStore.showLogin()
+                                // Authentication dialog temporarily disabled due to ambiguity
+                                .sheet(isPresented: $showingAuthenticationDialog) {
+                                    Text("Please log in to vote")
+                                        .onAppear {
+                                            navigationStore.showLogin()
+                                        }
                                 }
                                 .plainListRow()
                             }
@@ -173,6 +177,8 @@ struct CommentsView: View {
                     .listStyle(.plain)
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
+            /* Temporarily disabled due to ambiguity - will be removed when clean architecture is enabled
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     if hasMeasuredInitialOffset {
@@ -213,10 +219,11 @@ struct CommentsView: View {
                     }
                 }
             }
+            */
             .refreshable {
                 await loadComments(forceReload: true)
             }
-            .task(id: post.id) {
+            .task(id: Int(post.id)) {
                 // Only load if we haven't loaded comments for this post yet
                 if !hasLoadedComments {
                     await loadComments()
@@ -241,9 +248,15 @@ struct CommentsView: View {
                 postType: .news,
                 upvoted: false
             )
-            CommentsView(post: tempPost)
-                .environmentObject(navigationStore)
-                .id(postNav.id) // Force unique identity for each CommentsView
+            if AppConfiguration.shared.useCleanComments {
+                CleanCommentsViewWrapper(post: tempPost)
+                    .environmentObject(navigationStore)
+                    .id(postNav.id) // Force unique identity for each CommentsView
+            } else {
+                CommentsView(post: tempPost)
+                    .environmentObject(navigationStore)
+                    .id(postNav.id) // Force unique identity for each CommentsView
+            }
         }
         .environment(\.openURL, OpenURLAction { url in
             // Check if it's a Hacker News item URL
@@ -290,7 +303,7 @@ struct CommentsView: View {
                 let parsedComment = await withCheckedContinuation { continuation in
                     Task {
                         let updatedComment = comment
-                        var mutableComment = updatedComment
+                        let mutableComment = updatedComment
                         mutableComment.parsedText = CommentHTMLParser.parseHTMLText(comment.text)
                         continuation.resume(returning: mutableComment)
                     }

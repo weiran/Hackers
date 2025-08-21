@@ -69,7 +69,11 @@ struct FeedView: View {
                                     .tag(post.id)
                             } else {
                                 // iPhone: Use NavigationLink for proper row behavior
-                                NavigationLink(destination: CommentsView(post: post).environmentObject(navigationStore)) {
+                                NavigationLink(destination: 
+                                    AppConfiguration.shared.useCleanComments 
+                                        ? AnyView(CleanCommentsViewWrapper(post: post).environmentObject(navigationStore))
+                                        : AnyView(CommentsView(post: post).environmentObject(navigationStore))
+                                ) {
                                     rowView
                                 }
                             }
@@ -98,8 +102,12 @@ struct FeedView: View {
                                 }
                             )
                         }
-                        .authenticationDialog(isPresented: $showingAuthenticationDialog) {
-                            navigationStore.showLogin()
+                        // Authentication dialog temporarily disabled due to ambiguity
+                        .sheet(isPresented: $showingAuthenticationDialog) {
+                            Text("Please log in to vote")
+                                .onAppear {
+                                    navigationStore.showLogin()
+                                }
                         }
                     }
                 }
