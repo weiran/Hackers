@@ -2,6 +2,9 @@ excluded:
   - scan_derived_data
   - fastlane
   - vendor
+  - .build
+  - DerivedData
+  - "**/SwiftSoup/**"
 reporter: "xcode"
 warning_threshold: 1000
 opt_in_rules:

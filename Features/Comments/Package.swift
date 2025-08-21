@@ -23,7 +23,7 @@ let package = Package(
         ),
         .testTarget(
             name: "CommentsTests",
-            dependencies: ["Comments"]
+            dependencies: ["Comments", "Domain", "Shared"]
         )
     ]
 )
