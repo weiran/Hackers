@@ -49,6 +49,9 @@ public final class CommentsViewModel: @unchecked Sendable {
             self.comments = loadedComments
             updateVisibleComments()
             
+            // Update the comments count with the actual number of comments
+            self.post.commentsCount = loadedComments.count
+            
             isLoading = false
         } catch {
             self.error = error
