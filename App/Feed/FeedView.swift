@@ -141,13 +141,10 @@ struct FeedView: View {
                     }
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: selectedPostType.iconName)
-                            .font(.headline)
-                            .foregroundColor(.primary)
                         Text(selectedPostType.displayName)
                             .font(.headline)
                             .foregroundColor(.primary)
-                        Image(systemName: "chevron.down")
+                        Image(systemName: "chevron.down.circle.fill")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }

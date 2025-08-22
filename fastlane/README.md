@@ -29,7 +29,7 @@ Run Unit Tests
 [bundle exec] fastlane ios test_all
 ```
 
-Run All Tests (including SPM modules)
+Run All Tests
 
 ### ios uitest
 
