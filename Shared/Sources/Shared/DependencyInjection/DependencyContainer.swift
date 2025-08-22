@@ -10,7 +10,7 @@ import Domain
 import Data
 import Networking
 
-public class DependencyContainer {
+public final class DependencyContainer: @unchecked Sendable {
     public static let shared = DependencyContainer()
     
     private lazy var networkManager: NetworkManagerProtocol = NetworkManager()

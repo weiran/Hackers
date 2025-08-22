@@ -88,15 +88,9 @@ public struct PostDisplayView: View {
             }
             
             if showPostText, let text = post.text, !text.isEmpty {
-                if let parsedText = post.parsedText {
-                    Text(parsedText)
-                        .foregroundColor(.primary)
-                        .padding(.top, 4)
-                } else {
-                    Text(text)
-                        .foregroundColor(.primary)
-                        .padding(.top, 4)
-                }
+                Text(text)
+                    .foregroundColor(.primary)
+                    .padding(.top, 4)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

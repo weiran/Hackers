@@ -42,22 +42,25 @@ public struct MailView: UIViewControllerRepresentable {
     }
     
     public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        let parent: MailView
+        var parent: MailView
         
         init(_ parent: MailView) {
             self.parent = parent
         }
         
-        public func mailComposeController(
+        nonisolated public func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
             error: Error?
         ) {
-            controller.dismiss(animated: true)
-            if let error = error {
-                parent.result = .failure(error)
-            } else {
-                parent.result = .success(result)
+            let parentCopy = parent
+            Task { @MainActor in
+                controller.dismiss(animated: true)
+                if let error = error {
+                    parentCopy.result = .failure(error)
+                } else {
+                    parentCopy.result = .success(result)
+                }
             }
         }
     }

@@ -7,7 +7,8 @@
 
 import UIKit
 
-public class PresentationService {
+@MainActor
+public final class PresentationService: @unchecked Sendable {
     public static let shared = PresentationService()
     
     private init() {}

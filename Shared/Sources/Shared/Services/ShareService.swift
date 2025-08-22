@@ -8,7 +8,7 @@
 import SwiftUI
 import Domain
 
-public class ShareService {
+public final class ShareService: @unchecked Sendable {
     public static let shared = ShareService()
     
     private init() {}
@@ -53,11 +53,5 @@ public class ShareService {
             
             rootViewController.present(activityVC, animated: true)
         }
-    }
-}
-
-extension String {
-    public func strippingHTML() -> String {
-        return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
     }
 }
