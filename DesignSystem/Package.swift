@@ -13,12 +13,13 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../Domain")
+        .package(path: "../Domain"),
+        .package(path: "../Shared")
     ],
     targets: [
         .target(
             name: "DesignSystem",
-            dependencies: ["Domain"]
+            dependencies: ["Domain", "Shared"]
         ),
         .testTarget(
             name: "DesignSystemTests",
