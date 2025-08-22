@@ -57,11 +57,13 @@ struct CommentsView: View {
                     List {
                         PostDisplayView(
                             post: currentPost,
-                            showVoteButton: true,
                             showPostText: true,
-                            onVote: { await handlePostVote() },
-                            onLinkTap: { handleLinkTap() }
+                            onThumbnailTap: { handleLinkTap() }
                         )
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            handleLinkTap()
+                        }
                         .padding()
                         .id("header")
                         .background(GeometryReader { geometry in

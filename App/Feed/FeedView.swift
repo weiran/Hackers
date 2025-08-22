@@ -59,7 +59,9 @@ struct FeedView: View {
                             onLinkTap: { post in
                                 handleLinkTap(post: post)
                             },
-                            onCommentsTap: { _ in }
+                            onCommentsTap: { post in
+                                navigationStore.showPost(post)
+                            }
                         )
                         
                         Group {
@@ -251,6 +253,10 @@ struct PostRowView: View {
 
     var body: some View {
         postContent
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onCommentsTap?(post)
+            }
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                 if UserDefaults.standard.swipeActionsEnabled {
                     if post.upvoted {
@@ -279,9 +285,7 @@ struct PostRowView: View {
     private var postContent: some View {
         PostDisplayView(
             post: post,
-            showVoteButton: false,
             showPostText: false,
-            onLinkTap: { onLinkTap?(post) },
             onThumbnailTap: { onLinkTap?(post) }
         )
     }

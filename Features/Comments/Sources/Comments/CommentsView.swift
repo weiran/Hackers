@@ -227,11 +227,13 @@ private struct PostHeader: View {
     var body: some View {
         PostDisplayView(
             post: post,
-            showVoteButton: true,
             showPostText: true,
-            onVote: onVote,
-            onLinkTap: onLinkTap
+            onThumbnailTap: { onLinkTap() }
         )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onLinkTap()
+        }
         .padding()
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
             // Swipe actions temporarily disabled - need UserDefaults extension

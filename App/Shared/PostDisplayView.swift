@@ -10,25 +10,16 @@ import SwiftUI
 
 struct PostDisplayView: View {
     let post: Post
-    let showVoteButton: Bool
     let showPostText: Bool
-    let onVote: (() async -> Void)?
-    let onLinkTap: () -> Void
     let onThumbnailTap: (() -> Void)?
 
     init(
         post: Post,
-        showVoteButton: Bool = false,
         showPostText: Bool = false,
-        onVote: (() async -> Void)? = nil,
-        onLinkTap: @escaping () -> Void,
         onThumbnailTap: (() -> Void)? = nil
     ) {
         self.post = post
-        self.showVoteButton = showVoteButton
         self.showPostText = showPostText
-        self.onVote = onVote
-        self.onLinkTap = onLinkTap
         self.onThumbnailTap = onThumbnailTap
     }
 
@@ -43,13 +34,7 @@ struct PostDisplayView: View {
                     .highPriorityGesture(
                         TapGesture()
                             .onEnded { _ in
-                                if showVoteButton {
-                                    // Comments view - thumbnail taps to open link
-                                    onLinkTap()
-                                } else if let onThumbnailTap = onThumbnailTap {
-                                    // Feed view - thumbnail has specific tap behavior
-                                    onThumbnailTap()
-                                }
+                                onThumbnailTap?()
                             }
                     )
 
@@ -63,38 +48,13 @@ struct PostDisplayView: View {
 
                     // Metadata row
                     HStack(spacing: 3) {
-                        if showVoteButton {
-                            // Only show vote button if we can actually vote/unvote
-                            if !post.upvoted || post.voteLinks?.unvote != nil {
-                                Button {
-                                    Task { await onVote?() }
-                                } label: {
-                                    HStack(spacing: 0) {
-                                        Text("\(post.score)")
-                                            .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                        Image(systemName: "arrow.up")
-                                            .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                            .font(.caption2)
-                                    }
-                                }
-                            } else {
-                                // Show non-interactive vote display when upvoted but no unvote link
-                                HStack(spacing: 0) {
-                                    Text("\(post.score)")
-                                        .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                    Image(systemName: "arrow.up")
-                                        .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                        .font(.caption2)
-                                }
-                            }
-                        } else {
-                            HStack(spacing: 0) {
-                                Text("\(post.score)")
-                                    .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                Image(systemName: "arrow.up")
-                                    .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
-                                    .font(.caption2)
-                            }
+                        // Always show non-interactive vote display (voting only via swipe gestures)
+                        HStack(spacing: 0) {
+                            Text("\(post.score)")
+                                .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
+                            Image(systemName: "arrow.up")
+                                .foregroundColor(post.upvoted ? Color("upvotedColor") : .secondary)
+                                .font(.caption2)
                         }
 
                         Text("•")
@@ -118,14 +78,6 @@ struct PostDisplayView: View {
                     }
                     .font(.subheadline)
                 }
-            }
-            .if(showVoteButton) { view in
-                view
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // In comments view, the entire content taps to open link
-                        onLinkTap()
-                    }
             }
 
             if showPostText, let text = post.text, !text.isEmpty {

@@ -6,25 +6,16 @@ import Domain
 
 public struct PostDisplayView: View {
     let post: Post
-    let showVoteButton: Bool
     let showPostText: Bool
-    let onVote: () async -> Void
-    let onLinkTap: () -> Void
     let onThumbnailTap: (() -> Void)?
 
     public init(
         post: Post,
-        showVoteButton: Bool = false,
         showPostText: Bool = false,
-        onVote: @escaping () async -> Void = {},
-        onLinkTap: @escaping () -> Void,
         onThumbnailTap: (() -> Void)? = nil
     ) {
         self.post = post
-        self.showVoteButton = showVoteButton
         self.showPostText = showPostText
-        self.onVote = onVote
-        self.onLinkTap = onLinkTap
         self.onThumbnailTap = onThumbnailTap
     }
 
@@ -37,13 +28,7 @@ public struct PostDisplayView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if showVoteButton {
-                            // Comments view - thumbnail taps to open link
-                            onLinkTap()
-                        } else if let onThumbnailTap = onThumbnailTap {
-                            // Feed view - thumbnail has specific tap behavior
-                            onThumbnailTap()
-                        }
+                        onThumbnailTap?()
                     }
 
                 VStack(alignment: .leading, spacing: 4) {
