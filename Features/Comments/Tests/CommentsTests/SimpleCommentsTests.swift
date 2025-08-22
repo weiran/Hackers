@@ -2,6 +2,7 @@ import Testing
 @testable import Comments
 import Domain
 import Shared
+import Foundation
 
 @Suite("Comments Module Tests")
 struct SimpleCommentsTests {
@@ -41,7 +42,7 @@ struct SimpleCommentsTests {
         @Test("Comment initializes with correct values")
         func commentInitialization() {
             // Given & When
-            let comment = Comment(
+            let comment = Domain.Comment(
                 id: 1,
                 age: "2 hours ago",
                 text: "This is a test comment",
@@ -62,13 +63,13 @@ struct SimpleCommentsTests {
         }
         
         @Test("Comment visibility transitions", arguments: [
-            (from: CommentVisibilityType.visible, to: CommentVisibilityType.compact),
-            (from: CommentVisibilityType.compact, to: CommentVisibilityType.hidden),
-            (from: CommentVisibilityType.hidden, to: CommentVisibilityType.visible)
+            (from: Domain.CommentVisibilityType.visible, to: Domain.CommentVisibilityType.compact),
+            (from: Domain.CommentVisibilityType.compact, to: Domain.CommentVisibilityType.hidden),
+            (from: Domain.CommentVisibilityType.hidden, to: Domain.CommentVisibilityType.visible)
         ])
-        func commentVisibilityToggle(from: CommentVisibilityType, to: CommentVisibilityType) {
+        func commentVisibilityToggle(from: Domain.CommentVisibilityType, to: Domain.CommentVisibilityType) {
             // Given
-            let comment = Comment(
+            let comment = Domain.Comment(
                 id: 1,
                 age: "1 hour ago",
                 text: "Test",
@@ -88,7 +89,7 @@ struct SimpleCommentsTests {
         @Test("Comment upvote state toggles correctly", arguments: [false, true])
         func commentUpvoteToggle(initialState: Bool) {
             // Given
-            let comment = Comment(
+            let comment = Domain.Comment(
                 id: 1,
                 age: "1 hour ago",
                 text: "Test",
@@ -161,17 +162,17 @@ struct SimpleCommentsTests {
                 upvoted: false
             )
             
-            let comments = (1...commentCount).map { index in
-                Comment(
+            let comments: [Domain.Comment] = commentCount > 0 ? (1...commentCount).map { index in
+                Domain.Comment(
                     id: index,
                     age: "\(index * 10) min ago",
                     text: "Comment \(index)",
                     by: "user\(index)",
                     level: index % 3, // Vary levels
                     upvoted: index % 2 == 0,
-                    visibility: .visible
+                    visibility: Domain.CommentVisibilityType.visible
                 )
-            }
+            } : []
             
             // When
             post.comments = comments.isEmpty ? nil : comments
@@ -213,11 +214,11 @@ struct SimpleCommentsTests {
         func commentHierarchy() {
             // Given
             let comments = [
-                Comment(id: 1, age: "1h", text: "Root 1", by: "user1", level: 0, upvoted: false, visibility: .visible),
-                Comment(id: 2, age: "50m", text: "Child 1.1", by: "user2", level: 1, upvoted: false, visibility: .visible),
-                Comment(id: 3, age: "45m", text: "Child 1.2", by: "user3", level: 1, upvoted: false, visibility: .visible),
-                Comment(id: 4, age: "40m", text: "Grandchild 1.1.1", by: "user4", level: 2, upvoted: false, visibility: .visible),
-                Comment(id: 5, age: "30m", text: "Root 2", by: "user5", level: 0, upvoted: false, visibility: .visible)
+                Domain.Comment(id: 1, age: "1h", text: "Root 1", by: "user1", level: 0, upvoted: false, visibility: .visible),
+                Domain.Comment(id: 2, age: "50m", text: "Child 1.1", by: "user2", level: 1, upvoted: false, visibility: .visible),
+                Domain.Comment(id: 3, age: "45m", text: "Child 1.2", by: "user3", level: 1, upvoted: false, visibility: .visible),
+                Domain.Comment(id: 4, age: "40m", text: "Grandchild 1.1.1", by: "user4", level: 2, upvoted: false, visibility: .visible),
+                Domain.Comment(id: 5, age: "30m", text: "Root 2", by: "user5", level: 0, upvoted: false, visibility: .visible)
             ]
             
             // Then
@@ -239,10 +240,10 @@ struct SimpleCommentsTests {
         func visibleCommentsFilter() {
             // Given
             let comments = [
-                Comment(id: 1, age: "1h", text: "Visible", by: "user1", level: 0, upvoted: false, visibility: .visible),
-                Comment(id: 2, age: "50m", text: "Hidden", by: "user2", level: 1, upvoted: false, visibility: .hidden),
-                Comment(id: 3, age: "45m", text: "Compact", by: "user3", level: 1, upvoted: false, visibility: .compact),
-                Comment(id: 4, age: "40m", text: "Visible", by: "user4", level: 2, upvoted: false, visibility: .visible)
+                Domain.Comment(id: 1, age: "1h", text: "Visible", by: "user1", level: 0, upvoted: false, visibility: .visible),
+                Domain.Comment(id: 2, age: "50m", text: "Hidden", by: "user2", level: 1, upvoted: false, visibility: .hidden),
+                Domain.Comment(id: 3, age: "45m", text: "Compact", by: "user3", level: 1, upvoted: false, visibility: .compact),
+                Domain.Comment(id: 4, age: "40m", text: "Visible", by: "user4", level: 2, upvoted: false, visibility: .visible)
             ]
             
             // When

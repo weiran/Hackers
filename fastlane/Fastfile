@@ -2,8 +2,75 @@ default_platform(:ios)
 
 platform :ios do
   desc "Run Unit Tests"
-  lane :test do
+  lane :test do |options|
+    if options[:module]
+      # Check if it's a valid test scheme or module
+      all_schemes = ["HackersTests", "HackersUITests"]
+      
+      if all_schemes.include?(options[:module])
+        run_tests(scheme: options[:module])
+      else
+        # For Swift packages, run tests using xcodebuild with iOS simulator
+        UI.message("Testing module: #{options[:module]}")
+        package_paths = {
+          "Domain" => "Domain",
+          "Data" => "Data",
+          "Shared" => "Shared",
+          "DesignSystem" => "DesignSystem",
+          "Networking" => "Networking",
+          "Comments" => "Features/Comments",
+          "Settings" => "Features/Settings",
+          "Feed" => "Features/Feed"
+        }
+        
+        package_path = package_paths[options[:module]]
+        if package_path
+          # Use xcodebuild to test the Swift package for iOS
+          sh("cd ../#{package_path} && xcodebuild test -scheme #{options[:module]} -destination 'platform=iOS Simulator,name=iPhone 16'")
+        else
+          UI.error("Unknown module: #{options[:module]}")
+          UI.message("Available modules: #{(all_schemes + package_paths.keys).join(', ')}")
+        end
+      end
+    else
+      # Default to main app tests
+      run_tests(scheme: "HackersTests")
+    end
+  end
+
+  desc "Run All Tests"
+  lane :test_all do
+    # Run main app tests
     run_tests(scheme: "HackersTests")
+    
+    # Run UI tests
+    run_tests(scheme: "HackersUITests")
+    
+    # Run Swift Package tests for each module
+    test_swift_packages
+  end
+
+  desc "Run Swift Package Tests"
+  private_lane :test_swift_packages do
+    packages = {
+      "Domain" => "Domain",
+      "Data" => "Data",
+      "Shared" => "Shared",
+      "DesignSystem" => "DesignSystem",
+      "Networking" => "Networking",
+      "Comments" => "Features/Comments",
+      "Settings" => "Features/Settings",
+      "Feed" => "Features/Feed"
+    }
+    
+    packages.each do |scheme, path|
+      UI.message("Testing #{scheme} module...")
+      begin
+        sh("cd ../#{path} && xcodebuild test -scheme #{scheme} -destination 'platform=iOS Simulator,name=iPhone 16'")
+      rescue => e
+        UI.error("Failed to test #{scheme}: #{e.message}")
+      end
+    end
   end
 
   desc "Run UI Tests"

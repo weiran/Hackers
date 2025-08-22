@@ -2,6 +2,7 @@ import Testing
 @testable import Comments
 import Domain
 import Shared
+import Foundation
 
 @Suite("CommentsViewModel Tests")
 struct CommentsViewModelTests {
@@ -65,8 +66,8 @@ struct CommentsViewModelTests {
         mockPostUseCase.mockPost = postWithComments
         
         var callbackCalled = false
-        var receivedComments: [Comment] = []
-        sut.onCommentsLoaded = { comments in
+        var receivedComments: [Domain.Comment] = []
+        sut.onCommentsLoaded = { (comments: [Domain.Comment]) in
             callbackCalled = true
             receivedComments = comments
         }
@@ -192,6 +193,18 @@ struct CommentsViewModelTests {
             )
         }
         
+        private func createTestComment(id: Int, level: Int = 0) -> Domain.Comment {
+            return Domain.Comment(
+                id: id,
+                age: "1 hour ago",
+                text: "Test comment \(id)",
+                by: "user\(id)",
+                level: level,
+                upvoted: false,
+                visibility: Domain.CommentVisibilityType.visible
+            )
+        }
+        
         @Test("Toggle comment from visible to compact hides children")
         @MainActor
         func toggleVisibleToCompact() {
@@ -199,17 +212,20 @@ struct CommentsViewModelTests {
             let parentComment = createTestComment(id: 1, level: 0)
             let childComment = createTestComment(id: 2, level: 1)
             sut.comments = [parentComment, childComment]
-            sut.updateVisibleComments()
+            // Set initial visibility
+            parentComment.visibility = Domain.CommentVisibilityType.visible
+            childComment.visibility = Domain.CommentVisibilityType.visible
+            sut.visibleComments = sut.comments
             
-            #expect(parentComment.visibility == .visible)
-            #expect(childComment.visibility == .visible)
+            #expect(parentComment.visibility == Domain.CommentVisibilityType.visible)
+            #expect(childComment.visibility == Domain.CommentVisibilityType.visible)
             
             // When
             sut.toggleCommentVisibility(parentComment)
             
             // Then
-            #expect(parentComment.visibility == .compact)
-            #expect(childComment.visibility == .hidden)
+            #expect(parentComment.visibility == Domain.CommentVisibilityType.compact)
+            #expect(childComment.visibility == Domain.CommentVisibilityType.hidden)
             #expect(sut.visibleComments.count == 1)
         }
         
@@ -218,18 +234,18 @@ struct CommentsViewModelTests {
         func toggleCompactToVisible() {
             // Given
             let parentComment = createTestComment(id: 1, level: 0)
-            parentComment.visibility = .compact
+            parentComment.visibility = Domain.CommentVisibilityType.compact
             let childComment = createTestComment(id: 2, level: 1)
-            childComment.visibility = .hidden
+            childComment.visibility = Domain.CommentVisibilityType.hidden
             sut.comments = [parentComment, childComment]
-            sut.updateVisibleComments()
+            sut.visibleComments = sut.comments
             
             // When
             sut.toggleCommentVisibility(parentComment)
             
             // Then
-            #expect(parentComment.visibility == .visible)
-            #expect(childComment.visibility == .visible)
+            #expect(parentComment.visibility == Domain.CommentVisibilityType.visible)
+            #expect(childComment.visibility == Domain.CommentVisibilityType.visible)
             #expect(sut.visibleComments.count == 2)
         }
         
@@ -241,22 +257,22 @@ struct CommentsViewModelTests {
             let childComment1 = createTestComment(id: 2, level: 1)
             let childComment2 = createTestComment(id: 3, level: 2)
             sut.comments = [rootComment, childComment1, childComment2]
-            sut.updateVisibleComments()
+            sut.visibleComments = sut.comments
             
             // When
             sut.hideCommentBranch(childComment2)
             
             // Then
-            #expect(rootComment.visibility == .compact)
-            #expect(childComment1.visibility == .hidden)
-            #expect(childComment2.visibility == .hidden)
+            #expect(rootComment.visibility == Domain.CommentVisibilityType.compact)
+            #expect(childComment1.visibility == Domain.CommentVisibilityType.hidden)
+            #expect(childComment2.visibility == Domain.CommentVisibilityType.hidden)
             #expect(sut.visibleComments.count == 1)
         }
     }
     
     // MARK: - Helper Methods
     
-    private func createTestComments() -> [Comment] {
+    private func createTestComments() -> [Domain.Comment] {
         return [
             createTestComment(id: 1, level: 0),
             createTestComment(id: 2, level: 1),
@@ -266,19 +282,19 @@ struct CommentsViewModelTests {
         ]
     }
     
-    private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Comment {
-        return Comment(
+    private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Domain.Comment {
+        return Domain.Comment(
             id: id,
             age: "1 hour ago",
             text: "Test comment \(id)",
             by: "user\(id)",
             level: level,
             upvoted: upvoted,
-            visibility: .visible
+            visibility: Domain.CommentVisibilityType.visible
         )
     }
     
-    private func createPostWithComments(comments: [Comment]) -> Post {
+    private func createPostWithComments(comments: [Domain.Comment]) -> Post {
         var post = testPost
         post.comments = comments
         return post
@@ -310,13 +326,13 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
         )
     }
     
-    func getPosts(type: PostType, page: Int) async throws -> [Post] {
+    func getPosts(type: PostType, page: Int, nextId: Int?) async throws -> [Post] {
         return []
     }
 }
 
 final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
-    func getComments(for postId: Int) async throws -> [Comment] {
+    func getComments(for post: Post) async throws -> [Domain.Comment] {
         return []
     }
 }
@@ -342,14 +358,14 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
         }
     }
     
-    func upvote(comment: Comment, for post: Post) async throws {
+    func upvote(comment: Domain.Comment, for post: Post) async throws {
         upvoteCommentCalled = true
         if shouldThrowError {
             throw MockError.testError
         }
     }
     
-    func unvote(comment: Comment, for post: Post) async throws {
+    func unvote(comment: Domain.Comment, for post: Post) async throws {
         unvoteCommentCalled = true
         if shouldThrowError {
             throw MockError.testError
@@ -362,8 +378,8 @@ enum MockError: Error {
 }
 
 // Helper function to create test comment outside of struct
-private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Comment {
-    return Comment(
+private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Domain.Comment {
+    return Domain.Comment(
         id: id,
         age: "1 hour ago",
         text: "Test comment \(id)",

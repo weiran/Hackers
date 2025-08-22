@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Run Unit Tests
 
+### ios test_all
+
+```sh
+[bundle exec] fastlane ios test_all
+```
+
+Run All Tests (including SPM modules)
+
 ### ios uitest
 
 ```sh
