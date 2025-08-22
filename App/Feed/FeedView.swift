@@ -170,8 +170,13 @@ struct FeedView: View {
                 }
             }
         }
-        .task { @Sendable in
-            await viewModel.loadFeed()
+        .onAppear {
+            // Only load on first appearance (app launch)
+            if viewModel.posts.isEmpty && !viewModel.hasInitiallyLoaded {
+                Task {
+                    await viewModel.loadFeed()
+                }
+            }
         }
         .alert("Vote Error", isPresented: $showingVoteError) {
             Button("OK") { }
@@ -290,6 +295,7 @@ class SwiftUIFeedViewModel: ObservableObject {
     @Published var posts: [Post] = []
     @Published var isLoading = false
     @Published var isLoadingMore = false
+    @Published var hasInitiallyLoaded = false
 
     var postType: PostType = .news {
         didSet {
@@ -312,6 +318,7 @@ class SwiftUIFeedViewModel: ObservableObject {
         do {
             try await feedViewModel.fetchFeed()
             posts = feedViewModel.posts
+            hasInitiallyLoaded = true
         } catch {
             print("Error loading feed: \(error)")
             // TODO: Add error state handling
