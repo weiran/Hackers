@@ -1,14 +1,36 @@
 import SwiftUI
 import MessageUI
+import Domain
+import Shared
+import DesignSystem
 
-public struct CleanSettingsView: View {
-    @State private var viewModel = SettingsViewModel()
+public struct CleanSettingsView<NavigationStore: NavigationStoreProtocol>: View {
+    @State private var viewModel: SettingsViewModel
+    @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
     @State private var showOnboarding = false
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
-
-    public init() {}
+    @State private var showLogin = false
+    
+    let isAuthenticated: Bool
+    let currentUsername: String?
+    let onLogin: (String, String) async throws -> Void
+    let onLogout: () -> Void
+    
+    public init(
+        viewModel: SettingsViewModel = SettingsViewModel(),
+        isAuthenticated: Bool = false,
+        currentUsername: String? = nil,
+        onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
+        onLogout: @escaping () -> Void = { }
+    ) {
+        self._viewModel = State(initialValue: viewModel)
+        self.isAuthenticated = isAuthenticated
+        self.currentUsername = currentUsername
+        self.onLogin = onLogin
+        self.onLogout = onLogout
+    }
 
     public var body: some View {
         NavigationStack {
@@ -38,13 +60,43 @@ public struct CleanSettingsView: View {
                         Text("Send Feedback")
                     })
                     .disabled(!MFMailComposeViewController.canSendMail())
-                    .sheet(isPresented: $showMailView) { MailView(result: self.$mailResult) }
+                    .sheet(isPresented: $showMailView) {
+                        MailView(
+                            result: self.$mailResult,
+                            recipients: ["me@weiran.co"],
+                            subject: "Hackers App Feedback",
+                            messageBody: "\n\n\n---\nApp Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")"
+                        )
+                    }
                     Button(action: { self.showOnboarding = true }, label: {
                         Text("Show What's New")
                     })
                     .sheet(isPresented: $showOnboarding) { OnboardingViewControllerWrapper() }
                 }
 
+                Section(header: Text("Account")) {
+                    Button(action: {
+                        showLogin = true
+                    }) {
+                        HStack {
+                            Text(isAuthenticated ? "Logged in as \(currentUsername ?? "")" : "Login")
+                            Spacer()
+                            if isAuthenticated {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                            }
+                        }
+                    }
+                    .sheet(isPresented: $showLogin) {
+                        LoginView(
+                            isAuthenticated: isAuthenticated,
+                            currentUsername: currentUsername,
+                            onLogin: onLogin,
+                            onLogout: onLogout
+                        )
+                    }
+                }
+                
                 Section(header: Text("Appearance")) {
                     Toggle(isOn: $viewModel.showThumbnails) {
                         Text("Show Thumbnails")
@@ -92,43 +144,7 @@ public struct CleanSettingsView: View {
     }
 }
 
-// These need to be provided by the main app, so for now we'll create placeholders
-struct MailView: UIViewControllerRepresentable {
-    @Binding var result: Result<MFMailComposeResult, Error>?
-
-    func makeUIViewController(context: Context) -> MFMailComposeViewController {
-        let vc = MFMailComposeViewController()
-        vc.mailComposeDelegate = context.coordinator
-        return vc
-    }
-
-    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        let parent: MailView
-
-        init(_ parent: MailView) {
-            self.parent = parent
-        }
-
-        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-            let parentCopy = parent
-            Task { @MainActor in
-                controller.dismiss(animated: true)
-                if let error = error {
-                    parentCopy.result = .failure(error)
-                } else {
-                    parentCopy.result = .success(result)
-                }
-            }
-        }
-    }
-}
-
+// Placeholder for onboarding
 struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         return UIViewController() // Placeholder
