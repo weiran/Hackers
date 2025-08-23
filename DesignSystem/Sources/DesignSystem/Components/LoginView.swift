@@ -38,7 +38,7 @@ public struct LoginView: View {
             if !isAuthenticated {
                 VStack {
                     Text("Login to Hacker News")
-                        .font(.largeTitle)
+                        .scaledFont(.largeTitle)
                         .padding(.bottom, 30)
 
                     TextField("Username", text: $username)
@@ -53,7 +53,7 @@ public struct LoginView: View {
 
                     Text("Hackers never stores your password")
                         .foregroundColor(Color.secondary)
-                        .font(.footnote)
+                        .scaledFont(.footnote)
 
                     Button("Login") {
                         isAuthenticating = true
@@ -95,9 +95,9 @@ public struct LoginView: View {
             } else {
                 VStack {
                     Text("Logged in as")
-                        .font(.title)
+                        .scaledFont(.title)
                     Text(currentUsername ?? "")
-                        .font(.title)
+                        .scaledFont(.title)
                         .bold()
                         .padding(.bottom, 30)
 
@@ -138,7 +138,7 @@ public struct FilledButton: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
-            .font(.headline)
+            .scaledFont(.headline)
             .padding()
             .padding(.horizontal, 50)
             .frame(maxWidth: .infinity)

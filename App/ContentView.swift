@@ -12,15 +12,17 @@ import Comments
 import Feed
 import DesignSystem
 import Shared
+import Domain
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject private var sessionService = SessionService()
+    @StateObject private var settingsViewModel = SettingsViewModel()
 
     var body: some View {
         Group {
             if UIDevice.current.userInterfaceIdiom == .pad {
-                AdaptiveSplitView()
+                AdaptiveSplitView(settingsViewModel: settingsViewModel)
                     .environmentObject(navigationStore)
                     .environmentObject(sessionService)
             } else {
@@ -38,6 +40,7 @@ struct MainContentView: View {
                                 .environmentObject(sessionService)
                         case .settings:
                             SettingsView<NavigationStore>(
+                                viewModel: settingsViewModel,
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
                                 currentUsername: sessionService.username
                             )
@@ -48,6 +51,7 @@ struct MainContentView: View {
                 }
             }
         }
+        .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
@@ -65,6 +69,7 @@ struct MainContentView: View {
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
             SettingsView<NavigationStore>(
+                viewModel: settingsViewModel,
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username
             )
@@ -77,6 +82,7 @@ struct MainContentView: View {
 struct AdaptiveSplitView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var sessionService: SessionService
+    @StateObject var settingsViewModel: SettingsViewModel
 
     var body: some View {
         NavigationSplitView {
@@ -100,6 +106,7 @@ struct AdaptiveSplitView: View {
                 }
             }
         }
+        .textScaling(for: settingsViewModel.textSize)
     }
 }
 

@@ -10,7 +10,9 @@ import Foundation
 
 public protocol UserDefaultsProtocol: Sendable {
     func bool(forKey defaultName: String) -> Bool
+    func integer(forKey defaultName: String) -> Int
     func set(_ value: Bool, forKey defaultName: String)
+    func set(_ value: Int, forKey defaultName: String)
     func set(_ value: Any?, forKey defaultName: String)
 }
 
@@ -31,7 +33,8 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
             userDefaults.register(defaults: [
                 "safariReaderMode": false,
                 "showCommentsButton": false,
-                "openInDefaultBrowser": false
+                "openInDefaultBrowser": false,
+                "textSize": TextSize.medium.rawValue
             ])
         }
     }
@@ -60,6 +63,16 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "openInDefaultBrowser")
+        }
+    }
+    
+    public var textSize: TextSize {
+        get {
+            let rawValue = userDefaults.integer(forKey: "textSize")
+            return TextSize(rawValue: rawValue) ?? .medium
+        }
+        set {
+            userDefaults.set(newValue.rawValue, forKey: "textSize")
         }
     }
 }

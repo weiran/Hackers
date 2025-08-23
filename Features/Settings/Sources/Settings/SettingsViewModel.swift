@@ -6,29 +6,63 @@
 //
 
 import Foundation
+import Combine
 import Domain
 import Shared
 
-@Observable
-public final class SettingsViewModel: @unchecked Sendable {
+public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     private var settingsUseCase: any SettingsUseCase
+    
+    @Published public var safariReaderMode: Bool = false
+    @Published public var showComments: Bool = false
+    @Published public var openInDefaultBrowser: Bool = false
+    @Published public var textSize: TextSize = .medium
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
         self.settingsUseCase = settingsUseCase
+        loadSettings()
     }
-
-    public var safariReaderMode: Bool {
-        get { settingsUseCase.safariReaderMode }
-        set { settingsUseCase.safariReaderMode = newValue }
+    
+    private func loadSettings() {
+        safariReaderMode = settingsUseCase.safariReaderMode
+        showComments = settingsUseCase.showComments
+        openInDefaultBrowser = settingsUseCase.openInDefaultBrowser
+        textSize = settingsUseCase.textSize
+        
+        // Set up observers for changes
+        setupBindings()
     }
-
-    public var showComments: Bool {
-        get { settingsUseCase.showComments }
-        set { settingsUseCase.showComments = newValue }
+    
+    private func setupBindings() {
+        // Use combine to sync changes back to the use case
+        $safariReaderMode
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.safariReaderMode = newValue
+            }
+            .store(in: &cancellables)
+        
+        $showComments
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.showComments = newValue
+            }
+            .store(in: &cancellables)
+        
+        $openInDefaultBrowser
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.openInDefaultBrowser = newValue
+            }
+            .store(in: &cancellables)
+        
+        $textSize
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.textSize = newValue
+            }
+            .store(in: &cancellables)
     }
-
-    public var openInDefaultBrowser: Bool {
-        get { settingsUseCase.openInDefaultBrowser }
-        set { settingsUseCase.openInDefaultBrowser = newValue }
-    }
+    
+    private var cancellables = Set<AnyCancellable>()
 }

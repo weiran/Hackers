@@ -301,12 +301,12 @@ private struct CommentRow: View {
 
             HStack {
                 Text(comment.by)
-                    .font(.subheadline)
+                    .scaledFont(.subheadline)
                     .fontWeight(.bold)
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
 
                 Text(comment.age)
-                    .font(.subheadline)
+                    .scaledFont(.subheadline)
                     .foregroundColor(.secondary)
 
                 Spacer()
@@ -314,12 +314,12 @@ private struct CommentRow: View {
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color("upvotedColor"))
-                        .font(.body)
+                        .scaledFont(.body)
                 }
 
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.down")
-                        .font(.caption)
+                        .scaledFont(.caption)
                         .foregroundColor(.secondary)
                 }
             }
@@ -359,7 +359,7 @@ private struct ToolbarTitle: View {
                 .frame(width: 33, height: 33)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
             Text(post.title)
-                .font(.headline)
+                .scaledFont(.headline)
                 .lineLimit(1)
                 .truncationMode(.tail)
         }
@@ -401,7 +401,7 @@ private struct LoadingView: View {
             Spacer()
             ProgressView()
             Text("Loading comments...")
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .foregroundColor(.secondary)
             Spacer()
         }
@@ -412,7 +412,7 @@ private struct LoadingView: View {
 private struct EmptyCommentsView: View {
     var body: some View {
         Text("No comments yet")
-            .font(.subheadline)
+            .scaledFont(.subheadline)
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity)
     }

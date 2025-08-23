@@ -50,8 +50,9 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             .frame(width: 80, height: 80)
                         VStack(alignment: .leading) {
                             Text("Hackers")
-                                .font(.title)
+                                .scaledFont(.title)
                             Text("By Weiran Zhang")
+                                .scaledFont(.body)
                         }
                     }
                     Button(action: {
@@ -108,6 +109,35 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     Toggle(isOn: $viewModel.showComments) {
                         Text("Show Comments Button")
                     }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Text Size")
+                            Spacer()
+                            Text(viewModel.textSize.displayName)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        HStack {
+                            Text("A")
+                                .scaledFont(.caption2)
+                                .foregroundColor(.secondary)
+                            
+                            Slider(
+                                value: Binding(
+                                    get: { Double(viewModel.textSize.rawValue) },
+                                    set: { viewModel.textSize = TextSize(rawValue: Int($0)) ?? .medium }
+                                ),
+                                in: 0...4,
+                                step: 1
+                            )
+                            
+                            Text("A")
+                                .scaledFont(.title2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
 
                 Section(header: Text("Behaviour")) {

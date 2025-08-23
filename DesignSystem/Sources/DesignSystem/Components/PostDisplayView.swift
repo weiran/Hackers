@@ -47,7 +47,7 @@ public struct PostDisplayView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(post.title)
-                        .font(.headline)
+                        .scaledFont(.headline)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -60,7 +60,7 @@ public struct PostDisplayView: View {
                                 .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
                             Image(systemName: "arrow.up")
                                 .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
-                                .font(.caption2)
+                                .scaledFont(.caption2)
                         }
 
                         Text("•")
@@ -71,7 +71,7 @@ public struct PostDisplayView: View {
                                 .foregroundColor(.secondary)
                             Image(systemName: "message")
                                 .foregroundColor(.secondary)
-                                .font(.caption2)
+                                .scaledFont(.caption2)
                         }
 
                         if let host = post.url.host,
@@ -83,7 +83,7 @@ public struct PostDisplayView: View {
                                 .lineLimit(1)
                         }
                     }
-                    .font(.subheadline)
+                    .scaledFont(.subheadline)
                 }
             }
 
