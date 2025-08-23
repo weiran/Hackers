@@ -21,34 +21,31 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
     }
 
     public var body: some View {
-        NavigationView {
-            CommentsContentView(
-                viewModel: viewModel,
-                showTitle: $showTitle,
-                hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
-                visibleCommentPositions: $visibleCommentPositions,
-                navigateToPostId: $navigateToPostId,
-                handlePostVote: handlePostVote,
-                handleCommentVote: handleCommentVote,
-                handleLinkTap: handleLinkTap,
-                toggleCommentVisibility: toggleCommentVisibility
-            )
-            .navigationTitle("Comments")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    ToolbarTitle(
-                        post: viewModel.post,
-                        showTitle: showTitle,
-                        onTap: handleLinkTap
-                    )
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    ShareMenu(post: viewModel.post)
-                }
+        CommentsContentView(
+            viewModel: viewModel,
+            showTitle: $showTitle,
+            hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
+            visibleCommentPositions: $visibleCommentPositions,
+            navigateToPostId: $navigateToPostId,
+            handlePostVote: handlePostVote,
+            handleCommentVote: handleCommentVote,
+            handleLinkTap: handleLinkTap,
+            toggleCommentVisibility: toggleCommentVisibility
+        )
+        .navigationTitle("Comments")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                ToolbarTitle(
+                    post: viewModel.post,
+                    showTitle: showTitle,
+                    onTap: handleLinkTap
+                )
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ShareMenu(post: viewModel.post)
             }
         }
-        .navigationViewStyle(.stack)
         .task {
             await viewModel.loadComments()
         }

@@ -84,7 +84,7 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol>: View {
             }
             .listStyle(.plain)
             .refreshable {
-                await viewModel.loadFeed()
+                await viewModel.refreshFeed()
             }
         }
     }

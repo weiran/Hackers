@@ -34,7 +34,7 @@ enum HtmlParser {
     static func voteLinks(from elements: Elements) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) {
         let voteLinkElements = try elements.select("a")
         let upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
-        
+
         // Look for unvote link by ID first, then by text content
         var unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
         if unvoteLink == nil {
@@ -48,17 +48,17 @@ enum HtmlParser {
         // 1. Presence of unvote link (by ID or text)
         // 2. Presence of upvote link with "nosee" class
         var upvoted = false
-        
+
         // Check for unvote link (indicates already upvoted)
         let hasUnvote = unvoteLink != nil
-        
+
         // Check for upvote link with "nosee" class (also indicates already upvoted)
         var hasUpvoteWithNosee = false
         if let upvoteElement = upvoteLink {
             let hasNosee = (try? upvoteElement.classNames().contains("nosee")) ?? false
             hasUpvoteWithNosee = hasNosee
         }
-        
+
         upvoted = hasUnvote || hasUpvoteWithNosee
 
         return (upvote: upvoteURL, unvote: unvoteURL, upvoted: upvoted)
