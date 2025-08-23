@@ -42,7 +42,13 @@ struct MainContentView: View {
                             SettingsView<NavigationStore>(
                                 viewModel: settingsViewModel,
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
-                                currentUsername: sessionService.username
+                                currentUsername: sessionService.username,
+                                onLogin: { username, password in
+                                    _ = try await sessionService.authenticate(username: username, password: password)
+                                },
+                                onLogout: {
+                                    sessionService.unauthenticate()
+                                }
                             )
                             .environmentObject(navigationStore)
                             .environmentObject(sessionService)
@@ -59,7 +65,7 @@ struct MainContentView: View {
                 currentUsername: sessionService.username,
                 onLogin: { username, password in
                     Task {
-                        try? await sessionService.authenticate(username: username, password: password)
+                        _ = try? await sessionService.authenticate(username: username, password: password)
                     }
                 },
                 onLogout: {
@@ -71,7 +77,13 @@ struct MainContentView: View {
             SettingsView<NavigationStore>(
                 viewModel: settingsViewModel,
                 isAuthenticated: sessionService.authenticationState == .authenticated,
-                currentUsername: sessionService.username
+                currentUsername: sessionService.username,
+                onLogin: { username, password in
+                    _ = try await sessionService.authenticate(username: username, password: password)
+                },
+                onLogout: {
+                    sessionService.unauthenticate()
+                }
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)
