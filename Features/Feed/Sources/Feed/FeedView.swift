@@ -167,7 +167,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 Text(selectedPostType.displayName)
                     .font(.headline)
                     .foregroundColor(.primary)
-                Image(systemName: "chevron.down")
+                Image(systemName: "chevron.down.circle.fill")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
