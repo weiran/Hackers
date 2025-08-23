@@ -103,7 +103,6 @@
 		241E7A262E4CB2830013EEA1 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A4A2E4CB2830013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
 		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
 		241E7A5C2E4CB28F0013EEA1 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
-		241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Shared Frameworks"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,7 +164,6 @@
 				241E7A262E4CB2830013EEA1 /* App */,
 				241E7A502E4CB28D0013EEA1 /* Tests */,
 				241E7A5C2E4CB28F0013EEA1 /* Extensions */,
-				241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
 				24F39F8618AFB1150055F8DC /* Products */,
@@ -273,7 +271,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				241E7A262E4CB2830013EEA1 /* App */,
-				241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */,
 			);
 			name = Hackers;
 			packageProductDependencies = (
