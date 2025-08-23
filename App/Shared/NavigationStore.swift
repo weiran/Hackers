@@ -11,7 +11,13 @@ import Combine
 import Shared
 import Domain
 
+enum NavigationDestination: Hashable {
+    case comments(Domain.Post)
+    case settings
+}
+
 class NavigationStore: ObservableObject, NavigationStoreProtocol {
+    @Published var path: NavigationPath = NavigationPath()
     @Published var selectedPost: Domain.Post? // Using Domain.Post for protocol conformance
     @Published var selectedHackersKitPost: Post? // Keep old Post for compatibility
     @Published var selectedPostType: PostType = .news
@@ -34,12 +40,23 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     func showPost(_ post: Domain.Post) {
         selectedPost = post
         selectedHackersKitPost = post.toHackersKit()
+
+        // For iPhone navigation, use NavigationPath
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            path.append(NavigationDestination.comments(post))
+        }
     }
 
     // Overload for HackersKit Post during migration
     func showPost(_ post: Post) {
-        selectedPost = post.toDomain()
+        let domainPost = post.toDomain()
+        selectedPost = domainPost
         selectedHackersKitPost = post
+
+        // For iPhone navigation, use NavigationPath
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            path.append(NavigationDestination.comments(domainPost))
+        }
     }
 
     func clearSelection() {
@@ -103,9 +120,9 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
 
         // Create a temporary post object for immediate navigation
         // This will be replaced with the actual post data when loaded
-        let tempPost = Post(
+        let tempPost: Post = Post(
             id: id,
-            url: URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!,
+            url: URL(string: "\(Domain.HackerNewsConstants.baseURL)/item?id=\(id)")!,
             title: "Loading...",
             age: "",
             commentsCount: 0,

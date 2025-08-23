@@ -77,7 +77,7 @@ class Comment: ObservableObject, Hashable {
 
     // UI properties
     @Published var visibility = CommentVisibilityType.visible
-    
+
     // Parsed HTML content for performance
     var parsedText: AttributedString?
 

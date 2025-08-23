@@ -1,6 +1,6 @@
 //
 //  CommentHTMLParser.swift
-//  Hackers
+//  Comments
 //
 //  Created by Weiran Zhang on SwiftUI Migration.
 //  Copyright © 2024 Glass Umbrella. All rights reserved.
@@ -12,7 +12,7 @@ import SwiftUI
 // swiftlint:disable type_body_length
 
 /// High-performance HTML parser optimized for comment content
-enum CommentHTMLParser {
+public enum CommentHTMLParser {
 
     // MARK: - Static Properties
     private static let htmlEntityMap: [String: String] = [
@@ -94,7 +94,7 @@ enum CommentHTMLParser {
     /// Parses HTML text into an AttributedString with optimized performance
     /// - Parameter htmlString: The raw HTML string to parse
     /// - Returns: An AttributedString with parsed content
-    static func parseHTMLText(_ htmlString: String) -> AttributedString {
+    public static func parseHTMLText(_ htmlString: String) -> AttributedString {
         guard !htmlString.isEmpty else {
             return AttributedString("")
         }
@@ -376,12 +376,13 @@ enum CommentHTMLParser {
         var linkAttributedString = AttributedString(cleanLinkText)
 
         var resolvedURL = URL(string: urlString)
-        if resolvedURL?.scheme == nil, let base = URL(string: HackerNewsConstants.baseURL) {
+        if resolvedURL?.scheme == nil, let base = URL(string: "https://news.ycombinator.com") {
             resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
         }
         if let url = resolvedURL {
             linkAttributedString.link = url
-            linkAttributedString.foregroundColor = AppTheme.default.appTintColor
+            // Use Color directly instead of AppTheme
+            linkAttributedString.foregroundColor = Color("appTintColor")
             linkAttributedString.underlineStyle = .single
         }
 
@@ -411,7 +412,8 @@ enum CommentHTMLParser {
             // Apply link attributes to the entire range
             let fullRange = linkAttributedString.startIndex..<linkAttributedString.endIndex
             linkAttributedString[fullRange].link = url
-            linkAttributedString[fullRange].foregroundColor = AppTheme.default.appTintColor
+            // Use Color directly instead of AppTheme
+            linkAttributedString[fullRange].foregroundColor = Color("appTintColor")
             linkAttributedString[fullRange].underlineStyle = .single
         }
 

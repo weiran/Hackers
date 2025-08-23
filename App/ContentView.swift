@@ -8,10 +8,13 @@
 
 import SwiftUI
 import UIKit
+import Settings
+import Comments
+import Feed
+import DesignSystem
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
-    @EnvironmentObject private var settingsStore: SettingsStore
 
     var body: some View {
         Group {
@@ -19,39 +22,44 @@ struct MainContentView: View {
                 AdaptiveSplitView()
                     .environmentObject(navigationStore)
             } else {
-                NavigationStack {
-                    if AppConfiguration.shared.useCleanFeed {
-                        CleanFeedViewWrapper()
+                NavigationStack(path: $navigationStore.path) {
+                    CleanFeedView<NavigationStore>(
+                        isSidebar: false,
+                        showThumbnails: true,
+                        swipeActionsEnabled: true
+                    )
+                    .environmentObject(navigationStore)
+                    .navigationDestination(for: NavigationDestination.self) { destination in
+                        switch destination {
+                        case .comments(let post):
+                            CleanCommentsView<NavigationStore>(post: post)
+                                .environmentObject(navigationStore)
+                        case .settings:
+                            CleanSettingsView<NavigationStore>(
+                                isAuthenticated: false, // TODO: Connect to actual auth state
+                                currentUsername: nil
+                            )
                             .environmentObject(navigationStore)
-                            .navigationDestination(item: $navigationStore.selectedHackersKitPost) { post in
-                                if AppConfiguration.shared.useCleanComments {
-                                    CleanCommentsViewWrapper(post: post)
-                                        .environmentObject(navigationStore)
-                                } else {
-                                    CommentsView(post: post)
-                                        .environmentObject(navigationStore)
-                                }
-                            }
-                    } else {
-                        FeedView()
-                            .environmentObject(navigationStore)
-                            // Navigation is now handled by NavigationLink in FeedView
+                        }
                     }
                 }
             }
         }
         .accentColor(.accentColor)
         .sheet(isPresented: $navigationStore.showingLogin) {
-            LoginView()
+            LoginView(
+                isAuthenticated: false, // TODO: Connect to actual auth state
+                currentUsername: nil,
+                onLogin: { _, _ in }, // TODO: Implement login
+                onLogout: { } // TODO: Implement logout
+            )
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
-            if AppConfiguration.shared.useCleanSettings {
-                CleanSettingsViewWrapper()
-                    .environmentObject(settingsStore)
-            } else {
-                SettingsView()
-                    .environmentObject(settingsStore)
-            }
+            CleanSettingsView<NavigationStore>(
+                isAuthenticated: false, // TODO: Connect to actual auth state
+                currentUsername: nil
+            )
+            .environmentObject(navigationStore)
         }
     }
 }
@@ -62,28 +70,20 @@ struct AdaptiveSplitView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
-            if AppConfiguration.shared.useCleanFeed {
-                CleanFeedViewWrapper(isSidebar: true)
-                    .environmentObject(navigationStore)
-                    .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
-            } else {
-                FeedView(isSidebar: true)
-                    .environmentObject(navigationStore)
-                    .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
-            }
+            CleanFeedView<NavigationStore>(
+                isSidebar: true,
+                showThumbnails: true,
+                swipeActionsEnabled: false
+            )
+            .environmentObject(navigationStore)
+            .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {
             // Detail - CommentsView or empty state
             NavigationStack {
-                if let selectedPost = navigationStore.selectedHackersKitPost {
-                    if AppConfiguration.shared.useCleanComments {
-                        CleanCommentsViewWrapper(post: selectedPost)
-                            .environmentObject(navigationStore)
-                            .id(selectedPost.id) // Add id to force re-render when post changes
-                    } else {
-                        CommentsView(post: selectedPost)
-                            .environmentObject(navigationStore)
-                            .id(selectedPost.id) // Add id to force re-render when post changes
-                    }
+                if let selectedPost = navigationStore.selectedPost {
+                    CleanCommentsView<NavigationStore>(post: selectedPost)
+                        .environmentObject(navigationStore)
+                        .id(selectedPost.id) // Add id to force re-render when post changes
                 } else {
                     EmptyDetailView()
                 }
@@ -105,6 +105,5 @@ struct EmptyDetailView: View {
 
 #Preview {
     MainContentView()
-        .environmentObject(SettingsStore())
         .environmentObject(NavigationStore())
 }

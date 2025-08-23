@@ -12,12 +12,12 @@ public struct CleanSettingsView<NavigationStore: NavigationStoreProtocol>: View 
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
-    
+
     let isAuthenticated: Bool
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
-    
+
     public init(
         viewModel: SettingsViewModel = SettingsViewModel(),
         isAuthenticated: Bool = false,
@@ -96,7 +96,7 @@ public struct CleanSettingsView<NavigationStore: NavigationStoreProtocol>: View 
                         )
                     }
                 }
-                
+
                 Section(header: Text("Appearance")) {
                     Toggle(isOn: $viewModel.showThumbnails) {
                         Text("Show Thumbnails")

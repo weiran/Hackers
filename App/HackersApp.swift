@@ -10,7 +10,6 @@ import SwiftUI
 
 @main
 struct HackersApp: App {
-    @StateObject private var settingsStore = SettingsStore()
     @StateObject private var navigationStore = NavigationStore()
 
     // Keep AppDelegate for legacy services and setup
@@ -19,7 +18,6 @@ struct HackersApp: App {
     var body: some Scene {
         WindowGroup {
             MainContentView()
-                .environmentObject(settingsStore)
                 .environmentObject(navigationStore)
                 .onAppear {
                     setupAppearance()

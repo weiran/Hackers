@@ -4,7 +4,7 @@ import Combine
 public struct VoteLinks: Sendable, Hashable {
     public let upvote: URL?
     public let unvote: URL?
-    
+
     public init(upvote: URL?, unvote: URL?) {
         self.upvote = upvote
         self.unvote = unvote
@@ -99,11 +99,11 @@ public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
         self.visibility = visibility
         self.parsedText = parsedText
     }
-    
+
     public static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -139,4 +139,37 @@ public enum HackersKitAuthenticationError: Error, Sendable {
     case serverUnreachable
     case noInternet
     case unknown
+}
+
+// MARK: - Extensions
+
+public enum HackerNewsConstants {
+    public static let baseURL = "https://news.ycombinator.com"
+    public static let host = "news.ycombinator.com"
+}
+
+extension Post {
+    public var hackerNewsURL: URL {
+        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
+    }
+}
+
+extension PostType {
+    public var title: String {
+        switch self {
+        case .news: return "Top"
+        case .ask: return "Ask"
+        case .show: return "Show"
+        case .jobs: return "Jobs"
+        case .newest: return "New"
+        case .best: return "Best"
+        case .active: return "Active"
+        }
+    }
+}
+
+extension Comment {
+    public var hackerNewsURL: URL {
+        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
+    }
 }

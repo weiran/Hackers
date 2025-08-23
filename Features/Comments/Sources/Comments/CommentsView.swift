@@ -15,12 +15,141 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    
+
     public init(post: Post, viewModel: CommentsViewModel? = nil) {
         self._viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
     }
-    
+
     public var body: some View {
+        NavigationView {
+            CommentsContentView(
+                viewModel: viewModel,
+                showTitle: $showTitle,
+                hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
+                visibleCommentPositions: $visibleCommentPositions,
+                navigateToPostId: $navigateToPostId,
+                handlePostVote: handlePostVote,
+                handleCommentVote: handleCommentVote,
+                handleLinkTap: handleLinkTap,
+                toggleCommentVisibility: toggleCommentVisibility
+            )
+            .navigationTitle("Comments")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    ToolbarTitle(
+                        post: viewModel.post,
+                        showTitle: showTitle,
+                        onTap: handleLinkTap
+                    )
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    ShareMenu(post: viewModel.post)
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
+        .task {
+            await viewModel.loadComments()
+        }
+        .refreshable {
+            await viewModel.refreshComments()
+        }
+        .alert("Vote Error", isPresented: $showingVoteError) {
+            Button("OK") { }
+        } message: {
+            Text(voteErrorMessage)
+        }
+        .alert("Authentication Required", isPresented: $showingAuthenticationDialog) {
+            Button("Cancel") { }
+            Button("Login") {
+                // TODO: Implement login flow
+            }
+        } message: {
+            Text("Please log in to vote on posts and comments.")
+        }
+    }
+
+    @MainActor
+    private func handlePostVote() async {
+        let isUpvote = !viewModel.post.upvoted
+
+        do {
+            try await viewModel.voteOnPost(upvote: isUpvote)
+        } catch {
+            handleVoteError(error)
+        }
+    }
+
+    @MainActor
+    private func handleCommentVote(_ comment: Comment) async {
+        let isUpvote = !comment.upvoted
+
+        do {
+            try await viewModel.voteOnComment(comment, upvote: isUpvote)
+        } catch {
+            handleVoteError(error)
+        }
+    }
+
+    private func handleVoteError(_ error: Error) {
+        if let hackersError = error as? HackersKitError {
+            switch hackersError {
+            case .unauthenticated:
+                showingAuthenticationDialog = true
+            default:
+                voteErrorMessage = "Failed to vote. Please try again."
+                showingVoteError = true
+            }
+        } else {
+            voteErrorMessage = "Failed to vote. Please try again."
+            showingVoteError = true
+        }
+    }
+
+    private func handleLinkTap() {
+        LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
+    }
+
+    private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            let wasVisible = comment.visibility == .visible
+            viewModel.toggleCommentVisibility(comment)
+
+            if wasVisible && !isCommentVisibleOnScreen(comment) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    scrollTo("comment-\(comment.id)")
+                }
+            }
+        }
+    }
+
+    private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
+        guard let commentFrame = visibleCommentPositions[comment.id] else {
+            return false
+        }
+
+        guard let window = PresentationService.shared.windowScene?.windows.first else {
+            return false
+        }
+
+        let screenBounds = window.bounds
+        return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
+    }
+}
+
+private struct CommentsContentView: View {
+    @State var viewModel: CommentsViewModel
+    @Binding var showTitle: Bool
+    @Binding var hasMeasuredInitialOffset: Bool
+    @Binding var visibleCommentPositions: [Int: CGRect]
+    @Binding var navigateToPostId: Int?
+    let handlePostVote: () async -> Void
+    let handleCommentVote: (Comment) async -> Void
+    let handleLinkTap: () -> Void
+    let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
@@ -55,7 +184,7 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
                         }
                         .tint(viewModel.post.upvoted ? .secondary : Color("upvotedColor"))
                     }
-                    
+
                     if viewModel.isLoading {
                         LoadingView()
                             .plainListRow()
@@ -63,182 +192,68 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
                         EmptyCommentsView()
                             .plainListRow()
                     } else {
-                        ForEach(viewModel.visibleComments, id: \.id) { comment in
-                            CommentRow(
-                                comment: comment,
-                                post: viewModel.post,
-                                onToggle: {
-                                    toggleCommentVisibility(comment) { id in
-                                        proxy.scrollTo(id, anchor: .top)
-                                    }
-                                },
-                                onVote: { await handleCommentVote(comment) },
-                                onHide: {
-                                    viewModel.hideCommentBranch(comment)
-                                }
-                            )
-                            .id("comment-\(comment.id)")
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(
-                                    key: CommentPositionKey.self,
-                                    value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global))
-                                )
-                            })
-                            .onPreferenceChange(CommentPositionKey.self) { position in
-                                if let position = position {
-                                    visibleCommentPositions[position.id] = position.frame
+                        CommentsForEach(
+                            viewModel: viewModel,
+                            visibleCommentPositions: $visibleCommentPositions,
+                            handleCommentVote: handleCommentVote,
+                            toggleCommentVisibility: { comment in
+                                toggleCommentVisibility(comment) { id in
+                                    proxy.scrollTo(id, anchor: .top)
                                 }
                             }
-                            .listRowSeparator(.hidden)
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                    Task { await handleCommentVote(comment) }
-                                } label: {
-                                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
-                                }
-                                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
-                            }
-                            .swipeActions(edge: .trailing) {
-                                Button {
-                                    viewModel.hideCommentBranch(comment)
-                                } label: {
-                                    Image(systemName: "minus.circle")
-                                }
-                            }
-                        }
+                        )
                     }
                 }
                 .listStyle(.plain)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                if hasMeasuredInitialOffset {
-                    ToolbarTitle(
-                        post: viewModel.post,
-                        showTitle: showTitle,
-                        onTap: { handleLinkTap() }
-                    )
-                }
-            }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                ShareMenu(post: viewModel.post)
-            }
-        }
-        .refreshable {
-            await viewModel.refreshComments()
-        }
-        .task(id: viewModel.post.id) {
-            await viewModel.loadComments()
-        }
-        .alert("Vote Error", isPresented: $showingVoteError) {
-            Button("OK") { }
-        } message: {
-            Text(voteErrorMessage)
-        }
-        .sheet(isPresented: $showingAuthenticationDialog) {
-            Text("Please log in to vote")
-                .onAppear {
-                    navigationStore.showLogin()
-                }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(item: $navigateToPostId) { postId in
-            let tempPost = Post(
-                id: postId,
-                url: URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(postId)")!,
-                title: "Loading...",
-                age: "",
-                commentsCount: 0,
-                by: "",
-                score: 0,
-                postType: .news,
-                upvoted: false
+    }
+}
+
+private struct CommentsForEach: View {
+    @State var viewModel: CommentsViewModel
+    @Binding var visibleCommentPositions: [Int: CGRect]
+    let handleCommentVote: (Comment) async -> Void
+    let toggleCommentVisibility: (Comment) -> Void
+
+    var body: some View {
+        ForEach(viewModel.visibleComments, id: \.id) { comment in
+            CommentRow(
+                comment: comment,
+                post: viewModel.post,
+                onToggle: { toggleCommentVisibility(comment) },
+                onVote: { await handleCommentVote(comment) },
+                onHide: { viewModel.hideCommentBranch(comment) }
             )
-            CleanCommentsView<NavigationStore>(post: tempPost)
-                .environmentObject(navigationStore)
-                .id(postId)
-        }
-        .environment(\.openURL, OpenURLAction { url in
-            if url.host?.localizedCaseInsensitiveCompare(HackerNewsConstants.host) == .orderedSame,
-               let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-               let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
-               let id = Int(idString) {
-                navigateToPostId = id
-                return .handled
+            .id("comment-\(comment.id)")
+            .background(GeometryReader { geometry in
+                Color.clear.preference(
+                    key: CommentPositionKey.self,
+                    value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global))
+                )
+            })
+            .onPreferenceChange(CommentPositionKey.self) { position in
+                if let position = position {
+                    visibleCommentPositions[position.id] = position.frame
+                }
             }
-            
-            LinkOpener.openURL(url)
-            return .handled
-        })
-    }
-    
-    @MainActor
-    private func handlePostVote() async {
-        let isUpvote = !viewModel.post.upvoted
-        
-        do {
-            try await viewModel.voteOnPost(upvote: isUpvote)
-        } catch {
-            handleVoteError(error)
-        }
-    }
-    
-    @MainActor
-    private func handleCommentVote(_ comment: Comment) async {
-        let isUpvote = !comment.upvoted
-        
-        do {
-            try await viewModel.voteOnComment(comment, upvote: isUpvote)
-        } catch {
-            handleVoteError(error)
-        }
-    }
-    
-    private func handleVoteError(_ error: Error) {
-        if let hackersError = error as? HackersKitError {
-            switch hackersError {
-            case .unauthenticated:
-                showingAuthenticationDialog = true
-            default:
-                voteErrorMessage = "Failed to vote. Please try again."
-                showingVoteError = true
+            .listRowSeparator(.hidden)
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                Button {
+                    Task { await handleCommentVote(comment) }
+                } label: {
+                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                }
+                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
             }
-        } else {
-            voteErrorMessage = "Failed to vote. Please try again."
-            showingVoteError = true
-        }
-    }
-    
-    private func handleLinkTap() {
-        LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
-    }
-    
-    private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
-        withAnimation(.easeInOut(duration: 0.3)) {
-            let wasVisible = comment.visibility == .visible
-            viewModel.toggleCommentVisibility(comment)
-            
-            if wasVisible && !isCommentVisibleOnScreen(comment) {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    scrollTo("comment-\(comment.id)")
+            .swipeActions(edge: .trailing) {
+                Button {
+                    viewModel.hideCommentBranch(comment)
+                } label: {
+                    Image(systemName: "minus.circle")
                 }
             }
         }
-    }
-    
-    private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
-        guard let commentFrame = visibleCommentPositions[comment.id] else {
-            return false
-        }
-        
-        guard let window = PresentationService.shared.windowScene?.windows.first else {
-            return false
-        }
-        
-        let screenBounds = window.bounds
-        return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
     }
 }
 
@@ -246,7 +261,7 @@ private struct PostHeader: View {
     let post: Post
     let onVote: () async -> Void
     let onLinkTap: () -> Void
-    
+
     var body: some View {
         PostDisplayView(
             post: post,
@@ -274,12 +289,12 @@ private struct CommentRow: View {
     let onToggle: () -> Void
     let onVote: () async -> Void
     let onHide: () -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Divider()
                 .padding(.bottom, 6)
-            
+
             HStack {
                 Text(comment.by)
                     .font(.subheadline)
@@ -304,7 +319,7 @@ private struct CommentRow: View {
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             if comment.visibility == .visible {
                 if let parsedText = comment.parsedText {
                     Text(parsedText)
@@ -333,7 +348,7 @@ private struct ToolbarTitle: View {
     let post: Post
     let showTitle: Bool
     let onTap: () -> Void
-    
+
     var body: some View {
         HStack {
             ThumbnailView(url: post.url)
@@ -355,7 +370,7 @@ private struct ToolbarTitle: View {
 
 private struct ShareMenu: View {
     let post: Post
-    
+
     var body: some View {
         Menu {
             if post.url.host != nil {
@@ -404,7 +419,7 @@ private struct CommentContextMenu: View {
     let onVote: () -> Void
     let onShare: () -> Void
     let onCopy: () -> Void
-    
+
     var body: some View {
         Group {
             Button {
@@ -413,15 +428,15 @@ private struct CommentContextMenu: View {
                 Label(comment.upvoted ? "Unvote" : "Upvote",
                       systemImage: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
             }
-            
+
             Button {
                 onCopy()
             } label: {
                 Label("Copy", systemImage: "doc.on.doc")
             }
-            
+
             Divider()
-            
+
             Button {
                 onShare()
             } label: {

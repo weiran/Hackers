@@ -1,6 +1,6 @@
 //
 //  CommentHTMLParserWhitespaceTests.swift
-//  HackersTests
+//  DomainTests
 //
 //  Created by Weiran Zhang on SwiftUI Migration.
 //  Copyright © 2024 Glass Umbrella. All rights reserved.
@@ -11,7 +11,7 @@
 
 import Testing
 import Foundation
-@testable import Hackers
+@testable import Domain
 
 @Suite("CommentHTMLParser Whitespace Tests")
 struct CommentHTMLParserWhitespaceTests {

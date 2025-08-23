@@ -13,6 +13,9 @@
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
 		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
 		241E802E2E55B5F40013EEA1 /* Comments in Frameworks */ = {isa = PBXBuildFile; productRef = 241E802D2E55B5F40013EEA1 /* Comments */; };
+		248256F82E59D2460068E91E /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 248256F72E59D2460068E91E /* Domain */; };
+		248256FB2E59D2540068E91E /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FA2E59D2540068E91E /* Networking */; };
+		248256FE2E59D2660068E91E /* Feed in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FD2E59D2660068E91E /* Feed */; };
 		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -87,14 +90,6 @@
 			);
 			target = 245345EB22466EA8001AF1CE /* HackersUITests */;
 		};
-		241E7A542E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				HackersTests/CommentHTMLParserTests.swift,
-				HackersTests/CommentHTMLParserWhitespaceTests.swift,
-			);
-			target = 24C03D5C2E003EB8002B6ED5 /* HackersTests */;
-		};
 		241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -106,7 +101,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		241E7A262E4CB2830013EEA1 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A4A2E4CB2830013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
-		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 241E7A542E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
+		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
 		241E7A5C2E4CB28F0013EEA1 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
 		241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Shared Frameworks"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -137,6 +132,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				248256FE2E59D2660068E91E /* Feed in Frameworks */,
+				248256F82E59D2460068E91E /* Domain in Frameworks */,
 				241E802E2E55B5F40013EEA1 /* Comments in Frameworks */,
 				24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */,
 				241E7B492E51D1C80013EEA1 /* Settings in Frameworks */,
@@ -146,6 +143,7 @@
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
 				241E7B412E511BC20013EEA1 /* Data in Frameworks */,
+				248256FB2E59D2540068E91E /* Networking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +283,9 @@
 				241E7B402E511BC20013EEA1 /* Data */,
 				241E7B482E51D1C80013EEA1 /* Settings */,
 				241E802D2E55B5F40013EEA1 /* Comments */,
+				248256F72E59D2460068E91E /* Domain */,
+				248256FA2E59D2540068E91E /* Networking */,
+				248256FD2E59D2660068E91E /* Feed */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -336,6 +337,9 @@
 				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
 				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */,
 				241E802C2E55B5F40013EEA1 /* XCLocalSwiftPackageReference "Features/Comments" */,
+				248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */,
+				248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */,
+				248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -928,6 +932,18 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Features/Comments;
 		};
+		248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Domain;
+		};
+		248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Networking;
+		};
+		248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Feed;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -984,6 +1000,18 @@
 		241E802D2E55B5F40013EEA1 /* Comments */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Comments;
+		};
+		248256F72E59D2460068E91E /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+		248256FA2E59D2540068E91E /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Networking;
+		};
+		248256FD2E59D2660068E91E /* Feed */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Feed;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

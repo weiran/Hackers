@@ -10,7 +10,7 @@ let package = Package(
         .library(
             name: "Domain",
             targets: ["Domain"]
-        ),
+        )
     ],
     targets: [
         .target(
@@ -20,6 +20,6 @@ let package = Package(
             name: "DomainTests",
             dependencies: ["Domain"],
             path: "Tests"
-        ),
+        )
     ]
 )

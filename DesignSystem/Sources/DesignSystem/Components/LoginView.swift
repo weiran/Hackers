@@ -100,7 +100,7 @@ public struct LoginView: View {
                         .font(.title)
                         .bold()
                         .padding(.bottom, 30)
-                    
+
                     Button("Log out") {
                         onLogout()
                         dismiss()

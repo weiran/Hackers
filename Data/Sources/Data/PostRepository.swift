@@ -22,18 +22,18 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     public func getPost(id: Int) async throws -> Post {
         let html = try await fetchPostHtml(id: id, recursive: true)
         let document = try SwiftSoup.parse(html)
-        
+
         // Get the fatitem table element
         guard let fatitemTable = try document.select("table.fatitem").first() else {
             throw HackersKitError.scraperError
         }
-        
+
         // Parse the post from the fatitem table
         let posts = try self.posts(from: fatitemTable, type: .news)
         guard let post = posts.first else {
             throw HackersKitError.scraperError
         }
-        
+
         let comments = try self.comments(from: html)
         var postWithComments = post
         postWithComments.comments = comments
@@ -92,13 +92,22 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     // MARK: - Private Helper Methods
 
     private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
-        var url: URL
+        let url: URL
         if type == .newest || type == .jobs {
-            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)")!
+            guard let constructedURL = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)") else {
+                throw HackersKitError.requestFailure
+            }
+            url = constructedURL
         } else if type == .active {
-            url = URL(string: "https://news.ycombinator.com/active?p=\(page)")!
+            guard let constructedURL = URL(string: "https://news.ycombinator.com/active?p=\(page)") else {
+                throw HackersKitError.requestFailure
+            }
+            url = constructedURL
         } else {
-            url = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)")!
+            guard let constructedURL = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)") else {
+                throw HackersKitError.requestFailure
+            }
+            url = constructedURL
         }
         return try await networkManager.get(url: url)
     }
@@ -140,7 +149,10 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
 
     private func postsTableElement(from html: String) throws -> Element {
         let document = try SwiftSoup.parse(html)
-        return try document.select("table.itemlist").first()!
+        guard let tableElement = try document.select("table:has(.athing.submission)").first() else {
+            throw HackersKitError.scraperError
+        }
+        return tableElement
     }
 
     private func posts(from tableElement: Element, type: PostType) throws -> [Post] {
@@ -172,14 +184,19 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         guard elements.size() >= 2 else {
             throw HackersKitError.scraperError
         }
-        
+
         let titleElement = try elements.get(0)
         let metadataElement = try elements.get(1)
 
         let id = Int(try titleElement.attr("id")) ?? 0
-        let titleLink = try titleElement.select("span.titleline > a").first()!
+        guard let titleLink = try titleElement.select("span.titleline > a").first() else {
+            throw HackersKitError.scraperError
+        }
         let title = try titleLink.text()
-        let url = URL(string: try titleLink.attr("href")) ?? URL(string: "https://news.ycombinator.com")!
+        let urlString = try titleLink.attr("href")
+        guard let url = URL(string: urlString) ?? URL(string: "https://news.ycombinator.com") else {
+            throw HackersKitError.scraperError
+        }
 
         let scoreElement = try metadataElement.select("span.score")
         let score = try scoreElement.first()?.text().replacingOccurrences(of: " points", with: "")
@@ -191,9 +208,21 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         let byElement = try metadataElement.select("a.hnuser")
         let by = try byElement.first()?.text() ?? ""
 
-        let commentsElement = try metadataElement.select("a").last()
-        let commentsText = try commentsElement?.text() ?? "0 comments"
-        let commentsCount = Int(commentsText.components(separatedBy: " ").first ?? "0") ?? 0
+        // Find comments link specifically (like original HtmlParser)
+        let linkElements = try metadataElement.select("a")
+        let commentLinkElement = linkElements.first { element in
+            let text = try? element.text()
+            return text?.contains("comment") == true
+        }
+
+        let commentsCount: Int
+        if let commentLinkText = try commentLinkElement?.text(),
+           let commentsCountString = commentLinkText.components(separatedBy: .whitespaces).first,
+           let count = Int(String(commentsCountString)) {
+            commentsCount = count
+        } else {
+            commentsCount = 0
+        }
 
         let voteLinks = try self.voteLinks(from: metadataElement)
 
@@ -230,7 +259,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     private func comments(from html: String) throws -> [Domain.Comment] {
         let document = try SwiftSoup.parse(html)
         let commentElements = try document.select(".comtr")
-        
+
         return commentElements.compactMap { element in
             do {
                 return try parseComment(from: element)
@@ -240,15 +269,15 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
             }
         }
     }
-    
+
     private func parseComment(from element: Element) throws -> Domain.Comment {
         let text = try commentText(from: element.select(".commtext"))
-        
+
         // Skip empty comments (deleted comments, etc.)
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw HackersKitError.scraperError
         }
-        
+
         let age = try element.select(".age").text()
         let user = try element.select(".hnuser").text()
         guard let id = try Int(element.select(".comtr").attr("id")) else {
@@ -260,7 +289,9 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         let level = indentWidth / 40
         let voteLinksResult = try self.voteLinks(from: element)
         let upvoted = voteLinksResult.upvoted
-        
+
+        let parsedText = CommentHTMLParser.parseHTMLText(text)
+
         return Domain.Comment(
             id: id,
             age: age,
@@ -268,16 +299,17 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
             by: user,
             level: level,
             upvoted: upvoted,
-            voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote)
+            voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote),
+            parsedText: parsedText
         )
     }
-    
+
     private func commentText(from elements: Elements) throws -> String {
         // Clear reply link from text
         if let replyElement = try? elements.select(".reply") {
             try replyElement.html("")
         }
-        
+
         // Parse links from href attribute rather than truncated text
         if let links = try? elements.select("a") {
             try links.forEach { link in
@@ -286,7 +318,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
                 }
             }
         }
-        
+
         return try elements.html()
     }
 }

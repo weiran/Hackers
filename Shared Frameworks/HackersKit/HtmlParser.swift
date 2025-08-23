@@ -164,7 +164,7 @@ enum HtmlParser {
     private static func score(from metadataElement: Element) throws -> Int {
         let scoreString = try metadataElement.select(".score").text()
         guard
-            let scoreNumberString = scoreString.components(separatedBy: " ").first,
+            let scoreNumberString = scoreString.components(separatedBy: .whitespaces).first,
             let score = Int(String(scoreNumberString)) else {
                 return 0
         }

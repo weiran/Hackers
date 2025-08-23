@@ -53,7 +53,6 @@ extension HackersKit {
         }
     }
 
-
     func upvote(post: Post) async throws {
         guard
             let upvoteURL = post.voteLinks?.upvote,

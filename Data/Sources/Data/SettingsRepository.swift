@@ -16,7 +16,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         self.userDefaults = userDefaults
         registerDefaults()
     }
-    
+
     private func registerDefaults() {
         // Register default values for fresh installs
         // Note: This only sets defaults for keys that don't exist yet

@@ -1,12 +1,6 @@
 import Foundation
 import Domain
 
-extension Post {
-    public var hackerNewsURL: URL {
-        URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
-    }
-}
-
 extension PostType {
     public var displayName: String {
         switch self {
@@ -19,7 +13,7 @@ extension PostType {
         case .active: return "Active"
         }
     }
-    
+
     public var iconName: String {
         switch self {
         case .news: return "flame"

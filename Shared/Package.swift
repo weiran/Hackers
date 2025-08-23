@@ -10,12 +10,12 @@ let package = Package(
         .library(
             name: "Shared",
             targets: ["Shared"]
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Data"),
-        .package(path: "../Networking"),
+        .package(path: "../Networking")
     ],
     targets: [
         .target(
@@ -26,6 +26,6 @@ let package = Package(
             name: "SharedTests",
             dependencies: ["Shared"],
             path: "Tests"
-        ),
+        )
     ]
 )

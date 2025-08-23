@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Comments
 
 struct CommentsButton: View {
     let post: Post
@@ -37,9 +38,8 @@ extension CommentsButton {
         let commentsButton = CommentsButton(post: post) { [weak parentViewController] in
             guard let parentViewController = parentViewController else { return }
             let navigationStore = NavigationStore()
-            let commentsView: AnyView = AppConfiguration.shared.useCleanComments
-                ? AnyView(CleanCommentsViewWrapper(post: post).environmentObject(navigationStore))
-                : AnyView(CommentsView(post: post).environmentObject(navigationStore))
+            let commentsView = CleanCommentsView<NavigationStore>(post: post.toDomain())
+                .environmentObject(navigationStore)
 
             let hostingController = UIHostingController(rootView: commentsView)
             let navigationController = UINavigationController(rootViewController: hostingController)
