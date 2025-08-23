@@ -77,10 +77,7 @@ public struct LoginView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.secondary)
+                    Image(systemName: "xmark")
                 }
             }
         }
@@ -264,10 +261,7 @@ public struct LoginView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(.secondary)
+                    Image(systemName: "xmark")
                 }
             }
         }
