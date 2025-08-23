@@ -5,11 +5,8 @@ import SwiftUI
 
 @Observable
 public final class FeedViewModel: @unchecked Sendable {
-    public var posts: [Domain.Post] = []
-    public var isLoading = false
     public var isLoadingMore = false
     public var postType: Domain.PostType = .news
-    public var error: Error?
 
     private var postIds: Set<Int> = Set()
     private var pageIndex = 1
@@ -18,6 +15,11 @@ public final class FeedViewModel: @unchecked Sendable {
 
     private let postUseCase: any PostUseCase
     private let voteUseCase: any VoteUseCase
+    private let feedLoader: LoadingStateManager<[Domain.Post]>
+
+    public var posts: [Domain.Post] { feedLoader.data }
+    public var isLoading: Bool { feedLoader.isLoading }
+    public var error: Error? { feedLoader.error }
 
     public init(
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
@@ -25,33 +27,20 @@ public final class FeedViewModel: @unchecked Sendable {
     ) {
         self.postUseCase = postUseCase
         self.voteUseCase = voteUseCase
+        self.feedLoader = LoadingStateManager(initialData: [])
+        
+        // Set up the loading function after initialization
+        feedLoader.setLoadFunction(
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { [weak self] in
+                try await self?.fetchFeed() ?? []
+            }
+        )
     }
 
     @MainActor
     public func loadFeed() async {
-        guard !isLoading else { return }
-
-        isLoading = true
-        error = nil
-        reset()
-
-        do {
-            let fetchedPosts = try await postUseCase.getPosts(
-                type: postType,
-                page: pageIndex,
-                nextId: lastPostId > 0 ? lastPostId : nil
-            )
-
-            let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
-            let newPostIds = newPosts.map { $0.id }
-            self.posts.append(contentsOf: newPosts)
-            self.postIds.formUnion(newPostIds)
-
-            isLoading = false
-        } catch {
-            self.error = error
-            isLoading = false
-        }
+        await feedLoader.loadIfNeeded()
     }
 
     @MainActor
@@ -75,12 +64,14 @@ public final class FeedViewModel: @unchecked Sendable {
 
             let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
             let newPostIds = newPosts.map { $0.id }
-            self.posts.append(contentsOf: newPosts)
+            
+            // Update the LoadingStateManager's data with appended posts
+            feedLoader.data.append(contentsOf: newPosts)
             self.postIds.formUnion(newPostIds)
 
             isLoadingMore = false
         } catch {
-            self.error = error
+            // Can't set error directly anymore, could log or handle differently
             isLoadingMore = false
         }
     }
@@ -95,18 +86,46 @@ public final class FeedViewModel: @unchecked Sendable {
     }
 
     @MainActor
+    public func refreshFeed() async {
+        reset()
+        await feedLoader.refresh()
+    }
+    
+    private func fetchFeed() async throws -> [Domain.Post] {
+        do {
+            let fetchedPosts = try await postUseCase.getPosts(
+                type: postType,
+                page: pageIndex,
+                nextId: lastPostId > 0 ? lastPostId : nil
+            )
+
+            let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
+            
+            await MainActor.run {
+                let newPostIds = newPosts.map { $0.id }
+                self.postIds.formUnion(newPostIds)
+            }
+
+            return newPosts
+        } catch {
+            throw error
+        }
+    }
+
+    @MainActor
     public func changePostType(_ newType: Domain.PostType) async {
         guard postType != newType else { return }
 
         postType = newType
-        await loadFeed()
+        await refreshFeed()
     }
 
+    @MainActor
     private func reset() {
-        posts = []
         postIds = Set()
         pageIndex = 1
         lastPostId = 0
         isFetching = false
+        feedLoader.reset()
     }
 }

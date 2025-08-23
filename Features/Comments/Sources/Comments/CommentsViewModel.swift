@@ -6,10 +6,7 @@ import SwiftUI
 @Observable
 public final class CommentsViewModel: @unchecked Sendable {
     public var post: Post
-    public var comments: [Comment] = []
     public var visibleComments: [Comment] = []
-    public var isLoading = false
-    public var error: Error?
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?
@@ -17,6 +14,11 @@ public final class CommentsViewModel: @unchecked Sendable {
     private let postUseCase: any PostUseCase
     private let commentUseCase: any CommentUseCase
     private let voteUseCase: any VoteUseCase
+    private let commentsLoader: LoadingStateManager<[Comment]>
+
+    public var comments: [Comment] { commentsLoader.data }
+    public var isLoading: Bool { commentsLoader.isLoading }
+    public var error: Error? { commentsLoader.error }
 
     public init(
         post: Post,
@@ -28,40 +30,53 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.postUseCase = postUseCase
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
+        self.commentsLoader = LoadingStateManager(initialData: [])
+        
+        // Set up the loading function after initialization
+        commentsLoader.setLoadFunction(
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { [weak self] in
+                try await self?.fetchComments() ?? []
+            }
+        )
     }
 
     @MainActor
     public func loadComments() async {
-        guard !isLoading else { return }
-
-        isLoading = true
-        error = nil
-
-        do {
-            let postWithComments = try await postUseCase.getPost(id: post.id)
-            self.post = postWithComments
-
-            let loadedComments = postWithComments.comments ?? []
-
-            // Call the callback for HTML parsing if provided
-            onCommentsLoaded?(loadedComments)
-
-            self.comments = loadedComments
-            updateVisibleComments()
-
-            // Update the comments count with the actual number of comments
-            self.post.commentsCount = loadedComments.count
-
-            isLoading = false
-        } catch {
-            self.error = error
-            isLoading = false
-        }
+        await commentsLoader.loadIfNeeded()
+        updateVisibleComments()
     }
 
     @MainActor
     public func refreshComments() async {
-        await loadComments()
+        await commentsLoader.refresh()
+        updateVisibleComments()
+    }
+
+    private func fetchComments() async throws -> [Comment] {
+        do {
+            let postWithComments = try await postUseCase.getPost(id: post.id)
+            
+            await MainActor.run {
+                self.post = postWithComments
+            }
+
+            let loadedComments = postWithComments.comments ?? []
+
+            // Call the callback for HTML parsing if provided
+            await MainActor.run {
+                onCommentsLoaded?(loadedComments)
+            }
+
+            // Update the comments count with the actual number of comments
+            await MainActor.run {
+                self.post.commentsCount = loadedComments.count
+            }
+
+            return loadedComments
+        } catch {
+            throw error
+        }
     }
 
     @MainActor
