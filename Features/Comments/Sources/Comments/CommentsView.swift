@@ -3,7 +3,7 @@ import Domain
 import Shared
 import DesignSystem
 
-public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View {
+public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var showingVoteError = false
     @State private var voteErrorMessage = ""

@@ -26,7 +26,7 @@ struct MainContentView: View {
                     .environmentObject(sessionService)
             } else {
                 NavigationStack(path: $navigationStore.path) {
-                    CleanFeedView<NavigationStore, SessionService>(
+                    FeedView<NavigationStore, SessionService>(
                         isSidebar: false
                     )
                     .environmentObject(navigationStore)
@@ -34,11 +34,11 @@ struct MainContentView: View {
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
                         case .comments(let post):
-                            CleanCommentsView<NavigationStore>(post: post)
+                            CommentsView<NavigationStore>(post: post)
                                 .environmentObject(navigationStore)
                                 .environmentObject(sessionService)
                         case .settings:
-                            CleanSettingsView<NavigationStore>(
+                            SettingsView<NavigationStore>(
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
                                 currentUsername: sessionService.username
                             )
@@ -65,7 +65,7 @@ struct MainContentView: View {
             )
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
-            CleanSettingsView<NavigationStore>(
+            SettingsView<NavigationStore>(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username
             )
@@ -82,7 +82,7 @@ struct AdaptiveSplitView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
-            CleanFeedView<NavigationStore, SessionService>(
+            FeedView<NavigationStore, SessionService>(
                 isSidebar: true
             )
             .environmentObject(navigationStore)
@@ -92,7 +92,7 @@ struct AdaptiveSplitView: View {
             // Detail - CommentsView or empty state
             NavigationStack {
                 if let selectedPost = navigationStore.selectedPost {
-                    CleanCommentsView<NavigationStore>(post: selectedPost)
+                    CommentsView<NavigationStore>(post: selectedPost)
                         .environmentObject(navigationStore)
                         .environmentObject(sessionService)
                         .id(selectedPost.id) // Add id to force re-render when post changes

@@ -3,7 +3,7 @@ import Domain
 import Shared
 import DesignSystem
 
-public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
+public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
     @State private var viewModel: FeedViewModel
     @State private var selectedPostType: Domain.PostType = .news
     @State private var selectedPostId: Int?

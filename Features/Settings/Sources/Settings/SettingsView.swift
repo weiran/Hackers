@@ -4,7 +4,7 @@ import Domain
 import Shared
 import DesignSystem
 
-public struct CleanSettingsView<NavigationStore: NavigationStoreProtocol>: View {
+public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
