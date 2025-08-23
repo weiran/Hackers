@@ -3,7 +3,7 @@ import Domain
 import Shared
 import DesignSystem
 
-public struct CleanFeedView<NavigationStore: NavigationStoreProtocol>: View {
+public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
     @State private var viewModel: FeedViewModel
     @State private var selectedPostType: Domain.PostType = .news
     @State private var selectedPostId: Int?
@@ -11,6 +11,7 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var voteErrorMessage = ""
     @State private var showingAuthenticationDialog = false
     @EnvironmentObject private var navigationStore: NavigationStore
+    @EnvironmentObject private var authService: AuthService
 
     let isSidebar: Bool
     let showThumbnails: Bool
@@ -51,8 +52,16 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol>: View {
                 .navigationBarTitleDisplayMode(.inline)
         }
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                userButton
+            }
+            
             ToolbarItem(placement: .principal) {
                 toolbarMenu
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                settingsButton
             }
         }
         .task { @Sendable in
@@ -162,6 +171,28 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol>: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var userButton: some View {
+        Button {
+            navigationStore.showLogin()
+        } label: {
+            Image(systemName: authService.isAuthenticated ? "person.crop.circle.fill" : "person.crop.circle")
+                .font(.headline)
+                .foregroundColor(authService.isAuthenticated ? .primary : .secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private var settingsButton: some View {
+        Button {
+            navigationStore.showSettings()
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.headline)
+                .foregroundColor(.primary)
         }
     }
 

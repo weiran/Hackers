@@ -10,9 +10,10 @@ import Foundation
 import Domain
 import Data
 import Combine
+import Shared
 
 @MainActor
-class SessionService: ObservableObject {
+class SessionService: ObservableObject, AuthenticationServiceProtocol {
     @Published private var user: Domain.User?
 
     var authenticationState: AuthenticationState {
@@ -26,6 +27,16 @@ class SessionService: ObservableObject {
 
     var username: String? {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
+    }
+    
+    // MARK: - AuthenticationServiceProtocol
+    
+    var isAuthenticated: Bool {
+        return authenticationState == .authenticated
+    }
+    
+    func showLogin() {
+        // This will be handled by NavigationStore in the view layer
     }
 
     func authenticate(username: String, password: String) async throws -> AuthenticationState {

@@ -12,6 +12,7 @@ import Settings
 import Comments
 import Feed
 import DesignSystem
+import Shared
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
@@ -25,7 +26,7 @@ struct MainContentView: View {
                     .environmentObject(sessionService)
             } else {
                 NavigationStack(path: $navigationStore.path) {
-                    CleanFeedView<NavigationStore>(
+                    CleanFeedView<NavigationStore, SessionService>(
                         isSidebar: false,
                         showThumbnails: true,
                         swipeActionsEnabled: true
@@ -83,7 +84,7 @@ struct AdaptiveSplitView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
-            CleanFeedView<NavigationStore>(
+            CleanFeedView<NavigationStore, SessionService>(
                 isSidebar: true,
                 showThumbnails: true,
                 swipeActionsEnabled: false
