@@ -131,7 +131,7 @@ enum CommentHTMLParser {
         // Check if there are code blocks that need processing
         let codeBlockRange = NSRange(location: 0, length: workingHTML.utf16.count)
         let codeBlockMatches = codeBlockRegex.matches(in: workingHTML, range: codeBlockRange)
-        
+
         if !codeBlockMatches.isEmpty {
             // Process code blocks and return the result
             return processCodeBlocks(workingHTML)
@@ -162,17 +162,17 @@ enum CommentHTMLParser {
         var result = AttributedString()
         let nsString = html as NSString
         let range = NSRange(location: 0, length: html.utf16.count)
-        
+
         // Find all code blocks
         let codeBlockMatches = codeBlockRegex.matches(in: html, range: range)
-        
+
         guard !codeBlockMatches.isEmpty else {
             // No code blocks, process normally
             return processLinksInText(html)
         }
-        
+
         var lastEnd = 0
-        
+
         for (index, match) in codeBlockMatches.enumerated() {
             // Add and process text before the code block
             if match.range.location > lastEnd {
@@ -184,36 +184,36 @@ enum CommentHTMLParser {
                     result += processedText
                 }
             }
-            
+
             // Extract and format the code block content
             let codeContentRange = match.range(at: 1)
             if codeContentRange.location != NSNotFound {
                 let codeContent = nsString.substring(with: codeContentRange)
                 // Decode HTML entities in the code content
                 let decodedCode = decodeHTMLEntities(codeContent)
-                
+
                 // Create formatted code block
                 var codeAttributedString = AttributedString(decodedCode)
-                
+
                 // Apply monospace font
                 let fullRange = codeAttributedString.startIndex..<codeAttributedString.endIndex
                 codeAttributedString[fullRange].font = .system(.body, design: .monospaced)
-                
+
                 // Add paragraph spacing before code block (like <p> tags)
                 // Only add spacing if there's content before this code block
                 if !result.characters.isEmpty {
                     result += createParagraphSpacing()
                 }
-                
+
                 result += codeAttributedString
-                
+
                 // Add single line spacing after code block (not double)
                 result += AttributedString("\n")
             }
-            
+
             lastEnd = NSMaxRange(match.range)
         }
-        
+
         // Add and process remaining text after last code block
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
@@ -221,7 +221,7 @@ enum CommentHTMLParser {
             // Always add remaining text, even if it starts with whitespace
             result += processedText
         }
-        
+
         return result
     }
 
@@ -490,7 +490,7 @@ enum CommentHTMLParser {
                 formatSegments.append((range: match.range, type: .italic, content: content))
             }
         }
-        
+
         // Find inline code tags (not within pre tags)
         let inlineCodeMatches = inlineCodeRegex.matches(in: text, range: fullRange)
         for match in inlineCodeMatches {

@@ -13,11 +13,11 @@ import SwiftUI
 struct CleanFeedViewWrapper: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     let isSidebar: Bool
-    
+
     init(isSidebar: Bool = false) {
         self.isSidebar = isSidebar
     }
-    
+
     var body: some View {
         // This will be replaced with the actual CleanFeedView from the Feed module
         // For now, we'll use the existing FeedView

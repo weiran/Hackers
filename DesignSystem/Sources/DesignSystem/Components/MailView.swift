@@ -13,7 +13,7 @@ public struct MailView: UIViewControllerRepresentable {
     let recipients: [String]
     let subject: String
     let messageBody: String
-    
+
     public init(
         result: Binding<Result<MFMailComposeResult, Error>?>,
         recipients: [String] = [],
@@ -25,29 +25,29 @@ public struct MailView: UIViewControllerRepresentable {
         self.subject = subject
         self.messageBody = messageBody
     }
-    
+
     public func makeUIViewController(context: Context) -> MFMailComposeViewController {
-        let vc = MFMailComposeViewController()
-        vc.mailComposeDelegate = context.coordinator
-        vc.setToRecipients(recipients)
-        vc.setSubject(subject)
-        vc.setMessageBody(messageBody, isHTML: false)
-        return vc
+        let mailVC = MFMailComposeViewController()
+        mailVC.mailComposeDelegate = context.coordinator
+        mailVC.setToRecipients(recipients)
+        mailVC.setSubject(subject)
+        mailVC.setMessageBody(messageBody, isHTML: false)
+        return mailVC
     }
-    
+
     public func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {}
-    
+
     public func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     public class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         var parent: MailView
-        
+
         init(_ parent: MailView) {
             self.parent = parent
         }
-        
+
         nonisolated public func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,

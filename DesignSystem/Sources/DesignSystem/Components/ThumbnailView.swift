@@ -9,11 +9,11 @@ import SwiftUI
 
 public struct ThumbnailView: View {
     let url: URL?
-    
+
     public init(url: URL?) {
         self.url = url
     }
-    
+
     private func thumbnailURL(for url: URL) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
@@ -23,7 +23,7 @@ public struct ThumbnailView: View {
         components.queryItems = [URLQueryItem(name: "url", value: urlString)]
         return components.url
     }
-    
+
     private var placeholderImage: some View {
         Image(systemName: "safari")
             .font(.title2)
@@ -31,7 +31,7 @@ public struct ThumbnailView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.secondary.opacity(0.1))
     }
-    
+
     public var body: some View {
         if let url = url, let thumbnailURL = thumbnailURL(for: url) {
             AsyncImage(url: thumbnailURL) { image in

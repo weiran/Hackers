@@ -35,7 +35,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         selectedPost = post
         selectedHackersKitPost = post.toHackersKit()
     }
-    
+
     // Overload for HackersKit Post during migration
     func showPost(_ post: Post) {
         selectedPost = post.toDomain()
@@ -59,7 +59,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         selectedPostType = type.toHackersKit()
         clearSelection()
     }
-    
+
     // Overload for HackersKit PostType during migration
     func selectPostType(_ postType: PostType) {
         selectedPostType = postType

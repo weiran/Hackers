@@ -46,7 +46,15 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
                             }
                         }
                     }
-                    .plainListRow()
+                    .listRowSeparator(.hidden)
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button {
+                            Task { await handlePostVote() }
+                        } label: {
+                            Image(systemName: viewModel.post.upvoted ? "arrow.uturn.down" : "arrow.up")
+                        }
+                        .tint(viewModel.post.upvoted ? .secondary : Color("upvotedColor"))
+                    }
                     
                     if viewModel.isLoading {
                         LoadingView()
@@ -81,7 +89,22 @@ public struct CleanCommentsView<NavigationStore: NavigationStoreProtocol>: View 
                                     visibleCommentPositions[position.id] = position.frame
                                 }
                             }
-                            .plainListRow()
+                            .listRowSeparator(.hidden)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    Task { await handleCommentVote(comment) }
+                                } label: {
+                                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                                }
+                                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button {
+                                    viewModel.hideCommentBranch(comment)
+                                } label: {
+                                    Image(systemName: "minus.circle")
+                                }
+                            }
                         }
                     }
                 }
@@ -234,18 +257,6 @@ private struct PostHeader: View {
         .onTapGesture {
             onLinkTap()
         }
-        .padding()
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            // Swipe actions temporarily disabled - need UserDefaults extension
-            if false { // UserDefaults.standard.swipeActionsEnabled
-                Button {
-                    Task { await onVote() }
-                } label: {
-                    Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
-                }
-                .tint(post.upvoted ? .secondary : Color("upvotedColor"))
-            }
-        }
         .contextMenu {
             PostContextMenu(
                 post: post,
@@ -274,21 +285,21 @@ private struct CommentRow: View {
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
-                
+
                 Text(comment.age)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 if comment.upvoted {
                     Image(systemName: "arrow.up.circle.fill")
                         .foregroundColor(Color("upvotedColor"))
                         .font(.body)
                 }
-                
+
                 if comment.visibility == .compact {
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "chevron.down")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -298,42 +309,13 @@ private struct CommentRow: View {
                 if let parsedText = comment.parsedText {
                     Text(parsedText)
                         .foregroundColor(.primary)
-                        .padding(.bottom, 16)
-                } else {
-                    Text(comment.text)
-                        .foregroundColor(.primary)
-                        .padding(.bottom, 16)
                 }
-            } else {
-                Spacer()
             }
         }
-        .padding(.leading, CGFloat(comment.level * 16))
-        .padding(.horizontal)
+        .listRowInsets(.init(top: 10, leading: CGFloat((comment.level + 1) * 16), bottom: 10, trailing: 16))
         .contentShape(Rectangle())
         .onTapGesture {
             onToggle()
-        }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            // Swipe actions temporarily disabled - need UserDefaults extension
-            if false { // UserDefaults.standard.swipeActionsEnabled
-                Button {
-                    Task { await onVote() }
-                } label: {
-                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
-                }
-                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
-            }
-        }
-        .swipeActions(edge: .trailing) {
-            // Swipe actions temporarily disabled - need UserDefaults extension
-            if false { // UserDefaults.standard.swipeActionsEnabled
-                Button {
-                    onHide()
-                } label: {
-                    Image(systemName: "minus.circle")
-                }
-            }
         }
         .contextMenu {
             CommentContextMenu(
@@ -404,7 +386,6 @@ private struct LoadingView: View {
                 .foregroundColor(.secondary)
             Spacer()
         }
-        .padding()
         .frame(maxWidth: .infinity)
     }
 }
@@ -414,7 +395,6 @@ private struct EmptyCommentsView: View {
         Text("No comments yet")
             .font(.subheadline)
             .foregroundColor(.secondary)
-            .padding()
             .frame(maxWidth: .infinity)
     }
 }

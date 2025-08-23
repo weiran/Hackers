@@ -7,21 +7,21 @@
 
 import SwiftUI
 
-public struct AppColors {
+public enum AppColors {
     public static let upvoted = Color("upvotedColor", bundle: .main)
     public static let appTint = Color("appTintColor", bundle: .main)
-    
+
     // Add fallback colors if asset colors are not found
     public static var upvotedColor: Color {
-        if let _ = UIColor(named: "upvotedColor") {
+        if UIColor(named: "upvotedColor") != nil {
             return Color("upvotedColor")
         } else {
             return Color.orange
         }
     }
-    
+
     public static var appTintColor: Color {
-        if let _ = UIColor(named: "appTintColor") {
+        if UIColor(named: "appTintColor") != nil {
             return Color("appTintColor")
         } else {
             return Color.orange

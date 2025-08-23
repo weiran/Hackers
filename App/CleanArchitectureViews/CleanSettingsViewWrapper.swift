@@ -10,7 +10,7 @@ import Settings
 
 struct CleanSettingsViewWrapper: View {
     @EnvironmentObject private var navigationStore: NavigationStore
-    
+
     var body: some View {
         // Using the new clean architecture CleanSettingsView from the Settings module
         CleanSettingsView<NavigationStore>(

@@ -14,7 +14,7 @@ public struct PostDisplayView: View {
     let showPostText: Bool
     let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
-    
+
     public init(
         post: Post,
         showPostText: Bool = false,
@@ -26,7 +26,7 @@ public struct PostDisplayView: View {
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
@@ -43,7 +43,7 @@ public struct PostDisplayView: View {
                                 }
                         )
                 }
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(post.title)
@@ -51,7 +51,7 @@ public struct PostDisplayView: View {
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    
+
                     // Metadata row
                     HStack(spacing: 3) {
                         // Always show non-interactive vote display (voting only via swipe gestures)
@@ -62,10 +62,10 @@ public struct PostDisplayView: View {
                                 .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
                                 .font(.caption2)
                         }
-                        
+
                         Text("•")
                             .foregroundColor(.secondary)
-                        
+
                         HStack(spacing: 0) {
                             Text("\(post.commentsCount)")
                                 .foregroundColor(.secondary)
@@ -73,7 +73,7 @@ public struct PostDisplayView: View {
                                 .foregroundColor(.secondary)
                                 .font(.caption2)
                         }
-                        
+
                         if let host = post.url.host,
                            !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
                             Text("•")
@@ -86,7 +86,7 @@ public struct PostDisplayView: View {
                     .font(.subheadline)
                 }
             }
-            
+
             if showPostText, let text = post.text, !text.isEmpty {
                 Text(text)
                     .foregroundColor(.primary)
@@ -102,7 +102,7 @@ public struct PostContextMenu: View {
     let onVote: () -> Void
     let onOpenLink: () -> Void
     let onShare: () -> Void
-    
+
     public init(
         post: Post,
         onVote: @escaping () -> Void,
@@ -114,7 +114,7 @@ public struct PostContextMenu: View {
         self.onOpenLink = onOpenLink
         self.onShare = onShare
     }
-    
+
     public var body: some View {
         Group {
             if post.upvoted {
@@ -133,9 +133,9 @@ public struct PostContextMenu: View {
                     Label("Upvote", systemImage: "arrow.up")
                 }
             }
-            
+
             Divider()
-            
+
             if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
                 Button {
                     onOpenLink()
@@ -143,7 +143,7 @@ public struct PostContextMenu: View {
                     Label("Open Link", systemImage: "safari")
                 }
             }
-            
+
             Button {
                 onShare()
             } label: {

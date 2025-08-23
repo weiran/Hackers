@@ -9,12 +9,12 @@ import Foundation
 
 struct AppConfiguration {
     static let shared = AppConfiguration()
-    
+
     // Feature flags for clean architecture migration
     // Set to true once the modules are added to Xcode project
     let useCleanFeed = true
     let useCleanSettings = true
     let useCleanComments = true // Migrated to clean architecture
-    
+
     private init() {}
 }

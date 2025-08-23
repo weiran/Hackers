@@ -15,12 +15,12 @@ public struct LoginView: View {
     @State private var isAuthenticating = false
     @State private var showAlert = false
     @Environment(\.dismiss) var dismiss
-    
+
     let isAuthenticated: Bool
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
-    
+
     public init(
         isAuthenticated: Bool,
         currentUsername: String?,
@@ -32,7 +32,7 @@ public struct LoginView: View {
         self.onLogin = onLogin
         self.onLogout = onLogout
     }
-    
+
     public var body: some View {
         NavigationStack {
             if !isAuthenticated {
@@ -40,21 +40,21 @@ public struct LoginView: View {
                     Text("Login to Hacker News")
                         .font(.largeTitle)
                         .padding(.bottom, 30)
-                    
+
                     TextField("Username", text: $username)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .textFieldStyle(RoundedTextField())
                         .textContentType(.username)
-                    
+
                     SecureField("Password", text: $password)
                         .textFieldStyle(RoundedTextField())
                         .textContentType(.password)
-                    
+
                     Text("Hackers never stores your password")
                         .foregroundColor(Color.secondary)
                         .font(.footnote)
-                    
+
                     Button("Login") {
                         isAuthenticating = true
                         Task {
@@ -122,6 +122,7 @@ public struct LoginView: View {
 }
 
 public struct RoundedTextField: TextFieldStyle {
+    // swiftlint:disable:next identifier_name
     public func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(.all, 10)
