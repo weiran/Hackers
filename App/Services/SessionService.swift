@@ -9,9 +9,11 @@
 import Foundation
 import Domain
 import Data
+import Combine
 
-class SessionService {
-    private var user: Domain.User?
+@MainActor
+class SessionService: ObservableObject {
+    @Published private var user: Domain.User?
 
     var authenticationState: AuthenticationState {
         // For now, check if username exists in UserDefaults

@@ -15,12 +15,14 @@ import DesignSystem
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
+    @StateObject private var sessionService = SessionService()
 
     var body: some View {
         Group {
             if UIDevice.current.userInterfaceIdiom == .pad {
                 AdaptiveSplitView()
                     .environmentObject(navigationStore)
+                    .environmentObject(sessionService)
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     CleanFeedView<NavigationStore>(
@@ -29,17 +31,20 @@ struct MainContentView: View {
                         swipeActionsEnabled: true
                     )
                     .environmentObject(navigationStore)
+                    .environmentObject(sessionService)
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
                         case .comments(let post):
                             CleanCommentsView<NavigationStore>(post: post)
                                 .environmentObject(navigationStore)
+                                .environmentObject(sessionService)
                         case .settings:
                             CleanSettingsView<NavigationStore>(
-                                isAuthenticated: false, // TODO: Connect to actual auth state
-                                currentUsername: nil
+                                isAuthenticated: sessionService.authenticationState == .authenticated,
+                                currentUsername: sessionService.username
                             )
                             .environmentObject(navigationStore)
+                            .environmentObject(sessionService)
                         }
                     }
                 }
@@ -48,24 +53,32 @@ struct MainContentView: View {
         .accentColor(.accentColor)
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
-                isAuthenticated: false, // TODO: Connect to actual auth state
-                currentUsername: nil,
-                onLogin: { _, _ in }, // TODO: Implement login
-                onLogout: { } // TODO: Implement logout
+                isAuthenticated: sessionService.authenticationState == .authenticated,
+                currentUsername: sessionService.username,
+                onLogin: { username, password in
+                    Task {
+                        try? await sessionService.authenticate(username: username, password: password)
+                    }
+                },
+                onLogout: {
+                    sessionService.unauthenticate()
+                }
             )
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
             CleanSettingsView<NavigationStore>(
-                isAuthenticated: false, // TODO: Connect to actual auth state
-                currentUsername: nil
+                isAuthenticated: sessionService.authenticationState == .authenticated,
+                currentUsername: sessionService.username
             )
             .environmentObject(navigationStore)
+            .environmentObject(sessionService)
         }
     }
 }
 
 struct AdaptiveSplitView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
+    @EnvironmentObject private var sessionService: SessionService
 
     var body: some View {
         NavigationSplitView {
@@ -76,6 +89,7 @@ struct AdaptiveSplitView: View {
                 swipeActionsEnabled: false
             )
             .environmentObject(navigationStore)
+            .environmentObject(sessionService)
             .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {
             // Detail - CommentsView or empty state
@@ -83,6 +97,7 @@ struct AdaptiveSplitView: View {
                 if let selectedPost = navigationStore.selectedPost {
                     CleanCommentsView<NavigationStore>(post: selectedPost)
                         .environmentObject(navigationStore)
+                        .environmentObject(sessionService)
                         .id(selectedPost.id) // Add id to force re-render when post changes
                 } else {
                     EmptyDetailView()
