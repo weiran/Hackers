@@ -22,8 +22,6 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         // Note: This only sets defaults for keys that don't exist yet
         if let userDefaults = userDefaults as? UserDefaults {
             userDefaults.register(defaults: [
-                "showThumbnails": true,      // Default to true
-                "swipeActions": true,        // Default to true
                 "safariReaderMode": false,
                 "showCommentsButton": false,
                 "openInDefaultBrowser": false
@@ -37,24 +35,6 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "safariReaderMode")
-        }
-    }
-
-    public var showThumbnails: Bool {
-        get {
-            userDefaults.bool(forKey: "showThumbnails")
-        }
-        set {
-            userDefaults.set(newValue, forKey: "showThumbnails")
-        }
-    }
-
-    public var swipeActions: Bool {
-        get {
-            userDefaults.bool(forKey: "swipeActions")
-        }
-        set {
-            userDefaults.set(newValue, forKey: "swipeActions")
         }
     }
 

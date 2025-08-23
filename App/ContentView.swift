@@ -27,9 +27,7 @@ struct MainContentView: View {
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     CleanFeedView<NavigationStore, SessionService>(
-                        isSidebar: false,
-                        showThumbnails: true,
-                        swipeActionsEnabled: true
+                        isSidebar: false
                     )
                     .environmentObject(navigationStore)
                     .environmentObject(sessionService)
@@ -85,9 +83,7 @@ struct AdaptiveSplitView: View {
         NavigationSplitView {
             // Sidebar - FeedView
             CleanFeedView<NavigationStore, SessionService>(
-                isSidebar: true,
-                showThumbnails: true,
-                swipeActionsEnabled: false
+                isSidebar: true
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)

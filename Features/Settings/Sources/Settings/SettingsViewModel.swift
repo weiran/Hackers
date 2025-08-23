@@ -15,16 +15,6 @@ public final class SettingsViewModel: @unchecked Sendable {
         set { settingsUseCase.safariReaderMode = newValue }
     }
 
-    public var showThumbnails: Bool {
-        get { settingsUseCase.showThumbnails }
-        set { settingsUseCase.showThumbnails = newValue }
-    }
-
-    public var swipeActions: Bool {
-        get { settingsUseCase.swipeActions }
-        set { settingsUseCase.swipeActions = newValue }
-    }
-
     public var showComments: Bool {
         get { settingsUseCase.showComments }
         set { settingsUseCase.showComments = newValue }

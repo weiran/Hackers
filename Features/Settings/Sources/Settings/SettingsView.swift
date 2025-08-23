@@ -98,12 +98,6 @@ public struct CleanSettingsView<NavigationStore: NavigationStoreProtocol>: View 
                 }
 
                 Section(header: Text("Appearance")) {
-                    Toggle(isOn: $viewModel.showThumbnails) {
-                        Text("Show Thumbnails")
-                    }
-                    Toggle(isOn: $viewModel.swipeActions) {
-                        Text("Enable Swipe Actions")
-                    }
                     Toggle(isOn: $viewModel.showComments) {
                         Text("Show Comments Button")
                     }

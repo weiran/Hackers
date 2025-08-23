@@ -14,19 +14,13 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthServic
     @EnvironmentObject private var authService: AuthService
 
     let isSidebar: Bool
-    let showThumbnails: Bool
-    let swipeActionsEnabled: Bool
 
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
-        isSidebar: Bool = false,
-        showThumbnails: Bool = true,
-        swipeActionsEnabled: Bool = false
+        isSidebar: Bool = false
     ) {
         self._viewModel = State(initialValue: viewModel)
         self.isSidebar = isSidebar
-        self.showThumbnails = showThumbnails
-        self.swipeActionsEnabled = swipeActionsEnabled
     }
 
     private var selectionBinding: Binding<Int?> {
@@ -102,7 +96,6 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthServic
     private func postRow(for post: Domain.Post) -> some View {
         PostRowView(
             post: post,
-            showThumbnails: showThumbnails,
             onVote: {
                 Task { await handleVote(post: post) }
             },
@@ -120,7 +113,7 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthServic
             }
         }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            if swipeActionsEnabled {
+            if !isSidebar {
                 Button {
                     Task { await handleVote(post: post) }
                 } label: {
@@ -230,18 +223,15 @@ public struct CleanFeedView<NavigationStore: NavigationStoreProtocol, AuthServic
 
 struct PostRowView: View {
     let post: Domain.Post
-    let showThumbnails: Bool
     let onVote: (() -> Void)?
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
 
     init(post: Domain.Post,
-         showThumbnails: Bool = true,
          onVote: (() -> Void)? = nil,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil) {
         self.post = post
-        self.showThumbnails = showThumbnails
         self.onVote = onVote
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
@@ -251,7 +241,7 @@ struct PostRowView: View {
         PostDisplayView(
             post: post,
             showPostText: false,
-            showThumbnails: showThumbnails,
+            showThumbnails: true,
             onThumbnailTap: onLinkTap
         )
         .contentShape(Rectangle())
