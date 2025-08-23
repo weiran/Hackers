@@ -18,9 +18,8 @@ enum NavigationDestination: Hashable {
 
 class NavigationStore: ObservableObject, NavigationStoreProtocol {
     @Published var path: NavigationPath = NavigationPath()
-    @Published var selectedPost: Domain.Post? // Using Domain.Post for protocol conformance
-    @Published var selectedHackersKitPost: Post? // Keep old Post for compatibility
-    @Published var selectedPostType: PostType = .news
+    @Published var selectedPost: Domain.Post?
+    @Published var selectedPostType: Domain.PostType = .news
     @Published var showingLogin = false
     @Published var showingSettings = false
     @Published var pendingPostId: Int?
@@ -39,7 +38,6 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
 
     func showPost(_ post: Domain.Post) {
         selectedPost = post
-        selectedHackersKitPost = post.toHackersKit()
 
         // For iPhone navigation, use NavigationPath
         if UIDevice.current.userInterfaceIdiom != .pad {
@@ -47,21 +45,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         }
     }
 
-    // Overload for HackersKit Post during migration
-    func showPost(_ post: Post) {
-        let domainPost = post.toDomain()
-        selectedPost = domainPost
-        selectedHackersKitPost = post
-
-        // For iPhone navigation, use NavigationPath
-        if UIDevice.current.userInterfaceIdiom != .pad {
-            path.append(NavigationDestination.comments(domainPost))
-        }
-    }
-
     func clearSelection() {
         selectedPost = nil
-        selectedHackersKitPost = nil
     }
 
     func showLogin() {
@@ -73,13 +58,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     }
 
     func selectPostType(_ type: Domain.PostType) {
-        selectedPostType = type.toHackersKit()
-        clearSelection()
-    }
-
-    // Overload for HackersKit PostType during migration
-    func selectPostType(_ postType: PostType) {
-        selectedPostType = postType
+        selectedPostType = type
         clearSelection()
     }
 
@@ -120,7 +99,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
 
         // Create a temporary post object for immediate navigation
         // This will be replaced with the actual post data when loaded
-        let tempPost: Post = Post(
+        let tempPost = Domain.Post(
             id: id,
             url: URL(string: "\(Domain.HackerNewsConstants.baseURL)/item?id=\(id)")!,
             title: "Loading...",

@@ -8,6 +8,7 @@
 
 import SwiftUI
 import WhatsNewKit
+import DesignSystem
 
 enum OnboardingService {
     static func onboardingViewController(forceShow: Bool = false) -> UIViewController? {
@@ -46,9 +47,8 @@ enum OnboardingService {
     }
 
     private static func configuration() -> WhatsNewViewController.Configuration {
-        let appTheme = AppTheme.default
         let theme = WhatsNewViewController.Theme { theme in
-            theme.completionButton.backgroundColor = appTheme.appTintColor
+            theme.completionButton.backgroundColor = UIColor(AppColors.appTintColor)
             theme.completionButton.titleColor = .white
         }
         var configuration = WhatsNewViewController.Configuration(theme: theme)

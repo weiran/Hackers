@@ -1,14 +1,13 @@
 //
 //  UserDefaultsExtensions.swift
-//  Hackers
+//  Data
 //
-//  Created by Weiran Zhang on 05/05/2018.
-//  Copyright © 2018 Weiran Zhang. All rights reserved.
+//  Extensions for UserDefaults settings management
 //
 
 import Foundation
 
-extension UserDefaults {
+public extension UserDefaults {
     var darkModeEnabled: Bool {
         let themeSetting = string(forKey: UserDefaultsKeys.theme.rawValue)
         return themeSetting == "dark"
@@ -84,7 +83,7 @@ extension UserDefaults {
     }
 }
 
-enum UserDefaultsKeys: String {
+public enum UserDefaultsKeys: String {
     case theme
     case systemTheme
     case safariReaderMode

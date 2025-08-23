@@ -1,6 +1,25 @@
 import Foundation
 import Domain
 
+extension Collection where Indices.Iterator.Element == Index {
+    public subscript (safe index: Index) -> Iterator.Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension NotificationCenter {
+    public func observe(name: NSNotification.Name?, object obj: Any?,
+                       queue: OperationQueue?,
+                       using block: @escaping (Notification) -> Void) -> NotificationToken {
+        let token = addObserver(forName: name, object: obj, queue: queue, using: block)
+        return NotificationToken(notificationCenter: self, token: token)
+    }
+}
+
+extension Notification.Name {
+    public static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
+}
+
 extension PostType {
     public var displayName: String {
         switch self {
@@ -33,4 +52,17 @@ extension String {
         return self.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    public subscript(value: PartialRangeUpTo<Int>) -> Substring {
+        return self[..<index(startIndex, offsetBy: value.upperBound)]
+    }
+
+    public subscript(value: PartialRangeThrough<Int>) -> Substring {
+        return self[...index(startIndex, offsetBy: value.upperBound)]
+    }
+
+    public subscript(value: PartialRangeFrom<Int>) -> Substring {
+        return self[index(startIndex, offsetBy: value.lowerBound)...]
+    }
+
 }
