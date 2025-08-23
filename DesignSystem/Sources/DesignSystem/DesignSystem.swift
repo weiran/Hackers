@@ -1,3 +1,10 @@
+//
+//  DesignSystem.swift
+//  DesignSystem
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import SwiftUI
 
 // Placeholder for DesignSystem module

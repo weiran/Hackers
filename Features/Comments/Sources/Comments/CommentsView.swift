@@ -1,3 +1,10 @@
+//
+//  CommentsView.swift
+//  Comments
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import SwiftUI
 import Domain
 import Shared

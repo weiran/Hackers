@@ -2,7 +2,7 @@
 //  LinkOpener.swift
 //  Shared
 //
-//  Service for opening URLs
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI

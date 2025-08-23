@@ -1,3 +1,10 @@
+//
+//  Package.swift
+//  Hackers
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 // swift-tools-version: 6.0
 import PackageDescription
 

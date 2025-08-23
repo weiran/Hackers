@@ -1,3 +1,10 @@
+//
+//  NetworkManager.swift
+//  Networking
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import Foundation
 
 public protocol NetworkManagerProtocol: Sendable {

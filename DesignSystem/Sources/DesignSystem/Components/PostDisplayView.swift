@@ -2,7 +2,7 @@
 //  PostDisplayView.swift
 //  DesignSystem
 //
-//  Reusable post display component
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI

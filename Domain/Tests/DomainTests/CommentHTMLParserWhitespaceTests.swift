@@ -2,11 +2,11 @@
 //  CommentHTMLParserWhitespaceTests.swift
 //  DomainTests
 //
-//  Created by Weiran Zhang on SwiftUI Migration.
-//  Copyright © 2024 Glass Umbrella. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 // swiftlint:disable type_body_length line_length
+
 // swiftlint:disable:next force_cast
 
 import Testing

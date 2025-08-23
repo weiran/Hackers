@@ -1,3 +1,10 @@
+//
+//  PostRepository.swift
+//  Data
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import Domain
 import Networking
 import Foundation

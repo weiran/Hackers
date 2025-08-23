@@ -1,3 +1,10 @@
+//
+//  HackerNewsConstantsTests.swift
+//  SharedTests
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import Testing
 @testable import Shared
 

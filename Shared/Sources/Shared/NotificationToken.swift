@@ -2,7 +2,7 @@
 //  NotificationToken.swift
 //  Shared
 //
-//  Automatic notification observer cleanup
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import Foundation

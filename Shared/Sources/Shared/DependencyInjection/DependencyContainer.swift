@@ -2,7 +2,7 @@
 //  DependencyContainer.swift
 //  Shared
 //
-//  Dependency injection container
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import Foundation

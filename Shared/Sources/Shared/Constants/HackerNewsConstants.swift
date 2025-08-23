@@ -2,7 +2,7 @@
 //  HackerNewsConstants.swift
 //  Shared
 //
-//  Constants for Hacker News
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import Foundation

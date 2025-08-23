@@ -1,3 +1,10 @@
+//
+//  SimpleCommentsTests.swift
+//  CommentsTests
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import Testing
 @testable import Comments
 import Domain

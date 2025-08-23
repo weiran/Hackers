@@ -2,7 +2,7 @@
 //  PresentationService.swift
 //  Shared
 //
-//  Service for presentation-related utilities
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import UIKit

@@ -2,7 +2,7 @@
 //  MailView.swift
 //  DesignSystem
 //
-//  Mail compose view
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI

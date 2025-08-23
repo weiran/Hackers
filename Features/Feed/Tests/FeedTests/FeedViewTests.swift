@@ -2,7 +2,7 @@
 //  FeedViewTests.swift
 //  FeedTests
 //
-//  Tests for FeedView
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import Testing

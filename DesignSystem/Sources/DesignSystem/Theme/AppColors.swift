@@ -2,7 +2,7 @@
 //  AppColors.swift
 //  DesignSystem
 //
-//  App color theme
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import SwiftUI

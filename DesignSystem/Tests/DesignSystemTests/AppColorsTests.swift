@@ -1,3 +1,10 @@
+//
+//  AppColorsTests.swift
+//  DesignSystemTests
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 import Testing
 import SwiftUI
 @testable import DesignSystem

@@ -1,9 +1,8 @@
 //
 //  HackersUITests.swift
-//  HackersUITests
+//  Hackers
 //
-//  Created by Weiran Zhang on 23/03/2019.
-//  Copyright © 2019 Weiran Zhang. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 // swiftlint:disable force_cast

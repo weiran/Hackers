@@ -1,3 +1,10 @@
+//
+//  UseCaseTests.swift
+//  DomainTests
+//
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
+//
+
 // swiftlint:disable force_cast
 
 import Testing
