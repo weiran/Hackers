@@ -293,6 +293,9 @@ private struct CommentRow: View {
     let onToggle: () -> Void
     let onVote: () async -> Void
     let onHide: () -> Void
+    private var scaledCommentText: AttributedString {
+        CommentHTMLParser.parseHTMLText(comment.text)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -325,10 +328,9 @@ private struct CommentRow: View {
             }
 
             if comment.visibility == .visible {
-                if let parsedText = comment.parsedText {
-                    Text(parsedText)
-                        .foregroundColor(.primary)
-                }
+                Text(scaledCommentText)
+                    .scaledFont(.body)
+                    .foregroundColor(.primary)
             }
         }
         .listRowInsets(.init(top: 10, leading: CGFloat((comment.level + 1) * 16), bottom: 10, trailing: 16))

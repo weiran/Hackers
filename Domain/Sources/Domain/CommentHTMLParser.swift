@@ -196,7 +196,7 @@ public enum CommentHTMLParser {
 
                 // Apply monospace font
                 let fullRange = codeAttributedString.startIndex..<codeAttributedString.endIndex
-                codeAttributedString[fullRange].font = .system(.body, design: .monospaced)
+                codeAttributedString[fullRange].font = .body.monospaced()
 
                 // Add paragraph spacing before code block (like <p> tags)
                 // Only add spacing if there's content before this code block
@@ -542,7 +542,7 @@ public enum CommentHTMLParser {
                     formattedString.inlinePresentationIntent = .emphasized
                     formattedString.font = .body.italic()
                 case .code:
-                    formattedString.font = .system(.body, design: .monospaced)
+                    formattedString.font = .body.monospaced()
                 }
 
                 result += formattedString
