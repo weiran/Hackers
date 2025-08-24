@@ -115,10 +115,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 }
 
                 Section(header: Text("Appearance")) {
-                    Toggle(isOn: $viewModel.showComments) {
-                        Text("Show Comments Button")
-                    }
-                    
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Text Size")
@@ -149,7 +145,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     .padding(.vertical, 4)
                 }
 
-                Section(header: Text("Behaviour")) {
+                Section(header: Text("Browser")) {
+                    Toggle(isOn: $viewModel.showComments) {
+                        Text("Show Comments Button")
+                    }
                     Toggle(isOn: $viewModel.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
                     }
