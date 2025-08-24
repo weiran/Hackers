@@ -122,12 +122,12 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             Text(viewModel.textSize.displayName)
                                 .foregroundColor(.secondary)
                         }
-                        
+
                         HStack {
                             Text("A")
                                 .scaledFont(.caption2)
                                 .foregroundColor(.secondary)
-                            
+
                             Slider(
                                 value: Binding(
                                     get: { Double(viewModel.textSize.rawValue) },
@@ -136,7 +136,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                 in: 0...4,
                                 step: 1
                             )
-                            
+
                             Text("A")
                                 .scaledFont(.title2)
                                 .foregroundColor(.secondary)
@@ -182,7 +182,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         }
     }
 }
-
 
 extension Bundle {
     public var icon: UIImage? {

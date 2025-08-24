@@ -150,13 +150,13 @@ final class SettingsViewTests: XCTestCase {
 
     func testOnboardingCallback() {
         var onboardingCalled = false
-        
+
         let settingsView = SettingsView<MockNavigationStore>(
             onShowOnboarding: { onboardingCalled = true }
         )
-        
+
         XCTAssertNotNil(settingsView)
-        
+
         // Test that the callback is properly stored
         XCTAssertFalse(onboardingCalled)
     }

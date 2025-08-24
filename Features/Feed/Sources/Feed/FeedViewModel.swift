@@ -21,7 +21,6 @@ public final class FeedViewModel: @unchecked Sendable {
     private var isFetching = false
 
     private let postUseCase: any PostUseCase
-    private let voteUseCase: any VoteUseCase
     private let feedLoader: LoadingStateManager<[Domain.Post]>
 
     public var posts: [Domain.Post] { feedLoader.data }
@@ -29,13 +28,11 @@ public final class FeedViewModel: @unchecked Sendable {
     public var error: Error? { feedLoader.error }
 
     public init(
-        postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+        postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase()
     ) {
         self.postUseCase = postUseCase
-        self.voteUseCase = voteUseCase
         self.feedLoader = LoadingStateManager(initialData: [])
-        
+
         // Set up the loading function after initialization
         feedLoader.setLoadFunction(
             shouldSkipLoad: { !$0.isEmpty },
@@ -71,7 +68,7 @@ public final class FeedViewModel: @unchecked Sendable {
 
             let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
             let newPostIds = newPosts.map { $0.id }
-            
+
             // Update the LoadingStateManager's data with appended posts
             feedLoader.data.append(contentsOf: newPosts)
             self.postIds.formUnion(newPostIds)
@@ -85,6 +82,7 @@ public final class FeedViewModel: @unchecked Sendable {
 
     @MainActor
     public func vote(on post: Domain.Post, upvote: Bool) async throws {
+        let voteUseCase = DependencyContainer.shared.getVoteUseCase()
         if upvote {
             try await voteUseCase.upvote(post: post)
         } else {
@@ -97,7 +95,7 @@ public final class FeedViewModel: @unchecked Sendable {
         reset()
         await feedLoader.refresh()
     }
-    
+
     private func fetchFeed() async throws -> [Domain.Post] {
         do {
             let fetchedPosts = try await postUseCase.getPosts(
@@ -107,7 +105,7 @@ public final class FeedViewModel: @unchecked Sendable {
             )
 
             let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
-            
+
             await MainActor.run {
                 let newPostIds = newPosts.map { $0.id }
                 self.postIds.formUnion(newPostIds)

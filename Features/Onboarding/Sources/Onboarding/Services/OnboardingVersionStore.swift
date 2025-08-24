@@ -15,15 +15,15 @@ public protocol OnboardingVersionStore: Sendable {
 public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @unchecked Sendable {
     private let userDefaults: UserDefaults
     private let key = "OnboardingShown"
-    
+
     public init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
-    
+
     public func hasShownOnboarding() -> Bool {
         userDefaults.bool(forKey: key)
     }
-    
+
     public func markOnboardingShown() {
         userDefaults.set(true, forKey: key)
     }

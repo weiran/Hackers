@@ -8,6 +8,40 @@
 import Foundation
 import Combine
 
+// MARK: - Voting System
+
+public struct VotingState: Sendable {
+    public let isUpvoted: Bool
+    public let score: Int?
+    public let canVote: Bool
+    public let isVoting: Bool
+    public let error: Error?
+
+    public init(
+        isUpvoted: Bool,
+        score: Int? = nil,
+        canVote: Bool,
+        isVoting: Bool = false,
+        error: Error? = nil
+    ) {
+        self.isUpvoted = isUpvoted
+        self.score = score
+        self.canVote = canVote
+        self.isVoting = isVoting
+        self.error = error
+    }
+}
+
+public protocol Votable: Identifiable, Sendable {
+    var id: Int { get }
+    var upvoted: Bool { get set }
+    var voteLinks: VoteLinks? { get }
+}
+
+public protocol ScoredVotable: Votable {
+    var score: Int { get set }
+}
+
 public struct VoteLinks: Sendable, Hashable {
     public let upvote: URL?
     public let unvote: URL?
@@ -180,3 +214,8 @@ extension Comment {
         return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }
+
+// MARK: - Votable Conformance
+
+extension Post: ScoredVotable {}
+extension Comment: Votable {}

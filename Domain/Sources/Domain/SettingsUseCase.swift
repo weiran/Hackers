@@ -13,7 +13,7 @@ public enum TextSize: Int, CaseIterable, Sendable {
     case medium = 2
     case large = 3
     case extraLarge = 4
-    
+
     public var displayName: String {
         switch self {
         case .extraSmall: return "Extra Small"
@@ -23,7 +23,7 @@ public enum TextSize: Int, CaseIterable, Sendable {
         case .extraLarge: return "Extra Large"
         }
     }
-    
+
     public var scaleFactor: CGFloat {
         switch self {
         case .extraSmall: return 0.8

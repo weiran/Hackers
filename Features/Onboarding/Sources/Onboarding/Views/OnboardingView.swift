@@ -11,12 +11,12 @@ import DesignSystem
 public struct OnboardingView: View {
     private let onboardingData: OnboardingData
     private let onDismiss: () -> Void
-    
+
     public init(onboardingData: OnboardingData, onDismiss: @escaping () -> Void) {
         self.onboardingData = onboardingData
         self.onDismiss = onDismiss
     }
-    
+
     public var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -28,7 +28,7 @@ public struct OnboardingView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
                 }
-                
+
                 continueButton
                     .padding(.horizontal, 24)
                     .padding(.bottom, 24)
@@ -48,7 +48,7 @@ public struct OnboardingView: View {
             }
         }
     }
-    
+
     private var headerView: some View {
         VStack(spacing: 12) {
             Text(onboardingData.title)
@@ -57,7 +57,7 @@ public struct OnboardingView: View {
                 .multilineTextAlignment(.center)
         }
     }
-    
+
     private var itemsList: some View {
         LazyVStack(spacing: 24) {
             ForEach(onboardingData.items) { item in
@@ -65,7 +65,7 @@ public struct OnboardingView: View {
             }
         }
     }
-    
+
     private var continueButton: some View {
         Button(action: onDismiss) {
             Text("Continue")

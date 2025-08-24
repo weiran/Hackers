@@ -56,11 +56,11 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             ToolbarItem(placement: .navigationBarLeading) {
                 userButton
             }
-            
+
             ToolbarItem(placement: .principal) {
                 toolbarMenu
             }
-            
+
             ToolbarItem(placement: .navigationBarTrailing) {
                 settingsButton
             }
@@ -173,7 +173,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         }
     }
-    
+
     @ViewBuilder
     private var userButton: some View {
         Button {
@@ -184,7 +184,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 .foregroundColor(authService.isAuthenticated ? .primary : .secondary)
         }
     }
-    
+
     @ViewBuilder
     private var settingsButton: some View {
         Button {

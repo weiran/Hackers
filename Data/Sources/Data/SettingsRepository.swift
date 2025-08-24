@@ -65,7 +65,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
             userDefaults.set(newValue, forKey: "openInDefaultBrowser")
         }
     }
-    
+
     public var textSize: TextSize {
         get {
             let rawValue = userDefaults.integer(forKey: "textSize")

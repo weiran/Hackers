@@ -27,13 +27,13 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
     var username: String? {
         return user?.username ?? UserDefaults.standard.string(forKey: "username")
     }
-    
+
     // MARK: - AuthenticationServiceProtocol
-    
+
     var isAuthenticated: Bool {
         return authenticationState == .authenticated
     }
-    
+
     func showLogin() {
         // This will be handled by NavigationStore in the view layer
     }

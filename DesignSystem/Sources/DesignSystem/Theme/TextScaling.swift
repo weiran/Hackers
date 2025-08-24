@@ -23,7 +23,7 @@ public extension View {
     func textScaling(_ scaleFactor: CGFloat) -> some View {
         self.environment(\.textScaling, scaleFactor)
     }
-    
+
     func textScaling(for textSize: TextSize) -> some View {
         self.environment(\.textScaling, textSize.scaleFactor)
     }
@@ -63,7 +63,7 @@ public extension Font {
 struct ScaledFont: ViewModifier {
     @Environment(\.textScaling) private var textScaling
     let font: Font
-    
+
     func body(content: Content) -> some View {
         content
             .font(font.scaled(with: textScaling))

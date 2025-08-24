@@ -38,7 +38,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
         self.commentsLoader = LoadingStateManager(initialData: [])
-        
+
         // Set up the loading function after initialization
         commentsLoader.setLoadFunction(
             shouldSkipLoad: { !$0.isEmpty },
@@ -63,7 +63,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     private func fetchComments() async throws -> [Comment] {
         do {
             let postWithComments = try await postUseCase.getPost(id: post.id)
-            
+
             await MainActor.run {
                 self.post = postWithComments
             }
