@@ -9,30 +9,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "Settings",
+    name: "Onboarding",
     platforms: [
         .iOS(.v17)
     ],
     products: [
         .library(
-            name: "Settings",
-            targets: ["Settings"]
+            name: "Onboarding",
+            targets: ["Onboarding"]
         )
     ],
     dependencies: [
         .package(path: "../../Domain"),
         .package(path: "../../Shared"),
-        .package(path: "../../DesignSystem"),
-        .package(path: "../Onboarding")
+        .package(path: "../../DesignSystem")
     ],
     targets: [
         .target(
-            name: "Settings",
-            dependencies: ["Domain", "Shared", "DesignSystem", "Onboarding"]
+            name: "Onboarding",
+            dependencies: ["Domain", "Shared", "DesignSystem"]
         ),
         .testTarget(
-            name: "SettingsTests",
-            dependencies: ["Settings"],
+            name: "OnboardingTests",
+            dependencies: ["Onboarding"],
             path: "Tests"
         )
     ]

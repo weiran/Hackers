@@ -10,6 +10,7 @@ import MessageUI
 import Domain
 import Shared
 import DesignSystem
+import Onboarding
 
 public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
@@ -24,19 +25,22 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
+    let onShowOnboarding: () -> Void
 
     public init(
         viewModel: SettingsViewModel = SettingsViewModel(),
         isAuthenticated: Bool = false,
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
-        onLogout: @escaping () -> Void = { }
+        onLogout: @escaping () -> Void = { },
+        onShowOnboarding: @escaping () -> Void = { }
     ) {
         self._viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
         self.onLogout = onLogout
+        self.onShowOnboarding = onShowOnboarding
     }
 
     public var body: some View {
@@ -79,7 +83,12 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     Button(action: { self.showOnboarding = true }, label: {
                         Text("Show What's New")
                     })
-                    .sheet(isPresented: $showOnboarding) { OnboardingViewControllerWrapper() }
+                    .sheet(isPresented: $showOnboarding) {
+                        Onboarding.OnboardingService.createOnboardingView {
+                            Onboarding.OnboardingService.markOnboardingShown()
+                            showOnboarding = false
+                        }
+                    }
                 }
 
                 Section(header: Text("Account")) {
@@ -175,14 +184,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     }
 }
 
-// Placeholder for onboarding
-struct OnboardingViewControllerWrapper: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        return UIViewController() // Placeholder
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-}
 
 extension Bundle {
     public var icon: UIImage? {

@@ -18,6 +18,7 @@ struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject private var sessionService = SessionService()
     @StateObject private var settingsViewModel = SettingsViewModel()
+    @State private var showOnboarding = false
 
     var body: some View {
         Group {
@@ -48,6 +49,9 @@ struct MainContentView: View {
                                 },
                                 onLogout: {
                                     sessionService.unauthenticate()
+                                },
+                                onShowOnboarding: {
+                                    showOnboarding = true
                                 }
                             )
                             .environmentObject(navigationStore)
@@ -83,10 +87,18 @@ struct MainContentView: View {
                 },
                 onLogout: {
                     sessionService.unauthenticate()
+                },
+                onShowOnboarding: {
+                    showOnboarding = true
                 }
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)
+            .textScaling(for: settingsViewModel.textSize)
+        }
+        .sheet(isPresented: $showOnboarding) {
+            OnboardingViewWrapper()
+                .textScaling(for: settingsViewModel.textSize)
         }
     }
 }

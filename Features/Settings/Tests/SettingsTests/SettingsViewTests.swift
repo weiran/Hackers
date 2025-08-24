@@ -148,23 +148,17 @@ final class SettingsViewTests: XCTestCase {
 
     // MARK: - Onboarding Tests
 
-    func testOnboardingViewControllerWrapper() {
-        let onboardingWrapper = OnboardingViewControllerWrapper()
-        XCTAssertNotNil(onboardingWrapper)
-
-        // Test that we can create a view controller
-        let viewController = onboardingWrapper.makeUIViewController(context: ())
-        XCTAssertNotNil(viewController)
-        XCTAssertTrue(viewController is UIViewController)
-    }
-
-    func testOnboardingViewControllerUpdate() {
-        let onboardingWrapper = OnboardingViewControllerWrapper()
-        let viewController = UIViewController()
-
-        // Test that update doesn't crash
-        onboardingWrapper.updateUIViewController(viewController, context: ())
-        // No assertion needed, just testing it doesn't crash
+    func testOnboardingCallback() {
+        var onboardingCalled = false
+        
+        let settingsView = SettingsView<MockNavigationStore>(
+            onShowOnboarding: { onboardingCalled = true }
+        )
+        
+        XCTAssertNotNil(settingsView)
+        
+        // Test that the callback is properly stored
+        XCTAssertFalse(onboardingCalled)
     }
 
     // MARK: - SwiftUI Integration Tests

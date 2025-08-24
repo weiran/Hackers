@@ -16,6 +16,7 @@
 		248256F82E59D2460068E91E /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 248256F72E59D2460068E91E /* Domain */; };
 		248256FB2E59D2540068E91E /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FA2E59D2540068E91E /* Networking */; };
 		248256FE2E59D2660068E91E /* Feed in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FD2E59D2660068E91E /* Feed */; };
+		2482576E2E5B38190068E91E /* Onboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 2482576D2E5B38190068E91E /* Onboarding */; };
 		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -136,6 +137,7 @@
 				241E802E2E55B5F40013EEA1 /* Comments in Frameworks */,
 				24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */,
 				241E7B492E51D1C80013EEA1 /* Settings in Frameworks */,
+				2482576E2E5B38190068E91E /* Onboarding in Frameworks */,
 				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
@@ -283,6 +285,7 @@
 				248256F72E59D2460068E91E /* Domain */,
 				248256FA2E59D2540068E91E /* Networking */,
 				248256FD2E59D2660068E91E /* Feed */,
+				2482576D2E5B38190068E91E /* Onboarding */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -337,6 +340,7 @@
 				248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */,
 				248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */,
 				248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */,
+				2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/Onboarding" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -941,6 +945,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Features/Feed;
 		};
+		2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/Onboarding" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Onboarding;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -1009,6 +1017,10 @@
 		248256FD2E59D2660068E91E /* Feed */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Feed;
+		};
+		2482576D2E5B38190068E91E /* Onboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Onboarding;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
