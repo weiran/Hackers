@@ -17,20 +17,30 @@ public struct OnboardingData: Sendable {
     }
 
     public static func currentOnboarding() -> OnboardingData {
-        let activeCategory = OnboardingItem(
-            title: "Active Category Added",
-            subtitle: "Browse the most actively discussed stories with the new Active feed category.",
-            systemImage: "flame"
+        let swiftUIRewrite = OnboardingItem(
+            title: "Complete SwiftUI Rewrite",
+            subtitle: "Entirely rebuilt from the ground up with modern SwiftUI and clean architecture for the best experience.",
+            systemImage: "hammer.fill"
         )
-        let stabilityFixes = OnboardingItem(
-            title: "Stability Improvements",
-            subtitle: "Fixed crashes when tapping comment permalinks and improved feed pagination.",
-            systemImage: "checkmark.shield"
+        let votingSystem = OnboardingItem(
+            title: "Enhanced Voting System",
+            subtitle: "Redesigned voting interface with improved visual feedback and consistent behavior across the app.",
+            systemImage: "arrow.up.circle"
+        )
+        let textSize = OnboardingItem(
+            title: "Customizable Text Size",
+            subtitle: "New app-wide text size control with 5 scaling options. Adjust text size in Settings.",
+            systemImage: "textformat.size"
+        )
+        let performance = OnboardingItem(
+            title: "Performance Improvements",
+            subtitle: "Complete app modernization with clean architecture for faster loading and smoother navigation.",
+            systemImage: "speedometer"
         )
 
         return OnboardingData(
-            title: "What's New in Hackers",
-            items: [activeCategory, stabilityFixes]
+            title: "What's New in Hackers 5.0",
+            items: [swiftUIRewrite, votingSystem, textSize, performance]
         )
     }
 }
