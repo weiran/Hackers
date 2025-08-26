@@ -12,11 +12,9 @@ import DesignSystem
 
 public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
     @State private var viewModel: FeedViewModel
+    @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType = .news
     @State private var selectedPostId: Int?
-    @State private var showingVoteError = false
-    @State private var voteErrorMessage = ""
-    @State private var showingAuthenticationDialog = false
     @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var authService: AuthService
 
@@ -24,9 +22,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
 
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
+        votingViewModel: VotingViewModel? = nil,
         isSidebar: Bool = false
     ) {
         self._viewModel = State(initialValue: viewModel)
+        let container = DependencyContainer.shared
+        let defaultVotingViewModel = VotingViewModel(
+            votingService: container.getVotingService(),
+            commentVotingService: container.getCommentVotingService()
+        )
+        self._votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
         self.isSidebar = isSidebar
     }
 
@@ -68,16 +73,12 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         .task { @Sendable in
             await viewModel.loadFeed()
         }
-        .alert("Vote Error", isPresented: $showingVoteError) {
-            Button("OK") { }
+        .alert("Vote Error", isPresented: .constant(votingViewModel.lastError != nil)) {
+            Button("OK") {
+                votingViewModel.clearError()
+            }
         } message: {
-            Text(voteErrorMessage)
-        }
-        .sheet(isPresented: $showingAuthenticationDialog) {
-            Text("Please log in to vote")
-                .onAppear {
-                    navigationStore.showLogin()
-                }
+            Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
         }
     }
 
@@ -103,9 +104,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     private func postRow(for post: Domain.Post) -> some View {
         PostRowView(
             post: post,
-            onVote: {
-                Task { await handleVote(post: post) }
-            },
+            votingViewModel: votingViewModel,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: { navigationStore.showPost(post) }
         )
@@ -122,7 +121,10 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
             if !isSidebar {
                 Button {
-                    Task { await handleVote(post: post) }
+                    Task {
+                        var mutablePost = post
+                        await votingViewModel.toggleVote(for: &mutablePost)
+                    }
                 } label: {
                     Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
@@ -130,12 +132,31 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         }
         .contextMenu {
-            PostContextMenu(
-                post: post,
-                onVote: { Task { await handleVote(post: post) } },
-                onOpenLink: { handleLinkTap(post: post) },
-                onShare: { ShareService.shared.sharePost(post) }
+            VotingContextMenuItems.postVotingMenuItems(
+                for: post,
+                onVote: {
+                    Task {
+                        var mutablePost = post
+                        await votingViewModel.toggleVote(for: &mutablePost)
+                    }
+                }
             )
+
+            Divider()
+
+            if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
+                Button {
+                    handleLinkTap(post: post)
+                } label: {
+                    Label("Open Link", systemImage: "safari")
+                }
+            }
+
+            Button {
+                ShareService.shared.sharePost(post)
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
         }
     }
 
@@ -196,27 +217,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         }
     }
 
-    @MainActor
-    private func handleVote(post: Domain.Post) async {
-        let isUpvote = !post.upvoted
-
-        do {
-            try await viewModel.vote(on: post, upvote: isUpvote)
-        } catch {
-            if let hackersError = error as? HackersKitError {
-                switch hackersError {
-                case .unauthenticated:
-                    showingAuthenticationDialog = true
-                default:
-                    voteErrorMessage = "Failed to vote. Please try again."
-                    showingVoteError = true
-                }
-            } else {
-                voteErrorMessage = "Failed to vote. Please try again."
-                showingVoteError = true
-            }
-        }
-    }
 
     private func handleLinkTap(post: Domain.Post) {
         guard !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) else {
@@ -230,16 +230,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
 
 struct PostRowView: View {
     let post: Domain.Post
-    let onVote: (() -> Void)?
+    let votingViewModel: VotingViewModel
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
 
     init(post: Domain.Post,
-         onVote: (() -> Void)? = nil,
+         votingViewModel: VotingViewModel,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil) {
         self.post = post
-        self.onVote = onVote
+        self.votingViewModel = votingViewModel
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
     }
@@ -247,6 +247,7 @@ struct PostRowView: View {
     var body: some View {
         PostDisplayView(
             post: post,
+            votingState: votingViewModel.votingState(for: post),
             showPostText: false,
             showThumbnails: true,
             onThumbnailTap: onLinkTap

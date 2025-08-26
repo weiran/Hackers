@@ -24,7 +24,7 @@ public struct VoteIndicator: View {
         HStack(spacing: style.spacing) {
             if votingState.isUpvoted {
                 Image(systemName: style.upvotedIconName)
-                    .font(style.iconFont)
+                    .scaledFont(style.iconFont)
                     .foregroundColor(style.upvotedColor)
                     .scaleEffect(style.iconScale)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
@@ -32,7 +32,7 @@ public struct VoteIndicator: View {
 
             if style.showScore, let score = votingState.score {
                 Text("\(score)")
-                    .font(style.scoreFont)
+                    .scaledFont(style.scoreFont)
                     .foregroundColor(scoreColor)
                     .contentTransition(.numericText())
                     .animation(.easeInOut(duration: 0.2), value: score)

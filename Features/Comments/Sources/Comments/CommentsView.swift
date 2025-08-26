@@ -12,9 +12,7 @@ import DesignSystem
 
 public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
-    @State private var showingVoteError = false
-    @State private var voteErrorMessage = ""
-    @State private var showingAuthenticationDialog = false
+    @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
@@ -23,19 +21,24 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    public init(post: Post, viewModel: CommentsViewModel? = nil) {
+    public init(post: Post, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
         self._viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
+        let container = DependencyContainer.shared
+        let defaultVotingViewModel = VotingViewModel(
+            votingService: container.getVotingService(),
+            commentVotingService: container.getCommentVotingService()
+        )
+        self._votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
     public var body: some View {
         CommentsContentView(
             viewModel: viewModel,
+            votingViewModel: votingViewModel,
             showTitle: $showTitle,
             hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
             visibleCommentPositions: $visibleCommentPositions,
             navigateToPostId: $navigateToPostId,
-            handlePostVote: handlePostVote,
-            handleCommentVote: handleCommentVote,
             handleLinkTap: handleLinkTap,
             toggleCommentVisibility: toggleCommentVisibility
         )
@@ -59,57 +62,15 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         .refreshable {
             await viewModel.refreshComments()
         }
-        .alert("Vote Error", isPresented: $showingVoteError) {
-            Button("OK") { }
-        } message: {
-            Text(voteErrorMessage)
-        }
-        .alert("Authentication Required", isPresented: $showingAuthenticationDialog) {
-            Button("Cancel") { }
-            Button("Login") {
-                // TODO: Implement login flow
+        .alert("Vote Error", isPresented: .constant(votingViewModel.lastError != nil)) {
+            Button("OK") {
+                votingViewModel.clearError()
             }
         } message: {
-            Text("Please log in to vote on posts and comments.")
+            Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
         }
     }
 
-    @MainActor
-    private func handlePostVote() async {
-        let isUpvote = !viewModel.post.upvoted
-
-        do {
-            try await viewModel.voteOnPost(upvote: isUpvote)
-        } catch {
-            handleVoteError(error)
-        }
-    }
-
-    @MainActor
-    private func handleCommentVote(_ comment: Comment) async {
-        let isUpvote = !comment.upvoted
-
-        do {
-            try await viewModel.voteOnComment(comment, upvote: isUpvote)
-        } catch {
-            handleVoteError(error)
-        }
-    }
-
-    private func handleVoteError(_ error: Error) {
-        if let hackersError = error as? HackersKitError {
-            switch hackersError {
-            case .unauthenticated:
-                showingAuthenticationDialog = true
-            default:
-                voteErrorMessage = "Failed to vote. Please try again."
-                showingVoteError = true
-            }
-        } else {
-            voteErrorMessage = "Failed to vote. Please try again."
-            showingVoteError = true
-        }
-    }
 
     private func handleLinkTap() {
         LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
@@ -144,12 +105,11 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
 
 private struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
+    @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
     @Binding var hasMeasuredInitialOffset: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var navigateToPostId: Int?
-    let handlePostVote: () async -> Void
-    let handleCommentVote: (Comment) async -> Void
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
 
@@ -159,7 +119,7 @@ private struct CommentsContentView: View {
                 List {
                     PostHeader(
                         post: viewModel.post,
-                        onVote: { await handlePostVote() },
+                        votingViewModel: votingViewModel,
                         onLinkTap: { handleLinkTap() }
                     )
                     .id("header")
@@ -182,7 +142,11 @@ private struct CommentsContentView: View {
                     .listRowSeparator(.hidden)
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
                         Button {
-                            Task { await handlePostVote() }
+                            Task {
+                                var mutablePost = viewModel.post
+                                await votingViewModel.toggleVote(for: &mutablePost)
+                                viewModel.post = mutablePost
+                            }
                         } label: {
                             Image(systemName: viewModel.post.upvoted ? "arrow.uturn.down" : "arrow.up")
                         }
@@ -198,8 +162,8 @@ private struct CommentsContentView: View {
                     } else {
                         CommentsForEach(
                             viewModel: viewModel,
+                            votingViewModel: votingViewModel,
                             visibleCommentPositions: $visibleCommentPositions,
-                            handleCommentVote: handleCommentVote,
                             toggleCommentVisibility: { comment in
                                 toggleCommentVisibility(comment) { id in
                                     proxy.scrollTo(id, anchor: .top)
@@ -216,8 +180,8 @@ private struct CommentsContentView: View {
 
 private struct CommentsForEach: View {
     @State var viewModel: CommentsViewModel
+    @State var votingViewModel: VotingViewModel
     @Binding var visibleCommentPositions: [Int: CGRect]
-    let handleCommentVote: (Comment) async -> Void
     let toggleCommentVisibility: (Comment) -> Void
 
     var body: some View {
@@ -225,8 +189,8 @@ private struct CommentsForEach: View {
             CommentRow(
                 comment: comment,
                 post: viewModel.post,
+                votingViewModel: votingViewModel,
                 onToggle: { toggleCommentVisibility(comment) },
-                onVote: { await handleCommentVote(comment) },
                 onHide: { viewModel.hideCommentBranch(comment) }
             )
             .id("comment-\(comment.id)")
@@ -244,7 +208,9 @@ private struct CommentsForEach: View {
             .listRowSeparator(.hidden)
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                 Button {
-                    Task { await handleCommentVote(comment) }
+                    Task {
+                        await votingViewModel.toggleVote(for: comment, in: viewModel.post)
+                    }
                 } label: {
                     Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
@@ -263,12 +229,13 @@ private struct CommentsForEach: View {
 
 private struct PostHeader: View {
     let post: Post
-    let onVote: () async -> Void
+    let votingViewModel: VotingViewModel
     let onLinkTap: () -> Void
 
     var body: some View {
         PostDisplayView(
             post: post,
+            votingState: votingViewModel.votingState(for: post),
             showPostText: true,
             onThumbnailTap: { onLinkTap() }
         )
@@ -277,12 +244,29 @@ private struct PostHeader: View {
             onLinkTap()
         }
         .contextMenu {
-            PostContextMenu(
-                post: post,
-                onVote: { Task { await onVote() } },
-                onOpenLink: onLinkTap,
-                onShare: { ShareService.shared.shareURL(post.url, title: post.title) }
+            VotingContextMenuItems.postVotingMenuItems(
+                for: post,
+                onVote: {
+                    Task {
+                        var mutablePost = post
+                        await votingViewModel.toggleVote(for: &mutablePost)
+                    }
+                }
             )
+
+            Divider()
+
+            Button {
+                onLinkTap()
+            } label: {
+                Label("Open Link", systemImage: "safari")
+            }
+
+            Button {
+                ShareService.shared.shareURL(post.url, title: post.title)
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
         }
     }
 }
@@ -290,8 +274,8 @@ private struct PostHeader: View {
 private struct CommentRow: View {
     @ObservedObject var comment: Comment
     let post: Post
+    let votingViewModel: VotingViewModel
     let onToggle: () -> Void
-    let onVote: () async -> Void
     let onHide: () -> Void
     private var scaledCommentText: AttributedString {
         CommentHTMLParser.parseHTMLText(comment.text)
@@ -314,11 +298,14 @@ private struct CommentRow: View {
 
                 Spacer()
 
-                if comment.upvoted {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .foregroundColor(Color("upvotedColor"))
-                        .scaledFont(.body)
-                }
+                VoteIndicator(
+                    votingState: votingViewModel.votingState(for: comment),
+                    style: VoteIndicatorStyle(
+                        showScore: false,
+                        iconFont: .body,
+                        iconScale: 1.0
+                    )
+                )
 
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.down")
@@ -339,12 +326,28 @@ private struct CommentRow: View {
             onToggle()
         }
         .contextMenu {
-            CommentContextMenu(
-                comment: comment,
-                onVote: { Task { await onVote() } },
-                onShare: { ShareService.shared.shareComment(comment) },
-                onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() }
+            VotingContextMenuItems.commentVotingMenuItems(
+                for: comment,
+                onVote: {
+                    Task {
+                        await votingViewModel.toggleVote(for: comment, in: post)
+                    }
+                }
             )
+
+            Button {
+                UIPasteboard.general.string = comment.text.strippingHTML()
+            } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+
+            Divider()
+
+            Button {
+                ShareService.shared.shareComment(comment)
+            } label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
         }
         .id(String(comment.id) + String(comment.visibility.rawValue))
     }
@@ -420,37 +423,6 @@ private struct EmptyCommentsView: View {
     }
 }
 
-private struct CommentContextMenu: View {
-    @ObservedObject var comment: Comment
-    let onVote: () -> Void
-    let onShare: () -> Void
-    let onCopy: () -> Void
-
-    var body: some View {
-        Group {
-            Button {
-                onVote()
-            } label: {
-                Label(comment.upvoted ? "Unvote" : "Upvote",
-                      systemImage: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
-            }
-
-            Button {
-                onCopy()
-            } label: {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-
-            Divider()
-
-            Button {
-                onShare()
-            } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
-        }
-    }
-}
 
 struct ViewOffsetKey: PreferenceKey {
     typealias Value = CGFloat

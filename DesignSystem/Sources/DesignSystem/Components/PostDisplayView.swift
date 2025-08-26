@@ -11,17 +11,20 @@ import Shared
 
 public struct PostDisplayView: View {
     let post: Post
+    let votingState: VotingState?
     let showPostText: Bool
     let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
 
     public init(
         post: Post,
+        votingState: VotingState? = nil,
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil
     ) {
         self.post = post
+        self.votingState = votingState
         self.showPostText = showPostText
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
@@ -54,13 +57,25 @@ public struct PostDisplayView: View {
 
                     // Metadata row
                     HStack(spacing: 3) {
-                        // Always show non-interactive vote display (voting only via swipe gestures)
-                        HStack(spacing: 0) {
-                            Text("\(post.score)")
-                                .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
-                            Image(systemName: "arrow.up")
-                                .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
-                                .scaledFont(.caption2)
+                        // Use new VoteIndicator if voting state is provided
+                        if let votingState = votingState {
+                            VoteIndicator(
+                                votingState: votingState,
+                                style: VoteIndicatorStyle(
+                                    iconFont: .caption2,
+                                    scoreFont: .subheadline,
+                                    spacing: 1
+                                )
+                            )
+                        } else {
+                            // Fallback to old display
+                            HStack(spacing: 0) {
+                                Text("\(post.score)")
+                                    .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
+                                Image(systemName: "arrow.up")
+                                    .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
+                                    .scaledFont(.caption2)
+                            }
                         }
 
                         Text("•")

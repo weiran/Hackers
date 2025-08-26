@@ -32,13 +32,13 @@ public struct VoteButton: View {
                         .foregroundColor(style.foregroundColor(for: votingState))
                 } else {
                     Image(systemName: iconName)
-                        .font(style.iconFont)
+                        .scaledFont(style.iconFont)
                         .foregroundColor(style.foregroundColor(for: votingState))
                 }
 
                 if style.showScore, let score = votingState.score {
                     Text("\(score)")
-                        .font(style.scoreFont)
+                        .scaledFont(style.scoreFont)
                         .foregroundColor(style.foregroundColor(for: votingState))
                 }
             }
