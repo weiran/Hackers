@@ -67,15 +67,28 @@ public struct OnboardingView: View {
     }
 
     private var continueButton: some View {
-        Button(action: onDismiss) {
-            Text("Continue")
-                .scaledFont(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(AppColors.appTintColor)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+
+        if #available(iOS 26.0, *) {
+            return Button(action: onDismiss) {
+                Text("Continue")
+                    .scaledFont(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+            }
+            .glassEffect(.regular.tint(AppColors.appTintColor))
+        } else {
+            return Button(action: onDismiss) {
+                Text("Continue")
+                    .scaledFont(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(AppColors.appTintColor)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 }
