@@ -22,14 +22,6 @@ public struct VoteIndicator: View {
 
     public var body: some View {
         HStack(spacing: style.spacing) {
-            if votingState.isUpvoted {
-                Image(systemName: style.upvotedIconName)
-                    .scaledFont(style.iconFont)
-                    .foregroundColor(style.upvotedColor)
-                    .scaleEffect(style.iconScale)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
-            }
-
             if style.showScore, let score = votingState.score {
                 Text("\(score)")
                     .scaledFont(style.scoreFont)
@@ -37,8 +29,20 @@ public struct VoteIndicator: View {
                     .contentTransition(.numericText())
                     .animation(.easeInOut(duration: 0.2), value: score)
             }
+
+            if votingState.isUpvoted {
+                Image(systemName: style.upvotedIconName)
+                    .scaledFont(style.iconFont)
+                    .foregroundColor(style.upvotedColor)
+                    .scaleEffect(style.iconScale)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
+            } else {
+                Image(systemName: "arrow.up")
+                    .scaledFont(style.iconFont)
+                    .foregroundColor(.secondary)
+                    .scaleEffect(style.iconScale)
+            }
         }
-        .opacity(votingState.canVote ? 1.0 : 0.6)
         .animation(.easeInOut(duration: 0.2), value: votingState.canVote)
     }
 
@@ -46,7 +50,7 @@ public struct VoteIndicator: View {
         if votingState.isUpvoted {
             return style.upvotedColor
         } else {
-            return style.defaultColor
+            return .secondary
         }
     }
 }

@@ -64,16 +64,18 @@ public struct PostDisplayView: View {
                                 style: VoteIndicatorStyle(
                                     iconFont: .caption2,
                                     scoreFont: .subheadline,
-                                    spacing: 1
+                                    spacing: 0,
+                                    defaultColor: .secondary,
+                                    upvotedColor: AppColors.upvotedColor
                                 )
                             )
                         } else {
                             // Fallback to old display
                             HStack(spacing: 0) {
                                 Text("\(post.score)")
-                                    .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
+                                    .foregroundColor(post.upvoted ? AppColors.upvotedColor : .secondary)
                                 Image(systemName: "arrow.up")
-                                    .foregroundColor(post.upvoted ? AppColors.upvoted : .secondary)
+                                    .foregroundColor(post.upvoted ? AppColors.upvotedColor : .secondary)
                                     .scaledFont(.caption2)
                             }
                         }
