@@ -2,11 +2,12 @@
 //  AppDelegate.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on 07/06/2014.
-//  Copyright (c) 2014 Weiran Zhang. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
+import Shared
+import Data
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 

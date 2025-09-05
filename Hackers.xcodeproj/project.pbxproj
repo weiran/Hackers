@@ -9,7 +9,13 @@
 /* Begin PBXBuildFile section */
 		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
-		2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38928AD08CC00CB396B /* WhatsNewKit */; };
+		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
+		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
+		241E802E2E55B5F40013EEA1 /* Comments in Frameworks */ = {isa = PBXBuildFile; productRef = 241E802D2E55B5F40013EEA1 /* Comments */; };
+		248256F82E59D2460068E91E /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 248256F72E59D2460068E91E /* Domain */; };
+		248256FB2E59D2540068E91E /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FA2E59D2540068E91E /* Networking */; };
+		248256FE2E59D2660068E91E /* Feed in Frameworks */ = {isa = PBXBuildFile; productRef = 248256FD2E59D2660068E91E /* Feed */; };
+		2482576E2E5B38190068E91E /* Onboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 2482576D2E5B38190068E91E /* Onboarding */; };
 		24D1E48C2D9810B8005F1038 /* HackersActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2419D02024898DF700740184 /* HackersActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8818AFB1150055F8DC /* Foundation.framework */; };
 		24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */; };
@@ -84,14 +90,6 @@
 			);
 			target = 245345EB22466EA8001AF1CE /* HackersUITests */;
 		};
-		241E7A542E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				HackersTests/CommentHTMLParserTests.swift,
-				HackersTests/CommentHTMLParserWhitespaceTests.swift,
-			);
-			target = 24C03D5C2E003EB8002B6ED5 /* HackersTests */;
-		};
 		241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -103,9 +101,8 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		241E7A262E4CB2830013EEA1 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A4A2E4CB2830013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
-		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 241E7A542E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
+		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
 		241E7A5C2E4CB28F0013EEA1 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
-		241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Shared Frameworks"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,12 +131,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				248256FE2E59D2660068E91E /* Feed in Frameworks */,
+				248256F82E59D2460068E91E /* Domain in Frameworks */,
+				241E802E2E55B5F40013EEA1 /* Comments in Frameworks */,
 				24F39F8B18AFB1150055F8DC /* CoreGraphics.framework in Frameworks */,
-				2406B38A28AD08CC00CB396B /* WhatsNewKit in Frameworks */,
+				241E7B492E51D1C80013EEA1 /* Settings in Frameworks */,
+				2482576E2E5B38190068E91E /* Onboarding in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
 				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
+				241E7B412E511BC20013EEA1 /* Data in Frameworks */,
+				248256FB2E59D2540068E91E /* Networking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,7 +164,6 @@
 				241E7A262E4CB2830013EEA1 /* App */,
 				241E7A502E4CB28D0013EEA1 /* Tests */,
 				241E7A5C2E4CB28F0013EEA1 /* Extensions */,
-				241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
 				24F39F8618AFB1150055F8DC /* Products */,
@@ -269,13 +271,18 @@
 			);
 			fileSystemSynchronizedGroups = (
 				241E7A262E4CB2830013EEA1 /* App */,
-				241E7A6D2E4CB2920013EEA1 /* Shared Frameworks */,
 			);
 			name = Hackers;
 			packageProductDependencies = (
 				2406B37828ACF72F00CB396B /* Drops */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
-				2406B38928AD08CC00CB396B /* WhatsNewKit */,
+				241E7B402E511BC20013EEA1 /* Data */,
+				241E7B482E51D1C80013EEA1 /* Settings */,
+				241E802D2E55B5F40013EEA1 /* Comments */,
+				248256F72E59D2460068E91E /* Domain */,
+				248256FA2E59D2540068E91E /* Networking */,
+				248256FD2E59D2660068E91E /* Feed */,
+				2482576D2E5B38190068E91E /* Onboarding */,
 			);
 			productName = Hackers2;
 			productReference = 24F39F8518AFB1150055F8DC /* Hackers.app */;
@@ -322,7 +329,14 @@
 			packageReferences = (
 				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-				2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
+				241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */,
+				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
+				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */,
+				241E802C2E55B5F40013EEA1 /* XCLocalSwiftPackageReference "Features/Comments" */,
+				248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */,
+				248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */,
+				248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */,
+				2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/Onboarding" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -467,7 +481,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 131;
+				CURRENT_PROJECT_VERSION = 133;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -506,7 +520,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 131;
+				CURRENT_PROJECT_VERSION = 133;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -620,7 +634,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 133;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -657,7 +671,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 133;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -793,7 +807,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 131;
+				CURRENT_PROJECT_VERSION = 133;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -825,7 +839,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 131;
+				CURRENT_PROJECT_VERSION = 133;
 				DEVELOPMENT_TEAM = 2KB59GPA9B;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -898,6 +912,41 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Data;
+		};
+		241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = DesignSystem;
+		};
+		241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Settings;
+		};
+		241E802C2E55B5F40013EEA1 /* XCLocalSwiftPackageReference "Features/Comments" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Comments;
+		};
+		248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Domain;
+		};
+		248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Networking;
+		};
+		248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Feed;
+		};
+		2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/Onboarding" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Features/Onboarding;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -915,14 +964,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SvenTiigi/WhatsNewKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -936,10 +977,33 @@
 			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
 		};
-		2406B38928AD08CC00CB396B /* WhatsNewKit */ = {
+		241E7B402E511BC20013EEA1 /* Data */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2406B38828AD08CC00CB396B /* XCRemoteSwiftPackageReference "WhatsNewKit" */;
-			productName = WhatsNewKit;
+			productName = Data;
+		};
+		241E7B482E51D1C80013EEA1 /* Settings */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Settings;
+		};
+		241E802D2E55B5F40013EEA1 /* Comments */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Comments;
+		};
+		248256F72E59D2460068E91E /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+		248256FA2E59D2540068E91E /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Networking;
+		};
+		248256FD2E59D2660068E91E /* Feed */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Feed;
+		};
+		2482576D2E5B38190068E91E /* Onboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Onboarding;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -2,8 +2,7 @@
 //  SessionService+DependencyInjection.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on 13/08/2025.
-//  Copyright © 2025 Glass Umbrella. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import Foundation

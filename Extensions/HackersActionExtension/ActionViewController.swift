@@ -1,9 +1,8 @@
 //
 //  ActionViewController.swift
-//  HackersActionExtension
+//  Hackers
 //
-//  Created by Weiran Zhang on 04/06/2020.
-//  Copyright © 2020 Weiran Zhang. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import UIKit
