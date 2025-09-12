@@ -29,9 +29,15 @@ public struct MailView: UIViewControllerRepresentable {
     public func makeUIViewController(context: Context) -> MFMailComposeViewController {
         let mailVC = MFMailComposeViewController()
         mailVC.mailComposeDelegate = context.coordinator
-        mailVC.setToRecipients(recipients)
-        mailVC.setSubject(subject)
-        mailVC.setMessageBody(messageBody, isHTML: false)
+
+        // Ensure configuration happens on main queue with slight delay
+        // This fixes iOS 18+ issue where fields appear blank
+        DispatchQueue.main.async {
+            mailVC.setToRecipients(self.recipients)
+            mailVC.setSubject(self.subject)
+            mailVC.setMessageBody(self.messageBody, isHTML: false)
+        }
+
         return mailVC
     }
 
