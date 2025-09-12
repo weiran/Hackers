@@ -5,6 +5,9 @@ excluded:
   - .build
   - DerivedData
   - "**/SwiftSoup/**"
+  - "**/.build/**"
+  - "Features/**/.build/**"
+  - "Data/.build/**"
 reporter: "xcode"
 warning_threshold: 1000
 opt_in_rules:
