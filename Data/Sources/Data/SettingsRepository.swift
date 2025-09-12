@@ -32,7 +32,6 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         if let userDefaults = userDefaults as? UserDefaults {
             userDefaults.register(defaults: [
                 "safariReaderMode": false,
-                "showCommentsButton": false,
                 "openInDefaultBrowser": false,
                 "textSize": TextSize.medium.rawValue
             ])
@@ -45,15 +44,6 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "safariReaderMode")
-        }
-    }
-
-    public var showComments: Bool {
-        get {
-            userDefaults.bool(forKey: "showCommentsButton")
-        }
-        set {
-            userDefaults.set(newValue, forKey: "showCommentsButton")
         }
     }
 

@@ -146,9 +146,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 }
 
                 Section(header: Text("Browser")) {
-                    Toggle(isOn: $viewModel.showComments) {
-                        Text("Show Comments Button")
-                    }
                     Toggle(isOn: $viewModel.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
                     }

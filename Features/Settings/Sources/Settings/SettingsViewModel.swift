@@ -14,7 +14,6 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     private var settingsUseCase: any SettingsUseCase
 
     @Published public var safariReaderMode: Bool = false
-    @Published public var showComments: Bool = false
     @Published public var openInDefaultBrowser: Bool = false
     @Published public var textSize: TextSize = .medium
 
@@ -25,7 +24,6 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
 
     private func loadSettings() {
         safariReaderMode = settingsUseCase.safariReaderMode
-        showComments = settingsUseCase.showComments
         openInDefaultBrowser = settingsUseCase.openInDefaultBrowser
         textSize = settingsUseCase.textSize
 
@@ -39,13 +37,6 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
             .dropFirst()
             .sink { [weak self] newValue in
                 self?.settingsUseCase.safariReaderMode = newValue
-            }
-            .store(in: &cancellables)
-
-        $showComments
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.showComments = newValue
             }
             .store(in: &cancellables)
 

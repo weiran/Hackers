@@ -74,29 +74,11 @@ struct UseCaseTests {
 
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
-        private var _showThumbnails = true
-        private var _swipeActions = true
-        private var _showComments = true
         private var _openInDefaultBrowser = false
 
         var safariReaderMode: Bool {
             get { _safariReaderMode }
             set { _safariReaderMode = newValue }
-        }
-
-        var showThumbnails: Bool {
-            get { _showThumbnails }
-            set { _showThumbnails = newValue }
-        }
-
-        var swipeActions: Bool {
-            get { _swipeActions }
-            set { _swipeActions = newValue }
-        }
-
-        var showComments: Bool {
-            get { _showComments }
-            set { _showComments = newValue }
         }
 
         var openInDefaultBrowser: Bool {
@@ -221,23 +203,14 @@ struct UseCaseTests {
 
         // Test initial values
         #expect(mockUseCase.safariReaderMode == false)
-        #expect(mockUseCase.showThumbnails == true)
-        #expect(mockUseCase.swipeActions == true)
-        #expect(mockUseCase.showComments == true)
         #expect(mockUseCase.openInDefaultBrowser == false)
 
         // Test setters
         mockUseCase.safariReaderMode = true
-        mockUseCase.showThumbnails = false
-        mockUseCase.swipeActions = false
-        mockUseCase.showComments = false
         mockUseCase.openInDefaultBrowser = true
 
         // Verify changes
         #expect(mockUseCase.safariReaderMode == true)
-        #expect(mockUseCase.showThumbnails == false)
-        #expect(mockUseCase.swipeActions == false)
-        #expect(mockUseCase.showComments == false)
         #expect(mockUseCase.openInDefaultBrowser == true)
     }
 

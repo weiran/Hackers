@@ -23,9 +23,6 @@ struct SettingsViewModelTests {
 
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
-        private var _showThumbnails = false
-        private var _swipeActions = false
-        private var _showComments = false
         private var _openInDefaultBrowser = false
 
         var getterCallCounts: [String: Int] = [:]
@@ -39,39 +36,6 @@ struct SettingsViewModelTests {
             set {
                 setterCallCounts["safariReaderMode", default: 0] += 1
                 _safariReaderMode = newValue
-            }
-        }
-
-        var showThumbnails: Bool {
-            get {
-                getterCallCounts["showThumbnails", default: 0] += 1
-                return _showThumbnails
-            }
-            set {
-                setterCallCounts["showThumbnails", default: 0] += 1
-                _showThumbnails = newValue
-            }
-        }
-
-        var swipeActions: Bool {
-            get {
-                getterCallCounts["swipeActions", default: 0] += 1
-                return _swipeActions
-            }
-            set {
-                setterCallCounts["swipeActions", default: 0] += 1
-                _swipeActions = newValue
-            }
-        }
-
-        var showComments: Bool {
-            get {
-                getterCallCounts["showComments", default: 0] += 1
-                return _showComments
-            }
-            set {
-                setterCallCounts["showComments", default: 0] += 1
-                _showComments = newValue
             }
         }
 
@@ -139,8 +103,10 @@ struct SettingsViewModelTests {
         #expect(settingsViewModel.safariReaderMode == false)
     }
 
-    // MARK: - Show Thumbnails Tests
-
+    // MARK: - Removed Settings Tests
+    // Note: showThumbnails and swipeActions settings have been removed from the app
+    
+    /*
     @Test("Show thumbnails getter")
     func showThumbnailsGetter() {
         mockSettingsUseCase._showThumbnails = true
@@ -173,8 +139,6 @@ struct SettingsViewModelTests {
         #expect(settingsViewModel.showThumbnails == false)
     }
 
-    // MARK: - Swipe Actions Tests
-
     @Test("Swipe actions getter")
     func swipeActionsGetter() {
         mockSettingsUseCase._swipeActions = true
@@ -206,40 +170,10 @@ struct SettingsViewModelTests {
         settingsViewModel.swipeActions = false
         #expect(settingsViewModel.swipeActions == false)
     }
+    */
 
-    // MARK: - Show Comments Tests
-
-    @Test("Show comments getter")
-    func showCommentsGetter() {
-        mockSettingsUseCase._showComments = true
-
-        let value = settingsViewModel.showComments
-
-        #expect(value == true)
-        #expect(mockSettingsUseCase.getterCallCounts["showComments"] == 1)
-    }
-
-    @Test("Show comments setter")
-    func showCommentsSetter() {
-        settingsViewModel.showComments = true
-
-        #expect(mockSettingsUseCase._showComments == true)
-        #expect(mockSettingsUseCase.setterCallCounts["showComments"] == 1)
-    }
-
-    @Test("Show comments toggle")
-    func showCommentsToggle() {
-        // Start with false
-        #expect(settingsViewModel.showComments == false)
-
-        // Toggle to true
-        settingsViewModel.showComments = true
-        #expect(settingsViewModel.showComments == true)
-
-        // Toggle back to false
-        settingsViewModel.showComments = false
-        #expect(settingsViewModel.showComments == false)
-    }
+    // MARK: - Removed Settings (showComments)
+    // Note: showComments setting has been removed from the app
 
     // MARK: - Open In Default Browser Tests
 
@@ -281,23 +215,14 @@ struct SettingsViewModelTests {
     func multipleSettingsChanges() {
         // Change multiple settings
         settingsViewModel.safariReaderMode = true
-        settingsViewModel.showThumbnails = true
-        settingsViewModel.swipeActions = false
-        settingsViewModel.showComments = false
         settingsViewModel.openInDefaultBrowser = true
 
         // Verify all changes are reflected
         #expect(settingsViewModel.safariReaderMode == true)
-        #expect(settingsViewModel.showThumbnails == true)
-        #expect(settingsViewModel.swipeActions == false)
-        #expect(settingsViewModel.showComments == false)
         #expect(settingsViewModel.openInDefaultBrowser == true)
 
         // Verify the underlying use case was called correctly
         #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["showThumbnails"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["swipeActions"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["showComments"] == 1)
         #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == 1)
     }
 
@@ -307,16 +232,10 @@ struct SettingsViewModelTests {
         settingsViewModel.safariReaderMode = true
 
         // Other settings should remain at their default values
-        #expect(settingsViewModel.showThumbnails == false)
-        #expect(settingsViewModel.swipeActions == false)
-        #expect(settingsViewModel.showComments == false)
         #expect(settingsViewModel.openInDefaultBrowser == false)
 
         // Only safari reader mode setter should have been called
         #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["showThumbnails"] == nil)
-        #expect(mockSettingsUseCase.setterCallCounts["swipeActions"] == nil)
-        #expect(mockSettingsUseCase.setterCallCounts["showComments"] == nil)
         #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == nil)
     }
 
@@ -351,15 +270,9 @@ struct SettingsViewModelTests {
     func performanceOfMultiplePropertyAccess() {
         for _ in 0..<1000 {
             settingsViewModel.safariReaderMode = true
-            settingsViewModel.showThumbnails = false
-            settingsViewModel.swipeActions = true
-            settingsViewModel.showComments = false
             settingsViewModel.openInDefaultBrowser = true
 
             _ = settingsViewModel.safariReaderMode
-            _ = settingsViewModel.showThumbnails
-            _ = settingsViewModel.swipeActions
-            _ = settingsViewModel.showComments
             _ = settingsViewModel.openInDefaultBrowser
         }
     }
@@ -374,22 +287,22 @@ struct SettingsViewModelTests {
                 group.addTask {
                     let isEven = index % 2 == 0
                     self.settingsViewModel.safariReaderMode = isEven
-                    self.settingsViewModel.showThumbnails = !isEven
+                    self.settingsViewModel.openInDefaultBrowser = !isEven
 
                     // Read the values
                     _ = self.settingsViewModel.safariReaderMode
-                    _ = self.settingsViewModel.showThumbnails
+                    _ = self.settingsViewModel.openInDefaultBrowser
                 }
             }
         }
 
         // After concurrent operations, the values should be consistent
         let safariMode = settingsViewModel.safariReaderMode
-        let thumbnails = settingsViewModel.showThumbnails
+        let browser = settingsViewModel.openInDefaultBrowser
 
         // Both should have valid boolean values
         #expect(safariMode || !safariMode) // Always true for boolean
-        #expect(thumbnails || !thumbnails) // Always true for boolean
+        #expect(browser || !browser) // Always true for boolean
     }
 
     // MARK: - Edge Cases Tests

@@ -22,7 +22,7 @@ struct LinkOpenerTests {
 
         // This should compile without issues
         await MainActor.run {
-            LinkOpener.openURL(httpURL, with: testPost, showCommentsButton: true)
+            LinkOpener.openURL(httpURL, with: testPost)
         }
 
         #expect(true, "LinkOpener static methods should be accessible")
@@ -36,7 +36,6 @@ struct LinkOpenerTests {
             // This should compile and run without issues on MainActor
             LinkOpener.openURL(url)
             LinkOpener.openURL(url, with: createTestPost())
-            LinkOpener.openURL(url, with: createTestPost(), showCommentsButton: true)
         }
 
         #expect(true, "Methods should be callable from MainActor context")
@@ -73,9 +72,6 @@ struct LinkOpenerTests {
             LinkOpener.openURL(url)
             LinkOpener.openURL(url, with: nil)
             LinkOpener.openURL(url, with: post)
-            LinkOpener.openURL(url, with: nil, showCommentsButton: false)
-            LinkOpener.openURL(url, with: post, showCommentsButton: true)
-            LinkOpener.openURL(url, with: post, showCommentsButton: false)
         }
 
         #expect(true, "Should accept various parameter combinations")

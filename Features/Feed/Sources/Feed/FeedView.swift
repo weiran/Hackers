@@ -224,7 +224,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             return
         }
 
-        LinkOpener.openURL(post.url, with: nil, showCommentsButton: false)
+        LinkOpener.openURL(post.url, with: nil)
     }
 }
 
@@ -249,7 +249,6 @@ struct PostRowView: View {
             post: post,
             votingState: votingViewModel.votingState(for: post),
             showPostText: false,
-            showThumbnails: true,
             onThumbnailTap: onLinkTap
         )
         .contentShape(Rectangle())

@@ -11,7 +11,7 @@ import Domain
 
 public struct LinkOpener {
     @MainActor
-    public static func openURL(_ url: URL, with post: Post? = nil, showCommentsButton: Bool = false) {
+    public static func openURL(_ url: URL, with post: Post? = nil) {
         // Check if URL should be opened in Safari
         if shouldOpenInSafari(url) {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
