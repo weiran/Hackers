@@ -112,11 +112,11 @@ public enum CommentHTMLParser {
         result = result.replacingOccurrences(of: "&nbsp; ", with: " ")
         result = result.replacingOccurrences(of: "&nbsp;", with: " ")
 
-        // Use single pass replacement for other entities
-        for (entity, replacement) in htmlEntityMap {
-            if entity != "&nbsp;" {
-                result = result.replacingOccurrences(of: entity, with: replacement)
-            }
+        // Decode entities in deterministic order; decode &amp; last to avoid premature short-circuiting
+        let orderedEntities = ["&lt;", "&gt;", "&quot;", "&#x27;", "&#39;", "&amp;"]
+        for entity in orderedEntities {
+            guard let replacement = htmlEntityMap[entity] else { continue }
+            result = result.replacingOccurrences(of: entity, with: replacement)
         }
 
         return result
@@ -407,7 +407,13 @@ public enum CommentHTMLParser {
         // Process formatting within the link text
         var linkAttributedString = processFormattingTags(linkText)
 
-        if let url = URL(string: urlString) {
+        // Resolve relative URLs
+        var resolvedURL = URL(string: urlString)
+        if resolvedURL?.scheme == nil, let base = URL(string: "https://news.ycombinator.com") {
+            resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
+        }
+        
+        if let url = resolvedURL {
             // Apply link attributes to the entire range
             let fullRange = linkAttributedString.startIndex..<linkAttributedString.endIndex
             linkAttributedString[fullRange].link = url
