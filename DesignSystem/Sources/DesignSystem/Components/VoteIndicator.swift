@@ -36,11 +36,6 @@ public struct VoteIndicator: View {
                     .foregroundColor(style.upvotedColor)
                     .scaleEffect(style.iconScale)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
-            } else {
-                Image(systemName: "arrow.up")
-                    .scaledFont(style.iconFont)
-                    .foregroundColor(.secondary)
-                    .scaleEffect(style.iconScale)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: votingState.canVote)

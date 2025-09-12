@@ -150,7 +150,7 @@ private struct CommentsContentView: View {
                         } label: {
                             Image(systemName: viewModel.post.upvoted ? "arrow.uturn.down" : "arrow.up")
                         }
-                        .tint(viewModel.post.upvoted ? .secondary : Color("upvotedColor"))
+                        .tint(viewModel.post.upvoted ? .secondary : AppColors.upvotedColor)
                     }
 
                     if viewModel.isLoading {
@@ -214,7 +214,7 @@ private struct CommentsForEach: View {
                 } label: {
                     Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
                 }
-                .tint(comment.upvoted ? .secondary : Color("upvotedColor"))
+                .tint(comment.upvoted ? .secondary : AppColors.upvotedColor)
             }
             .swipeActions(edge: .trailing) {
                 Button {
