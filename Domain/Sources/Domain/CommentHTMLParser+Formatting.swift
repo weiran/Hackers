@@ -10,7 +10,6 @@ import SwiftUI
 
 extension CommentHTMLParser {
     // Processes bold, italic, and inline code tags together to preserve all formatting
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     static func processFormattingTagsTogether(_ text: String) -> AttributedString {
         let preserveWhitespace = shouldPreserveWhitespace(text)
         if hasNestedFormattingTags(text) {

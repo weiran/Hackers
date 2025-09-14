@@ -114,7 +114,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     }
 
     @ViewBuilder
-    // swiftlint:disable:next function_body_length
     private func postRow(for post: Domain.Post) -> some View {
         PostRowView(
             post: post,

@@ -30,7 +30,6 @@ public extension View {
 }
 
 public extension Font {
-    // swiftlint:disable:next cyclomatic_complexity
     func scaled(with factor: CGFloat) -> Font {
         switch self {
         case .largeTitle:

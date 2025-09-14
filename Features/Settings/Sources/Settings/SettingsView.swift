@@ -73,12 +73,12 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     })
                     .disabled(!MFMailComposeViewController.canSendMail())
                     .sheet(isPresented: $showMailView) {
+                        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
                         MailView(
                             result: self.$mailResult,
                             recipients: ["me@weiran.co"],
                             subject: "Hackers App Feedback",
-                            // swiftlint:disable:next line_length
-                            messageBody: "\n\n\n---\nApp Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")"
+                            messageBody: "\n\n\n---\nApp Version: \(version)"
                         )
                     }
                     Button(action: { self.showOnboarding = true }, label: {

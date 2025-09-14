@@ -10,6 +10,11 @@ import Domain
 import SwiftSoup
 
 extension PostRepository {
+    struct VoteLinkInfo {
+        let upvote: URL?
+        let unvote: URL?
+        let upvoted: Bool
+    }
     // MARK: - VoteUseCase
 
     public func upvote(post: Post) async throws {
@@ -112,7 +117,7 @@ extension PostRepository {
     func voteLinks(
         from titleElement: Element,
         metadata metadataElement: Element? = nil
-    ) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) { // swiftlint:disable:this large_tuple
+    ) throws -> VoteLinkInfo {
         let voteLinkElements = try titleElement.select("td.votelinks a")
         var upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
 
@@ -153,6 +158,6 @@ extension PostRepository {
         }
 
         let upvoted = (derivedUnvoteURL != nil) || upvoteHidden
-        return (upvote: upvoteURL, unvote: derivedUnvoteURL, upvoted: upvoted)
+        return VoteLinkInfo(upvote: upvoteURL, unvote: derivedUnvoteURL, upvoted: upvoted)
     }
 }

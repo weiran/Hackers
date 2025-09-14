@@ -10,7 +10,6 @@ import Domain
 import Shared
 import DesignSystem
 
-// swiftlint:disable file_length
 public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
