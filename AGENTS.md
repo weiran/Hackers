@@ -46,37 +46,29 @@
 ## Build & Test Commands
 
 ### Important: Working Directory
-**Always run xcodebuild from the project directory:** `/Users/weiran/git/Hackers/Hackers/`
+**Always run xcodebuild from the project directory**
 
 ### Build Commands
 ```bash
 # Build the app
-cd /Users/weiran/git/Hackers/Hackers && xcodebuild -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
+xcodebuild -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 
 # Clean and build
-cd /Users/weiran/git/Hackers/Hackers && xcodebuild clean build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
+xcodebuild clean build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
 
 # Quick build status check
-cd /Users/weiran/git/Hackers/Hackers && xcodebuild build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro' 2>&1 | grep "BUILD"
+xcodebuild build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro' 2>&1 | grep "BUILD"
 ```
 
 ### Test Commands
-
-#### Run Tests for Individual Modules
 ```bash
-# Test specific module (run from module directory)
-cd /Users/weiran/git/Hackers/Hackers/[ModuleName] && xcodebuild test -scheme [ModuleName] -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
+# Run all tests
+./run_tests.sh
 
-# Examples:
-cd /Users/weiran/git/Hackers/Hackers/Domain && xcodebuild test -scheme Domain -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
-cd /Users/weiran/git/Hackers/Hackers/Features/Feed && xcodebuild test -scheme Feed -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
-cd /Users/weiran/git/Hackers/Hackers/Networking && xcodebuild test -scheme Networking -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
-```
-
-#### Build for Testing
-```bash
-# Build individual module for testing
-cd /Users/weiran/git/Hackers/Hackers/[ModuleName] && xcodebuild build-for-testing -scheme [ModuleName] -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
+# Run tests for specific module
+./run_tests.sh Domain
+./run_tests.sh Feed
+./run_tests.sh Networking
 ```
 
 ### Test Structure Notes

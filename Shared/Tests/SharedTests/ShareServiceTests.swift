@@ -63,12 +63,15 @@ struct ShareServiceTests {
     private func createTestComment() -> Domain.Comment {
         return Domain.Comment(
             id: 456,
-            level: 0,
-            by: "commentuser",
             age: "1 hour ago",
             text: "<p>This is a test comment with <strong>HTML</strong> content.</p>",
+            by: "commentuser",
+            level: 0,
+            upvoted: false,
+            upvoteLink: nil,
+            voteLinks: nil,
             visibility: .visible,
-            upvoted: false
+            parsedText: nil
         )
     }
 

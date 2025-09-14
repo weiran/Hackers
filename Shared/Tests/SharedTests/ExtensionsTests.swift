@@ -6,8 +6,9 @@
 //
 
 import Testing
+import Foundation
 @testable import Shared
-@testable import Domain
+import Domain  // Import Domain for PostType only
 
 @Suite("Extensions Tests")
 struct ExtensionsTests {

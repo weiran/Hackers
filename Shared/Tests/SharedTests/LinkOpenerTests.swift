@@ -14,6 +14,7 @@ import Foundation
 struct LinkOpenerTests {
 
     @Test("LinkOpener is a struct with static methods")
+    @MainActor
     func testStructureType() {
         // Test that LinkOpener is designed as a utility struct
         // We can't instantiate it, but we can access its static methods
@@ -22,9 +23,7 @@ struct LinkOpenerTests {
         let testPost = createTestPost()
 
         // This should compile without issues
-        await MainActor.run {
-            LinkOpener.openURL(httpURL, with: testPost)
-        }
+        LinkOpener.openURL(httpURL, with: testPost)
 
         #expect(true, "LinkOpener static methods should be accessible")
     }

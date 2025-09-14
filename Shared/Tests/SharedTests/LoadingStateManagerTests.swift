@@ -176,14 +176,16 @@ struct LoadingStateManagerTests {
     @Test("loadIfNeeded with custom shouldSkipLoad logic")
     func testCustomShouldSkipLogic() async {
         var loadCount = 0
+        var currentData = ["initial"]
 
         // Skip loading if we have more than 2 items
         let manager = LoadingStateManager(
-            initialData: ["initial"] as [String],
+            initialData: currentData,
             shouldSkipLoad: { $0.count > 2 },
             loadData: {
                 loadCount += 1
-                return manager.data + ["new_item\(loadCount)"]
+                currentData = currentData + ["new_item\(loadCount)"]
+                return currentData
             }
         )
 

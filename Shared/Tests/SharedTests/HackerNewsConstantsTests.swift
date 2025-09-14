@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import Shared
 
 @Suite("HackerNewsConstants Tests")

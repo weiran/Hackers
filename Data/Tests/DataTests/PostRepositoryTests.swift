@@ -332,7 +332,7 @@ struct PostRepositoryTests {
         <html>
         <body>
         <table class="itemlist">
-            <tr class="athing" id="123">
+            <tr class="athing submission" id="123">
                 <td>
                     <span class="titleline">
                         <a href="https://example.com/article">Test Article Title</a>
