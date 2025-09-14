@@ -8,10 +8,8 @@
 import Foundation
 import SwiftUI
 
-// swiftlint:disable type_body_length
-
 /// High-performance HTML parser optimized for comment content
-public enum CommentHTMLParser {
+public enum CommentHTMLParser { // swiftlint:disable:this type_body_length
 
     // MARK: - Static Properties
     private static let htmlEntityMap: [String: String] = [
@@ -459,7 +457,8 @@ public enum CommentHTMLParser {
         return result
     }
 
-    /// Processes bold, italic, and inline code tags together to preserve all formatting
+    // Processes bold, italic, and inline code tags together to preserve all formatting
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func processFormattingTagsTogether(_ text: String) -> AttributedString {
         // For nested formatting, we need to strip all HTML tags first, then process the clean text
         // This prevents duplicate content from overlapping tags
@@ -472,7 +471,7 @@ public enum CommentHTMLParser {
         }
 
         // Find all formatting tags and their positions
-        var formatSegments: [(range: NSRange, type: FormattingType, content: String)] = []
+        var formatSegments: [FormatSegment] = []
 
         let nsString = text as NSString
         let fullRange = NSRange(location: 0, length: text.utf16.count)
@@ -483,7 +482,7 @@ public enum CommentHTMLParser {
             let contentRange = match.range(at: 1)
             if contentRange.location != NSNotFound {
                 let content = nsString.substring(with: contentRange)
-                formatSegments.append((range: match.range, type: .bold, content: content))
+                formatSegments.append(FormatSegment(range: match.range, type: .bold, content: content))
             }
         }
 
@@ -493,7 +492,7 @@ public enum CommentHTMLParser {
             let contentRange = match.range(at: 1)
             if contentRange.location != NSNotFound {
                 let content = nsString.substring(with: contentRange)
-                formatSegments.append((range: match.range, type: .italic, content: content))
+                formatSegments.append(FormatSegment(range: match.range, type: .italic, content: content))
             }
         }
 
@@ -503,7 +502,7 @@ public enum CommentHTMLParser {
             let contentRange = match.range(at: 1)
             if contentRange.location != NSNotFound {
                 let content = nsString.substring(with: contentRange)
-                formatSegments.append((range: match.range, type: .code, content: content))
+                formatSegments.append(FormatSegment(range: match.range, type: .code, content: content))
             }
         }
 
@@ -578,10 +577,8 @@ public enum CommentHTMLParser {
 
         // Check for overlapping ranges
         for boldMatch in boldMatches {
-            for italicMatch in italicMatches {
-                if NSIntersectionRange(boldMatch.range, italicMatch.range).length > 0 {
-                    return true
-                }
+            for italicMatch in italicMatches where NSIntersectionRange(boldMatch.range, italicMatch.range).length > 0 {
+                return true
             }
         }
 
@@ -624,6 +621,13 @@ public enum CommentHTMLParser {
         case bold
         case italic
         case code
+    }
+
+    /// Struct to represent formatting segments to avoid large tuples
+    private struct FormatSegment {
+        let range: NSRange
+        let type: FormattingType
+        let content: String
     }
 
     /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)

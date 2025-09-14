@@ -56,12 +56,12 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         guard let voteLinks = post.voteLinks else {
             throw HackersKitError.unauthenticated
         }
-        
+
         guard let upvoteURL = voteLinks.upvote else {
             // If we have vote links but no upvote URL, could be:
             // 1. User not authenticated (both upvote and unvote URLs are nil)
             // 2. Already upvoted (only unvote link available, shouldn't call upvote)
-            
+
             if voteLinks.unvote == nil {
                 // Neither upvote nor unvote URL exists - user not authenticated
                 throw HackersKitError.unauthenticated
@@ -70,17 +70,22 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
                 throw HackersKitError.scraperError
             }
         }
-        
+
         // Construct the full URL - upvoteURL is relative, so prepend urlBase with /
-        let fullURLString = upvoteURL.absoluteString.hasPrefix("http") ? upvoteURL.absoluteString : urlBase + "/" + upvoteURL.absoluteString
+        let fullURLString = upvoteURL.absoluteString.hasPrefix("http")
+            ? upvoteURL.absoluteString
+            : urlBase + "/" + upvoteURL.absoluteString
         guard let realURL = URL(string: fullURLString) else {
             throw HackersKitError.scraperError
         }
-        
+
         let response = try await networkManager.get(url: realURL)
-        
+
         // Check if the response contains a login form, indicating user needs to authenticate
-        let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"") || response.contains("You have to be logged in")
+        let containsLoginForm =
+            response.contains("<form action=\"/login") ||
+            response.contains("name=\"acct\"") ||
+            response.contains("You have to be logged in")
         if containsLoginForm {
             throw HackersKitError.unauthenticated
         }
@@ -91,7 +96,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         guard let voteLinks = post.voteLinks else {
             throw HackersKitError.unauthenticated
         }
-        
+
         // Determine unvote URL. If missing but post is marked upvoted and upvote URL exists,
         // derive the unvote URL by swapping how=up -> how=un.
         let resolvedUnvoteURL: URL? = {
@@ -113,15 +118,17 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
                 throw HackersKitError.scraperError
             }
         }
-        
+
         // Construct the full URL - unvoteURL may be relative, so prepend urlBase with /
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http") ? unvoteURL.absoluteString : urlBase + "/" + unvoteURL.absoluteString
+        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
+            ? unvoteURL.absoluteString
+            : urlBase + "/" + unvoteURL.absoluteString
         guard let realURL = URL(string: fullURLString) else {
             throw HackersKitError.scraperError
         }
-        
+
         let response = try await networkManager.get(url: realURL)
-        
+
         // Check if the response contains a login form, indicating user needs to authenticate
         let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
         if containsLoginForm {
@@ -134,12 +141,12 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         guard let voteLinks = comment.voteLinks else {
             throw HackersKitError.unauthenticated
         }
-        
+
         guard let upvoteURL = voteLinks.upvote else {
             // If we have vote links but no upvote URL, could be:
             // 1. User not authenticated (both upvote and unvote URLs are nil)
             // 2. Already upvoted (only unvote link available, shouldn't call upvote)
-            
+
             if voteLinks.unvote == nil {
                 // Neither upvote nor unvote URL exists - user not authenticated
                 throw HackersKitError.unauthenticated
@@ -148,21 +155,23 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
                 throw HackersKitError.scraperError
             }
         }
-        
+
         // Construct the full URL - upvoteURL is relative, so prepend urlBase with /
-        let fullURLString = upvoteURL.absoluteString.hasPrefix("http") ? upvoteURL.absoluteString : urlBase + "/" + upvoteURL.absoluteString
+        let fullURLString = upvoteURL.absoluteString.hasPrefix("http")
+            ? upvoteURL.absoluteString
+            : urlBase + "/" + upvoteURL.absoluteString
         guard let realURL = URL(string: fullURLString) else {
             throw HackersKitError.scraperError
         }
-        
+
         let response = try await networkManager.get(url: realURL)
-        
+
         // Check if the response contains a login form, indicating user needs to authenticate
         let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
         if containsLoginForm {
             throw HackersKitError.unauthenticated
         }
-        
+
         // Update comment state after successful upvote
         await MainActor.run {
             comment.upvoted = true
@@ -174,7 +183,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         guard let voteLinks = comment.voteLinks else {
             throw HackersKitError.unauthenticated
         }
-        
+
         // Resolve unvote URL; if not present but comment is marked upvoted,
         // derive it from the upvote URL by swapping how=up -> how=un.
         let resolvedUnvoteURL: URL? = {
@@ -194,21 +203,23 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
                 throw HackersKitError.scraperError
             }
         }
-        
+
         // Construct the full URL - unvoteURL is relative, so prepend urlBase with /
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http") ? unvoteURL.absoluteString : urlBase + "/" + unvoteURL.absoluteString
+        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
+            ? unvoteURL.absoluteString
+            : urlBase + "/" + unvoteURL.absoluteString
         guard let realURL = URL(string: fullURLString) else {
             throw HackersKitError.scraperError
         }
-        
+
         let response = try await networkManager.get(url: realURL)
-        
+
         // Check if the response contains a login form, indicating user needs to authenticate
         let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
         if containsLoginForm {
             throw HackersKitError.unauthenticated
         }
-        
+
         // Update comment state after successful unvote
         await MainActor.run {
             comment.upvoted = false
@@ -227,17 +238,23 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     private func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         let url: URL
         if type == .newest || type == .jobs {
-            guard let constructedURL = URL(string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)") else {
+            guard let constructedURL = URL(
+                string: "https://news.ycombinator.com/\(type.rawValue)?next=\(nextId)"
+            ) else {
                 throw HackersKitError.requestFailure
             }
             url = constructedURL
         } else if type == .active {
-            guard let constructedURL = URL(string: "https://news.ycombinator.com/active?p=\(page)") else {
+            guard let constructedURL = URL(
+                string: "https://news.ycombinator.com/active?p=\(page)"
+            ) else {
                 throw HackersKitError.requestFailure
             }
             url = constructedURL
         } else {
-            guard let constructedURL = URL(string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)") else {
+            guard let constructedURL = URL(
+                string: "https://news.ycombinator.com/\(type.rawValue)?p=\(page)"
+            ) else {
                 throw HackersKitError.requestFailure
             }
             url = constructedURL
@@ -358,7 +375,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         }
 
         let voteLinks = try self.voteLinks(from: titleElement, metadata: metadataElement)
-        
+
         // Preserve vote links if either upvote or unvote is present.
         // Previously we dropped links when upvote was nil, which broke unvoting.
         let hasAnyVoteLink = voteLinks.upvote != nil || voteLinks.unvote != nil
@@ -378,7 +395,10 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         )
     }
 
-    private func voteLinks(from titleElement: Element, metadata metadataElement: Element? = nil) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) {
+    private func voteLinks(
+        from titleElement: Element,
+        metadata metadataElement: Element? = nil
+    ) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) { // swiftlint:disable:this large_tuple
         // Look for upvote link in the votelinks column of the title row
         let voteLinkElements = try titleElement.select("td.votelinks a")
         var upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
@@ -416,8 +436,8 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         // - If an explicit unvote link exists, it's upvoted
         // - Some HN pages hide the upvote arrow via 'nosee' class when already upvoted
         let upvoteHidden: Bool = {
-            guard let up = upvoteLink else { return false }
-            return (try? up.hasClass("nosee")) ?? false
+            guard let upElement = upvoteLink else { return false }
+            return (try? upElement.hasClass("nosee")) ?? false
         }()
 
         // If we're upvoted but no explicit unvote link is present, derive it from the upvote URL

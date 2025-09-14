@@ -77,6 +77,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             result: self.$mailResult,
                             recipients: ["me@weiran.co"],
                             subject: "Hackers App Feedback",
+                            // swiftlint:disable:next line_length
                             messageBody: "\n\n\n---\nApp Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")"
                         )
                     }
@@ -92,18 +93,21 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 }
 
                 Section(header: Text("Account")) {
-                    Button(action: {
-                        showLogin = true
-                    }) {
-                        HStack {
-                            Text(isAuthenticated ? "Logged in as \(currentUsername ?? "")" : "Login")
-                            Spacer()
-                            if isAuthenticated {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
+                    Button(
+                        action: {
+                            showLogin = true
+                        },
+                        label: {
+                            HStack {
+                                Text(isAuthenticated ? "Logged in as \(currentUsername ?? "")" : "Login")
+                                Spacer()
+                                if isAuthenticated {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                }
                             }
                         }
-                    }
+                    )
                     .sheet(isPresented: $showLogin) {
                         LoginView(
                             isAuthenticated: isAuthenticated,

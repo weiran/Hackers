@@ -8,7 +8,7 @@
 import SwiftUI
 import Domain
 
-public struct VotingContextMenuItems {
+public enum VotingContextMenuItems {
 
     // MARK: - Post Voting Menu Items
 
