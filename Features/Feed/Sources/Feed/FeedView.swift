@@ -57,6 +57,9 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             contentView
                 .navigationBarTitleDisplayMode(.inline)
         }
+        // Ensure contrast in dark mode and with Reduced Transparency enabled
+        .toolbarBackground(.regularMaterial, for: .navigationBar)
+        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 userButton
@@ -203,13 +206,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             HStack(spacing: 4) {
                 Image(systemName: selectedPostType.iconName)
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Text(selectedPostType.displayName)
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Image(systemName: "chevron.down.circle.fill")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
         }
     }
