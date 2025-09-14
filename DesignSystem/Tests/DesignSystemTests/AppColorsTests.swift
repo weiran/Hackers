@@ -12,38 +12,8 @@ import SwiftUI
 @Suite("AppColors Tests")
 struct AppColorsTests {
 
-    @Test("AppColors provides static color properties")
-    func testStaticColorProperties() {
-        // Test that static color properties exist and return Color objects
-        let upvoted = AppColors.upvoted
-        let appTint = AppColors.appTint
 
-        #expect(upvoted != nil, "upvoted color should not be nil")
-        #expect(appTint != nil, "appTint color should not be nil")
-    }
 
-    @Test("AppColors provides fallback color properties")
-    func testFallbackColorProperties() {
-        // Test that fallback color properties exist and return Color objects
-        let upvotedColor = AppColors.upvotedColor
-        let appTintColor = AppColors.appTintColor
-
-        #expect(upvotedColor != nil, "upvotedColor fallback should not be nil")
-        #expect(appTintColor != nil, "appTintColor fallback should not be nil")
-    }
-
-    @Test("Fallback colors return orange when asset colors not found")
-    func testFallbackBehavior() {
-        // Note: This test assumes the asset colors might not be available in test context
-        // The fallback logic should return .orange when UIColor(named:) returns nil
-
-        let upvotedColor = AppColors.upvotedColor
-        let appTintColor = AppColors.appTintColor
-
-        // These should be either the asset color or orange fallback
-        #expect(upvotedColor != nil)
-        #expect(appTintColor != nil)
-    }
 
     @Test("Color properties are consistent between calls")
     func testColorConsistency() {

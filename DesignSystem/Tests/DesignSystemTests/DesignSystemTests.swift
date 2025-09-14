@@ -19,23 +19,7 @@ struct DesignSystemTests {
         #expect(designSystem1 === designSystem2, "DesignSystem should be a singleton")
     }
 
-    @Test("DesignSystem conforms to Sendable")
-    func testSendableConformance() {
-        let designSystem = DesignSystem.shared
 
-        // Test that we can pass it across actor boundaries
-        Task {
-            _ = designSystem // This should compile without warnings if Sendable is properly implemented
-        }
-
-        #expect(designSystem != nil)
-    }
-
-    @Test("DesignSystem is accessible")
-    func testAccessibility() {
-        let designSystem = DesignSystem.shared
-        #expect(designSystem != nil, "DesignSystem should be accessible")
-    }
 
     @Test("DesignSystem singleton consistency")
     func testSingletonConsistency() {
@@ -69,12 +53,4 @@ struct DesignSystemTests {
         }
     }
 
-    @Test("DesignSystem placeholder functionality")
-    func testPlaceholderFunctionality() {
-        // Since this is currently a placeholder, we just test its basic structure
-        let designSystem = DesignSystem.shared
-
-        // The struct should exist and be accessible
-        #expect(designSystem != nil, "DesignSystem placeholder should be functional")
-    }
 }
