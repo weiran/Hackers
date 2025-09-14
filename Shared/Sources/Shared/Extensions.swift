@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import Domain
 
 extension Collection where Indices.Iterator.Element == Index {
@@ -78,4 +79,16 @@ extension String {
         return self[index(startIndex, offsetBy: value.lowerBound)...]
     }
 
+}
+
+// MARK: - View helpers
+public extension View {
+    @ViewBuilder
+    func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
 }

@@ -50,17 +50,19 @@ struct CommentsContentView: View {
                         }
                     }
                     .listRowSeparator(.hidden)
-                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                        Button {
-                            Task {
-                                var mutablePost = viewModel.post
-                                await votingViewModel.toggleVote(for: &mutablePost)
-                                await MainActor.run { viewModel.post = mutablePost }
+                    .if(viewModel.post.voteLinks?.upvote != nil && !viewModel.post.upvoted) { view in
+                        view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                Task {
+                                    var mutablePost = viewModel.post
+                                    await votingViewModel.upvote(post: &mutablePost)
+                                    await MainActor.run { viewModel.post = mutablePost }
+                                }
+                            } label: {
+                                Image(systemName: "arrow.up")
                             }
-                        } label: {
-                            Image(systemName: viewModel.post.upvoted ? "arrow.uturn.down" : "arrow.up")
+                            .tint(AppColors.upvotedColor)
                         }
-                        .tint(viewModel.post.upvoted ? .secondary : AppColors.upvotedColor)
                     }
 
                     if viewModel.isLoading {
@@ -115,15 +117,17 @@ struct CommentsForEach: View {
                 }
             }
             .listRowSeparator(.hidden)
-            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                Button {
-                    Task {
-                        await votingViewModel.toggleVote(for: comment, in: viewModel.post)
+            .if(comment.voteLinks?.upvote != nil && !comment.upvoted) { view in
+                view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        Task {
+                            await votingViewModel.upvote(comment: comment, in: viewModel.post)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.up")
                     }
-                } label: {
-                    Image(systemName: comment.upvoted ? "arrow.uturn.down" : "arrow.up")
+                    .tint(AppColors.upvotedColor)
                 }
-                .tint(comment.upvoted ? .secondary : AppColors.upvotedColor)
             }
             .swipeActions(edge: .trailing) {
                 Button { viewModel.hideCommentBranch(comment) } label: {
@@ -155,7 +159,7 @@ struct PostHeader: View {
                 onVote: {
                     Task {
                         var mutablePost = post
-                        await votingViewModel.toggleVote(for: &mutablePost)
+                        await votingViewModel.upvote(post: &mutablePost)
                         await MainActor.run { onPostUpdate(mutablePost) }
                     }
                 }
@@ -201,7 +205,7 @@ struct CommentRow: View {
                     votingState: VotingState(
                         isUpvoted: comment.upvoted,
                         score: nil,
-                        canVote: comment.voteLinks?.upvote != nil || comment.voteLinks?.unvote != nil,
+                        canVote: comment.voteLinks?.upvote != nil,
                         isVoting: votingViewModel.isVoting,
                         error: votingViewModel.lastError
                     ),
@@ -226,7 +230,7 @@ struct CommentRow: View {
             VotingContextMenuItems.commentVotingMenuItems(
                 for: comment,
                 onVote: {
-                    Task { await votingViewModel.toggleVote(for: comment, in: post) }
+                    Task { await votingViewModel.upvote(comment: comment, in: post) }
                 }
             )
             Button { UIPasteboard.general.string = comment.text.strippingHTML() } label: {

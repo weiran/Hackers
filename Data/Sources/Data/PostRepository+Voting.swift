@@ -36,32 +36,7 @@ extension PostRepository {
         if containsLoginForm { throw HackersKitError.unauthenticated }
     }
 
-    public func unvote(post: Post) async throws {
-        guard let voteLinks = post.voteLinks else { throw HackersKitError.unauthenticated }
-
-        let resolvedUnvoteURL: URL? = {
-            if let explicit = voteLinks.unvote { return explicit }
-            if post.upvoted, let upvoteURL = voteLinks.upvote {
-                let unvoteURLString = upvoteURL.absoluteString.replacingOccurrences(of: "how=up", with: "how=un")
-                return URL(string: unvoteURLString)
-            }
-            return nil
-        }()
-
-        guard let unvoteURL = resolvedUnvoteURL else {
-            if voteLinks.upvote == nil { throw HackersKitError.unauthenticated }
-            throw HackersKitError.scraperError
-        }
-
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
-
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
-    }
+    // Unvote functionality removed
 
     public func upvote(comment: Domain.Comment, for post: Post) async throws {
         guard let voteLinks = comment.voteLinks else { throw HackersKitError.unauthenticated }
@@ -82,34 +57,7 @@ extension PostRepository {
         await MainActor.run { comment.upvoted = true }
     }
 
-    public func unvote(comment: Domain.Comment, for post: Post) async throws {
-        guard let voteLinks = comment.voteLinks else { throw HackersKitError.unauthenticated }
-
-        let resolvedUnvoteURL: URL? = {
-            if let explicit = voteLinks.unvote { return explicit }
-            if comment.upvoted, let upvoteURL = voteLinks.upvote {
-                let unvoteURLString = upvoteURL.absoluteString.replacingOccurrences(of: "how=up", with: "how=un")
-                return URL(string: unvoteURLString)
-            }
-            return nil
-        }()
-
-        guard let unvoteURL = resolvedUnvoteURL else {
-            if voteLinks.upvote == nil { throw HackersKitError.unauthenticated }
-            throw HackersKitError.scraperError
-        }
-
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
-
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
-
-        await MainActor.run { comment.upvoted = false }
-    }
+    // Unvote functionality removed
 
     // MARK: - Vote link extraction
 

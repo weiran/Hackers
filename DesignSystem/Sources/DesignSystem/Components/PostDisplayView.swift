@@ -131,16 +131,7 @@ public struct PostContextMenu: View {
 
     public var body: some View {
         Group {
-            if post.upvoted {
-                // Only show unvote if unvote link is available
-                if post.voteLinks?.unvote != nil {
-                    Button {
-                        onVote()
-                    } label: {
-                        Label("Unvote", systemImage: "arrow.uturn.down")
-                    }
-                }
-            } else {
+            if post.voteLinks?.upvote != nil {
                 Button {
                     onVote()
                 } label: {

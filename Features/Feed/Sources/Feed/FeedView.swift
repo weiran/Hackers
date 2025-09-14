@@ -131,8 +131,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 }
             }
         }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            if post.voteLinks?.upvote != nil || post.voteLinks?.unvote != nil {
+        .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
+            view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 voteSwipeAction(for: post)
             }
         }
@@ -144,13 +144,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         Button {
             Task {
                 var mutablePost = post
-                await votingViewModel.toggleVote(for: &mutablePost)
+                await votingViewModel.upvote(post: &mutablePost)
                 await MainActor.run { viewModel.replacePost(mutablePost) }
             }
         } label: {
-            Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+            Image(systemName: "arrow.up")
         }
-        .tint(post.upvoted ? .secondary : AppColors.upvotedColor)
+        .tint(AppColors.upvotedColor)
     }
 
     @ViewBuilder
@@ -160,7 +160,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             onVote: {
                 Task {
                     var mutablePost = post
-                    await votingViewModel.toggleVote(for: &mutablePost)
+                    await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run { viewModel.replacePost(mutablePost) }
                 }
             }
@@ -278,13 +278,4 @@ struct PostRowView: View {
     }
 }
 
-extension View {
-    @ViewBuilder
-    func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
-    }
-}
+// moved 'if' View helper to Shared.Extensions

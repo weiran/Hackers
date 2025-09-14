@@ -80,7 +80,6 @@ struct FeedViewTests {
 
     final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
         private var _upvoteCalled = false
-        private var _unvoteCalled = false
         private var _shouldThrowError = false
 
         var upvoteCalled: Bool {
@@ -88,10 +87,6 @@ struct FeedViewTests {
             set { _upvoteCalled = newValue }
         }
 
-        var unvoteCalled: Bool {
-            get { _unvoteCalled }
-            set { _unvoteCalled = newValue }
-        }
 
         var shouldThrowError: Bool {
             get { _shouldThrowError }
@@ -106,21 +101,12 @@ struct FeedViewTests {
             // Mock implementation - in real app this would be handled by the repository
         }
 
-        func unvote(post: Post) async throws {
-            if shouldThrowError {
-                throw HackersKitError.unauthenticated
-            }
-            unvoteCalled = true
-            // Mock implementation - in real app this would be handled by the repository
-        }
 
         func upvote(comment: Domain.Comment, for post: Post) async throws {
             // Not used in feed
         }
 
-        func unvote(comment: Domain.Comment, for post: Post) async throws {
-            // Not used in feed
-        }
+        // Unvote removed
     }
 
     private func createMockPost(id: Int, upvoted: Bool = false) -> Post {
@@ -223,14 +209,7 @@ struct FeedViewTests {
 
         // Assert
         #expect(mockVoteUseCase.upvoteCalled == true)
-        #expect(mockVoteUseCase.unvoteCalled == false)
-
-        // Act - Unvote
-        mockVoteUseCase.upvoteCalled = false
-        try await viewModel.vote(on: viewModel.posts[0], upvote: false)
-
-        // Assert
-        #expect(mockVoteUseCase.unvoteCalled == true)
+        // Unvote removed; no-op when upvote == false
     }
 
     @Test("FeedViewModel handles post type changes")

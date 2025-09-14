@@ -33,39 +33,7 @@ public final class VotingViewModel {
         self.commentVotingService = commentVotingService
     }
 
-    // MARK: - Post Voting
-
-    public func toggleVote(for post: inout Post) async {
-
-        let originalUpvoted = post.upvoted
-        let originalScore = post.score
-
-        // Create a copy of the post with the original state for the voting service
-        var postForVoting = post
-        postForVoting.upvoted = originalUpvoted
-        postForVoting.score = originalScore
-
-        // Optimistic UI update
-        post.upvoted.toggle()
-        post.score += post.upvoted ? 1 : -1
-
-        isVoting = true
-        lastError = nil
-
-        do {
-            try await votingService.toggleVote(for: postForVoting)
-
-        } catch {
-
-            // Revert optimistic changes on error
-            post.upvoted = originalUpvoted
-            post.score = originalScore
-
-            await handleUnauthenticatedIfNeeded(error)
-        }
-
-        isVoting = false
-    }
+    // MARK: - Post Voting (Upvote only)
 
     public func upvote(post: inout Post) async {
         guard !post.upvoted else { return }
@@ -99,59 +67,11 @@ public final class VotingViewModel {
         isVoting = false
     }
 
-    public func unvote(post: inout Post) async {
-        guard post.upvoted else { return }
-
-        let originalScore = post.score
-
-        // Optimistic UI update
-        post.upvoted = false
-        post.score -= 1
-
-        isVoting = true
-        lastError = nil
-
-        do {
-            try await votingService.unvote(item: post)
-
-        } catch {
-
-            // Revert optimistic changes on error
-            post.upvoted = true
-            post.score = originalScore
-
-            await handleUnauthenticatedIfNeeded(error)
-        }
-
-        isVoting = false
-    }
+    // Unvote removed
 
     // MARK: - Comment Voting
 
-    @MainActor
-    public func toggleVote(for comment: Comment, in post: Post) async {
-        let originalUpvoted = comment.upvoted
-
-        // Optimistic UI update
-        comment.upvoted.toggle()
-
-        isVoting = true
-        lastError = nil
-
-        do {
-            // Delegate toggle logic to the service
-            try await commentVotingService.toggleVoteOnComment(comment, for: post)
-        } catch {
-            // Revert optimistic changes on error
-            comment.upvoted = originalUpvoted
-
-            await handleUnauthenticatedIfNeeded(error)
-        }
-
-        isVoting = false
-    }
-
-    @MainActor
+    // Comment toggle removed
     public func upvote(comment: Comment, in post: Post) async {
         guard !comment.upvoted else { return }
 
@@ -178,32 +98,7 @@ public final class VotingViewModel {
         isVoting = false
     }
 
-    @MainActor
-    public func unvote(comment: Comment, in post: Post) async {
-        guard comment.upvoted else { return }
-
-        // Optimistic UI update
-        comment.upvoted = false
-
-        isVoting = true
-        lastError = nil
-
-        do {
-            try await commentVotingService.unvoteComment(comment, for: post)
-        } catch {
-            // Revert optimistic changes on error
-            comment.upvoted = true
-
-            // Check if error is unauthenticated and show login
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
-        }
-
-        isVoting = false
-    }
+    // Comment unvote removed
 
     // MARK: - State Helpers
 
@@ -212,14 +107,14 @@ public final class VotingViewModel {
         return VotingState(
             isUpvoted: item.upvoted,
             score: score,
-            canVote: item.voteLinks?.upvote != nil || item.voteLinks?.unvote != nil,
+            canVote: item.voteLinks?.upvote != nil,
             isVoting: isVoting,
             error: lastError
         )
     }
 
     public func canVote(item: any Votable) -> Bool {
-        return item.voteLinks?.upvote != nil || item.voteLinks?.unvote != nil
+        return item.voteLinks?.upvote != nil
     }
 
     public func clearError() {

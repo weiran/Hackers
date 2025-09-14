@@ -40,24 +40,14 @@ struct UseCaseTests {
     @MainActor
     final class MockVoteUseCase: VoteUseCase {
         var upvotePostCallCount = 0
-        var unvotePostCallCount = 0
         var upvoteCommentCallCount = 0
-        var unvoteCommentCallCount = 0
 
         func upvote(post: Post) async throws {
             upvotePostCallCount += 1
         }
 
-        func unvote(post: Post) async throws {
-            unvotePostCallCount += 1
-        }
-
         func upvote(comment: Domain.Comment, for post: Post) async throws {
             upvoteCommentCallCount += 1
-        }
-
-        func unvote(comment: Domain.Comment, for post: Post) async throws {
-            unvoteCommentCallCount += 1
         }
     }
 
@@ -149,16 +139,6 @@ struct UseCaseTests {
         #expect(mockUseCase.upvotePostCallCount == 1)
     }
 
-    @MainActor
-    @Test("VoteUseCase unvote post executes successfully")
-    func voteUseCaseUnvotePost() async throws {
-        let mockUseCase = MockVoteUseCase()
-        let testPost = Self.createTestPost()
-
-        try await mockUseCase.unvote(post: testPost)
-
-        #expect(mockUseCase.unvotePostCallCount == 1)
-    }
 
     @MainActor
     @Test("VoteUseCase upvote comment executes successfully")
@@ -172,17 +152,6 @@ struct UseCaseTests {
         #expect(mockUseCase.upvoteCommentCallCount == 1)
     }
 
-    @MainActor
-    @Test("VoteUseCase unvote comment executes successfully")
-    func voteUseCaseUnvoteComment() async throws {
-        let mockUseCase = MockVoteUseCase()
-        let testPost = Self.createTestPost()
-        let testComment = Self.createTestComment()
-
-        try await mockUseCase.unvote(comment: testComment, for: testPost)
-
-        #expect(mockUseCase.unvoteCommentCallCount == 1)
-    }
 
     // MARK: - CommentUseCase Tests
 

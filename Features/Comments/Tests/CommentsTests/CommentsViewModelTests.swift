@@ -131,8 +131,7 @@ struct CommentsViewModelTests {
     // MARK: - Voting Tests
 
     @Test("Upvoting post updates state correctly", arguments: [
-        (initial: false, upvote: true, expectedUpvoted: true, expectedScoreDelta: 1),
-        (initial: true, upvote: false, expectedUpvoted: false, expectedScoreDelta: -1)
+        (initial: false, upvote: true, expectedUpvoted: true, expectedScoreDelta: 1)
     ])
     @MainActor
     func voteOnPost(initial: Bool, upvote: Bool, expectedUpvoted: Bool, expectedScoreDelta: Int) async throws {
@@ -146,11 +145,7 @@ struct CommentsViewModelTests {
         // Then
         #expect(sut.post.upvoted == expectedUpvoted)
         #expect(sut.post.score == initialScore + expectedScoreDelta)
-        if upvote {
-            #expect(mockVoteUseCase.upvotePostCalled)
-        } else {
-            #expect(mockVoteUseCase.unvotePostCalled)
-        }
+        #expect(mockVoteUseCase.upvotePostCalled)
     }
 
     @Test("Failed vote on post reverts changes")
@@ -170,23 +165,19 @@ struct CommentsViewModelTests {
         #expect(sut.post.score == initialScore)
     }
 
-    @Test("Voting on comment updates state", arguments: [false, true])
+    @Test("Upvoting comment updates state", arguments: [false])
     @MainActor
     func voteOnComment(initialUpvoted: Bool) async throws {
         // Given
         let comment = createTestComment(id: 1, upvoted: initialUpvoted)
-        let expectedUpvoted = !initialUpvoted
+        let expectedUpvoted = true
 
         // When
         try await sut.voteOnComment(comment, upvote: expectedUpvoted)
 
         // Then
         #expect(comment.upvoted == expectedUpvoted)
-        if expectedUpvoted {
-            #expect(mockVoteUseCase.upvoteCommentCalled)
-        } else {
-            #expect(mockVoteUseCase.unvoteCommentCalled)
-        }
+        #expect(mockVoteUseCase.upvoteCommentCalled)
     }
 
     // MARK: - Comment Visibility Tests
@@ -404,9 +395,7 @@ final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
 
 final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
     var upvotePostCalled = false
-    var unvotePostCalled = false
     var upvoteCommentCalled = false
-    var unvoteCommentCalled = false
     var shouldThrowError = false
 
     func upvote(post: Post) async throws {
@@ -416,22 +405,8 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
         }
     }
 
-    func unvote(post: Post) async throws {
-        unvotePostCalled = true
-        if shouldThrowError {
-            throw MockError.testError
-        }
-    }
-
     func upvote(comment: Domain.Comment, for post: Post) async throws {
         upvoteCommentCalled = true
-        if shouldThrowError {
-            throw MockError.testError
-        }
-    }
-
-    func unvote(comment: Domain.Comment, for post: Post) async throws {
-        unvoteCommentCalled = true
         if shouldThrowError {
             throw MockError.testError
         }

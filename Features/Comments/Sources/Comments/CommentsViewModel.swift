@@ -88,34 +88,28 @@ public final class CommentsViewModel: @unchecked Sendable {
 
     @MainActor
     public func voteOnPost(upvote: Bool) async throws {
-        post.upvoted = upvote
-        post.score += upvote ? 1 : -1
+        guard upvote else { return }
+        post.upvoted = true
+        post.score += 1
 
         do {
-            if upvote {
-                try await voteUseCase.upvote(post: post)
-            } else {
-                try await voteUseCase.unvote(post: post)
-            }
+            try await voteUseCase.upvote(post: post)
         } catch {
-            post.upvoted = !upvote
-            post.score += upvote ? -1 : 1
+            post.upvoted = false
+            post.score -= 1
             throw error
         }
     }
 
     @MainActor
     public func voteOnComment(_ comment: Comment, upvote: Bool) async throws {
-        comment.upvoted = upvote
+        guard upvote else { return }
+        comment.upvoted = true
 
         do {
-            if upvote {
-                try await voteUseCase.upvote(comment: comment, for: post)
-            } else {
-                try await voteUseCase.unvote(comment: comment, for: post)
-            }
+            try await voteUseCase.upvote(comment: comment, for: post)
         } catch {
-            comment.upvoted = !upvote
+            comment.upvoted = false
             throw error
         }
     }

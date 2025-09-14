@@ -17,23 +17,12 @@ public enum VotingContextMenuItems {
         for post: Post,
         onVote: @escaping @Sendable () -> Void
     ) -> some View {
-        if post.upvoted {
-            // Only show unvote if unvote link is available
-            if post.voteLinks?.unvote != nil {
-                Button {
-                    onVote()
-                } label: {
-                    Label("Unvote", systemImage: "arrow.uturn.down")
-                }
-            }
-        } else {
-            // Only show upvote if upvote link is available
-            if post.voteLinks?.upvote != nil {
-                Button {
-                    onVote()
-                } label: {
-                    Label("Upvote", systemImage: "arrow.up")
-                }
+        // Only show upvote if available and not already upvoted
+        if post.voteLinks?.upvote != nil && !post.upvoted {
+            Button {
+                onVote()
+            } label: {
+                Label("Upvote", systemImage: "arrow.up")
             }
         }
     }
@@ -45,14 +34,12 @@ public enum VotingContextMenuItems {
         for comment: Comment,
         onVote: @escaping @Sendable () -> Void
     ) -> some View {
-        if comment.voteLinks?.upvote != nil || comment.voteLinks?.unvote != nil {
+        // Only show upvote if available and not already upvoted
+        if comment.voteLinks?.upvote != nil && !comment.upvoted {
             Button {
                 onVote()
             } label: {
-                Label(
-                    comment.upvoted ? "Unvote" : "Upvote",
-                    systemImage: comment.upvoted ? "arrow.uturn.down" : "arrow.up"
-                )
+                Label("Upvote", systemImage: "arrow.up")
             }
         }
     }
@@ -64,23 +51,12 @@ public enum VotingContextMenuItems {
         for item: T,
         onVote: @escaping @Sendable () -> Void
     ) -> some View {
-        if item.upvoted {
-            // Only show unvote if unvote link is available
-            if item.voteLinks?.unvote != nil {
-                Button {
-                    onVote()
-                } label: {
-                    Label("Unvote", systemImage: "arrow.uturn.down")
-                }
-            }
-        } else {
-            // Only show upvote if upvote link is available
-            if item.voteLinks?.upvote != nil {
-                Button {
-                    onVote()
-                } label: {
-                    Label("Upvote", systemImage: "arrow.up")
-                }
+        // Only show upvote if available and not already upvoted
+        if item.voteLinks?.upvote != nil && !item.upvoted {
+            Button {
+                onVote()
+            } label: {
+                Label("Upvote", systemImage: "arrow.up")
             }
         }
     }

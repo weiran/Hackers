@@ -87,9 +87,8 @@ public final class FeedViewModel: @unchecked Sendable {
     public func vote(on post: Domain.Post, upvote: Bool) async throws {
         if upvote {
             try await voteUseCase.upvote(post: post)
-        } else {
-            try await voteUseCase.unvote(post: post)
         }
+        // Unvote removed; do nothing when upvote == false
     }
 
     @MainActor

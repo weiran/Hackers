@@ -128,18 +128,7 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
     }
 
-    @Test("Unvote post")
-    func unvotePost() async throws {
-        let voteLinks = VoteLinks(upvote: nil, unvote: URL(string: "/vote?id=123&how=un")!)
-        let post = createTestPost(voteLinks: voteLinks)
-
-        try await postRepository.unvote(post: post)
-
-        #expect(mockNetworkManager.getCallCount == 1)
-        #expect(mockNetworkManager.lastGetURL != nil)
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
-    }
+    // Unvote post test removed
 
     @Test("Upvote post without vote links")
     func upvotePostWithoutVoteLinks() async {
@@ -170,22 +159,7 @@ struct PostRepositoryTests {
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after successful API call")
     }
 
-    @Test("Unvote comment")
-    func unvoteComment() async throws {
-        let voteLinks = VoteLinks(upvote: nil, unvote: URL(string: "/vote?id=456&how=un")!)
-        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
-        let post = createTestPost()
-
-        try await postRepository.unvote(comment: comment, for: post)
-
-        #expect(mockNetworkManager.getCallCount == 1)
-        #expect(mockNetworkManager.lastGetURL != nil)
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
-        
-        // Verify comment state is updated after successful unvote
-        #expect(comment.upvoted == false, "Comment should be marked as not upvoted after successful API call")
-    }
+    // Unvote comment test removed
 
     // MARK: - Post Feed Upvoted State Tests
     
@@ -215,41 +189,9 @@ struct PostRepositoryTests {
                 "Derived unvote link should use how=un")
     }
 
-    @Test("Derived unvote link is used for hidden upvote arrow (nosee)")
-    func derivedUnvoteLinkUsed() async throws {
-        mockNetworkManager.stubbedGetResponse = createMockFeedHTMLWithUpvotedPost()
+    // Derived unvote link test removed
 
-        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
-
-        guard let hiddenArrowPost = posts.first(where: { $0.id == 45238055 }) else {
-            Issue.record("Failed to find post with hidden upvote arrow")
-            return
-        }
-
-        // Should have derived unvote link
-        #expect(hiddenArrowPost.voteLinks?.unvote != nil, "Expected derived unvote link for hidden arrow")
-        #expect(hiddenArrowPost.voteLinks?.unvote?.absoluteString.contains("how=un") == true)
-
-        // Unvote should hit the derived unvote URL (news.ycombinator.com/...how=un)
-        try await postRepository.unvote(post: hiddenArrowPost)
-        #expect(mockNetworkManager.lastGetURL != nil)
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("how=un"))
-        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("id=45238055"))
-    }
-
-    @Test("Unvote after optimistic upvote without refresh derives URL and succeeds")
-    func unvoteAfterOptimisticUpvote() async throws {
-        // Start with a post that has only an upvote link (typical for not-yet-upvoted)
-        let voteLinks = VoteLinks(upvote: URL(string: "/vote?id=999&how=up&auth=abc&goto=news")!, unvote: nil)
-        let post = createTestPostWithId(999, voteLinks: voteLinks, upvoted: true)
-
-        try await postRepository.unvote(post: post)
-
-        #expect(mockNetworkManager.lastGetURL != nil)
-        let urlString = mockNetworkManager.lastGetURL!.absoluteString
-        #expect(urlString.contains("id=999"))
-        #expect(urlString.contains("how=un"))
-    }
+    // Unvote after optimistic upvote test removed
 
     // MARK: - Comments Tests
 

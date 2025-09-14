@@ -27,24 +27,15 @@ struct VotingViewModelTests {
     // MARK: - Mock Services
     
     final class MockVotingService: VotingService, @unchecked Sendable {
-        var toggleVoteCalled = false
         var upvoteCalled = false
-        var unvoteCalled = false
         var shouldThrow = false
         
         func votingState(for item: any Votable) -> VotingState {
             return VotingState(
                 isUpvoted: item.upvoted,
                 score: (item as? any ScoredVotable)?.score,
-                canVote: item.voteLinks?.upvote != nil || item.voteLinks?.unvote != nil
+                canVote: item.voteLinks?.upvote != nil
             )
-        }
-        
-        func toggleVote(for item: any Votable) async throws {
-            toggleVoteCalled = true
-            if shouldThrow {
-                throw HackersKitError.requestFailure
-            }
         }
         
         func upvote(item: any Votable) async throws {
@@ -53,37 +44,14 @@ struct VotingViewModelTests {
                 throw HackersKitError.requestFailure
             }
         }
-        
-        func unvote(item: any Votable) async throws {
-            unvoteCalled = true
-            if shouldThrow {
-                throw HackersKitError.requestFailure
-            }
-        }
     }
     
     final class MockCommentVotingService: CommentVotingService, @unchecked Sendable {
         var upvoteCommentCalled = false
-        var unvoteCommentCalled = false
-        var toggleVoteCalled = false
         var shouldThrow = false
         
         func upvoteComment(_ comment: Domain.Comment, for post: Post) async throws {
             upvoteCommentCalled = true
-            if shouldThrow {
-                throw HackersKitError.requestFailure
-            }
-        }
-        
-        func unvoteComment(_ comment: Domain.Comment, for post: Post) async throws {
-            unvoteCommentCalled = true
-            if shouldThrow {
-                throw HackersKitError.requestFailure
-            }
-        }
-        
-        func toggleVoteOnComment(_ comment: Domain.Comment, for post: Post) async throws {
-            toggleVoteCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
             }
@@ -119,12 +87,12 @@ struct VotingViewModelTests {
             upvoted: false
         )
 
-        // When - This should work because the method is marked @MainActor
-        await votingViewModel.toggleVote(for: comment, in: post)
+        // When - upvote comment
+        await votingViewModel.upvote(comment: comment, in: post)
 
         // Then
-        #expect(mockCommentVotingService.toggleVoteCalled, "Toggle vote should be called")
-        #expect(comment.upvoted == true, "Comment should be marked as upvoted after toggle")
+        #expect(mockCommentVotingService.upvoteCommentCalled, "Upvote should be called")
+        #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
     }
     
     @Test("Comment voting error handling")
@@ -157,10 +125,10 @@ struct VotingViewModelTests {
         mockCommentVotingService.shouldThrow = true
 
         // When
-        await votingViewModel.toggleVote(for: comment, in: post)
+        await votingViewModel.upvote(comment: comment, in: post)
 
         // Then - Should revert the optimistic update
-        #expect(mockCommentVotingService.toggleVoteCalled, "Toggle vote should be called")
+        #expect(mockCommentVotingService.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == false, "Comment should be reverted to original state after error")
         #expect(votingViewModel.lastError != nil, "Error should be set")
     }
