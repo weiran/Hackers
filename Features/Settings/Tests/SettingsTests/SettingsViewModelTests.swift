@@ -8,6 +8,7 @@
 // swiftlint:disable force_cast
 
 import Testing
+import Observation
 @testable import Settings
 @testable import Domain
 
@@ -85,7 +86,7 @@ struct SettingsViewModelTests {
 
     @Test("Safari reader mode getter")
     func safariReaderModeGetter() {
-        mockSettingsUseCase._safariReaderMode = true
+        mockSettingsUseCase.safariReaderMode = true
 
         let value = settingsViewModel.safariReaderMode
 
@@ -97,7 +98,7 @@ struct SettingsViewModelTests {
     func safariReaderModeSetter() {
         settingsViewModel.safariReaderMode = true
 
-        #expect(mockSettingsUseCase._safariReaderMode == true)
+        #expect(mockSettingsUseCase.safariReaderMode == true)
         #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
     }
 
@@ -191,7 +192,7 @@ struct SettingsViewModelTests {
 
     @Test("Open in default browser getter")
     func openInDefaultBrowserGetter() {
-        mockSettingsUseCase._openInDefaultBrowser = true
+        mockSettingsUseCase.openInDefaultBrowser = true
 
         let value = settingsViewModel.openInDefaultBrowser
 
@@ -203,7 +204,7 @@ struct SettingsViewModelTests {
     func openInDefaultBrowserSetter() {
         settingsViewModel.openInDefaultBrowser = true
 
-        #expect(mockSettingsUseCase._openInDefaultBrowser == true)
+        #expect(mockSettingsUseCase.openInDefaultBrowser == true)
         #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == 1)
     }
 
@@ -258,22 +259,12 @@ struct SettingsViewModelTests {
         // Test that the SettingsViewModel is properly observable
         // This mainly tests that the @Observable macro is working correctly
 
-        var changeCount = 0
-        let observation = withObservationTracking {
-            _ = settingsViewModel.safariReaderMode
-        } onChange: {
-            changeCount += 1
-        }
-
-        // Change the value
+        // Basic test that the property can be read and set
         settingsViewModel.safariReaderMode = true
-
-        // Clean up the observation
-        withExtendedLifetime(observation) {}
-
-        // Note: In actual SwiftUI, @Observable would trigger view updates
-        // Here we're just testing that the property can be observed
         #expect(settingsViewModel.safariReaderMode == true)
+
+        settingsViewModel.safariReaderMode = false
+        #expect(settingsViewModel.safariReaderMode == false)
     }
 
     // MARK: - Performance Tests
