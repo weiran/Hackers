@@ -25,7 +25,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-BASE_DIR="/Users/weiran/git/Hackers/Hackers"
+BASE_DIR="$(pwd)"
 DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro"
 VERBOSE=false
 
