@@ -7,25 +7,28 @@
 
 // swiftlint:disable force_cast
 
-import XCTest
+import Testing
 import Foundation
 @testable import Domain
 
-class ModelsTests: XCTestCase {
+@Suite("Model Tests")
+struct ModelsTests {
 
     // MARK: - VoteLinks Tests
 
-    func testVoteLinksInit() {
+    @Test("VoteLinks initializes with correct properties")
+    func voteLinksInit() {
         let upvoteURL = URL(string: "https://example.com/upvote")
         let unvoteURL = URL(string: "https://example.com/unvote")
 
         let voteLinks = VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
 
-        XCTAssertEqual(voteLinks.upvote, upvoteURL)
-        XCTAssertEqual(voteLinks.unvote, unvoteURL)
+        #expect(voteLinks.upvote == upvoteURL)
+        #expect(voteLinks.unvote == unvoteURL)
     }
 
-    func testVoteLinksHashable() {
+    @Test("VoteLinks implements Hashable correctly")
+    func voteLinksHashable() {
         let upvoteURL = URL(string: "https://example.com/upvote")
         let unvoteURL = URL(string: "https://example.com/unvote")
 
@@ -33,14 +36,15 @@ class ModelsTests: XCTestCase {
         let voteLinks2 = VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
         let voteLinks3 = VoteLinks(upvote: nil, unvote: unvoteURL)
 
-        XCTAssertEqual(voteLinks1, voteLinks2)
-        XCTAssertNotEqual(voteLinks1, voteLinks3)
-        XCTAssertEqual(voteLinks1.hashValue, voteLinks2.hashValue)
+        #expect(voteLinks1 == voteLinks2)
+        #expect(voteLinks1 != voteLinks3)
+        #expect(voteLinks1.hashValue == voteLinks2.hashValue)
     }
 
     // MARK: - Post Tests
 
-    func testPostInit() {
+    @Test("Post initializes with correct properties")
+    func postInit() {
         let url = URL(string: "https://example.com/post")!
         let voteLinks = VoteLinks(upvote: URL(string: "https://example.com/upvote"), unvote: nil)
 
@@ -57,19 +61,20 @@ class ModelsTests: XCTestCase {
             voteLinks: voteLinks
         )
 
-        XCTAssertEqual(post.id, 123)
-        XCTAssertEqual(post.url, url)
-        XCTAssertEqual(post.title, "Test Post")
-        XCTAssertEqual(post.age, "2 hours ago")
-        XCTAssertEqual(post.commentsCount, 5)
-        XCTAssertEqual(post.by, "testuser")
-        XCTAssertEqual(post.score, 10)
-        XCTAssertEqual(post.postType, .news)
-        XCTAssertEqual(post.upvoted, false)
-        XCTAssertEqual(post.voteLinks, voteLinks)
+        #expect(post.id == 123)
+        #expect(post.url == url)
+        #expect(post.title == "Test Post")
+        #expect(post.age == "2 hours ago")
+        #expect(post.commentsCount == 5)
+        #expect(post.by == "testuser")
+        #expect(post.score == 10)
+        #expect(post.postType == .news)
+        #expect(post.upvoted == false)
+        #expect(post.voteLinks == voteLinks)
     }
 
-    func testPostHashable() {
+    @Test("Post implements Hashable correctly")
+    func postHashable() {
         let url = URL(string: "https://example.com/post")!
         let post1 = Post(
             id: 123,
@@ -107,14 +112,15 @@ class ModelsTests: XCTestCase {
             upvoted: true
         )
 
-        XCTAssertEqual(post1, post2)
-        XCTAssertNotEqual(post1, post3)
-        XCTAssertEqual(post1.hashValue, post2.hashValue)
+        #expect(post1 == post2)
+        #expect(post1 != post3)
+        #expect(post1.hashValue == post2.hashValue)
     }
 
     // MARK: - Comment Tests
 
-    func testCommentInit() {
+    @Test("Comment initializes with correct properties")
+    func commentInit() {
         let voteLinks = VoteLinks(upvote: URL(string: "https://example.com/upvote"), unvote: nil)
 
         let comment = Comment(
@@ -128,17 +134,18 @@ class ModelsTests: XCTestCase {
             visibility: .visible
         )
 
-        XCTAssertEqual(comment.id, 456)
-        XCTAssertEqual(comment.age, "1 hour ago")
-        XCTAssertEqual(comment.text, "This is a test comment")
-        XCTAssertEqual(comment.by, "commenter")
-        XCTAssertEqual(comment.level, 0)
-        XCTAssertEqual(comment.upvoted, false)
-        XCTAssertEqual(comment.voteLinks, voteLinks)
-        XCTAssertEqual(comment.visibility, .visible)
+        #expect(comment.id == 456)
+        #expect(comment.age == "1 hour ago")
+        #expect(comment.text == "This is a test comment")
+        #expect(comment.by == "commenter")
+        #expect(comment.level == 0)
+        #expect(comment.upvoted == false)
+        #expect(comment.voteLinks == voteLinks)
+        #expect(comment.visibility == .visible)
     }
 
-    func testCommentHashable() {
+    @Test("Comment implements Hashable correctly")
+    func commentHashable() {
         let comment1 = Comment(
             id: 456,
             age: "1 hour ago",
@@ -166,65 +173,71 @@ class ModelsTests: XCTestCase {
             upvoted: true
         )
 
-        XCTAssertEqual(comment1, comment2)
-        XCTAssertNotEqual(comment1, comment3)
-        XCTAssertEqual(comment1.hashValue, comment2.hashValue)
+        #expect(comment1 == comment2)
+        #expect(comment1 != comment3)
+        #expect(comment1.hashValue == comment2.hashValue)
     }
 
     // MARK: - PostType Tests
 
-    func testPostTypeRawValues() {
-        XCTAssertEqual(PostType.news.rawValue, "news")
-        XCTAssertEqual(PostType.ask.rawValue, "ask")
-        XCTAssertEqual(PostType.show.rawValue, "show")
-        XCTAssertEqual(PostType.jobs.rawValue, "jobs")
-        XCTAssertEqual(PostType.newest.rawValue, "newest")
-        XCTAssertEqual(PostType.best.rawValue, "best")
-        XCTAssertEqual(PostType.active.rawValue, "active")
+    @Test("PostType raw values match expected strings")
+    func postTypeRawValues() {
+        #expect(PostType.news.rawValue == "news")
+        #expect(PostType.ask.rawValue == "ask")
+        #expect(PostType.show.rawValue == "show")
+        #expect(PostType.jobs.rawValue == "jobs")
+        #expect(PostType.newest.rawValue == "newest")
+        #expect(PostType.best.rawValue == "best")
+        #expect(PostType.active.rawValue == "active")
     }
 
-    func testPostTypeAllCases() {
+    @Test("PostType allCases contains all expected cases")
+    func postTypeAllCases() {
         let expectedCases: [PostType] = [.news, .ask, .show, .jobs, .newest, .best, .active]
-        XCTAssertEqual(PostType.allCases, expectedCases)
+        #expect(PostType.allCases == expectedCases)
     }
 
     // MARK: - CommentVisibilityType Tests
 
-    func testCommentVisibilityTypeRawValues() {
-        XCTAssertEqual(CommentVisibilityType.visible.rawValue, 3)
-        XCTAssertEqual(CommentVisibilityType.compact.rawValue, 2)
-        XCTAssertEqual(CommentVisibilityType.hidden.rawValue, 1)
+    @Test("CommentVisibilityType raw values match expected integers")
+    func commentVisibilityTypeRawValues() {
+        #expect(CommentVisibilityType.visible.rawValue == 3)
+        #expect(CommentVisibilityType.compact.rawValue == 2)
+        #expect(CommentVisibilityType.hidden.rawValue == 1)
     }
 
     // MARK: - User Tests
 
-    func testUserInit() {
+    @Test("User initializes with correct properties")
+    func userInit() {
         let joinDate = Date()
         let user = User(username: "testuser", karma: 1000, joined: joinDate)
 
-        XCTAssertEqual(user.username, "testuser")
-        XCTAssertEqual(user.karma, 1000)
-        XCTAssertEqual(user.joined, joinDate)
+        #expect(user.username == "testuser")
+        #expect(user.karma == 1000)
+        #expect(user.joined == joinDate)
     }
 
     // MARK: - Error Tests
 
-    func testHackersKitError() {
+    @Test("HackersKitError handles authentication errors correctly")
+    func hackersKitError() {
         let authError = HackersKitError.authenticationError(error: .badCredentials)
 
         switch authError {
         case .authenticationError(let error):
-            XCTAssertEqual(error, .badCredentials)
+            #expect(error == .badCredentials)
         default:
-            XCTFail("Expected authentication error")
+            Issue.record("Expected authentication error")
         }
     }
 
-    func testHackersKitAuthenticationError() {
+    @Test("HackersKitAuthenticationError cases are valid")
+    func hackersKitAuthenticationError() {
         let errors: [HackersKitAuthenticationError] = [.badCredentials, .serverUnreachable, .noInternet, .unknown]
 
         for error in errors {
-            XCTAssertNotNil(error, "Error case should be valid")
+            #expect(error != nil, "Error case should be valid")
         }
     }
 }

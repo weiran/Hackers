@@ -16,7 +16,7 @@ import Foundation
 @Suite("CommentHTMLParser Whitespace Tests")
 struct CommentHTMLParserWhitespaceTests {
 
-    @Test("Whitespace preservation around bold tags")
+    @Test("Whitespace preservation maintains spacing around bold tags")
     func testWhitespaceAroundBoldTags() {
         let input = "  <b>bold text</b>  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -26,7 +26,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  bold text  ", "Whitespace around bold tags should be preserved")
     }
 
-    @Test("Whitespace preservation around italic tags")
+    @Test("Whitespace preservation maintains spacing around italic tags")
     func testWhitespaceAroundItalicTags() {
         let input = "  <i>italic text</i>  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -36,7 +36,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  italic text  ", "Whitespace around italic tags should be preserved")
     }
 
-    @Test("Whitespace preservation around link tags")
+    @Test("Whitespace preservation maintains spacing around link tags")
     func testWhitespaceAroundLinkTags() {
         let input = "  <a href=\"https://example.com\">link text</a>  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -46,7 +46,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  link text  ", "Whitespace around link tags should be preserved")
     }
 
-    @Test("Whitespace preservation with mixed formatting tags")
+    @Test("Whitespace preservation maintains spacing with mixed formatting tags")
     func testWhitespaceWithMixedFormattingTags() {
         let input = "  <b>bold</b> and <i>italic</i> text  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -56,7 +56,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  bold and italic text  ", "Whitespace around mixed formatting tags should be preserved")
     }
 
-    @Test("Whitespace preservation with nested formatting")
+    @Test("Whitespace preservation maintains spacing with nested formatting")
     func testWhitespaceWithNestedFormatting() {
         let input = "  <b>bold with <i>nested</i> text</b>  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -66,7 +66,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  bold with nested text  ", "Whitespace around nested formatting should be preserved")
     }
 
-    @Test("Whitespace preservation in paragraph context")
+    @Test("Whitespace preservation maintains spacing in paragraph context")
     func testWhitespaceInParagraphContext() {
         let input = "<p>  <b>bold</b> and <i>italic</i> text  </p>"
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -77,7 +77,7 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString.contains("italic"), "Italic text should be preserved")
     }
 
-    @Test("Whitespace preservation with links and formatting")
+    @Test("Whitespace preservation maintains spacing with links and formatting")
     func testWhitespaceWithLinksAndFormatting() {
         let input = "  <a href=\"https://example.com\"><b>bold link</b></a>  "
         let result = CommentHTMLParser.parseHTMLText(input)
@@ -87,13 +87,13 @@ struct CommentHTMLParserWhitespaceTests {
         #expect(resultString == "  bold link  ", "Whitespace around links with formatting should be preserved")
     }
 
-    @Test("Edge case - empty string")
+    @Test("Edge case handles empty string correctly")
     func testEmptyString() {
         let result = CommentHTMLParser.parseHTMLText("")
         #expect(result.characters.isEmpty, "Empty string should return empty AttributedString")
     }
 
-    @Test("Edge case - whitespace only")
+    @Test("Edge case handles whitespace-only string correctly")
     func testWhitespaceOnly() {
         let result = CommentHTMLParser.parseHTMLText("   \n\t   ")
         #expect(result.characters.isEmpty, "Whitespace-only string should return empty AttributedString")

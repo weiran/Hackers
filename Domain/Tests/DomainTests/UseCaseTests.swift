@@ -96,7 +96,7 @@ struct UseCaseTests {
     // MARK: - PostUseCase Tests
 
     @MainActor
-    @Test("PostUseCase getPosts functionality")
+    @Test("PostUseCase getPosts returns expected posts")
     func postUseCaseGetPosts() async throws {
         let mockUseCase = MockPostUseCase()
         let testPost = Self.createTestPost()
@@ -110,7 +110,7 @@ struct UseCaseTests {
     }
 
     @MainActor
-    @Test("PostUseCase getPost functionality")
+    @Test("PostUseCase getPost returns single post correctly")
     func postUseCaseGetPost() async throws {
         let mockUseCase = MockPostUseCase()
         let testPost = Self.createTestPost()
@@ -123,7 +123,7 @@ struct UseCaseTests {
     }
 
     @MainActor
-    @Test("PostUseCase getPost error handling")
+    @Test("PostUseCase getPost throws error when post not found")
     func postUseCaseGetPostError() async {
         let mockUseCase = MockPostUseCase()
         mockUseCase.stubPost = nil
@@ -139,7 +139,7 @@ struct UseCaseTests {
     // MARK: - VoteUseCase Tests
 
     @MainActor
-    @Test("VoteUseCase upvote post functionality")
+    @Test("VoteUseCase upvote post executes successfully")
     func voteUseCaseUpvotePost() async throws {
         let mockUseCase = MockVoteUseCase()
         let testPost = Self.createTestPost()
@@ -150,7 +150,7 @@ struct UseCaseTests {
     }
 
     @MainActor
-    @Test("VoteUseCase unvote post functionality")
+    @Test("VoteUseCase unvote post executes successfully")
     func voteUseCaseUnvotePost() async throws {
         let mockUseCase = MockVoteUseCase()
         let testPost = Self.createTestPost()
@@ -161,7 +161,7 @@ struct UseCaseTests {
     }
 
     @MainActor
-    @Test("VoteUseCase upvote comment functionality")
+    @Test("VoteUseCase upvote comment executes successfully")
     func voteUseCaseUpvoteComment() async throws {
         let mockUseCase = MockVoteUseCase()
         let testPost = Self.createTestPost()
@@ -173,7 +173,7 @@ struct UseCaseTests {
     }
 
     @MainActor
-    @Test("VoteUseCase unvote comment functionality")
+    @Test("VoteUseCase unvote comment executes successfully")
     func voteUseCaseUnvoteComment() async throws {
         let mockUseCase = MockVoteUseCase()
         let testPost = Self.createTestPost()
@@ -187,7 +187,7 @@ struct UseCaseTests {
     // MARK: - CommentUseCase Tests
 
     @MainActor
-    @Test("CommentUseCase getComments functionality")
+    @Test("CommentUseCase getComments returns expected comments")
     func commentUseCaseGetComments() async throws {
         let mockUseCase = MockCommentUseCase()
         let testPost = Self.createTestPost()
@@ -203,7 +203,7 @@ struct UseCaseTests {
 
     // MARK: - SettingsUseCase Tests
 
-    @Test("SettingsUseCase getters and setters")
+    @Test("SettingsUseCase getters and setters manage properties correctly")
     func settingsUseCaseGettersAndSetters() {
         let mockUseCase = MockSettingsUseCase()
 
