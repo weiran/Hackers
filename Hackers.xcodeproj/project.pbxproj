@@ -25,20 +25,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		245345F122466EA8001AF1CE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 24F39F8418AFB1150055F8DC;
-			remoteInfo = Hackers;
-		};
-		24C03D612E003EB8002B6ED5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 24F39F8418AFB1150055F8DC;
-			remoteInfo = Hackers;
-		};
 		24D1E48A2D981085005F1038 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 24F39F7D18AFB1150055F8DC /* Project object */;
@@ -65,8 +51,6 @@
 /* Begin PBXFileReference section */
 		241387A51945A6E100D71220 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2419D02024898DF700740184 /* HackersActionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HackersActionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		245345EC22466EA8001AF1CE /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		24C03D5D2E003EB8002B6ED5 /* HackersTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F39F8518AFB1150055F8DC /* Hackers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F39F8818AFB1150055F8DC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -83,13 +67,6 @@
 			);
 			target = 24F39F8418AFB1150055F8DC /* Hackers */;
 		};
-		241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				HackersUITests/HackersUITests.swift,
-			);
-			target = 245345EB22466EA8001AF1CE /* HackersUITests */;
-		};
 		241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -101,26 +78,11 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		241E7A262E4CB2830013EEA1 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A4A2E4CB2830013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
-		241E7A502E4CB28D0013EEA1 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A532E4CB28D0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
 		241E7A5C2E4CB28F0013EEA1 /* Extensions */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (241E7A622E4CB28F0013EEA1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Extensions; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2419D01D24898DF700740184 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		245345E922466EA8001AF1CE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		24C03D5A2E003EB8002B6ED5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -162,7 +124,6 @@
 			isa = PBXGroup;
 			children = (
 				241E7A262E4CB2830013EEA1 /* App */,
-				241E7A502E4CB28D0013EEA1 /* Tests */,
 				241E7A5C2E4CB28F0013EEA1 /* Extensions */,
 				24CE5FF119434E0B009D2677 /* Assets */,
 				24F39F8718AFB1150055F8DC /* Frameworks */,
@@ -175,9 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				24F39F8518AFB1150055F8DC /* Hackers.app */,
-				245345EC22466EA8001AF1CE /* HackersUITests.xctest */,
 				2419D02024898DF700740184 /* HackersActionExtension.appex */,
-				24C03D5D2E003EB8002B6ED5 /* HackersTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -214,44 +173,6 @@
 			productName = HackersActionExtension;
 			productReference = 2419D02024898DF700740184 /* HackersActionExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
-		};
-		245345EB22466EA8001AF1CE /* HackersUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 245345F522466EA8001AF1CE /* Build configuration list for PBXNativeTarget "HackersUITests" */;
-			buildPhases = (
-				245345E822466EA8001AF1CE /* Sources */,
-				245345E922466EA8001AF1CE /* Frameworks */,
-				245345EA22466EA8001AF1CE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				245345F222466EA8001AF1CE /* PBXTargetDependency */,
-			);
-			name = HackersUITests;
-			packageProductDependencies = (
-			);
-			productName = HackersUITests;
-			productReference = 245345EC22466EA8001AF1CE /* HackersUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		24C03D5C2E003EB8002B6ED5 /* HackersTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 24C03D652E003EB9002B6ED5 /* Build configuration list for PBXNativeTarget "HackersTests" */;
-			buildPhases = (
-				24C03D592E003EB8002B6ED5 /* Sources */,
-				24C03D5A2E003EB8002B6ED5 /* Frameworks */,
-				24C03D5B2E003EB8002B6ED5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				24C03D622E003EB8002B6ED5 /* PBXTargetDependency */,
-			);
-			name = HackersTests;
-			productName = HackersTests;
-			productReference = 24C03D5D2E003EB8002B6ED5 /* HackersTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		24F39F8418AFB1150055F8DC /* Hackers */ = {
 			isa = PBXNativeTarget;
@@ -303,15 +224,6 @@
 					2419D01F24898DF700740184 = {
 						CreatedOnToolsVersion = 11.5;
 					};
-					245345EB22466EA8001AF1CE = {
-						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1020;
-						TestTargetID = 24F39F8418AFB1150055F8DC;
-					};
-					24C03D5C2E003EB8002B6ED5 = {
-						CreatedOnToolsVersion = 26.0;
-						TestTargetID = 24F39F8418AFB1150055F8DC;
-					};
 					24F39F8418AFB1150055F8DC = {
 						LastSwiftMigration = 1020;
 					};
@@ -343,29 +255,13 @@
 			projectRoot = "";
 			targets = (
 				24F39F8418AFB1150055F8DC /* Hackers */,
-				245345EB22466EA8001AF1CE /* HackersUITests */,
 				2419D01F24898DF700740184 /* HackersActionExtension */,
-				24C03D5C2E003EB8002B6ED5 /* HackersTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2419D01E24898DF700740184 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		245345EA22466EA8001AF1CE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		24C03D5B2E003EB8002B6ED5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -427,20 +323,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		245345E822466EA8001AF1CE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		24C03D592E003EB8002B6ED5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		24F39F8118AFB1150055F8DC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -451,16 +333,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		245345F222466EA8001AF1CE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 24F39F8418AFB1150055F8DC /* Hackers */;
-			targetProxy = 245345F122466EA8001AF1CE /* PBXContainerItemProxy */;
-		};
-		24C03D622E003EB8002B6ED5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 24F39F8418AFB1150055F8DC /* Hackers */;
-			targetProxy = 24C03D612E003EB8002B6ED5 /* PBXContainerItemProxy */;
-		};
 		24D1E48B2D981085005F1038 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2419D01F24898DF700740184 /* HackersActionExtension */;
@@ -541,156 +413,6 @@
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		245345F322466EA8001AF1CE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Manual;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.UITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hackers Extensions Dev";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Hackers;
-			};
-			name = Debug;
-		};
-		245345F422466EA8001AF1CE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Manual;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2KB59GPA9B;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = Tests/HackersUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.UITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hackers Extensions Dev";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Hackers;
-			};
-			name = Release;
-		};
-		24C03D632E003EB8002B6ED5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 133;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = co.weiran.HackersTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hackers.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hackers";
-			};
-			name = Debug;
-		};
-		24C03D642E003EB8002B6ED5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 133;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 2KB59GPA9B;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = co.weiran.HackersTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hackers.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hackers";
 			};
 			name = Release;
 		};
@@ -870,24 +592,6 @@
 			buildConfigurations = (
 				2419D02D24898DF700740184 /* Debug */,
 				2419D02E24898DF700740184 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		245345F522466EA8001AF1CE /* Build configuration list for PBXNativeTarget "HackersUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				245345F322466EA8001AF1CE /* Debug */,
-				245345F422466EA8001AF1CE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		24C03D652E003EB9002B6ED5 /* Build configuration list for PBXNativeTarget "HackersTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				24C03D632E003EB8002B6ED5 /* Debug */,
-				24C03D642E003EB8002B6ED5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
