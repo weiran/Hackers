@@ -107,10 +107,20 @@ public final class FeedViewModel: @unchecked Sendable {
             )
 
             return await MainActor.run {
-                let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
-                let newPostIds = newPosts.map { $0.id }
+                // Filter duplicates by creating a new set from the fetched posts
+                var seenIds = Set<Int>()
+                let uniquePosts = fetchedPosts.filter { post in
+                    if seenIds.contains(post.id) {
+                        return false
+                    } else {
+                        seenIds.insert(post.id)
+                        return true
+                    }
+                }
+
+                let newPostIds = uniquePosts.map { $0.id }
                 self.postIds.formUnion(newPostIds)
-                return newPosts
+                return uniquePosts
             }
         } catch {
             throw error
