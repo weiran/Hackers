@@ -58,14 +58,5 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
         return !cookies.isEmpty
     }
 
-    public func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        willPerformHTTPRedirection response: HTTPURLResponse,
-        newRequest request: URLRequest,
-        completionHandler: @escaping (URLRequest?) -> Void
-    ) {
-        // avoid following redirects
-        completionHandler(nil)
-    }
+    // Follow redirects by default; no custom handling needed
 }

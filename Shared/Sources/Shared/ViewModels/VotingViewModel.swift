@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Domain
+import Shared
 
 @MainActor
 @Observable
@@ -60,12 +61,7 @@ public final class VotingViewModel {
             post.upvoted = originalUpvoted
             post.score = originalScore
 
-            // Check if error is unauthenticated and show login
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
+            await handleUnauthenticatedIfNeeded(error)
         }
 
         isVoting = false
@@ -97,12 +93,7 @@ public final class VotingViewModel {
             post.upvoted = false
             post.score = originalScore
 
-            // Check if error is unauthenticated and show login
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
+            await handleUnauthenticatedIfNeeded(error)
         }
 
         isVoting = false
@@ -129,12 +120,7 @@ public final class VotingViewModel {
             post.upvoted = true
             post.score = originalScore
 
-            // Check if error is unauthenticated and show login
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
+            await handleUnauthenticatedIfNeeded(error)
         }
 
         isVoting = false
@@ -159,11 +145,7 @@ public final class VotingViewModel {
             // Revert optimistic changes on error
             comment.upvoted = originalUpvoted
 
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
+            await handleUnauthenticatedIfNeeded(error)
         }
 
         isVoting = false
@@ -190,11 +172,7 @@ public final class VotingViewModel {
             comment.upvoted = false
 
             // Check if error is unauthenticated and show login
-            if case HackersKitError.unauthenticated = error {
-                navigationStore?.showLogin()
-            } else {
-                lastError = error
-            }
+            await handleUnauthenticatedIfNeeded(error)
         }
 
         isVoting = false
@@ -246,5 +224,23 @@ public final class VotingViewModel {
 
     public func clearError() {
         lastError = nil
+    }
+
+    // MARK: - Auth handling
+    private func handleUnauthenticatedIfNeeded(_ error: Error) async {
+        guard case HackersKitError.unauthenticated = error else {
+            lastError = error
+            return
+        }
+        // Clear cookies and stored username
+        do {
+            try await DependencyContainer.shared.getAuthenticationUseCase().logout()
+        } catch {
+            // ignore logout errors
+        }
+        // Notify session to update UI state
+        NotificationCenter.default.post(name: .userDidLogout, object: nil)
+        // Prompt login
+        navigationStore?.showLogin()
     }
 }

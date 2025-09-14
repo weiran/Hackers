@@ -28,6 +28,7 @@ extension NotificationCenter {
 
 extension Notification.Name {
     public static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
+    public static let userDidLogout = NSNotification.Name(rawValue: "UserDidLogoutNotification")
 }
 
 extension PostType {

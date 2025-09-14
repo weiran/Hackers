@@ -24,6 +24,15 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
         Task {
             self.user = await authenticationUseCase.getCurrentUser()
         }
+
+        // Observe explicit logout notifications to update session state
+        NotificationCenter.default.addObserver(
+            forName: .userDidLogout,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.user = nil
+        }
     }
 
     var authenticationState: AuthenticationState {
