@@ -57,6 +57,8 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             }
         }
         .task {
+            // Set the navigation store for the voting view model
+            votingViewModel.navigationStore = navigationStore
             await viewModel.loadComments()
         }
         .refreshable {
@@ -68,6 +70,10 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             }
         } message: {
             Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
+        }
+        .onAppear {
+            // Ensure the navigation store is set
+            votingViewModel.navigationStore = navigationStore
         }
     }
 

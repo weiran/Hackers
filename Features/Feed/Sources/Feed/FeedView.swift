@@ -71,6 +71,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         }
         .task { @Sendable in
+            // Set the navigation store for the voting view model
+            votingViewModel.navigationStore = navigationStore
             await viewModel.loadFeed()
         }
         .alert("Vote Error", isPresented: .constant(votingViewModel.lastError != nil)) {
@@ -79,6 +81,10 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         } message: {
             Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
+        }
+        .onAppear {
+            // Ensure the navigation store is set
+            votingViewModel.navigationStore = navigationStore
         }
     }
 
