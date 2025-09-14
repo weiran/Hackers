@@ -319,3 +319,12 @@ struct CommentPositionKey: PreferenceKey {
     static let defaultValue: CommentPosition? = nil
     static func reduce(value: inout Value, nextValue: () -> Value) { value = value ?? nextValue() }
 }
+
+// MARK: - Helpers
+extension View {
+    func plainListRow() -> some View {
+        self
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets())
+    }
+}
