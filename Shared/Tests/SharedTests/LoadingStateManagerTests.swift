@@ -184,7 +184,7 @@ struct LoadingStateManagerTests {
             shouldSkipLoad: { $0.count > 2 },
             loadData: {
                 loadCount += 1
-                currentData = currentData + ["new_item\(loadCount)"]
+                currentData += ["new_item\(loadCount)"]
                 return currentData
             }
         )

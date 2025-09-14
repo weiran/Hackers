@@ -466,10 +466,10 @@ struct PostRepositoryTests {
                             <a href="item?id=45237717">4 hours ago</a>
                         </span>
                         <span id="unv_45237717">
-                             | 
+                             |
                             <a id='un_45237717' class='clicky' href='vote?id=45237717&amp;how=un&amp;auth=test&amp;goto=news'>unvote</a>
                         </span>
-                         | 
+                         |
                         <a href="item?id=45237717">13&nbsp;comments</a>
                     </span>
                 </td>

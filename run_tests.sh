@@ -26,7 +26,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BASE_DIR="/Users/weiran/git/Hackers/Hackers"
-DESTINATION="platform=iOS Simulator,name=iPhone 16 Pro"
+DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro"
 VERBOSE=false
 
 # All available modules
@@ -252,7 +252,7 @@ fi
 # Print header
 echo
 print_status $CYAN "🚀 Hackers iOS Test Runner"
-print_status $BLUE "📱 Target: iOS Simulator (iPhone 16 Pro)"
+print_status $BLUE "📱 Target: iOS Simulator (iPhone 17 Pro)"
 print_status $BLUE "📊 Mode: $([ "$VERBOSE" = true ] && echo "Verbose" || echo "Quiet")"
 print_status $BLUE "📦 Modules: ${MODULES_TO_RUN[*]}"
 echo

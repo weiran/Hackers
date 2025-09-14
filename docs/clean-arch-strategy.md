@@ -250,7 +250,7 @@ This matrix defines the allowed import directions. A `✅` means the row module 
 #### **Screenshot Tests**
 *   **Tool:** `pointfreeco/swift-snapshot-testing`.
 *   **Policy:** Generate snapshots for key screens in a feature module across a defined device matrix. Snapshots are stored in the repo. Diffs are posted as PR comments.
-*   **Device Matrix:** iPhone 15 Pro (iOS 26), iPhone SE (3rd gen, iOS 26), iPad Pro 11" (iOS 26).
+*   **Device Matrix:** iPhone 17 Pro (iOS 26), iPhone SE (3rd gen, iOS 26), iPad Pro 11" (iOS 26).
 *   **Threshold:** 0% diff tolerance. Any change must be explicitly approved by updating the reference image.
 
 #### **E2E/UI Tests**
@@ -297,13 +297,13 @@ jobs:
       run: swiftlint --strict
 
     - name: Unit & Component Tests
-      run: xcodebuild test -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 15 Pro' -enableCodeCoverage YES
+      run: xcodebuild test -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -enableCodeCoverage YES
 
     - name: Upload Coverage
       uses: codecov/codecov-action@v4
 
     - name: UI & Screenshot Tests
-      run: xcodebuild test -scheme HackersUITests -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+      run: xcodebuild test -scheme HackersUITests -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
     - name: Upload Screenshot Diffs
       # ... action to upload artifacts ...

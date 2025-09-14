@@ -412,7 +412,6 @@ public enum CommentHTMLParser {
         if resolvedURL?.scheme == nil, let base = URL(string: "https://news.ycombinator.com") {
             resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
         }
-        
         if let url = resolvedURL {
             // Apply link attributes to the entire range
             let fullRange = linkAttributedString.startIndex..<linkAttributedString.endIndex

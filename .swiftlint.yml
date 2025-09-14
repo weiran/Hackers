@@ -8,8 +8,11 @@ excluded:
   - "**/.build/**"
   - "Features/**/.build/**"
   - "Data/.build/**"
+  - "**/.DerivedData/**"
 reporter: "xcode"
 warning_threshold: 1000
+# Don't fail build on violations during development
+strict: false
 opt_in_rules:
   - convenience_type
   - empty_count
