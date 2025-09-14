@@ -305,7 +305,13 @@ private struct CommentRow: View {
                 Spacer()
 
                 VoteIndicator(
-                    votingState: votingViewModel.votingState(for: comment),
+                    votingState: VotingState(
+                        isUpvoted: comment.upvoted,
+                        score: nil,
+                        canVote: comment.voteLinks?.upvote != nil || comment.voteLinks?.unvote != nil,
+                        isVoting: votingViewModel.isVoting,
+                        error: votingViewModel.lastError
+                    ),
                     style: VoteIndicatorStyle(
                         showScore: false,
                         iconFont: .body,

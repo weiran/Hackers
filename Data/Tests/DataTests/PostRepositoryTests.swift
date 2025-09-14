@@ -164,12 +164,15 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
+        
+        // Verify comment state is updated after successful upvote
+        #expect(comment.upvoted == true, "Comment should be marked as upvoted after successful API call")
     }
 
     @Test("Unvote comment")
     func unvoteComment() async throws {
         let voteLinks = VoteLinks(upvote: nil, unvote: URL(string: "/vote?id=456&how=un")!)
-        let comment = createTestComment(voteLinks: voteLinks)
+        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
         let post = createTestPost()
 
         try await postRepository.unvote(comment: comment, for: post)
@@ -178,6 +181,33 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
+        
+        // Verify comment state is updated after successful unvote
+        #expect(comment.upvoted == false, "Comment should be marked as not upvoted after successful API call")
+    }
+
+    // MARK: - Post Feed Upvoted State Tests
+    
+    @Test("Parse upvoted post from feed HTML")
+    func parseUpvotedPostFromFeed() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockFeedHTMLWithUpvotedPost()
+
+        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+
+        #expect(posts.count == 2, "Should parse two posts")
+        
+        let upvotedPost = posts.first { $0.id == 45237717 }
+        let notUpvotedPost = posts.first { $0.id == 45238055 }
+        
+        #expect(upvotedPost != nil, "Should find upvoted post")
+        #expect(notUpvotedPost != nil, "Should find not upvoted post")
+        
+        #expect(upvotedPost?.upvoted == true, "Post with unvote link should be marked as upvoted")
+        #expect(notUpvotedPost?.upvoted == false, "Post without unvote link should not be marked as upvoted")
+        
+        #expect(upvotedPost?.voteLinks?.unvote != nil, "Upvoted post should have unvote link")
+        #expect(upvotedPost?.voteLinks?.upvote != nil, "Upvoted post should still have upvote link available")
+        #expect(notUpvotedPost?.voteLinks?.unvote == nil, "Not upvoted post should not have unvote link")
     }
 
     // MARK: - Comments Tests
@@ -229,14 +259,14 @@ struct PostRepositoryTests {
         )
     }
 
-    private func createTestComment(voteLinks: VoteLinks? = nil) -> Domain.Comment {
+    private func createTestComment(voteLinks: VoteLinks? = nil, upvoted: Bool = false) -> Domain.Comment {
         return Domain.Comment(
             id: 456,
             age: "1 hour ago",
             text: "Test comment",
             by: "commenter",
             level: 0,
-            upvoted: false,
+            upvoted: upvoted,
             voteLinks: voteLinks
         )
     }
@@ -305,6 +335,87 @@ struct PostRepositoryTests {
                         <a class="hnuser" href="user?id=commenter">commenter</a>
                         <div class="comment-body">This is a test comment</div>
                     </div>
+                </td>
+            </tr>
+        </table>
+        </body>
+        </html>
+        """
+    }
+    
+    private func createMockFeedHTMLWithUpvotedPost() -> String {
+        return """
+        <html>
+        <body>
+        <table id="hnmain">
+            <tr class="athing submission" id="45238055">
+                <td align="right" valign="top" class="title">
+                    <span class="rank">1.</span>
+                </td>
+                <td valign="top" class="votelinks">
+                    <center>
+                        <a id='up_45238055' class='clicky nosee' href='vote?id=45238055&amp;how=up&amp;auth=test&amp;goto=news'>
+                            <div class='votearrow' title='upvote'></div>
+                        </a>
+                    </center>
+                </td>
+                <td class="title">
+                    <span class="titleline">
+                        <a href="http://example.com/article1">Not Upvoted Article</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td class="subtext">
+                    <span class="subline">
+                        <span class="score" id="score_45238055">241 points</span>
+                         by 
+                        <a href="user?id=testuser" class="hnuser">testuser</a>
+                        <span class="age" title="2025-09-14T07:00:44">
+                            <a href="item?id=45238055">3 hours ago</a>
+                        </span>
+                        <span id="unv_45238055"></span>
+                         | 
+                        <a href="item?id=45238055">45&nbsp;comments</a>
+                    </span>
+                </td>
+            </tr>
+            <tr class="spacer" style="height:5px"></tr>
+            <tr class="athing submission" id="45237717">
+                <td align="right" valign="top" class="title">
+                    <span class="rank">2.</span>
+                </td>
+                <td valign="top" class="votelinks">
+                    <center>
+                        <a id='up_45237717' class='clicky nosee' href='vote?id=45237717&amp;how=up&amp;auth=test&amp;goto=news'>
+                            <div class='votearrow' title='upvote'></div>
+                        </a>
+                    </center>
+                </td>
+                <td class="title">
+                    <span class="titleline">
+                        <a href="http://example.com/article2">Upvoted Article</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td class="subtext">
+                    <span class="subline">
+                        <span class="score" id="score_45237717">72 points</span>
+                         by 
+                        <a href="user?id=testuser2" class="hnuser">testuser2</a>
+                        <span class="age" title="2025-09-14T05:42:38">
+                            <a href="item?id=45237717">4 hours ago</a>
+                        </span>
+                        <span id="unv_45237717">
+                             | 
+                            <a id='un_45237717' class='clicky' href='vote?id=45237717&amp;how=un&amp;auth=test&amp;goto=news'>unvote</a>
+                        </span>
+                         | 
+                        <a href="item?id=45237717">13&nbsp;comments</a>
+                    </span>
                 </td>
             </tr>
         </table>

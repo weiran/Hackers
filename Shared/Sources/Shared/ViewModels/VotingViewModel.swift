@@ -130,6 +130,7 @@ public final class VotingViewModel {
 
     // MARK: - Comment Voting
 
+    @MainActor
     public func toggleVote(for comment: Comment, in post: Post) async {
         let originalUpvoted = comment.upvoted
 
@@ -160,6 +161,7 @@ public final class VotingViewModel {
         isVoting = false
     }
 
+    @MainActor
     public func upvote(comment: Comment, in post: Post) async {
         guard !comment.upvoted else { return }
 
@@ -190,6 +192,7 @@ public final class VotingViewModel {
         isVoting = false
     }
 
+    @MainActor
     public func unvote(comment: Comment, in post: Post) async {
         guard comment.upvoted else { return }
 
