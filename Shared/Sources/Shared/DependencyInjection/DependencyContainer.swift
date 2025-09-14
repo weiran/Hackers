@@ -13,43 +13,44 @@ import Networking
 public final class DependencyContainer: @unchecked Sendable {
     public static let shared = DependencyContainer()
 
-    private lazy var networkManager: NetworkManagerProtocol = NetworkManager()
-    private lazy var postRepository: PostRepository = PostRepository(networkManager: networkManager)
-    private lazy var settingsRepository: SettingsRepository = SettingsRepository()
-    private lazy var votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
-    private lazy var authenticationRepository: AuthenticationRepository = 
+    // Use type-level singletons to guarantee identity across access sites and threads
+    private static let networkManager: NetworkManagerProtocol = NetworkManager()
+    private static let postRepository: PostRepository = PostRepository(networkManager: networkManager)
+    private static let settingsRepository: SettingsRepository = SettingsRepository()
+    private static let votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
+    private static let authenticationRepository: AuthenticationRepository =
         AuthenticationRepository(networkManager: networkManager)
 
     private init() {}
 
     public func getPostUseCase() -> any PostUseCase {
-        return postRepository
+        return Self.postRepository
     }
 
     public func getVoteUseCase() -> any VoteUseCase {
-        return postRepository
+        return Self.postRepository
     }
 
     public func getCommentUseCase() -> any CommentUseCase {
-        return postRepository
+        return Self.postRepository
     }
 
     public func getSettingsUseCase() -> any SettingsUseCase {
-        return settingsRepository
+        return Self.settingsRepository
     }
 
     public func getVotingService() -> any VotingService {
-        return votingService
+        return Self.votingService
     }
 
     public func getCommentVotingService() -> any CommentVotingService {
-        guard let defaultVotingService = votingService as? DefaultVotingService else {
+        guard let defaultVotingService = Self.votingService as? DefaultVotingService else {
             fatalError("VotingService must be DefaultVotingService to conform to CommentVotingService")
         }
         return defaultVotingService
     }
 
     public func getAuthenticationUseCase() -> any AuthenticationUseCase {
-        return authenticationRepository
+        return Self.authenticationRepository
     }
 }

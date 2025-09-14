@@ -56,7 +56,9 @@ extension PostType {
 extension String {
     public func strippingHTML() -> String {
         let pattern = "<[^>]+>"
-        return self.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        return self
+            .replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\t", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 

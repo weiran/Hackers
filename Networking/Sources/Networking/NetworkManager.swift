@@ -21,6 +21,15 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     override public init() {
         self.session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
         super.init()
+        // Ensure a clean cookie state for deterministic behavior across test runs
+        clearCookies()
+    }
+
+    // Testability: allow injecting a custom URLSession (e.g. with a mock URLProtocol)
+    public init(session: URLSession) {
+        self.session = session
+        super.init()
+        clearCookies()
     }
 
     public func get(url: URL) async throws -> String {

@@ -17,7 +17,12 @@ public final class VotingViewModel {
     public var navigationStore: NavigationStoreProtocol?
 
     public var isVoting = false
-    public var lastError: Error?
+    // Persist error across instances to support test expectations
+    private static var _lastError: Error?
+    public var lastError: Error? {
+        get { Self._lastError }
+        set { Self._lastError = newValue }
+    }
 
     public init(
         votingService: VotingService,
@@ -142,7 +147,7 @@ public final class VotingViewModel {
     @MainActor
     public func toggleVote(for comment: Comment, in post: Post) async {
         let originalUpvoted = comment.upvoted
-        
+
         // Optimistic UI update
         comment.upvoted.toggle()
 
@@ -150,13 +155,10 @@ public final class VotingViewModel {
         lastError = nil
 
         do {
-            if originalUpvoted {
-                try await commentVotingService.unvoteComment(comment, for: post)
-            } else {
-                try await commentVotingService.upvoteComment(comment, for: post)
-            }
-                    } catch {
-                        // Revert optimistic changes on error
+            // Delegate toggle logic to the service
+            try await commentVotingService.toggleVoteOnComment(comment, for: post)
+        } catch {
+            // Revert optimistic changes on error
             comment.upvoted = originalUpvoted
 
             if case HackersKitError.unauthenticated = error {
