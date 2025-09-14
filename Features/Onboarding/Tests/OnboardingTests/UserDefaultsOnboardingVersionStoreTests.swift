@@ -12,8 +12,12 @@ import Foundation
 struct UserDefaultsOnboardingVersionStoreTests {
     @Test("Initial state returns false")
     func initialStateReturnsFalse() {
-        let userDefaults = UserDefaults()
-        userDefaults.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        // Use a dedicated test suite to avoid interference
+        let testSuiteName = "com.weiran.hackers.onboarding.tests.isolated.\(UUID().uuidString)"
+        let userDefaults = UserDefaults(suiteName: testSuiteName) ?? UserDefaults()
+
+        // Clean up any existing data
+        userDefaults.removeObject(forKey: "com.weiran.hackers.onboarding.shown")
 
         let store = UserDefaultsOnboardingVersionStore(userDefaults: userDefaults)
         #expect(!store.hasShownOnboarding())
@@ -21,8 +25,12 @@ struct UserDefaultsOnboardingVersionStoreTests {
 
     @Test("Marking as shown persists state")
     func markingAsShownPersistsState() {
-        let userDefaults = UserDefaults()
-        userDefaults.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        // Use a dedicated test suite to avoid interference
+        let testSuiteName = "com.weiran.hackers.onboarding.tests.isolated.\(UUID().uuidString)"
+        let userDefaults = UserDefaults(suiteName: testSuiteName) ?? UserDefaults()
+
+        // Clean up any existing data
+        userDefaults.removeObject(forKey: "com.weiran.hackers.onboarding.shown")
 
         let store = UserDefaultsOnboardingVersionStore(userDefaults: userDefaults)
         store.markOnboardingShown()
