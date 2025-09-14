@@ -105,7 +105,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     postRow(for: post)
                 }
             }
-            .listStyle(.plain)
+            .if(isSidebar) { view in view.listStyle(.sidebar) }
+            .if(!isSidebar) { view in view.listStyle(.plain) }
             .refreshable {
                 await viewModel.refreshFeed()
             }
@@ -118,7 +119,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             post: post,
             votingViewModel: votingViewModel,
             onLinkTap: { handleLinkTap(post: post) },
-            onCommentsTap: { navigationStore.showPost(post) }
+            onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) }
         )
         .if(isSidebar) { view in
             view.tag(post.id)
@@ -266,8 +267,10 @@ struct PostRowView: View {
             onThumbnailTap: onLinkTap
         )
         .contentShape(Rectangle())
-        .onTapGesture {
-            onCommentsTap?()
+        .if(onCommentsTap != nil) { view in
+            view.onTapGesture {
+                onCommentsTap?()
+            }
         }
     }
 }
