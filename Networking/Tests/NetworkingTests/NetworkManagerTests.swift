@@ -200,7 +200,12 @@ struct NetworkManagerTests {
 
     @Test("Clear cookies functionality")
     func clearCookies() {
-        // First, let's add a cookie
+        // Create a custom session and manager for this test to avoid interference
+        let configuration = URLSessionConfiguration.default
+        let customSession = URLSession(configuration: configuration)
+        let manager = NetworkManager(session: customSession)
+
+        // First, let's add a cookie after the manager has already cleared them
         let cookie = HTTPCookie(properties: [
             .domain: "example.com",
             .path: "/",
@@ -210,16 +215,26 @@ struct NetworkManagerTests {
 
         HTTPCookieStorage.shared.setCookie(cookie)
 
-        // Verify cookie exists
+        // Verify cookie exists by checking properties
         let cookiesBeforeClearing = HTTPCookieStorage.shared.cookies ?? []
-        #expect(cookiesBeforeClearing.contains(cookie), "Cookie should exist before clearing")
+        let cookieExists = cookiesBeforeClearing.contains { existingCookie in
+            existingCookie.name == "testCookie" &&
+            existingCookie.value == "testValue" &&
+            existingCookie.domain == "example.com"
+        }
+        #expect(cookieExists, "Cookie should exist before clearing")
 
-        // Clear cookies
-        defaultManager.clearCookies()
+        // Clear cookies using the manager
+        manager.clearCookies()
 
         // Verify cookies are cleared
         let cookiesAfterClearing = HTTPCookieStorage.shared.cookies ?? []
-        #expect(!cookiesAfterClearing.contains(cookie), "Cookie should not exist after clearing")
+        let cookieStillExists = cookiesAfterClearing.contains { existingCookie in
+            existingCookie.name == "testCookie" &&
+            existingCookie.value == "testValue" &&
+            existingCookie.domain == "example.com"
+        }
+        #expect(!cookieStillExists, "Cookie should not exist after clearing")
     }
 
     @Test("Contains cookie for URL functionality")
