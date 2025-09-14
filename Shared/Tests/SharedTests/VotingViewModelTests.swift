@@ -16,6 +16,7 @@ struct VotingViewModelTests {
     let mockVotingService = MockVotingService()
     let mockCommentVotingService = MockCommentVotingService()
     
+    @MainActor
     var votingViewModel: VotingViewModel {
         VotingViewModel(
             votingService: mockVotingService,
@@ -67,21 +68,21 @@ struct VotingViewModelTests {
         var toggleVoteCalled = false
         var shouldThrow = false
         
-        func upvoteComment(_ comment: Comment, for post: Post) async throws {
+        func upvoteComment(_ comment: Domain.Comment, for post: Post) async throws {
             upvoteCommentCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
             }
         }
         
-        func unvoteComment(_ comment: Comment, for post: Post) async throws {
+        func unvoteComment(_ comment: Domain.Comment, for post: Post) async throws {
             unvoteCommentCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
             }
         }
         
-        func toggleVoteOnComment(_ comment: Comment, for post: Post) async throws {
+        func toggleVoteOnComment(_ comment: Domain.Comment, for post: Post) async throws {
             toggleVoteCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
@@ -96,7 +97,7 @@ struct VotingViewModelTests {
     func commentVotingWithMainActor() async throws {
         // Given
         let voteLinks = VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
-        let comment = Comment(
+        let comment = Domain.Comment(
             id: 123,
             age: "1h",
             text: "Test comment",
@@ -131,7 +132,7 @@ struct VotingViewModelTests {
     func commentVotingErrorHandling() async throws {
         // Given
         let voteLinks = VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
-        let comment = Comment(
+        let comment = Domain.Comment(
             id: 123,
             age: "1h", 
             text: "Test comment",

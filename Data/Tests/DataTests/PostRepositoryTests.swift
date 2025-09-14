@@ -241,9 +241,7 @@ struct PostRepositoryTests {
     func unvoteAfterOptimisticUpvote() async throws {
         // Start with a post that has only an upvote link (typical for not-yet-upvoted)
         let voteLinks = VoteLinks(upvote: URL(string: "/vote?id=999&how=up&auth=abc&goto=news")!, unvote: nil)
-        var post = createTestPost(voteLinks: voteLinks)
-        post.id = 999
-        post.upvoted = true // Optimistic UI toggled to upvoted; links not refreshed yet
+        let post = createTestPostWithId(999, voteLinks: voteLinks, upvoted: true)
 
         try await postRepository.unvote(post: post)
 
@@ -298,6 +296,21 @@ struct PostRepositoryTests {
             score: 10,
             postType: .news,
             upvoted: false,
+            voteLinks: voteLinks
+        )
+    }
+
+    private func createTestPostWithId(_ id: Int, voteLinks: VoteLinks? = nil, upvoted: Bool = false) -> Post {
+        return Post(
+            id: id,
+            url: URL(string: "https://example.com/post")!,
+            title: "Test Post",
+            age: "2 hours ago",
+            commentsCount: 5,
+            by: "testuser",
+            score: 10,
+            postType: .news,
+            upvoted: upvoted,
             voteLinks: voteLinks
         )
     }

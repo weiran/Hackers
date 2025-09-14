@@ -150,7 +150,8 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase
+            postUseCase: mockPostUseCase,
+            voteUseCase: MockVoteUseCase()
         )
 
         // Act
@@ -177,7 +178,8 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase
+            postUseCase: mockPostUseCase,
+            voteUseCase: MockVoteUseCase()
         )
 
         // Act - Load first page
@@ -210,7 +212,8 @@ struct FeedViewTests {
         mockPostUseCase.mockPosts = [post]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase
+            postUseCase: mockPostUseCase,
+            voteUseCase: mockVoteUseCase
         )
 
         await viewModel.loadFeed()
@@ -239,7 +242,8 @@ struct FeedViewTests {
         mockPostUseCase.mockPosts = [createMockPost(id: 1)]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase
+            postUseCase: mockPostUseCase,
+            voteUseCase: MockVoteUseCase()
         )
 
         // Act
@@ -264,7 +268,8 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase
+            postUseCase: mockPostUseCase,
+            voteUseCase: mockVoteUseCase
         )
 
         // Act

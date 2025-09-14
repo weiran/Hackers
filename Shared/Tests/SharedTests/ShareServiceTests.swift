@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import Shared
 @testable import Domain
 
@@ -59,8 +60,8 @@ struct ShareServiceTests {
         )
     }
 
-    private func createTestComment() -> Comment {
-        return Comment(
+    private func createTestComment() -> Domain.Comment {
+        return Domain.Comment(
             id: 456,
             level: 0,
             by: "commentuser",

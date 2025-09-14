@@ -36,7 +36,7 @@ struct OnboardingServiceTests {
     }
 }
 
-final class MockOnboardingVersionStore: OnboardingVersionStore {
+final class MockOnboardingVersionStore: OnboardingVersionStore, @unchecked Sendable {
     private var hasShown: Bool
 
     init(hasShown: Bool) {

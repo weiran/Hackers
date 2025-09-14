@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import Shared
 @testable import Domain
 

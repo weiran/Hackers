@@ -24,6 +24,7 @@ struct SettingsViewModelTests {
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
+        private var _textSize: TextSize = .medium
 
         var getterCallCounts: [String: Int] = [:]
         var setterCallCounts: [String: Int] = [:]
@@ -47,6 +48,17 @@ struct SettingsViewModelTests {
             set {
                 setterCallCounts["openInDefaultBrowser", default: 0] += 1
                 _openInDefaultBrowser = newValue
+            }
+        }
+
+        var textSize: TextSize {
+            get {
+                getterCallCounts["textSize", default: 0] += 1
+                return _textSize
+            }
+            set {
+                setterCallCounts["textSize", default: 0] += 1
+                _textSize = newValue
             }
         }
 
@@ -266,7 +278,7 @@ struct SettingsViewModelTests {
 
     // MARK: - Performance Tests
 
-    @Test("Performance of multiple property access", .timeLimit(.seconds(5)))
+    @Test("Performance of multiple property access", .timeLimit(.minutes(1)))
     func performanceOfMultiplePropertyAccess() {
         for _ in 0..<1000 {
             settingsViewModel.safariReaderMode = true

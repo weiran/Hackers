@@ -31,7 +31,17 @@ struct SettingsRepositoryTests {
             return storage[defaultName] as? Bool ?? false
         }
 
+        func integer(forKey defaultName: String) -> Int {
+            lock.lock(); defer { lock.unlock() }
+            return storage[defaultName] as? Int ?? 0
+        }
+
         func set(_ value: Bool, forKey defaultName: String) {
+            lock.lock(); defer { lock.unlock() }
+            storage[defaultName] = value
+        }
+
+        func set(_ value: Int, forKey defaultName: String) {
             lock.lock(); defer { lock.unlock() }
             storage[defaultName] = value
         }
@@ -83,12 +93,12 @@ struct SettingsRepositoryTests {
         // Test setting to true
         settingsRepository.safariReaderMode = true
         #expect(settingsRepository.safariReaderMode == true)
-        #expect(mockUserDefaults.bool(forKey: "SafariReaderMode") == true)
+        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
 
         // Test setting to false
         settingsRepository.safariReaderMode = false
         #expect(settingsRepository.safariReaderMode == false)
-        #expect(mockUserDefaults.bool(forKey: "SafariReaderMode") == false)
+        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == false)
     }
 
     // MARK: - Removed Settings Tests
@@ -150,12 +160,12 @@ struct SettingsRepositoryTests {
         // Test setting to true
         settingsRepository.openInDefaultBrowser = true
         #expect(settingsRepository.openInDefaultBrowser == true)
-        #expect(mockUserDefaults.bool(forKey: "OpenInDefaultBrowser") == true)
+        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
 
         // Test setting to false
         settingsRepository.openInDefaultBrowser = false
         #expect(settingsRepository.openInDefaultBrowser == false)
-        #expect(mockUserDefaults.bool(forKey: "OpenInDefaultBrowser") == false)
+        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == false)
     }
 
     // MARK: - Integration Tests
@@ -171,8 +181,8 @@ struct SettingsRepositoryTests {
         #expect(settingsRepository.openInDefaultBrowser == true)
 
         // Verify underlying storage
-        #expect(mockUserDefaults.bool(forKey: "SafariReaderMode") == true)
-        #expect(mockUserDefaults.bool(forKey: "OpenInDefaultBrowser") == true)
+        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
+        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
     }
 
     @Test("Settings independence")
@@ -208,8 +218,8 @@ struct SettingsRepositoryTests {
         settingsRepository.openInDefaultBrowser = true
 
         // Verify the keys match what's expected
-        #expect(mockUserDefaults.bool(forKey: "SafariReaderMode") == true)
-        #expect(mockUserDefaults.bool(forKey: "OpenInDefaultBrowser") == true)
+        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
+        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
     }
 
     // MARK: - Thread Safety Tests
