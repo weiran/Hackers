@@ -9,6 +9,10 @@ excluded:
   - "Features/**/.build/**"
   - "Data/.build/**"
   - "**/.DerivedData/**"
+  # Exclude all tests from linting
+  - "**/Tests/**"
+  - "**/*Tests.swift"
+  - "HackersTests"
 reporter: "xcode"
 warning_threshold: 1000
 # Don't fail build on violations during development
