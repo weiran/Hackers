@@ -64,6 +64,11 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         .refreshable {
             await viewModel.refreshComments()
         }
+        // Ensure all links tapped within comment content route via LinkOpener
+        .environment(\.openURL, OpenURLAction { url in
+            LinkOpener.openURL(url, with: viewModel.post)
+            return .handled
+        })
         .alert(
             "Vote Error",
             isPresented: Binding(
