@@ -31,7 +31,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./run_tests.sh
       - name: Run Tests
-        run: ./run_tests.sh
+        run: ./run_tests.sh -v
 
   build:
     runs-on: macos-26
