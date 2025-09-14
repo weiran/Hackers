@@ -31,6 +31,13 @@ public extension View {
 
 public extension Font {
     func scaled(with factor: CGFloat) -> Font {
+        if let titleFont = scaledTitleFont(with: factor) { return titleFont }
+        if let textFont = scaledTextFont(with: factor) { return textFont }
+        return self
+    }
+
+    // MARK: - Helpers split to reduce complexity
+    private func scaledTitleFont(with factor: CGFloat) -> Font? {
         switch self {
         case .largeTitle:
             return .system(size: 34 * factor, weight: .regular, design: .default)
@@ -40,6 +47,13 @@ public extension Font {
             return .system(size: 22 * factor, weight: .regular, design: .default)
         case .title3:
             return .system(size: 20 * factor, weight: .regular, design: .default)
+        default:
+            return nil
+        }
+    }
+
+    private func scaledTextFont(with factor: CGFloat) -> Font? {
+        switch self {
         case .headline:
             return .system(size: 17 * factor, weight: .semibold, design: .default)
         case .body:
@@ -55,7 +69,7 @@ public extension Font {
         case .caption2:
             return .system(size: 11 * factor, weight: .regular, design: .default)
         default:
-            return self
+            return nil
         }
     }
 }

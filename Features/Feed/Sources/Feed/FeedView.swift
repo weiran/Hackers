@@ -131,45 +131,47 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 }
             }
         }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            Button {
+        .swipeActions(edge: .leading, allowsFullSwipe: true) { voteSwipeAction(for: post) }
+        .contextMenu { contextMenuContent(for: post) }
+    }
+
+    @ViewBuilder
+    private func voteSwipeAction(for post: Domain.Post) -> some View {
+        Button {
+            Task {
+                var mutablePost = post
+                await votingViewModel.toggleVote(for: &mutablePost)
+                await MainActor.run { viewModel.replacePost(mutablePost) }
+            }
+        } label: {
+            Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+        }
+        .tint(post.upvoted ? .secondary : AppColors.upvotedColor)
+    }
+
+    @ViewBuilder
+    private func contextMenuContent(for post: Domain.Post) -> some View {
+        VotingContextMenuItems.postVotingMenuItems(
+            for: post,
+            onVote: {
                 Task {
                     var mutablePost = post
                     await votingViewModel.toggleVote(for: &mutablePost)
                     await MainActor.run { viewModel.replacePost(mutablePost) }
                 }
-            } label: {
-                Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
             }
-            .tint(post.upvoted ? .secondary : AppColors.upvotedColor)
+        )
+
+        Divider()
+
+        if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
+            Button { handleLinkTap(post: post) } label: {
+                Label("Open Link", systemImage: "safari")
+            }
         }
-        .contextMenu {
-            VotingContextMenuItems.postVotingMenuItems(
-                for: post,
-                onVote: {
-                    Task {
-                        var mutablePost = post
-                        await votingViewModel.toggleVote(for: &mutablePost)
-                        await MainActor.run { viewModel.replacePost(mutablePost) }
-                    }
-                }
-            )
 
-            Divider()
-
-            if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
-                Button {
-                    handleLinkTap(post: post)
-                } label: {
-                    Label("Open Link", systemImage: "safari")
-                }
-            }
-
-            Button {
-                ShareService.shared.sharePost(post)
-            } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
+        Button { ShareService.shared.sharePost(post) } label: {
+            Label("Share", systemImage: "square.and.arrow.up")
         }
     }
 

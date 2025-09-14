@@ -329,17 +329,7 @@ struct ModernTextField: View {
     }
 }
 
-public struct RoundedTextField: TextFieldStyle {
-    public func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .padding(.all, 10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.secondary, lineWidth: 0.5)
-            )
-            .padding(.horizontal, 20)
-    }
-}
+// Removed unused RoundedTextField to avoid identifier_name warning on _body(protocol requirement)
 
 public struct FilledButton: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
