@@ -39,12 +39,9 @@ public struct PostDisplayView: View {
                         .frame(width: 55, height: 55)
                         .clipShape(RoundedRectangle(cornerRadius: 6))
                         .contentShape(Rectangle())
-                        .highPriorityGesture(
-                            TapGesture()
-                                .onEnded { _ in
-                                    onThumbnailTap?()
-                                }
-                        )
+                        .onTapGesture {
+                            onThumbnailTap?()
+                        }
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
