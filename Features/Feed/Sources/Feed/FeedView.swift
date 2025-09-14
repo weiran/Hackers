@@ -131,7 +131,11 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 }
             }
         }
-        .swipeActions(edge: .leading, allowsFullSwipe: true) { voteSwipeAction(for: post) }
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            if post.voteLinks?.upvote != nil || post.voteLinks?.unvote != nil {
+                voteSwipeAction(for: post)
+            }
+        }
         .contextMenu { contextMenuContent(for: post) }
     }
 
