@@ -2,8 +2,7 @@
 //  SceneDelegate.swift
 //  Hackers
 //
-//  Created by Weiran Zhang on SwiftUI Migration.
-//  Copyright © 2024 Glass Umbrella. All rights reserved.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import UIKit

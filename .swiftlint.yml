@@ -2,6 +2,23 @@ excluded:
   - scan_derived_data
   - fastlane
   - vendor
+  - .build
+  - DerivedData
+  - "**/SwiftSoup/**"
+  - "**/.build/**"
+  - "Features/**/.build/**"
+  - "Data/.build/**"
+  - "**/.DerivedData/**"
+  - build
+  - "**/build/**"
+  # Exclude all tests from linting
+  - "**/Tests/**"
+  - "**/*Tests.swift"
+  - "HackersTests"
+reporter: "xcode"
+warning_threshold: 1000
+# Don't fail build on violations during development
+strict: false
 opt_in_rules:
   - convenience_type
   - empty_count

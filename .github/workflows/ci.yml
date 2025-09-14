@@ -2,42 +2,44 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 permissions:
   contents: read
 
 jobs:
   lint:
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-    - name: Install SwiftLint
-      run: brew install swiftlint
-    - name: Run SwiftLint
-      run: fastlane lint
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: Run SwiftLint
+        run: swiftlint
 
   test:
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: AckeeCZ/load-xcode-version@v1
-    - name: Run UI Tests
-      run: fastlane test
+      - uses: actions/checkout@v4
+      - uses: AckeeCZ/load-xcode-version@v1
+      - name: Make test script executable
+        run: chmod +x ./run_tests.sh
+      - name: Run Tests
+        run: ./run_tests.sh
 
   build:
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-    - uses: AckeeCZ/load-xcode-version@v1
-    - name: Build
-      run: fastlane build
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: AckeeCZ/load-xcode-version@v1
+      - name: Build App
+        run: xcodebuild -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
