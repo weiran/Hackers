@@ -32,7 +32,6 @@ extension PostRepository {
         let response = try await networkManager.get(url: realURL)
         let containsLoginForm =
             response.contains("<form action=\"/login") ||
-            response.contains("name=\"acct\"") ||
             response.contains("You have to be logged in")
         if containsLoginForm { throw HackersKitError.unauthenticated }
     }
@@ -60,7 +59,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
+        let containsLoginForm = response.contains("<form action=\"/login")
         if containsLoginForm { throw HackersKitError.unauthenticated }
     }
 
@@ -77,7 +76,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
+        let containsLoginForm = response.contains("<form action=\"/login")
         if containsLoginForm { throw HackersKitError.unauthenticated }
 
         await MainActor.run { comment.upvoted = true }
@@ -106,7 +105,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login") || response.contains("name=\"acct\"")
+        let containsLoginForm = response.contains("<form action=\"/login")
         if containsLoginForm { throw HackersKitError.unauthenticated }
 
         await MainActor.run { comment.upvoted = false }
