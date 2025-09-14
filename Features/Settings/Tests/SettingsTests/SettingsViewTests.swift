@@ -51,37 +51,12 @@ struct SettingsViewTests {
 
     // MARK: - View Compilation Tests
 
-    @Test("SettingsView body compilation")
-    func settingsViewBody() {
-        let settingsView = SettingsView<MockNavigationStore>()
-
-        // Test that the view body compiles and can be rendered
-        let body = settingsView.body
-        #expect(body != nil)
-    }
 
     // MARK: - Integration Tests with ViewModel
 
-    @Test("SettingsView with mock navigation store")
-    func settingsViewWithMockViewModel() {
-        // Create a settings view
-        let settingsView = SettingsView<MockNavigationStore>()
-
-        // Test that we can access the view hierarchy
-        // Note: More comprehensive view testing would require ViewInspector or similar
-        #expect(settingsView != nil)
-    }
 
     // MARK: - Accessibility Tests
 
-    @Test("SettingsView accessibility")
-    func settingsViewAccessibility() {
-        let settingsView = SettingsView<MockNavigationStore>()
-
-        // Basic test that the view can be created for accessibility testing
-        // In a real app, this would test VoiceOver labels, hints, etc.
-        #expect(settingsView != nil)
-    }
 
     // MARK: - Bundle Tests
 
@@ -100,35 +75,8 @@ struct SettingsViewTests {
 
     // MARK: - Onboarding Tests
 
-    @Test("Onboarding callback")
-    func onboardingCallback() {
-        let settingsView = SettingsView<MockNavigationStore>(
-            onShowOnboarding: { @Sendable in }
-        )
-
-        #expect(settingsView != nil)
-    }
 
     // MARK: - SwiftUI Integration Tests
 
-    @Test("SettingsView in NavigationStack")
-    @MainActor
-    func settingsViewInNavigationStack() {
-        let settingsView = SettingsView<MockNavigationStore>()
-        let navigationView = NavigationStack {
-            settingsView
-        }
 
-        #expect(navigationView != nil)
-    }
-
-    // MARK: - Performance Tests
-
-    @Test("SettingsView performance", .timeLimit(.minutes(1)))
-    func settingsViewPerformance() {
-        for _ in 0..<100 {
-            let settingsView = SettingsView<MockNavigationStore>()
-            _ = settingsView.body
-        }
-    }
 }

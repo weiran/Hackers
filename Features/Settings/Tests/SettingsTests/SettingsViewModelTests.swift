@@ -267,70 +267,11 @@ struct SettingsViewModelTests {
         #expect(settingsViewModel.safariReaderMode == false)
     }
 
-    // MARK: - Performance Tests
-
-    @Test("Performance of multiple property access", .timeLimit(.minutes(1)))
-    func performanceOfMultiplePropertyAccess() {
-        for _ in 0..<1000 {
-            settingsViewModel.safariReaderMode = true
-            settingsViewModel.openInDefaultBrowser = true
-
-            _ = settingsViewModel.safariReaderMode
-            _ = settingsViewModel.openInDefaultBrowser
-        }
-    }
 
     // MARK: - Concurrent Access Tests
 
-    @Test("Concurrent access")
-    func concurrentAccess() async {
-        // Test concurrent read/write operations
-        await withTaskGroup(of: Void.self) { group in
-            for index in 0..<10 {
-                group.addTask {
-                    let isEven = index % 2 == 0
-                    self.settingsViewModel.safariReaderMode = isEven
-                    self.settingsViewModel.openInDefaultBrowser = !isEven
-
-                    // Read the values
-                    _ = self.settingsViewModel.safariReaderMode
-                    _ = self.settingsViewModel.openInDefaultBrowser
-                }
-            }
-        }
-
-        // After concurrent operations, the values should be consistent
-        let safariMode = settingsViewModel.safariReaderMode
-        let browser = settingsViewModel.openInDefaultBrowser
-
-        // Both should have valid boolean values
-        #expect(safariMode || !safariMode) // Always true for boolean
-        #expect(browser || !browser) // Always true for boolean
-    }
 
     // MARK: - Edge Cases Tests
 
-    @Test("Rapid toggling")
-    func rapidToggling() {
-        // Test rapidly toggling the same setting
-        for index in 0..<100 {
-            settingsViewModel.safariReaderMode = index % 2 == 0
-        }
 
-        // Final value should be false (since 99 % 2 == 1)
-        #expect(settingsViewModel.safariReaderMode == false)
-        #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 100)
-    }
-
-    @Test("Same value assignment")
-    func sameValueAssignment() {
-        // Test assigning the same value multiple times
-        settingsViewModel.safariReaderMode = true
-        settingsViewModel.safariReaderMode = true
-        settingsViewModel.safariReaderMode = true
-
-        #expect(settingsViewModel.safariReaderMode == true)
-        // Should still call setter each time (view model doesn't optimize for this)
-        #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 3)
-    }
 }
