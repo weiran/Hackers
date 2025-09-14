@@ -20,7 +20,7 @@ jobs:
     - name: Install SwiftLint
       run: brew install swiftlint
     - name: Run SwiftLint
-      run: fastlane lint
+      run: swiftlint
 
   test:
     runs-on: macos-15
@@ -28,8 +28,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: AckeeCZ/load-xcode-version@v1
-    - name: Run UI Tests
-      run: fastlane test
+    - name: Make test script executable
+      run: chmod +x ./run_tests.sh
+    - name: Run Tests
+      run: ./run_tests.sh
 
   build:
     runs-on: macos-15
@@ -39,5 +41,5 @@ jobs:
       with:
         persist-credentials: false
     - uses: AckeeCZ/load-xcode-version@v1
-    - name: Build
-      run: fastlane build
+    - name: Build App
+      run: xcodebuild -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
