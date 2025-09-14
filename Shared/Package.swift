@@ -32,7 +32,7 @@ let package = Package(
         .testTarget(
             name: "SharedTests",
             dependencies: ["Shared"],
-            path: "Tests"
+            path: "Tests/SharedTests"
         )
     ]
 )

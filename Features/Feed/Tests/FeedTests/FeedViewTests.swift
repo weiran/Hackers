@@ -15,7 +15,11 @@ import SwiftUI
 struct FeedViewTests {
 
     // Mock Navigation Store
-    class MockNavigationStore: NavigationStoreProtocol {
+    @MainActor
+    final class MockNavigationStore: @MainActor NavigationStoreProtocol, ObservableObject, @unchecked Sendable {
+        var selectedPost: Post?
+        var showingLogin: Bool = false
+        var showingSettings: Bool = false
         var showPostCalled = false
         var showLoginCalled = false
         var showSettingsCalled = false
@@ -39,8 +43,12 @@ struct FeedViewTests {
     }
 
     // Mock Use Cases
-    class MockPostUseCase: PostUseCase {
-        var mockPosts: [Post] = []
+    final class MockPostUseCase: PostUseCase, @unchecked Sendable {
+        private var _mockPosts: [Post] = []
+        var mockPosts: [Post] {
+            get { _mockPosts }
+            set { _mockPosts = newValue }
+        }
         var getPostsCalled = false
         var lastRequestedType: PostType?
         var lastRequestedPage: Int?
@@ -53,21 +61,49 @@ struct FeedViewTests {
         }
 
         func getPost(id: Int) async throws -> Post {
-            return mockPosts.first { $0.id == id } ?? createMockPost(id: id)
+            if let existing = mockPosts.first(where: { $0.id == id }) {
+                return existing
+            }
+            return Post(
+                id: id,
+                url: URL(string: "https://example.com")!,
+                title: "Test",
+                age: "1h",
+                commentsCount: 0,
+                by: "test",
+                score: 0,
+                postType: .news,
+                upvoted: false
+            )
         }
     }
 
-    class MockVoteUseCase: VoteUseCase {
-        var upvoteCalled = false
-        var unvoteCalled = false
-        var shouldThrowError = false
+    final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
+        private var _upvoteCalled = false
+        private var _unvoteCalled = false
+        private var _shouldThrowError = false
+
+        var upvoteCalled: Bool {
+            get { _upvoteCalled }
+            set { _upvoteCalled = newValue }
+        }
+
+        var unvoteCalled: Bool {
+            get { _unvoteCalled }
+            set { _unvoteCalled = newValue }
+        }
+
+        var shouldThrowError: Bool {
+            get { _shouldThrowError }
+            set { _shouldThrowError = newValue }
+        }
 
         func upvote(post: Post) async throws {
             if shouldThrowError {
                 throw HackersKitError.unauthenticated
             }
             upvoteCalled = true
-            post.upvoted = true
+            // Mock implementation - in real app this would be handled by the repository
         }
 
         func unvote(post: Post) async throws {
@@ -75,14 +111,14 @@ struct FeedViewTests {
                 throw HackersKitError.unauthenticated
             }
             unvoteCalled = true
-            post.upvoted = false
+            // Mock implementation - in real app this would be handled by the repository
         }
 
-        func upvote(comment: Comment, for post: Post) async throws {
+        func upvote(comment: Domain.Comment, for post: Post) async throws {
             // Not used in feed
         }
 
-        func unvote(comment: Comment, for post: Post) async throws {
+        func unvote(comment: Domain.Comment, for post: Post) async throws {
             // Not used in feed
         }
     }
@@ -114,8 +150,7 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            postUseCase: mockPostUseCase
         )
 
         // Act
@@ -142,8 +177,7 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            postUseCase: mockPostUseCase
         )
 
         // Act - Load first page
@@ -176,8 +210,7 @@ struct FeedViewTests {
         mockPostUseCase.mockPosts = [post]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            postUseCase: mockPostUseCase
         )
 
         await viewModel.loadFeed()
@@ -206,16 +239,15 @@ struct FeedViewTests {
         mockPostUseCase.mockPosts = [createMockPost(id: 1)]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            postUseCase: mockPostUseCase
         )
 
         // Act
-        await viewModel.changePostType(.ask)
+        await viewModel.changePostType(Domain.PostType.ask)
 
         // Assert
-        #expect(viewModel.postType == .ask)
-        #expect(mockPostUseCase.lastRequestedType == .ask)
+        #expect(viewModel.postType == Domain.PostType.ask)
+        #expect(mockPostUseCase.lastRequestedType == Domain.PostType.ask)
         #expect(mockPostUseCase.getPostsCalled == true)
     }
 
@@ -232,8 +264,7 @@ struct FeedViewTests {
         ]
 
         let viewModel = FeedViewModel(
-            postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            postUseCase: mockPostUseCase
         )
 
         // Act

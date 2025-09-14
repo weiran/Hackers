@@ -32,7 +32,7 @@ let package = Package(
         .testTarget(
             name: "DataTests",
             dependencies: ["Data"],
-            path: "Tests"
+            path: "Tests/DataTests"
         )
     ]
 )

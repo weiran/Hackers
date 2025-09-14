@@ -52,11 +52,11 @@ struct UseCaseTests {
             unvotePostCallCount += 1
         }
 
-        func upvote(comment: Comment, for post: Post) async throws {
+        func upvote(comment: Domain.Comment, for post: Post) async throws {
             upvoteCommentCallCount += 1
         }
 
-        func unvote(comment: Comment, for post: Post) async throws {
+        func unvote(comment: Domain.Comment, for post: Post) async throws {
             unvoteCommentCallCount += 1
         }
     }
@@ -64,9 +64,9 @@ struct UseCaseTests {
     @MainActor
     final class MockCommentUseCase: CommentUseCase {
         var getCommentsCallCount = 0
-        var stubComments: [Comment] = []
+        var stubComments: [Domain.Comment] = []
 
-        func getComments(for post: Post) async throws -> [Comment] {
+        func getComments(for post: Post) async throws -> [Domain.Comment] {
             getCommentsCallCount += 1
             return stubComments
         }
@@ -75,6 +75,7 @@ struct UseCaseTests {
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
+        private var _textSize = TextSize.medium
 
         var safariReaderMode: Bool {
             get { _safariReaderMode }
@@ -84,6 +85,11 @@ struct UseCaseTests {
         var openInDefaultBrowser: Bool {
             get { _openInDefaultBrowser }
             set { _openInDefaultBrowser = newValue }
+        }
+
+        var textSize: TextSize {
+            get { _textSize }
+            set { _textSize = newValue }
         }
     }
 
@@ -230,7 +236,7 @@ struct UseCaseTests {
         )
     }
 
-    private static func createTestComment() -> Comment {
+    private static func createTestComment() -> Domain.Comment {
         return Comment(
             id: 456,
             age: "1 hour ago",

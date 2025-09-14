@@ -32,7 +32,7 @@ let package = Package(
         .testTarget(
             name: "OnboardingTests",
             dependencies: ["Onboarding"],
-            path: "Tests"
+            path: "Tests/OnboardingTests"
         )
     ]
 )
