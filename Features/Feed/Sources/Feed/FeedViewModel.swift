@@ -133,4 +133,13 @@ public final class FeedViewModel: @unchecked Sendable {
         isFetching = false
         feedLoader.reset()
     }
+
+    // MARK: - Post Updates
+
+    @MainActor
+    public func replacePost(_ updatedPost: Domain.Post) {
+        if let index = feedLoader.data.firstIndex(where: { $0.id == updatedPost.id }) {
+            feedLoader.data[index] = updatedPost
+        }
+    }
 }

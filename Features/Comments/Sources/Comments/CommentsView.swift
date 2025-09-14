@@ -64,10 +64,16 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         .refreshable {
             await viewModel.refreshComments()
         }
-        .alert("Vote Error", isPresented: .constant(votingViewModel.lastError != nil)) {
-            Button("OK") {
-                votingViewModel.clearError()
-            }
+        .alert(
+            "Vote Error",
+            isPresented: Binding(
+                get: { votingViewModel.lastError != nil },
+                set: { newValue in
+                    if newValue == false { votingViewModel.clearError() }
+                }
+            )
+        ) {
+            Button("OK") { votingViewModel.clearError() }
         } message: {
             Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
         }
@@ -126,7 +132,10 @@ private struct CommentsContentView: View {
                     PostHeader(
                         post: viewModel.post,
                         votingViewModel: votingViewModel,
-                        onLinkTap: { handleLinkTap() }
+                        onLinkTap: { handleLinkTap() },
+                        onPostUpdate: { updated in
+                            viewModel.post = updated
+                        }
                     )
                     .id("header")
                     .background(GeometryReader { geometry in
@@ -151,7 +160,7 @@ private struct CommentsContentView: View {
                             Task {
                                 var mutablePost = viewModel.post
                                 await votingViewModel.toggleVote(for: &mutablePost)
-                                viewModel.post = mutablePost
+                                await MainActor.run { viewModel.post = mutablePost }
                             }
                         } label: {
                             Image(systemName: viewModel.post.upvoted ? "arrow.uturn.down" : "arrow.up")
@@ -237,6 +246,7 @@ private struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
     let onLinkTap: () -> Void
+    let onPostUpdate: @Sendable (Post) -> Void
 
     var body: some View {
         PostDisplayView(
@@ -256,6 +266,7 @@ private struct PostHeader: View {
                     Task {
                         var mutablePost = post
                         await votingViewModel.toggleVote(for: &mutablePost)
+                        await MainActor.run { onPostUpdate(mutablePost) }
                     }
                 }
             )

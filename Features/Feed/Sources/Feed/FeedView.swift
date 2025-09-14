@@ -75,10 +75,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             votingViewModel.navigationStore = navigationStore
             await viewModel.loadFeed()
         }
-        .alert("Vote Error", isPresented: .constant(votingViewModel.lastError != nil)) {
-            Button("OK") {
-                votingViewModel.clearError()
-            }
+        .alert(
+            "Vote Error",
+            isPresented: Binding(
+                get: { votingViewModel.lastError != nil },
+                set: { newValue in
+                    if newValue == false { votingViewModel.clearError() }
+                }
+            )
+        ) {
+            Button("OK") { votingViewModel.clearError() }
         } message: {
             Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
         }
@@ -130,6 +136,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     Task {
                         var mutablePost = post
                         await votingViewModel.toggleVote(for: &mutablePost)
+                        await MainActor.run { viewModel.replacePost(mutablePost) }
                     }
                 } label: {
                     Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
@@ -144,6 +151,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     Task {
                         var mutablePost = post
                         await votingViewModel.toggleVote(for: &mutablePost)
+                        await MainActor.run { viewModel.replacePost(mutablePost) }
                     }
                 }
             )

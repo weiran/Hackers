@@ -13,6 +13,7 @@ import Foundation
 @testable import Domain
 @testable import Networking
 
+// swiftlint:disable type_body_length
 @Suite("PostRepository Tests")
 struct PostRepositoryTests {
 
@@ -188,7 +189,7 @@ struct PostRepositoryTests {
 
     // MARK: - Post Feed Upvoted State Tests
     
-    @Test("Parse upvoted post from feed HTML")
+    @Test("Parse upvoted post from feed HTML (nosee + explicit unvote)")
     func parseUpvotedPostFromFeed() async throws {
         mockNetworkManager.stubbedGetResponse = createMockFeedHTMLWithUpvotedPost()
 
@@ -197,17 +198,59 @@ struct PostRepositoryTests {
         #expect(posts.count == 2, "Should parse two posts")
         
         let upvotedPost = posts.first { $0.id == 45237717 }
-        let notUpvotedPost = posts.first { $0.id == 45238055 }
+        let alsoUpvotedHiddenArrow = posts.first { $0.id == 45238055 }
         
         #expect(upvotedPost != nil, "Should find upvoted post")
-        #expect(notUpvotedPost != nil, "Should find not upvoted post")
+        #expect(alsoUpvotedHiddenArrow != nil, "Should find post with hidden upvote arrow (nosee)")
         
-        #expect(upvotedPost?.upvoted == true, "Post with unvote link should be marked as upvoted")
-        #expect(notUpvotedPost?.upvoted == false, "Post without unvote link should not be marked as upvoted")
+        #expect(upvotedPost?.upvoted == true, "Post with explicit unvote link should be marked as upvoted")
+        #expect(alsoUpvotedHiddenArrow?.upvoted == true, "Post with 'nosee' upvote link should be marked as upvoted")
         
         #expect(upvotedPost?.voteLinks?.unvote != nil, "Upvoted post should have unvote link")
         #expect(upvotedPost?.voteLinks?.upvote != nil, "Upvoted post should still have upvote link available")
-        #expect(notUpvotedPost?.voteLinks?.unvote == nil, "Not upvoted post should not have unvote link")
+
+        // For the 'nosee' case without explicit unvote, we derive the unvote URL
+        #expect(alsoUpvotedHiddenArrow?.voteLinks?.unvote != nil, "Hidden upvote arrow should yield a derived unvote link")
+        #expect(alsoUpvotedHiddenArrow?.voteLinks?.unvote?.absoluteString.contains("how=un") == true,
+                "Derived unvote link should use how=un")
+    }
+
+    @Test("Derived unvote link is used for hidden upvote arrow (nosee)")
+    func derivedUnvoteLinkUsed() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockFeedHTMLWithUpvotedPost()
+
+        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+
+        guard let hiddenArrowPost = posts.first(where: { $0.id == 45238055 }) else {
+            Issue.record("Failed to find post with hidden upvote arrow")
+            return
+        }
+
+        // Should have derived unvote link
+        #expect(hiddenArrowPost.voteLinks?.unvote != nil, "Expected derived unvote link for hidden arrow")
+        #expect(hiddenArrowPost.voteLinks?.unvote?.absoluteString.contains("how=un") == true)
+
+        // Unvote should hit the derived unvote URL (news.ycombinator.com/...how=un)
+        try await postRepository.unvote(post: hiddenArrowPost)
+        #expect(mockNetworkManager.lastGetURL != nil)
+        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("how=un"))
+        #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("id=45238055"))
+    }
+
+    @Test("Unvote after optimistic upvote without refresh derives URL and succeeds")
+    func unvoteAfterOptimisticUpvote() async throws {
+        // Start with a post that has only an upvote link (typical for not-yet-upvoted)
+        let voteLinks = VoteLinks(upvote: URL(string: "/vote?id=999&how=up&auth=abc&goto=news")!, unvote: nil)
+        var post = createTestPost(voteLinks: voteLinks)
+        post.id = 999
+        post.upvoted = true // Optimistic UI toggled to upvoted; links not refreshed yet
+
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.lastGetURL != nil)
+        let urlString = mockNetworkManager.lastGetURL!.absoluteString
+        #expect(urlString.contains("id=999"))
+        #expect(urlString.contains("how=un"))
     }
 
     // MARK: - Comments Tests
@@ -424,3 +467,4 @@ struct PostRepositoryTests {
         """
     }
 }
+// swiftlint:enable type_body_length
