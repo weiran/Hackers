@@ -132,18 +132,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         }
         .swipeActions(edge: .leading, allowsFullSwipe: true) {
-            if !isSidebar {
-                Button {
-                    Task {
-                        var mutablePost = post
-                        await votingViewModel.toggleVote(for: &mutablePost)
-                        await MainActor.run { viewModel.replacePost(mutablePost) }
-                    }
-                } label: {
-                    Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
+            Button {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.toggleVote(for: &mutablePost)
+                    await MainActor.run { viewModel.replacePost(mutablePost) }
                 }
-                .tint(post.upvoted ? .secondary : AppColors.upvotedColor)
+            } label: {
+                Image(systemName: post.upvoted ? "arrow.uturn.down" : "arrow.up")
             }
+            .tint(post.upvoted ? .secondary : AppColors.upvotedColor)
         }
         .contextMenu {
             VotingContextMenuItems.postVotingMenuItems(
