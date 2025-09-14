@@ -143,11 +143,6 @@ public final class VotingViewModel {
     public func toggleVote(for comment: Comment, in post: Post) async {
         let originalUpvoted = comment.upvoted
         
-
-        // Create a copy of the comment with the original state for the voting service
-        var commentForVoting = comment
-        commentForVoting.upvoted = originalUpvoted
-
         // Optimistic UI update
         comment.upvoted.toggle()
 
@@ -155,14 +150,15 @@ public final class VotingViewModel {
         lastError = nil
 
         do {
-            try await commentVotingService.toggleVoteOnComment(commentForVoting, for: post)
-            
-        } catch {
-            
-            // Revert optimistic changes on error
+            if originalUpvoted {
+                try await commentVotingService.unvoteComment(comment, for: post)
+            } else {
+                try await commentVotingService.upvoteComment(comment, for: post)
+            }
+                    } catch {
+                        // Revert optimistic changes on error
             comment.upvoted = originalUpvoted
-            
-            // Check if error is unauthenticated and show login
+
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()
             } else {
@@ -177,7 +173,6 @@ public final class VotingViewModel {
     public func upvote(comment: Comment, in post: Post) async {
         guard !comment.upvoted else { return }
         
-
         // Create a copy of the comment with the original state for the voting service
         var commentForVoting = comment
         commentForVoting.upvoted = false
@@ -190,10 +185,8 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingService.upvoteComment(commentForVoting, for: post)
-            
-        } catch {
-            
-            // Revert optimistic changes on error
+                    } catch {
+                        // Revert optimistic changes on error
             comment.upvoted = false
             
             // Check if error is unauthenticated and show login
@@ -211,7 +204,6 @@ public final class VotingViewModel {
     public func unvote(comment: Comment, in post: Post) async {
         guard comment.upvoted else { return }
         
-
         // Optimistic UI update
         comment.upvoted = false
 
@@ -220,10 +212,8 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingService.unvoteComment(comment, for: post)
-            
-        } catch {
-            
-            // Revert optimistic changes on error
+                    } catch {
+                        // Revert optimistic changes on error
             comment.upvoted = true
             
             // Check if error is unauthenticated and show login

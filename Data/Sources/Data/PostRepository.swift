@@ -175,16 +175,22 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
             throw HackersKitError.unauthenticated
         }
         
-        guard let unvoteURL = voteLinks.unvote else {
-            // If we have vote links but no unvote URL, could be:
-            // 1. User not authenticated (both upvote and unvote URLs are nil)
-            // 2. Not upvoted yet (only upvote link available, shouldn't call unvote)
-            
+        // Resolve unvote URL; if not present but comment is marked upvoted,
+        // derive it from the upvote URL by swapping how=up -> how=un.
+        let resolvedUnvoteURL: URL? = {
+            if let explicit = voteLinks.unvote { return explicit }
+            if comment.upvoted, let upvoteURL = voteLinks.upvote {
+                let unvoteURLString = upvoteURL.absoluteString.replacingOccurrences(of: "how=up", with: "how=un")
+                return URL(string: unvoteURLString)
+            }
+            return nil
+        }()
+
+        guard let unvoteURL = resolvedUnvoteURL else {
+            // If we have vote links but no usable unvote URL, could be unauthenticated or not upvoted
             if voteLinks.upvote == nil {
-                // Neither upvote nor unvote URL exists - user not authenticated
                 throw HackersKitError.unauthenticated
             } else {
-                // Has upvote link but no unvote link - not upvoted yet, shouldn't unvote
                 throw HackersKitError.scraperError
             }
         }
@@ -375,7 +381,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
     private func voteLinks(from titleElement: Element, metadata metadataElement: Element? = nil) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) {
         // Look for upvote link in the votelinks column of the title row
         let voteLinkElements = try titleElement.select("td.votelinks a")
-        let upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
+        var upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
 
         // Look for unvote link - first try title element (for individual posts), then metadata element (for feed)
         var unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
@@ -390,6 +396,17 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
             if unvoteLink == nil {
                 unvoteLink = try metadataUnvoteLinks.first { try $0.text().lowercased() == "unvote" }
             }
+        }
+
+        // Fallbacks: search anywhere within the element for vote anchors if not found yet (for nested comment markup)
+        if upvoteLink == nil {
+            let anyLinks = try titleElement.select("a")
+            upvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "up_") }
+        }
+        if unvoteLink == nil {
+            let anyLinks = try titleElement.select("a")
+            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") }
+                ?? (try anyLinks.first { try $0.text().lowercased() == "unvote" })
         }
 
         let upvoteURL = try upvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
