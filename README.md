@@ -1,6 +1,6 @@
 # Hackers
 
-![Hackers](https://github.com/weiran/Hackers/workflows/Hackers/badge.svg?branch=master)
+[![CI](https://github.com/weiran/Hackers/actions/workflows/ci.yml/badge.svg)](https://github.com/weiran/Hackers/actions/workflows/ci.yml)
 
 Hackers is an iPhone and iPad app for reading Hacker News on the go. It's optimised for quickly catching up on the latest news and comments without getting in your way.
 
@@ -22,7 +22,7 @@ Hackers is open source and licenced under the MIT licence.
 
 ## Download
 
-[![Download in App Store][3]][2] 
+[![Download in App Store][3]][2]
 
 Or install the [latest beta version from TestFlight][4].
 
@@ -32,7 +32,7 @@ Or install the [latest beta version from TestFlight][4].
 
 ## Links
 
-* I wrote [a blog post introducing Hackers](http://weiran.co/blog/2013/3/hackers-a-hacker-news-app-for-iphone). 
+* I wrote [a blog post introducing Hackers](http://weiran.co/blog/2013/3/hackers-a-hacker-news-app-for-iphone).
 * You can follow [Hackers' progress on my blogs tagged Hackers](http://weiran.co/?tag=hackers).
 * You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
