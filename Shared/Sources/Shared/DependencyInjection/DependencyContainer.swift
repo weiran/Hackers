@@ -17,6 +17,8 @@ public final class DependencyContainer: @unchecked Sendable {
     private lazy var postRepository: PostRepository = PostRepository(networkManager: networkManager)
     private lazy var settingsRepository: SettingsRepository = SettingsRepository()
     private lazy var votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
+    private lazy var authenticationRepository: AuthenticationRepository = 
+        AuthenticationRepository(networkManager: networkManager)
 
     private init() {}
 
@@ -45,5 +47,9 @@ public final class DependencyContainer: @unchecked Sendable {
             fatalError("VotingService must be DefaultVotingService to conform to CommentVotingService")
         }
         return defaultVotingService
+    }
+
+    public func getAuthenticationUseCase() -> any AuthenticationUseCase {
+        return authenticationRepository
     }
 }

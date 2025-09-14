@@ -52,6 +52,12 @@ public struct VoteLinks: Sendable, Hashable {
     }
 }
 
+extension VoteLinks: CustomStringConvertible {
+    public var description: String {
+        return "VoteLinks(upvote: \(upvote?.absoluteString ?? "nil"), unvote: \(unvote?.absoluteString ?? "nil"))"
+    }
+}
+
 public struct Post: Sendable, Identifiable, Hashable {
     public let id: Int
     public let url: URL

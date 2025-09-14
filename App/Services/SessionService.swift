@@ -14,18 +14,28 @@ import Shared
 @MainActor
 class SessionService: ObservableObject, AuthenticationServiceProtocol {
     @Published private var user: Domain.User?
+    private let authenticationUseCase: AuthenticationUseCase
+
+    init() {
+        // Get authentication use case from dependency container
+        self.authenticationUseCase = DependencyContainer.shared.getAuthenticationUseCase()
+
+        // Load current user on init
+        Task {
+            self.user = await authenticationUseCase.getCurrentUser()
+        }
+    }
 
     var authenticationState: AuthenticationState {
-        // For now, check if username exists in UserDefaults
-        // TODO: Replace with proper authentication use case when implemented
-        if UserDefaults.standard.string(forKey: "username") != nil {
+        // Check if we have a stored user
+        if user != nil {
             return .authenticated
         }
         return .notAuthenticated
     }
 
     var username: String? {
-        return user?.username ?? UserDefaults.standard.string(forKey: "username")
+        return user?.username
     }
 
     // MARK: - AuthenticationServiceProtocol
@@ -39,17 +49,20 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
     }
 
     func authenticate(username: String, password: String) async throws -> AuthenticationState {
-        // TODO: Replace with proper authentication use case when implemented
-        // For now, just simulate authentication by storing username
-        self.user = Domain.User(username: username, karma: 0, joined: Date())
-        UserDefaults.standard.set(username, forKey: "username")
+        // Use the actual authentication repository to log in to Hacker News
+        try await authenticationUseCase.authenticate(username: username, password: password)
+
+        // Update the user after successful authentication
+        self.user = await authenticationUseCase.getCurrentUser()
+
         return .authenticated
     }
 
     func unauthenticate() {
-        // TODO: Replace with proper authentication use case when implemented  
-        UserDefaults.standard.removeObject(forKey: "username")
-        self.user = nil
+        Task {
+            try? await authenticationUseCase.logout()
+            self.user = nil
+        }
     }
 
     enum AuthenticationState {
