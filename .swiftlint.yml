@@ -9,6 +9,8 @@ excluded:
   - "Features/**/.build/**"
   - "Data/.build/**"
   - "**/.DerivedData/**"
+  - build
+  - "**/build/**"
   # Exclude all tests from linting
   - "**/Tests/**"
   - "**/*Tests.swift"

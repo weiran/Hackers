@@ -35,7 +35,7 @@ public final class VotingViewModel {
     // MARK: - Post Voting
 
     public func toggleVote(for post: inout Post) async {
-        
+
         let originalUpvoted = post.upvoted
         let originalScore = post.score
 
@@ -53,13 +53,13 @@ public final class VotingViewModel {
 
         do {
             try await votingService.toggleVote(for: postForVoting)
-            
+
         } catch {
-            
+
             // Revert optimistic changes on error
             post.upvoted = originalUpvoted
             post.score = originalScore
-            
+
             // Check if error is unauthenticated and show login
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()
@@ -73,7 +73,6 @@ public final class VotingViewModel {
 
     public func upvote(post: inout Post) async {
         guard !post.upvoted else { return }
-        
 
         let originalScore = post.score
 
@@ -91,13 +90,13 @@ public final class VotingViewModel {
 
         do {
             try await votingService.upvote(item: postForVoting)
-            
+
         } catch {
-            
+
             // Revert optimistic changes on error
             post.upvoted = false
             post.score = originalScore
-            
+
             // Check if error is unauthenticated and show login
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()
@@ -111,7 +110,6 @@ public final class VotingViewModel {
 
     public func unvote(post: inout Post) async {
         guard post.upvoted else { return }
-        
 
         let originalScore = post.score
 
@@ -124,13 +122,13 @@ public final class VotingViewModel {
 
         do {
             try await votingService.unvote(item: post)
-            
+
         } catch {
-            
+
             // Revert optimistic changes on error
             post.upvoted = true
             post.score = originalScore
-            
+
             // Check if error is unauthenticated and show login
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()
@@ -174,7 +172,7 @@ public final class VotingViewModel {
     @MainActor
     public func upvote(comment: Comment, in post: Post) async {
         guard !comment.upvoted else { return }
-        
+
         // Create a copy of the comment with the original state for the voting service
         var commentForVoting = comment
         commentForVoting.upvoted = false
@@ -187,10 +185,10 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingService.upvoteComment(commentForVoting, for: post)
-                    } catch {
-                        // Revert optimistic changes on error
+        } catch {
+            // Revert optimistic changes on error
             comment.upvoted = false
-            
+
             // Check if error is unauthenticated and show login
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()
@@ -205,7 +203,7 @@ public final class VotingViewModel {
     @MainActor
     public func unvote(comment: Comment, in post: Post) async {
         guard comment.upvoted else { return }
-        
+
         // Optimistic UI update
         comment.upvoted = false
 
@@ -214,10 +212,10 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingService.unvoteComment(comment, for: post)
-                    } catch {
-                        // Revert optimistic changes on error
+        } catch {
+            // Revert optimistic changes on error
             comment.upvoted = true
-            
+
             // Check if error is unauthenticated and show login
             if case HackersKitError.unauthenticated = error {
                 navigationStore?.showLogin()

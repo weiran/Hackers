@@ -10,6 +10,7 @@ import Domain
 import Shared
 import DesignSystem
 
+// swiftlint:disable file_length
 public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
@@ -87,7 +88,6 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             votingViewModel.navigationStore = navigationStore
         }
     }
-
 
     private func handleLinkTap() {
         LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
@@ -450,7 +450,6 @@ private struct EmptyCommentsView: View {
             .frame(maxWidth: .infinity)
     }
 }
-
 
 struct ViewOffsetKey: PreferenceKey {
     typealias Value = CGFloat

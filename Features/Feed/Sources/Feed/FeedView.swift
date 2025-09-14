@@ -114,6 +114,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     }
 
     @ViewBuilder
+    // swiftlint:disable:next function_body_length
     private func postRow(for post: Domain.Post) -> some View {
         PostRowView(
             post: post,
@@ -229,7 +230,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 .foregroundColor(.primary)
         }
     }
-
 
     private func handleLinkTap(post: Domain.Post) {
         guard !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) else {

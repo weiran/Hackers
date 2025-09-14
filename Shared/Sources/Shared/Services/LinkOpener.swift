@@ -9,7 +9,7 @@ import SwiftUI
 import SafariServices
 import Domain
 
-public struct LinkOpener {
+public enum LinkOpener {
     @MainActor
     public static func openURL(_ url: URL, with post: Post? = nil) {
         // Determine user preference for opening links

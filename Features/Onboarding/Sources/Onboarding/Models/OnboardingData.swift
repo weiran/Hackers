@@ -19,12 +19,14 @@ public struct OnboardingData: Sendable {
     public static func currentOnboarding() -> OnboardingData {
         let swiftUIRewrite = OnboardingItem(
             title: "Complete SwiftUI Rewrite",
-            subtitle: "Entirely rebuilt from the ground up with modern SwiftUI and clean architecture for the best experience.",
+            subtitle: "Entirely rebuilt from the ground up with modern SwiftUI " +
+                      "and clean architecture for the best experience.",
             systemImage: "hammer.fill"
         )
         let votingSystem = OnboardingItem(
             title: "Enhanced Voting System",
-            subtitle: "Redesigned voting interface with improved visual feedback and consistent behavior across the app.",
+            subtitle: "Redesigned voting interface with improved visual feedback " +
+                      "and consistent behavior across the app.",
             systemImage: "arrow.up.circle"
         )
         let textSize = OnboardingItem(

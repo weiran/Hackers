@@ -67,8 +67,6 @@ public struct OnboardingView: View {
     }
 
     private var continueButton: some View {
-
-
         if #available(iOS 26.0, *) {
             return Button(action: onDismiss) {
                 Text("Continue")
