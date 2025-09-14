@@ -37,11 +37,6 @@ Or install the [latest beta version from TestFlight][4].
 * You can also get in touch via Twitter: [@weiran](https://twitter.com/weiran).
 
 
-## Generate screenshots
-
-1. Install [fastlane](https://fastlane.tools).
-2. Run `fastlane screenshots` in `/fastlane`
-
 ## Credits
 
 I use several open source projects in Hackers, in no particular order:
