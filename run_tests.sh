@@ -189,6 +189,39 @@ parse_test_failures() {
     fi
 }
 
+# Function to extract and display individual test results
+extract_individual_tests() {
+    local output_file=$1
+    local module_name=$2
+
+    # Extract passed tests from Swift Testing output
+    grep -E "✔ Test \".*\" passed after" "$output_file" | while read -r line; do
+        if [[ $line =~ ✔[[:space:]]*Test[[:space:]]*\"([^\"]+)\"[[:space:]]*passed ]]; then
+            local test_name="${BASH_REMATCH[1]}"
+            print_status $GREEN "   ✅ $test_name"
+        fi
+    done
+
+    # Extract failed tests from Swift Testing output
+    grep -E "✘ Test \".*\" failed after" "$output_file" | while read -r line; do
+        if [[ $line =~ ✘[[:space:]]*Test[[:space:]]*\"([^\"]+)\"[[:space:]]*failed ]]; then
+            local test_name="${BASH_REMATCH[1]}"
+            print_status $RED "   ❌ $test_name"
+        fi
+    done
+
+    # Extract XCTest results (older format)
+    grep -E "Test Case '.*' (passed|failed)" "$output_file" | while read -r line; do
+        if [[ $line =~ Test\ Case\ \'([^\']+)\'.*passed ]]; then
+            local test_name="${BASH_REMATCH[1]}"
+            print_status $GREEN "   ✅ $test_name"
+        elif [[ $line =~ Test\ Case\ \'([^\']+)\'.*failed ]]; then
+            local test_name="${BASH_REMATCH[1]}"
+            print_status $RED "   ❌ $test_name"
+        fi
+    done
+}
+
 # Function to run tests for a module
 run_module_tests() {
     local module_name=$1
@@ -290,11 +323,21 @@ run_module_tests() {
             print_status $GREEN "✅ ${module_name} tests passed (${duration}s)"
         fi
 
+        # Show individual test results in non-verbose mode
+        if [ "$VERBOSE" = false ]; then
+            extract_individual_tests "$temp_output" "$module_name"
+        fi
+
         rm "$temp_output"
         return 0
     else
         # Failure - show detailed error information
         print_status $RED "❌ ${module_name} tests failed (${duration}s)"
+
+        # Show individual test results in non-verbose mode
+        if [ "$VERBOSE" = false ]; then
+            extract_individual_tests "$temp_output" "$module_name"
+        fi
 
         # Parse and display specific failures
         parse_test_failures "$temp_output" "$module_name"
