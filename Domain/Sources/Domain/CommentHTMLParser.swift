@@ -12,7 +12,7 @@ import SwiftUI
 public enum CommentHTMLParser {
 
     // MARK: - Static Properties
-    private static let htmlEntityMap: [String: String] = [
+    static let htmlEntityMap: [String: String] = [
         "&amp;": "&",
         "&lt;": "<",
         "&gt;": ">",
@@ -21,7 +21,7 @@ public enum CommentHTMLParser {
         "&#39;": "'",
         "&nbsp;": " "
     ]
-    private static let linkRegex: NSRegularExpression = {
+    static let linkRegex: NSRegularExpression = {
         let pattern = #"<a\s+[^>]*href=(['"])(.*?)\1[^>]*>(.*?)</a>"#
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
@@ -30,7 +30,7 @@ public enum CommentHTMLParser {
         }
     }()
 
-    private static let htmlTagRegex: NSRegularExpression = {
+    static let htmlTagRegex: NSRegularExpression = {
         do {
             // More specific regex that matches actual HTML tags:
             // - Opening tags: <tagname> or <tagname attributes>
@@ -42,7 +42,7 @@ public enum CommentHTMLParser {
         }
     }()
 
-    private static let boldRegex: NSRegularExpression = {
+    static let boldRegex: NSRegularExpression = {
         let pattern = "<b\\b[^>]*>(.*?)</b>"
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
@@ -51,7 +51,7 @@ public enum CommentHTMLParser {
         }
     }()
 
-    private static let italicRegex: NSRegularExpression = {
+    static let italicRegex: NSRegularExpression = {
         let pattern = "<i\\b[^>]*>(.*?)</i>"
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
@@ -59,7 +59,7 @@ public enum CommentHTMLParser {
             fatalError("Invalid regex pattern: \(error)")
         }
     }()
-    private static let paragraphRegex: NSRegularExpression = {
+    static let paragraphRegex: NSRegularExpression = {
         let pattern = #"<p\b[^>]*>(.*?)</p>"#
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
@@ -68,7 +68,7 @@ public enum CommentHTMLParser {
         }
     }()
 
-    private static let codeBlockRegex: NSRegularExpression = {
+    static let codeBlockRegex: NSRegularExpression = {
         let pattern = #"<pre>\s*<code>(.*?)</code>\s*</pre>"#
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
@@ -77,7 +77,7 @@ public enum CommentHTMLParser {
         }
     }()
 
-    private static let inlineCodeRegex: NSRegularExpression = {
+    static let inlineCodeRegex: NSRegularExpression = {
         let pattern = #"<code\b[^>]*>(.*?)</code>"#
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
@@ -129,13 +129,13 @@ public enum CommentHTMLParser {
     // moved to extension in CommentHTMLParser+Stripping.swift
 
     /// Processes formatting tags (bold, italic, and inline code) and returns an AttributedString
-    private static func processFormattingTags(_ text: String) -> AttributedString {
+    static func processFormattingTags(_ text: String) -> AttributedString {
         let cleanedText = removeEmptyFormattingTags(text)
         return processFormattingTagsTogether(cleanedText)
     }
 
     /// Removes empty formatting tags that would otherwise leave extra spaces
-    private static func removeEmptyFormattingTags(_ text: String) -> String {
+    static func removeEmptyFormattingTags(_ text: String) -> String {
         var result = text
         result = result.replacingOccurrences(
             of: "<b\\b[^>]*>\\s*</b>",

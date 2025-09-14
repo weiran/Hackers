@@ -10,8 +10,8 @@ import Networking
 import Foundation
 import SwiftSoup
 public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sendable {
-    private let networkManager: NetworkManagerProtocol
-    private let urlBase = "https://news.ycombinator.com"
+    let networkManager: NetworkManagerProtocol
+    let urlBase = "https://news.ycombinator.com"
 
     public init(networkManager: NetworkManagerProtocol) {
         self.networkManager = networkManager

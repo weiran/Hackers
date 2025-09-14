@@ -109,7 +109,7 @@ extension PostRepository {
 
     // MARK: - Vote link extraction
 
-    private func voteLinks(
+    func voteLinks(
         from titleElement: Element,
         metadata metadataElement: Element? = nil
     ) throws -> (upvote: URL?, unvote: URL?, upvoted: Bool) { // swiftlint:disable:this large_tuple

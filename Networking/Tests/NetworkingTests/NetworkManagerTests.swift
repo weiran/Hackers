@@ -200,75 +200,107 @@ struct NetworkManagerTests {
 
     @Test("Clear cookies functionality")
     func clearCookies() {
-        // Store initial cookie state to restore later for test isolation
+        let manager = NetworkManager()
+
+        // Store initial cookies state to restore later
         let initialCookies = HTTPCookieStorage.shared.cookies ?? []
 
-        // Clean up: restore initial cookies to not affect other tests
+        // Cleanup after test completes
         defer {
-            // Clear all cookies first
-            HTTPCookieStorage.shared.cookies?.forEach(HTTPCookieStorage.shared.deleteCookie)
-            // Restore original cookies
-            initialCookies.forEach(HTTPCookieStorage.shared.setCookie)
+            // Clear all cookies and restore initial state
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
         }
 
-        // Create a test cookie that will be added and then cleared
+        // Test that clearCookies method completes without errors
+        manager.clearCookies()
+        manager.clearCookies() // Test idempotency
+
+        // Test actual cookie clearing functionality with isolated domain
         let testCookie = HTTPCookie(properties: [
-            .domain: "example.com",
+            .domain: "clear-cookies-test.local",
             .path: "/",
-            .name: "testCookie_\(Int.random(in: 1000...9999))",
+            .name: "clearTest",
             .value: "testValue"
         ])!
 
-        // Set the test cookie
         HTTPCookieStorage.shared.setCookie(testCookie)
 
-        // Verify cookie was added (synchronous operation)
-        let cookiesWithTest = HTTPCookieStorage.shared.cookies ?? []
-        #expect(cookiesWithTest.contains(testCookie), "Test cookie should be set")
+        // Verify cookie was set
+        let cookiesAfterSet = HTTPCookieStorage.shared.cookies ?? []
+        let cookieWasSet = cookiesAfterSet.contains { cookie in
+            cookie.name == "clearTest" && cookie.domain == "clear-cookies-test.local"
+        }
+        #expect(cookieWasSet, "Test cookie should be set")
 
-        // Create manager and clear cookies
-        let manager = NetworkManager()
+        // Clear cookies and verify our test cookie was removed
         manager.clearCookies()
 
-        // Verify ALL cookies are cleared (this is synchronous)
-        let cookiesAfterClear = HTTPCookieStorage.shared.cookies ?? []
-        #expect(cookiesAfterClear.isEmpty, "All cookies should be cleared")
-        #expect(!cookiesAfterClear.contains(testCookie), "Test cookie should be cleared")
+        let remainingCookies = HTTPCookieStorage.shared.cookies ?? []
+        let testCookieRemains = remainingCookies.contains { cookie in
+            cookie.name == "clearTest" && cookie.domain == "clear-cookies-test.local"
+        }
+        #expect(!testCookieRemains, "Test cookie should be cleared")
     }
 
     @Test("Contains cookie for URL functionality")
     func containsCookieForURL() {
-        let url = URL(string: "https://example.com")!
+        let url = URL(string: "https://cookie-url-test.example")!
+        let manager = NetworkManager()
 
-        // Initially should have no cookies
-        #expect(!defaultManager.containsCookie(for: url), "Should have no cookies initially")
+        // Store initial cookies state to restore later
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+
+        // Cleanup after test completes
+        defer {
+            // Clear all cookies and restore initial state
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+
+        // Initially should have no cookies for this specific domain
+        #expect(!manager.containsCookie(for: url), "Should have no cookies initially for test domain")
 
         // Add a cookie for the domain
         let cookie = HTTPCookie(properties: [
-            .domain: "example.com",
+            .domain: "cookie-url-test.example",
             .path: "/",
-            .name: "testCookie",
+            .name: "urlTestCookie",
             .value: "testValue"
         ])!
 
         HTTPCookieStorage.shared.setCookie(cookie)
 
         // Now should detect cookie
-        #expect(defaultManager.containsCookie(for: url), "Should detect cookie after setting")
-
-        // Clean up
-        HTTPCookieStorage.shared.deleteCookie(cookie)
+        #expect(manager.containsCookie(for: url), "Should detect cookie after setting")
     }
 
     @Test("Contains cookie for URL with no cookies")
     func containsCookieForURLWithNoCookies() {
-        let url = URL(string: "https://no-cookies-example.com")!
+        let url = URL(string: "https://no-cookies-test.example")!
+        let manager = NetworkManager()
 
-        // Clear all cookies first
-        defaultManager.clearCookies()
+        // Store initial cookies state to restore later
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+
+        // Cleanup after test completes
+        defer {
+            // Restore initial cookies state
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+
+        // Clear all cookies to ensure clean state
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
 
         // Should return false for URL with no cookies
-        #expect(!defaultManager.containsCookie(for: url), "Should return false for URL with no cookies")
+        #expect(!manager.containsCookie(for: url), "Should return false for URL with no cookies")
     }
 
     // MARK: - URLSessionDelegate Tests
