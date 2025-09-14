@@ -57,9 +57,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             contentView
                 .navigationBarTitleDisplayMode(.inline)
         }
-        // Ensure contrast in dark mode and with Reduced Transparency enabled
-        .toolbarBackground(.regularMaterial, for: .navigationBar)
-        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 userButton
