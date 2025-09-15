@@ -9,6 +9,7 @@ import Domain // Import Domain for PostType only
 import Foundation
 @testable import Shared
 import Testing
+import Domain
 
 @Suite("Extensions Tests")
 struct ExtensionsTests {

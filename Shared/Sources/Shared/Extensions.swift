@@ -59,13 +59,6 @@ public extension PostType {
 }
 
 public extension String {
-    func strippingHTML() -> String {
-        let pattern = "<[^>]+>"
-        return replacingOccurrences(of: pattern, with: "", options: .regularExpression)
-            .replacingOccurrences(of: "\t", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
     subscript(value: PartialRangeUpTo<Int>) -> Substring {
         self[..<index(startIndex, offsetBy: value.upperBound)]
     }

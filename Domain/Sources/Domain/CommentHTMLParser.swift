@@ -155,7 +155,7 @@ public enum CommentHTMLParser {
 
 // MARK: - String Extensions
 
-extension String {
+public extension String {
     /// Strips HTML tags and decodes entities for plain text output
     func strippingHTML() -> String {
         let decodedHTML = CommentHTMLParser.decodeHTMLEntities(self)
