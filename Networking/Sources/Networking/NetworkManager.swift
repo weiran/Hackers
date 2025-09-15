@@ -24,6 +24,8 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
         let config = URLSessionConfiguration.default
         config.urlCache = nil // disable URL caching for this session
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
         config.httpCookieStorage = HTTPCookieStorage.shared // preserve existing cookie behavior
         session = URLSession(configuration: config, delegate: nil, delegateQueue: nil)
         super.init()
@@ -38,6 +40,9 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     public func get(url: URL) async throws -> String {
         let request = URLRequest(url: url)
         let (data, response) = try await session.data(for: request)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw URLError(.badServerResponse)
+        }
         return String(data: data, encoding: .utf8) ?? ""
     }
 
@@ -48,6 +53,9 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
         let (data, response) = try await session.data(for: request)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw URLError(.badServerResponse)
+        }
         let html = String(data: data, encoding: .utf8) ?? ""
 
         return html
