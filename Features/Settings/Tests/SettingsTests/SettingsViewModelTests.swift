@@ -25,6 +25,7 @@ struct SettingsViewModelTests {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
         private var _textSize: TextSize = .medium
+        var clearCacheCallCount = 0
 
         var getterCallCounts: [String: Int] = [:]
         var setterCallCounts: [String: Int] = [:]
@@ -66,6 +67,9 @@ struct SettingsViewModelTests {
             getterCallCounts.removeAll()
             setterCallCounts.removeAll()
         }
+
+        func clearCache() { clearCacheCallCount += 1 }
+        func cacheUsageBytes() async -> Int64 { 0 }
     }
 
     // MARK: - Initialization Tests

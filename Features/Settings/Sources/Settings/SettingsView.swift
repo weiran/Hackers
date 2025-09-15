@@ -11,6 +11,7 @@ import MessageUI
 import Onboarding
 import Shared
 import SwiftUI
+import Drops
 
 public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
@@ -20,6 +21,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
+    @State private var showClearCacheAlert = false
 
     let isAuthenticated: Bool
     let currentUsername: String?
@@ -159,6 +161,30 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
 
                     Toggle(isOn: $viewModel.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
+                    }
+                }
+
+                Section(header: Text("Storage")) {
+                    HStack {
+                        Text("Storage Used")
+                        Spacer()
+                        Text(viewModel.cacheUsageText)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                    Button(role: .destructive) {
+                        showClearCacheAlert = true
+                    } label: {
+                        Text("Clear Cache")
+                    }
+                    .alert("Clear Cache?", isPresented: $showClearCacheAlert) {
+                        Button("Clear", role: .destructive) {
+                            viewModel.clearCache()
+                            Drops.show(Drop(title: "Cache cleared"))
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("This removes cached images and network responses to reduce storage.")
                     }
                 }
             }

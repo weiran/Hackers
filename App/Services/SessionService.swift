@@ -21,17 +21,21 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
         authenticationUseCase = DependencyContainer.shared.getAuthenticationUseCase()
 
         // Load current user on init
-        Task {
-            self.user = await authenticationUseCase.getCurrentUser()
+        Task { [weak self] in
+            guard let useCase = self?.authenticationUseCase else { return }
+            let user = await useCase.getCurrentUser()
+            await MainActor.run { self?.user = user }
         }
 
         // Observe explicit logout notifications to update session state
         NotificationCenter.default.addObserver(
             forName: .userDidLogout,
             object: nil,
-            queue: .main,
+            queue: .main
         ) { [weak self] _ in
-            self?.user = nil
+            Task { @MainActor in
+                self?.user = nil
+            }
         }
     }
 
@@ -68,9 +72,10 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
     }
 
     func unauthenticate() {
-        Task {
-            try? await authenticationUseCase.logout()
-            self.user = nil
+        Task { [weak self] in
+            guard let useCase = self?.authenticationUseCase else { return }
+            try? await useCase.logout()
+            await MainActor.run { self?.user = nil }
         }
     }
 

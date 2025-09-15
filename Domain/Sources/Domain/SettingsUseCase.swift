@@ -39,4 +39,6 @@ public protocol SettingsUseCase: Sendable {
     var safariReaderMode: Bool { get set }
     var openInDefaultBrowser: Bool { get set }
     var textSize: TextSize { get set }
+    func clearCache()
+    func cacheUsageBytes() async -> Int64
 }

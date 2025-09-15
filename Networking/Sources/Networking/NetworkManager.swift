@@ -20,7 +20,12 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     private let session: URLSession
 
     override public init() {
-        session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
+        // Use a configuration that avoids writing responses to disk to minimize storage.
+        let config = URLSessionConfiguration.default
+        config.urlCache = nil // disable URL caching for this session
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.httpCookieStorage = HTTPCookieStorage.shared // preserve existing cookie behavior
+        session = URLSession(configuration: config, delegate: nil, delegateQueue: nil)
         super.init()
     }
 

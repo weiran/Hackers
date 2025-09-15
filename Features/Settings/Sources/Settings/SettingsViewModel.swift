@@ -16,10 +16,12 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     @Published public var safariReaderMode: Bool = false
     @Published public var openInDefaultBrowser: Bool = false
     @Published public var textSize: TextSize = .medium
+    @Published public var cacheUsageText: String = "Calculating…"
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
         self.settingsUseCase = settingsUseCase
         loadSettings()
+        refreshCacheUsage()
     }
 
     private func loadSettings() {
@@ -56,4 +58,19 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     }
 
     private var cancellables = Set<AnyCancellable>()
+
+    // User actions
+    public func clearCache() {
+        settingsUseCase.clearCache()
+        refreshCacheUsage()
+    }
+
+    public func refreshCacheUsage() {
+        Task { [weak self] in
+            guard let self else { return }
+            let bytes = await settingsUseCase.cacheUsageBytes()
+            let formatted = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+            await MainActor.run { self.cacheUsageText = formatted }
+        }
+    }
 }

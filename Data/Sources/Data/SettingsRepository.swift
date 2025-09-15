@@ -65,4 +65,56 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
             userDefaults.set(newValue.rawValue, forKey: "textSize")
         }
     }
+
+    public func clearCache() {
+        // Remove all cached URL responses (affects AsyncImage and URLSession.shared consumers)
+        URLCache.shared.removeAllCachedResponses()
+
+        // Also purge temporary directory contents to reclaim space
+        let fileManager = FileManager.default
+        let tempDir = fileManager.temporaryDirectory
+        if let items = try? fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil) {
+            for url in items {
+                // Best-effort removal; ignore errors to avoid disrupting UX
+                try? fileManager.removeItem(at: url)
+            }
+        }
+    }
+
+    public func cacheUsageBytes() async -> Int64 {
+        let fileManager = FileManager.default
+
+        func directorySize(at url: URL) -> Int64 {
+            var total: Int64 = 0
+            let resourceKeys: Set<URLResourceKey> = [
+                .isRegularFileKey,
+                .totalFileAllocatedSizeKey,
+                .fileAllocatedSizeKey,
+            ]
+            if let enumerator = fileManager.enumerator(
+                at: url,
+                includingPropertiesForKeys: Array(resourceKeys),
+                options: [.skipsHiddenFiles, .skipsPackageDescendants]
+            ) {
+                for case let fileURL as URL in enumerator {
+                    guard let values = try? fileURL.resourceValues(forKeys: resourceKeys),
+                          values.isRegularFile == true
+                    else { continue }
+                    if let size = values.totalFileAllocatedSize ?? values.fileAllocatedSize {
+                        total += Int64(size)
+                    }
+                }
+            }
+            return total
+        }
+
+        var total: Int64 = 0
+        // Include Library/Caches where URLCache stores responses
+        if let cachesURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            total += directorySize(at: cachesURL)
+        }
+        // Include tmp directory where we might place transient files
+        total += directorySize(at: fileManager.temporaryDirectory)
+        return total
+    }
 }

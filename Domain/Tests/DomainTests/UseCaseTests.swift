@@ -65,6 +65,7 @@ struct UseCaseTests {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
         private var _textSize = TextSize.medium
+        var clearCacheCallCount = 0
 
         var safariReaderMode: Bool {
             get { _safariReaderMode }
@@ -80,6 +81,9 @@ struct UseCaseTests {
             get { _textSize }
             set { _textSize = newValue }
         }
+
+        func clearCache() { clearCacheCallCount += 1 }
+        func cacheUsageBytes() async -> Int64 { 0 }
     }
 
     // MARK: - PostUseCase Tests

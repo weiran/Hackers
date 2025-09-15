@@ -67,6 +67,7 @@ public struct OnboardingView: View {
         }
     }
 
+    @ViewBuilder
     private var continueButton: some View {
         if #available(iOS 26.0, *) {
             Button(action: onDismiss) {

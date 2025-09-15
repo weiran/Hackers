@@ -43,10 +43,11 @@ public enum LinkOpener {
     }
 
     // Find the top-most view controller to present from
+    @MainActor
     private static func findPresenter() -> UIViewController? {
         let keyWindow = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
+            .flatMap { $0.windows }
             .first(where: { $0.isKeyWindow })
         let root = keyWindow?.rootViewController
 
