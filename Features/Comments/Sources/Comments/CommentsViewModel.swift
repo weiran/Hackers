@@ -11,7 +11,7 @@ import Shared
 import SwiftUI
 
 @Observable
-public final class CommentsViewModel {
+public final class CommentsViewModel: @unchecked Sendable {
     public var post: Post
     public var visibleComments: [Comment] = []
 
