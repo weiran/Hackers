@@ -209,10 +209,12 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     .font(.headline)
                 Image(systemName: "chevron.down.circle.fill")
                     .font(.caption)
+                    .foregroundColor(.secondary)
             }
             .foregroundStyle(.primary)
             .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            // hacky way to adapt to iPad toolbar height being smaller
+            .padding(.vertical, UIDevice.current.userInterfaceIdiom == .pad ? 4 : 8)
             .glassEffect(in: .rect(cornerRadius: 32.0))
         }
     }
