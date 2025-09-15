@@ -5,9 +5,9 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
-import Domain
 import Data
+import Domain
+import Foundation
 import Networking
 
 public final class DependencyContainer: @unchecked Sendable {
@@ -15,32 +15,32 @@ public final class DependencyContainer: @unchecked Sendable {
 
     // Use type-level singletons to guarantee identity across access sites and threads
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
-    private static let postRepository: PostRepository = PostRepository(networkManager: networkManager)
-    private static let settingsRepository: SettingsRepository = SettingsRepository()
+    private static let postRepository: PostRepository = .init(networkManager: networkManager)
+    private static let settingsRepository: SettingsRepository = .init()
     private static let votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
     private static let authenticationRepository: AuthenticationRepository =
-        AuthenticationRepository(networkManager: networkManager)
+        .init(networkManager: networkManager)
 
     private init() {}
 
     public func getPostUseCase() -> any PostUseCase {
-        return Self.postRepository
+        Self.postRepository
     }
 
     public func getVoteUseCase() -> any VoteUseCase {
-        return Self.postRepository
+        Self.postRepository
     }
 
     public func getCommentUseCase() -> any CommentUseCase {
-        return Self.postRepository
+        Self.postRepository
     }
 
     public func getSettingsUseCase() -> any SettingsUseCase {
-        return Self.settingsRepository
+        Self.settingsRepository
     }
 
     public func getVotingService() -> any VotingService {
-        return Self.votingService
+        Self.votingService
     }
 
     public func getCommentVotingService() -> any CommentVotingService {
@@ -51,6 +51,6 @@ public final class DependencyContainer: @unchecked Sendable {
     }
 
     public func getAuthenticationUseCase() -> any AuthenticationUseCase {
-        return Self.authenticationRepository
+        Self.authenticationRepository
     }
 }

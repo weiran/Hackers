@@ -5,15 +5,14 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
-import SwiftUI
-@testable import Feed
 @testable import Domain
+@testable import Feed
 @testable import Shared
+import SwiftUI
+import Testing
 
 @Suite("FeedView Tests")
 struct FeedViewTests {
-
     // Mock Navigation Store
     @MainActor
     final class MockNavigationStore: @MainActor NavigationStoreProtocol, ObservableObject, @unchecked Sendable {
@@ -25,7 +24,7 @@ struct FeedViewTests {
         var showSettingsCalled = false
         var selectedPostType: PostType?
 
-        func showPost(_ post: Post) {
+        func showPost(_: Post) {
             showPostCalled = true
         }
 
@@ -49,11 +48,12 @@ struct FeedViewTests {
             get { _mockPosts }
             set { _mockPosts = newValue }
         }
+
         var getPostsCalled = false
         var lastRequestedType: PostType?
         var lastRequestedPage: Int?
 
-        func getPosts(type: PostType, page: Int, nextId: Int?) async throws -> [Post] {
+        func getPosts(type: PostType, page: Int, nextId _: Int?) async throws -> [Post] {
             getPostsCalled = true
             lastRequestedType = type
             lastRequestedPage = page
@@ -73,7 +73,7 @@ struct FeedViewTests {
                 by: "test",
                 score: 0,
                 postType: .news,
-                upvoted: false
+                upvoted: false,
             )
         }
     }
@@ -87,13 +87,12 @@ struct FeedViewTests {
             set { _upvoteCalled = newValue }
         }
 
-
         var shouldThrowError: Bool {
             get { _shouldThrowError }
             set { _shouldThrowError = newValue }
         }
 
-        func upvote(post: Post) async throws {
+        func upvote(post _: Post) async throws {
             if shouldThrowError {
                 throw HackersKitError.unauthenticated
             }
@@ -101,8 +100,7 @@ struct FeedViewTests {
             // Mock implementation - in real app this would be handled by the repository
         }
 
-
-        func upvote(comment: Domain.Comment, for post: Post) async throws {
+        func upvote(comment _: Domain.Comment, for _: Post) async throws {
             // Not used in feed
         }
 
@@ -110,7 +108,7 @@ struct FeedViewTests {
     }
 
     private func createMockPost(id: Int, upvoted: Bool = false) -> Post {
-        return Post(
+        Post(
             id: id,
             url: URL(string: "https://example.com/\(id)")!,
             title: "Test Post \(id)",
@@ -119,25 +117,25 @@ struct FeedViewTests {
             by: "testuser",
             score: 100,
             postType: .news,
-            upvoted: upvoted
+            upvoted: upvoted,
         )
     }
 
     @Test("FeedViewModel loads posts successfully")
     @MainActor
-    func testLoadPosts() async throws {
+    func loadPosts() async throws {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
-            createMockPost(id: 3)
+            createMockPost(id: 3),
         ]
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
-            voteUseCase: MockVoteUseCase()
+            voteUseCase: MockVoteUseCase(),
         )
 
         // Act
@@ -154,18 +152,18 @@ struct FeedViewTests {
 
     @Test("FeedViewModel handles pagination")
     @MainActor
-    func testPagination() async throws {
+    func pagination() async throws {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
-            createMockPost(id: 2)
+            createMockPost(id: 2),
         ]
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
-            voteUseCase: MockVoteUseCase()
+            voteUseCase: MockVoteUseCase(),
         )
 
         // Act - Load first page
@@ -175,7 +173,7 @@ struct FeedViewTests {
         // Update mock data for second page
         mockPostUseCase.mockPosts = [
             createMockPost(id: 3),
-            createMockPost(id: 4)
+            createMockPost(id: 4),
         ]
 
         // Act - Load next page
@@ -190,7 +188,7 @@ struct FeedViewTests {
 
     @Test("FeedViewModel handles voting")
     @MainActor
-    func testVoting() async throws {
+    func voting() async throws {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
@@ -199,7 +197,7 @@ struct FeedViewTests {
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            voteUseCase: mockVoteUseCase,
         )
 
         await viewModel.loadFeed()
@@ -214,7 +212,7 @@ struct FeedViewTests {
 
     @Test("FeedViewModel handles post type changes")
     @MainActor
-    func testPostTypeChange() async throws {
+    func postTypeChange() async throws {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
@@ -222,7 +220,7 @@ struct FeedViewTests {
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
-            voteUseCase: MockVoteUseCase()
+            voteUseCase: MockVoteUseCase(),
         )
 
         // Act
@@ -236,19 +234,19 @@ struct FeedViewTests {
 
     @Test("FeedViewModel filters duplicate posts")
     @MainActor
-    func testDuplicateFiltering() async throws {
+    func duplicateFiltering() async throws {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
-            createMockPost(id: 1) // Duplicate
+            createMockPost(id: 1), // Duplicate
         ]
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
-            voteUseCase: mockVoteUseCase
+            voteUseCase: mockVoteUseCase,
         )
 
         // Act
@@ -256,6 +254,6 @@ struct FeedViewTests {
 
         // Assert
         #expect(viewModel.posts.count == 2) // Should filter out duplicate
-        #expect(Set(viewModel.posts.map { $0.id }).count == 2)
+        #expect(Set(viewModel.posts.map(\.id)).count == 2)
     }
 }

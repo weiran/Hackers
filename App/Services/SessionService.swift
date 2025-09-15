@@ -5,10 +5,10 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
-import Domain
-import Data
 import Combine
+import Data
+import Domain
+import Foundation
 import Shared
 
 @MainActor
@@ -18,7 +18,7 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
 
     init() {
         // Get authentication use case from dependency container
-        self.authenticationUseCase = DependencyContainer.shared.getAuthenticationUseCase()
+        authenticationUseCase = DependencyContainer.shared.getAuthenticationUseCase()
 
         // Load current user on init
         Task {
@@ -29,7 +29,7 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
         NotificationCenter.default.addObserver(
             forName: .userDidLogout,
             object: nil,
-            queue: .main
+            queue: .main,
         ) { [weak self] _ in
             self?.user = nil
         }
@@ -44,13 +44,13 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
     }
 
     var username: String? {
-        return user?.username
+        user?.username
     }
 
     // MARK: - AuthenticationServiceProtocol
 
     var isAuthenticated: Bool {
-        return authenticationState == .authenticated
+        authenticationState == .authenticated
     }
 
     func showLogin() {
@@ -62,7 +62,7 @@ class SessionService: ObservableObject, AuthenticationServiceProtocol {
         try await authenticationUseCase.authenticate(username: username, password: password)
 
         // Update the user after successful authentication
-        self.user = await authenticationUseCase.getCurrentUser()
+        user = await authenticationUseCase.getCurrentUser()
 
         return .authenticated
     }

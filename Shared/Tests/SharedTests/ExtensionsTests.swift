@@ -5,21 +5,19 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
+import Domain // Import Domain for PostType only
 import Foundation
 @testable import Shared
-import Domain  // Import Domain for PostType only
+import Testing
 
 @Suite("Extensions Tests")
 struct ExtensionsTests {
-
     // MARK: - PostType Extensions Tests
 
     @Suite("PostType Extensions")
     struct PostTypeExtensionsTests {
-
         @Test("PostType displayName returns correct values")
-        func testPostTypeDisplayName() {
+        func postTypeDisplayName() {
             #expect(PostType.news.displayName == "Top")
             #expect(PostType.ask.displayName == "Ask")
             #expect(PostType.show.displayName == "Show")
@@ -30,7 +28,7 @@ struct ExtensionsTests {
         }
 
         @Test("PostType iconName returns valid SF Symbol names")
-        func testPostTypeIconName() {
+        func postTypeIconName() {
             #expect(PostType.news.iconName == "flame")
             #expect(PostType.ask.iconName == "bubble.left.and.bubble.right")
             #expect(PostType.show.iconName == "eye")
@@ -41,7 +39,7 @@ struct ExtensionsTests {
         }
 
         @Test("All PostType cases have displayName")
-        func testAllPostTypesHaveDisplayName() {
+        func allPostTypesHaveDisplayName() {
             let allCases: [PostType] = [.news, .ask, .show, .jobs, .newest, .best, .active]
 
             for postType in allCases {
@@ -55,9 +53,8 @@ struct ExtensionsTests {
 
     @Suite("String Extensions")
     struct StringExtensionsTests {
-
         @Test("strippingHTML removes basic HTML tags")
-        func testStrippingHTMLBasicTags() {
+        func strippingHTMLBasicTags() {
             let htmlString = "<p>Hello <b>world</b>!</p>"
             let expected = "Hello world!"
 
@@ -65,7 +62,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML removes nested HTML tags")
-        func testStrippingHTMLNestedTags() {
+        func strippingHTMLNestedTags() {
             let htmlString = "<div><p>Hello <strong><em>world</em></strong>!</p></div>"
             let expected = "Hello world!"
 
@@ -73,7 +70,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles self-closing tags")
-        func testStrippingHTMLSelfClosingTags() {
+        func strippingHTMLSelfClosingTags() {
             let htmlString = "Line 1<br/>Line 2<hr/>"
             let expected = "Line 1Line 2"
 
@@ -81,7 +78,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles tags with attributes")
-        func testStrippingHTMLTagsWithAttributes() {
+        func strippingHTMLTagsWithAttributes() {
             let htmlString = "<p class=\"text\">Hello</p> <a href=\"https://example.com\">world</a>!"
             let expected = "Hello world!"
 
@@ -89,7 +86,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML trims whitespace")
-        func testStrippingHTMLTrimsWhitespace() {
+        func strippingHTMLTrimsWhitespace() {
             let htmlString = "  <p>  Hello world  </p>  "
             let expected = "Hello world"
 
@@ -97,7 +94,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles empty string")
-        func testStrippingHTMLEmptyString() {
+        func strippingHTMLEmptyString() {
             let htmlString = ""
             let expected = ""
 
@@ -105,7 +102,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles string without HTML")
-        func testStrippingHTMLNoHTML() {
+        func strippingHTMLNoHTML() {
             let htmlString = "Hello world!"
             let expected = "Hello world!"
 
@@ -113,7 +110,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles only HTML tags")
-        func testStrippingHTMLOnlyTags() {
+        func strippingHTMLOnlyTags() {
             let htmlString = "<div></div><p></p><br/>"
             let expected = ""
 
@@ -121,7 +118,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles malformed HTML")
-        func testStrippingHTMLMalformed() {
+        func strippingHTMLMalformed() {
             let htmlString = "Hello <b world!"
             let expected = "Hello <b world!"
 
@@ -129,7 +126,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles newlines and tabs")
-        func testStrippingHTMLWhitespaceChars() {
+        func strippingHTMLWhitespaceChars() {
             let htmlString = "<p>Hello\n\t</p><p>world</p>"
             let expected = "Hello\nworld"
 
@@ -137,7 +134,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles special characters in content")
-        func testStrippingHTMLSpecialCharacters() {
+        func strippingHTMLSpecialCharacters() {
             let htmlString = "<p>&lt;Hello&gt; &amp; &quot;world&quot;</p>"
             let expected = "&lt;Hello&gt; &amp; &quot;world&quot;"
 
@@ -145,7 +142,7 @@ struct ExtensionsTests {
         }
 
         @Test("strippingHTML handles complex real-world HTML")
-        func testStrippingHTMLComplexExample() {
+        func strippingHTMLComplexExample() {
             let htmlString = """
             <div class="container">
                 <h1>Title</h1>

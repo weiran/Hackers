@@ -5,10 +5,10 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
-import SwiftUI
 import Domain
+import Foundation
 import Shared
+import SwiftUI
 
 @MainActor
 @Observable
@@ -27,7 +27,7 @@ public final class VotingViewModel {
 
     public init(
         votingService: VotingService,
-        commentVotingService: CommentVotingService
+        commentVotingService: CommentVotingService,
     ) {
         self.votingService = votingService
         self.commentVotingService = commentVotingService
@@ -56,7 +56,6 @@ public final class VotingViewModel {
             try await votingService.upvote(item: postForVoting)
 
         } catch {
-
             // Revert optimistic changes on error
             post.upvoted = false
             post.score = originalScore
@@ -109,12 +108,12 @@ public final class VotingViewModel {
             score: score,
             canVote: item.voteLinks?.upvote != nil,
             isVoting: isVoting,
-            error: lastError
+            error: lastError,
         )
     }
 
     public func canVote(item: any Votable) -> Bool {
-        return item.voteLinks?.upvote != nil
+        item.voteLinks?.upvote != nil
     }
 
     public func clearError() {
@@ -122,6 +121,7 @@ public final class VotingViewModel {
     }
 
     // MARK: - Auth handling
+
     private func handleUnauthenticatedIfNeeded(_ error: Error) async {
         guard case HackersKitError.unauthenticated = error else {
             lastError = error

@@ -5,10 +5,10 @@
 //  Extracted subviews and helpers from CommentsView to reduce file length
 //
 
-import SwiftUI
+import DesignSystem
 import Domain
 import Shared
-import DesignSystem
+import SwiftUI
 
 struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
@@ -30,13 +30,13 @@ struct CommentsContentView: View {
                         onLinkTap: { handleLinkTap() },
                         onPostUpdate: { updated in
                             viewModel.post = updated
-                        }
+                        },
                     )
                     .id("header")
                     .background(GeometryReader { geometry in
                         Color.clear.preference(
                             key: ViewOffsetKey.self,
-                            value: geometry.frame(in: .global).minY
+                            value: geometry.frame(in: .global).minY,
                         )
                     })
                     .onPreferenceChange(ViewOffsetKey.self) { offset in
@@ -81,7 +81,7 @@ struct CommentsContentView: View {
                                 toggleCommentVisibility(comment) { id in
                                     proxy.scrollTo(id, anchor: .top)
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -90,6 +90,7 @@ struct CommentsContentView: View {
         }
     }
 }
+
 struct CommentsForEach: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
@@ -103,17 +104,17 @@ struct CommentsForEach: View {
                 post: viewModel.post,
                 votingViewModel: votingViewModel,
                 onToggle: { toggleCommentVisibility(comment) },
-                onHide: { viewModel.hideCommentBranch(comment) }
+                onHide: { viewModel.hideCommentBranch(comment) },
             )
             .id("comment-\(comment.id)")
             .background(GeometryReader { geometry in
                 Color.clear.preference(
                     key: CommentPositionKey.self,
-                    value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global))
+                    value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global)),
                 )
             })
             .onPreferenceChange(CommentPositionKey.self) { position in
-                if let position = position {
+                if let position {
                     visibleCommentPositions[position.id] = position.frame
                 }
             }
@@ -151,7 +152,7 @@ struct PostHeader: View {
             post: post,
             votingState: votingViewModel.votingState(for: post),
             showPostText: true,
-            onThumbnailTap: { onLinkTap() }
+            onThumbnailTap: { onLinkTap() },
         )
         .contentShape(Rectangle())
         .onTapGesture { onLinkTap() }
@@ -164,7 +165,7 @@ struct PostHeader: View {
                         await votingViewModel.upvote(post: &mutablePost)
                         await MainActor.run { onPostUpdate(mutablePost) }
                     }
-                }
+                },
             )
 
             Divider()
@@ -209,9 +210,9 @@ struct CommentRow: View {
                         score: nil,
                         canVote: comment.voteLinks?.upvote != nil,
                         isVoting: votingViewModel.isVoting,
-                        error: votingViewModel.lastError
+                        error: votingViewModel.lastError,
                     ),
-                    style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0)
+                    style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
                 )
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.down")
@@ -236,7 +237,7 @@ struct CommentRow: View {
                 for: comment,
                 onVote: {
                     Task { await votingViewModel.upvote(comment: comment, in: post) }
-                }
+                },
             )
             Button { UIPasteboard.general.string = comment.text.strippingHTML() } label: {
                 Label("Copy", systemImage: "doc.on.doc")
@@ -333,10 +334,10 @@ struct CommentPositionKey: PreferenceKey {
 }
 
 // MARK: - Helpers
+
 extension View {
     func plainListRow() -> some View {
-        self
-            .listRowSeparator(.hidden)
+        listRowSeparator(.hidden)
             .listRowInsets(EdgeInsets())
     }
 }

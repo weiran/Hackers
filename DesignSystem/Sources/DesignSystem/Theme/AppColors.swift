@@ -14,17 +14,17 @@ public enum AppColors {
     // Add fallback colors if asset colors are not found
     public static var upvotedColor: Color {
         if UIColor(named: "upvotedColor") != nil {
-            return Color("upvotedColor")
+            Color("upvotedColor")
         } else {
-            return Color.orange
+            Color.orange
         }
     }
 
     public static var appTintColor: Color {
         if UIColor(named: "appTintColor") != nil {
-            return Color("appTintColor")
+            Color("appTintColor")
         } else {
-            return Color.orange
+            Color.orange
         }
     }
 }

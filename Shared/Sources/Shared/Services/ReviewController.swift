@@ -31,7 +31,8 @@ public enum ReviewController {
 
         // Don't request more than once per 120 days
         if let lastRequest = lastRequestTime,
-           Date().timeIntervalSince(lastRequest) < 120 * 24 * 60 * 60 {
+           Date().timeIntervalSince(lastRequest) < 120 * 24 * 60 * 60
+        {
             return
         }
 

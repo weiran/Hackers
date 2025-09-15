@@ -7,14 +7,13 @@
 
 // swiftlint:disable force_cast
 
-import Testing
 @testable import Data
 @testable import Domain
 import Foundation
+import Testing
 
 @Suite("SettingsRepository Tests")
 struct SettingsRepositoryTests {
-
     let mockUserDefaults = MockUserDefaults()
     var settingsRepository: SettingsRepository {
         SettingsRepository(userDefaults: mockUserDefaults)
@@ -102,49 +101,51 @@ struct SettingsRepositoryTests {
     }
 
     // MARK: - Removed Settings Tests
+
     // Note: showThumbnails and swipeActions settings have been removed from the app
-    
+
     /*
-    @Test("Show thumbnails default value")
-    func showThumbnailsDefaultValue() {
-        // Default should be false for bool values
-        #expect(settingsRepository.showThumbnails == false)
-    }
+     @Test("Show thumbnails default value")
+     func showThumbnailsDefaultValue() {
+         // Default should be false for bool values
+         #expect(settingsRepository.showThumbnails == false)
+     }
 
-    @Test("Show thumbnails setter and getter")
-    func showThumbnailsSetterAndGetter() {
-        // Test setting to true
-        settingsRepository.showThumbnails = true
-        #expect(settingsRepository.showThumbnails == true)
-        #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
+     @Test("Show thumbnails setter and getter")
+     func showThumbnailsSetterAndGetter() {
+         // Test setting to true
+         settingsRepository.showThumbnails = true
+         #expect(settingsRepository.showThumbnails == true)
+         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
 
-        // Test setting to false
-        settingsRepository.showThumbnails = false
-        #expect(settingsRepository.showThumbnails == false)
-        #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == false)
-    }
+         // Test setting to false
+         settingsRepository.showThumbnails = false
+         #expect(settingsRepository.showThumbnails == false)
+         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == false)
+     }
 
-    @Test("Swipe actions default value")
-    func swipeActionsDefaultValue() {
-        // Default should be false for bool values
-        #expect(settingsRepository.swipeActions == false)
-    }
+     @Test("Swipe actions default value")
+     func swipeActionsDefaultValue() {
+         // Default should be false for bool values
+         #expect(settingsRepository.swipeActions == false)
+     }
 
-    @Test("Swipe actions setter and getter")
-    func swipeActionsSetterAndGetter() {
-        // Test setting to true
-        settingsRepository.swipeActions = true
-        #expect(settingsRepository.swipeActions == true)
-        #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == true)
+     @Test("Swipe actions setter and getter")
+     func swipeActionsSetterAndGetter() {
+         // Test setting to true
+         settingsRepository.swipeActions = true
+         #expect(settingsRepository.swipeActions == true)
+         #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == true)
 
-        // Test setting to false
-        settingsRepository.swipeActions = false
-        #expect(settingsRepository.swipeActions == false)
-        #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == false)
-    }
-    */
+         // Test setting to false
+         settingsRepository.swipeActions = false
+         #expect(settingsRepository.swipeActions == false)
+         #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == false)
+     }
+     */
 
     // MARK: - Removed Settings (showComments)
+
     // Note: showComments setting has been removed from the app
 
     // MARK: - Open In Default Browser Tests
@@ -229,10 +230,10 @@ struct SettingsRepositoryTests {
         // Test concurrent read/write operations
         await withTaskGroup(of: Void.self) { group in
             // Add multiple concurrent tasks
-            for _ in 0..<10 {
+            for _ in 0 ..< 10 {
                 group.addTask {
-                    self.settingsRepository.safariReaderMode = true
-                    self.settingsRepository.openInDefaultBrowser = true
+                    settingsRepository.safariReaderMode = true
+                    settingsRepository.openInDefaultBrowser = true
                 }
             }
         }

@@ -5,17 +5,17 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
-@testable import Networking
 import Foundation
+@testable import Networking
+import Testing
 
 @Suite("NetworkManager Tests")
 struct NetworkManagerTests {
-
     // Default instance (no network calls made in tests that use mocks)
     let defaultManager = NetworkManager()
 
     // MARK: - Mock URLProtocol
+
     final class MockURLProtocol: URLProtocol {
         // Handler returns: HTTPURLResponse, Data, optional artificial delay (seconds)
         nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data, TimeInterval?))?
@@ -63,7 +63,7 @@ struct NetworkManagerTests {
                     "method=POST",
                     "url=\(url.absoluteString)",
                     "content-type=\(contentType)",
-                    "body=\(body)"
+                    "body=\(body)",
                 ]
                 let data = parts.joined(separator: "&").data(using: .utf8)!
                 let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
@@ -81,7 +81,7 @@ struct NetworkManagerTests {
             }
         }
 
-        override class func canInit(with request: URLRequest) -> Bool { true }
+        override class func canInit(with _: URLRequest) -> Bool { true }
         override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
         override func startLoading() {
             guard let handler = Self.requestHandler else {
@@ -104,6 +104,7 @@ struct NetworkManagerTests {
                 client?.urlProtocol(self, didFailWithError: error)
             }
         }
+
         override func stopLoading() { /* no-op */ }
     }
 
@@ -223,7 +224,7 @@ struct NetworkManagerTests {
             .domain: "clear-cookies-test.local",
             .path: "/",
             .name: "clearTest",
-            .value: "testValue"
+            .value: "testValue",
         ])!
 
         HTTPCookieStorage.shared.setCookie(testCookie)
@@ -270,7 +271,7 @@ struct NetworkManagerTests {
             .domain: "cookie-url-test.example",
             .path: "/",
             .name: "urlTestCookie",
-            .value: "testValue"
+            .value: "testValue",
         ])!
 
         HTTPCookieStorage.shared.setCookie(cookie)
@@ -314,7 +315,7 @@ struct NetworkManagerTests {
             url: URL(string: "https://example.com")!,
             statusCode: 301,
             httpVersion: "HTTP/1.1",
-            headerFields: ["Location": "https://redirected.com"]
+            headerFields: ["Location": "https://redirected.com"],
         )!
 
         let request = URLRequest(url: URL(string: "https://redirected.com")!)
@@ -326,7 +327,7 @@ struct NetworkManagerTests {
             URLSession.shared,
             task: URLSessionDataTask(),
             willPerformHTTPRedirection: response,
-            newRequest: request
+            newRequest: request,
         ) { request in
             completionHandlerCalled = true
             receivedRequest = request
@@ -343,7 +344,7 @@ struct NetworkManagerTests {
         let urls = [
             URL(string: "https://example.com/delay/short1")!,
             URL(string: "https://example.com/delay/short2")!,
-            URL(string: "https://example.com/delay/short3")!
+            URL(string: "https://example.com/delay/short3")!,
         ]
 
         let manager = makeManager()

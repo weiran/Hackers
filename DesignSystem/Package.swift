@@ -11,26 +11,26 @@ import PackageDescription
 let package = Package(
     name: "DesignSystem",
     platforms: [
-        .iOS(.v26)
+        .iOS(.v26),
     ],
     products: [
         .library(
             name: "DesignSystem",
-            targets: ["DesignSystem"]
-        )
+            targets: ["DesignSystem"],
+        ),
     ],
     dependencies: [
         .package(path: "../Domain"),
-        .package(path: "../Shared")
+        .package(path: "../Shared"),
     ],
     targets: [
         .target(
             name: "DesignSystem",
-            dependencies: ["Domain", "Shared"]
+            dependencies: ["Domain", "Shared"],
         ),
         .testTarget(
             name: "DesignSystemTests",
-            dependencies: ["DesignSystem"]
-        )
-    ]
+            dependencies: ["DesignSystem"],
+        ),
+    ],
 )

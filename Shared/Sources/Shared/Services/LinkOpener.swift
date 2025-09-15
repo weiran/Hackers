@@ -5,13 +5,13 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
-import SafariServices
 import Domain
+import SafariServices
+import SwiftUI
 
 public enum LinkOpener {
     @MainActor
-    public static func openURL(_ url: URL, with post: Post? = nil) {
+    public static func openURL(_ url: URL, with _: Post? = nil) {
         // Determine user preference for opening links
         let preferSystemBrowser = UserDefaults.standard.bool(forKey: "openInDefaultBrowser")
 
@@ -39,14 +39,14 @@ public enum LinkOpener {
 
     private static func isWebURL(_ url: URL) -> Bool {
         // Web URLs are HTTP/HTTPS
-        return url.scheme == "http" || url.scheme == "https"
+        url.scheme == "http" || url.scheme == "https"
     }
 
     // Find the top-most view controller to present from
     private static func findPresenter() -> UIViewController? {
         let keyWindow = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
+            .flatMap(\.windows)
             .first(where: { $0.isKeyWindow })
         let root = keyWindow?.rootViewController
 

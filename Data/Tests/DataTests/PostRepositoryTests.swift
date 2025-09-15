@@ -7,16 +7,15 @@
 
 // swiftlint:disable force_cast
 
-import Testing
-import Foundation
 @testable import Data
 @testable import Domain
+import Foundation
 @testable import Networking
+import Testing
 
 // swiftlint:disable type_body_length
 @Suite("PostRepository Tests")
 struct PostRepositoryTests {
-
     let mockNetworkManager = MockNetworkManager()
     var postRepository: PostRepository {
         PostRepository(networkManager: mockNetworkManager)
@@ -50,8 +49,8 @@ struct PostRepositoryTests {
             // No-op for testing
         }
 
-        func containsCookie(for url: URL) -> Bool {
-            return false // Return false for testing simplicity
+        func containsCookie(for _: URL) -> Bool {
+            false // Return false for testing simplicity
         }
     }
 
@@ -154,7 +153,7 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
-        
+
         // Verify comment state is updated after successful upvote
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after successful API call")
     }
@@ -162,7 +161,7 @@ struct PostRepositoryTests {
     // Unvote comment test removed
 
     // MARK: - Post Feed Upvoted State Tests
-    
+
     @Test("Parse upvoted post from feed HTML (nosee + explicit unvote)")
     func parseUpvotedPostFromFeed() async throws {
         mockNetworkManager.stubbedGetResponse = createMockFeedHTMLWithUpvotedPost()
@@ -170,16 +169,16 @@ struct PostRepositoryTests {
         let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
 
         #expect(posts.count == 2, "Should parse two posts")
-        
-        let upvotedPost = posts.first { $0.id == 45237717 }
-        let alsoUpvotedHiddenArrow = posts.first { $0.id == 45238055 }
-        
+
+        let upvotedPost = posts.first { $0.id == 45_237_717 }
+        let alsoUpvotedHiddenArrow = posts.first { $0.id == 45_238_055 }
+
         #expect(upvotedPost != nil, "Should find upvoted post")
         #expect(alsoUpvotedHiddenArrow != nil, "Should find post with hidden upvote arrow (nosee)")
-        
+
         #expect(upvotedPost?.upvoted == true, "Post with explicit unvote link should be marked as upvoted")
         #expect(alsoUpvotedHiddenArrow?.upvoted == true, "Post with 'nosee' upvote link should be marked as upvoted")
-        
+
         #expect(upvotedPost?.voteLinks?.unvote != nil, "Upvoted post should have unvote link")
         #expect(upvotedPost?.voteLinks?.upvote != nil, "Upvoted post should still have upvote link available")
 
@@ -228,7 +227,7 @@ struct PostRepositoryTests {
     // MARK: - Helper Methods
 
     private func createTestPost(voteLinks: VoteLinks? = nil) -> Post {
-        return Post(
+        Post(
             id: 123,
             url: URL(string: "https://example.com/post")!,
             title: "Test Post",
@@ -238,12 +237,12 @@ struct PostRepositoryTests {
             score: 10,
             postType: .news,
             upvoted: false,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
     }
 
     private func createTestPostWithId(_ id: Int, voteLinks: VoteLinks? = nil, upvoted: Bool = false) -> Post {
-        return Post(
+        Post(
             id: id,
             url: URL(string: "https://example.com/post")!,
             title: "Test Post",
@@ -253,24 +252,24 @@ struct PostRepositoryTests {
             score: 10,
             postType: .news,
             upvoted: upvoted,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
     }
 
     private func createTestComment(voteLinks: VoteLinks? = nil, upvoted: Bool = false) -> Domain.Comment {
-        return Domain.Comment(
+        Domain.Comment(
             id: 456,
             age: "1 hour ago",
             text: "Test comment",
             by: "commenter",
             level: 0,
             upvoted: upvoted,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
     }
 
     private func createMockPostsHTML() -> String {
-        return """
+        """
         <html>
         <body>
         <table class="itemlist">
@@ -296,7 +295,7 @@ struct PostRepositoryTests {
     }
 
     private func createMockSinglePostHTML() -> String {
-        return """
+        """
         <html>
         <body>
         <table class="fatitem">
@@ -322,7 +321,7 @@ struct PostRepositoryTests {
     }
 
     private func createMockCommentsHTML() -> String {
-        return """
+        """
         <html>
         <body>
         <table class="comment-tree">
@@ -340,9 +339,9 @@ struct PostRepositoryTests {
         </html>
         """
     }
-    
+
     private func createMockFeedHTMLWithUpvotedPost() -> String {
-        return """
+        """
         <html>
         <body>
         <table id="hnmain">
@@ -422,4 +421,5 @@ struct PostRepositoryTests {
         """
     }
 }
+
 // swiftlint:enable type_body_length

@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 // MARK: - Voting System
 
@@ -22,7 +22,7 @@ public struct VotingState: Sendable {
         score: Int? = nil,
         canVote: Bool,
         isVoting: Bool = false,
-        error: Error? = nil
+        error: Error? = nil,
     ) {
         self.isUpvoted = isUpvoted
         self.score = score
@@ -54,7 +54,7 @@ public struct VoteLinks: Sendable, Hashable {
 
 extension VoteLinks: CustomStringConvertible {
     public var description: String {
-        return "VoteLinks(upvote: \(upvote?.absoluteString ?? "nil"), unvote: \(unvote?.absoluteString ?? "nil"))"
+        "VoteLinks(upvote: \(upvote?.absoluteString ?? "nil"), unvote: \(unvote?.absoluteString ?? "nil"))"
     }
 }
 
@@ -84,7 +84,7 @@ public struct Post: Sendable, Identifiable, Hashable {
         upvoted: Bool,
         voteLinks: VoteLinks? = nil,
         text: String? = nil,
-        comments: [Comment]? = nil
+        comments: [Comment]? = nil,
     ) {
         self.id = id
         self.url = url
@@ -133,7 +133,7 @@ public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
         upvoteLink: String? = nil,
         voteLinks: VoteLinks? = nil,
         visibility: CommentVisibilityType = .visible,
-        parsedText: AttributedString? = nil
+        parsedText: AttributedString? = nil,
     ) {
         self.id = id
         self.age = age
@@ -195,29 +195,29 @@ public enum HackerNewsConstants {
     public static let host = "news.ycombinator.com"
 }
 
-extension Post {
-    public var hackerNewsURL: URL {
-        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
+public extension Post {
+    var hackerNewsURL: URL {
+        URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }
 
-extension PostType {
-    public var title: String {
+public extension PostType {
+    var title: String {
         switch self {
-        case .news: return "Top"
-        case .ask: return "Ask"
-        case .show: return "Show"
-        case .jobs: return "Jobs"
-        case .newest: return "New"
-        case .best: return "Best"
-        case .active: return "Active"
+        case .news: "Top"
+        case .ask: "Ask"
+        case .show: "Show"
+        case .jobs: "Jobs"
+        case .newest: "New"
+        case .best: "Best"
+        case .active: "Active"
         }
     }
 }
 
-extension Comment {
-    public var hackerNewsURL: URL {
-        return URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
+public extension Comment {
+    var hackerNewsURL: URL {
+        URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }
 

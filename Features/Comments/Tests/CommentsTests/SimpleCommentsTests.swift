@@ -5,15 +5,14 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 @testable import Comments
 import Domain
-import Shared
 import Foundation
+import Shared
+import Testing
 
 @Suite("Comments Module Tests")
 struct SimpleCommentsTests {
-
     @Suite("CommentsViewModel")
     struct ViewModelTests {
         @Test("ViewModel initializes with correct default values")
@@ -28,7 +27,7 @@ struct SimpleCommentsTests {
                 by: "testuser",
                 score: 100,
                 postType: .news,
-                upvoted: false
+                upvoted: false,
             )
 
             // When
@@ -56,7 +55,7 @@ struct SimpleCommentsTests {
                 by: "testuser",
                 level: 0,
                 upvoted: false,
-                visibility: .visible
+                visibility: .visible,
             )
 
             // Then
@@ -83,7 +82,7 @@ struct SimpleCommentsTests {
                 by: "user",
                 level: 0,
                 upvoted: false,
-                visibility: from
+                visibility: from,
             )
 
             // When
@@ -103,7 +102,7 @@ struct SimpleCommentsTests {
                 by: "user",
                 level: 0,
                 upvoted: initialState,
-                visibility: .visible
+                visibility: .visible,
             )
 
             // When
@@ -123,7 +122,7 @@ struct SimpleCommentsTests {
                 by: "user1",
                 level: 0,
                 upvoted: false,
-                visibility: .visible
+                visibility: .visible,
             )
 
             let comment2 = Comment(
@@ -133,7 +132,7 @@ struct SimpleCommentsTests {
                 by: "user2",
                 level: 1,
                 upvoted: true,
-                visibility: .hidden
+                visibility: .hidden,
             )
 
             let comment3 = Comment(
@@ -143,7 +142,7 @@ struct SimpleCommentsTests {
                 by: "user1",
                 level: 0,
                 upvoted: false,
-                visibility: .visible
+                visibility: .visible,
             )
 
             // Then
@@ -166,10 +165,10 @@ struct SimpleCommentsTests {
                 by: "testuser",
                 score: 100,
                 postType: .news,
-                upvoted: false
+                upvoted: false,
             )
 
-            let comments: [Domain.Comment] = commentCount > 0 ? (1...commentCount).map { index in
+            let comments: [Domain.Comment] = commentCount > 0 ? (1 ... commentCount).map { index in
                 Domain.Comment(
                     id: index,
                     age: "\(index * 10) min ago",
@@ -177,7 +176,7 @@ struct SimpleCommentsTests {
                     by: "user\(index)",
                     level: index % 3, // Vary levels
                     upvoted: index % 2 == 0,
-                    visibility: Domain.CommentVisibilityType.visible
+                    visibility: Domain.CommentVisibilityType.visible,
                 )
             } : []
 
@@ -206,7 +205,7 @@ struct SimpleCommentsTests {
                 by: "testuser",
                 score: 100,
                 postType: type,
-                upvoted: false
+                upvoted: false,
             )
 
             // Then
@@ -225,22 +224,22 @@ struct SimpleCommentsTests {
                 Domain.Comment(id: 2, age: "50m", text: "Child 1.1", by: "user2", level: 1, upvoted: false, visibility: .visible),
                 Domain.Comment(id: 3, age: "45m", text: "Child 1.2", by: "user3", level: 1, upvoted: false, visibility: .visible),
                 Domain.Comment(id: 4, age: "40m", text: "Grandchild 1.1.1", by: "user4", level: 2, upvoted: false, visibility: .visible),
-                Domain.Comment(id: 5, age: "30m", text: "Root 2", by: "user5", level: 0, upvoted: false, visibility: .visible)
+                Domain.Comment(id: 5, age: "30m", text: "Root 2", by: "user5", level: 0, upvoted: false, visibility: .visible),
             ]
 
             // Then
-            #expect(comments.filter { $0.level == 0 }.count == 2) // 2 root comments
-            #expect(comments.filter { $0.level == 1 }.count == 2) // 2 child comments
-            #expect(comments.filter { $0.level == 2 }.count == 1) // 1 grandchild comment
+            #expect(comments.count(where: { $0.level == 0 }) == 2) // 2 root comments
+            #expect(comments.count(where: { $0.level == 1 }) == 2) // 2 child comments
+            #expect(comments.count(where: { $0.level == 2 }) == 1) // 1 grandchild comment
 
             // Verify structure
             let roots = comments.filter { $0.level == 0 }
             let children = comments.filter { $0.level == 1 }
             let grandchildren = comments.filter { $0.level == 2 }
 
-            #expect(roots.map { $0.id }.sorted() == [1, 5])
-            #expect(children.map { $0.id }.sorted() == [2, 3])
-            #expect(grandchildren.map { $0.id } == [4])
+            #expect(roots.map(\.id).sorted() == [1, 5])
+            #expect(children.map(\.id).sorted() == [2, 3])
+            #expect(grandchildren.map(\.id) == [4])
         }
 
         @Test("Visible comments filter works correctly")
@@ -250,7 +249,7 @@ struct SimpleCommentsTests {
                 Domain.Comment(id: 1, age: "1h", text: "Visible", by: "user1", level: 0, upvoted: false, visibility: .visible),
                 Domain.Comment(id: 2, age: "50m", text: "Hidden", by: "user2", level: 1, upvoted: false, visibility: .hidden),
                 Domain.Comment(id: 3, age: "45m", text: "Compact", by: "user3", level: 1, upvoted: false, visibility: .compact),
-                Domain.Comment(id: 4, age: "40m", text: "Visible", by: "user4", level: 2, upvoted: false, visibility: .visible)
+                Domain.Comment(id: 4, age: "40m", text: "Visible", by: "user4", level: 2, upvoted: false, visibility: .visible),
             ]
 
             // When
@@ -258,7 +257,7 @@ struct SimpleCommentsTests {
 
             // Then
             #expect(visibleComments.count == 3)
-            #expect(visibleComments.map { $0.id }.sorted() == [1, 3, 4])
+            #expect(visibleComments.map(\.id).sorted() == [1, 3, 4])
         }
     }
 }

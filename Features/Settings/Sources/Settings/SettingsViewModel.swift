@@ -5,9 +5,9 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Combine
 import Domain
+import Foundation
 import Shared
 
 public final class SettingsViewModel: ObservableObject, @unchecked Sendable {

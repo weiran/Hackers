@@ -7,16 +7,15 @@
 
 // swiftlint:disable force_cast
 
-import Testing
-import Foundation
-@testable import Shared
-@testable import Domain
 @testable import Data
+@testable import Domain
+import Foundation
 @testable import Networking
+@testable import Shared
+import Testing
 
 @Suite("DependencyContainer Tests")
 struct DependencyContainerTests {
-
     let dependencyContainer = DependencyContainer.shared
 
     // MARK: - Singleton Tests
@@ -227,12 +226,12 @@ struct DependencyContainerTests {
     func concurrentAccess() async {
         // Test concurrent access to the dependency container
         await withTaskGroup(of: Void.self) { group in
-            for _ in 0..<10 {
+            for _ in 0 ..< 10 {
                 group.addTask {
-                    let postUseCase = self.dependencyContainer.getPostUseCase()
-                    let voteUseCase = self.dependencyContainer.getVoteUseCase()
-                    let commentUseCase = self.dependencyContainer.getCommentUseCase()
-                    let settingsUseCase = self.dependencyContainer.getSettingsUseCase()
+                    let postUseCase = dependencyContainer.getPostUseCase()
+                    let voteUseCase = dependencyContainer.getVoteUseCase()
+                    let commentUseCase = dependencyContainer.getCommentUseCase()
+                    let settingsUseCase = dependencyContainer.getSettingsUseCase()
 
                     // All should be non-nil and consistent
                     #expect(postUseCase != nil)
@@ -271,7 +270,7 @@ struct DependencyContainerTests {
     // MARK: - Helper Methods
 
     private static func createTestPost() -> Post {
-        return Post(
+        Post(
             id: 123,
             url: URL(string: "https://example.com/post")!,
             title: "Test Post",
@@ -280,7 +279,7 @@ struct DependencyContainerTests {
             by: "testuser",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
     }
 }

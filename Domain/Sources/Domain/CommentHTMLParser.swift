@@ -10,8 +10,8 @@ import SwiftUI
 
 /// High-performance HTML parser optimized for comment content
 public enum CommentHTMLParser {
-
     // MARK: - Static Properties
+
     static let htmlEntityMap: [String: String] = [
         "&amp;": "&",
         "&lt;": "<",
@@ -19,7 +19,7 @@ public enum CommentHTMLParser {
         "&quot;": "\"",
         "&#x27;": "'",
         "&#39;": "'",
-        "&nbsp;": " "
+        "&nbsp;": " ",
     ]
     static let linkRegex: NSRegularExpression = {
         let pattern = #"<a\s+[^>]*href=(['"])(.*?)\1[^>]*>(.*?)</a>"#
@@ -59,6 +59,7 @@ public enum CommentHTMLParser {
             fatalError("Invalid regex pattern: \(error)")
         }
     }()
+
     static let paragraphRegex: NSRegularExpression = {
         let pattern = #"<p\b[^>]*>(.*?)</p>"#
         do {
@@ -101,6 +102,7 @@ public enum CommentHTMLParser {
     }
 
     // MARK: - Private Implementation
+
     // Efficiently decodes HTML entities using a single pass
     // moved to extension in CommentHTMLParser+Entities.swift
 
@@ -140,19 +142,19 @@ public enum CommentHTMLParser {
         result = result.replacingOccurrences(
             of: "<b\\b[^>]*>\\s*</b>",
             with: "",
-            options: .regularExpression
+            options: .regularExpression,
         )
         result = result.replacingOccurrences(
             of: "<i\\b[^>]*>\\s*</i>",
             with: "",
-            options: .regularExpression
+            options: .regularExpression,
         )
         return result
     }
-
 }
 
 // MARK: - String Extensions
+
 extension String {
     /// Strips HTML tags and decodes entities for plain text output
     func strippingHTML() -> String {

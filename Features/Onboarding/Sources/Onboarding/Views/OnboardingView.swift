@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import DesignSystem
+import SwiftUI
 
 public struct OnboardingView: View {
     private let onboardingData: OnboardingData
@@ -69,7 +69,7 @@ public struct OnboardingView: View {
 
     private var continueButton: some View {
         if #available(iOS 26.0, *) {
-            return Button(action: onDismiss) {
+            Button(action: onDismiss) {
                 Text("Continue")
                     .scaledFont(.headline)
                     .foregroundStyle(.white)
@@ -78,7 +78,7 @@ public struct OnboardingView: View {
             }
             .glassEffect(.regular.tint(AppColors.appTintColor))
         } else {
-            return Button(action: onDismiss) {
+            Button(action: onDismiss) {
                 Text("Continue")
                     .scaledFont(.headline)
                     .foregroundStyle(.white)

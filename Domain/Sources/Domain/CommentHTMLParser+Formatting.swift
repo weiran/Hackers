@@ -10,6 +10,7 @@ import SwiftUI
 
 extension CommentHTMLParser {
     // MARK: - Types
+
     private enum FormattingType {
         case bold
         case italic
@@ -48,7 +49,7 @@ extension CommentHTMLParser {
                 segment: segment,
                 lastEnd: lastEnd,
                 preserveWhitespace: preserveWhitespace,
-                into: &result
+                into: &result,
             )
             appendFormattedSegment(segment, into: &result)
             lastEnd = NSMaxRange(segment.range)
@@ -57,12 +58,13 @@ extension CommentHTMLParser {
             nsString: nsString,
             lastEnd: lastEnd,
             preserveWhitespace: preserveWhitespace,
-            into: &result
+            into: &result,
         )
         return result
     }
 
     // MARK: - Helpers to reduce complexity/length
+
     private static func buildFormatSegments(_ text: String) -> [FormatSegment] {
         var segments: [FormatSegment] = []
         let nsString = text as NSString
@@ -97,7 +99,7 @@ extension CommentHTMLParser {
         segment: FormatSegment,
         lastEnd: Int,
         preserveWhitespace: Bool,
-        into result: inout AttributedString
+        into result: inout AttributedString,
     ) {
         if segment.range.location > lastEnd {
             let beforeRange = NSRange(location: lastEnd, length: segment.range.location - lastEnd)
@@ -130,7 +132,7 @@ extension CommentHTMLParser {
         nsString: NSString,
         lastEnd: Int,
         preserveWhitespace: Bool,
-        into result: inout AttributedString
+        into result: inout AttributedString,
     ) {
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
@@ -165,7 +167,7 @@ extension CommentHTMLParser {
     private static func shouldPreserveWhitespace(_ text: String) -> Bool {
         if text.contains("\n") { return false }
         let hasLeadingOrTrailingWhitespace = text.hasPrefix(" ") || text.hasSuffix(" ") ||
-                                             text.hasPrefix("\t") || text.hasSuffix("\t")
+            text.hasPrefix("\t") || text.hasSuffix("\t")
         let hasParagraphTags = text.contains("<p") || text.contains("<div") || text.contains("<br")
         return hasLeadingOrTrailingWhitespace && !hasParagraphTags
     }

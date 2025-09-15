@@ -29,7 +29,7 @@ public final class DefaultVotingService: VotingService, Sendable {
             isUpvoted: item.upvoted,
             score: score,
             canVote: item.voteLinks?.upvote != nil,
-            isVoting: false
+            isVoting: false,
         )
     }
 
@@ -44,7 +44,6 @@ public final class DefaultVotingService: VotingService, Sendable {
             throw HackersKitError.requestFailure
         }
     }
-
 }
 
 // MARK: - Comment-Specific Voting Service

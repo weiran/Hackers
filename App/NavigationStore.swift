@@ -5,10 +5,10 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Combine
-import Shared
 import Domain
+import Shared
+import SwiftUI
 
 enum NavigationDestination: Hashable {
     case comments(Domain.Post)
@@ -16,7 +16,7 @@ enum NavigationDestination: Hashable {
 }
 
 class NavigationStore: ObservableObject, NavigationStoreProtocol {
-    @Published var path: NavigationPath = NavigationPath()
+    @Published var path: NavigationPath = .init()
     @Published var selectedPost: Domain.Post?
     @Published var selectedPostType: Domain.PostType = .news
     @Published var showingLogin = false
@@ -67,7 +67,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier,
               let scheme = url.scheme,
               scheme.localizedCaseInsensitiveCompare(bundleIdentifier) == .orderedSame,
-              let view = url.host else {
+              let view = url.host
+        else {
             return
         }
 
@@ -76,7 +77,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         switch view {
         case "item":
             if let idString = parameters["id"],
-               let id = Int(idString) {
+               let id = Int(idString)
+            {
                 navigateToPost(withId: id)
             }
         default:
@@ -107,7 +109,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
             by: "",
             score: 0,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
 
         showPost(tempPost)

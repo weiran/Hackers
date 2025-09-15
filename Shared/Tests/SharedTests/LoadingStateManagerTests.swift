@@ -5,18 +5,17 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 @testable import Shared
+import Testing
 
 @Suite("LoadingStateManager Tests")
 struct LoadingStateManagerTests {
-
     @Test("Initial state is correct")
-    func testInitialState() {
+    func initialState() {
         let manager = LoadingStateManager(
             initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
-            loadData: { ["test"] }
+            loadData: { ["test"] },
         )
 
         #expect(manager.data == [])
@@ -26,7 +25,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("loadIfNeeded loads data on first call")
-    func testLoadIfNeededFirstCall() async {
+    func loadIfNeededFirstCall() async {
         var loadCount = 0
 
         let manager = LoadingStateManager(
@@ -35,7 +34,7 @@ struct LoadingStateManagerTests {
             loadData: {
                 loadCount += 1
                 return ["item1", "item2"]
-            }
+            },
         )
 
         await manager.loadIfNeeded()
@@ -48,7 +47,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("loadIfNeeded skips loading when shouldSkipLoad returns true")
-    func testLoadIfNeededSkipsWhenDataExists() async {
+    func loadIfNeededSkipsWhenDataExists() async {
         var loadCount = 0
 
         let manager = LoadingStateManager(
@@ -57,7 +56,7 @@ struct LoadingStateManagerTests {
             loadData: {
                 loadCount += 1
                 return ["item\(loadCount)"]
-            }
+            },
         )
 
         // First load should work
@@ -72,7 +71,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("refresh always loads new data")
-    func testRefreshAlwaysLoads() async {
+    func refreshAlwaysLoads() async {
         var loadCount = 0
 
         let manager = LoadingStateManager(
@@ -81,7 +80,7 @@ struct LoadingStateManagerTests {
             loadData: {
                 loadCount += 1
                 return ["refresh_item\(loadCount)"]
-            }
+            },
         )
 
         // Initial load
@@ -101,7 +100,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("Error handling works correctly")
-    func testErrorHandling() async {
+    func errorHandling() async {
         struct TestError: Error, Equatable {}
 
         let manager = LoadingStateManager(
@@ -109,7 +108,7 @@ struct LoadingStateManagerTests {
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
                 throw TestError()
-            }
+            },
         )
 
         await manager.loadIfNeeded()
@@ -130,7 +129,7 @@ struct LoadingStateManagerTests {
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
                 throw TestError()
-            }
+            },
         )
 
         // Load and fail
@@ -145,7 +144,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("Concurrent loadIfNeeded calls don't cause multiple loads")
-    func testConcurrentLoadIfNeeded() async {
+    func concurrentLoadIfNeeded() async {
         var loadCount = 0
 
         let manager = LoadingStateManager(
@@ -156,7 +155,7 @@ struct LoadingStateManagerTests {
                 // Simulate some async work
                 try await Task.sleep(nanoseconds: 10_000_000) // 10ms
                 return ["concurrent_item\(loadCount)"]
-            }
+            },
         )
 
         // Start multiple concurrent loads
@@ -174,7 +173,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("loadIfNeeded with custom shouldSkipLoad logic")
-    func testCustomShouldSkipLogic() async {
+    func customShouldSkipLogic() async {
         var loadCount = 0
         var currentData = ["initial"]
 
@@ -186,7 +185,7 @@ struct LoadingStateManagerTests {
                 loadCount += 1
                 currentData += ["new_item\(loadCount)"]
                 return currentData
-            }
+            },
         )
 
         // First load: [initial] -> [initial, new_item1] (count = 2, should not skip)
@@ -206,7 +205,7 @@ struct LoadingStateManagerTests {
     }
 
     @Test("Initialization with minimal parameters")
-    func testMinimalInitialization() async {
+    func minimalInitialization() async {
         let manager = LoadingStateManager(initialData: ["test"])
 
         #expect(manager.data == ["test"])
@@ -235,7 +234,7 @@ struct LoadingStateManagerTests {
             loadData: {
                 loadCount += 1
                 return ["configured_item\(loadCount)"]
-            }
+            },
         )
 
         // Now loadIfNeeded should work

@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Domain
+import SwiftUI
 
 public struct VoteIndicator: View {
     private let votingState: VotingState
@@ -14,7 +14,7 @@ public struct VoteIndicator: View {
 
     public init(
         votingState: VotingState,
-        style: VoteIndicatorStyle = .default
+        style: VoteIndicatorStyle = .default,
     ) {
         self.votingState = votingState
         self.style = style
@@ -49,9 +49,9 @@ public struct VoteIndicator: View {
 
     private var scoreColor: Color {
         if votingState.isUpvoted {
-            return style.upvotedColor
+            style.upvotedColor
         } else {
-            return .secondary
+            .secondary
         }
     }
 }
@@ -74,7 +74,7 @@ public struct VoteIndicatorStyle: Sendable {
         iconScale: CGFloat = 1.0,
         upvotedIconName: String = "arrow.up.circle.fill",
         defaultColor: Color = .secondary,
-        upvotedColor: Color = AppColors.upvotedColor
+        upvotedColor: Color = AppColors.upvotedColor,
     ) {
         self.showScore = showScore
         self.iconFont = iconFont
@@ -92,13 +92,13 @@ public struct VoteIndicatorStyle: Sendable {
         showScore: false,
         iconFont: .caption,
         spacing: 0,
-        iconScale: 0.8
+        iconScale: 0.8,
     )
 
     public static let large = VoteIndicatorStyle(
         iconFont: .title3,
         scoreFont: .body,
         spacing: 6,
-        iconScale: 1.2
+        iconScale: 1.2,
     )
 }

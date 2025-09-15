@@ -15,22 +15,22 @@ let package = Package(
     products: [
         .library(
             name: "Comments",
-            targets: ["Comments"]
-        )
+            targets: ["Comments"],
+        ),
     ],
     dependencies: [
         .package(path: "../../Domain"),
         .package(path: "../../Shared"),
-        .package(path: "../../DesignSystem")
+        .package(path: "../../DesignSystem"),
     ],
     targets: [
         .target(
             name: "Comments",
-            dependencies: ["Domain", "Shared", "DesignSystem"]
+            dependencies: ["Domain", "Shared", "DesignSystem"],
         ),
         .testTarget(
             name: "CommentsTests",
-            dependencies: ["Comments", "Domain", "Shared"]
-        )
-    ]
+            dependencies: ["Comments", "Domain", "Shared"],
+        ),
+    ],
 )

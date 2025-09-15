@@ -13,6 +13,7 @@ extension CommentHTMLParser {
         let range = NSRange(location: 0, length: text.utf16.count)
         return htmlTagRegex.stringByReplacingMatches(in: text, range: range, withTemplate: "")
     }
+
     /// Strips HTML tags and normalizes whitespace (converts newlines to spaces)
     /// Use this for non-paragraph content where newlines should not be preserved
     static func stripHTMLTagsAndNormalizeWhitespace(_ text: String) -> String {
@@ -20,7 +21,7 @@ extension CommentHTMLParser {
         let normalized = tagsRemoved.replacingOccurrences(
             of: "\\s+",
             with: " ",
-            options: .regularExpression
+            options: .regularExpression,
         )
         return normalized
     }
@@ -28,6 +29,6 @@ extension CommentHTMLParser {
     /// Strips HTML tags but preserves whitespace structure
     /// Use this when whitespace around formatting tags needs to be preserved
     static func stripHTMLTagsPreservingWhitespace(_ text: String) -> String {
-        return stripHTMLTags(text)
+        stripHTMLTags(text)
     }
 }

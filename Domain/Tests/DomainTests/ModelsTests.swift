@@ -7,13 +7,12 @@
 
 // swiftlint:disable force_cast
 
-import Testing
-import Foundation
 @testable import Domain
+import Foundation
+import Testing
 
 @Suite("Model Tests")
 struct ModelsTests {
-
     // MARK: - VoteLinks Tests
 
     @Test("VoteLinks initializes with correct properties")
@@ -58,7 +57,7 @@ struct ModelsTests {
             score: 10,
             postType: .news,
             upvoted: false,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
 
         #expect(post.id == 123)
@@ -85,7 +84,7 @@ struct ModelsTests {
             by: "testuser",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
 
         let post2 = Post(
@@ -97,7 +96,7 @@ struct ModelsTests {
             by: "testuser",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
 
         let post3 = Post(
@@ -109,7 +108,7 @@ struct ModelsTests {
             by: "otheruser",
             score: 5,
             postType: .ask,
-            upvoted: true
+            upvoted: true,
         )
 
         #expect(post1 == post2)
@@ -131,7 +130,7 @@ struct ModelsTests {
             level: 0,
             upvoted: false,
             voteLinks: voteLinks,
-            visibility: .visible
+            visibility: .visible,
         )
 
         #expect(comment.id == 456)
@@ -152,7 +151,7 @@ struct ModelsTests {
             text: "Test comment",
             by: "user",
             level: 0,
-            upvoted: false
+            upvoted: false,
         )
 
         let comment2 = Comment(
@@ -161,7 +160,7 @@ struct ModelsTests {
             text: "Test comment",
             by: "user",
             level: 0,
-            upvoted: false
+            upvoted: false,
         )
 
         let comment3 = Comment(
@@ -170,7 +169,7 @@ struct ModelsTests {
             text: "Different comment",
             by: "otheruser",
             level: 1,
-            upvoted: true
+            upvoted: true,
         )
 
         #expect(comment1 == comment2)
@@ -225,7 +224,7 @@ struct ModelsTests {
         let authError = HackersKitError.authenticationError(error: .badCredentials)
 
         switch authError {
-        case .authenticationError(let error):
+        case let .authenticationError(error):
             #expect(error == .badCredentials)
         default:
             Issue.record("Expected authentication error")

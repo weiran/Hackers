@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 @testable import Onboarding
+import Testing
 
 struct OnboardingDataTests {
     @Test("Current onboarding data contains expected items")
@@ -26,7 +26,7 @@ struct OnboardingDataTests {
         let item = OnboardingItem(
             title: "Test Title",
             subtitle: "Test Subtitle",
-            systemImage: "star"
+            systemImage: "star",
         )
 
         #expect(item.title == "Test Title")

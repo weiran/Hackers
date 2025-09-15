@@ -5,14 +5,14 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Comments
+import DesignSystem
+import Domain
+import Feed
+import Settings
+import Shared
 import SwiftUI
 import UIKit
-import Settings
-import Comments
-import Feed
-import DesignSystem
-import Shared
-import Domain
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
@@ -29,13 +29,13 @@ struct MainContentView: View {
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     FeedView<NavigationStore, SessionService>(
-                        isSidebar: false
+                        isSidebar: false,
                     )
                     .environmentObject(navigationStore)
                     .environmentObject(sessionService)
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
-                        case .comments(let post):
+                        case let .comments(post):
                             CommentsView<NavigationStore>(post: post)
                                 .environmentObject(navigationStore)
                                 .environmentObject(sessionService)
@@ -52,7 +52,7 @@ struct MainContentView: View {
                                 },
                                 onShowOnboarding: {
                                     showOnboarding = true
-                                }
+                                },
                             )
                             .environmentObject(navigationStore)
                             .environmentObject(sessionService)
@@ -74,7 +74,7 @@ struct MainContentView: View {
                 },
                 onLogout: {
                     sessionService.unauthenticate()
-                }
+                },
             )
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
@@ -90,7 +90,7 @@ struct MainContentView: View {
                 },
                 onShowOnboarding: {
                     showOnboarding = true
-                }
+                },
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)
@@ -112,7 +112,7 @@ struct AdaptiveSplitView: View {
         NavigationSplitView {
             // Sidebar - FeedView
             FeedView<NavigationStore, SessionService>(
-                isSidebar: true
+                isSidebar: true,
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)

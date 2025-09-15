@@ -5,8 +5,8 @@
 //  Split voting-related methods from PostRepository to reduce file length
 //
 
-import Foundation
 import Domain
+import Foundation
 import SwiftSoup
 
 extension PostRepository {
@@ -15,6 +15,7 @@ extension PostRepository {
         let unvote: URL?
         let upvoted: Bool
     }
+
     // MARK: - VoteUseCase
 
     public func upvote(post: Post) async throws {
@@ -38,7 +39,7 @@ extension PostRepository {
 
     // Unvote functionality removed
 
-    public func upvote(comment: Domain.Comment, for post: Post) async throws {
+    public func upvote(comment: Domain.Comment, for _: Post) async throws {
         guard let voteLinks = comment.voteLinks else { throw HackersKitError.unauthenticated }
         guard let upvoteURL = voteLinks.upvote else {
             if voteLinks.unvote == nil { throw HackersKitError.unauthenticated }
@@ -63,7 +64,7 @@ extension PostRepository {
 
     func voteLinks(
         from titleElement: Element,
-        metadata metadataElement: Element? = nil
+        metadata metadataElement: Element? = nil,
     ) throws -> VoteLinkInfo {
         let voteLinkElements = try titleElement.select("td.votelinks a")
         var upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
@@ -73,7 +74,7 @@ extension PostRepository {
             unvoteLink = try voteLinkElements.first { try $0.text().lowercased() == "unvote" }
         }
 
-        if unvoteLink == nil, let metadataElement = metadataElement {
+        if unvoteLink == nil, let metadataElement {
             let metadataUnvoteLinks = try metadataElement.select("a")
             unvoteLink = try metadataUnvoteLinks.first { try $0.attr("id").starts(with: "un_") }
             if unvoteLink == nil {
@@ -87,8 +88,8 @@ extension PostRepository {
         }
         if unvoteLink == nil {
             let anyLinks = try titleElement.select("a")
-            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") }
-                ?? (try anyLinks.first { try $0.text().lowercased() == "unvote" })
+            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") try }
+                ?? (anyLinks.first { try $0.text().lowercased() == "unvote" })
         }
 
         let upvoteURL = try upvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
@@ -99,7 +100,7 @@ extension PostRepository {
             return (try? upElement.hasClass("nosee")) ?? false
         }()
 
-        if derivedUnvoteURL == nil, upvoteHidden, let upvoteURL = upvoteURL {
+        if derivedUnvoteURL == nil, upvoteHidden, let upvoteURL {
             let unvoteURLString = upvoteURL.absoluteString.replacingOccurrences(of: "how=up", with: "how=un")
             derivedUnvoteURL = URL(string: unvoteURLString)
         }

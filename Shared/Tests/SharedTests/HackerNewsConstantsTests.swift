@@ -5,13 +5,12 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 import Foundation
 @testable import Shared
+import Testing
 
 @Suite("HackerNewsConstants Tests")
 struct HackerNewsConstantsTests {
-
     @Test("baseURL is correct")
     func testBaseURL() {
         #expect(HackerNewsConstants.baseURL == "https://news.ycombinator.com")
@@ -28,7 +27,7 @@ struct HackerNewsConstantsTests {
     }
 
     @Test("baseURL is a valid URL")
-    func testBaseURLValidity() {
+    func baseURLValidity() {
         let url = URL(string: HackerNewsConstants.baseURL)
         #expect(url != nil)
         #expect(url?.scheme == "https")
@@ -36,20 +35,20 @@ struct HackerNewsConstantsTests {
     }
 
     @Test("Constants are not empty")
-    func testConstantsNotEmpty() {
+    func constantsNotEmpty() {
         #expect(HackerNewsConstants.baseURL.isEmpty == false)
         #expect(HackerNewsConstants.host.isEmpty == false)
         #expect(HackerNewsConstants.itemPrefix.isEmpty == false)
     }
 
     @Test("baseURL and host are consistent")
-    func testBaseURLHostConsistency() {
+    func baseURLHostConsistency() {
         let url = URL(string: HackerNewsConstants.baseURL)
         #expect(url?.host == HackerNewsConstants.host)
     }
 
     @Test("itemPrefix can be used to construct item URLs")
-    func testItemPrefixUsage() {
+    func itemPrefixUsage() {
         let itemId = 12345
         let itemURL = HackerNewsConstants.baseURL + "/" + HackerNewsConstants.itemPrefix + "\(itemId)"
         let expectedURL = "https://news.ycombinator.com/item?id=12345"
@@ -58,7 +57,7 @@ struct HackerNewsConstantsTests {
     }
 
     @Test("Constants struct cannot be instantiated")
-    func testPrivateInitializer() {
+    func privateInitializer() {
         // This test ensures the init is private by attempting to use the struct
         // The fact that we can access static properties but can't create instances
         // confirms the design
@@ -78,7 +77,7 @@ struct HackerNewsConstantsTests {
     }
 
     @Test("Constants are immutable")
-    func testConstantsImmutability() {
+    func constantsImmutability() {
         // Test that accessing constants multiple times returns the same values
         let baseURL1 = HackerNewsConstants.baseURL
         let baseURL2 = HackerNewsConstants.baseURL

@@ -7,16 +7,15 @@
 
 // swiftlint:disable force_cast
 
-import Testing
-import SwiftUI
+@testable import Domain
 import MessageUI
 @testable import Settings
-@testable import Domain
 @testable import Shared
+import SwiftUI
+import Testing
 
 @Suite("SettingsView Tests")
 struct SettingsViewTests {
-
     // MARK: - Mock Navigation Store
 
     final class MockNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
@@ -36,7 +35,7 @@ struct SettingsViewTests {
             showingSettings = true
         }
 
-        func selectPostType(_ type: Domain.PostType) {
+        func selectPostType(_: Domain.PostType) {
             // Mock implementation
         }
     }
@@ -51,12 +50,9 @@ struct SettingsViewTests {
 
     // MARK: - View Compilation Tests
 
-
     // MARK: - Integration Tests with ViewModel
 
-
     // MARK: - Accessibility Tests
-
 
     // MARK: - Bundle Tests
 
@@ -67,7 +63,7 @@ struct SettingsViewTests {
 
         // Icon might be nil in test environment, that's okay
         // Just test that the method doesn't crash
-        if let icon = icon {
+        if let icon {
             #expect(icon.size.width > 0)
             #expect(icon.size.height > 0)
         }
@@ -75,8 +71,5 @@ struct SettingsViewTests {
 
     // MARK: - Onboarding Tests
 
-
     // MARK: - SwiftUI Integration Tests
-
-
 }

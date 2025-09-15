@@ -5,9 +5,9 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Domain
 import Shared
+import SwiftUI
 
 public struct LoginView: View {
     @State private var username: String = ""
@@ -30,7 +30,7 @@ public struct LoginView: View {
         isAuthenticated: Bool,
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
-        onLogout: @escaping () -> Void
+        onLogout: @escaping () -> Void,
     ) {
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
@@ -65,11 +65,11 @@ public struct LoginView: View {
             LinearGradient(
                 gradient: Gradient(colors: [
                     Color(.systemBackground),
-                    Color(.systemGray6).opacity(0.3)
+                    Color(.systemGray6).opacity(0.3),
                 ]),
                 startPoint: .top,
-                endPoint: .bottom
-            )
+                endPoint: .bottom,
+            ),
         )
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -83,7 +83,7 @@ public struct LoginView: View {
             }
         }
         .alert("Login Failed", isPresented: $showAlert) {
-            Button("OK", role: .cancel) { }
+            Button("OK", role: .cancel) {}
         } message: {
             Text("Please check your username and password and try again.")
         }
@@ -123,7 +123,7 @@ public struct LoginView: View {
                 ModernTextField(
                     title: "Username",
                     text: $username,
-                    isSecure: false
+                    isSecure: false,
                 )
                 .textContentType(.username)
                 .autocapitalization(.none)
@@ -136,12 +136,12 @@ public struct LoginView: View {
                 ModernTextField(
                     title: "Password",
                     text: $password,
-                    isSecure: true
+                    isSecure: true,
                 )
                 .textContentType(.password)
                 .focused($focusedField, equals: .password)
                 .onSubmit {
-                    if !username.isEmpty && !password.isEmpty {
+                    if !username.isEmpty, !password.isEmpty {
                         performLogin()
                     }
                 }
@@ -182,7 +182,7 @@ public struct LoginView: View {
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(loginButtonGradient)
+                            .fill(loginButtonGradient),
                     )
                     .scaleEffect(isAuthenticating ? 0.95 : 1.0)
                     .animation(.easeInOut(duration: 0.1), value: isAuthenticating)
@@ -201,10 +201,9 @@ public struct LoginView: View {
         return LinearGradient(
             gradient: Gradient(colors: isEnabled ?
                 [Color.orange, Color.orange.opacity(0.8)] :
-                [Color.gray.opacity(0.6), Color.gray.opacity(0.4)]
-            ),
+                [Color.gray.opacity(0.6), Color.gray.opacity(0.4)]),
             startPoint: .topLeading,
-            endPoint: .bottomTrailing
+            endPoint: .bottomTrailing,
         )
     }
 
@@ -252,8 +251,8 @@ public struct LoginView: View {
                             .fill(LinearGradient(
                                 gradient: Gradient(colors: [Color.red, Color.red.opacity(0.8)]),
                                 startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
+                                endPoint: .bottomTrailing,
+                            )),
                     )
                 }
                 .padding(.horizontal, 20)
@@ -326,8 +325,8 @@ struct ModernTextField: View {
                     .fill(Color(.systemGray6))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(isFocused ? Color.orange : Color.clear, lineWidth: 2)
-                    )
+                            .stroke(isFocused ? Color.orange : Color.clear, lineWidth: 2),
+                    ),
             )
             .focused($isFocused)
         }

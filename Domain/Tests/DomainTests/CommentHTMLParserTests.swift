@@ -7,17 +7,16 @@
 
 // swiftlint:disable file_length type_body_length line_length force_cast
 
-import Testing
-import Foundation
 @testable import Domain
+import Foundation
+import Testing
 
 @Suite("CommentHTMLParser Tests")
 struct CommentHTMLParserTests {
-
     // MARK: - HTML Entity Decoding Tests
 
     @Test("HTML entity decoding handles basic entities")
-    func testHTMLEntityDecoding() {
+    func hTMLEntityDecoding() {
         let input = "This &amp; that &lt;tag&gt; &quot;quoted&quot; &#x27;apostrophe&#39; &nbsp;space"
         let expected = "This & that <tag> \"quoted\" 'apostrophe' space"
         let result = CommentHTMLParser.decodeHTMLEntities(input)
@@ -25,14 +24,14 @@ struct CommentHTMLParserTests {
     }
 
     @Test("HTML entity decoding preserves text without entities")
-    func testHTMLEntityDecodingNoEntities() {
+    func hTMLEntityDecodingNoEntities() {
         let input = "This is plain text with no entities"
         let result = CommentHTMLParser.decodeHTMLEntities(input)
         #expect(result == input, "Text without entities should remain unchanged")
     }
 
     @Test("HTML entity decoding handles mixed content correctly")
-    func testHTMLEntityDecodingMixedContent() {
+    func hTMLEntityDecodingMixedContent() {
         let input = "Code: if (x &lt; y &amp;&amp; z &gt; w) { return &quot;success&quot;; }"
         let expected = "Code: if (x < y && z > w) { return \"success\"; }"
         let result = CommentHTMLParser.decodeHTMLEntities(input)
@@ -42,7 +41,7 @@ struct CommentHTMLParserTests {
     // MARK: - HTML Tag Stripping Tests
 
     @Test("HTML tag stripping removes basic tags")
-    func testHTMLTagStripping() {
+    func hTMLTagStripping() {
         let input = "<p>Hello <b>world</b> <i>test</i></p>"
         let expected = "Hello world test"
         let result = CommentHTMLParser.stripHTMLTags(input)
@@ -50,7 +49,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("HTML tag stripping removes complex tags with attributes")
-    func testHTMLTagStrippingWithAttributes() {
+    func hTMLTagStrippingWithAttributes() {
         let input = "<div class=\"test\" id=\"example\">Content <span style=\"color: red\">here</span></div>"
         let expected = "Content here"
         let result = CommentHTMLParser.stripHTMLTags(input)
@@ -58,7 +57,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("HTML tag stripping preserves text without tags")
-    func testHTMLTagStrippingNoTags() {
+    func hTMLTagStrippingNoTags() {
         let input = "Plain text without any tags"
         let result = CommentHTMLParser.stripHTMLTags(input)
         #expect(result == input, "Text without HTML tags should remain unchanged")
@@ -67,7 +66,7 @@ struct CommentHTMLParserTests {
     // MARK: - Link Parsing Tests
 
     @Test("Link parsing handles basic link correctly")
-    func testBasicLinkParsing() {
+    func basicLinkParsing() {
         let input = "Check out <a href=\"https://example.com\">this link</a> for more info."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -79,12 +78,12 @@ struct CommentHTMLParserTests {
         let linkRange = resultString.range(of: "this link")!
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.upperBound))
-        let linkAttributes = result[start..<end]
+        let linkAttributes = result[start ..< end]
         #expect(linkAttributes.link?.absoluteString == "https://example.com", "Link should have correct URL")
     }
 
     @Test("Link parsing handles multiple links correctly")
-    func testMultipleLinkParsing() {
+    func multipleLinkParsing() {
         let input = "Visit <a href=\"https://site1.com\">Site 1</a> and <a href=\"https://site2.com\">Site 2</a> today."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -94,7 +93,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Link parsing handles links with single quotes")
-    func testLinkParsingWithSingleQuotes() {
+    func linkParsingWithSingleQuotes() {
         let input = "Check <a href='https://example.com'>this site</a> out."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -103,7 +102,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Link parsing handles links with additional attributes")
-    func testLinkParsingWithAttributes() {
+    func linkParsingWithAttributes() {
         let input = "Visit <a href=\"https://example.com\" target=\"_blank\" class=\"link\">Example</a> now."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -112,7 +111,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Link parsing preserves whitespace around links")
-    func testLinkParsingPreservesWhitespace() {
+    func linkParsingPreservesWhitespace() {
         let input = "Text before <a href=\"https://example.com\">link</a> text after"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -122,7 +121,7 @@ struct CommentHTMLParserTests {
     // MARK: - Paragraph Handling Tests
 
     @Test("Paragraph parsing handles single paragraph correctly")
-    func testSingleParagraphParsing() {
+    func singleParagraphParsing() {
         let input = "<p>This is a paragraph with some content.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -131,7 +130,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Paragraph parsing handles multiple paragraphs with proper spacing")
-    func testMultipleParagraphParsing() {
+    func multipleParagraphParsing() {
         let input = "<p>First paragraph content.</p><p>Second paragraph content.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -141,7 +140,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Paragraph parsing handles paragraphs containing links")
-    func testParagraphWithLinkParsing() {
+    func paragraphWithLinkParsing() {
         let input = "<p>Check out <a href=\"https://example.com\">this link</a> in paragraph.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -151,7 +150,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Paragraph parsing handles text before first paragraph")
-    func testTextBeforeFirstParagraph() {
+    func textBeforeFirstParagraph() {
         let input = "Text before paragraph <p>This is the paragraph content.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -161,7 +160,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Paragraph parsing handles text after last paragraph")
-    func testTextAfterLastParagraph() {
+    func textAfterLastParagraph() {
         let input = "<p>This is the paragraph content.</p>Text after paragraph"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -171,7 +170,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Paragraph parsing handles links in text before paragraphs")
-    func testLinkInTextBeforeParagraph() {
+    func linkInTextBeforeParagraph() {
         let input = "Check <a href=\"https://example.com\">this link</a> before paragraph <p>Paragraph content.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -183,7 +182,7 @@ struct CommentHTMLParserTests {
     // MARK: - Complex Content Tests
 
     @Test("Complex content parsing handles mixed paragraphs and links")
-    func testComplexMixedContent() {
+    func complexMixedContent() {
         let input = """
         Introduction text with <a href="https://intro.com">intro link</a>.
         <p>First paragraph with <a href="https://first.com">first link</a> and more content.</p>
@@ -201,7 +200,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Complex content parsing handles nested HTML with entities")
-    func testComplexNestedHTMLWithEntities() {
+    func complexNestedHTMLWithEntities() {
         let input = "<p>Code example: <code>if (x &lt; y &amp;&amp; z &gt; 0) { return true; }</code></p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -212,25 +211,25 @@ struct CommentHTMLParserTests {
     // MARK: - Edge Cases
 
     @Test("Edge case handles empty string correctly")
-    func testEmptyString() {
+    func emptyString() {
         let result = CommentHTMLParser.parseHTMLText("")
         #expect(result.characters.isEmpty, "Empty string should return empty AttributedString")
     }
 
     @Test("Edge case handles whitespace-only string correctly")
-    func testWhitespaceOnly() {
+    func whitespaceOnly() {
         let result = CommentHTMLParser.parseHTMLText("   \n\t   ")
         #expect(result.characters.isEmpty, "Whitespace-only string should return empty AttributedString")
     }
 
     @Test("Edge case handles HTML tags without content")
-    func testHTMLTagsOnly() {
+    func hTMLTagsOnly() {
         let result = CommentHTMLParser.parseHTMLText("<p></p><div></div>")
         #expect(result.characters.isEmpty, "Empty HTML tags should return empty AttributedString")
     }
 
     @Test("Edge case handles malformed links gracefully")
-    func testMalformedLink() {
+    func malformedLink() {
         let input = "Check <a href=\"https://example.com\">incomplete link"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -239,7 +238,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Edge case handles links without href attribute")
-    func testLinkWithoutHref() {
+    func linkWithoutHref() {
         let input = "Check <a>link without href</a> here"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -247,7 +246,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Edge case handles empty paragraphs correctly")
-    func testEmptyParagraph() {
+    func emptyParagraph() {
         let input = "Before <p></p> after"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -258,7 +257,7 @@ struct CommentHTMLParserTests {
     // MARK: - Newline Handling Tests
 
     @Test("Newline handling converts newlines to spaces without paragraphs")
-    func testNewlineHandlingWithoutParagraphs() {
+    func newlineHandlingWithoutParagraphs() {
         let input = "Line one\nLine two\nLine three"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -266,7 +265,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Newline handling converts newlines in link text to spaces")
-    func testNewlineHandlingInLinks() {
+    func newlineHandlingInLinks() {
         let input = "Check out <a href=\"https://example.com\">this\nlink\ntext</a> here"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -274,7 +273,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Newline handling normalizes text around links")
-    func testNewlineHandlingAroundLinks() {
+    func newlineHandlingAroundLinks() {
         let input = "Text\nwith\nnewlines <a href=\"https://example.com\">link</a> more\ntext\nhere"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -282,7 +281,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Newline handling preserves paragraph structure while normalizing other content")
-    func testOnlyParagraphsCreateNewlines() {
+    func onlyParagraphsCreateNewlines() {
         let input = "Text\nbefore\n<p>Paragraph\ncontent\nhere</p>\nText\nafter"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -293,7 +292,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Newline handling normalizes complex HTML to single spaces")
-    func testComplexHTMLNewlineHandling() {
+    func complexHTMLNewlineHandling() {
         let input = "Start\ntext\n<div>Some\ndiv\ncontent</div>\nMiddle\ntext\n<span>span\ncontent</span>\nEnd\ntext"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -304,7 +303,7 @@ struct CommentHTMLParserTests {
     // MARK: - Bold Formatting Tests
 
     @Test("Bold formatting applies to basic bold tags")
-    func testBasicBoldFormatting() {
+    func basicBoldFormatting() {
         let input = "This is <b>bold text</b> in a sentence."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -314,12 +313,12 @@ struct CommentHTMLParserTests {
         let boldRange = resultString.range(of: "bold text")!
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.upperBound))
-        let attributes = result[start..<end]
+        let attributes = result[start ..< end]
         #expect(attributes.font != nil, "Bold text should have font attribute")
     }
 
     @Test("Bold formatting handles multiple bold tags correctly")
-    func testMultipleBoldFormatting() {
+    func multipleBoldFormatting() {
         let input = "First <b>bold</b> and second <b>bold</b> text."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -328,7 +327,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Bold formatting handles bold tags with attributes")
-    func testBoldFormattingWithAttributes() {
+    func boldFormattingWithAttributes() {
         let input = "Text with <b class=\"highlight\" id=\"test\">bold styling</b> here."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -337,7 +336,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Bold formatting handles nested bold content")
-    func testBoldFormattingNested() {
+    func boldFormattingNested() {
         let input = "Check <a href=\"https://example.com\">this <b>bold link</b></a> out."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -347,7 +346,7 @@ struct CommentHTMLParserTests {
     // MARK: - Italic Formatting Tests
 
     @Test("Italic formatting applies to basic italic tags")
-    func testBasicItalicFormatting() {
+    func basicItalicFormatting() {
         let input = "This is <i>italic text</i> in a sentence."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -357,12 +356,12 @@ struct CommentHTMLParserTests {
         let italicRange = resultString.range(of: "italic text")!
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.upperBound))
-        let attributes = result[start..<end]
+        let attributes = result[start ..< end]
         #expect(attributes.font != nil, "Italic text should have font attribute")
     }
 
     @Test("Italic formatting handles multiple italic tags correctly")
-    func testMultipleItalicFormatting() {
+    func multipleItalicFormatting() {
         let input = "First <i>italic</i> and second <i>italic</i> text."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -371,7 +370,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Italic formatting handles italic tags with attributes")
-    func testItalicFormattingWithAttributes() {
+    func italicFormattingWithAttributes() {
         let input = "Text with <i class=\"emphasis\" style=\"color: blue\">italic styling</i> here."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -380,7 +379,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Italic formatting handles nested italic content")
-    func testItalicFormattingNested() {
+    func italicFormattingNested() {
         let input = "Check <a href=\"https://example.com\">this <i>italic link</i></a> out."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -390,7 +389,7 @@ struct CommentHTMLParserTests {
     // MARK: - Combined Formatting Tests
 
     @Test("Combined formatting handles bold and italic together")
-    func testBoldAndItalicTogether() {
+    func boldAndItalicTogether() {
         let input = "Text with <b>bold</b> and <i>italic</i> formatting."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -400,7 +399,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Combined formatting handles nested bold and italic")
-    func testNestedBoldAndItalic() {
+    func nestedBoldAndItalic() {
         let input = "This has <b>bold with <i>nested italic</i> text</b> content."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -408,7 +407,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Combined formatting handles bold, italic, and links together")
-    func testBoldItalicAndLinks() {
+    func boldItalicAndLinks() {
         let input = "Check <a href=\"https://example.com\"><b>bold</b> and <i>italic</i> link</a> here."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -419,12 +418,12 @@ struct CommentHTMLParserTests {
         let linkRange = resultString.range(of: "bold and italic link")!
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.upperBound))
-        let linkAttributes = result[start..<end]
+        let linkAttributes = result[start ..< end]
         #expect(linkAttributes.link != nil, "Link text should have URL attribute")
     }
 
     @Test("Combined formatting handles formatting within paragraphs")
-    func testFormattingInParagraphs() {
+    func formattingInParagraphs() {
         let input = "<p>First paragraph with <b>bold</b> text.</p><p>Second paragraph with <i>italic</i> text.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -437,7 +436,7 @@ struct CommentHTMLParserTests {
     // MARK: - Formatting Edge Cases
 
     @Test("Formatting edge cases handle empty bold tags")
-    func testEmptyBoldTag() {
+    func emptyBoldTag() {
         let input = "Text with <b></b> empty bold tag."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -445,7 +444,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Formatting edge cases handle empty italic tags")
-    func testEmptyItalicTag() {
+    func emptyItalicTag() {
         let input = "Text with <i></i> empty italic tag."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -453,7 +452,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Formatting edge cases handle malformed bold tags")
-    func testMalformedBoldTag() {
+    func malformedBoldTag() {
         let input = "Text with <b>unclosed bold tag."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -461,7 +460,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Formatting edge cases handle malformed italic tags")
-    func testMalformedItalicTag() {
+    func malformedItalicTag() {
         let input = "Text with <i>unclosed italic tag."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -469,7 +468,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Formatting edge cases handle bold and italic with HTML entities")
-    func testFormattingWithEntities() {
+    func formattingWithEntities() {
         let input = "Code: <b>if (x &lt; y)</b> and <i>result &amp;&amp; true</i>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -480,7 +479,7 @@ struct CommentHTMLParserTests {
     // MARK: - Code Block Tests
 
     @Test("Code block parsing handles basic pre/code blocks")
-    func testBasicCodeBlockParsing() {
+    func basicCodeBlockParsing() {
         let input = "Here is some code: <pre><code>function hello() {\n  return \"world\";\n}</code></pre> And more text."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -495,7 +494,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Code block parsing handles HTML entities in code")
-    func testCodeBlockWithHTMLEntities() {
+    func codeBlockWithHTMLEntities() {
         let input = "<pre><code>if (x &lt; y &amp;&amp; z &gt; w) {\n  return &quot;success&quot;;\n}</code></pre>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -504,7 +503,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Code block parsing handles multiple code blocks")
-    func testMultipleCodeBlocks() {
+    func multipleCodeBlocks() {
         let input = "First block: <pre><code>const a = 1;</code></pre> Second block: <pre><code>const b = 2;</code></pre>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -513,7 +512,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Inline code parsing handles basic inline code")
-    func testBasicInlineCodeParsing() {
+    func basicInlineCodeParsing() {
         let input = "Use the <code>getData()</code> function to retrieve data."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -522,7 +521,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Inline code parsing handles HTML entities in inline code")
-    func testInlineCodeWithHTMLEntities() {
+    func inlineCodeWithHTMLEntities() {
         let input = "Check if <code>x &lt; y &amp;&amp; z &gt; w</code> is true."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -530,7 +529,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Mixed code formatting handles code blocks and inline code together")
-    func testMixedCodeFormatting() {
+    func mixedCodeFormatting() {
         let input = "Use <code>foo()</code> like this:\n<pre><code>function foo() {\n  return bar();\n}</code></pre>\nThen call <code>bar()</code>."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -540,7 +539,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Code with other formatting handles bold, italic, and code together")
-    func testCodeWithOtherFormatting() {
+    func codeWithOtherFormatting() {
         let input = "This is <b>bold</b>, <i>italic</i>, and <code>code</code> text."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -548,7 +547,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Code blocks in paragraphs")
-    func testCodeBlocksInParagraphs() {
+    func codeBlocksInParagraphs() {
         let input = "<p>First paragraph with text.</p><p><pre><code>const example = true;</code></pre></p><p>Last paragraph.</p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -558,7 +557,7 @@ struct CommentHTMLParserTests {
     }
 
     @Test("Code block paragraph spacing")
-    func testCodeBlockParagraphSpacing() {
+    func codeBlockParagraphSpacing() {
         let input = "Text before code block.<pre><code>const code = 123;</code></pre>Text after code block."
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -573,7 +572,7 @@ struct CommentHTMLParserTests {
     // MARK: - String Extension Tests
 
     @Test("String extension strippingHTML removes HTML and decodes entities")
-    func testStringExtensionStrippingHTML() {
+    func stringExtensionStrippingHTML() {
         let input = "<p>Hello &amp; <a href=\"https://example.com\">world</a>!</p>"
         let result = input.strippingHTML()
         let expected = "Hello & world!"
@@ -581,14 +580,14 @@ struct CommentHTMLParserTests {
     }
 
     @Test("String extension strippingHTML trims whitespace correctly")
-    func testStringExtensionStrippingHTMLWithWhitespace() {
+    func stringExtensionStrippingHTMLWithWhitespace() {
         let input = "  <p>  Content  </p>  "
         let result = input.strippingHTML()
         #expect(result == "Content", "String extension should trim whitespace")
     }
 
     @Test("String extension strippingHTML removes formatting tags")
-    func testStringExtensionStrippingHTMLWithFormatting() {
+    func stringExtensionStrippingHTMLWithFormatting() {
         let input = "<p>Text with <b>bold</b> and <i>italic</i> formatting.</p>"
         let result = input.strippingHTML()
         let expected = "Text with bold and italic formatting."

@@ -5,11 +5,11 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import UIKit
 import MobileCoreServices
+import UIKit
 
 class ActionViewController: OpenInViewController {
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet var infoLabel: UILabel!
 
     @IBAction func done() {
         close()

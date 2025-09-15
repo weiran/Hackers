@@ -6,9 +6,10 @@
 //
 
 import Domain
-import Networking
 import Foundation
+import Networking
 import SwiftSoup
+
 public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sendable {
     let networkManager: NetworkManagerProtocol
     let urlBase = "https://news.ycombinator.com"
@@ -35,15 +36,14 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
         }
 
         // Parse the post from the fatitem table
-        let posts = try self.posts(from: fatitemTable, type: .news)
+        let posts = try posts(from: fatitemTable, type: .news)
         guard let post = posts.first else {
             throw HackersKitError.scraperError
         }
 
-        let comments = try self.comments(from: html)
+        let comments = try comments(from: html)
         var postWithComments = post
         postWithComments.comments = comments
         return postWithComments
     }
-
 }

@@ -5,11 +5,11 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 @testable import Comments
 import Domain
-import Shared
 import Foundation
+import Shared
+import Testing
 
 @Suite("CommentsViewModel Tests")
 struct CommentsViewModelTests {
@@ -20,11 +20,11 @@ struct CommentsViewModelTests {
     let sut: CommentsViewModel
 
     init() {
-        self.mockPostUseCase = MockPostUseCase()
-        self.mockCommentUseCase = MockCommentUseCase()
-        self.mockVoteUseCase = MockVoteUseCase()
+        mockPostUseCase = MockPostUseCase()
+        mockCommentUseCase = MockCommentUseCase()
+        mockVoteUseCase = MockVoteUseCase()
 
-        self.testPost = Post(
+        testPost = Post(
             id: 1,
             url: URL(string: "https://example.com")!,
             title: "Test Post",
@@ -33,14 +33,14 @@ struct CommentsViewModelTests {
             by: "testuser",
             score: 100,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
 
-        self.sut = CommentsViewModel(
+        sut = CommentsViewModel(
             post: testPost,
             postUseCase: mockPostUseCase,
             commentUseCase: mockCommentUseCase,
-            voteUseCase: mockVoteUseCase
+            voteUseCase: mockVoteUseCase,
         )
     }
 
@@ -191,11 +191,11 @@ struct CommentsViewModelTests {
         let sut: CommentsViewModel
 
         init() {
-            self.mockPostUseCase = MockPostUseCase()
-            self.mockCommentUseCase = MockCommentUseCase()
-            self.mockVoteUseCase = MockVoteUseCase()
+            mockPostUseCase = MockPostUseCase()
+            mockCommentUseCase = MockCommentUseCase()
+            mockVoteUseCase = MockVoteUseCase()
 
-            self.testPost = Post(
+            testPost = Post(
                 id: 1,
                 url: URL(string: "https://example.com")!,
                 title: "Test",
@@ -204,26 +204,26 @@ struct CommentsViewModelTests {
                 by: "user",
                 score: 0,
                 postType: .news,
-                upvoted: false
+                upvoted: false,
             )
 
-            self.sut = CommentsViewModel(
+            sut = CommentsViewModel(
                 post: testPost,
                 postUseCase: mockPostUseCase,
                 commentUseCase: mockCommentUseCase,
-                voteUseCase: mockVoteUseCase
+                voteUseCase: mockVoteUseCase,
             )
         }
 
         private func createTestComment(id: Int, level: Int = 0) -> Domain.Comment {
-            return Domain.Comment(
+            Domain.Comment(
                 id: id,
                 age: "1 hour ago",
                 text: "Test comment \(id)",
                 by: "user\(id)",
                 level: level,
                 upvoted: false,
-                visibility: Domain.CommentVisibilityType.visible
+                visibility: Domain.CommentVisibilityType.visible,
             )
         }
 
@@ -325,24 +325,24 @@ struct CommentsViewModelTests {
     // MARK: - Helper Methods
 
     private func createTestComments() -> [Domain.Comment] {
-        return [
+        [
             createTestComment(id: 1, level: 0),
             createTestComment(id: 2, level: 1),
             createTestComment(id: 3, level: 1),
             createTestComment(id: 4, level: 2),
-            createTestComment(id: 5, level: 0)
+            createTestComment(id: 5, level: 0),
         ]
     }
 
     private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Domain.Comment {
-        return Domain.Comment(
+        Domain.Comment(
             id: id,
             age: "1 hour ago",
             text: "Test comment \(id)",
             by: "user\(id)",
             level: level,
             upvoted: upvoted,
-            visibility: Domain.CommentVisibilityType.visible
+            visibility: Domain.CommentVisibilityType.visible,
         )
     }
 
@@ -378,18 +378,18 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
             by: "mockuser",
             score: 0,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
     }
 
-    func getPosts(type: PostType, page: Int, nextId: Int?) async throws -> [Post] {
-        return []
+    func getPosts(type _: PostType, page _: Int, nextId _: Int?) async throws -> [Post] {
+        []
     }
 }
 
 final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
-    func getComments(for post: Post) async throws -> [Domain.Comment] {
-        return []
+    func getComments(for _: Post) async throws -> [Domain.Comment] {
+        []
     }
 }
 
@@ -398,14 +398,14 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
     var upvoteCommentCalled = false
     var shouldThrowError = false
 
-    func upvote(post: Post) async throws {
+    func upvote(post _: Post) async throws {
         upvotePostCalled = true
         if shouldThrowError {
             throw MockError.testError
         }
     }
 
-    func upvote(comment: Domain.Comment, for post: Post) async throws {
+    func upvote(comment _: Domain.Comment, for _: Post) async throws {
         upvoteCommentCalled = true
         if shouldThrowError {
             throw MockError.testError
@@ -419,13 +419,13 @@ enum MockError: Error {
 
 // Helper function to create test comment outside of struct
 private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -> Domain.Comment {
-    return Domain.Comment(
+    Domain.Comment(
         id: id,
         age: "1 hour ago",
         text: "Test comment \(id)",
         by: "user\(id)",
         level: level,
         upvoted: upvoted,
-        visibility: .visible
+        visibility: .visible,
     )
 }

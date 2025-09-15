@@ -33,7 +33,7 @@ public struct ThumbnailView: View {
     }
 
     public var body: some View {
-        if let url = url, let thumbnailURL = thumbnailURL(for: url) {
+        if let url, let thumbnailURL = thumbnailURL(for: url) {
             AsyncImage(url: thumbnailURL) { image in
                 image
                     .resizable()

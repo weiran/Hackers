@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Domain
+import SwiftUI
 
 public struct VoteButton: View {
     private let votingState: VotingState
@@ -16,7 +16,7 @@ public struct VoteButton: View {
     public init(
         votingState: VotingState,
         style: VoteButtonStyle = .default,
-        action: @escaping @Sendable () -> Void
+        action: @escaping @Sendable () -> Void,
     ) {
         self.votingState = votingState
         self.style = style
@@ -57,9 +57,9 @@ public struct VoteButton: View {
 
     private var iconName: String {
         if votingState.isUpvoted {
-            return style.upvotedIconName
+            style.upvotedIconName
         } else {
-            return style.defaultIconName
+            style.defaultIconName
         }
     }
 }
@@ -86,7 +86,7 @@ public struct VoteButtonStyle: Sendable {
         upvotedIconName: String = "arrow.up.circle.fill",
         defaultColor: Color = .primary,
         upvotedColor: Color = AppColors.upvotedColor,
-        disabledColor: Color = .secondary
+        disabledColor: Color = .secondary,
     ) {
         self.showScore = showScore
         self.iconFont = iconFont
@@ -102,11 +102,11 @@ public struct VoteButtonStyle: Sendable {
 
     public func foregroundColor(for state: VotingState) -> Color {
         if !state.canVote {
-            return disabledColor
+            disabledColor
         } else if state.isUpvoted {
-            return upvotedColor
+            upvotedColor
         } else {
-            return defaultColor
+            defaultColor
         }
     }
 
@@ -115,12 +115,12 @@ public struct VoteButtonStyle: Sendable {
     public static let compact = VoteButtonStyle(
         showScore: false,
         iconFont: .caption,
-        spacing: 0
+        spacing: 0,
     )
 
     public static let inline = VoteButtonStyle(
         iconFont: .subheadline,
         scoreFont: .subheadline,
-        spacing: 6
+        spacing: 6,
     )
 }

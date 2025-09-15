@@ -5,52 +5,51 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
-import Foundation
 import Domain
+import Foundation
 @testable import Shared
+import Testing
 
 @Suite("VotingViewModel Tests")
 struct VotingViewModelTests {
-    
     let mockVotingService = MockVotingService()
     let mockCommentVotingService = MockCommentVotingService()
-    
+
     @MainActor
     var votingViewModel: VotingViewModel {
         VotingViewModel(
             votingService: mockVotingService,
-            commentVotingService: mockCommentVotingService
+            commentVotingService: mockCommentVotingService,
         )
     }
 
     // MARK: - Mock Services
-    
+
     final class MockVotingService: VotingService, @unchecked Sendable {
         var upvoteCalled = false
         var shouldThrow = false
-        
+
         func votingState(for item: any Votable) -> VotingState {
-            return VotingState(
+            VotingState(
                 isUpvoted: item.upvoted,
                 score: (item as? any ScoredVotable)?.score,
-                canVote: item.voteLinks?.upvote != nil
+                canVote: item.voteLinks?.upvote != nil,
             )
         }
-        
-        func upvote(item: any Votable) async throws {
+
+        func upvote(item _: any Votable) async throws {
             upvoteCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
             }
         }
     }
-    
+
     final class MockCommentVotingService: CommentVotingService, @unchecked Sendable {
         var upvoteCommentCalled = false
         var shouldThrow = false
-        
-        func upvoteComment(_ comment: Domain.Comment, for post: Post) async throws {
+
+        func upvoteComment(_: Domain.Comment, for _: Post) async throws {
             upvoteCommentCalled = true
             if shouldThrow {
                 throw HackersKitError.requestFailure
@@ -59,7 +58,7 @@ struct VotingViewModelTests {
     }
 
     // MARK: - Comment Voting Tests
-    
+
     @Test("Comment voting with MainActor")
     @MainActor
     func commentVotingWithMainActor() async throws {
@@ -72,9 +71,9 @@ struct VotingViewModelTests {
             by: "user",
             level: 0,
             upvoted: false,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
-        
+
         let post = Post(
             id: 456,
             url: URL(string: "https://example.com")!,
@@ -84,7 +83,7 @@ struct VotingViewModelTests {
             by: "author",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
 
         // When - upvote comment
@@ -94,7 +93,7 @@ struct VotingViewModelTests {
         #expect(mockCommentVotingService.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
     }
-    
+
     @Test("Comment voting error handling")
     @MainActor
     func commentVotingErrorHandling() async throws {
@@ -102,14 +101,14 @@ struct VotingViewModelTests {
         let voteLinks = VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
         let comment = Domain.Comment(
             id: 123,
-            age: "1h", 
+            age: "1h",
             text: "Test comment",
             by: "user",
             level: 0,
             upvoted: false,
-            voteLinks: voteLinks
+            voteLinks: voteLinks,
         )
-        
+
         let post = Post(
             id: 456,
             url: URL(string: "https://example.com")!,
@@ -119,9 +118,9 @@ struct VotingViewModelTests {
             by: "author",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
-        
+
         mockCommentVotingService.shouldThrow = true
 
         // When

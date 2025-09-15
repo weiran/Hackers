@@ -18,7 +18,7 @@ extension CommentHTMLParser {
 
         let paragraphMatches = paragraphRegex.matches(
             in: workingHTML,
-            range: NSRange(location: 0, length: workingHTML.utf16.count)
+            range: NSRange(location: 0, length: workingHTML.utf16.count),
         )
         if !paragraphMatches.isEmpty {
             return processParagraphsWithSpacing(workingHTML, paragraphMatches: paragraphMatches)
@@ -30,6 +30,7 @@ extension CommentHTMLParser {
             return result
         }
     }
+
     /// Processes code blocks (pre/code tags) and returns an AttributedString with the code blocks already formatted
     static func processCodeBlocks(_ html: String) -> AttributedString {
         var result = AttributedString()
@@ -56,7 +57,7 @@ extension CommentHTMLParser {
                 let decodedCode = decodeHTMLEntities(codeContent)
 
                 var codeAttributedString = AttributedString(decodedCode)
-                let fullRange = codeAttributedString.startIndex..<codeAttributedString.endIndex
+                let fullRange = codeAttributedString.startIndex ..< codeAttributedString.endIndex
                 codeAttributedString[fullRange].font = .body.monospaced()
 
                 if !result.characters.isEmpty { result += createParagraphSpacing() }
@@ -79,7 +80,7 @@ extension CommentHTMLParser {
     /// Processes content with paragraph tags, creating proper spacing between paragraphs
     static func processParagraphsWithSpacing(
         _ html: String,
-        paragraphMatches: [NSTextCheckingResult]
+        paragraphMatches: [NSTextCheckingResult],
     ) -> AttributedString {
         var result = AttributedString()
         let nsString = html as NSString
@@ -122,7 +123,7 @@ extension CommentHTMLParser {
 
     /// Creates double newline for paragraph spacing
     static func createParagraphSpacing() -> AttributedString {
-        return AttributedString("\n\n")
+        AttributedString("\n\n")
     }
 
     /// Processes links and formatting within a block of text
@@ -163,7 +164,7 @@ extension CommentHTMLParser {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 1.5
         paragraphStyle.paragraphSpacing = 20.0
-        let fullRange = styled.startIndex..<styled.endIndex
+        let fullRange = styled.startIndex ..< styled.endIndex
         styled[fullRange].paragraphStyle = paragraphStyle
         return styled
     }
@@ -196,7 +197,7 @@ extension CommentHTMLParser {
     /// Extracts and creates an attributed link component with formatting support
     static func extractLinkComponentWithFormatting(
         from match: NSTextCheckingResult,
-        in nsString: NSString
+        in nsString: NSString,
     ) -> AttributedString? {
         guard match.numberOfRanges >= 4 else { return nil }
 
@@ -214,7 +215,7 @@ extension CommentHTMLParser {
             resolvedURL = URL(string: urlString, relativeTo: base)?.absoluteURL
         }
         if let url = resolvedURL {
-            let fullRange = linkAttributedString.startIndex..<linkAttributedString.endIndex
+            let fullRange = linkAttributedString.startIndex ..< linkAttributedString.endIndex
             linkAttributedString[fullRange].link = url
             linkAttributedString[fullRange].foregroundColor = Color("appTintColor")
             linkAttributedString[fullRange].underlineStyle = .single

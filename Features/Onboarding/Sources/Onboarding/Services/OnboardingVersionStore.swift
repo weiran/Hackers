@@ -17,7 +17,7 @@ public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @
     private let domainName: String
     // Namespaced key to avoid collisions and shared-state leaks across tests
     private let key = "com.weiran.hackers.onboarding.shown"
-    nonisolated(unsafe) private static var didResetSuite = false
+    private nonisolated(unsafe) static var didResetSuite = false
 
     // Designated initializer
     private init(userDefaults: UserDefaults, domainName: String) {

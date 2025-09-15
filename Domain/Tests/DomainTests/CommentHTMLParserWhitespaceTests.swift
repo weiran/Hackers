@@ -9,15 +9,14 @@
 
 // swiftlint:disable:next force_cast
 
-import Testing
-import Foundation
 @testable import Domain
+import Foundation
+import Testing
 
 @Suite("CommentHTMLParser Whitespace Tests")
 struct CommentHTMLParserWhitespaceTests {
-
     @Test("Whitespace preservation maintains spacing around bold tags")
-    func testWhitespaceAroundBoldTags() {
+    func whitespaceAroundBoldTags() {
         let input = "  <b>bold text</b>  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -27,7 +26,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing around italic tags")
-    func testWhitespaceAroundItalicTags() {
+    func whitespaceAroundItalicTags() {
         let input = "  <i>italic text</i>  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -37,7 +36,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing around link tags")
-    func testWhitespaceAroundLinkTags() {
+    func whitespaceAroundLinkTags() {
         let input = "  <a href=\"https://example.com\">link text</a>  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -47,7 +46,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing with mixed formatting tags")
-    func testWhitespaceWithMixedFormattingTags() {
+    func whitespaceWithMixedFormattingTags() {
         let input = "  <b>bold</b> and <i>italic</i> text  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -57,7 +56,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing with nested formatting")
-    func testWhitespaceWithNestedFormatting() {
+    func whitespaceWithNestedFormatting() {
         let input = "  <b>bold with <i>nested</i> text</b>  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -67,7 +66,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing in paragraph context")
-    func testWhitespaceInParagraphContext() {
+    func whitespaceInParagraphContext() {
         let input = "<p>  <b>bold</b> and <i>italic</i> text  </p>"
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -78,7 +77,7 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Whitespace preservation maintains spacing with links and formatting")
-    func testWhitespaceWithLinksAndFormatting() {
+    func whitespaceWithLinksAndFormatting() {
         let input = "  <a href=\"https://example.com\"><b>bold link</b></a>  "
         let result = CommentHTMLParser.parseHTMLText(input)
         let resultString = String(result.characters)
@@ -88,13 +87,13 @@ struct CommentHTMLParserWhitespaceTests {
     }
 
     @Test("Edge case handles empty string correctly")
-    func testEmptyString() {
+    func emptyString() {
         let result = CommentHTMLParser.parseHTMLText("")
         #expect(result.characters.isEmpty, "Empty string should return empty AttributedString")
     }
 
     @Test("Edge case handles whitespace-only string correctly")
-    func testWhitespaceOnly() {
+    func whitespaceOnly() {
         let result = CommentHTMLParser.parseHTMLText("   \n\t   ")
         #expect(result.characters.isEmpty, "Whitespace-only string should return empty AttributedString")
     }

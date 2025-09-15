@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Domain
+import SwiftUI
 
 public final class ShareService: @unchecked Sendable {
     public static let shared = ShareService()
@@ -22,7 +22,7 @@ public final class ShareService: @unchecked Sendable {
     @MainActor
     public func shareURL(_ url: URL, title: String? = nil) {
         var items: [Any] = []
-        if let title = title {
+        if let title {
             items.append(title)
         }
         items.append(url)
@@ -41,13 +41,14 @@ public final class ShareService: @unchecked Sendable {
         let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
 
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController {
+           let rootViewController = windowScene.windows.first?.rootViewController
+        {
             // For iPad
             if let popover = activityVC.popoverPresentationController {
                 popover.sourceView = rootViewController.view
                 popover.sourceRect = CGRect(x: rootViewController.view.bounds.midX,
-                                           y: rootViewController.view.bounds.midY,
-                                           width: 0, height: 0)
+                                            y: rootViewController.view.bounds.midY,
+                                            width: 0, height: 0)
                 popover.permittedArrowDirections = []
             }
 

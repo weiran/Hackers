@@ -5,9 +5,9 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Domain
 import Shared
+import SwiftUI
 
 public struct PostDisplayView: View {
     let post: Post
@@ -21,7 +21,7 @@ public struct PostDisplayView: View {
         votingState: VotingState? = nil,
         showPostText: Bool = false,
         showThumbnails: Bool = true,
-        onThumbnailTap: (() -> Void)? = nil
+        onThumbnailTap: (() -> Void)? = nil,
     ) {
         self.post = post
         self.votingState = votingState
@@ -57,7 +57,7 @@ public struct PostDisplayView: View {
                     // Metadata row
                     HStack(spacing: 3) {
                         // Use new VoteIndicator if voting state is provided
-                        if let votingState = votingState {
+                        if let votingState {
                             VoteIndicator(
                                 votingState: votingState,
                                 style: VoteIndicatorStyle(
@@ -65,8 +65,8 @@ public struct PostDisplayView: View {
                                     scoreFont: .subheadline,
                                     spacing: 0,
                                     defaultColor: .secondary,
-                                    upvotedColor: AppColors.upvotedColor
-                                )
+                                    upvotedColor: AppColors.upvotedColor,
+                                ),
                             )
                         } else {
                             // Fallback to old display
@@ -94,7 +94,8 @@ public struct PostDisplayView: View {
                         }
 
                         if let host = post.url.host,
-                           !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
+                           !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix)
+                        {
                             Text("•")
                                 .foregroundColor(.secondary)
                                 .accessibilityHidden(true)
@@ -127,7 +128,7 @@ public struct PostContextMenu: View {
         post: Post,
         onVote: @escaping () -> Void,
         onOpenLink: @escaping () -> Void,
-        onShare: @escaping () -> Void
+        onShare: @escaping () -> Void,
     ) {
         self.post = post
         self.onVote = onVote

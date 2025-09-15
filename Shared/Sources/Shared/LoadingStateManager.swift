@@ -20,22 +20,22 @@ public final class LoadingStateManager<T>: @unchecked Sendable {
     public init(
         initialData: T,
         shouldSkipLoad: @escaping (T) -> Bool = { _ in false },
-        loadData: @escaping () async throws -> T
+        loadData: @escaping () async throws -> T,
     ) {
-        self.data = initialData
+        data = initialData
         self.shouldSkipLoad = shouldSkipLoad
         self.loadData = loadData
     }
 
     public init(initialData: T) {
-        self.data = initialData
-        self.shouldSkipLoad = nil
-        self.loadData = nil
+        data = initialData
+        shouldSkipLoad = nil
+        loadData = nil
     }
 
     public func setLoadFunction(
         shouldSkipLoad: @escaping (T) -> Bool = { _ in false },
-        loadData: @escaping () async throws -> T
+        loadData: @escaping () async throws -> T,
     ) {
         self.shouldSkipLoad = shouldSkipLoad
         self.loadData = loadData
@@ -44,7 +44,7 @@ public final class LoadingStateManager<T>: @unchecked Sendable {
     @MainActor
     public func loadIfNeeded() async {
         guard !isLoading else { return }
-        guard let shouldSkipLoad = shouldSkipLoad else { return }
+        guard let shouldSkipLoad else { return }
         guard !hasAttemptedLoad || !shouldSkipLoad(data) else { return }
 
         await performLoad()
@@ -58,7 +58,7 @@ public final class LoadingStateManager<T>: @unchecked Sendable {
 
     @MainActor
     private func performLoad() async {
-        guard let loadData = loadData else { return }
+        guard let loadData else { return }
 
         isLoading = true
         error = nil

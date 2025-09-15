@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Domain
+import Foundation
 import Shared
 import SwiftUI
 
@@ -31,20 +31,20 @@ public final class CommentsViewModel: @unchecked Sendable {
         post: Post,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
     ) {
         self.post = post
         self.postUseCase = postUseCase
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
-        self.commentsLoader = LoadingStateManager(initialData: [])
+        commentsLoader = LoadingStateManager(initialData: [])
 
         // Set up the loading function after initialization
         commentsLoader.setLoadFunction(
             shouldSkipLoad: { !$0.isEmpty },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
-            }
+            },
         )
     }
 
@@ -123,10 +123,10 @@ public final class CommentsViewModel: @unchecked Sendable {
             let childrenCount = countChildren(comment)
 
             if childrenCount > 0 {
-                for childIndex in 1...childrenCount {
+                for childIndex in 1 ... childrenCount {
                     let currentComment = comments[commentIndex + childIndex]
 
-                    if visible && currentComment.visibility == .hidden { continue }
+                    if visible, currentComment.visibility == .hidden { continue }
 
                     currentComment.visibility = visible ? .hidden : .visible
                 }
@@ -149,13 +149,13 @@ public final class CommentsViewModel: @unchecked Sendable {
     }
 
     private func indexOfComment(_ comment: Comment, source: [Comment]) -> Int? {
-        return source.firstIndex(where: { $0.id == comment.id })
+        source.firstIndex(where: { $0.id == comment.id })
     }
 
     private func indexOfVisibleRootComment(of comment: Comment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
-        for index in (0...commentIndex).reversed() where visibleComments[index].level == 0 {
+        for index in (0 ... commentIndex).reversed() where visibleComments[index].level == 0 {
             return index
         }
 
@@ -171,7 +171,7 @@ public final class CommentsViewModel: @unchecked Sendable {
             return 0
         }
 
-        for index in nextIndex..<comments.count {
+        for index in nextIndex ..< comments.count {
             let currentComment = comments[index]
             if currentComment.level > comment.level {
                 count += 1

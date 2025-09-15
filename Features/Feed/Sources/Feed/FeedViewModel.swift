@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Domain
+import Foundation
 import Shared
 import SwiftUI
 
@@ -30,18 +30,18 @@ public final class FeedViewModel: @unchecked Sendable {
 
     public init(
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
     ) {
         self.postUseCase = postUseCase
         self.voteUseCase = voteUseCase
-        self.feedLoader = LoadingStateManager(initialData: [])
+        feedLoader = LoadingStateManager(initialData: [])
 
         // Set up the loading function after initialization
         feedLoader.setLoadFunction(
             shouldSkipLoad: { !$0.isEmpty },
             loadData: { [weak self] in
                 try await self?.fetchFeed() ?? []
-            }
+            },
         )
     }
 
@@ -66,15 +66,15 @@ public final class FeedViewModel: @unchecked Sendable {
             let fetchedPosts = try await postUseCase.getPosts(
                 type: postType,
                 page: pageIndex,
-                nextId: lastPostId > 0 ? lastPostId : nil
+                nextId: lastPostId > 0 ? lastPostId : nil,
             )
 
             let newPosts = fetchedPosts.filter { !self.postIds.contains($0.id) }
-            let newPostIds = newPosts.map { $0.id }
+            let newPostIds = newPosts.map(\.id)
 
             // Update the LoadingStateManager's data with appended posts
             feedLoader.data.append(contentsOf: newPosts)
-            self.postIds.formUnion(newPostIds)
+            postIds.formUnion(newPostIds)
 
             isLoadingMore = false
         } catch {
@@ -102,7 +102,7 @@ public final class FeedViewModel: @unchecked Sendable {
             let fetchedPosts = try await postUseCase.getPosts(
                 type: postType,
                 page: pageIndex,
-                nextId: lastPostId > 0 ? lastPostId : nil
+                nextId: lastPostId > 0 ? lastPostId : nil,
             )
 
             return await MainActor.run {
@@ -117,7 +117,7 @@ public final class FeedViewModel: @unchecked Sendable {
                     }
                 }
 
-                let newPostIds = uniquePosts.map { $0.id }
+                let newPostIds = uniquePosts.map(\.id)
                 self.postIds.formUnion(newPostIds)
                 return uniquePosts
             }

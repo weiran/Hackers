@@ -5,16 +5,15 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
+@testable import Domain
 import Foundation
 @testable import Shared
-@testable import Domain
+import Testing
 
 @Suite("ShareService Tests")
 struct ShareServiceTests {
-
     @Test("ShareService is a singleton")
-    func testSingleton() {
+    func singleton() {
         let service1 = ShareService.shared
         let service2 = ShareService.shared
 
@@ -22,7 +21,7 @@ struct ShareServiceTests {
     }
 
     @Test("ShareService conforms to Sendable")
-    func testSendableConformance() {
+    func sendableConformance() {
         let service = ShareService.shared
 
         // Test that we can pass it across actor boundaries
@@ -39,7 +38,7 @@ struct ShareServiceTests {
     // the logic into testable components.
 
     @Test("ShareService exists and is accessible")
-    func testServiceAccessibility() {
+    func serviceAccessibility() {
         let service = ShareService.shared
         #expect(service != nil)
     }
@@ -47,7 +46,7 @@ struct ShareServiceTests {
     // MARK: - Helper Test Data Creation
 
     private func createTestPost() -> Post {
-        return Post(
+        Post(
             id: 123,
             url: URL(string: "https://example.com/test")!,
             title: "Test Post Title",
@@ -56,12 +55,12 @@ struct ShareServiceTests {
             by: "testuser",
             score: 42,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
     }
 
     private func createTestComment() -> Domain.Comment {
-        return Domain.Comment(
+        Domain.Comment(
             id: 456,
             age: "1 hour ago",
             text: "<p>This is a test comment with <strong>HTML</strong> content.</p>",
@@ -71,14 +70,14 @@ struct ShareServiceTests {
             upvoteLink: nil,
             voteLinks: nil,
             visibility: .visible,
-            parsedText: nil
+            parsedText: nil,
         )
     }
 
     // MARK: - Structure Tests
 
     @Test("Service can be called with different data types")
-    func testServiceCallStructure() async {
+    func serviceCallStructure() async {
         let service = ShareService.shared
         let testPost = createTestPost()
         let testComment = createTestComment()
@@ -102,7 +101,7 @@ struct ShareServiceTests {
     }
 
     @Test("ShareService methods are MainActor isolated")
-    func testMainActorIsolation() async {
+    func mainActorIsolation() async {
         let service = ShareService.shared
         let testPost = createTestPost()
 

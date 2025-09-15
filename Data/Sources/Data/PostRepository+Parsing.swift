@@ -5,8 +5,8 @@
 //  Split parsing helpers from PostRepository to reduce file length
 //
 
-import Foundation
 import Domain
+import Foundation
 import SwiftSoup
 
 extension PostRepository {
@@ -19,7 +19,7 @@ extension PostRepository {
 
     // MARK: - HTML Parsing
 
-    internal func postsTableElement(from html: String) throws -> Element {
+    func postsTableElement(from html: String) throws -> Element {
         let document = try SwiftSoup.parse(html)
         guard let tableElement = try document.select("table:has(.athing.submission)").first() else {
             throw HackersKitError.scraperError
@@ -27,14 +27,14 @@ extension PostRepository {
         return tableElement
     }
 
-    internal func posts(from tableElement: Element, type: PostType) throws -> [Post] {
+    func posts(from tableElement: Element, type: PostType) throws -> [Post] {
         if tableElement.hasClass("fatitem") {
             let allRows = try tableElement.select("tr")
             guard allRows.size() >= 2 else { throw HackersKitError.scraperError }
             let titleElement = try allRows.get(0)
             let metadataElement = try allRows.get(1)
             let postElements = Elements([titleElement, metadataElement])
-            let post = try self.post(from: postElements, type: type)
+            let post = try post(from: postElements, type: type)
             return [post]
         } else {
             let titleElements = try tableElement.select("tr.athing")
@@ -47,13 +47,13 @@ extension PostRepository {
         }
     }
 
-    internal func post(from elements: Elements, type: PostType) throws -> Post {
+    func post(from elements: Elements, type: PostType) throws -> Post {
         guard elements.size() >= 2 else { throw HackersKitError.scraperError }
 
         let titleElement = try elements.get(0)
         let metadataElement = try elements.get(1)
 
-        let id = Int(try titleElement.attr("id")) ?? 0
+        let id = try Int(titleElement.attr("id")) ?? 0
         guard let titleLink = try titleElement.select("span.titleline > a").first() else {
             throw HackersKitError.scraperError
         }
@@ -79,16 +79,16 @@ extension PostRepository {
             return text?.contains("comment") == true
         }
 
-        let commentsCount: Int
-        if let commentLinkText = try commentLinkElement?.text(),
-           let commentsCountString = commentLinkText.components(separatedBy: .whitespaces).first,
-           let count = Int(String(commentsCountString)) {
-            commentsCount = count
+        let commentsCount: Int = if let commentLinkText = try commentLinkElement?.text(),
+                                    let commentsCountString = commentLinkText.components(separatedBy: .whitespaces).first,
+                                    let count = Int(String(commentsCountString))
+        {
+            count
         } else {
-            commentsCount = 0
+            0
         }
 
-        let voteLinks = try self.voteLinks(from: titleElement, metadata: metadataElement)
+        let voteLinks = try voteLinks(from: titleElement, metadata: metadataElement)
         let hasAnyVoteLink = voteLinks.upvote != nil || voteLinks.unvote != nil
         let finalVoteLinks = hasAnyVoteLink ? VoteLinks(upvote: voteLinks.upvote, unvote: voteLinks.unvote) : nil
 
@@ -102,11 +102,11 @@ extension PostRepository {
             score: scoreInt,
             postType: type,
             upvoted: voteLinks.upvoted,
-            voteLinks: finalVoteLinks
+            voteLinks: finalVoteLinks,
         )
     }
 
-    internal func comments(from html: String) throws -> [Domain.Comment] {
+    func comments(from html: String) throws -> [Domain.Comment] {
         let document = try SwiftSoup.parse(html)
         let commentElements = try document.select(".comtr")
 
@@ -119,7 +119,7 @@ extension PostRepository {
         }
     }
 
-    internal func parseComment(from element: Element) throws -> Domain.Comment {
+    func parseComment(from element: Element) throws -> Domain.Comment {
         let text = try commentText(from: element.select(".commtext"))
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw HackersKitError.scraperError
@@ -134,7 +134,7 @@ extension PostRepository {
             throw HackersKitError.scraperError
         }
         let level = indentWidth / 40
-        let voteLinksResult = try self.voteLinks(from: element)
+        let voteLinksResult = try voteLinks(from: element)
         let upvoted = voteLinksResult.upvoted
 
         let parsedText = CommentHTMLParser.parseHTMLText(text)
@@ -147,11 +147,11 @@ extension PostRepository {
             level: level,
             upvoted: upvoted,
             voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote),
-            parsedText: parsedText
+            parsedText: parsedText,
         )
     }
 
-    internal func commentText(from elements: Elements) throws -> String {
+    func commentText(from elements: Elements) throws -> String {
         if let replyElement = try? elements.select(".reply") { try replyElement.html("") }
         if let links = try? elements.select("a") {
             try links.forEach { link in

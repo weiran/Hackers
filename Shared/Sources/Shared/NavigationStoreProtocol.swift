@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Domain
+import Foundation
 
 public protocol NavigationStoreProtocol: ObservableObject {
     var selectedPost: Post? { get set }

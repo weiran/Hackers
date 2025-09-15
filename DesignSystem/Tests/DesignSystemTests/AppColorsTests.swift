@@ -5,18 +5,14 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
-import SwiftUI
 @testable import DesignSystem
+import SwiftUI
+import Testing
 
 @Suite("AppColors Tests")
 struct AppColorsTests {
-
-
-
-
     @Test("Color properties are consistent between calls")
-    func testColorConsistency() {
+    func colorConsistency() {
         // Test that multiple calls return the same color values
         let upvoted1 = AppColors.upvoted
         let upvoted2 = AppColors.upvoted
@@ -28,7 +24,7 @@ struct AppColorsTests {
     }
 
     @Test("Fallback color properties are consistent between calls")
-    func testFallbackColorConsistency() {
+    func fallbackColorConsistency() {
         // Test that multiple calls to fallback properties return consistent values
         let upvotedColor1 = AppColors.upvotedColor
         let upvotedColor2 = AppColors.upvotedColor
@@ -40,7 +36,7 @@ struct AppColorsTests {
     }
 
     @Test("AppColors enum structure")
-    func testEnumStructure() {
+    func enumStructure() {
         // Test that AppColors behaves like a namespace enum (no instances)
         // This is verified by the fact that we can access static properties
         // but can't create instances (private init should prevent this)
@@ -55,7 +51,7 @@ struct AppColorsTests {
     }
 
     @Test("Colors work with SwiftUI Views")
-    func testSwiftUICompatibility() {
+    func swiftUICompatibility() {
         // Test that colors can be used in SwiftUI contexts
         // This verifies they return proper Color types
 
@@ -79,7 +75,7 @@ struct AppColorsTests {
     }
 
     @Test("Asset color names are correct")
-    func testAssetColorNames() {
+    func assetColorNames() {
         // Verify that the asset color names used in the implementation are correct
         // This is important for the asset lookup to work properly
 
@@ -93,7 +89,7 @@ struct AppColorsTests {
     }
 
     @Test("Orange fallback colors")
-    func testOrangeFallbacks() {
+    func orangeFallbacks() {
         // Test that orange is used as fallback
         let orange = Color.orange
 
@@ -103,7 +99,7 @@ struct AppColorsTests {
     }
 
     @Test("Bundle reference is correct")
-    func testBundleReference() {
+    func bundleReference() {
         // Test that .main bundle is used for asset lookup
         // This is important for the color assets to be found in the main app bundle
 
@@ -112,10 +108,10 @@ struct AppColorsTests {
     }
 
     @Test("Thread safety of color access")
-    func testThreadSafety() async {
+    func threadSafety() async {
         // Test concurrent access to color properties
         await withTaskGroup(of: Void.self) { group in
-            for _ in 0..<10 {
+            for _ in 0 ..< 10 {
                 group.addTask {
                     _ = AppColors.upvoted
                     _ = AppColors.appTint

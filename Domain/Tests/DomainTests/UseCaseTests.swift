@@ -7,13 +7,12 @@
 
 // swiftlint:disable force_cast
 
-import Testing
-import Foundation
 @testable import Domain
+import Foundation
+import Testing
 
 @Suite("Domain Use Cases Tests")
 struct UseCaseTests {
-
     // MARK: - Mock Implementations for Testing
 
     @MainActor
@@ -23,12 +22,12 @@ struct UseCaseTests {
         var stubPosts: [Post] = []
         var stubPost: Post?
 
-        func getPosts(type: PostType, page: Int, nextId: Int?) async throws -> [Post] {
+        func getPosts(type _: PostType, page _: Int, nextId _: Int?) async throws -> [Post] {
             getPostsCallCount += 1
             return stubPosts
         }
 
-        func getPost(id: Int) async throws -> Post {
+        func getPost(id _: Int) async throws -> Post {
             getPostCallCount += 1
             guard let post = stubPost else {
                 throw HackersKitError.requestFailure
@@ -42,11 +41,11 @@ struct UseCaseTests {
         var upvotePostCallCount = 0
         var upvoteCommentCallCount = 0
 
-        func upvote(post: Post) async throws {
+        func upvote(post _: Post) async throws {
             upvotePostCallCount += 1
         }
 
-        func upvote(comment: Domain.Comment, for post: Post) async throws {
+        func upvote(comment _: Domain.Comment, for _: Post) async throws {
             upvoteCommentCallCount += 1
         }
     }
@@ -56,7 +55,7 @@ struct UseCaseTests {
         var getCommentsCallCount = 0
         var stubComments: [Domain.Comment] = []
 
-        func getComments(for post: Post) async throws -> [Domain.Comment] {
+        func getComments(for _: Post) async throws -> [Domain.Comment] {
             getCommentsCallCount += 1
             return stubComments
         }
@@ -139,7 +138,6 @@ struct UseCaseTests {
         #expect(mockUseCase.upvotePostCallCount == 1)
     }
 
-
     @MainActor
     @Test("VoteUseCase upvote comment executes successfully")
     func voteUseCaseUpvoteComment() async throws {
@@ -151,7 +149,6 @@ struct UseCaseTests {
 
         #expect(mockUseCase.upvoteCommentCallCount == 1)
     }
-
 
     // MARK: - CommentUseCase Tests
 
@@ -192,7 +189,7 @@ struct UseCaseTests {
     // MARK: - Helper Methods
 
     private static func createTestPost() -> Post {
-        return Post(
+        Post(
             id: 123,
             url: URL(string: "https://example.com/post")!,
             title: "Test Post",
@@ -201,18 +198,18 @@ struct UseCaseTests {
             by: "testuser",
             score: 10,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
     }
 
     private static func createTestComment() -> Domain.Comment {
-        return Comment(
+        Comment(
             id: 456,
             age: "1 hour ago",
             text: "Test comment",
             by: "commenter",
             level: 0,
-            upvoted: false
+            upvoted: false,
         )
     }
 }

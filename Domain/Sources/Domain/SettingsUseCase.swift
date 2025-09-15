@@ -16,21 +16,21 @@ public enum TextSize: Int, CaseIterable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .extraSmall: return "Extra Small"
-        case .small: return "Small"
-        case .medium: return "Medium"
-        case .large: return "Large"
-        case .extraLarge: return "Extra Large"
+        case .extraSmall: "Extra Small"
+        case .small: "Small"
+        case .medium: "Medium"
+        case .large: "Large"
+        case .extraLarge: "Extra Large"
         }
     }
 
     public var scaleFactor: CGFloat {
         switch self {
-        case .extraSmall: return 0.8
-        case .small: return 0.9
-        case .medium: return 1.0
-        case .large: return 1.1
-        case .extraLarge: return 1.2
+        case .extraSmall: 0.8
+        case .small: 0.9
+        case .medium: 1.0
+        case .large: 1.1
+        case .extraLarge: 1.2
         }
     }
 }

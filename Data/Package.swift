@@ -11,28 +11,28 @@ import PackageDescription
 let package = Package(
     name: "Data",
     platforms: [
-        .iOS(.v26)
+        .iOS(.v26),
     ],
     products: [
         .library(
             name: "Data",
-            targets: ["Data"]
-        )
+            targets: ["Data"],
+        ),
     ],
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Networking"),
-        .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.2")
+        .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.2"),
     ],
     targets: [
         .target(
             name: "Data",
-            dependencies: ["Domain", "Networking", "SwiftSoup"]
+            dependencies: ["Domain", "Networking", "SwiftSoup"],
         ),
         .testTarget(
             name: "DataTests",
             dependencies: ["Data"],
-            path: "Tests/DataTests"
-        )
-    ]
+            path: "Tests/DataTests",
+        ),
+    ],
 )

@@ -33,7 +33,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
             userDefaults.register(defaults: [
                 "safariReaderMode": false,
                 "openInDefaultBrowser": false,
-                "textSize": TextSize.medium.rawValue
+                "textSize": TextSize.medium.rawValue,
             ])
         }
     }

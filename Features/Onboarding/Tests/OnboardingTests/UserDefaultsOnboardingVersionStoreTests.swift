@@ -5,9 +5,9 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
 import Foundation
 @testable import Onboarding
+import Testing
 
 struct UserDefaultsOnboardingVersionStoreTests {
     @Test("Initial state returns false")

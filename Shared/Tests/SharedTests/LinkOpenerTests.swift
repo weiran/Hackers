@@ -5,17 +5,16 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
+@testable import Domain
 import Foundation
 @testable import Shared
-@testable import Domain
+import Testing
 
 @Suite("LinkOpener Tests")
 struct LinkOpenerTests {
-
     @Test("LinkOpener is a struct with static methods")
     @MainActor
-    func testStructureType() {
+    func structureType() {
         // Test that LinkOpener is designed as a utility struct
         // We can't instantiate it, but we can access its static methods
 
@@ -29,7 +28,7 @@ struct LinkOpenerTests {
     }
 
     @Test("LinkOpener openURL is MainActor isolated")
-    func testMainActorIsolation() async {
+    func mainActorIsolation() async {
         let url = URL(string: "https://example.com")!
 
         await MainActor.run {
@@ -42,7 +41,7 @@ struct LinkOpenerTests {
     }
 
     @Test("LinkOpener handles different URL schemes")
-    func testURLSchemeHandling() async {
+    func uRLSchemeHandling() async {
         let httpURL = URL(string: "http://example.com")!
         let httpsURL = URL(string: "https://example.com")!
         let mailto = URL(string: "mailto:test@example.com")!
@@ -63,7 +62,7 @@ struct LinkOpenerTests {
     }
 
     @Test("LinkOpener methods accept optional parameters")
-    func testOptionalParameters() async {
+    func optionalParameters() async {
         let url = URL(string: "https://example.com")!
         let post = createTestPost()
 
@@ -89,7 +88,7 @@ struct LinkOpenerTests {
             "https://www.google.com/search?q=test",
             "ftp://files.example.com/file.txt",
             "file:///path/to/file.txt",
-            "custom-app://open/item/123"
+            "custom-app://open/item/123",
         ]
 
         await MainActor.run {
@@ -106,7 +105,7 @@ struct LinkOpenerTests {
     // MARK: - Helper Methods
 
     private func createTestPost() -> Post {
-        return Post(
+        Post(
             id: 123,
             url: URL(string: "https://example.com/test-post")!,
             title: "Test Post for LinkOpener",
@@ -115,14 +114,14 @@ struct LinkOpenerTests {
             by: "testuser",
             score: 50,
             postType: .news,
-            upvoted: false
+            upvoted: false,
         )
     }
 
     // MARK: - Edge Case Tests
 
     @Test("LinkOpener handles edge cases gracefully")
-    func testEdgeCases() async {
+    func edgeCases() async {
         await MainActor.run {
             // Test with minimal valid URL
             if let minimalURL = URL(string: "https://a.com") {
@@ -144,7 +143,7 @@ struct LinkOpenerTests {
     }
 
     @Test("LinkOpener service type behavior")
-    func testServiceTypeBehavior() {
+    func serviceTypeBehavior() {
         // Test that LinkOpener behaves like a stateless service
         // (no instance state, all static methods)
 

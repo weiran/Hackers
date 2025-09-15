@@ -5,13 +5,12 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Testing
-@testable import Feed
 import Domain
+@testable import Feed
+import Testing
 
 @Suite("FeedViewModel Tests")
 struct FeedViewModelTests {
-
     @Test("FeedViewModel initializes with correct default state")
     func initialState() {
         let viewModel = FeedViewModel()

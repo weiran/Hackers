@@ -15,11 +15,12 @@ public protocol NetworkManagerProtocol: Sendable {
 }
 
 public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskDelegate,
-    NetworkManagerProtocol, Sendable {
+    NetworkManagerProtocol, Sendable
+{
     private let session: URLSession
 
     override public init() {
-        self.session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
+        session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
         super.init()
     }
 

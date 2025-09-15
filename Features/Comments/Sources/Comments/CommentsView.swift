@@ -5,10 +5,10 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
+import DesignSystem
 import Domain
 import Shared
-import DesignSystem
+import SwiftUI
 
 public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
@@ -22,13 +22,13 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @Environment(\.openURL) private var openURL
 
     public init(post: Post, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
-        self._viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
+        _viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
             votingService: container.getVotingService(),
-            commentVotingService: container.getCommentVotingService()
+            commentVotingService: container.getCommentVotingService(),
         )
-        self._votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
+        _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
     public var body: some View {
@@ -40,7 +40,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             visibleCommentPositions: $visibleCommentPositions,
             navigateToPostId: $navigateToPostId,
             handleLinkTap: handleLinkTap,
-            toggleCommentVisibility: toggleCommentVisibility
+            toggleCommentVisibility: toggleCommentVisibility,
         )
         .navigationTitle("Comments")
         .navigationBarTitleDisplayMode(.inline)
@@ -49,7 +49,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                 ToolbarTitle(
                     post: viewModel.post,
                     showTitle: showTitle,
-                    onTap: handleLinkTap
+                    onTap: handleLinkTap,
                 )
             }
             ToolbarItem(placement: .navigationBarTrailing) { ShareMenu(post: viewModel.post) }
@@ -67,8 +67,8 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             "Vote Error",
             isPresented: Binding(
                 get: { votingViewModel.lastError != nil },
-                set: { newValue in if newValue == false { votingViewModel.clearError() } }
-            )
+                set: { newValue in if newValue == false { votingViewModel.clearError() } },
+            ),
         ) {
             Button("OK") { votingViewModel.clearError() }
         } message: {
@@ -85,7 +85,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         withAnimation(.easeInOut(duration: 0.3)) {
             let wasVisible = comment.visibility == .visible
             viewModel.toggleCommentVisibility(comment)
-            if wasVisible && !isCommentVisibleOnScreen(comment) {
+            if wasVisible, !isCommentVisibleOnScreen(comment) {
                 withAnimation(.easeInOut(duration: 0.3)) { scrollTo("comment-\(comment.id)") }
             }
         }

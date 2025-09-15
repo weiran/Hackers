@@ -11,7 +11,7 @@ import SwiftUI
 public enum OnboardingService {
     public static func shouldShowOnboarding(
         versionStore: OnboardingVersionStore = UserDefaultsOnboardingVersionStore(),
-        forceShow: Bool = false
+        forceShow: Bool = false,
     ) -> Bool {
         if ProcessInfo.processInfo.arguments.contains("disableOnboarding"), forceShow == false {
             return false
@@ -21,14 +21,14 @@ public enum OnboardingService {
     }
 
     public static func createOnboardingView(
-        onDismiss: @escaping () -> Void
+        onDismiss: @escaping () -> Void,
     ) -> some View {
         let onboardingData = OnboardingData.currentOnboarding()
         return OnboardingView(onboardingData: onboardingData, onDismiss: onDismiss)
     }
 
     public static func markOnboardingShown(
-        versionStore: OnboardingVersionStore = UserDefaultsOnboardingVersionStore()
+        versionStore: OnboardingVersionStore = UserDefaultsOnboardingVersionStore(),
     ) {
         versionStore.markOnboardingShown()
     }

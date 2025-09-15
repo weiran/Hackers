@@ -9,8 +9,9 @@ import UIKit
 
 class SceneDelegate: NSObject, UIWindowSceneDelegate {
     func scene(_ scene: UIScene,
-               willConnectTo session: UISceneSession,
-               options connectionOptions: UIScene.ConnectionOptions) {
+               willConnectTo _: UISceneSession,
+               options _: UIScene.ConnectionOptions)
+    {
         // Handle dark mode for testing
         if ProcessInfo.processInfo.arguments.contains("darkMode") {
             if let windowScene = scene as? UIWindowScene {

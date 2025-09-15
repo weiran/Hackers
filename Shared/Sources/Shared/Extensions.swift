@@ -5,86 +5,85 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Domain
 import Foundation
 import SwiftUI
-import Domain
 
-extension Collection where Indices.Iterator.Element == Index {
-    public subscript (safe index: Index) -> Iterator.Element? {
-        return indices.contains(index) ? self[index] : nil
+public extension Collection where Indices.Iterator.Element == Index {
+    subscript(safe index: Index) -> Iterator.Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
 
-extension NotificationCenter {
-    public func observe(
+public extension NotificationCenter {
+    func observe(
         name: NSNotification.Name?,
         object obj: Any?,
         queue: OperationQueue?,
-        using block: @escaping (Notification) -> Void
+        using block: @escaping (Notification) -> Void,
     ) -> NotificationToken {
         let token = addObserver(forName: name, object: obj, queue: queue, using: block)
         return NotificationToken(notificationCenter: self, token: token)
     }
 }
 
-extension Notification.Name {
-    public static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
-    public static let userDidLogout = NSNotification.Name(rawValue: "UserDidLogoutNotification")
+public extension Notification.Name {
+    static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
+    static let userDidLogout = NSNotification.Name(rawValue: "UserDidLogoutNotification")
 }
 
-extension PostType {
-    public var displayName: String {
+public extension PostType {
+    var displayName: String {
         switch self {
-        case .news: return "Top"
-        case .ask: return "Ask"
-        case .show: return "Show"
-        case .jobs: return "Jobs"
-        case .newest: return "New"
-        case .best: return "Best"
-        case .active: return "Active"
+        case .news: "Top"
+        case .ask: "Ask"
+        case .show: "Show"
+        case .jobs: "Jobs"
+        case .newest: "New"
+        case .best: "Best"
+        case .active: "Active"
         }
     }
 
-    public var iconName: String {
+    var iconName: String {
         switch self {
-        case .news: return "flame"
-        case .ask: return "bubble.left.and.bubble.right"
-        case .show: return "eye"
-        case .jobs: return "briefcase"
-        case .newest: return "clock"
-        case .best: return "star"
-        case .active: return "bolt"
+        case .news: "flame"
+        case .ask: "bubble.left.and.bubble.right"
+        case .show: "eye"
+        case .jobs: "briefcase"
+        case .newest: "clock"
+        case .best: "star"
+        case .active: "bolt"
         }
     }
 }
 
-extension String {
-    public func strippingHTML() -> String {
+public extension String {
+    func strippingHTML() -> String {
         let pattern = "<[^>]+>"
-        return self
-            .replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        return replacingOccurrences(of: pattern, with: "", options: .regularExpression)
             .replacingOccurrences(of: "\t", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    public subscript(value: PartialRangeUpTo<Int>) -> Substring {
-        return self[..<index(startIndex, offsetBy: value.upperBound)]
+    subscript(value: PartialRangeUpTo<Int>) -> Substring {
+        self[..<index(startIndex, offsetBy: value.upperBound)]
     }
 
-    public subscript(value: PartialRangeThrough<Int>) -> Substring {
-        return self[...index(startIndex, offsetBy: value.upperBound)]
+    subscript(value: PartialRangeThrough<Int>) -> Substring {
+        self[...index(startIndex, offsetBy: value.upperBound)]
     }
 
-    public subscript(value: PartialRangeFrom<Int>) -> Substring {
-        return self[index(startIndex, offsetBy: value.lowerBound)...]
+    subscript(value: PartialRangeFrom<Int>) -> Substring {
+        self[index(startIndex, offsetBy: value.lowerBound)...]
     }
-
 }
 
 // MARK: - View helpers
+
 public extension View {
     @ViewBuilder
-    func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
+    func `if`(_ condition: Bool, transform: (Self) -> some View) -> some View {
         if condition {
             transform(self)
         } else {

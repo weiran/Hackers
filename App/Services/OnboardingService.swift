@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
 import Onboarding
+import SwiftUI
 
 @MainActor
 enum OnboardingService {

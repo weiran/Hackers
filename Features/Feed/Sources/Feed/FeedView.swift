@@ -5,10 +5,10 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
+import DesignSystem
 import Domain
 import Shared
-import DesignSystem
+import SwiftUI
 
 public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
     @State private var viewModel: FeedViewModel
@@ -23,15 +23,15 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
-        isSidebar: Bool = false
+        isSidebar: Bool = false,
     ) {
-        self._viewModel = State(initialValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
             votingService: container.getVotingService(),
-            commentVotingService: container.getCommentVotingService()
+            commentVotingService: container.getCommentVotingService(),
         )
-        self._votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
+        _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
         self.isSidebar = isSidebar
     }
 
@@ -41,11 +41,12 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 get: { selectedPostId },
                 set: { newPostId in
                     if let postId = newPostId,
-                       let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
+                       let selectedPost = viewModel.posts.first(where: { $0.id == postId })
+                    {
                         selectedPostId = postId
                         navigationStore.showPost(selectedPost)
                     }
-                }
+                },
             )
         } else {
             .constant(nil)
@@ -81,8 +82,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 get: { votingViewModel.lastError != nil },
                 set: { newValue in
                     if newValue == false { votingViewModel.clearError() }
-                }
-            )
+                },
+            ),
         ) {
             Button("OK") { votingViewModel.clearError() }
         } message: {
@@ -96,7 +97,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
 
     @ViewBuilder
     private var contentView: some View {
-        if viewModel.isLoading && viewModel.posts.isEmpty {
+        if viewModel.isLoading, viewModel.posts.isEmpty {
             ProgressView("Loading...")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
@@ -119,7 +120,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             post: post,
             votingViewModel: votingViewModel,
             onLinkTap: { handleLinkTap(post: post) },
-            onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) }
+            onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
         )
         .if(isSidebar) { view in
             view.tag(post.id)
@@ -164,7 +165,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run { viewModel.replacePost(mutablePost) }
                 }
-            }
+            },
         )
 
         Divider()
@@ -258,7 +259,8 @@ struct PostRowView: View {
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
          onLinkTap: (() -> Void)? = nil,
-         onCommentsTap: (() -> Void)? = nil) {
+         onCommentsTap: (() -> Void)? = nil)
+    {
         self.post = post
         self.votingViewModel = votingViewModel
         self.onLinkTap = onLinkTap
@@ -270,7 +272,7 @@ struct PostRowView: View {
             post: post,
             votingState: votingViewModel.votingState(for: post),
             showPostText: false,
-            onThumbnailTap: onLinkTap
+            onThumbnailTap: onLinkTap,
         )
         .contentShape(Rectangle())
         .if(onCommentsTap != nil) { view in

@@ -5,12 +5,12 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import SwiftUI
-import MessageUI
-import Domain
-import Shared
 import DesignSystem
+import Domain
+import MessageUI
 import Onboarding
+import Shared
+import SwiftUI
 
 public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
@@ -32,10 +32,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         isAuthenticated: Bool = false,
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
-        onLogout: @escaping () -> Void = { },
-        onShowOnboarding: @escaping () -> Void = { }
+        onLogout: @escaping () -> Void = {},
+        onShowOnboarding: @escaping () -> Void = {},
     ) {
-        self._viewModel = State(initialValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
@@ -67,7 +67,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         Text("Hackers on GitHub")
                     })
                     Button(action: {
-                        self.showMailView.toggle()
+                        showMailView.toggle()
                     }, label: {
                         Text("Send Feedback")
                     })
@@ -75,13 +75,13 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     .sheet(isPresented: $showMailView) {
                         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
                         MailView(
-                            result: self.$mailResult,
+                            result: $mailResult,
                             recipients: ["me@weiran.co"],
                             subject: "Hackers App Feedback",
-                            messageBody: "\n\n\n---\nApp Version: \(version)"
+                            messageBody: "\n\n\n---\nApp Version: \(version)",
                         )
                     }
-                    Button(action: { self.showOnboarding = true }, label: {
+                    Button(action: { showOnboarding = true }, label: {
                         Text("Show What's New")
                     })
                     .sheet(isPresented: $showOnboarding) {
@@ -107,14 +107,14 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                         .accessibilityHidden(true)
                                 }
                             }
-                        }
+                        },
                     )
                     .sheet(isPresented: $showLogin) {
                         LoginView(
                             isAuthenticated: isAuthenticated,
                             currentUsername: currentUsername,
                             onLogin: onLogin,
-                            onLogout: onLogout
+                            onLogout: onLogout,
                         )
                     }
                 }
@@ -136,10 +136,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             Slider(
                                 value: Binding(
                                     get: { Double(viewModel.textSize.rawValue) },
-                                    set: { viewModel.textSize = TextSize(rawValue: Int($0)) ?? .medium }
+                                    set: { viewModel.textSize = TextSize(rawValue: Int($0)) ?? .medium },
                                 ),
-                                in: 0...4,
-                                step: 1
+                                in: 0 ... 4,
+                                step: 1,
                             )
                             .accessibilityLabel("Text Size")
 
@@ -171,10 +171,9 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     },
                     label: {
                         Image(systemName: "xmark")
-                    }
+                    },
                 )
-                .accessibilityLabel("Close")
-            )
+                .accessibilityLabel("Close"))
         }
     }
 
@@ -189,12 +188,13 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     }
 }
 
-extension Bundle {
-    public var icon: UIImage? {
+public extension Bundle {
+    var icon: UIImage? {
         if let icons = infoDictionary?["CFBundleIcons"] as? [String: Any],
-            let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
-            let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
-            let lastIcon = iconFiles.last {
+           let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
+           let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
+           let lastIcon = iconFiles.last
+        {
             return UIImage(named: lastIcon)
         }
         return nil
