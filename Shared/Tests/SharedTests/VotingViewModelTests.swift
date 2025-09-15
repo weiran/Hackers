@@ -64,19 +64,18 @@ struct VotingViewModelTests {
         func getCurrentUser() async -> User? { nil }
     }
 
-    @MainActor
     final class MockNavigationStore: NavigationStoreProtocol {
         init() {}
 
-        @MainActor var selectedPost: Post?
-        @MainActor var showingLogin: Bool = false
-        @MainActor var showingSettings: Bool = false
-        @MainActor var showLoginCalled = false
+        var selectedPost: Post?
+        var showingLogin: Bool = false
+        var showingSettings: Bool = false
+        var showLoginCalled = false
 
-        @MainActor func showPost(_ post: Post) { selectedPost = post }
-        @MainActor func showLogin() { showingLogin = true; showLoginCalled = true }
-        @MainActor func showSettings() { showingSettings = true }
-        @MainActor func selectPostType(_: PostType) {}
+        func showPost(_ post: Post) { selectedPost = post }
+        func showLogin() { showingLogin = true; showLoginCalled = true }
+        func showSettings() { showingSettings = true }
+        func selectPostType(_: PostType) {}
     }
 
     // MARK: - Unauthenticated flow
