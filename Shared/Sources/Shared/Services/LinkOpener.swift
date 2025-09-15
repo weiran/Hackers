@@ -12,8 +12,9 @@ import SwiftUI
 public enum LinkOpener {
     @MainActor
     public static func openURL(_ url: URL, with _: Post? = nil) {
-        // Determine user preference for opening links
-        let preferSystemBrowser = UserDefaults.standard.bool(forKey: "openInDefaultBrowser")
+        // Determine user preference for opening links via injected settings use case
+        let settings = DependencyContainer.shared.getSettingsUseCase()
+        let preferSystemBrowser = settings.openInDefaultBrowser
 
         // For http/https, either open in-app (SFSafariViewController) or system browser based on preference
         if isWebURL(url) {
@@ -21,7 +22,7 @@ public enum LinkOpener {
                 UIApplication.shared.open(url)
             } else if let presenter = findPresenter() {
                 let config = SFSafariViewController.Configuration()
-                config.entersReaderIfAvailable = UserDefaults.standard.bool(forKey: "safariReaderMode")
+                config.entersReaderIfAvailable = settings.safariReaderMode
 
                 let safariVC = SFSafariViewController(url: url, configuration: config)
                 safariVC.preferredControlTintColor = UIColor(named: "appTintColor")
