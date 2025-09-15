@@ -58,7 +58,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             contentView
                 .navigationBarTitleDisplayMode(.inline)
         }
-//        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 userButton
