@@ -64,8 +64,8 @@ struct VotingViewModelTests {
         func getCurrentUser() async -> User? { nil }
     }
 
+    @MainActor
     final class MockNavigationStore: NavigationStoreProtocol {
-        @MainActor
         init() {}
 
         @MainActor var selectedPost: Post?
