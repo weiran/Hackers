@@ -162,9 +162,11 @@ struct NetworkManagerTests {
         defer { MockURLProtocol.requestHandler = original }
 
         MockURLProtocol.requestHandler = { request in
-            let url = request.url ?? URL(string: "https://example.com")!
-            let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
-            return (response, Data("error".utf8), nil)
+            if let url = request.url, url.path.contains("/status/500") {
+                let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (response, Data("error".utf8), nil)
+            }
+            return try MockURLProtocol.defaultHandler(request)
         }
 
         let manager = makeManager()
