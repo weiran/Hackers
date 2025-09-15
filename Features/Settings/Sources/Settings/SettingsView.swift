@@ -138,7 +138,11 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             Slider(
                                 value: Binding(
                                     get: { Double(viewModel.textSize.rawValue) },
-                                    set: { viewModel.textSize = TextSize(rawValue: Int($0)) ?? .medium },
+                                    set: { newValue in
+                                        Task { @MainActor in
+                                            viewModel.textSize = TextSize(rawValue: Int(newValue)) ?? .medium
+                                        }
+                                    }
                                 ),
                                 in: 0 ... 4,
                                 step: 1,
