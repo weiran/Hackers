@@ -131,6 +131,27 @@ struct CommentHTMLParserTests {
         #expect(attrs.link?.absoluteString == "https://news.ycombinator.com/item?id=123", "Relative HN link should resolve to absolute URL")
     }
 
+    @Test("Relative links without leading slash resolve against base URL")
+    func relativeLinkNoLeadingSlash() {
+        let input = "Go to <a href=\"item?id=456\">item</a>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let s = String(result.characters)
+        let range = s.range(of: "item")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: s.distance(from: s.startIndex, to: range.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: s.distance(from: s.startIndex, to: range.upperBound))
+        let attrs = result[start ..< end]
+        #expect(attrs.link?.absoluteString == "https://news.ycombinator.com/item?id=456")
+    }
+
+    @Test("Nested formatting tags result in plain text without formatting")
+    func nestedFormattingPlainText() {
+        let input = "Text <b>hello <i>world</i></b> end"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let s = String(result.characters)
+        #expect(s.contains("hello world"))
+        #expect(!s.contains("<b>") && !s.contains("</i>"))
+    }
+
     // MARK: - Paragraph Handling Tests
 
     @Test("Paragraph parsing handles single paragraph correctly")

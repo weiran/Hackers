@@ -155,6 +155,28 @@ struct NetworkManagerTests {
         }
     }
 
+    @Test("GET request with non-2xx status throws")
+    func getRequestWithServerErrorStatus() async {
+        // Temporarily override handler to return 500 for this test
+        let original = MockURLProtocol.requestHandler
+        defer { MockURLProtocol.requestHandler = original }
+
+        MockURLProtocol.requestHandler = { request in
+            let url = request.url ?? URL(string: "https://example.com")!
+            let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+            return (response, Data("error".utf8), nil)
+        }
+
+        let manager = makeManager()
+        let url = URL(string: "https://example.com/status/500")!
+        do {
+            _ = try await manager.get(url: url)
+            Issue.record("Expected badServerResponse error for non-2xx status")
+        } catch {
+            #expect((error as? URLError)?.code == .badServerResponse, "Should throw badServerResponse on non-2xx status")
+        }
+    }
+
     // MARK: - POST Request Tests
 
     @Test("POST request with valid URL")
