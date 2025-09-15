@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackers-app.dev/schemas/architecture.json",
+  "title": "Hackers App Architecture Schema",
+  "description": "Machine-readable schema for the Hackers iOS app architecture",
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "object",
+      "properties": {
+        "name": "Hackers",
+        "version": "5.0.0",
+        "buildNumber": "135",
+        "platform": "iOS",
+        "minimumVersion": "26.0",
+        "swiftVersion": "6.2",
+        "architecture": "Clean Architecture",
+        "uiFramework": "SwiftUI"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "enum": ["app", "feature", "domain", "data", "shared", "design-system", "networking"] },
+          "dependencies": { "type": "array", "items": { "type": "string" } },
+          "testCoverage": { "type": "number", "minimum": 0, "maximum": 100 }
+        }
+      },
+      "minItems": 1
+    },
+    "layers": {
+      "type": "object",
+      "properties": {
+        "presentation": {
+          "type": "object",
+          "properties": {
+            "pattern": "MVVM",
+            "stateManagement": "@Observable",
+            "uiFramework": "SwiftUI",
+            "navigation": "NavigationStack"
+          }
+        },
+        "domain": {
+          "type": "object",
+          "properties": {
+            "pattern": "Use Cases",
+            "purity": "Framework-free",
+            "models": ["Post", "Comment", "User", "VotingState"],
+            "services": ["VotingService"]
+          }
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "pattern": "Repository",
+            "persistence": "UserDefaults",
+            "networking": "async/await",
+            "parsing": "SwiftSoup"
+          }
+        }
+      }
+    },
+    "patterns": {
+      "type": "object",
+      "properties": {
+        "dependencyInjection": "Protocol-based Container",
+        "errorHandling": "Result + async throws",
+        "concurrency": "Swift 6 Strict Concurrency",
+        "threading": "@MainActor for UI",
+        "testFramework": "Swift Testing"
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "module": { "type": "string" },
+          "capabilities": { "type": "array", "items": { "type": "string" } },
+          "status": { "enum": ["implemented", "in-progress", "planned"] }
+        }
+      }
+    }
+  },
+  "required": ["app", "modules", "layers", "patterns", "features"]
+}
