@@ -255,7 +255,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
 
     private func isHackerNewsItemURL(_ url: URL) -> Bool {
         guard let hnHost = url.host else { return false }
-        return hnHost == HackerNewsConstants.host && url.path == "/item"
+        return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
     }
 }
 
