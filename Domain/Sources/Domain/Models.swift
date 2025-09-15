@@ -193,6 +193,7 @@ public enum HackersKitAuthenticationError: Error, Sendable {
 public enum HackerNewsConstants {
     public static let baseURL = "https://news.ycombinator.com"
     public static let host = "news.ycombinator.com"
+    public static let itemPrefix = "item?id="
 }
 
 public extension Post {

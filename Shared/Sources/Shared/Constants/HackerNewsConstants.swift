@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import Domain
 
 public struct HackerNewsConstants {
-    public static let baseURL = "https://news.ycombinator.com"
-    public static let host = "news.ycombinator.com"
-    public static let itemPrefix = "item?id="
+    public static let baseURL = Domain.HackerNewsConstants.baseURL
+    public static let host = Domain.HackerNewsConstants.host
+    public static let itemPrefix = Domain.HackerNewsConstants.itemPrefix
 
     private init() {}
 }
