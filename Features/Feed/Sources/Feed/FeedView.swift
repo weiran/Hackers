@@ -171,7 +171,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
 
         Divider()
 
-        if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
+        if !isHackerNewsItemURL(post.url) {
             Button { handleLinkTap(post: post) } label: {
                 Label("Open Link", systemImage: "safari")
             }
@@ -245,12 +245,17 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     }
 
     private func handleLinkTap(post: Domain.Post) {
-        guard !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) else {
+        guard !isHackerNewsItemURL(post.url) else {
             navigationStore.showPost(post)
             return
         }
 
         LinkOpener.openURL(post.url, with: nil)
+    }
+
+    private func isHackerNewsItemURL(_ url: URL) -> Bool {
+        guard url.host == HackerNewsConstants.host else { return false }
+        return url.path == "/item"
     }
 }
 

@@ -94,7 +94,7 @@ public struct PostDisplayView: View {
                         }
 
                         if let host = post.url.host,
-                           !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix)
+                           !isHackerNewsItemURL(post.url)
                         {
                             Text("•")
                                 .foregroundColor(.secondary)
@@ -148,7 +148,7 @@ public struct PostContextMenu: View {
 
             Divider()
 
-            if !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
+            if !isHackerNewsItemURL(post.url) {
                 Button {
                     onOpenLink()
                 } label: {
@@ -163,4 +163,9 @@ public struct PostContextMenu: View {
             }
         }
     }
+}
+
+private func isHackerNewsItemURL(_ url: URL) -> Bool {
+    guard url.host == HackerNewsConstants.host else { return false }
+    return url.path == "/item"
 }
