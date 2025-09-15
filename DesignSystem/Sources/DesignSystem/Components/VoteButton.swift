@@ -34,6 +34,7 @@ public struct VoteButton: View {
                     Image(systemName: iconName)
                         .scaledFont(style.iconFont)
                         .foregroundColor(style.foregroundColor(for: votingState))
+                        .accessibilityHidden(true)
                 }
 
                 if style.showScore, let score = votingState.score {
@@ -46,6 +47,12 @@ public struct VoteButton: View {
         .disabled(!votingState.canVote || votingState.isVoting)
         .scaleEffect(votingState.isVoting ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: votingState.isVoting)
+        .accessibilityLabel(votingState.isUpvoted ? "Upvoted" : "Upvote")
+        .accessibilityHint(votingState.isUpvoted ? "Already upvoted" : (votingState.canVote ? "Double-tap to upvote" : "Voting unavailable"))
+        .accessibilityValue({ () -> String in
+            if let score = votingState.score { return "\(score) points" }
+            return ""
+        }())
     }
 
     private var iconName: String {

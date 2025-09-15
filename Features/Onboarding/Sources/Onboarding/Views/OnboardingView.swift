@@ -44,6 +44,7 @@ public struct OnboardingView: View {
                             .font(.system(size: 16, weight: .medium))
                     }
                     .foregroundStyle(AppColors.appTintColor)
+                    .accessibilityLabel("Close")
                 }
             }
         }

@@ -104,6 +104,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                 if isAuthenticated {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)
+                                        .accessibilityHidden(true)
                                 }
                             }
                         }
@@ -140,6 +141,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                 in: 0...4,
                                 step: 1
                             )
+                            .accessibilityLabel("Text Size")
 
                             Text("A")
                                 .scaledFont(.title2)
@@ -171,6 +173,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         Image(systemName: "xmark")
                     }
                 )
+                .accessibilityLabel("Close")
             )
         }
     }

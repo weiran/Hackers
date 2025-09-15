@@ -42,6 +42,8 @@ public struct PostDisplayView: View {
                         .onTapGesture {
                             onThumbnailTap?()
                         }
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel("Open link")
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -74,11 +76,13 @@ public struct PostDisplayView: View {
                                 Image(systemName: "arrow.up")
                                     .foregroundColor(post.upvoted ? AppColors.upvotedColor : .secondary)
                                     .scaledFont(.caption2)
+                                    .accessibilityHidden(true)
                             }
                         }
 
                         Text("•")
                             .foregroundColor(.secondary)
+                            .accessibilityHidden(true)
 
                         HStack(spacing: 0) {
                             Text("\(post.commentsCount)")
@@ -86,12 +90,14 @@ public struct PostDisplayView: View {
                             Image(systemName: "message")
                                 .foregroundColor(.secondary)
                                 .scaledFont(.caption2)
+                                .accessibilityHidden(true)
                         }
 
                         if let host = post.url.host,
                            !post.url.absoluteString.starts(with: HackerNewsConstants.itemPrefix) {
                             Text("•")
                                 .foregroundColor(.secondary)
+                                .accessibilityHidden(true)
                             Text(host)
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)

@@ -36,9 +36,15 @@ public struct VoteIndicator: View {
                     .foregroundColor(style.upvotedColor)
                     .scaleEffect(style.iconScale)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
+                    .accessibilityHidden(true)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: votingState.canVote)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel({ () -> String in
+            let base = (votingState.score != nil) ? "\(votingState.score!) points" : "Votes"
+            return votingState.isUpvoted ? base + ", upvoted" : base
+        }())
     }
 
     private var scoreColor: Color {

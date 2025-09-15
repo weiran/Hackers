@@ -79,6 +79,7 @@ public struct LoginView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Close")
             }
         }
         .alert("Login Failed", isPresented: $showAlert) {
@@ -97,6 +98,7 @@ public struct LoginView: View {
                     .font(.system(size: 64))
                     .foregroundStyle(.orange.gradient)
                     .symbolRenderingMode(.hierarchical)
+                    .accessibilityHidden(true)
 
                 VStack(spacing: 8) {
                     Text("Welcome to")
@@ -150,6 +152,7 @@ public struct LoginView: View {
                     Image(systemName: "lock.shield")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
 
                     Text("Your password is never stored on this device")
                         .font(.caption)
@@ -167,6 +170,7 @@ public struct LoginView: View {
                         } else {
                             Image(systemName: "person.badge.key.fill")
                                 .font(.callout)
+                                .accessibilityHidden(true)
                         }
 
                         Text(isAuthenticating ? "Signing in..." : "Sign In")
@@ -213,6 +217,7 @@ public struct LoginView: View {
                     .font(.system(size: 80))
                     .foregroundStyle(.green.gradient)
                     .symbolRenderingMode(.hierarchical)
+                    .accessibilityHidden(true)
 
                 VStack(spacing: 12) {
                     Text("Welcome back!")
@@ -233,6 +238,7 @@ public struct LoginView: View {
                     HStack {
                         Image(systemName: "person.badge.minus")
                             .font(.callout)
+                            .accessibilityHidden(true)
 
                         Text("Sign Out")
                             .font(.headline)
@@ -263,6 +269,7 @@ public struct LoginView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
+                .accessibilityLabel("Close")
             }
         }
     }

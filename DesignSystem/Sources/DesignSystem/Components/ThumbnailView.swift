@@ -41,8 +41,10 @@ public struct ThumbnailView: View {
             } placeholder: {
                 placeholderImage
             }
+            .accessibilityHidden(true)
         } else {
             placeholderImage
+                .accessibilityHidden(true)
         }
     }
 }

@@ -25,6 +25,7 @@ struct OnboardingItemView: View {
             .scaledFont(.title2)
             .foregroundStyle(AppColors.appTintColor)
             .frame(width: 32, height: 32)
+            .accessibilityHidden(true)
     }
 
     private var contentView: some View {

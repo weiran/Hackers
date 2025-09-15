@@ -151,6 +151,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             Image(systemName: "arrow.up")
         }
         .tint(AppColors.upvotedColor)
+        .accessibilityLabel("Upvote")
     }
 
     @ViewBuilder
@@ -223,6 +224,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 .font(.headline)
                 .foregroundColor(authService.isAuthenticated ? .primary : .secondary)
         }
+        .accessibilityLabel(authService.isAuthenticated ? "Account" : "Login")
     }
 
     @ViewBuilder
@@ -234,6 +236,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 .font(.headline)
                 .foregroundColor(.primary)
         }
+        .accessibilityLabel("Settings")
     }
 
     private func handleLinkTap(post: Domain.Post) {
@@ -274,6 +277,11 @@ struct PostRowView: View {
             view.onTapGesture {
                 onCommentsTap?()
             }
+        }
+        .if(onCommentsTap != nil) { view in
+            view
+                .accessibilityAddTraits(.isButton)
+                .accessibilityHint("Open comments")
         }
     }
 }
