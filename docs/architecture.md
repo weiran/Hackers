@@ -1,7 +1,7 @@
 ---
 title: Architecture Guide
 version: 1.0.0
-lastUpdated: 2025-01-15
+lastUpdated: 2025-09-15
 audience: [developers, architects]
 tags: [architecture, clean-architecture, mvvm, swift]
 ---

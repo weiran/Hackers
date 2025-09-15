@@ -65,13 +65,13 @@ This documentation includes structured metadata for automated tools:
 
 | Document | Last Updated | Version | Status |
 |----------|-------------|---------|---------|
-| README.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| architecture.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| api-reference.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| coding-standards.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| design-system.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| testing-guide.md | 2025-01-15 | 1.0.0 | ✅ Current |
-| development-setup.md | 2025-01-15 | 1.0.0 | ✅ Current |
+| README.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| architecture.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| api-reference.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| coding-standards.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| design-system.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| testing-guide.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| development-setup.md | 2025-09-15 | 1.0.0 | ✅ Current |
 
 ---
 
