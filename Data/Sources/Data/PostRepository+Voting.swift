@@ -88,7 +88,7 @@ extension PostRepository {
         }
         if unvoteLink == nil {
             let anyLinks = try titleElement.select("a")
-            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") try }
+            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") }
                 ?? (anyLinks.first { try $0.text().lowercased() == "unvote" })
         }
 
