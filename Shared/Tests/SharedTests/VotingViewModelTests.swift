@@ -28,7 +28,7 @@ struct VotingViewModelTests {
 
     final class MockVotingService: VotingService, @unchecked Sendable {
         var upvoteCalled = false
-        var shouldThrow = false
+        var errorToThrow: Error?
 
         func votingState(for item: any Votable) -> VotingState {
             VotingState(
@@ -40,9 +40,7 @@ struct VotingViewModelTests {
 
         func upvote(item _: any Votable) async throws {
             upvoteCalled = true
-            if shouldThrow {
-                throw HackersKitError.requestFailure
-            }
+            if let errorToThrow { throw errorToThrow }
         }
     }
 
@@ -59,10 +57,67 @@ struct VotingViewModelTests {
     }
 
     final class MockAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
+        var logoutCalled = false
         func authenticate(username _: String, password _: String) async throws {}
-        func logout() async throws {}
+        func logout() async throws { logoutCalled = true }
         func isAuthenticated() async -> Bool { false }
         func getCurrentUser() async -> User? { nil }
+    }
+
+    final class MockNavigationStore: NavigationStoreProtocol {
+        @MainActor
+        init() {}
+
+        @MainActor var selectedPost: Post?
+        @MainActor var showingLogin: Bool = false
+        @MainActor var showingSettings: Bool = false
+        @MainActor var showLoginCalled = false
+
+        @MainActor func showPost(_ post: Post) { selectedPost = post }
+        @MainActor func showLogin() { showingLogin = true; showLoginCalled = true }
+        @MainActor func showSettings() { showingSettings = true }
+        @MainActor func selectPostType(_: PostType) {}
+    }
+
+    // MARK: - Unauthenticated flow
+
+    @Test("Unauthenticated upvote triggers logout and login prompt")
+    @MainActor
+    func unauthenticatedUpvoteFlow() async throws {
+        // Given
+        let mockAuth = MockAuthenticationUseCase()
+        let nav = MockNavigationStore()
+        let viewModel = VotingViewModel(
+            votingService: mockVotingService,
+            commentVotingService: mockCommentVotingService,
+            authenticationUseCase: mockAuth,
+        )
+        viewModel.navigationStore = nav
+
+        mockVotingService.errorToThrow = HackersKitError.unauthenticated
+
+        var post = Post(
+            id: 1,
+            url: URL(string: "https://example.com")!,
+            title: "Post",
+            age: "1h",
+            commentsCount: 0,
+            by: "user",
+            score: 10,
+            postType: .news,
+            upvoted: false,
+            voteLinks: VoteLinks(upvote: URL(string: "/vote?up"), unvote: nil)
+        )
+
+        // When
+        await viewModel.upvote(post: &post)
+
+        // Then
+        #expect(mockVotingService.upvoteCalled, "Upvote should be attempted")
+        #expect(mockAuth.logoutCalled, "Logout should be called on unauthenticated error")
+        #expect(nav.showLoginCalled, "Navigation should prompt login")
+        #expect(viewModel.lastError == nil, "lastError should not be set for unauthenticated flow")
+        #expect(post.upvoted == false && post.score == 10, "Optimistic state should be reverted")
     }
 
     // MARK: - Comment Voting Tests

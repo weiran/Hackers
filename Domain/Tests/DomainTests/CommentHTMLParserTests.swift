@@ -118,6 +118,19 @@ struct CommentHTMLParserTests {
         #expect(resultString == "Text before link text after", "Whitespace around links should be preserved")
     }
 
+    @Test("Relative links resolve against Hacker News base URL")
+    func relativeLinkResolution() {
+        let input = "Check <a href=\"/item?id=123\">item</a> link"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("item"), "Link text should be present")
+        let linkRange = resultString.range(of: "item")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: linkRange.upperBound))
+        let attrs = result[start ..< end]
+        #expect(attrs.link?.absoluteString == "https://news.ycombinator.com/item?id=123", "Relative HN link should resolve to absolute URL")
+    }
+
     // MARK: - Paragraph Handling Tests
 
     @Test("Paragraph parsing handles single paragraph correctly")
@@ -491,6 +504,19 @@ struct CommentHTMLParserTests {
         #expect(resultString.contains("\n\nfunction hello()"), "Code blocks should have paragraph spacing before them")
         // The text after might not have spacing if it's considered part of the same block
         #expect(resultString.contains("And more text"), "Text after code block should be preserved")
+    }
+
+    @Test("Links inside code blocks are not linkified")
+    func linkInsideCodeBlockNotLinked() {
+        let input = "<pre><code>See <a href=\"https://example.com\">example</a> here</code></pre>"
+        let result = CommentHTMLParser.parseHTMLText(input)
+        let resultString = String(result.characters)
+        #expect(resultString.contains("example"), "Code content should include inner text")
+        let range = resultString.range(of: "example")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: range.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: range.upperBound))
+        let attrs = result[start ..< end]
+        #expect(attrs.link == nil, "Inline links inside code blocks should not be linkified")
     }
 
     @Test("Code block parsing handles HTML entities in code")
