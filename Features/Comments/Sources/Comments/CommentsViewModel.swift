@@ -10,7 +10,6 @@ import Foundation
 import Shared
 import SwiftUI
 
-@MainActor
 @Observable
 public final class CommentsViewModel {
     public var post: Post

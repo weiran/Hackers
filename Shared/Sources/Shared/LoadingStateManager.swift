@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 @Observable
 public final class LoadingStateManager<T> {
     public var data: T

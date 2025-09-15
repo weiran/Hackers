@@ -10,7 +10,6 @@ import Foundation
 import Shared
 import SwiftUI
 
-@MainActor
 @Observable
 public final class FeedViewModel {
     public var isLoadingMore = false
