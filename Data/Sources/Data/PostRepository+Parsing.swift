@@ -10,6 +10,9 @@ import Foundation
 import SwiftSoup
 
 extension PostRepository {
+    private enum ParseConstants {
+        static let commentIndentWidth = 40
+    }
     // MARK: - CommentUseCase
 
     public func getComments(for post: Post) async throws -> [Domain.Comment] {
@@ -133,7 +136,7 @@ extension PostRepository {
         guard let indentWidth = try Int(element.select(".ind img").attr("width")) else {
             throw HackersKitError.scraperError
         }
-        let level = indentWidth / 40
+        let level = indentWidth / ParseConstants.commentIndentWidth
         let voteLinksResult = try voteLinks(from: element)
         let upvoted = voteLinksResult.upvoted
 

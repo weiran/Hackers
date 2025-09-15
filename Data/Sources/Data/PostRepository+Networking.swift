@@ -11,6 +11,7 @@ import SwiftSoup
 
 extension PostRepository {
     // MARK: - Networking helpers
+    private static let maxPostPages = 10
 
     func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         let url: URL
@@ -53,8 +54,8 @@ extension PostRepository {
         let document = try SwiftSoup.parse(html)
         let moreLinkExists = try !document.select("a.morelink").isEmpty()
 
-        if moreLinkExists, recursive {
-            return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: html)
+        if moreLinkExists, recursive, page < Self.maxPostPages {
+            return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: workingHtml + html)
         } else {
             return workingHtml + html
         }
