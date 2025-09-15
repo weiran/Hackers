@@ -62,6 +62,7 @@ struct CommentsContentView: View {
                                 Image(systemName: "arrow.up")
                             }
                             .tint(AppColors.upvotedColor)
+                            .accessibilityLabel("Upvote")
                         }
                     }
 
@@ -127,6 +128,7 @@ struct CommentsForEach: View {
                         Image(systemName: "arrow.up")
                     }
                     .tint(AppColors.upvotedColor)
+                    .accessibilityLabel("Upvote")
                 }
             }
             .swipeActions(edge: .trailing) {
@@ -215,17 +217,20 @@ struct CommentRow: View {
                     Image(systemName: "chevron.down")
                         .scaledFont(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
             if comment.visibility == .visible {
                 Text(scaledCommentText)
-                    .scaledFont(.body)
+                    .scaledFont(.callout)
                     .foregroundColor(.primary)
             }
         }
         .listRowInsets(.init(top: 10, leading: CGFloat((comment.level + 1) * 16), bottom: 10, trailing: 16))
         .contentShape(Rectangle())
         .onTapGesture { onToggle() }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint(comment.visibility == .visible ? "Double-tap to collapse" : "Double-tap to expand")
         .contextMenu {
             VotingContextMenuItems.commentVotingMenuItems(
                 for: comment,
@@ -261,6 +266,8 @@ struct ToolbarTitle: View {
                 .truncationMode(.tail)
         }
         .onTapGesture { onTap() }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Open link")
         .opacity(showTitle ? 1.0 : 0.0)
         .offset(y: showTitle ? 0 : 20)
         .animation(.easeInOut(duration: 0.3), value: showTitle)
@@ -280,6 +287,7 @@ struct ShareMenu: View {
             }
         } label: {
             Image(systemName: "square.and.arrow.up")
+                .accessibilityLabel("Share")
         }
     }
 }
