@@ -15,6 +15,7 @@ import SwiftUI
 public final class VotingViewModel {
     private let votingService: VotingService
     private let commentVotingService: CommentVotingService
+    private let authenticationUseCase: any AuthenticationUseCase
     public var navigationStore: NavigationStoreProtocol?
 
     public var isVoting = false
@@ -28,9 +29,11 @@ public final class VotingViewModel {
     public init(
         votingService: VotingService,
         commentVotingService: CommentVotingService,
+        authenticationUseCase: any AuthenticationUseCase,
     ) {
         self.votingService = votingService
         self.commentVotingService = commentVotingService
+        self.authenticationUseCase = authenticationUseCase
     }
 
     // MARK: - Post Voting (Upvote only)
@@ -129,7 +132,7 @@ public final class VotingViewModel {
         }
         // Clear cookies and stored username
         do {
-            try await DependencyContainer.shared.getAuthenticationUseCase().logout()
+            try await authenticationUseCase.logout()
         } catch {
             // ignore logout errors
         }

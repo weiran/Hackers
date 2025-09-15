@@ -30,6 +30,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         let defaultVotingViewModel = VotingViewModel(
             votingService: container.getVotingService(),
             commentVotingService: container.getCommentVotingService(),
+            authenticationUseCase: container.getAuthenticationUseCase()
         )
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
         self.isSidebar = isSidebar

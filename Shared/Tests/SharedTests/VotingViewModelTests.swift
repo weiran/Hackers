@@ -20,6 +20,7 @@ struct VotingViewModelTests {
         VotingViewModel(
             votingService: mockVotingService,
             commentVotingService: mockCommentVotingService,
+            authenticationUseCase: MockAuthenticationUseCase(),
         )
     }
 
@@ -55,6 +56,13 @@ struct VotingViewModelTests {
                 throw HackersKitError.requestFailure
             }
         }
+    }
+
+    final class MockAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
+        func authenticate(username _: String, password _: String) async throws {}
+        func logout() async throws {}
+        func isAuthenticated() async -> Bool { false }
+        func getCurrentUser() async -> User? { nil }
     }
 
     // MARK: - Comment Voting Tests
