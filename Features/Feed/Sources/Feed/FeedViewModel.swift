@@ -10,8 +10,9 @@ import Foundation
 import Shared
 import SwiftUI
 
+@MainActor
 @Observable
-public final class FeedViewModel: @unchecked Sendable {
+public final class FeedViewModel {
     public var isLoadingMore = false
     public var postType: Domain.PostType = .news
 

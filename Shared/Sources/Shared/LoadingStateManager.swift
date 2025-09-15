@@ -7,8 +7,9 @@
 
 import Foundation
 
+@MainActor
 @Observable
-public final class LoadingStateManager<T>: @unchecked Sendable {
+public final class LoadingStateManager<T> {
     public var data: T
     public private(set) var isLoading = false
     public private(set) var error: Error?
