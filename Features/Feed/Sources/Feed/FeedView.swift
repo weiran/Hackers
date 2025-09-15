@@ -58,6 +58,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             contentView
                 .navigationBarTitleDisplayMode(.inline)
         }
+//        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 userButton
@@ -205,14 +206,15 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             HStack(spacing: 4) {
                 Image(systemName: selectedPostType.iconName)
                     .font(.headline)
-                    .foregroundStyle(.primary)
                 Text(selectedPostType.displayName)
                     .font(.headline)
-                    .foregroundStyle(.primary)
                 Image(systemName: "chevron.down.circle.fill")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
             }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .glassEffect(in: .rect(cornerRadius: 32.0))
         }
     }
 
