@@ -166,6 +166,6 @@ public struct PostContextMenu: View {
 }
 
 private func isHackerNewsItemURL(_ url: URL) -> Bool {
-    guard let host = url.host else { return false }
-    return host == HackerNewsConstants.host && url.path == "/item"
+    guard let hnHost = url.host else { return false }
+    return hnHost == HackerNewsConstants.host && url.path == "/item"
 }
