@@ -286,6 +286,7 @@ run_module_tests() {
     # Detect genuine Swift Testing failures and ignore false negatives.
     local has_swift_fail=1
     local has_xctest_fail=1
+    local has_compilation_error=1
     local has_pass_summary=1
     if grep -qE "(^|[[:space:]])✘ |failed after [0-9.]+ seconds with [0-9]+ issue|recorded an issue at|✘ Test run with [0-9]+ tests .* failed" "$temp_output"; then
         has_swift_fail=0
@@ -293,15 +294,18 @@ run_module_tests() {
     if grep -q "Test Case .*failed" "$temp_output"; then
         has_xctest_fail=0
     fi
+    if grep -q "error:" "$temp_output"; then
+        has_compilation_error=0
+    fi
     if grep -qE "✔ Test run with [0-9]+ tests in [0-9]+ suites passed|Test Suite '.*' passed" "$temp_output"; then
         has_pass_summary=0
     fi
-    # If xcodebuild failed but there are no actual failing tests recorded, treat as success
-    if [ "${exit_code:-0}" -ne 0 ] && [ $has_swift_fail -ne 0 ] && [ $has_xctest_fail -ne 0 ]; then
+    # If xcodebuild failed but there are no actual failing tests recorded and no compilation errors, treat as success
+    if [ "${exit_code:-0}" -ne 0 ] && [ $has_swift_fail -ne 0 ] && [ $has_xctest_fail -ne 0 ] && [ $has_compilation_error -ne 0 ]; then
         exit_code=0
     fi
-    # If we detected real test failures, force a non-zero exit code
-    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ]; then
+    # If we detected real test failures or compilation errors, force a non-zero exit code
+    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ] || [ $has_compilation_error -eq 0 ]; then
         exit_code=1
     fi
 

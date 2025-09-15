@@ -21,7 +21,7 @@ struct NetworkManagerTests {
         nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data, TimeInterval?))?
 
         // Default handler used across tests to avoid shared-state races
-        nonisolated(unsafe) static func defaultHandler(_ request: URLRequest) throws -> (HTTPURLResponse, Data, TimeInterval?) {
+        nonisolated static func defaultHandler(_ request: URLRequest) throws -> (HTTPURLResponse, Data, TimeInterval?) {
             let url = request.url ?? URL(string: "https://example.com")!
             let method = request.httpMethod ?? "GET"
 
@@ -96,7 +96,7 @@ struct NetworkManagerTests {
                     self.client?.urlProtocolDidFinishLoading(self)
                 }
                 if let delay, delay > 0 {
-                    DispatchQueue.global().asyncAfter(deadline: .now() + delay) { execute() }
+                    DispatchQueue.global().asyncAfter(deadline: .now() + delay, execute: execute)
                 } else {
                     execute()
                 }
@@ -125,7 +125,8 @@ struct NetworkManagerTests {
 
     @Test("NetworkManager initialization")
     func networkManagerInitialization() {
-        #expect(defaultManager != nil, "NetworkManager should initialize successfully")
+        // NetworkManager initializes successfully if no exception is thrown
+        _ = defaultManager
     }
 
     // MARK: - GET Request Tests
@@ -305,37 +306,7 @@ struct NetworkManagerTests {
     }
 
     // MARK: - URLSessionDelegate Tests
-
-    @Test("Redirect handling")
-    func redirectHandling() {
-        // This tests the urlSession:task:willPerformHTTPRedirection method
-        // Since it's designed to prevent redirects, we test that it returns nil
-
-        let response = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
-            statusCode: 301,
-            httpVersion: "HTTP/1.1",
-            headerFields: ["Location": "https://redirected.com"],
-        )!
-
-        let request = URLRequest(url: URL(string: "https://redirected.com")!)
-
-        var completionHandlerCalled = false
-        var receivedRequest: URLRequest?
-
-        defaultManager.urlSession(
-            URLSession.shared,
-            task: URLSessionDataTask(),
-            willPerformHTTPRedirection: response,
-            newRequest: request,
-        ) { request in
-            completionHandlerCalled = true
-            receivedRequest = request
-        }
-
-        #expect(completionHandlerCalled, "Completion handler should be called")
-        #expect(receivedRequest == nil, "Should prevent redirects by returning nil")
-    }
+    // Note: NetworkManager doesn't override redirect handling, so redirects follow default behavior
 
     // MARK: - Concurrent Request Tests
 
@@ -387,7 +358,7 @@ struct NetworkManagerTests {
             _ = try await manager.get(url: url)
             Issue.record("Expected network error")
         } catch {
-            #expect(error != nil, "Should receive an error for unreachable URL")
+            // Error was thrown as expected
         }
     }
 
