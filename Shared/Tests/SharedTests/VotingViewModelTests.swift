@@ -196,3 +196,42 @@ struct VotingViewModelTests {
         #expect(votingViewModel.lastError != nil, "Error should be set")
     }
 }
+
+@Suite("NavigationStoreProtocol Default Behavior")
+struct NavigationStoreProtocolDefaultsTests {
+    final class RecordingNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
+        var selectedPost: Post?
+        var showingLogin: Bool = false
+        var showingSettings: Bool = false
+
+        var recordedURL: URL?
+        var recordedPushFlag: Bool?
+        var stubbedResult: Bool = false
+
+        func showPost(_: Post) {}
+        func showLogin() { showingLogin = true }
+        func showSettings() { showingSettings = true }
+        func selectPostType(_: PostType) {}
+
+        @MainActor
+        func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool) -> Bool {
+            recordedURL = url
+            recordedPushFlag = pushOntoDetailStack
+            return stubbedResult
+        }
+    }
+
+    @Test("Default openURLInPrimaryContext uses push flag")
+    @MainActor
+    func defaultConvenienceUsesPushFlag() {
+        let store = RecordingNavigationStore()
+        store.stubbedResult = true
+        let targetURL = URL(string: "https://example.com/web")!
+
+        let result = store.openURLInPrimaryContext(targetURL)
+
+        #expect(result == true)
+        #expect(store.recordedURL == targetURL)
+        #expect(store.recordedPushFlag == true)
+    }
+}
