@@ -7,6 +7,8 @@ It’s **open source (MIT)**, rebuilt from the ground up in **version 5.0**, and
 
 👉 [Download on the App Store](https://apps.apple.com/us/app/hackers-for-hacker-news/id603503901)
 
+![hackers5](https://github.com/user-attachments/assets/378e848f-6ef8-4238-972e-95e6c8f93869)
+
 ---
 
 ## ✨ Features
