@@ -9,10 +9,15 @@ import Combine
 import Domain
 import Shared
 import SwiftUI
+import UIKit
 
 enum NavigationDestination: Hashable {
     case comments(Domain.Post)
     case settings
+}
+
+enum NavigationDetailDestination: Hashable {
+    case web(URL)
 }
 
 class NavigationStore: ObservableObject, NavigationStoreProtocol {
@@ -22,6 +27,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     @Published var showingLogin = false
     @Published var showingSettings = false
     @Published var pendingPostId: Int?
+    @Published var embeddedBrowserURL: URL?
+    @Published var detailPath: [NavigationDetailDestination] = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -36,6 +43,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     }
 
     func showPost(_ post: Domain.Post) {
+        embeddedBrowserURL = nil
+        detailPath.removeAll()
         selectedPost = post
 
         // For iPhone navigation, use NavigationPath
@@ -46,6 +55,8 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
 
     func clearSelection() {
         selectedPost = nil
+        embeddedBrowserURL = nil
+        detailPath.removeAll()
     }
 
     func showLogin() {
@@ -59,6 +70,42 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     func selectPostType(_ type: Domain.PostType) {
         selectedPostType = type
         clearSelection()
+    }
+
+    @MainActor
+    func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool = true) -> Bool {
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        guard url.scheme == "http" || url.scheme == "https" else { return false }
+
+        let settings = DependencyContainer.shared.getSettingsUseCase()
+        if settings.openInDefaultBrowser {
+            return false
+        }
+
+        if pushOntoDetailStack, selectedPost != nil {
+            detailPath.append(.web(url))
+            return true
+        }
+
+        embeddedBrowserURL = url
+        detailPath.removeAll()
+        return true
+    }
+
+    @MainActor
+    func dismissEmbeddedBrowser() {
+        let dismiss = { [weak self] in
+            guard let self else { return }
+            if !self.detailPath.isEmpty {
+                self.detailPath.removeLast()
+            } else {
+                self.embeddedBrowserURL = nil
+            }
+        }
+
+        withAnimation(.easeInOut(duration: 0.25)) {
+            dismiss()
+        }
     }
 
     // MARK: - Deep Linking

@@ -38,6 +38,9 @@ struct SettingsViewTests {
         func selectPostType(_: Domain.PostType) {
             // Mock implementation
         }
+
+        @MainActor
+        func openURLInPrimaryContext(_: URL, pushOntoDetailStack _: Bool) -> Bool { false }
     }
 
     // MARK: - Basic View Tests

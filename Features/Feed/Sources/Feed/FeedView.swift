@@ -250,6 +250,14 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             return
         }
 
+        if isSidebar {
+            navigationStore.showPost(post)
+            selectedPostId = post.id
+        }
+
+        if navigationStore.openURLInPrimaryContext(post.url, pushOntoDetailStack: !isSidebar) {
+            return
+        }
         LinkOpener.openURL(post.url, with: nil)
     }
 

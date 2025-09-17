@@ -39,6 +39,9 @@ struct FeedViewTests {
         func selectPostType(_ type: PostType) {
             selectedPostType = type
         }
+
+        @MainActor
+        func openURLInPrimaryContext(_: URL, pushOntoDetailStack _: Bool) -> Bool { false }
     }
 
     // Mock Use Cases

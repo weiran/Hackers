@@ -16,4 +16,12 @@ public protocol NavigationStoreProtocol: ObservableObject {
     func showLogin()
     func showSettings()
     func selectPostType(_ type: PostType)
+    @MainActor func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool) -> Bool
+}
+
+public extension NavigationStoreProtocol {
+    @MainActor
+    func openURLInPrimaryContext(_ url: URL) -> Bool {
+        openURLInPrimaryContext(url, pushOntoDetailStack: true)
+    }
 }

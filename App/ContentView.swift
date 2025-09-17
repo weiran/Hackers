@@ -13,6 +13,7 @@ import Settings
 import Shared
 import SwiftUI
 import UIKit
+import WebKit
 
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
@@ -119,8 +120,13 @@ struct AdaptiveSplitView: View {
             .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {
             // Detail - CommentsView or empty state
-            NavigationStack {
-                if let selectedPost = navigationStore.selectedPost {
+            NavigationStack(path: $navigationStore.detailPath) {
+                if let embeddedURL = navigationStore.embeddedBrowserURL {
+                    EmbeddedWebView(url: embeddedURL,
+                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
+                                    showsCloseButton: true)
+                        .id(embeddedURL.absoluteString)
+                } else if let selectedPost = navigationStore.selectedPost {
                     CommentsView<NavigationStore>(post: selectedPost)
                         .environmentObject(navigationStore)
                         .environmentObject(sessionService)
@@ -129,8 +135,73 @@ struct AdaptiveSplitView: View {
                     EmptyDetailView()
                 }
             }
+            .navigationDestination(for: NavigationDetailDestination.self) { destination in
+                switch destination {
+                case let .web(url):
+                    EmbeddedWebView(url: url,
+                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
+                                    showsCloseButton: false)
+                }
+            }
         }
         .textScaling(for: settingsViewModel.textSize)
+    }
+}
+
+private struct EmbeddedWebView: View {
+    let url: URL
+    let onDismiss: @MainActor () -> Void
+    let showsCloseButton: Bool
+
+    @State private var page = WebPage()
+
+    var body: some View {
+        WebView(page)
+            .task(id: url) {
+                await loadURL()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    shareButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if showsCloseButton {
+                        closeButton
+                    }
+                }
+            }
+    }
+
+    private var shareButton: some View {
+        Button {
+            Task { @MainActor in
+                let targetURL = page.url ?? url
+                ShareService.shared.shareURL(targetURL, title: page.title)
+            }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+        }
+        .accessibilityLabel("Share")
+    }
+
+    private var closeButton: some View {
+        Button {
+            Task { @MainActor in onDismiss() }
+        } label: {
+            Image(systemName: "xmark")
+        }
+        .accessibilityLabel("Close")
+    }
+
+    @Sendable
+    private func loadURL() async {
+        guard page.url != url else { return }
+        do {
+            let navigation = page.load(URLRequest(url: url))
+            for try await _ in navigation {}
+        } catch {
+            // Ignore navigation failures; callers fall back to external opener if needed.
+        }
     }
 }
 

@@ -76,6 +76,8 @@ struct VotingViewModelTests {
         func showLogin() { showingLogin = true; showLoginCalled = true }
         func showSettings() { showingSettings = true }
         func selectPostType(_: PostType) {}
+        @MainActor
+        func openURLInPrimaryContext(_: URL, pushOntoDetailStack _: Bool) -> Bool { false }
     }
 
     // MARK: - Unauthenticated flow

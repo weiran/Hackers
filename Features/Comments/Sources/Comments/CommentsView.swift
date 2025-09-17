@@ -61,6 +61,9 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         }
         .refreshable { await viewModel.refreshComments() }
         .environment(\.openURL, OpenURLAction { url in
+            if navigationStore.openURLInPrimaryContext(url) {
+                return .handled
+            }
             LinkOpener.openURL(url, with: viewModel.post)
             return .handled
         })
@@ -79,6 +82,9 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private func handleLinkTap() {
+        if navigationStore.openURLInPrimaryContext(viewModel.post.url) {
+            return
+        }
         LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
     }
 
