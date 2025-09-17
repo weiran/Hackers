@@ -102,7 +102,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         // This will be replaced with the actual post data when loaded
         let tempPost = Domain.Post(
             id: id,
-            url: URL(string: "\(Domain.HackerNewsConstants.baseURL)/item?id=\(id)")!,
+            url: URL(string: "\(Shared.HackerNewsConstants.baseURL)/item?id=\(id)")!,
             title: "Loading...",
             age: "",
             commentsCount: 0,

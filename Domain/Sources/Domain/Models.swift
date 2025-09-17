@@ -190,18 +190,6 @@ public enum HackersKitAuthenticationError: Error, Sendable {
 
 // MARK: - Extensions
 
-public enum HackerNewsConstants {
-    public static let baseURL = "https://news.ycombinator.com"
-    public static let host = "news.ycombinator.com"
-    public static let itemPrefix = "item?id="
-}
-
-public extension Post {
-    var hackerNewsURL: URL {
-        URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
-    }
-}
-
 public extension PostType {
     var title: String {
         switch self {
@@ -213,12 +201,6 @@ public extension PostType {
         case .best: "Best"
         case .active: "Active"
         }
-    }
-}
-
-public extension Comment {
-    var hackerNewsURL: URL {
-        URL(string: "\(HackerNewsConstants.baseURL)/item?id=\(id)")!
     }
 }
 
