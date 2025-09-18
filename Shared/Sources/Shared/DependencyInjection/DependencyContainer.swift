@@ -20,6 +20,7 @@ public final class DependencyContainer: @unchecked Sendable {
     private static let votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
     private static let authenticationRepository: AuthenticationRepository =
         .init(networkManager: networkManager)
+    private static let onboardingRepository: OnboardingRepository = .init()
 
     private init() {}
 
@@ -52,5 +53,14 @@ public final class DependencyContainer: @unchecked Sendable {
 
     public func getAuthenticationUseCase() -> any AuthenticationUseCase {
         Self.authenticationRepository
+    }
+
+    public func getOnboardingUseCase() -> any OnboardingUseCase {
+        Self.onboardingRepository
+    }
+
+    @MainActor
+    public func makeSessionService() -> SessionService {
+        SessionService(authenticationUseCase: getAuthenticationUseCase())
     }
 }

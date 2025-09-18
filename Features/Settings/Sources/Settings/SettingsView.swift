@@ -8,7 +8,6 @@
 import DesignSystem
 import Domain
 import MessageUI
-import Onboarding
 import Shared
 import SwiftUI
 import Drops
@@ -17,7 +16,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
-    @State private var showOnboarding = false
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
@@ -83,15 +81,9 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             messageBody: "\n\n\n---\nApp Version: \(version)",
                         )
                     }
-                    Button(action: { showOnboarding = true }, label: {
+                    Button(action: { onShowOnboarding() }, label: {
                         Text("Show What's New")
                     })
-                    .sheet(isPresented: $showOnboarding) {
-                        Onboarding.OnboardingService.createOnboardingView {
-                            Onboarding.OnboardingService.markOnboardingShown()
-                            showOnboarding = false
-                        }
-                    }
                 }
 
                 Section(header: Text("Account")) {

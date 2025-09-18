@@ -14,11 +14,20 @@ import Shared
 import SwiftUI
 import UIKit
 
+@MainActor
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
-    @StateObject private var sessionService = SessionService()
+    @StateObject private var sessionService: SessionService
     @StateObject private var settingsViewModel = SettingsViewModel()
     @State private var showOnboarding = false
+    private let onboardingCoordinator: OnboardingCoordinator
+
+    init(container: DependencyContainer = .shared) {
+        _sessionService = StateObject(wrappedValue: container.makeSessionService())
+        onboardingCoordinator = OnboardingCoordinator(
+            onboardingUseCase: container.getOnboardingUseCase()
+        )
+    }
 
     var body: some View {
         Group {
@@ -97,8 +106,16 @@ struct MainContentView: View {
             .textScaling(for: settingsViewModel.textSize)
         }
         .sheet(isPresented: $showOnboarding) {
-            OnboardingViewWrapper()
+            onboardingCoordinator
+                .makeOnboardingView {
+                    showOnboarding = false
+                }
                 .textScaling(for: settingsViewModel.textSize)
+        }
+        .task {
+            if onboardingCoordinator.shouldShowOnboarding() {
+                showOnboarding = true
+            }
         }
     }
 }
