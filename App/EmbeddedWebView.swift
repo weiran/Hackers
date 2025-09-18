@@ -21,8 +21,10 @@ struct EmbeddedWebView: View {
         WebKitView(
             url: url,
             onUpdate: { updatedURL, updatedTitle in
-                currentURL = updatedURL
-                currentTitle = updatedTitle
+                Task { @MainActor in
+                    currentURL = updatedURL
+                    currentTitle = updatedTitle
+                }
             }
         )
         .ignoresSafeArea(.container, edges: .all)
