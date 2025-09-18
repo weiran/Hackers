@@ -66,10 +66,19 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     }
 
     public func containsCookie(for url: URL) -> Bool {
-        guard let cookies = HTTPCookieStorage.shared.cookies(for: url) else {
-            return false
+        if let scopedCookies = HTTPCookieStorage.shared.cookies(for: url), !scopedCookies.isEmpty {
+            return true
         }
-        return !cookies.isEmpty
+
+        guard let host = url.host else { return false }
+
+        let allCookies = HTTPCookieStorage.shared.cookies ?? []
+        return allCookies.contains { cookie in
+            let domain = cookie.domain.trimmingCharacters(in: CharacterSet(charactersIn: "."))
+            return host == cookie.domain
+                || host == domain
+                || host.hasSuffix(domain)
+        }
     }
 
     // Follow redirects by default; no custom handling needed
