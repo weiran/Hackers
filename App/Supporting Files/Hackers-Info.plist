@@ -49,8 +49,11 @@
 		<string>com.weiranzhang.Hackers.comments</string>
 		<string>com.weiranzhang.Hackers.link</string>
 	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchStoryboard</string>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>LaunchIcon</string>
+	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
