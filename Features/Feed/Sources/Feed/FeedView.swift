@@ -177,7 +177,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
             }
         }
 
-        Button { ShareService.shared.sharePost(post) } label: {
+        Button { ContentSharePresenter.shared.sharePost(post) } label: {
             Label("Share", systemImage: "square.and.arrow.up")
         }
     }

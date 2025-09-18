@@ -1,5 +1,5 @@
 //
-//  ReviewController.swift
+//  ReviewPromptController.swift
 //  Shared
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -9,11 +9,11 @@ import StoreKit
 import UIKit
 
 @MainActor
-public enum ReviewController {
+public enum ReviewPromptController {
     public static var disablePrompts = false
 
-    private static let launchCountKey = "ReviewController_LaunchCount"
-    private static let lastRequestTimeKey = "ReviewController_LastRequestTime"
+    private static let launchCountKey = "ReviewPromptController_LaunchCount"
+    private static let lastRequestTimeKey = "ReviewPromptController_LastRequestTime"
 
     public static func incrementLaunchCounter() {
         let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)

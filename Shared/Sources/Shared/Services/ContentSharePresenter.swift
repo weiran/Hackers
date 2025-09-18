@@ -1,5 +1,5 @@
 //
-//  ShareService.swift
+//  ContentSharePresenter.swift
 //  Shared
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -7,9 +7,10 @@
 
 import Domain
 import SwiftUI
+import UIKit
 
-public final class ShareService: @unchecked Sendable {
-    public static let shared = ShareService()
+public final class ContentSharePresenter: @unchecked Sendable {
+    public static let shared = ContentSharePresenter()
 
     private init() {}
 
@@ -40,8 +41,7 @@ public final class ShareService: @unchecked Sendable {
     private func showShareSheet(items: [Any]) {
         let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
 
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController
+        if let rootViewController = PresentationContextProvider.shared.rootViewController
         {
             // For iPad
             if let popover = activityVC.popoverPresentationController {

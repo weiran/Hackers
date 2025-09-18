@@ -42,7 +42,7 @@ struct EmbeddedWebView: View {
         Button {
             Task { @MainActor in
                 let targetURL = currentURL ?? url
-                ShareService.shared.shareURL(targetURL, title: currentTitle)
+                ContentSharePresenter.shared.shareURL(targetURL, title: currentTitle)
             }
         } label: {
             Image(systemName: "square.and.arrow.up")

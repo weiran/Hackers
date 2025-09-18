@@ -40,18 +40,14 @@ struct OnboardingRepositoryTests {
 
     @Test("UserDefaults store defaults to false")
     func userDefaultsStoreDefaultsToFalse() {
-        let suiteName = "com.weiran.hackers.tests.onboarding"
-        let defaults = UserDefaults(suiteName: suiteName)!
-        defaults.removePersistentDomain(forName: suiteName)
+        let defaults = makeIsolatedDefaults()
         let store = UserDefaultsOnboardingVersionStore(userDefaults: defaults)
         #expect(store.hasShownOnboarding() == false)
     }
 
     @Test("UserDefaults store records shown state")
     func userDefaultsStoreRecordsShownState() {
-        let suiteName = "com.weiran.hackers.tests.onboarding"
-        let defaults = UserDefaults(suiteName: suiteName)!
-        defaults.removePersistentDomain(forName: suiteName)
+        let defaults = makeIsolatedDefaults()
         let store = UserDefaultsOnboardingVersionStore(userDefaults: defaults)
         store.markOnboardingShown()
         #expect(store.hasShownOnboarding())
@@ -70,5 +66,15 @@ struct OnboardingRepositoryTests {
         func markOnboardingShown() {
             hasShown = true
         }
+    }
+
+    private func makeIsolatedDefaults() -> UserDefaults {
+        let suiteName = "com.weiran.hackers.tests.onboarding.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            fatalError("Expected to create user defaults for suite \(suiteName)")
+        }
+        defaults.removePersistentDomain(forName: suiteName)
+        defaults.synchronize()
+        return defaults
     }
 }

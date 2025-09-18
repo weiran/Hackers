@@ -1,5 +1,5 @@
 //
-//  NotificationToken.swift
+//  NotificationObservationToken.swift
 //  Shared
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class NotificationToken: NSObject {
+public final class NotificationObservationToken: NSObject {
     let notificationCenter: NotificationCenter
     let token: Any
 

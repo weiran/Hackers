@@ -21,15 +21,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         // process args for testing
         if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
-            ReviewController.disablePrompts = true
+            ReviewPromptController.disablePrompts = true
         }
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
 
         // setup review prompt
-        ReviewController.incrementLaunchCounter()
-        ReviewController.requestReview()
+        ReviewPromptController.incrementLaunchCounter()
+        ReviewPromptController.requestReview()
 
         // init default settings
         UserDefaults.standard.registerDefaults()

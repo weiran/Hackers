@@ -100,7 +100,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
 
     private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
         guard let commentFrame = visibleCommentPositions[comment.id] else { return false }
-        guard let window = PresentationService.shared.windowScene?.windows.first else { return false }
+        guard let window = PresentationContextProvider.shared.windowScene?.windows.first else { return false }
         let screenBounds = window.bounds
         return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
     }

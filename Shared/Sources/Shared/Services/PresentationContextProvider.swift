@@ -1,5 +1,5 @@
 //
-//  PresentationService.swift
+//  PresentationContextProvider.swift
 //  Shared
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -8,8 +8,8 @@
 import UIKit
 
 @MainActor
-public final class PresentationService: @unchecked Sendable {
-    public static let shared = PresentationService()
+public final class PresentationContextProvider: @unchecked Sendable {
+    public static let shared = PresentationContextProvider()
 
     private init() {}
 

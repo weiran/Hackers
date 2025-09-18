@@ -174,7 +174,7 @@ struct PostHeader: View {
                 Label("Open Link", systemImage: "safari")
             }
 
-            Button { ShareService.shared.shareURL(post.url, title: post.title) } label: {
+            Button { ContentSharePresenter.shared.shareURL(post.url, title: post.title) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
         }
@@ -243,7 +243,7 @@ struct CommentRow: View {
                 Label("Copy", systemImage: "doc.on.doc")
             }
             Divider()
-            Button { ShareService.shared.shareComment(comment) } label: {
+            Button { ContentSharePresenter.shared.shareComment(comment) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
         }
@@ -281,10 +281,10 @@ struct ShareMenu: View {
     var body: some View {
         Menu {
             if post.url.host != nil {
-                Button("Article Link") { ShareService.shared.shareURL(post.url, title: post.title) }
-                Button("Hacker News Link") { ShareService.shared.shareURL(post.hackerNewsURL, title: post.title) }
+                Button("Article Link") { ContentSharePresenter.shared.shareURL(post.url, title: post.title) }
+                Button("Hacker News Link") { ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title) }
             } else {
-                Button("Hacker News Link") { ShareService.shared.shareURL(post.hackerNewsURL, title: post.title) }
+                Button("Hacker News Link") { ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title) }
             }
         } label: {
             Image(systemName: "square.and.arrow.up")
