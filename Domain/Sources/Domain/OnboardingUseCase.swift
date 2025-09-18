@@ -8,6 +8,6 @@
 import Foundation
 
 public protocol OnboardingUseCase: Sendable {
-    func shouldShowOnboarding(forceShow: Bool) -> Bool
-    func markOnboardingShown()
+    func shouldShowOnboarding(currentVersion: String, forceShow: Bool) -> Bool
+    func markOnboardingShown(for version: String)
 }

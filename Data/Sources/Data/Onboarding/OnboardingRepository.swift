@@ -9,14 +9,13 @@ import Domain
 import Foundation
 
 public protocol OnboardingVersionStore: Sendable {
-    func hasShownOnboarding() -> Bool
-    func markOnboardingShown()
+    func lastShownVersion() -> String?
+    func save(shownVersion: String)
 }
 
 public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @unchecked Sendable {
     private let userDefaults: UserDefaults
-    private let key = "com.weiran.hackers.onboarding.shown"
-    private nonisolated(unsafe) static var didResetSuite = false
+    private let key = "com.weiran.hackers.onboarding.shownVersion"
 
     private init(storage: UserDefaults) {
         self.userDefaults = storage
@@ -30,19 +29,14 @@ public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @
         let suite = "com.weiran.hackers.onboarding"
         let defaults = UserDefaults(suiteName: suite) ?? .standard
         self.init(storage: defaults)
-
-        if !Self.didResetSuite {
-            defaults.removePersistentDomain(forName: suite)
-            Self.didResetSuite = true
-        }
     }
 
-    public func hasShownOnboarding() -> Bool {
-        userDefaults.bool(forKey: key)
+    public func lastShownVersion() -> String? {
+        userDefaults.string(forKey: key)
     }
 
-    public func markOnboardingShown() {
-        userDefaults.set(true, forKey: key)
+    public func save(shownVersion: String) {
+        userDefaults.set(shownVersion, forKey: key)
     }
 }
 
@@ -58,15 +52,17 @@ public final class OnboardingRepository: OnboardingUseCase, @unchecked Sendable 
         self.processArguments = processArguments
     }
 
-    public func shouldShowOnboarding(forceShow: Bool) -> Bool {
+    public func shouldShowOnboarding(currentVersion: String, forceShow: Bool) -> Bool {
         if processArguments.contains("disableOnboarding"), !forceShow {
             return false
         }
 
-        return forceShow || !versionStore.hasShownOnboarding()
+        if forceShow { return true }
+
+        return versionStore.lastShownVersion() != currentVersion
     }
 
-    public func markOnboardingShown() {
-        versionStore.markOnboardingShown()
+    public func markOnboardingShown(for version: String) {
+        versionStore.save(shownVersion: version)
     }
 }

@@ -13,58 +13,58 @@ import Testing
 struct OnboardingRepositoryTests {
     @Test("Force show overrides stored state")
     func forceShowOverridesStoredState() {
-        let store = MockStore(hasShown: true)
+        let store = MockStore(lastShownVersion: "5.0")
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
-        #expect(repository.shouldShowOnboarding(forceShow: true))
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: true))
     }
 
     @Test("Disable argument prevents onboarding when not forced")
     func disableArgumentPreventsOnboarding() {
-        let repository = OnboardingRepository(versionStore: MockStore(hasShown: false), processArguments: ["disableOnboarding"])
-        #expect(repository.shouldShowOnboarding(forceShow: false) == false)
+        let repository = OnboardingRepository(versionStore: MockStore(lastShownVersion: nil), processArguments: ["disableOnboarding"])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: false) == false)
     }
 
     @Test("Shows when onboarding not yet displayed")
     func showsWhenNotDisplayed() {
-        let repository = OnboardingRepository(versionStore: MockStore(hasShown: false), processArguments: [])
-        #expect(repository.shouldShowOnboarding(forceShow: false))
+        let repository = OnboardingRepository(versionStore: MockStore(lastShownVersion: nil), processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: false))
     }
 
     @Test("Marks onboarding as shown")
     func marksOnboardingAsShown() {
-        let store = MockStore(hasShown: false)
+        let store = MockStore(lastShownVersion: nil)
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
-        repository.markOnboardingShown()
-        #expect(store.hasShownOnboarding())
+        repository.markOnboardingShown(for: "5.1")
+        #expect(store.lastShownVersion() == "5.1")
     }
 
     @Test("UserDefaults store defaults to false")
     func userDefaultsStoreDefaultsToFalse() {
         let defaults = makeIsolatedDefaults()
         let store = UserDefaultsOnboardingVersionStore(userDefaults: defaults)
-        #expect(store.hasShownOnboarding() == false)
+        #expect(store.lastShownVersion() == nil)
     }
 
     @Test("UserDefaults store records shown state")
     func userDefaultsStoreRecordsShownState() {
         let defaults = makeIsolatedDefaults()
         let store = UserDefaultsOnboardingVersionStore(userDefaults: defaults)
-        store.markOnboardingShown()
-        #expect(store.hasShownOnboarding())
+        store.save(shownVersion: "5.1")
+        #expect(store.lastShownVersion() == "5.1")
     }
 
     final class MockStore: OnboardingVersionStore, @unchecked Sendable {
-        private var hasShown: Bool
-        init(hasShown: Bool) {
-            self.hasShown = hasShown
+        private var storedVersion: String?
+        init(lastShownVersion: String?) {
+            self.storedVersion = lastShownVersion
         }
 
-        func hasShownOnboarding() -> Bool {
-            hasShown
+        func lastShownVersion() -> String? {
+            storedVersion
         }
 
-        func markOnboardingShown() {
-            hasShown = true
+        func save(shownVersion: String) {
+            storedVersion = shownVersion
         }
     }
 
