@@ -13,12 +13,9 @@ struct OnboardingDataTests {
     func currentOnboardingData() {
         let data = OnboardingData.currentOnboarding()
 
-        #expect(data.title == "What's New in Hackers 5.0")
-        #expect(data.items.count == 4)
-        #expect(data.items.contains { $0.title.contains("SwiftUI Rewrite") })
-        #expect(data.items.contains { $0.title.contains("Enhanced Voting") })
-        #expect(data.items.contains { $0.title.contains("Customizable Text Size") })
-        #expect(data.items.contains { $0.title.contains("Performance Improvements") })
+        #expect(data.title == "What's New in Hackers 5.1")
+        #expect(data.items.count == 1)
+        #expect(data.items.contains { $0.title.contains("Embedded iPad Browser") })
     }
 
     @Test("OnboardingItem has proper initialization")
