@@ -63,7 +63,7 @@ private extension PostRepository {
 
         if let topTextHTML = try topTextHTML(from: fatitemTable) {
             post.text = topTextHTML
-            let topTextComment = makeTopTextComment(for: post, html: topTextHTML)
+            let topTextComment = makeTopTextComment(for: post, html: topTextHTML, in: fatitemTable)
             comments.insert(topTextComment, at: 0)
         }
 
@@ -80,11 +80,14 @@ private extension PostRepository {
         return html.isEmpty ? nil : html
     }
 
-    func makeTopTextComment(for post: Post, html: String) -> Domain.Comment {
+    func makeTopTextComment(for post: Post, html: String, in fatitemTable: Element) -> Domain.Comment {
         let parsedText = CommentHTMLParser.parseHTMLText(html)
+        let ageText = (try? fatitemTable.select("span.age").first()?.text())?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            ?? post.age
         return Domain.Comment(
             id: -post.id,
-            age: post.age,
+            age: ageText,
             text: html,
             by: post.by,
             level: 0,

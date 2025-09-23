@@ -128,6 +128,7 @@ struct PostRepositoryTests {
         #expect(topComment != nil)
         #expect(topComment?.id == -456)
         #expect(topComment?.level == 0)
+        #expect(topComment?.age == "4 hours ago")
         #expect(topComment?.text.contains("Intro text") == true)
         #expect(topComment?.text.contains("<p>First paragraph</p>") == true)
         #expect(topComment?.text.contains("<p>Second paragraph</p>") == true)
