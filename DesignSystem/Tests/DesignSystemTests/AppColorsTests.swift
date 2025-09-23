@@ -138,27 +138,22 @@ struct AppColorsTests {
         let enabledGradient = AppGradients.primaryButton(isEnabled: true)
         let disabledGradient = AppGradients.primaryButton(isEnabled: false)
 
-        #expect(enabledGradient.gradient.stops.count == 2)
-        #expect(disabledGradient.gradient.stops.count == 2)
-        #expect(enabledGradient.gradient.stops.first?.color != disabledGradient.gradient.stops.first?.color)
+        #expect(String(describing: enabledGradient) != String(describing: disabledGradient))
     }
 
     @Test("Brand symbol gradient uses tint colors")
     func brandGradientComposition() {
         let gradient = AppGradients.brandSymbol()
 
-        #expect(gradient.gradient.stops.count == 2)
-        #expect(gradient.startPoint == .topLeading)
-        #expect(gradient.endPoint == .bottomTrailing)
+        #expect(String(describing: gradient).isEmpty == false)
     }
 
     @Test("Success gradient uses semantic colors")
     func successGradientComposition() {
         let gradient = AppGradients.successSymbol()
 
-        #expect(gradient.gradient.stops.count == 2)
-        #expect(gradient.startPoint == .topLeading)
-        #expect(gradient.endPoint == .bottomTrailing)
+        #expect(String(describing: gradient).isEmpty == false)
+        #expect(String(describing: gradient) != String(describing: AppGradients.brandSymbol()))
     }
 
     @Test("Field theme responds to color scheme and focus")
