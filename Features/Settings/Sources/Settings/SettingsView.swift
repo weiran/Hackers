@@ -10,11 +10,11 @@ import Domain
 import MessageUI
 import Shared
 import SwiftUI
-import Drops
 
 public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: SettingsViewModel
     @EnvironmentObject private var navigationStore: NavigationStore
+    @EnvironmentObject private var toastPresenter: ToastPresenter
     @Environment(\.dismiss) private var dismiss
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
@@ -109,7 +109,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             currentUsername: currentUsername,
                             onLogin: onLogin,
                             onLogout: onLogout,
+                            textSize: viewModel.textSize
                         )
+                        .environmentObject(toastPresenter)
+                        .textScaling(for: viewModel.textSize)
                     }
                 }
 
@@ -176,7 +179,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     .alert("Clear Cache?", isPresented: $showClearCacheAlert) {
                         Button("Clear", role: .destructive) {
                             viewModel.clearCache()
-                            Drops.show(Drop(title: "Cache cleared"))
+                            toastPresenter.show(text: "Cache cleared", kind: .success)
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
@@ -196,6 +199,17 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     },
                 )
                 .accessibilityLabel("Close"))
+        }
+        .textScaling(for: viewModel.textSize)
+        .overlay(alignment: .top) {
+            if let toast = toastPresenter.message {
+                ToastBanner(message: toast)
+                    .padding(.horizontal)
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .allowsHitTesting(false)
+                    .textScaling(for: viewModel.textSize)
+            }
         }
     }
 

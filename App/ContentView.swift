@@ -18,12 +18,14 @@ import UIKit
 struct MainContentView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject private var sessionService: SessionService
+    @StateObject private var toastPresenter: ToastPresenter
     @StateObject private var settingsViewModel = SettingsViewModel()
     @State private var showOnboarding = false
     private let onboardingCoordinator: OnboardingCoordinator
 
     init(container: DependencyContainer = .shared) {
         _sessionService = StateObject(wrappedValue: container.makeSessionService())
+        _toastPresenter = StateObject(wrappedValue: container.makeToastPresenter())
         onboardingCoordinator = OnboardingCoordinator(
             onboardingUseCase: container.getOnboardingUseCase()
         )
@@ -58,7 +60,7 @@ struct MainContentView: View {
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
                                 currentUsername: sessionService.username,
                                 onLogin: { username, password in
-                                    _ = try await sessionService.authenticate(username: username, password: password)
+                                    try await sessionService.authenticate(username: username, password: password)
                                 },
                                 onLogout: {
                                     sessionService.unauthenticate()
@@ -69,26 +71,40 @@ struct MainContentView: View {
                             )
                             .environmentObject(navigationStore)
                             .environmentObject(sessionService)
+                            .environmentObject(toastPresenter)
                         }
                     }
                 }
             }
         }
+        .environmentObject(toastPresenter)
         .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
+        .overlay(alignment: .top) {
+            if let toast = toastPresenter.message {
+                ToastBanner(message: toast)
+                    .padding(.horizontal)
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .allowsHitTesting(false)
+                    .zIndex(1)
+                    .textScaling(for: settingsViewModel.textSize)
+            }
+        }
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
                 onLogin: { username, password in
-                    Task {
-                        _ = try? await sessionService.authenticate(username: username, password: password)
-                    }
+                    try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
                     sessionService.unauthenticate()
                 },
+                textSize: settingsViewModel.textSize
             )
+            .environmentObject(toastPresenter)
+            .textScaling(for: settingsViewModel.textSize)
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
             SettingsView<NavigationStore>(
@@ -96,7 +112,7 @@ struct MainContentView: View {
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
                 onLogin: { username, password in
-                    _ = try await sessionService.authenticate(username: username, password: password)
+                    try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
                     sessionService.unauthenticate()
@@ -107,6 +123,7 @@ struct MainContentView: View {
             )
             .environmentObject(navigationStore)
             .environmentObject(sessionService)
+            .environmentObject(toastPresenter)
             .textScaling(for: settingsViewModel.textSize)
         }
         .sheet(isPresented: $showOnboarding) {

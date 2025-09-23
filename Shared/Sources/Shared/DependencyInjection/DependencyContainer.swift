@@ -22,6 +22,9 @@ public final class DependencyContainer: @unchecked Sendable {
         .init(networkManager: networkManager)
     private static let onboardingRepository: OnboardingRepository = .init()
 
+    @MainActor
+    private lazy var toastPresenter = ToastPresenter()
+
     private init() {}
 
     public func getPostUseCase() -> any PostUseCase {
@@ -62,5 +65,10 @@ public final class DependencyContainer: @unchecked Sendable {
     @MainActor
     public func makeSessionService() -> SessionService {
         SessionService(authenticationUseCase: getAuthenticationUseCase())
+    }
+
+    @MainActor
+    public func makeToastPresenter() -> ToastPresenter {
+        toastPresenter
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Domain
+import Shared
 import SwiftUI
 
 public struct LoginView: View {
@@ -15,11 +16,13 @@ public struct LoginView: View {
     @State private var showAlert = false
     @FocusState private var focusedField: Field?
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject private var toastPresenter: ToastPresenter
 
     let isAuthenticated: Bool
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
+    let textSize: TextSize
 
     private enum Field {
         case username, password
@@ -30,11 +33,13 @@ public struct LoginView: View {
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
         onLogout: @escaping () -> Void,
+        textSize: TextSize = .medium
     ) {
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
         self.onLogout = onLogout
+        self.textSize = textSize
     }
 
     public var body: some View {
@@ -43,6 +48,17 @@ public struct LoginView: View {
                 loginView
             } else {
                 loggedInView
+            }
+        }
+        .textScaling(for: textSize)
+        .overlay(alignment: .top) {
+            if let toast = toastPresenter.message {
+                ToastBanner(message: toast)
+                    .padding(.horizontal)
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .allowsHitTesting(false)
+                    .textScaling(for: textSize)
             }
         }
     }
@@ -216,6 +232,7 @@ public struct LoginView: View {
             VStack(spacing: 20) {
                 Button {
                     onLogout()
+                    toastPresenter.show(text: "Signed out", kind: .success)
                 } label: {
                     HStack {
                         Image(systemName: "person.badge.minus")
@@ -261,6 +278,7 @@ public struct LoginView: View {
                 try await onLogin(username, password)
                 await MainActor.run {
                     isAuthenticating = false
+                    toastPresenter.show(text: "Welcome back, \(username)", kind: .success)
                     dismiss()
                 }
             } catch {
