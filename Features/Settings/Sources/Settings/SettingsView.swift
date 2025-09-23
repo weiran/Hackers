@@ -153,10 +153,12 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 }
 
                 Section(header: Text("Browser")) {
-                    // Place Safari default browser setting first
-                    Toggle(isOn: $viewModel.openInDefaultBrowser) {
-                        Text("Open Links in Safari")
+                    // Place default browser preference first
+                    Picker("Open Links Using", selection: $viewModel.openInDefaultBrowser) {
+                        Text("In-App Browser").tag(false)
+                        Text("System Browser").tag(true)
                     }
+                    .pickerStyle(.menu)
 
                     Toggle(isOn: $viewModel.safariReaderMode) {
                         Text("Open Safari in Reader Mode")
