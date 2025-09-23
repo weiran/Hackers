@@ -188,8 +188,17 @@ struct CommentRow: View {
     let onToggle: () -> Void
     let onHide: () -> Void
 
-    private var scaledCommentText: AttributedString {
-        CommentHTMLParser.parseHTMLText(comment.text)
+    private var styledCommentText: AttributedString {
+        var attributed = CommentHTMLParser.parseHTMLText(comment.text)
+        let linkColor = AppColors.appTintColor
+
+        for run in attributed.runs {
+            if run.link != nil {
+                attributed[run.range].foregroundColor = linkColor
+            }
+        }
+
+        return attributed
     }
 
     var body: some View {
@@ -199,7 +208,7 @@ struct CommentRow: View {
                 Text(comment.by)
                     .scaledFont(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundColor(comment.by == post.by ? Color(UIColor(named: "appTintColor")!) : .primary)
+                    .foregroundColor(comment.by == post.by ? AppColors.appTintColor : .primary)
                 Text(comment.age)
                     .scaledFont(.subheadline)
                     .foregroundColor(.secondary)
@@ -222,7 +231,7 @@ struct CommentRow: View {
                 }
             }
             if comment.visibility == .visible {
-                Text(scaledCommentText)
+                Text(styledCommentText)
                     .scaledFont(.callout)
                     .foregroundColor(.primary)
             }
@@ -295,24 +304,13 @@ struct ShareMenu: View {
 
 struct LoadingView: View {
     var body: some View {
-        VStack {
-            Spacer()
-            ProgressView()
-            Text("Loading comments...")
-                .scaledFont(.subheadline)
-                .foregroundColor(.secondary)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
+        AppLoadingStateView(message: "Loading comments...")
     }
 }
 
 struct EmptyCommentsView: View {
     var body: some View {
-        Text("No comments yet")
-            .scaledFont(.subheadline)
-            .foregroundColor(.secondary)
-            .frame(maxWidth: .infinity)
+        AppEmptyStateView(iconSystemName: "bubble.left", title: "No comments yet")
     }
 }
 

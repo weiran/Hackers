@@ -14,6 +14,9 @@ public enum AppColors {
     public static let secondaryBackground = Color(.secondarySystemBackground)
     public static let tertiaryBackground = Color(.tertiarySystemBackground)
     public static let groupedBackground = Color(.systemGroupedBackground)
+    public static let success = Color(.systemGreen)
+    public static let warning = Color(.systemOrange)
+    public static let danger = Color(.systemRed)
 
     // Add fallback colors if asset colors are not found
     public static var upvotedColor: Color {
@@ -38,6 +41,28 @@ public enum AppColors {
 }
 
 public enum AppGradients {
+    public static func brandSymbol() -> LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                AppColors.appTintColor,
+                AppColors.appTintColor.opacity(0.65),
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing,
+        )
+    }
+
+    public static func successSymbol() -> LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                AppColors.success,
+                AppColors.success.opacity(0.65),
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing,
+        )
+    }
+
     public static func screenBackground() -> LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [

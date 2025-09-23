@@ -18,9 +18,18 @@ struct AppColorsTests {
         let upvoted2 = AppColors.upvoted
         let appTint1 = AppColors.appTint
         let appTint2 = AppColors.appTint
+        let success1 = AppColors.success
+        let success2 = AppColors.success
+        let warning1 = AppColors.warning
+        let warning2 = AppColors.warning
+        let danger1 = AppColors.danger
+        let danger2 = AppColors.danger
 
         #expect(upvoted1 == upvoted2, "upvoted color should be consistent")
         #expect(appTint1 == appTint2, "appTint color should be consistent")
+        #expect(success1 == success2, "success color should be consistent")
+        #expect(warning1 == warning2, "warning color should be consistent")
+        #expect(danger1 == danger2, "danger color should be consistent")
     }
 
     @Test("Fallback color properties are consistent between calls")
@@ -132,6 +141,24 @@ struct AppColorsTests {
         #expect(enabledGradient.gradient.stops.count == 2)
         #expect(disabledGradient.gradient.stops.count == 2)
         #expect(enabledGradient.gradient.stops.first?.color != disabledGradient.gradient.stops.first?.color)
+    }
+
+    @Test("Brand symbol gradient uses tint colors")
+    func brandGradientComposition() {
+        let gradient = AppGradients.brandSymbol()
+
+        #expect(gradient.gradient.stops.count == 2)
+        #expect(gradient.startPoint == .topLeading)
+        #expect(gradient.endPoint == .bottomTrailing)
+    }
+
+    @Test("Success gradient uses semantic colors")
+    func successGradientComposition() {
+        let gradient = AppGradients.successSymbol()
+
+        #expect(gradient.gradient.stops.count == 2)
+        #expect(gradient.startPoint == .topLeading)
+        #expect(gradient.endPoint == .bottomTrailing)
     }
 
     @Test("Field theme responds to color scheme and focus")

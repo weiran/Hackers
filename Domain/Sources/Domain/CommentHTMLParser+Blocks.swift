@@ -188,7 +188,6 @@ extension CommentHTMLParser {
         }
         if let url = resolvedURL {
             linkAttributedString.link = url
-            linkAttributedString.foregroundColor = Color("appTintColor")
             linkAttributedString.underlineStyle = .single
         }
         return linkAttributedString
@@ -217,7 +216,6 @@ extension CommentHTMLParser {
         if let url = resolvedURL {
             let fullRange = linkAttributedString.startIndex ..< linkAttributedString.endIndex
             linkAttributedString[fullRange].link = url
-            linkAttributedString[fullRange].foregroundColor = Color("appTintColor")
             linkAttributedString[fullRange].underlineStyle = .single
         }
         return linkAttributedString

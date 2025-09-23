@@ -99,8 +99,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
     @ViewBuilder
     private var contentView: some View {
         if viewModel.isLoading, viewModel.posts.isEmpty {
-            ProgressView("Loading...")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            AppLoadingStateView(message: "Loading...")
         } else {
             List(selection: selectionBinding) {
                 ForEach(viewModel.posts, id: \.id) { post in

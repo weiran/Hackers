@@ -25,7 +25,6 @@ public enum LinkOpener {
                 config.entersReaderIfAvailable = settings.safariReaderMode
 
                 let safariVC = SFSafariViewController(url: url, configuration: config)
-                safariVC.preferredControlTintColor = UIColor(named: "appTintColor")
 
                 presenter.present(safariVC, animated: true)
             } else {

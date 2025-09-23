@@ -6,7 +6,6 @@
 //
 
 import Domain
-import Shared
 import SwiftUI
 
 public struct LoginView: View {
@@ -87,7 +86,7 @@ public struct LoginView: View {
             VStack(spacing: 16) {
                 Image(systemName: "newspaper.circle.fill")
                     .font(.system(size: 64))
-                    .foregroundStyle(.orange.gradient)
+                    .foregroundStyle(AppGradients.brandSymbol())
                     .symbolRenderingMode(.hierarchical)
                     .accessibilityHidden(true)
 
@@ -198,7 +197,7 @@ public struct LoginView: View {
             VStack(spacing: 24) {
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 80))
-                    .foregroundStyle(.green.gradient)
+                    .foregroundStyle(AppGradients.successSymbol())
                     .symbolRenderingMode(.hierarchical)
                     .accessibilityHidden(true)
 
@@ -276,73 +275,4 @@ public struct LoginView: View {
     }
 }
 
-public struct AppTextField: View {
-    private let title: String
-    @Binding private var text: String
-    private let isSecure: Bool
-    @Environment(\.colorScheme) private var colorScheme
-    @FocusState private var isFocused: Bool
-
-    public init(title: String, text: Binding<String>, isSecure: Bool) {
-        self.title = title
-        self._text = text
-        self.isSecure = isSecure
-    }
-
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-                .padding(.leading, 4)
-
-            Group {
-                if isSecure {
-                    SecureField("", text: $text)
-                } else {
-                    TextField("", text: $text)
-                }
-            }
-            .font(.body)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(fieldBackgroundColor)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(borderColor, lineWidth: AppFieldTheme.borderWidth(isFocused: isFocused)),
-                    ),
-            )
-            .focused($isFocused)
-        }
-        .padding(.horizontal, 20)
-        .animation(.easeInOut(duration: 0.2), value: isFocused)
-    }
-
-    private var fieldBackgroundColor: Color {
-        AppFieldTheme.background(for: colorScheme)
-    }
-
-    private var borderColor: Color {
-        AppFieldTheme.borderColor(for: colorScheme, isFocused: isFocused)
-    }
-}
-
 // Removed unused RoundedTextField to avoid identifier_name warning on _body(protocol requirement)
-
-public struct FilledButton: ButtonStyle {
-    public func makeBody(configuration: Configuration) -> some View {
-        configuration
-            .label
-            .scaledFont(.headline)
-            .padding()
-            .padding(.horizontal, 50)
-            .frame(maxWidth: .infinity)
-            .foregroundColor(Color.white)
-            .background(Color.accentColor)
-            .cornerRadius(15)
-            .padding(.horizontal, 20)
-    }
-}

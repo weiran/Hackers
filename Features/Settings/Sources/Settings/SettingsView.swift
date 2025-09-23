@@ -97,7 +97,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                 Spacer()
                                 if isAuthenticated {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
+                                        .foregroundColor(AppColors.success)
                                         .accessibilityHidden(true)
                                 }
                             }
