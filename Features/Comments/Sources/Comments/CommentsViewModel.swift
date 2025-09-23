@@ -12,7 +12,8 @@ import SwiftUI
 
 @Observable
 public final class CommentsViewModel: @unchecked Sendable {
-    public var post: Post
+    public let postID: Int
+    public var post: Post?
     public var visibleComments: [Comment] = []
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
@@ -26,62 +27,87 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var comments: [Comment] { commentsLoader.data }
     public var isLoading: Bool { commentsLoader.isLoading }
     public var error: Error? { commentsLoader.error }
+    public private(set) var isPostLoading: Bool
 
     public init(
-        post: Post,
+        postID: Int,
+        initialPost: Post? = nil,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
     ) {
-        self.post = post
+        self.postID = postID
+        post = initialPost
+        isPostLoading = initialPost == nil
         self.postUseCase = postUseCase
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
-        commentsLoader = LoadingStateManager(initialData: [])
 
-        // Set up the loading function after initialization
+        let initialComments = initialPost?.comments ?? []
+        commentsLoader = LoadingStateManager(initialData: initialComments)
         commentsLoader.setLoadFunction(
-            shouldSkipLoad: { !$0.isEmpty },
+            shouldSkipLoad: { [weak self] comments in
+                guard let self else { return false }
+                return !comments.isEmpty && self.post != nil
+            },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
-            },
+            }
+        )
+
+        updateVisibleComments()
+    }
+
+    public convenience init(
+        post: Post,
+        postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
+        commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+    ) {
+        self.init(
+            postID: post.id,
+            initialPost: post,
+            postUseCase: postUseCase,
+            commentUseCase: commentUseCase,
+            voteUseCase: voteUseCase
         )
     }
 
     @MainActor
     public func loadComments() async {
+        if post == nil {
+            isPostLoading = true
+        }
         await commentsLoader.loadIfNeeded()
         updateVisibleComments()
     }
 
     @MainActor
     public func refreshComments() async {
+        if post == nil {
+            isPostLoading = true
+        }
         await commentsLoader.refresh()
         updateVisibleComments()
     }
 
     private func fetchComments() async throws -> [Comment] {
         do {
-            let postWithComments = try await postUseCase.getPost(id: post.id)
+            let postWithComments = try await postUseCase.getPost(id: postID)
+            let loadedComments = postWithComments.comments ?? []
 
             await MainActor.run {
                 self.post = postWithComments
-            }
-
-            let loadedComments = postWithComments.comments ?? []
-
-            // Call the callback for HTML parsing if provided
-            await MainActor.run {
-                onCommentsLoaded?(loadedComments)
-            }
-
-            // Update the comments count with the actual number of comments
-            await MainActor.run {
-                self.post.commentsCount = loadedComments.count
+                self.post?.commentsCount = loadedComments.count
+                self.isPostLoading = false
+                self.onCommentsLoaded?(loadedComments)
             }
 
             return loadedComments
         } catch {
+            await MainActor.run {
+                self.isPostLoading = false
+            }
             throw error
         }
     }
@@ -89,14 +115,18 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     public func voteOnPost(upvote: Bool) async throws {
         guard upvote else { return }
-        post.upvoted = true
-        post.score += 1
+        guard var currentPost = post else { return }
+
+        currentPost.upvoted = true
+        currentPost.score += 1
+        post = currentPost
 
         do {
-            try await voteUseCase.upvote(post: post)
+            try await voteUseCase.upvote(post: currentPost)
         } catch {
-            post.upvoted = false
-            post.score -= 1
+            currentPost.upvoted = false
+            currentPost.score -= 1
+            post = currentPost
             throw error
         }
     }
@@ -104,6 +134,8 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     public func voteOnComment(_ comment: Comment, upvote: Bool) async throws {
         guard upvote else { return }
+        guard let post else { return }
+
         comment.upvoted = true
 
         do {

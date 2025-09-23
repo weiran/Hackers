@@ -20,11 +20,18 @@ struct SettingsViewTests {
 
     final class MockNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
         @Published var selectedPost: Post?
+        @Published var selectedPostId: Int?
         @Published var showingLogin = false
         @Published var showingSettings = false
 
         func showPost(_ post: Post) {
             selectedPost = post
+            selectedPostId = post.id
+        }
+
+        func showPost(withId id: Int) {
+            selectedPostId = id
+            selectedPost = nil
         }
 
         func showLogin() {

@@ -44,8 +44,12 @@ struct MainContentView: View {
                     .environmentObject(sessionService)
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
-                        case let .comments(post):
-                            CommentsView<NavigationStore>(post: post)
+                        case let .comments(postID):
+                            let initialPost: Post? = {
+                                guard navigationStore.selectedPost?.id == postID else { return nil }
+                                return navigationStore.selectedPost
+                            }()
+                            CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
                                 .environmentObject(navigationStore)
                                 .environmentObject(sessionService)
                         case .settings:
@@ -143,10 +147,15 @@ struct AdaptiveSplitView: View {
                                     showsCloseButton: true)
                         .id(embeddedURL.absoluteString)
                 } else if let selectedPost = navigationStore.selectedPost {
-                    CommentsView<NavigationStore>(post: selectedPost)
+                    CommentsView<NavigationStore>(postID: selectedPost.id, initialPost: selectedPost)
                         .environmentObject(navigationStore)
                         .environmentObject(sessionService)
                         .id(selectedPost.id) // Add id to force re-render when post changes
+                } else if let selectedPostId = navigationStore.selectedPostId {
+                    CommentsView<NavigationStore>(postID: selectedPostId, initialPost: nil)
+                        .environmentObject(navigationStore)
+                        .environmentObject(sessionService)
+                        .id(selectedPostId)
                 } else {
                     EmptyDetailView()
                 }

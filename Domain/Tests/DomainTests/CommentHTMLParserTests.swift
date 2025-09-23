@@ -348,7 +348,8 @@ struct CommentHTMLParserTests {
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: boldRange.upperBound))
         let attributes = result[start ..< end]
-        #expect(attributes.font != nil, "Bold text should have font attribute")
+        let boldPresentationIntent = attributes.inlinePresentationIntent
+        #expect(boldPresentationIntent?.contains(.stronglyEmphasized) == true, "Bold text should use strongly emphasized presentation intent")
     }
 
     @Test("Bold formatting handles multiple bold tags correctly")
@@ -391,7 +392,8 @@ struct CommentHTMLParserTests {
         let start = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.lowerBound))
         let end = result.characters.index(result.characters.startIndex, offsetBy: resultString.distance(from: resultString.startIndex, to: italicRange.upperBound))
         let attributes = result[start ..< end]
-        #expect(attributes.font != nil, "Italic text should have font attribute")
+        let presentationIntent = attributes.inlinePresentationIntent
+        #expect(presentationIntent?.contains(.emphasized) == true, "Italic text should use emphasized presentation intent")
     }
 
     @Test("Italic formatting handles multiple italic tags correctly")

@@ -12,7 +12,7 @@ import SwiftUI
 import UIKit
 
 enum NavigationDestination: Hashable {
-    case comments(Domain.Post)
+    case comments(postID: Int)
     case settings
 }
 
@@ -23,6 +23,7 @@ enum NavigationDetailDestination: Hashable {
 class NavigationStore: ObservableObject, NavigationStoreProtocol {
     @Published var path: NavigationPath = .init()
     @Published var selectedPost: Domain.Post?
+    @Published var selectedPostId: Int?
     @Published var selectedPostType: Domain.PostType = .news
     @Published var showingLogin = false
     @Published var showingSettings = false
@@ -46,15 +47,28 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         embeddedBrowserURL = nil
         detailPath.removeAll()
         selectedPost = post
+        selectedPostId = post.id
 
         // For iPhone navigation, use NavigationPath
         if UIDevice.current.userInterfaceIdiom != .pad {
-            path.append(NavigationDestination.comments(post))
+            path.append(NavigationDestination.comments(postID: post.id))
+        }
+    }
+
+    func showPost(withId id: Int) {
+        embeddedBrowserURL = nil
+        detailPath.removeAll()
+        selectedPost = nil
+        selectedPostId = id
+
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            path.append(NavigationDestination.comments(postID: id))
         }
     }
 
     func clearSelection() {
         selectedPost = nil
+        selectedPostId = nil
         embeddedBrowserURL = nil
         detailPath.removeAll()
     }
@@ -69,6 +83,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
 
     func selectPostType(_ type: Domain.PostType) {
         selectedPostType = type
+        selectedPostId = nil
         clearSelection()
     }
 
@@ -144,21 +159,6 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     func navigateToPost(withId id: Int) {
         // Store the pending post ID to be handled when posts are loaded
         pendingPostId = id
-
-        // Create a temporary post object for immediate navigation
-        // This will be replaced with the actual post data when loaded
-        let tempPost = Domain.Post(
-            id: id,
-            url: URL(string: "\(Shared.HackerNewsConstants.baseURL)/item?id=\(id)")!,
-            title: "Loading...",
-            age: "",
-            commentsCount: 0,
-            by: "",
-            score: 0,
-            postType: .news,
-            upvoted: false,
-        )
-
-        showPost(tempPost)
+        showPost(withId: id)
     }
 }

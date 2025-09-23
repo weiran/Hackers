@@ -34,11 +34,12 @@ struct SimpleCommentsTests {
             let viewModel = CommentsViewModel(post: post)
 
             // Then
-            #expect(viewModel.post.id == 1)
-            #expect(viewModel.post.title == "Test Post")
+            #expect(viewModel.post?.id == 1)
+            #expect(viewModel.post?.title == "Test Post")
             #expect(viewModel.comments.isEmpty)
             #expect(viewModel.visibleComments.isEmpty)
             #expect(!viewModel.isLoading)
+            #expect(!viewModel.isPostLoading)
             #expect(viewModel.error == nil)
         }
     }
@@ -259,5 +260,36 @@ struct SimpleCommentsTests {
             #expect(visibleComments.count == 3)
             #expect(visibleComments.map(\.id).sorted() == [1, 3, 4])
         }
+    }
+
+    @Suite("Comments Link Navigator")
+    struct LinkNavigatorTests {
+        @Test("Extracts Hacker News item id from valid URL")
+        func extractsItemId() {
+            // Given
+            let url = URL(string: "https://news.ycombinator.com/item?id=12345&ref=test")!
+
+            // When
+            let itemId = CommentsLinkNavigator.hackerNewsItemID(from: url)
+
+            // Then
+            #expect(itemId == 12345)
+        }
+
+        @Test("Returns nil for non-item Hacker News URLs")
+        func ignoresNonItemURLs() {
+            // Given
+            let userURL = URL(string: "https://news.ycombinator.com/user?id=test")!
+            let externalURL = URL(string: "https://example.com/item?id=12345")!
+
+            // When
+            let userItemId = CommentsLinkNavigator.hackerNewsItemID(from: userURL)
+            let externalItemId = CommentsLinkNavigator.hackerNewsItemID(from: externalURL)
+
+            // Then
+            #expect(userItemId == nil)
+            #expect(externalItemId == nil)
+        }
+
     }
 }

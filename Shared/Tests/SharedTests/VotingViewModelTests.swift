@@ -68,11 +68,20 @@ struct VotingViewModelTests {
         init() {}
 
         var selectedPost: Post?
+        var selectedPostId: Int?
         var showingLogin: Bool = false
         var showingSettings: Bool = false
         var showLoginCalled = false
 
-        func showPost(_ post: Post) { selectedPost = post }
+        func showPost(_ post: Post) {
+            selectedPost = post
+            selectedPostId = post.id
+        }
+
+        func showPost(withId id: Int) {
+            selectedPostId = id
+            selectedPost = nil
+        }
         func showLogin() { showingLogin = true; showLoginCalled = true }
         func showSettings() { showingSettings = true }
         func selectPostType(_: PostType) {}
@@ -201,6 +210,7 @@ struct VotingViewModelTests {
 struct NavigationStoreProtocolDefaultsTests {
     final class RecordingNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
         var selectedPost: Post?
+        var selectedPostId: Int?
         var showingLogin: Bool = false
         var showingSettings: Bool = false
 
@@ -208,7 +218,15 @@ struct NavigationStoreProtocolDefaultsTests {
         var recordedPushFlag: Bool?
         var stubbedResult: Bool = false
 
-        func showPost(_: Post) {}
+        func showPost(_ post: Post) {
+            selectedPost = post
+            selectedPostId = post.id
+        }
+
+        func showPost(withId id: Int) {
+            selectedPostId = id
+            selectedPost = nil
+        }
         func showLogin() { showingLogin = true }
         func showSettings() { showingSettings = true }
         func selectPostType(_: PostType) {}

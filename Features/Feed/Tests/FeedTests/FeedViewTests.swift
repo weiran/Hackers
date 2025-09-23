@@ -17,6 +17,7 @@ struct FeedViewTests {
     @MainActor
     final class MockNavigationStore: @MainActor NavigationStoreProtocol, ObservableObject, @unchecked Sendable {
         var selectedPost: Post?
+        var selectedPostId: Int?
         var showingLogin: Bool = false
         var showingSettings: Bool = false
         var showPostCalled = false
@@ -24,8 +25,13 @@ struct FeedViewTests {
         var showSettingsCalled = false
         var selectedPostType: PostType?
 
-        func showPost(_: Post) {
+        func showPost(_ post: Post) {
             showPostCalled = true
+            selectedPostId = post.id
+        }
+
+        func showPost(withId id: Int) {
+            selectedPostId = id
         }
 
         func showLogin() {

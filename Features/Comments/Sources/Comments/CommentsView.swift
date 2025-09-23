@@ -7,6 +7,7 @@
 
 import DesignSystem
 import Domain
+import Foundation
 import Shared
 import SwiftUI
 
@@ -16,13 +17,16 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
-    @State private var navigateToPostId: Int?
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    public init(post: Post, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
-        _viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
+    public init(postID: Int, initialPost: Post? = nil, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
+        if let viewModel {
+            _viewModel = State(initialValue: viewModel)
+        } else {
+            _viewModel = State(initialValue: CommentsViewModel(postID: postID, initialPost: initialPost))
+        }
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
             votingService: container.getVotingService(),
@@ -32,28 +36,51 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
+    public init(post: Post, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
+        self.init(postID: post.id, initialPost: post, viewModel: viewModel, votingViewModel: votingViewModel)
+    }
+
     public var body: some View {
-        CommentsContentView(
-            viewModel: viewModel,
-            votingViewModel: votingViewModel,
-            showTitle: $showTitle,
-            hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
-            visibleCommentPositions: $visibleCommentPositions,
-            navigateToPostId: $navigateToPostId,
-            handleLinkTap: handleLinkTap,
-            toggleCommentVisibility: toggleCommentVisibility,
-        )
-        .navigationTitle("Comments")
+        Group {
+            if let post = viewModel.post {
+                CommentsContentView(
+                    viewModel: viewModel,
+                    votingViewModel: votingViewModel,
+                    showTitle: $showTitle,
+                    hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
+                    visibleCommentPositions: $visibleCommentPositions,
+                    handleLinkTap: handleLinkTap,
+                    toggleCommentVisibility: toggleCommentVisibility,
+                )
+            } else if viewModel.isPostLoading {
+                AppLoadingStateView(message: "Loading...")
+            } else if let error = viewModel.error {
+                AppEmptyStateView(
+                    iconSystemName: "exclamationmark.triangle",
+                    title: "Unable to load post",
+                    subtitle: error.localizedDescription
+                )
+            } else {
+                AppLoadingStateView(message: "Loading...")
+            }
+        }
+        .navigationTitle(viewModel.post == nil ? "" : "Comments")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                ToolbarTitle(
-                    post: viewModel.post,
-                    showTitle: showTitle,
-                    onTap: handleLinkTap,
-                )
+                if let post = viewModel.post {
+                    ToolbarTitle(
+                        post: post,
+                        showTitle: showTitle,
+                        onTap: handleLinkTap,
+                    )
+                }
             }
-            ToolbarItem(placement: .navigationBarTrailing) { ShareMenu(post: viewModel.post) }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if let post = viewModel.post {
+                    ShareMenu(post: post)
+                }
+            }
         }
         .task {
             votingViewModel.navigationStore = navigationStore
@@ -61,6 +88,9 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         }
         .refreshable { await viewModel.refreshComments() }
         .environment(\.openURL, OpenURLAction { url in
+            if handleHackerNewsPostLink(url) {
+                return .handled
+            }
             if navigationStore.openURLInPrimaryContext(url) {
                 return .handled
             }
@@ -82,10 +112,21 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private func handleLinkTap() {
-        if navigationStore.openURLInPrimaryContext(viewModel.post.url) {
+        guard let post = viewModel.post else { return }
+        if navigationStore.openURLInPrimaryContext(post.url) {
             return
         }
-        LinkOpener.openURL(viewModel.post.url, with: viewModel.post)
+        LinkOpener.openURL(post.url, with: post)
+    }
+
+    private func handleHackerNewsPostLink(_ url: URL) -> Bool {
+        guard let itemId = CommentsLinkNavigator.hackerNewsItemID(from: url) else { return false }
+        if let currentPostId = viewModel.post?.id, currentPostId == itemId {
+            return true
+        }
+
+        navigationStore.showPost(withId: itemId)
+        return true
     }
 
     private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
@@ -103,5 +144,14 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         guard let window = PresentationContextProvider.shared.windowScene?.windows.first else { return false }
         let screenBounds = window.bounds
         return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
+    }
+}
+
+enum CommentsLinkNavigator {
+    static func hackerNewsItemID(from url: URL) -> Int? {
+        guard url.host == HackerNewsConstants.host else { return nil }
+        guard url.path == "/item" else { return nil }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return nil }
+        return components.queryItems?.first(where: { $0.name == "id" })?.value.flatMap(Int.init)
     }
 }

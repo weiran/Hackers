@@ -44,6 +44,23 @@ struct CommentsViewModelTests {
         )
     }
 
+    @Test("Initializes in loading state when post is absent")
+    func initializesWithoutPost() {
+        // When
+        let viewModel = CommentsViewModel(
+            postID: 42,
+            initialPost: nil,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase
+        )
+
+        // Then
+        #expect(viewModel.post == nil)
+        #expect(viewModel.isPostLoading)
+        #expect(viewModel.comments.isEmpty)
+    }
+
     // MARK: - Loading Comments Tests
 
     @Test("Loading comments successfully populates comments and visible comments")
@@ -61,6 +78,7 @@ struct CommentsViewModelTests {
         #expect(sut.comments.count == expectedComments.count)
         #expect(sut.visibleComments.count == expectedComments.count)
         #expect(!sut.isLoading)
+        #expect(!sut.isPostLoading)
         #expect(sut.error == nil)
     }
 
@@ -100,6 +118,7 @@ struct CommentsViewModelTests {
         #expect(sut.comments.isEmpty)
         #expect(sut.visibleComments.isEmpty)
         #expect(!sut.isLoading)
+        #expect(!sut.isPostLoading)
         #expect(sut.error != nil)
     }
 
@@ -136,15 +155,20 @@ struct CommentsViewModelTests {
     @MainActor
     func voteOnPost(initial: Bool, upvote: Bool, expectedUpvoted: Bool, expectedScoreDelta: Int) async throws {
         // Given
-        sut.post.upvoted = initial
-        let initialScore = sut.post.score
+        guard var post = sut.post else {
+            #expect(false, "Expected post to be available during voteOnPost test")
+            return
+        }
+        post.upvoted = initial
+        let initialScore = post.score
+        sut.post = post
 
         // When
         try await sut.voteOnPost(upvote: upvote)
 
         // Then
-        #expect(sut.post.upvoted == expectedUpvoted)
-        #expect(sut.post.score == initialScore + expectedScoreDelta)
+        #expect(sut.post?.upvoted == expectedUpvoted)
+        #expect(sut.post?.score == initialScore + expectedScoreDelta)
         #expect(mockVoteUseCase.upvotePostCalled)
     }
 
@@ -153,16 +177,20 @@ struct CommentsViewModelTests {
     func voteOnPostFailureRevertsChanges() async {
         // Given
         mockVoteUseCase.shouldThrowError = true
-        let initialUpvoted = sut.post.upvoted
-        let initialScore = sut.post.score
+        guard let initialPost = sut.post else {
+            #expect(false, "Expected post to be available during voteOnPostFailureRevertsChanges test")
+            return
+        }
+        let initialUpvoted = initialPost.upvoted
+        let initialScore = initialPost.score
 
         // When & Then
         await #expect(throws: MockError.self) {
             try await sut.voteOnPost(upvote: true)
         }
 
-        #expect(sut.post.upvoted == initialUpvoted)
-        #expect(sut.post.score == initialScore)
+        #expect(sut.post?.upvoted == initialUpvoted)
+        #expect(sut.post?.score == initialScore)
     }
 
     @Test("Upvoting comment updates state", arguments: [false])

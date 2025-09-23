@@ -16,16 +16,23 @@ struct CommentsContentView: View {
     @Binding var showTitle: Bool
     @Binding var hasMeasuredInitialOffset: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
-    @Binding var navigateToPostId: Int?
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
 
     var body: some View {
+        Group {
+            if let post = viewModel.post {
+                content(for: post)
+            }
+        }
+    }
+
+    private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
                     PostHeader(
-                        post: viewModel.post,
+                        post: post,
                         votingViewModel: votingViewModel,
                         onLinkTap: { handleLinkTap() },
                         onPostUpdate: { updated in
@@ -50,11 +57,11 @@ struct CommentsContentView: View {
                         }
                     }
                     .listRowSeparator(.hidden)
-                    .if(viewModel.post.voteLinks?.upvote != nil && !viewModel.post.upvoted) { view in
+                    .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
                         view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button {
                                 Task {
-                                    var mutablePost = viewModel.post
+                                    var mutablePost = post
                                     await votingViewModel.upvote(post: &mutablePost)
                                     await MainActor.run { viewModel.post = mutablePost }
                                 }
@@ -76,6 +83,7 @@ struct CommentsContentView: View {
                         CommentsForEach(
                             viewModel: viewModel,
                             votingViewModel: votingViewModel,
+                            post: post,
                             visibleCommentPositions: $visibleCommentPositions,
                             toggleCommentVisibility: { comment in
                                 toggleCommentVisibility(comment) { id in
@@ -94,6 +102,7 @@ struct CommentsContentView: View {
 struct CommentsForEach: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
+    let post: Post
     @Binding var visibleCommentPositions: [Int: CGRect]
     let toggleCommentVisibility: (Comment) -> Void
 
@@ -101,7 +110,7 @@ struct CommentsForEach: View {
         ForEach(viewModel.visibleComments, id: \.id) { comment in
             CommentRow(
                 comment: comment,
-                post: viewModel.post,
+                post: post,
                 votingViewModel: votingViewModel,
                 onToggle: { toggleCommentVisibility(comment) },
                 onHide: { viewModel.hideCommentBranch(comment) },
@@ -123,7 +132,7 @@ struct CommentsForEach: View {
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
                         Task {
-                            await votingViewModel.upvote(comment: comment, in: viewModel.post)
+                            await votingViewModel.upvote(comment: comment, in: post)
                         }
                     } label: {
                         Image(systemName: "arrow.up")
@@ -304,7 +313,7 @@ struct ShareMenu: View {
 
 struct LoadingView: View {
     var body: some View {
-        AppLoadingStateView(message: "Loading comments...")
+        AppLoadingStateView(message: "Loading...")
     }
 }
 
