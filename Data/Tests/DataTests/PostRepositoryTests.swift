@@ -26,6 +26,7 @@ struct PostRepositoryTests {
     final class MockNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
         var stubbedGetResponse: String = ""
         var stubbedPostResponse: String = ""
+        var responseQueue: [String] = []
         var getCallCount = 0
         var postCallCount = 0
         var lastGetURL: URL?
@@ -35,6 +36,9 @@ struct PostRepositoryTests {
         func get(url: URL) async throws -> String {
             getCallCount += 1
             lastGetURL = url
+            if !responseQueue.isEmpty {
+                return responseQueue.removeFirst()
+            }
             return stubbedGetResponse
         }
 
@@ -110,6 +114,41 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.getCallCount == 1)
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("id=123"))
+    }
+
+    @Test("Get Ask HN post includes top text")
+    func getAskPostIncludesTopText() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockAskPostHTML(id: 456)
+
+        let post = try await postRepository.getPost(id: 456)
+
+        let topComment = post.comments?.first
+
+        #expect(post.text?.contains("Intro text") == true)
+        #expect(topComment != nil)
+        #expect(topComment?.id == -456)
+        #expect(topComment?.level == 0)
+        #expect(topComment?.text.contains("Intro text") == true)
+        #expect(topComment?.text.contains("<p>First paragraph</p>") == true)
+        #expect(topComment?.text.contains("<p>Second paragraph</p>") == true)
+    }
+
+    @Test("Get post from comment id resolves parent story")
+    func getPostFromCommentID() async throws {
+        let commentID = 999
+        let parentCommentID = 998
+        let storyID = 321
+
+        mockNetworkManager.responseQueue = [
+            createMockCommentPermalinkHTML(commentID: commentID, parentCommentID: parentCommentID, storyID: storyID),
+            createMockSinglePostWithCommentsHTML(storyID: storyID, commentIDs: [commentID])
+        ]
+
+        let post = try await postRepository.getPost(id: commentID)
+
+        #expect(mockNetworkManager.getCallCount == 2)
+        #expect(post.id == storyID)
+        #expect(post.comments?.contains(where: { $0.id == commentID }) == true)
     }
 
     // MARK: - Vote Tests
@@ -294,12 +333,12 @@ struct PostRepositoryTests {
         """
     }
 
-    private func createMockSinglePostHTML() -> String {
+    private func createMockSinglePostHTML(id: Int = 123) -> String {
         """
         <html>
         <body>
         <table class="fatitem">
-            <tr class="athing" id="123">
+            <tr class="athing" id="\(id)">
                 <td>
                     <span class="titleline">
                         <a href="https://example.com/article">Test Article Title</a>
@@ -311,10 +350,121 @@ struct PostRepositoryTests {
                     <span class="score">10 points</span>
                     <span class="age" title="2023-01-01T10:00:00">2 hours ago</span>
                     <a class="hnuser" href="user?id=testuser">testuser</a>
-                    <a href="item?id=123">5 comments</a>
+                    <a href="item?id=\(id)">5 comments</a>
                 </td>
             </tr>
         </table>
+        </body>
+        </html>
+        """
+    }
+
+    private func createMockAskPostHTML(id: Int) -> String {
+        """
+        <html>
+        <body>
+        <table class="fatitem">
+            <tr class="athing submission" id="\(id)">
+                <td align="right" valign="top" class="title"><span class="rank"></span></td>
+                <td valign="top" class="votelinks"></td>
+                <td class="title">
+                    <span class="titleline">
+                        <a href="item?id=\(id)">Ask HN Example</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td class="subtext">
+                    <span class="subline">
+                        <span class="score">12 points</span>
+                        by <a href="user?id=asker" class="hnuser">asker</a>
+                        <span class="age" title="2023-01-01T12:00:00"><a href="item?id=\(id)">4 hours ago</a></span>
+                        <a href="item?id=\(id)">3&nbsp;comments</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td>
+                    <div class="toptext">Intro text<p>First paragraph</p><p>Second paragraph</p></div>
+                </td>
+            </tr>
+        </table>
+        </body>
+        </html>
+        """
+    }
+
+    private func createMockSinglePostWithCommentsHTML(storyID: Int, commentIDs: [Int]) -> String {
+        let commentsHTML = commentIDs.map { id in
+            """
+            <tr class=\"athing comtr\" id=\"\(id)\">
+                <td>
+                    <table>
+                        <tr>
+                            <td class=\"ind\" indent=\"0\"><img src=\"s.gif\" height=\"1\" width=\"0\"></td>
+                            <td valign=\"top\" class=\"votelinks\"><center><a id='up_\(id)' href='vote?id=\(id)&how=up&goto=item%3Fid%3D\(storyID)'><div class='votearrow' title='upvote'></div></a></center></td>
+                            <td class=\"default\">
+                                <div style=\"margin-top:2px; margin-bottom:-10px;\">
+                                    <span class=\"comhead\">
+                                        <a href=\"user?id=commenter\" class=\"hnuser\">commenter</a>
+                                        <span class=\"age\" title=\"2023-01-01T10:00:00\"><a href=\"item?id=\(id)\">1 hour ago</a></span>
+                                        <span id=\"unv_\(id)\"></span>
+                                        <span class=\"navs\"></span>
+                                    </span>
+                                </div>
+                                <br>
+                                <div class=\"comment\">
+                                    <div class=\"commtext c00\">Comment \(id)</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            """
+        }.joined(separator: "\n")
+
+        return """
+        <html>
+        <body>
+        <table class=\"fatitem\">
+            <tr class=\"athing\" id=\"\(storyID)\">
+                <td>
+                    <span class=\"titleline\">
+                        <a href=\"https://example.com/article\">Test Article Title</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=\"score\">10 points</span>
+                    <span class=\"age\" title=\"2023-01-01T10:00:00\">2 hours ago</span>
+                    <a class=\"hnuser\" href=\"user?id=testuser\">testuser</a>
+                    <a href=\"item?id=\(storyID)\">5 comments</a>
+                </td>
+            </tr>
+        </table>
+        <table class=\"comment-tree\">
+            \(commentsHTML)
+        </table>
+        </body>
+        </html>
+        """
+    }
+
+    private func createMockCommentPermalinkHTML(commentID: Int, parentCommentID: Int, storyID: Int) -> String {
+        """
+        <html>
+        <body>
+        <table class=\"fatitem\">
+            <tr class=\"athing\" id=\"\(commentID)\"></tr>
+        </table>
+        <span class=\"navs\">
+            | <a href=\"item?id=\(parentCommentID)\">parent</a>
+            <span class=\"onstory\"> | on: <a href=\"item?id=\(storyID)\">Story Title</a></span>
+        </span>
         </body>
         </html>
         """

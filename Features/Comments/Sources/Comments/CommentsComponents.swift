@@ -16,6 +16,7 @@ struct CommentsContentView: View {
     @Binding var showTitle: Bool
     @Binding var hasMeasuredInitialOffset: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
+    @Binding var pendingCommentID: Int?
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
 
@@ -47,13 +48,12 @@ struct CommentsContentView: View {
                         )
                     })
                     .onPreferenceChange(ViewOffsetKey.self) { offset in
+                        let shouldShowTitle = offset < 50
                         if !hasMeasuredInitialOffset {
                             hasMeasuredInitialOffset = true
-                            showTitle = offset < 50
-                        } else {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showTitle = offset < 50
-                            }
+                            showTitle = shouldShowTitle
+                        } else if showTitle != shouldShowTitle {
+                            showTitle = shouldShowTitle
                         }
                     }
                     .listRowSeparator(.hidden)
@@ -94,7 +94,28 @@ struct CommentsContentView: View {
                     }
                 }
                 .listStyle(.plain)
+                .transaction { transaction in
+                    transaction.disablesAnimations = true
+                }
+                .onChange(of: pendingCommentID) { _ in
+                    scrollToPendingComment(with: proxy)
+                }
+                .onChange(of: viewModel.visibleComments) { _ in
+                    scrollToPendingComment(with: proxy)
+                }
             }
+        }
+    }
+
+    private func scrollToPendingComment(with proxy: ScrollViewProxy) {
+        guard let targetID = pendingCommentID else { return }
+        guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut) {
+                proxy.scrollTo("comment-\(targetID)", anchor: .top)
+            }
+            pendingCommentID = nil
         }
     }
 }

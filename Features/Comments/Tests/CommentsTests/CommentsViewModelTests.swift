@@ -348,6 +348,38 @@ struct CommentsViewModelTests {
             #expect(loadedChild2.visibility == Domain.CommentVisibilityType.hidden)
             #expect(sut.visibleComments.count == 1)
         }
+
+        @Test("Reveal comment shows hidden ancestors")
+        @MainActor
+        func revealCommentUnhidesAncestors() async {
+            // Given - Comment chain with collapsed ancestors
+            let rootComment = createTestComment(id: 1, level: 0)
+            let childComment = createTestComment(id: 2, level: 1)
+            let grandchildComment = createTestComment(id: 3, level: 2)
+
+            rootComment.visibility = .compact
+            childComment.visibility = .hidden
+            grandchildComment.visibility = .hidden
+
+            let post = createPostWithComments(comments: [rootComment, childComment, grandchildComment])
+            mockPostUseCase.mockPost = post
+
+            await sut.loadComments()
+
+            // When
+            let revealed = sut.revealComment(withId: 3)
+
+            // Then
+            #expect(revealed)
+            let loadedRoot = sut.comments.first(where: { $0.id == 1 })!
+            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
+            let loadedGrandchild = sut.comments.first(where: { $0.id == 3 })!
+
+            #expect(loadedRoot.visibility == .visible)
+            #expect(loadedChild.visibility == .visible)
+            #expect(loadedGrandchild.visibility == .visible)
+            #expect(sut.visibleComments.contains(where: { $0.id == 3 }))
+        }
     }
 
     // MARK: - Helper Methods

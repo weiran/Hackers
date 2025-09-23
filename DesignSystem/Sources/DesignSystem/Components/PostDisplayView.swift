@@ -108,11 +108,6 @@ public struct PostDisplayView: View {
                 }
             }
 
-            if showPostText, let text = post.text, !text.isEmpty {
-                Text(text)
-                    .foregroundColor(.primary)
-                    .padding(.top, 4)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

@@ -130,7 +130,8 @@ extension PostRepository {
 
         let age = try element.select(".age").text()
         let user = try element.select(".hnuser").text()
-        guard let id = try Int(element.select(".comtr").attr("id")) else {
+        let idValue = try element.attr("id")
+        guard let id = Int(idValue), !idValue.isEmpty else {
             throw HackersKitError.scraperError
         }
         guard let indentWidth = try Int(element.select(".ind img").attr("width")) else {

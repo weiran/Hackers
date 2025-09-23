@@ -17,11 +17,19 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
+    @State private var pendingCommentID: Int?
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    public init(postID: Int, initialPost: Post? = nil, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
+    public init(
+        postID: Int,
+        initialPost: Post? = nil,
+        targetCommentID: Int? = nil,
+        viewModel: CommentsViewModel? = nil,
+        votingViewModel: VotingViewModel? = nil
+    ) {
+        _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
         } else {
@@ -36,8 +44,19 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
-    public init(post: Post, viewModel: CommentsViewModel? = nil, votingViewModel: VotingViewModel? = nil) {
-        self.init(postID: post.id, initialPost: post, viewModel: viewModel, votingViewModel: votingViewModel)
+    public init(
+        post: Post,
+        targetCommentID: Int? = nil,
+        viewModel: CommentsViewModel? = nil,
+        votingViewModel: VotingViewModel? = nil
+    ) {
+        self.init(
+            postID: post.id,
+            initialPost: post,
+            targetCommentID: targetCommentID,
+            viewModel: viewModel,
+            votingViewModel: votingViewModel
+        )
     }
 
     public var body: some View {
@@ -49,6 +68,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                     showTitle: $showTitle,
                     hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
                     visibleCommentPositions: $visibleCommentPositions,
+                    pendingCommentID: $pendingCommentID,
                     handleLinkTap: handleLinkTap,
                     toggleCommentVisibility: toggleCommentVisibility,
                 )
@@ -85,8 +105,16 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         .task {
             votingViewModel.navigationStore = navigationStore
             await viewModel.loadComments()
+            if let targetID = pendingCommentID {
+                _ = await viewModel.revealComment(withId: targetID)
+            }
         }
-        .refreshable { await viewModel.refreshComments() }
+        .refreshable {
+            await viewModel.refreshComments()
+            if let targetID = pendingCommentID {
+                _ = await viewModel.revealComment(withId: targetID)
+            }
+        }
         .environment(\.openURL, OpenURLAction { url in
             if handleHackerNewsPostLink(url) {
                 return .handled
@@ -121,6 +149,12 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
 
     private func handleHackerNewsPostLink(_ url: URL) -> Bool {
         guard let itemId = CommentsLinkNavigator.hackerNewsItemID(from: url) else { return false }
+
+        if viewModel.revealComment(withId: itemId) {
+            pendingCommentID = itemId
+            return true
+        }
+
         if let currentPostId = viewModel.post?.id, currentPostId == itemId {
             return true
         }

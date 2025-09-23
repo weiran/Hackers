@@ -95,10 +95,11 @@ public final class CommentsViewModel: @unchecked Sendable {
         do {
             let postWithComments = try await postUseCase.getPost(id: postID)
             let loadedComments = postWithComments.comments ?? []
+            let commentCountExcludingStoryText = loadedComments.filter { $0.id >= 0 }.count
 
             await MainActor.run {
                 self.post = postWithComments
-                self.post?.commentsCount = loadedComments.count
+                self.post?.commentsCount = commentCountExcludingStoryText
                 self.isPostLoading = false
                 self.onCommentsLoaded?(loadedComments)
             }
@@ -144,6 +145,21 @@ public final class CommentsViewModel: @unchecked Sendable {
             comment.upvoted = false
             throw error
         }
+    }
+
+    @MainActor
+    @discardableResult
+    public func revealComment(withId id: Int) -> Bool {
+        guard let index = comments.firstIndex(where: { $0.id == id }) else { return false }
+        let targetComment = comments[index]
+        targetComment.visibility = .visible
+
+        if targetComment.level > 0 {
+            ensureAncestorVisibility(forCommentAt: index)
+        }
+
+        updateVisibleComments()
+        return true
     }
 
     @MainActor
@@ -213,5 +229,20 @@ public final class CommentsViewModel: @unchecked Sendable {
         }
 
         return count
+    }
+
+    private func ensureAncestorVisibility(forCommentAt index: Int) {
+        var remainingLevel = comments[index].level
+        guard remainingLevel > 0 else { return }
+
+        var searchIndex = index - 1
+        while searchIndex >= 0, remainingLevel > 0 {
+            let candidate = comments[searchIndex]
+            if candidate.level == remainingLevel - 1 {
+                candidate.visibility = .visible
+                remainingLevel -= 1
+            }
+            searchIndex -= 1
+        }
     }
 }
