@@ -61,16 +61,7 @@ public struct LoginView: View {
             }
             .scrollDismissesKeyboard(.interactively)
         }
-        .background(
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(.systemBackground),
-                    Color(.systemGray6).opacity(0.3),
-                ]),
-                startPoint: .top,
-                endPoint: .bottom,
-            ),
-        )
+        .background(AppGradients.screenBackground())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -120,7 +111,7 @@ public struct LoginView: View {
     private var formSection: some View {
         VStack(spacing: 32) {
             VStack(spacing: 20) {
-                ModernTextField(
+                AppTextField(
                     title: "Username",
                     text: $username,
                     isSecure: false,
@@ -133,7 +124,7 @@ public struct LoginView: View {
                     focusedField = .password
                 }
 
-                ModernTextField(
+                AppTextField(
                     title: "Password",
                     text: $password,
                     isSecure: true,
@@ -182,12 +173,12 @@ public struct LoginView: View {
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(loginButtonGradient),
+                            .fill(AppGradients.primaryButton(isEnabled: isLoginEnabled)),
                     )
                     .scaleEffect(isAuthenticating ? 0.95 : 1.0)
                     .animation(.easeInOut(duration: 0.1), value: isAuthenticating)
                 }
-                .disabled(isAuthenticating || username.isEmpty || password.isEmpty)
+                .disabled(!isLoginEnabled)
                 .padding(.horizontal, 20)
             }
 
@@ -196,15 +187,8 @@ public struct LoginView: View {
         .padding(.top, 32)
     }
 
-    private var loginButtonGradient: LinearGradient {
-        let isEnabled = !username.isEmpty && !password.isEmpty && !isAuthenticating
-        return LinearGradient(
-            gradient: Gradient(colors: isEnabled ?
-                [Color.orange, Color.orange.opacity(0.8)] :
-                [Color.gray.opacity(0.6), Color.gray.opacity(0.4)]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing,
-        )
+    private var isLoginEnabled: Bool {
+        !isAuthenticating && !username.isEmpty && !password.isEmpty
     }
 
     private var loggedInView: some View {
@@ -248,11 +232,7 @@ public struct LoginView: View {
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(LinearGradient(
-                                gradient: Gradient(colors: [Color.red, Color.red.opacity(0.8)]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing,
-                            )),
+                            .fill(AppGradients.destructiveButton()),
                     )
                 }
                 .padding(.horizontal, 20)
@@ -296,13 +276,20 @@ public struct LoginView: View {
     }
 }
 
-struct ModernTextField: View {
-    let title: String
-    @Binding var text: String
-    let isSecure: Bool
+public struct AppTextField: View {
+    private let title: String
+    @Binding private var text: String
+    private let isSecure: Bool
+    @Environment(\.colorScheme) private var colorScheme
     @FocusState private var isFocused: Bool
 
-    var body: some View {
+    public init(title: String, text: Binding<String>, isSecure: Bool) {
+        self.title = title
+        self._text = text
+        self.isSecure = isSecure
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline)
@@ -322,16 +309,24 @@ struct ModernTextField: View {
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(.systemGray6))
+                    .fill(fieldBackgroundColor)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(isFocused ? Color.orange : Color.clear, lineWidth: 2),
+                            .strokeBorder(borderColor, lineWidth: AppFieldTheme.borderWidth(isFocused: isFocused)),
                     ),
             )
             .focused($isFocused)
         }
         .padding(.horizontal, 20)
         .animation(.easeInOut(duration: 0.2), value: isFocused)
+    }
+
+    private var fieldBackgroundColor: Color {
+        AppFieldTheme.background(for: colorScheme)
+    }
+
+    private var borderColor: Color {
+        AppFieldTheme.borderColor(for: colorScheme, isFocused: isFocused)
     }
 }
 

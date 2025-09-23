@@ -123,4 +123,29 @@ struct AppColorsTests {
 
         #expect(true, "Concurrent color access should work safely")
     }
+
+    @Test("Primary button gradient adapts to enabled state")
+    func primaryButtonGradientState() {
+        let enabledGradient = AppGradients.primaryButton(isEnabled: true)
+        let disabledGradient = AppGradients.primaryButton(isEnabled: false)
+
+        #expect(enabledGradient.gradient.stops.count == 2)
+        #expect(disabledGradient.gradient.stops.count == 2)
+        #expect(enabledGradient.gradient.stops.first?.color != disabledGradient.gradient.stops.first?.color)
+    }
+
+    @Test("Field theme responds to color scheme and focus")
+    func fieldThemeVariants() {
+        let focusedBorder = AppFieldTheme.borderColor(for: .light, isFocused: true)
+        let unfocusedLight = AppFieldTheme.borderColor(for: .light, isFocused: false)
+        let unfocusedDark = AppFieldTheme.borderColor(for: .dark, isFocused: false)
+
+        #expect(focusedBorder != unfocusedLight)
+        #expect(unfocusedLight != unfocusedDark)
+
+        let lightBackground = AppFieldTheme.background(for: .light)
+        let darkBackground = AppFieldTheme.background(for: .dark)
+
+        #expect(lightBackground != darkBackground)
+    }
 }
