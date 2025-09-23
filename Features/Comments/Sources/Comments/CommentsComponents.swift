@@ -266,7 +266,7 @@ struct CommentRow: View {
                     .foregroundColor(.primary)
             }
         }
-        .listRowInsets(.init(top: 10, leading: CGFloat((comment.level + 1) * 16), bottom: 10, trailing: 16))
+        .listRowInsets(.init(top: 12, leading: CGFloat((comment.level + 1) * 16), bottom: 8, trailing: 16))
         .contentShape(Rectangle())
         .onTapGesture { onToggle() }
         .accessibilityAddTraits(.isButton)
