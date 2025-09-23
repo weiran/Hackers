@@ -118,12 +118,10 @@ extension CommentHTMLParser {
         switch segment.type {
         case .bold:
             formattedString.inlinePresentationIntent = .stronglyEmphasized
-            formattedString.font = .body.bold()
         case .italic:
             formattedString.inlinePresentationIntent = .emphasized
-            formattedString.font = .body.italic()
         case .code:
-            formattedString.font = .body.monospaced()
+            formattedString.inlinePresentationIntent = .code
         }
         result += formattedString
     }
