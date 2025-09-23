@@ -1,15 +1,6 @@
 {
-  "originHash" : "8d8aac571b86f714acb82792fbc1c270756d162e4ab40d4155e036a3f1085561",
+  "originHash" : "0000000000000000000000000000000000000000000000000000000000000000",
   "pins" : [
-    {
-      "identity" : "drops",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/omaralbeik/Drops",
-      "state" : {
-        "revision" : "a183ee6f79f21c940092a19c2cba756555422371",
-        "version" : "1.7.0"
-      }
-    },
     {
       "identity" : "swiftsoup",
       "kind" : "remoteSourceControl",

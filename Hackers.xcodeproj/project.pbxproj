@@ -6,8 +6,8 @@
 	objectVersion = 70;
 	objects = {
 
+
 /* Begin PBXBuildFile section */
-		2406B37928ACF72F00CB396B /* Drops in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B37828ACF72F00CB396B /* Drops */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
 		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
@@ -98,7 +98,6 @@
 				2482576E2E5B38190068E91E /* Onboarding in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
-				2406B37928ACF72F00CB396B /* Drops in Frameworks */,
 				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
 				241E7B412E511BC20013EEA1 /* Data in Frameworks */,
 				248256FB2E59D2540068E91E /* Networking in Frameworks */,
@@ -183,7 +182,6 @@
 			);
 			name = Hackers;
 			packageProductDependencies = (
-				2406B37828ACF72F00CB396B /* Drops */,
 				2406B38628AD083500CB396B /* SwiftSoup */,
 				241E7B402E511BC20013EEA1 /* Data */,
 				241E7B482E51D1C80013EEA1 /* Settings */,
@@ -227,7 +225,6 @@
 			);
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			packageReferences = (
-				2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */,
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */,
 				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
@@ -619,14 +616,6 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/omaralbeik/Drops";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
@@ -638,11 +627,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2406B37828ACF72F00CB396B /* Drops */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2406B37728ACF72F00CB396B /* XCRemoteSwiftPackageReference "Drops" */;
-			productName = Drops;
-		};
 		2406B38628AD083500CB396B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;

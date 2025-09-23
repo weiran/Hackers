@@ -24,12 +24,11 @@ let package = Package(
         .package(path: "../../Shared"),
         .package(path: "../../DesignSystem"),
         .package(path: "../Onboarding"),
-        .package(url: "https://github.com/omaralbeik/Drops", from: "1.7.0"),
     ],
     targets: [
         .target(
             name: "Settings",
-            dependencies: ["Domain", "Shared", "DesignSystem", "Onboarding", .product(name: "Drops", package: "Drops")],
+            dependencies: ["Domain", "Shared", "DesignSystem", "Onboarding"],
         ),
         .testTarget(
             name: "SettingsTests",

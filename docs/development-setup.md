@@ -115,7 +115,6 @@ xed .
 The project uses **minimal external dependencies**:
 
 - **SwiftSoup**: HTML parsing
-- **Drops**: Toast notifications
 
 Dependencies are managed through Swift Package Manager and should resolve automatically when opening the project.
 
