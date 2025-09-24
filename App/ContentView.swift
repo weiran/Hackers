@@ -60,7 +60,7 @@ struct MainContentView: View {
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
                                 currentUsername: sessionService.username,
                                 onLogin: { username, password in
-                                    try await sessionService.authenticate(username: username, password: password)
+                                    _ = try await sessionService.authenticate(username: username, password: password)
                                 },
                                 onLogout: {
                                     sessionService.unauthenticate()
@@ -86,7 +86,7 @@ struct MainContentView: View {
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
                 onLogin: { username, password in
-                    try await sessionService.authenticate(username: username, password: password)
+                    _ = try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
                     sessionService.unauthenticate()
@@ -103,7 +103,7 @@ struct MainContentView: View {
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
                 onLogin: { username, password in
-                    try await sessionService.authenticate(username: username, password: password)
+                    _ = try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
                     sessionService.unauthenticate()
