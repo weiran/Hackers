@@ -83,7 +83,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                 AppLoadingStateView(message: "Loading...")
             }
         }
-        .scenePadding(.minimum, edges: .horizontal)
+        .scenePadding(.minimum, edges: .leading)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
