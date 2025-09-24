@@ -45,7 +45,7 @@ public enum AppGradients {
         LinearGradient(
             gradient: Gradient(colors: [
                 AppColors.appTintColor,
-                AppColors.appTintColor.opacity(0.65),
+                AppColors.appTintColor.opacity(0.65)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing,
@@ -56,7 +56,7 @@ public enum AppGradients {
         LinearGradient(
             gradient: Gradient(colors: [
                 AppColors.success,
-                AppColors.success.opacity(0.65),
+                AppColors.success.opacity(0.65)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing,
@@ -67,7 +67,7 @@ public enum AppGradients {
         LinearGradient(
             gradient: Gradient(colors: [
                 AppColors.background,
-                AppColors.secondaryBackground.opacity(0.3),
+                AppColors.secondaryBackground.opacity(0.3)
             ]),
             startPoint: .top,
             endPoint: .bottom,

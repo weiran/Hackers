@@ -11,18 +11,18 @@ import PackageDescription
 let package = Package(
     name: "Shared",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v26)
     ],
     products: [
         .library(
             name: "Shared",
             targets: ["Shared"],
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Data"),
-        .package(path: "../Networking"),
+        .package(path: "../Networking")
     ],
     targets: [
         .target(
@@ -33,6 +33,6 @@ let package = Package(
             name: "SharedTests",
             dependencies: ["Shared"],
             path: "Tests/SharedTests",
-        ),
+        )
     ],
 )

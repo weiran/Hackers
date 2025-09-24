@@ -11,18 +11,18 @@ import PackageDescription
 let package = Package(
     name: "Feed",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v26)
     ],
     products: [
         .library(
             name: "Feed",
             targets: ["Feed"],
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../../Domain"),
         .package(path: "../../Shared"),
-        .package(path: "../../DesignSystem"),
+        .package(path: "../../DesignSystem")
     ],
     targets: [
         .target(
@@ -33,6 +33,6 @@ let package = Package(
             name: "FeedTests",
             dependencies: ["Feed"],
             path: "Tests/FeedTests",
-        ),
+        )
     ],
 )

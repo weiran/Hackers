@@ -29,7 +29,7 @@ public extension UserDefaults {
     func registerDefaults() {
         register(defaults: [
             UserDefaultsKeys.safariReaderMode.rawValue: false,
-            UserDefaultsKeys.openInDefaultBrowser.rawValue: false,
+            UserDefaultsKeys.openInDefaultBrowser.rawValue: false
         ])
     }
 }

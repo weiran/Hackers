@@ -19,7 +19,7 @@ public enum CommentHTMLParser {
         "&quot;": "\"",
         "&#x27;": "'",
         "&#39;": "'",
-        "&nbsp;": " ",
+        "&nbsp;": " "
     ]
     static let linkRegex: NSRegularExpression = {
         let pattern = #"<a\s+[^>]*href=(['"])(.*?)\1[^>]*>(.*?)</a>"#

@@ -11,13 +11,13 @@ import PackageDescription
 let package = Package(
     name: "Networking",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v26)
     ],
     products: [
         .library(
             name: "Networking",
             targets: ["Networking"],
-        ),
+        )
     ],
     targets: [
         .target(
@@ -27,6 +27,6 @@ let package = Package(
             name: "NetworkingTests",
             dependencies: ["Networking"],
             path: "Tests/NetworkingTests",
-        ),
+        )
     ],
 )

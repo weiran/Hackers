@@ -69,7 +69,7 @@ extension PostRepository {
         components.path = "/item"
         components.queryItems = [
             URLQueryItem(name: "id", value: String(id)),
-            URLQueryItem(name: "p", value: String(page)),
+            URLQueryItem(name: "p", value: String(page))
         ]
         return components.url
     }

@@ -16,12 +16,12 @@ let package = Package(
         .library(
             name: "Comments",
             targets: ["Comments"],
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../../Domain"),
         .package(path: "../../Shared"),
-        .package(path: "../../DesignSystem"),
+        .package(path: "../../DesignSystem")
     ],
     targets: [
         .target(
@@ -31,6 +31,6 @@ let package = Package(
         .testTarget(
             name: "CommentsTests",
             dependencies: ["Comments", "Domain", "Shared"],
-        ),
+        )
     ],
 )

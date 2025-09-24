@@ -11,19 +11,19 @@ import PackageDescription
 let package = Package(
     name: "Settings",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v26)
     ],
     products: [
         .library(
             name: "Settings",
             targets: ["Settings"],
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../../Domain"),
         .package(path: "../../Shared"),
         .package(path: "../../DesignSystem"),
-        .package(path: "../Onboarding"),
+        .package(path: "../Onboarding")
     ],
     targets: [
         .target(
@@ -34,6 +34,6 @@ let package = Package(
             name: "SettingsTests",
             dependencies: ["Settings"],
             path: "Tests/SettingsTests",
-        ),
+        )
     ],
 )

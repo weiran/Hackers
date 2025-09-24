@@ -11,13 +11,13 @@ import PackageDescription
 let package = Package(
     name: "Domain",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v26)
     ],
     products: [
         .library(
             name: "Domain",
             targets: ["Domain"],
-        ),
+        )
     ],
     targets: [
         .target(
@@ -27,6 +27,6 @@ let package = Package(
             name: "DomainTests",
             dependencies: ["Domain"],
             path: "Tests/DomainTests",
-        ),
+        )
     ],
 )
