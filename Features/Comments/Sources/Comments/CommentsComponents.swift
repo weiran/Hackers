@@ -14,7 +14,6 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
-    @Binding var hasMeasuredInitialOffset: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var pendingCommentID: Int?
     let handleLinkTap: () -> Void
@@ -47,15 +46,6 @@ struct CommentsContentView: View {
                             value: geometry.frame(in: .global).minY,
                         )
                     })
-                    .onPreferenceChange(ViewOffsetKey.self) { offset in
-                        let shouldShowTitle = offset < 50
-                        if !hasMeasuredInitialOffset {
-                            hasMeasuredInitialOffset = true
-                            showTitle = shouldShowTitle
-                        } else if showTitle != shouldShowTitle {
-                            showTitle = shouldShowTitle
-                        }
-                    }
                     .listRowSeparator(.hidden)
                     .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
                         view.swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -93,6 +83,11 @@ struct CommentsContentView: View {
                         )
                     }
                 }
+                .onScrollGeometryChange(for: Bool.self, of: { geometry in
+                    geometry.contentOffset.y + geometry.contentInsets.top > 40
+                }, action: { _, newValue in
+                    showTitle = newValue
+                })
                 .listStyle(.plain)
                 .transaction { transaction in
                     transaction.disablesAnimations = true

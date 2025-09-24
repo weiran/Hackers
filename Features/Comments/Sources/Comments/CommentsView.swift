@@ -66,7 +66,6 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,
-                    hasMeasuredInitialOffset: $hasMeasuredInitialOffset,
                     visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
                     handleLinkTap: handleLinkTap,
@@ -85,7 +84,6 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             }
         }
         .scenePadding(.minimum, edges: .horizontal)
-        .navigationTitle(viewModel.post == nil ? "" : "Comments")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
