@@ -9,7 +9,8 @@ import Foundation
 @testable import Networking
 import Testing
 
-@Suite("NetworkManager Tests")
+// Serialise the suite so concurrent runs don't fight over HTTPCookieStorage.shared
+@Suite("NetworkManager Tests", .serialized)
 struct NetworkManagerTests {
     // Default instance (no network calls made in tests that use mocks)
     let defaultManager = NetworkManager()
