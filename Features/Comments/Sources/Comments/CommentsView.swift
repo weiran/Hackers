@@ -18,6 +18,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var pendingCommentID: Int?
+    @State private var listAnimationsEnabled = false
     @EnvironmentObject private var navigationStore: NavigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -68,8 +69,10 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                     showTitle: $showTitle,
                     visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
+                    listAnimationsEnabled: $listAnimationsEnabled,
                     handleLinkTap: handleLinkTap,
                     toggleCommentVisibility: toggleCommentVisibility,
+                    hideCommentBranch: hideCommentBranch,
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")
@@ -162,12 +165,38 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
+        listAnimationsEnabled = true
+        let wasVisible = comment.visibility == .visible
+
         withAnimation(.easeInOut(duration: 0.3)) {
-            let wasVisible = comment.visibility == .visible
             viewModel.toggleCommentVisibility(comment)
-            if wasVisible, !isCommentVisibleOnScreen(comment) {
-                withAnimation(.easeInOut(duration: 0.3)) { scrollTo("comment-\(comment.id)") }
+        }
+
+        if wasVisible, !isCommentVisibleOnScreen(comment) {
+            DispatchQueue.main.async {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    scrollTo("comment-\(comment.id)")
+                }
+                listAnimationsEnabled = false
             }
+        } else {
+            DispatchQueue.main.async { listAnimationsEnabled = false }
+        }
+    }
+
+    private func hideCommentBranch(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
+        listAnimationsEnabled = true
+        let collapsedRoot = withAnimation(.easeInOut(duration: 0.3)) {
+            viewModel.hideCommentBranch(comment)
+        }
+
+        DispatchQueue.main.async {
+            if let root = collapsedRoot {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    scrollTo("comment-\(root.id)")
+                }
+            }
+            listAnimationsEnabled = false
         }
     }
 

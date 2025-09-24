@@ -337,12 +337,13 @@ struct CommentsViewModelTests {
             let loadedChild2 = sut.comments.first(where: { $0.id == 3 })!
 
             // When
-            sut.hideCommentBranch(loadedChild2)
+            let collapsedRoot = sut.hideCommentBranch(loadedChild2)
 
             // Then
             let loadedRoot = sut.comments.first(where: { $0.id == 1 })!
             let loadedChild1 = sut.comments.first(where: { $0.id == 2 })!
 
+            #expect(collapsedRoot === loadedRoot)
             #expect(loadedRoot.visibility == Domain.CommentVisibilityType.compact)
             #expect(loadedChild1.visibility == Domain.CommentVisibilityType.hidden)
             #expect(loadedChild2.visibility == Domain.CommentVisibilityType.hidden)

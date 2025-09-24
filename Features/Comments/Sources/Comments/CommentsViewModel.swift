@@ -185,11 +185,13 @@ public final class CommentsViewModel: @unchecked Sendable {
     }
 
     @MainActor
-    public func hideCommentBranch(_ comment: Comment) {
-        if let rootIndex = indexOfVisibleRootComment(of: comment) {
-            let rootComment = visibleComments[rootIndex]
-            toggleCommentVisibility(rootComment)
-        }
+    @discardableResult
+    public func hideCommentBranch(_ comment: Comment) -> Comment? {
+        guard let rootIndex = indexOfVisibleRootComment(of: comment) else { return nil }
+
+        let rootComment = visibleComments[rootIndex]
+        toggleCommentVisibility(rootComment)
+        return rootComment
     }
 
     private func updateVisibleComments() {

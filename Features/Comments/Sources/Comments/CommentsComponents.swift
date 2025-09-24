@@ -16,8 +16,10 @@ struct CommentsContentView: View {
     @Binding var showTitle: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var pendingCommentID: Int?
+    @Binding var listAnimationsEnabled: Bool
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
+    let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
 
     var body: some View {
         Group {
@@ -80,6 +82,11 @@ struct CommentsContentView: View {
                                     proxy.scrollTo(id, anchor: .top)
                                 }
                             },
+                            hideCommentBranch: { comment in
+                                hideCommentBranch(comment) { id in
+                                    proxy.scrollTo(id, anchor: .top)
+                                }
+                            },
                         )
                     }
                 }
@@ -90,7 +97,7 @@ struct CommentsContentView: View {
                 })
                 .listStyle(.plain)
                 .transaction { transaction in
-                    transaction.disablesAnimations = true
+                    transaction.disablesAnimations = !listAnimationsEnabled
                 }
                 .onChange(of: pendingCommentID) { _ in
                     scrollToPendingComment(with: proxy)
@@ -121,6 +128,7 @@ struct CommentsForEach: View {
     let post: Post
     @Binding var visibleCommentPositions: [Int: CGRect]
     let toggleCommentVisibility: (Comment) -> Void
+    let hideCommentBranch: (Comment) -> Void
 
     var body: some View {
         ForEach(viewModel.visibleComments, id: \.id) { comment in
@@ -129,7 +137,7 @@ struct CommentsForEach: View {
                 post: post,
                 votingViewModel: votingViewModel,
                 onToggle: { toggleCommentVisibility(comment) },
-                onHide: { viewModel.hideCommentBranch(comment) },
+                onHide: { hideCommentBranch(comment) },
             )
             .id("comment-\(comment.id)")
             .background(GeometryReader { geometry in
@@ -158,7 +166,7 @@ struct CommentsForEach: View {
                 }
             }
             .swipeActions(edge: .trailing) {
-                Button { viewModel.hideCommentBranch(comment) } label: {
+                Button { hideCommentBranch(comment) } label: {
                     Image(systemName: "minus.circle")
                 }
             }
