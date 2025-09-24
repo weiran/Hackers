@@ -290,6 +290,5 @@ struct SimpleCommentsTests {
             #expect(userItemId == nil)
             #expect(externalItemId == nil)
         }
-
     }
 }

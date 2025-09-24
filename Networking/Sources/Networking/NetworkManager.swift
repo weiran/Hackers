@@ -40,7 +40,7 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     public func get(url: URL) async throws -> String {
         let request = URLRequest(url: url)
         let (data, response) = try await session.data(for: request)
-        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw URLError(.badServerResponse)
         }
         return String(data: data, encoding: .utf8) ?? ""
@@ -53,7 +53,7 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
         let (data, response) = try await session.data(for: request)
-        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        if let http = response as? HTTPURLResponse, !(200 ... 299).contains(http.statusCode) {
             throw URLError(.badServerResponse)
         }
         let html = String(data: data, encoding: .utf8) ?? ""

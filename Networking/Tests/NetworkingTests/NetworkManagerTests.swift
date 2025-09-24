@@ -330,6 +330,7 @@ struct NetworkManagerTests {
     }
 
     // MARK: - URLSessionDelegate Tests
+
     // Note: NetworkManager doesn't override redirect handling, so redirects follow default behavior
 
     // MARK: - Concurrent Request Tests

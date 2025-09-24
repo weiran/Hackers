@@ -106,15 +106,15 @@ private struct WebKitView: UIViewRepresentable {
             onUpdate(webView.url, webView.title)
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             forwardUpdate(from: webView)
         }
 
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError _: Error) {
+        func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError _: Error) {
             forwardUpdate(from: webView)
         }
 
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError _: Error) {
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError _: Error) {
             forwardUpdate(from: webView)
         }
     }

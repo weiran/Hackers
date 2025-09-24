@@ -84,6 +84,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                 AppLoadingStateView(message: "Loading...")
             }
         }
+        .scenePadding(.minimum, edges: .horizontal)
         .navigationTitle(viewModel.post == nil ? "" : "Comments")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

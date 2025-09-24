@@ -107,7 +107,6 @@ public struct PostDisplayView: View {
                     .scaledFont(.subheadline)
                 }
             }
-
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

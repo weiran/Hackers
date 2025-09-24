@@ -11,6 +11,7 @@ import SwiftSoup
 
 extension PostRepository {
     // MARK: - Networking helpers
+
     private static let maxPostPages = 10
 
     func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {

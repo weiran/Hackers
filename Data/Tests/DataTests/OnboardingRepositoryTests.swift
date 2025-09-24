@@ -56,7 +56,7 @@ struct OnboardingRepositoryTests {
     final class MockStore: OnboardingVersionStore, @unchecked Sendable {
         private var storedVersion: String?
         init(lastShownVersion: String?) {
-            self.storedVersion = lastShownVersion
+            storedVersion = lastShownVersion
         }
 
         func lastShownVersion() -> String? {

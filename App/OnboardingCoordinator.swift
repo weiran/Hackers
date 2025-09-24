@@ -6,9 +6,9 @@
 //
 
 import Domain
+import Foundation
 import Onboarding
 import SwiftUI
-import Foundation
 
 @MainActor
 final class OnboardingCoordinator {

@@ -48,7 +48,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         commentsLoader.setLoadFunction(
             shouldSkipLoad: { [weak self] comments in
                 guard let self else { return false }
-                return !comments.isEmpty && self.post != nil
+                return !comments.isEmpty && post != nil
             },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
@@ -95,7 +95,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         do {
             let postWithComments = try await postUseCase.getPost(id: postID)
             let loadedComments = postWithComments.comments ?? []
-            let commentCountExcludingStoryText = loadedComments.filter { $0.id >= 0 }.count
+            let commentCountExcludingStoryText = loadedComments.count(where: { $0.id >= 0 })
 
             await MainActor.run {
                 self.post = postWithComments

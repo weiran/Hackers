@@ -16,7 +16,7 @@ public struct AppTextField: View {
 
     public init(title: String, text: Binding<String>, isSecure: Bool) {
         self.title = title
-        self._text = text
+        _text = text
         self.isSecure = isSecure
     }
 
@@ -55,4 +55,3 @@ public struct AppTextField: View {
         .animation(.easeInOut(duration: 0.2), value: isFocused)
     }
 }
-

@@ -13,6 +13,7 @@ extension PostRepository {
     private enum ParseConstants {
         static let commentIndentWidth = 40
     }
+
     // MARK: - CommentUseCase
 
     public func getComments(for post: Post) async throws -> [Domain.Comment] {

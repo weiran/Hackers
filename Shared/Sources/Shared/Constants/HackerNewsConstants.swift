@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Foundation
 import Domain
+import Foundation
 
 public struct HackerNewsConstants {
     public static let baseURL = "https://news.ycombinator.com"

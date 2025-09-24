@@ -47,7 +47,7 @@ public enum LinkOpener {
     private static func findPresenter() -> UIViewController? {
         let keyWindow = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
+            .flatMap(\.windows)
             .first(where: { $0.isKeyWindow })
         let root = keyWindow?.rootViewController
 

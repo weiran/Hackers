@@ -50,11 +50,11 @@ public final class ToastPresenter: ObservableObject {
             }
 
             await MainActor.run { [weak self] in
-                guard let self, self.message?.id == toastID else { return }
+                guard let self, message?.id == toastID else { return }
                 withAnimation(.easeInOut(duration: 0.3)) {
                     self.message = nil
                 }
-                self.dismissTask = nil
+                dismissTask = nil
             }
         }
     }

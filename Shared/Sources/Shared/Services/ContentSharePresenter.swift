@@ -41,8 +41,7 @@ public final class ContentSharePresenter: @unchecked Sendable {
     private func showShareSheet(items: [Any]) {
         let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
 
-        if let rootViewController = PresentationContextProvider.shared.rootViewController
-        {
+        if let rootViewController = PresentationContextProvider.shared.rootViewController {
             // For iPad
             if let popover = activityVC.popoverPresentationController {
                 popover.sourceView = rootViewController.view

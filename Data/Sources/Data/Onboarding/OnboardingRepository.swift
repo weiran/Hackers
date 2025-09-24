@@ -18,7 +18,7 @@ public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @
     private let key = "com.weiran.hackers.onboarding.shownVersion"
 
     private init(storage: UserDefaults) {
-        self.userDefaults = storage
+        userDefaults = storage
     }
 
     public convenience init(userDefaults: UserDefaults) {

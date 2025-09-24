@@ -82,6 +82,7 @@ struct VotingViewModelTests {
             selectedPostId = id
             selectedPost = nil
         }
+
         func showLogin() { showingLogin = true; showLoginCalled = true }
         func showSettings() { showingSettings = true }
         func selectPostType(_: PostType) {}
@@ -227,6 +228,7 @@ struct NavigationStoreProtocolDefaultsTests {
             selectedPostId = id
             selectedPost = nil
         }
+
         func showLogin() { showingLogin = true }
         func showSettings() { showingSettings = true }
         func selectPostType(_: PostType) {}

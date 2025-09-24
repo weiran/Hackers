@@ -111,10 +111,10 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
     func dismissEmbeddedBrowser() {
         let dismiss = { [weak self] in
             guard let self else { return }
-            if !self.detailPath.isEmpty {
-                self.detailPath.removeLast()
+            if !detailPath.isEmpty {
+                detailPath.removeLast()
             } else {
-                self.embeddedBrowserURL = nil
+                embeddedBrowserURL = nil
             }
         }
 

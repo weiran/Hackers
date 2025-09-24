@@ -16,7 +16,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Configure a modest shared URL cache to limit on-disk growth from image/HTTP caching
         // This affects system components like AsyncImage that use URLSession.shared
         let memoryCapacity = 64 * 1024 * 1024 // 64 MB
-        let diskCapacity = 128 * 1024 * 1024  // 128 MB
+        let diskCapacity = 128 * 1024 * 1024 // 128 MB
         URLCache.shared = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity)
 
         // process args for testing
