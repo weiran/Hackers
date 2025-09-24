@@ -8,166 +8,179 @@
 @testable import DesignSystem
 import SwiftUI
 import Testing
+import UIKit
 
-@Suite("AppColors Tests")
+@Suite("App Color Semantics")
 struct AppColorsTests {
-    @Test("Color properties are consistent between calls")
-    func colorConsistency() {
-        // Test that multiple calls return the same color values
-        let upvoted1 = AppColors.upvoted
-        let upvoted2 = AppColors.upvoted
-        let appTint1 = AppColors.appTint
-        let appTint2 = AppColors.appTint
-        let success1 = AppColors.success
-        let success2 = AppColors.success
-        let warning1 = AppColors.warning
-        let warning2 = AppColors.warning
-        let danger1 = AppColors.danger
-        let danger2 = AppColors.danger
+    @Test("Asset-backed colors resolve from main bundle")
+    func assetBackedColorsResolve() {
+        let upvotedAsset = UIColor(named: "upvotedColor", in: .main, compatibleWith: nil)
+        let tintAsset = UIColor(named: "appTintColor", in: .main, compatibleWith: nil)
 
-        #expect(upvoted1 == upvoted2, "upvoted color should be consistent")
-        #expect(appTint1 == appTint2, "appTint color should be consistent")
-        #expect(success1 == success2, "success color should be consistent")
-        #expect(warning1 == warning2, "warning color should be consistent")
-        #expect(danger1 == danger2, "danger color should be consistent")
-    }
+        let upvoted = resolvedColor(AppColors.upvoted, style: .light)
+        let fallbackUpvoted = resolvedColor(AppColors.upvotedColor, style: .light)
+        let tint = resolvedColor(AppColors.appTint, style: .light)
+        let fallbackTint = resolvedColor(AppColors.appTintColor, style: .light)
 
-    @Test("Fallback color properties are consistent between calls")
-    func fallbackColorConsistency() {
-        // Test that multiple calls to fallback properties return consistent values
-        let upvotedColor1 = AppColors.upvotedColor
-        let upvotedColor2 = AppColors.upvotedColor
-        let appTintColor1 = AppColors.appTintColor
-        let appTintColor2 = AppColors.appTintColor
-
-        #expect(upvotedColor1 == upvotedColor2, "upvotedColor should be consistent")
-        #expect(appTintColor1 == appTintColor2, "appTintColor should be consistent")
-    }
-
-    @Test("AppColors enum structure")
-    func enumStructure() {
-        // Test that AppColors behaves like a namespace enum (no instances)
-        // This is verified by the fact that we can access static properties
-        // but can't create instances (private init should prevent this)
-
-        // Static access should work
-        _ = AppColors.upvoted
-        _ = AppColors.appTint
-        _ = AppColors.upvotedColor
-        _ = AppColors.appTintColor
-
-        #expect(true, "Static properties should be accessible")
-    }
-
-    @Test("Colors work with SwiftUI Views")
-    func swiftUICompatibility() {
-        // Test that colors can be used in SwiftUI contexts
-        // This verifies they return proper Color types
-
-        struct TestView: View {
-            var body: some View {
-                VStack {
-                    Rectangle()
-                        .fill(AppColors.upvoted)
-                    Rectangle()
-                        .fill(AppColors.appTint)
-                    Rectangle()
-                        .fill(AppColors.upvotedColor)
-                    Rectangle()
-                        .fill(AppColors.appTintColor)
-                }
-            }
+        if let upvotedAsset {
+            #expect(upvoted.approximatelyEquals(upvotedAsset))
+            #expect(fallbackUpvoted.approximatelyEquals(upvotedAsset))
+        } else {
+            #expect(upvoted.approximatelyEquals(fallbackUpvoted))
         }
 
-        let testView = TestView()
-        #expect(testView != nil, "Colors should work in SwiftUI Views")
-    }
-
-    @Test("Asset color names are correct")
-    func assetColorNames() {
-        // Verify that the asset color names used in the implementation are correct
-        // This is important for the asset lookup to work properly
-
-        // Test by checking if the Color initializers can be called
-        // (even if the actual assets aren't available in test context)
-        let upvotedFromAsset = Color("upvotedColor", bundle: .main)
-        let appTintFromAsset = Color("appTintColor", bundle: .main)
-
-        #expect(upvotedFromAsset != nil)
-        #expect(appTintFromAsset != nil)
-    }
-
-    @Test("Orange fallback colors")
-    func orangeFallbacks() {
-        // Test that orange is used as fallback
-        let orange = Color.orange
-
-        // The fallback logic should use orange when assets aren't found
-        // In a test environment, this might be the case
-        #expect(orange != nil, "Orange fallback color should be available")
-    }
-
-    @Test("Bundle reference is correct")
-    func bundleReference() {
-        // Test that .main bundle is used for asset lookup
-        // This is important for the color assets to be found in the main app bundle
-
-        let mainBundle = Bundle.main
-        #expect(mainBundle != nil, "Main bundle should be accessible")
-    }
-
-    @Test("Thread safety of color access")
-    func threadSafety() async {
-        // Test concurrent access to color properties
-        await withTaskGroup(of: Void.self) { group in
-            for _ in 0 ..< 10 {
-                group.addTask {
-                    _ = AppColors.upvoted
-                    _ = AppColors.appTint
-                    _ = AppColors.upvotedColor
-                    _ = AppColors.appTintColor
-                }
-            }
+        if let tintAsset {
+            #expect(tint.approximatelyEquals(tintAsset))
+            #expect(fallbackTint.approximatelyEquals(tintAsset))
+        } else {
+            #expect(tint.approximatelyEquals(fallbackTint))
         }
-
-        #expect(true, "Concurrent color access should work safely")
     }
 
-    @Test("Primary button gradient adapts to enabled state")
-    func primaryButtonGradientState() {
-        let enabledGradient = AppGradients.primaryButton(isEnabled: true)
-        let disabledGradient = AppGradients.primaryButton(isEnabled: false)
+    @Test("Fallback helpers mirror asset colours when available")
+    func fallbackHelpersMatchAsset() {
+        let upvoted = resolvedColor(AppColors.upvoted, style: .light)
+        let fallbackUpvoted = resolvedColor(AppColors.upvotedColor, style: .light)
+        let tint = resolvedColor(AppColors.appTint, style: .light)
+        let fallbackTint = resolvedColor(AppColors.appTintColor, style: .light)
 
-        #expect(String(describing: enabledGradient) != String(describing: disabledGradient))
+        #expect(fallbackUpvoted.approximatelyEquals(upvoted))
+        #expect(fallbackTint.approximatelyEquals(tint))
     }
 
-    @Test("Brand symbol gradient uses tint colors")
-    func brandGradientComposition() {
-        let gradient = AppGradients.brandSymbol()
-
-        #expect(String(describing: gradient).isEmpty == false)
+    @Test("Semantic system colours retain expected RGB values")
+    func semanticSystemColours() {
+        #expect(
+            resolvedColor(AppColors.success, style: .light)
+                .approximatelyEquals(UIColor.systemGreen)
+        )
+        #expect(
+            resolvedColor(AppColors.warning, style: .light)
+                .approximatelyEquals(UIColor.systemOrange)
+        )
+        #expect(
+            resolvedColor(AppColors.danger, style: .light)
+                .approximatelyEquals(UIColor.systemRed)
+        )
     }
 
-    @Test("Success gradient uses semantic colors")
-    func successGradientComposition() {
-        let gradient = AppGradients.successSymbol()
+    @Test("Separator opacity adjusts with colour scheme")
+    func separatorOpacityAdjusts() {
+        let light = resolvedColor(AppColors.separator(for: .light), style: .light)
+        let dark = resolvedColor(AppColors.separator(for: .dark), style: .dark)
 
-        #expect(String(describing: gradient).isEmpty == false)
-        #expect(String(describing: gradient) != String(describing: AppGradients.brandSymbol()))
+        let baseLight = UIColor.separator.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
+        let baseDark = UIColor.separator.resolvedColor(with: UITraitCollection(userInterfaceStyle: .dark))
+        let expectedLightAlpha = baseLight.cgColor.alpha * 0.3
+        let expectedDarkAlpha = baseDark.cgColor.alpha * 0.6
+
+        #expect(light.alpha.isApproximatelyEqual(to: expectedLightAlpha, tolerance: 0.01))
+        #expect(dark.alpha.isApproximatelyEqual(to: expectedDarkAlpha, tolerance: 0.01))
+        #expect(dark.alpha > light.alpha)
     }
 
-    @Test("Field theme responds to color scheme and focus")
+    @Test("Primary button gradient uses tint colours when enabled")
+    func primaryButtonGradientEnabled() {
+        let gradient = AppGradients.primaryButton(isEnabled: true)
+        let colors = colors(from: gradient)
+
+        #expect(colors.count == 2)
+        let tint = resolvedColor(AppColors.appTintColor, style: .light)
+        #expect(colors[0].approximatelyEquals(tint))
+        #expect(colors[1].approximatelyEquals(tint.withAlphaComponent(0.8), tolerance: 0.05))
+    }
+
+    @Test("Disabled primary button falls back to grey palette")
+    func primaryButtonGradientDisabled() {
+        let gradient = AppGradients.primaryButton(isEnabled: false)
+        let colors = colors(from: gradient)
+
+        #expect(colors.count == 2)
+        #expect(colors.allSatisfy { $0.isGrayscale(tolerance: 0.05) })
+    }
+
+    @Test("Field theme returns focus tint and separator defaults")
     func fieldThemeVariants() {
-        let focusedBorder = AppFieldTheme.borderColor(for: .light, isFocused: true)
-        let unfocusedLight = AppFieldTheme.borderColor(for: .light, isFocused: false)
-        let unfocusedDark = AppFieldTheme.borderColor(for: .dark, isFocused: false)
+        let focused = resolvedColor(AppFieldTheme.borderColor(for: .light, isFocused: true), style: .light)
+        let unfocusedLight = resolvedColor(AppFieldTheme.borderColor(for: .light, isFocused: false), style: .light)
+        let unfocusedDark = resolvedColor(AppFieldTheme.borderColor(for: .dark, isFocused: false), style: .dark)
 
-        #expect(focusedBorder != unfocusedLight)
-        #expect(unfocusedLight != unfocusedDark)
+        let tint = resolvedColor(AppColors.appTintColor, style: .light)
+        let expectedLight = resolvedColor(AppColors.separator(for: .light), style: .light)
+        let expectedDark = resolvedColor(AppColors.separator(for: .dark), style: .dark)
 
-        let lightBackground = AppFieldTheme.background(for: .light)
-        let darkBackground = AppFieldTheme.background(for: .dark)
-
-        #expect(lightBackground != darkBackground)
+        #expect(focused.approximatelyEquals(tint))
+        #expect(unfocusedLight.approximatelyEquals(expectedLight))
+        #expect(unfocusedDark.approximatelyEquals(expectedDark))
     }
+}
+
+// MARK: - Test Helpers
+
+private extension UIColor {
+    var alpha: CGFloat {
+        var a: CGFloat = 0
+        getRed(nil, green: nil, blue: nil, alpha: &a)
+        return a
+    }
+
+    func approximatelyEquals(_ other: UIColor?, tolerance: CGFloat = 0.001) -> Bool {
+        guard let other else { return false }
+        var lhsComponents: (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        var rhsComponents: (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+
+        guard getRed(&lhsComponents.0, green: &lhsComponents.1, blue: &lhsComponents.2, alpha: &lhsComponents.3) else {
+            return false
+        }
+        guard other.getRed(&rhsComponents.0, green: &rhsComponents.1, blue: &rhsComponents.2, alpha: &rhsComponents.3) else {
+            return false
+        }
+
+        let pairs = zip([lhsComponents.0, lhsComponents.1, lhsComponents.2, lhsComponents.3],
+                         [rhsComponents.0, rhsComponents.1, rhsComponents.2, rhsComponents.3])
+        for (lhsValue, rhsValue) in pairs where abs(lhsValue - rhsValue) > tolerance {
+            return false
+        }
+        return true
+    }
+
+    func isGrayscale(tolerance: CGFloat) -> Bool {
+        var white: CGFloat = 0
+        var alpha: CGFloat = 0
+        if getWhite(&white, alpha: &alpha) { return true }
+
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        guard getRed(&r, green: &g, blue: &b, alpha: &alpha) else { return false }
+        return abs(r - g) < tolerance && abs(g - b) < tolerance
+    }
+
+    func componentsDescription() -> String {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        guard getRed(&r, green: &g, blue: &b, alpha: &a) else { return "unresolved" }
+        return String(format: "(%.3f, %.3f, %.3f, %.3f)", r, g, b, a)
+    }
+}
+
+private extension CGFloat {
+    func isApproximatelyEqual(to value: CGFloat, tolerance: CGFloat) -> Bool {
+        abs(self - value) <= tolerance
+    }
+}
+
+private func colors(from gradient: LinearGradient) -> [UIColor] {
+    let mirror = Mirror(reflecting: gradient)
+    guard let storedGradient = mirror.children.first(where: { $0.label == "gradient" })?.value as? Gradient else {
+        Issue.record("Unable to introspect gradient colours")
+        return []
+    }
+    return storedGradient.stops.map { UIColor($0.color) }
+}
+
+private func resolvedColor(_ color: Color, style: UIUserInterfaceStyle) -> UIColor {
+    UIColor(color).resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
 }

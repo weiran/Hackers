@@ -5,215 +5,481 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-// swiftlint:disable force_cast
-
+@testable import Data
 @testable import Domain
 import Foundation
+@testable import Networking
 import Testing
 
-@Suite("Domain Use Cases Tests")
+@Suite("Domain Use Case Integration Tests")
 struct UseCaseTests {
-    // MARK: - Mock Implementations for Testing
-
-    @MainActor
-    final class MockPostUseCase: PostUseCase {
-        var getPostsCallCount = 0
-        var getPostCallCount = 0
-        var stubPosts: [Post] = []
-        var stubPost: Post?
-
-        func getPosts(type _: PostType, page _: Int, nextId _: Int?) async throws -> [Post] {
-            getPostsCallCount += 1
-            return stubPosts
-        }
-
-        func getPost(id _: Int) async throws -> Post {
-            getPostCallCount += 1
-            guard let post = stubPost else {
-                throw HackersKitError.requestFailure
-            }
-            return post
-        }
+    private let network = StubNetworkManager()
+    private var postRepository: PostRepository { PostRepository(networkManager: network) }
+    private var settingsRepository: SettingsRepository {
+        SettingsRepository(userDefaults: InMemoryUserDefaults())
     }
 
-    @MainActor
-    final class MockVoteUseCase: VoteUseCase {
-        var upvotePostCallCount = 0
-        var upvoteCommentCallCount = 0
-
-        func upvote(post _: Post) async throws {
-            upvotePostCallCount += 1
-        }
-
-        func upvote(comment _: Domain.Comment, for _: Post) async throws {
-            upvoteCommentCallCount += 1
-        }
-    }
+    // MARK: - PostUseCase via PostRepository
 
     @MainActor
-    final class MockCommentUseCase: CommentUseCase {
-        var getCommentsCallCount = 0
-        var stubComments: [Domain.Comment] = []
+    @Test("Fetching posts parses feed metadata and deduplicates IDs")
+    func fetchPostsParsesFeed() async throws {
+        network.reset()
+        network.enqueue(html: HTMLFixtures.feedPage)
 
-        func getComments(for _: Post) async throws -> [Domain.Comment] {
-            getCommentsCallCount += 1
-            return stubComments
+        let postUseCase: any PostUseCase = postRepository
+        let posts = try await postUseCase.getPosts(type: .news, page: 1, nextId: nil)
+
+        #expect(posts.count == 2)
+
+        let first = posts[0]
+        #expect(first.id == 123)
+        #expect(first.title == "Test Article Title")
+        #expect(first.url.absoluteString == "https://example.com/article")
+        #expect(first.age == "2023-01-01T10:00:00")
+        #expect(first.commentsCount == 5)
+        #expect(first.by == "testuser")
+        #expect(first.score == 10)
+        #expect(first.voteLinks?.upvote != nil)
+        #expect(first.voteLinks?.unvote == nil)
+
+        let second = posts[1]
+        #expect(second.id == 456)
+        #expect(second.upvoted)
+        if let unvoteURL = second.voteLinks?.unvote?.absoluteString {
+            #expect(unvoteURL.contains("how=un"))
+        } else {
+            Issue.record("Expected derived unvote link for hidden upvote")
         }
     }
 
-    final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
-        private var _safariReaderMode = false
-        private var _openInDefaultBrowser = false
-        private var _textSize = TextSize.medium
-        var clearCacheCallCount = 0
-
-        var safariReaderMode: Bool {
-            get { _safariReaderMode }
-            set { _safariReaderMode = newValue }
-        }
-
-        var openInDefaultBrowser: Bool {
-            get { _openInDefaultBrowser }
-            set { _openInDefaultBrowser = newValue }
-        }
-
-        var textSize: TextSize {
-            get { _textSize }
-            set { _textSize = newValue }
-        }
-
-        func clearCache() { clearCacheCallCount += 1 }
-        func cacheUsageBytes() async -> Int64 { 0 }
-    }
-
-    // MARK: - PostUseCase Tests
-
     @MainActor
-    @Test("PostUseCase getPosts returns expected posts")
-    func postUseCaseGetPosts() async throws {
-        let mockUseCase = MockPostUseCase()
-        let testPost = Self.createTestPost()
-        mockUseCase.stubPosts = [testPost]
+    @Test("Fetching individual Ask HN post injects top text comment")
+    func fetchAskPostIncludesTopTextComment() async throws {
+        network.reset()
+        network.enqueue(html: HTMLFixtures.askPost)
 
-        let posts = try await mockUseCase.getPosts(type: .news, page: 1, nextId: nil)
+        let postUseCase: any PostUseCase = postRepository
+        let post = try await postUseCase.getPost(id: 999)
 
-        #expect(mockUseCase.getPostsCallCount == 1)
-        #expect(posts.count == 1)
-        #expect(posts.first?.id == testPost.id)
+        #expect(post.text?.contains("Intro text") == true)
+        #expect(post.comments?.count == 2)
+        #expect(post.comments?.first?.id == -post.id)
+        #expect(post.comments?.first?.text.contains("Intro text") == true)
     }
 
     @MainActor
-    @Test("PostUseCase getPost returns single post correctly")
-    func postUseCaseGetPost() async throws {
-        let mockUseCase = MockPostUseCase()
-        let testPost = Self.createTestPost()
-        mockUseCase.stubPost = testPost
+    @Test("Fetching comments resolves comment permalink to story")
+    func fetchPostFromCommentPermalink() async throws {
+        network.reset()
+        network.enqueue(html: HTMLFixtures.commentPermalink)
+        network.enqueue(html: HTMLFixtures.storyWithComments)
 
-        let post = try await mockUseCase.getPost(id: 123)
+        let postUseCase: any PostUseCase = postRepository
+        let post = try await postUseCase.getPost(id: 604)
 
-        #expect(mockUseCase.getPostCallCount == 1)
-        #expect(post.id == testPost.id)
+        #expect(post.id == 101)
+        #expect(post.comments?.contains(where: { $0.id == 604 }) == true)
+        let requested = network.urlsRequested.map(\.absoluteString)
+        #expect(requested.count == 2)
+        #expect(requested.contains { $0.hasPrefix("https://news.ycombinator.com/item?id=604") })
+        #expect(requested.contains { $0.hasPrefix("https://news.ycombinator.com/item?id=101") })
     }
 
     @MainActor
-    @Test("PostUseCase getPost throws error when post not found")
-    func postUseCaseGetPostError() async {
-        let mockUseCase = MockPostUseCase()
-        mockUseCase.stubPost = nil
+    @Test("Comments endpoint returns parsed thread for post")
+    func fetchCommentsForPost() async throws {
+        network.reset()
+        network.enqueue(html: HTMLFixtures.storyWithComments)
+        let post = Post(
+            id: 101,
+            url: URL(string: "https://example.com/story")!,
+            title: "Story",
+            age: "3 hours ago",
+            commentsCount: 3,
+            by: "author",
+            score: 42,
+            postType: .news,
+            upvoted: false
+        )
 
-        do {
-            _ = try await mockUseCase.getPost(id: 123)
-            Issue.record("Expected error to be thrown")
-        } catch {
-            #expect(error is HackersKitError)
-        }
+        let commentUseCase: any CommentUseCase = postRepository
+        let comments = try await commentUseCase.getComments(for: post)
+        #expect(comments.count == 3)
+        #expect(comments[0].id == 604)
+        #expect(comments[0].level == 0)
+        #expect(comments[1].id == 202)
+        #expect(comments[1].level == 1)
+        #expect(comments[2].id == 203)
+        #expect(comments[2].upvoted == false)
     }
 
-    // MARK: - VoteUseCase Tests
+    // MARK: - VoteUseCase via PostRepository
 
     @MainActor
-    @Test("VoteUseCase upvote post executes successfully")
-    func voteUseCaseUpvotePost() async throws {
-        let mockUseCase = MockVoteUseCase()
-        let testPost = Self.createTestPost()
+    @Test("Upvoting a post issues network request to HN vote endpoint")
+    func upvotePostInvokesNetwork() async throws {
+        network.reset()
+        network.enqueue(html: "<html></html>")
+        let voteUseCase: any VoteUseCase = postRepository
 
-        try await mockUseCase.upvote(post: testPost)
-
-        #expect(mockUseCase.upvotePostCallCount == 1)
-    }
-
-    @MainActor
-    @Test("VoteUseCase upvote comment executes successfully")
-    func voteUseCaseUpvoteComment() async throws {
-        let mockUseCase = MockVoteUseCase()
-        let testPost = Self.createTestPost()
-        let testComment = Self.createTestComment()
-
-        try await mockUseCase.upvote(comment: testComment, for: testPost)
-
-        #expect(mockUseCase.upvoteCommentCallCount == 1)
-    }
-
-    // MARK: - CommentUseCase Tests
-
-    @MainActor
-    @Test("CommentUseCase getComments returns expected comments")
-    func commentUseCaseGetComments() async throws {
-        let mockUseCase = MockCommentUseCase()
-        let testPost = Self.createTestPost()
-        let testComment = Self.createTestComment()
-        mockUseCase.stubComments = [testComment]
-
-        let comments = try await mockUseCase.getComments(for: testPost)
-
-        #expect(mockUseCase.getCommentsCallCount == 1)
-        #expect(comments.count == 1)
-        #expect(comments.first?.id == testComment.id)
-    }
-
-    // MARK: - SettingsUseCase Tests
-
-    @Test("SettingsUseCase getters and setters manage properties correctly")
-    func settingsUseCaseGettersAndSetters() {
-        let mockUseCase = MockSettingsUseCase()
-
-        // Test initial values
-        #expect(mockUseCase.safariReaderMode == false)
-        #expect(mockUseCase.openInDefaultBrowser == false)
-
-        // Test setters
-        mockUseCase.safariReaderMode = true
-        mockUseCase.openInDefaultBrowser = true
-
-        // Verify changes
-        #expect(mockUseCase.safariReaderMode == true)
-        #expect(mockUseCase.openInDefaultBrowser == true)
-    }
-
-    // MARK: - Helper Methods
-
-    private static func createTestPost() -> Post {
-        Post(
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=123&how=up")!,
+            unvote: nil
+        )
+        let post = Post(
             id: 123,
-            url: URL(string: "https://example.com/post")!,
-            title: "Test Post",
-            age: "2 hours ago",
-            commentsCount: 5,
-            by: "testuser",
+            url: URL(string: "https://example.com")!,
+            title: "Vote",
+            age: "1 hour ago",
+            commentsCount: 0,
+            by: "upvoter",
             score: 10,
             postType: .news,
             upvoted: false,
+            voteLinks: voteLinks
         )
+
+        try await voteUseCase.upvote(post: post)
+
+        #expect(network.urlsRequested.last?.absoluteString == "https://news.ycombinator.com/vote?id=123&how=up")
     }
 
-    private static func createTestComment() -> Domain.Comment {
-        Comment(
-            id: 456,
-            age: "1 hour ago",
-            text: "Test comment",
-            by: "commenter",
-            level: 0,
-            upvoted: false,
+    @MainActor
+    @Test("Missing vote links throws unauthenticated error")
+    func upvotePostWithoutLinksThrows() async {
+        let voteUseCase: any VoteUseCase = postRepository
+        let post = Post(
+            id: 321,
+            url: URL(string: "https://example.com")!,
+            title: "Vote",
+            age: "now",
+            commentsCount: 0,
+            by: "user",
+            score: 1,
+            postType: .news,
+            upvoted: false
         )
+
+        await #expect {
+            try await voteUseCase.upvote(post: post)
+        } throws: { error in
+            guard let hackersError = error as? HackersKitError else { return false }
+            if case .unauthenticated = hackersError { return true }
+            return false
+        }
     }
+
+    // MARK: - SettingsUseCase via SettingsRepository
+
+    @Test("Settings repository persists changes through protocol")
+    func settingsUseCasePersistsValues() {
+        var settingsUseCase: any SettingsUseCase = settingsRepository
+
+        #expect(settingsUseCase.safariReaderMode == false)
+        #expect(settingsUseCase.openInDefaultBrowser == false)
+        #expect(settingsUseCase.textSize == .medium)
+
+        settingsUseCase.safariReaderMode = true
+        settingsUseCase.openInDefaultBrowser = true
+        settingsUseCase.textSize = .large
+
+        #expect(settingsUseCase.safariReaderMode == true, "actual: \(settingsUseCase.safariReaderMode)")
+        #expect(settingsUseCase.openInDefaultBrowser == true, "actual: \(settingsUseCase.openInDefaultBrowser)")
+        #expect(settingsUseCase.textSize == .large, "actual: \(settingsUseCase.textSize)")
+    }
+}
+
+// MARK: - Supporting Test Doubles
+
+final class StubNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
+    private(set) var urlsRequested: [URL] = []
+    private var responseQueue: [Result<String, Error>] = []
+
+    func enqueue(html: String) {
+        responseQueue.append(.success(html))
+    }
+
+    func enqueue(error: Error) {
+        responseQueue.append(.failure(error))
+    }
+
+    func get(url: URL) async throws -> String {
+        urlsRequested.append(url)
+        guard !responseQueue.isEmpty else { throw StubError.unexpectedRequest(url) }
+        let response = responseQueue.removeFirst()
+        switch response {
+        case let .success(html):
+            return html
+        case let .failure(error):
+            throw error
+        }
+    }
+
+    func post(url: URL, body _: String) async throws -> String {
+        urlsRequested.append(url)
+        guard !responseQueue.isEmpty else { throw StubError.unexpectedRequest(url) }
+        let response = responseQueue.removeFirst()
+        switch response {
+        case let .success(html):
+            return html
+        case let .failure(error):
+            throw error
+        }
+    }
+
+    func clearCookies() {}
+
+    func containsCookie(for _: URL) -> Bool { false }
+
+    func reset() {
+        urlsRequested.removeAll()
+        responseQueue.removeAll()
+    }
+
+    enum StubError: Error, CustomStringConvertible {
+        case unexpectedRequest(URL)
+
+        var description: String {
+            switch self {
+            case let .unexpectedRequest(url):
+                return "Unexpected request for \(url.absoluteString)"
+            }
+        }
+    }
+}
+
+final class InMemoryUserDefaults: UserDefaultsProtocol, @unchecked Sendable {
+    private var storage: [String: Any] = [
+        "safariReaderMode": false,
+        "openInDefaultBrowser": false,
+        "textSize": TextSize.medium.rawValue
+    ]
+
+    func bool(forKey defaultName: String) -> Bool {
+        storage[defaultName] as? Bool ?? false
+    }
+
+    func integer(forKey defaultName: String) -> Int {
+        storage[defaultName] as? Int ?? 0
+    }
+
+    func set(_ value: Bool, forKey defaultName: String) {
+        storage[defaultName] = value
+    }
+
+    func set(_ value: Int, forKey defaultName: String) {
+        storage[defaultName] = value
+    }
+
+    func set(_ value: Any?, forKey defaultName: String) {
+        storage[defaultName] = value
+    }
+}
+
+enum HTMLFixtures {
+    static let feedPage = """
+    <html>
+      <body>
+        <table class=\"itemlist\">
+          <tr class=\"athing submission\" id=\"123\">
+            <td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">1.</span></td>
+            <td valign=\"top\" class=\"votelinks\">
+              <center>
+                <a id='up_123' href='vote?id=123&how=up'>
+                  <div class='votearrow' title='upvote'></div>
+                </a>
+              </center>
+            </td>
+            <td class=\"title\">
+              <span class=\"titleline\">
+                <a href=\"https://example.com/article\">Test Article Title</a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\"2\"></td>
+            <td class=\"subtext\">
+              <span class=\"score\">10 points</span>
+              <span class=\"age\" title=\"2023-01-01T10:00:00\"><a href=\"item?id=123\">2 hours ago</a></span>
+              <a class=\"hnuser\" href=\"user?id=testuser\">testuser</a>
+              <span id=\"unv_123\"></span>
+              <a href=\"item?id=123\">5&nbsp;comments</a>
+            </td>
+          </tr>
+          <tr class=\"spacer\" style=\"height:5px\"></tr>
+          <tr class=\"athing submission\" id=\"456\">
+            <td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\">2.</span></td>
+            <td valign=\"top\" class=\"votelinks\">
+              <center>
+                <a id='up_456' class='clicky nosee' href='vote?id=456&how=up'>
+                  <div class='votearrow' title='upvote'></div>
+                </a>
+              </center>
+            </td>
+            <td class=\"title\">
+              <span class=\"titleline\">
+                <a href=\"https://example.com/article2\">Already Upvoted</a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\"2\"></td>
+            <td class=\"subtext\">
+              <span class=\"score\">15 points</span>
+              <span class=\"age\" title=\"2023-01-01T11:00:00\"><a href=\"item?id=456\">1 hour ago</a></span>
+              <a class=\"hnuser\" href=\"user?id=second\">second</a>
+              <span id=\"unv_456\">
+                <a id='un_456' href='vote?id=456&how=un'>unvote</a>
+              </span>
+              <a href=\"item?id=456\">3&nbsp;comments</a>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
+
+    static let askPost = """
+    <html>
+      <body>
+        <table class=\"fatitem\">
+          <tr class=\"athing submission\" id=\"999\">
+            <td align=\"right\" valign=\"top\" class=\"title\"><span class=\"rank\"></span></td>
+            <td valign=\"top\" class=\"votelinks\"></td>
+            <td class=\"title\">
+              <span class=\"titleline\"><a href=\"item?id=999\">Ask HN?</a></span>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\"2\"></td>
+            <td class=\"subtext\">
+              <span class=\"score\">12 points</span>
+              by <a href=\"user?id=asker\" class=\"hnuser\">asker</a>
+              <span class=\"age\" title=\"2023-01-01T12:00:00\"><a href=\"item?id=999\">4 hours ago</a></span>
+              <a href=\"item?id=999\">3&nbsp;comments</a>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\"2\"></td>
+            <td>
+              <div class=\"toptext\">Intro text<p>Details</p></div>
+            </td>
+          </tr>
+        </table>
+        <table class=\"comment-tree\">
+          <tr class=\"athing comtr\" id=\"777\">
+            <td>
+              <table>
+                <tr>
+                  <td class=\"ind\" indent=\"0\"><img src=\"s.gif\" height=\"1\" width=\"0\"></td>
+                  <td class=\"default\">
+                    <div class=\"comment\">
+                      <span class=\"age\">1 hour ago</span>
+                      <a class=\"hnuser\" href=\"user?id=commenter\">commenter</a>
+                      <div class=\"commtext c00\">First response</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
+
+    static let commentPermalink = """
+    <html>
+      <body>
+        <table class=\"fatitem\">
+          <tr class=\"athing\" id=\"604\"></tr>
+        </table>
+        <span class=\"navs\">
+          | <a href=\"item?id=101\">parent</a>
+        </span>
+      </body>
+    </html>
+    """
+
+    static let storyWithComments = """
+    <html>
+      <body>
+        <table class=\"fatitem\">
+          <tr class=\"athing\" id=\"101\">
+            <td>
+              <span class=\"titleline\"><a href=\"https://example.com/story\">Story</a></span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class=\"score\">42 points</span>
+              <span class=\"age\" title=\"2023-01-01T09:00:00\">3 hours ago</span>
+              <a class=\"hnuser\" href=\"user?id=author\">author</a>
+              <a href=\"item?id=101\">3 comments</a>
+            </td>
+          </tr>
+        </table>
+        <table class=\"comment-tree\">
+          <tr class=\"athing comtr\" id=\"604\">
+            <td>
+              <table>
+                <tr>
+                  <td class=\"ind\" indent=\"0\"><img src=\"s.gif\" height=\"1\" width=\"0\"></td>
+                  <td valign=\"top\" class=\"votelinks\"><center><a id='up_604' href='vote?id=604&how=up&goto=item%3Fid%3D101'><div class='votearrow' title='upvote'></div></a></center></td>
+                  <td class=\"default\">
+                    <span class=\"comhead\">
+                      <a class=\"hnuser\">commenter</a>
+                      <span class=\"age\">2 hours ago</span>
+                    </span>
+                    <div class=\"comment\">
+                      <div class=\"commtext c00\">Permalink comment</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr class=\"athing comtr\" id=\"202\">
+            <td>
+              <table>
+                <tr>
+                  <td class=\"ind\" indent=\"40\"><img src=\"s.gif\" height=\"1\" width=\"40\"></td>
+                  <td valign=\"top\" class=\"votelinks\"><center><a id='up_202' href='vote?id=202&how=up&goto=item%3Fid%3D101'><div class='votearrow' title='upvote'></div></a></center></td>
+                  <td class=\"default\">
+                    <span class=\"comhead\">
+                      <a class=\"hnuser\">child</a>
+                      <span class=\"age\">2 hours ago</span>
+                    </span>
+                    <div class=\"comment\">
+                      <div class=\"commtext c00\">Child</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr class=\"athing comtr\" id=\"203\">
+            <td>
+              <table>
+                <tr>
+                  <td class=\"ind\" indent=\"80\"><img src=\"s.gif\" height=\"1\" width=\"80\"></td>
+                  <td valign=\"top\" class=\"votelinks\"><center><a id='up_203' href='vote?id=203&how=up&goto=item%3Fid%3D101'><div class='votearrow' title='upvote'></div></a></center></td>
+                  <td class=\"default\">
+                    <span class=\"comhead\">
+                      <a class=\"hnuser\">grandchild</a>
+                      <span class=\"age\">1 hour ago</span>
+                    </span>
+                    <div class=\"comment\">
+                      <div class=\"commtext c00\">Grandchild</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
 }

@@ -145,6 +145,35 @@ struct CommentsViewModelTests {
 
         // Then - Should only have called getPost once
         #expect(mockPostUseCase.getPostCallCount == 1)
+        mockPostUseCase.shouldDelay = false
+    }
+
+    @Test("Refreshing comments replaces data and clears loading flag")
+    @MainActor
+    func refreshCommentsUpdatesThread() async {
+        let firstComment = createTestComment(id: 11, level: 0)
+        let secondComment = createTestComment(id: 22, level: 0)
+        mockPostUseCase.postQueue = [
+            createPostWithComments(comments: [firstComment]),
+            createPostWithComments(comments: [secondComment])
+        ]
+
+        let viewModel = CommentsViewModel(
+            postID: testPost.id,
+            initialPost: nil,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase
+        )
+
+        await viewModel.loadComments()
+        #expect(viewModel.comments.first?.id == 11)
+
+        await viewModel.refreshComments()
+
+        #expect(viewModel.comments.first?.id == 22)
+        #expect(viewModel.isPostLoading == false)
+        #expect(viewModel.error == nil)
     }
 
     // MARK: - Voting Tests
@@ -199,12 +228,28 @@ struct CommentsViewModelTests {
         // Given
         let comment = createTestComment(id: 1, upvoted: initialUpvoted)
         let expectedUpvoted = true
+        mockVoteUseCase.upvoteCommentCalled = false
 
         // When
         try await sut.voteOnComment(comment, upvote: expectedUpvoted)
 
         // Then
         #expect(comment.upvoted == expectedUpvoted)
+        #expect(mockVoteUseCase.upvoteCommentCalled)
+    }
+
+    @Test("Vote failure on comment reverts optimistic state")
+    @MainActor
+    func voteOnCommentFailureReverts() async {
+        mockVoteUseCase.shouldThrowError = true
+        let comment = createTestComment(id: 9, upvoted: false)
+        mockVoteUseCase.upvoteCommentCalled = false
+
+        await #expect(throws: MockError.self) {
+            try await sut.voteOnComment(comment, upvote: true)
+        }
+
+        #expect(comment.upvoted == false)
         #expect(mockVoteUseCase.upvoteCommentCalled)
     }
 
@@ -421,6 +466,7 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
     var shouldThrowError = false
     var shouldDelay = false
     var getPostCallCount = 0
+    var postQueue: [Post] = []
 
     func getPost(id: Int) async throws -> Post {
         getPostCallCount += 1
@@ -429,6 +475,9 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
         }
         if shouldThrowError {
             throw MockError.testError
+        }
+        if !postQueue.isEmpty {
+            return postQueue.removeFirst()
         }
         return mockPost ?? Post(
             id: id,

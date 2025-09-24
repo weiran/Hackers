@@ -6,10 +6,22 @@
 //
 
 import SwiftUI
+import UIKit
 
 public enum AppColors {
-    public static let upvoted = Color("upvotedColor", bundle: .main)
-    public static let appTint = Color("appTintColor", bundle: .main)
+    public static var upvoted: Color {
+        if UIColor(named: "upvotedColor", in: .main, compatibleWith: nil) != nil {
+            return Color("upvotedColor", bundle: .main)
+        }
+        return Color.orange
+    }
+
+    public static var appTint: Color {
+        if UIColor(named: "appTintColor", in: .main, compatibleWith: nil) != nil {
+            return Color("appTintColor", bundle: .main)
+        }
+        return Color.orange
+    }
     public static let background = Color(.systemBackground)
     public static let secondaryBackground = Color(.secondarySystemBackground)
     public static let tertiaryBackground = Color(.tertiarySystemBackground)

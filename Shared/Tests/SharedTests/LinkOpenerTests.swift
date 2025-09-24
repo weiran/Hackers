@@ -6,162 +6,130 @@
 //
 
 @testable import Domain
-import Foundation
+import SafariServices
 @testable import Shared
 import Testing
+import UIKit
 
-@Suite("LinkOpener Tests")
+@Suite("LinkOpener Behaviour")
 struct LinkOpenerTests {
-    @Test("LinkOpener is a struct with static methods")
     @MainActor
-    func structureType() {
-        // Test that LinkOpener is designed as a utility struct
-        // We can't instantiate it, but we can access its static methods
+    @Test("System browser preference forwards URL to opener")
+    func prefersSystemBrowser() {
+        let settings = StubSettingsUseCase(openInDefaultBrowser: true)
+        var openedURLs: [URL] = []
 
-        let httpURL = URL(string: "https://example.com")!
-        let testPost = createTestPost()
-
-        // This should compile without issues
-        LinkOpener.openURL(httpURL, with: testPost)
-
-        #expect(true, "LinkOpener static methods should be accessible")
-    }
-
-    @Test("LinkOpener openURL is MainActor isolated")
-    func mainActorIsolation() async {
-        let url = URL(string: "https://example.com")!
-
-        await MainActor.run {
-            // This should compile and run without issues on MainActor
-            LinkOpener.openURL(url)
-            LinkOpener.openURL(url, with: createTestPost())
-        }
-
-        #expect(true, "Methods should be callable from MainActor context")
-    }
-
-    @Test("LinkOpener handles different URL schemes")
-    func uRLSchemeHandling() async {
-        let httpURL = URL(string: "http://example.com")!
-        let httpsURL = URL(string: "https://example.com")!
-        let mailto = URL(string: "mailto:test@example.com")!
-        let tel = URL(string: "tel:+1234567890")!
-        let customScheme = URL(string: "myapp://open")!
-
-        await MainActor.run {
-            // These calls test the method signature and that they don't crash
-            // In a test environment, they won't actually open URLs/present Safari
-            LinkOpener.openURL(httpURL)
-            LinkOpener.openURL(httpsURL)
-            LinkOpener.openURL(mailto)
-            LinkOpener.openURL(tel)
-            LinkOpener.openURL(customScheme)
-        }
-
-        #expect(true, "Should handle various URL schemes without crashing")
-    }
-
-    @Test("LinkOpener methods accept optional parameters")
-    func optionalParameters() async {
-        let url = URL(string: "https://example.com")!
-        let post = createTestPost()
-
-        await MainActor.run {
-            // Test different parameter combinations
-            LinkOpener.openURL(url)
-            LinkOpener.openURL(url, with: nil)
-            LinkOpener.openURL(url, with: post)
-        }
-
-        #expect(true, "Should accept various parameter combinations")
-    }
-
-    @Test("LinkOpener works with various valid URLs")
-    func testValidURLs() async {
-        let validURLs = [
-            "https://example.com",
-            "http://example.com",
-            "https://news.ycombinator.com/item?id=123",
-            "mailto:test@example.com",
-            "tel:+1234567890",
-            "sms:+1234567890",
-            "https://www.google.com/search?q=test",
-            "ftp://files.example.com/file.txt",
-            "file:///path/to/file.txt",
-            "custom-app://open/item/123",
-        ]
-
-        await MainActor.run {
-            for urlString in validURLs {
-                if let url = URL(string: urlString) {
-                    LinkOpener.openURL(url)
-                }
-            }
-        }
-
-        #expect(true, "Should handle various valid URL formats")
-    }
-
-    // MARK: - Helper Methods
-
-    private func createTestPost() -> Post {
-        Post(
-            id: 123,
-            url: URL(string: "https://example.com/test-post")!,
-            title: "Test Post for LinkOpener",
-            age: "1 hour ago",
-            commentsCount: 10,
-            by: "testuser",
-            score: 50,
-            postType: .news,
-            upvoted: false,
+        LinkOpener.setEnvironmentForTesting(
+            settings: { settings },
+            openURL: { url in openedURLs.append(url) },
+            presenter: { StubPresenter() },
+            presentSafari: { _, _ in Issue.record("Should not present Safari when system browser preferred") }
         )
+
+        let url = URL(string: "https://example.com")!
+        LinkOpener.openURL(url)
+
+        #expect(openedURLs == [url])
+        LinkOpener.resetEnvironment()
     }
 
-    // MARK: - Edge Case Tests
+    @MainActor
+    @Test("In-app browser presents Safari with reader mode setting")
+    func presentsSafariViewController() {
+        let settings = StubSettingsUseCase(safariReaderMode: true, openInDefaultBrowser: false)
+        var capturedPresented: (UIViewController, SFSafariViewController)?
 
-    @Test("LinkOpener handles edge cases gracefully")
-    func edgeCases() async {
-        await MainActor.run {
-            // Test with minimal valid URL
-            if let minimalURL = URL(string: "https://a.com") {
-                LinkOpener.openURL(minimalURL)
+        LinkOpener.setEnvironmentForTesting(
+            settings: { settings },
+            openURL: { _ in Issue.record("Should not open system browser when presenter exists") },
+            presenter: { StubPresenter() },
+            presentSafari: { presenter, safari in
+                capturedPresented = (presenter, safari)
             }
+        )
 
-            // Test with complex URL with parameters
-            if let complexURL = URL(string: "https://example.com/path/to/resource?param1=value1&param2=value2#section") {
-                LinkOpener.openURL(complexURL)
-            }
+        let url = URL(string: "https://news.ycombinator.com")!
+        LinkOpener.openURL(url)
 
-            // Test with international domain
-            if let internationalURL = URL(string: "https://例え.テスト") {
-                LinkOpener.openURL(internationalURL)
-            }
+        guard let (_, safariController) = capturedPresented else {
+            Issue.record("Expected Safari to be presented")
+            return
         }
 
-        #expect(true, "Should handle edge cases without crashing")
+        #expect(safariController.initialURL == url)
+        #expect(safariController.resolvedConfiguration.entersReaderIfAvailable)
+        LinkOpener.resetEnvironment()
     }
 
-    @Test("LinkOpener service type behavior")
-    func serviceTypeBehavior() {
-        // Test that LinkOpener behaves like a stateless service
-        // (no instance state, all static methods)
+    @MainActor
+    @Test("Missing presenter falls back to system opener")
+    func missingPresenterFallsBack() {
+        let settings = StubSettingsUseCase(openInDefaultBrowser: false)
+        var openedURLs: [URL] = []
 
-        let url1 = URL(string: "https://example1.com")!
-        let url2 = URL(string: "https://example2.com")!
+        LinkOpener.setEnvironmentForTesting(
+            settings: { settings },
+            openURL: { url in openedURLs.append(url) },
+            presenter: { nil },
+            presentSafari: { _, _ in Issue.record("Should not present without presenter") }
+        )
 
-        Task {
-            await MainActor.run {
-                LinkOpener.openURL(url1)
-            }
-        }
+        let url = URL(string: "https://example.com")!
+        LinkOpener.openURL(url)
 
-        Task {
-            await MainActor.run {
-                LinkOpener.openURL(url2)
-            }
-        }
+        #expect(openedURLs == [url])
+        LinkOpener.resetEnvironment()
+    }
 
-        #expect(true, "Should work as stateless service across different tasks")
+    @MainActor
+    @Test("Non-web schemes always use system opener")
+    func nonWebSchemesUseSystemOpener() {
+        let settings = StubSettingsUseCase(openInDefaultBrowser: false)
+        var openedURLs: [URL] = []
+
+        LinkOpener.setEnvironmentForTesting(
+            settings: { settings },
+            openURL: { url in openedURLs.append(url) },
+            presenter: { StubPresenter() },
+            presentSafari: { _, _ in Issue.record("Non-web URLs should not present Safari") }
+        )
+
+        let telURL = URL(string: "tel:+123456789")!
+        LinkOpener.openURL(telURL)
+
+        #expect(openedURLs == [telURL])
+        LinkOpener.resetEnvironment()
+    }
+}
+
+// MARK: - Test Support
+
+private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
+    var safariReaderMode: Bool
+    var openInDefaultBrowser: Bool
+    var textSize: TextSize
+
+    init(safariReaderMode: Bool = false, openInDefaultBrowser: Bool = false, textSize: TextSize = .medium) {
+        self.safariReaderMode = safariReaderMode
+        self.openInDefaultBrowser = openInDefaultBrowser
+        self.textSize = textSize
+    }
+
+    func clearCache() {}
+    func cacheUsageBytes() async -> Int64 { 0 }
+}
+
+private final class StubPresenter: UIViewController {}
+
+private extension SFSafariViewController {
+    var initialURL: URL {
+        // SFSafariViewController exposes the initial URL through private API, but we can rely on the
+        // view controller's `value(forKey:)` for testing purposes in the test bundle.
+        value(forKey: "URL") as? URL ?? URL(string: "about:blank")!
+    }
+
+    var resolvedConfiguration: SFSafariViewController.Configuration {
+        (value(forKey: "configuration") as? SFSafariViewController.Configuration)
+            ?? SFSafariViewController.Configuration()
     }
 }

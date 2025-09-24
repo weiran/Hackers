@@ -24,9 +24,15 @@ struct PostRepositoryTests {
     // MARK: - Mock NetworkManager
 
     final class MockNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
+        private enum PendingResponse {
+            case success(String)
+            case failure(Error)
+        }
+
         var stubbedGetResponse: String = ""
         var stubbedPostResponse: String = ""
-        var responseQueue: [String] = []
+        private var getResponses: [PendingResponse] = []
+        private var postResponses: [PendingResponse] = []
         var getCallCount = 0
         var postCallCount = 0
         var lastGetURL: URL?
@@ -36,8 +42,14 @@ struct PostRepositoryTests {
         func get(url: URL) async throws -> String {
             getCallCount += 1
             lastGetURL = url
-            if !responseQueue.isEmpty {
-                return responseQueue.removeFirst()
+            if !getResponses.isEmpty {
+                let response = getResponses.removeFirst()
+                switch response {
+                case let .success(html):
+                    return html
+                case let .failure(error):
+                    throw error
+                }
             }
             return stubbedGetResponse
         }
@@ -46,6 +58,15 @@ struct PostRepositoryTests {
             postCallCount += 1
             lastPostURL = url
             lastPostBody = body
+            if !postResponses.isEmpty {
+                let response = postResponses.removeFirst()
+                switch response {
+                case let .success(html):
+                    return html
+                case let .failure(error):
+                    throw error
+                }
+            }
             return stubbedPostResponse
         }
 
@@ -55,6 +76,24 @@ struct PostRepositoryTests {
 
         func containsCookie(for _: URL) -> Bool {
             false // Return false for testing simplicity
+        }
+
+        // MARK: - Helpers
+
+        func enqueueGetResponse(_ html: String) {
+            getResponses.append(.success(html))
+        }
+
+        func enqueueGetError(_ error: Error) {
+            getResponses.append(.failure(error))
+        }
+
+        func enqueuePostResponse(_ html: String) {
+            postResponses.append(.success(html))
+        }
+
+        func enqueuePostError(_ error: Error) {
+            postResponses.append(.failure(error))
         }
     }
 
@@ -77,6 +116,21 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil, "Should have a URL")
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news"), "URL should contain 'news'")
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("p=1"), "URL should contain page parameter")
+        #expect(posts.count == 1, "Should parse a single post from fixture")
+
+        guard let post = posts.first else {
+            Issue.record("Expected parsed post")
+            return
+        }
+
+        #expect(post.id == 123)
+        #expect(post.title == "Test Article Title")
+        #expect(post.url.absoluteString == "https://example.com/article")
+        #expect(post.by == "testuser")
+        #expect(post.commentsCount == 5)
+        #expect(post.score == 10)
+        #expect(post.age == "2023-01-01T10:00:00")
+        #expect(post.voteLinks?.upvote != nil)
     }
 
     @Test("Get posts with newest type")
@@ -89,6 +143,11 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("newest"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("next=12345"))
+        if let upvote = posts.first?.voteLinks?.upvote?.absoluteString {
+            #expect(upvote.contains("vote?id=123&how=up"))
+        } else {
+            Issue.record("Expected upvote URL for newest post fixture")
+        }
     }
 
     @Test("Get posts with active type")
@@ -101,19 +160,41 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("active"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("p=2"))
+        #expect(posts.first?.commentsCount == 5)
+    }
+
+    @Test("Malformed feed HTML surfaces scraper error")
+    func malformedFeedHTMLThrows() async {
+        mockNetworkManager.stubbedGetResponse = "<html><body><p>No table</p></body></html>"
+
+        await #expect(throws: HackersKitError.self) {
+            _ = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+        }
     }
 
     // MARK: - GetPost Tests
 
     @Test("Get post")
     func getPost() async throws {
-        mockNetworkManager.stubbedGetResponse = createMockSinglePostHTML()
+        mockNetworkManager.stubbedGetResponse =
+            createMockSinglePostWithCommentsHTML(storyID: 123, commentIDs: [201, 202])
 
         let post = try await postRepository.getPost(id: 123)
 
         #expect(mockNetworkManager.getCallCount == 1)
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("id=123"))
+        #expect(post.id == 123)
+        #expect(post.title == "Test Article Title")
+        #expect(post.score == 10)
+        #expect(post.by == "testuser")
+        #expect(post.comments?.count == 2)
+        #expect(post.comments?.first?.id == 201)
+        if let commentUpvote = post.comments?.first?.voteLinks?.upvote?.absoluteString {
+            #expect(commentUpvote.contains("vote?id=201"))
+        } else {
+            Issue.record("Expected comment upvote link")
+        }
     }
 
     @Test("Get Ask HN post includes top text")
@@ -140,10 +221,12 @@ struct PostRepositoryTests {
         let parentCommentID = 998
         let storyID = 321
 
-        mockNetworkManager.responseQueue = [
-            createMockCommentPermalinkHTML(commentID: commentID, parentCommentID: parentCommentID, storyID: storyID),
+        mockNetworkManager.enqueueGetResponse(
+            createMockCommentPermalinkHTML(commentID: commentID, parentCommentID: parentCommentID, storyID: storyID)
+        )
+        mockNetworkManager.enqueueGetResponse(
             createMockSinglePostWithCommentsHTML(storyID: storyID, commentIDs: [commentID])
-        ]
+        )
 
         let post = try await postRepository.getPost(id: commentID)
 
@@ -236,7 +319,8 @@ struct PostRepositoryTests {
 
     @Test("Get comments")
     func getComments() async throws {
-        mockNetworkManager.stubbedGetResponse = createMockCommentsHTML()
+        mockNetworkManager.stubbedGetResponse =
+            createMockSinglePostWithCommentsHTML(storyID: 123, commentIDs: [456, 789, 790])
         let post = createTestPost()
 
         let comments = try await postRepository.getComments(for: post)
@@ -245,22 +329,23 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("item"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("id=123"))
+        #expect(comments.count == 3)
+        #expect(comments[0].id == 456)
+        #expect(comments[0].level == 0)
+        #expect(comments[1].level == 1)
+        #expect(comments[2].level == 2)
+        #expect(comments[0].text.contains("Comment 456"))
     }
 
     // MARK: - Error Handling Tests
 
     @Test("Network error handling")
     func networkError() async {
-        // Configure mock to throw an error
+        mockNetworkManager.enqueueGetError(URLError(.notConnectedToInternet))
         let post = createTestPost()
 
-        do {
+        await #expect(throws: URLError.self) {
             _ = try await postRepository.getComments(for: post)
-            // Since we're not setting stubbed response, this should use the default empty string
-            // which should result in an empty comments array, not an error
-            // This test verifies the repository handles parsing gracefully
-        } catch {
-            Issue.record("Repository should handle parsing errors gracefully")
         }
     }
 
@@ -314,18 +399,27 @@ struct PostRepositoryTests {
         <body>
         <table class="itemlist">
             <tr class="athing submission" id="123">
-                <td>
+                <td align="right" valign="top" class="title"><span class="rank">1.</span></td>
+                <td valign="top" class="votelinks">
+                    <center>
+                        <a id='up_123' href='vote?id=123&how=up'>
+                            <div class='votearrow' title='upvote'></div>
+                        </a>
+                    </center>
+                </td>
+                <td class="title">
                     <span class="titleline">
                         <a href="https://example.com/article">Test Article Title</a>
                     </span>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td colspan="2"></td>
+                <td class="subtext">
                     <span class="score">10 points</span>
                     <span class="age" title="2023-01-01T10:00:00">2 hours ago</span>
                     <a class="hnuser" href="user?id=testuser">testuser</a>
-                    <a href="item?id=123">5 comments</a>
+                    <a href="item?id=123">5&nbsp;comments</a>
                 </td>
             </tr>
         </table>
@@ -398,13 +492,14 @@ struct PostRepositoryTests {
     }
 
     private func createMockSinglePostWithCommentsHTML(storyID: Int, commentIDs: [Int]) -> String {
-        let commentsHTML = commentIDs.map { id in
-            """
+        let commentsHTML = commentIDs.enumerated().map { index, id -> String in
+            let indentWidth = index * 40
+            return """
             <tr class=\"athing comtr\" id=\"\(id)\">
                 <td>
                     <table>
                         <tr>
-                            <td class=\"ind\" indent=\"0\"><img src=\"s.gif\" height=\"1\" width=\"0\"></td>
+                            <td class=\"ind\" indent=\"\(indentWidth)\"><img src=\"s.gif\" height=\"1\" width=\"\(indentWidth)\"></td>
                             <td valign=\"top\" class=\"votelinks\"><center><a id='up_\(id)' href='vote?id=\(id)&how=up&goto=item%3Fid%3D\(storyID)'><div class='votearrow' title='upvote'></div></a></center></td>
                             <td class=\"default\">
                                 <div style=\"margin-top:2px; margin-bottom:-10px;\">

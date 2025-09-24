@@ -8,6 +8,7 @@
 // swiftlint:disable force_cast
 
 @testable import Domain
+import Foundation
 import Observation
 @testable import Settings
 import Testing
@@ -26,6 +27,8 @@ struct SettingsViewModelTests {
         private var _openInDefaultBrowser = false
         private var _textSize: TextSize = .medium
         var clearCacheCallCount = 0
+        var cacheUsageBytesValue: Int64 = 0
+        var cacheUsageCallCount = 0
 
         var getterCallCounts: [String: Int] = [:]
         var setterCallCounts: [String: Int] = [:]
@@ -66,10 +69,15 @@ struct SettingsViewModelTests {
         func reset() {
             getterCallCounts.removeAll()
             setterCallCounts.removeAll()
+            clearCacheCallCount = 0
+            cacheUsageCallCount = 0
         }
 
         func clearCache() { clearCacheCallCount += 1 }
-        func cacheUsageBytes() async -> Int64 { 0 }
+        func cacheUsageBytes() async -> Int64 {
+            cacheUsageCallCount += 1
+            return cacheUsageBytesValue
+        }
     }
 
     // MARK: - Initialization Tests
@@ -272,7 +280,52 @@ struct SettingsViewModelTests {
         #expect(settingsViewModel.safariReaderMode == false)
     }
 
+    // MARK: - Cache Usage Tests
+
+    @MainActor
+    @Test("Cache usage refresh formats byte count")
+    func refreshCacheUsageFormatsBytes() async {
+        mockSettingsUseCase.cacheUsageBytesValue = 2_048
+        let viewModel = settingsViewModel
+
+        await waitUntil(viewModel.cacheUsageText != "Calculating…")
+        let expected = ByteCountFormatter.string(fromByteCount: 2_048, countStyle: .file)
+        #expect(viewModel.cacheUsageText == expected)
+
+        mockSettingsUseCase.cacheUsageBytesValue = 4_096
+        await viewModel.refreshCacheUsage()
+        await waitUntil(viewModel.cacheUsageText == ByteCountFormatter.string(fromByteCount: 4_096, countStyle: .file))
+        #expect(mockSettingsUseCase.cacheUsageCallCount >= 2)
+    }
+
+    @MainActor
+    @Test("Clearing cache triggers use case and refresh")
+    func clearCacheTriggersRefresh() async {
+        mockSettingsUseCase.cacheUsageBytesValue = 1_024
+        let viewModel = settingsViewModel
+        await waitUntil(viewModel.cacheUsageText != "Calculating…")
+
+        mockSettingsUseCase.cacheUsageBytesValue = 512
+        viewModel.clearCache()
+
+        await waitUntil(mockSettingsUseCase.clearCacheCallCount == 1)
+        await waitUntil(viewModel.cacheUsageText == ByteCountFormatter.string(fromByteCount: 512, countStyle: .file))
+        #expect(mockSettingsUseCase.cacheUsageCallCount >= 2)
+    }
+
     // MARK: - Concurrent Access Tests
 
     // MARK: - Edge Cases Tests
+
+    @MainActor
+    private func waitUntil(_ predicate: @autoclosure () -> Bool, timeoutMilliseconds: Int = 200) async {
+        var iterations = 0
+        while !predicate() && iterations < timeoutMilliseconds {
+            iterations += 1
+            try? await Task.sleep(nanoseconds: 5_000_000)
+        }
+        if iterations == timeoutMilliseconds {
+            Issue.record("Timed out waiting for condition")
+        }
+    }
 }

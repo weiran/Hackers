@@ -9,9 +9,23 @@ import Data
 import Domain
 import Foundation
 import Networking
+import os
 
 public final class DependencyContainer: @unchecked Sendable {
     public static let shared = DependencyContainer()
+
+    struct Overrides: @unchecked Sendable {
+        var postUseCase: (() -> any PostUseCase)?
+        var voteUseCase: (() -> any VoteUseCase)?
+        var commentUseCase: (() -> any CommentUseCase)?
+        var settingsUseCase: (() -> any SettingsUseCase)?
+        var votingService: (() -> any VotingService)?
+        var commentVotingService: (() -> any CommentVotingService)?
+        var authenticationUseCase: (() -> any AuthenticationUseCase)?
+        var onboardingUseCase: (() -> any OnboardingUseCase)?
+        var sessionService: (@MainActor () -> SessionService)?
+        var toastPresenter: (@MainActor () -> ToastPresenter)?
+    }
 
     // Use type-level singletons to guarantee identity across access sites and threads
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
@@ -21,6 +35,11 @@ public final class DependencyContainer: @unchecked Sendable {
     private static let authenticationRepository: AuthenticationRepository =
         .init(networkManager: networkManager)
     private static let onboardingRepository: OnboardingRepository = .init()
+    private static let overridesLock = OSAllocatedUnfairLock<Overrides?>(initialState: nil)
+    private static var overrides: Overrides? {
+        get { overridesLock.withLock { $0 } }
+        set { overridesLock.withLock { $0 = newValue } }
+    }
 
     @MainActor
     private lazy var toastPresenter = ToastPresenter()
@@ -28,47 +47,71 @@ public final class DependencyContainer: @unchecked Sendable {
     private init() {}
 
     public func getPostUseCase() -> any PostUseCase {
-        Self.postRepository
+        Self.overrides?.postUseCase?() ?? Self.postRepository
     }
 
     public func getVoteUseCase() -> any VoteUseCase {
-        Self.postRepository
+        Self.overrides?.voteUseCase?() ?? Self.postRepository
     }
 
     public func getCommentUseCase() -> any CommentUseCase {
-        Self.postRepository
+        Self.overrides?.commentUseCase?() ?? Self.postRepository
     }
 
     public func getSettingsUseCase() -> any SettingsUseCase {
-        Self.settingsRepository
+        Self.overrides?.settingsUseCase?() ?? Self.settingsRepository
     }
 
     public func getVotingService() -> any VotingService {
-        Self.votingService
+        Self.overrides?.votingService?() ?? Self.votingService
     }
 
     public func getCommentVotingService() -> any CommentVotingService {
-        guard let defaultVotingService = Self.votingService as? DefaultVotingService else {
-            fatalError("VotingService must be DefaultVotingService to conform to CommentVotingService")
+        if let override = Self.overrides?.commentVotingService?() {
+            return override
         }
-        return defaultVotingService
+
+        let votingService = getVotingService()
+        if let commentVoting = votingService as? CommentVotingService {
+            return commentVoting
+        }
+
+        fatalError("VotingService must conform to CommentVotingService")
     }
 
     public func getAuthenticationUseCase() -> any AuthenticationUseCase {
-        Self.authenticationRepository
+        Self.overrides?.authenticationUseCase?() ?? Self.authenticationRepository
     }
 
     public func getOnboardingUseCase() -> any OnboardingUseCase {
-        Self.onboardingRepository
+        Self.overrides?.onboardingUseCase?() ?? Self.onboardingRepository
     }
 
     @MainActor
     public func makeSessionService() -> SessionService {
-        SessionService(authenticationUseCase: getAuthenticationUseCase())
+        if let factory = Self.overrides?.sessionService {
+            return factory()
+        }
+        return SessionService(authenticationUseCase: getAuthenticationUseCase())
     }
 
     @MainActor
     public func makeToastPresenter() -> ToastPresenter {
-        toastPresenter
+        if let factory = Self.overrides?.toastPresenter {
+            return factory()
+        }
+        return toastPresenter
+    }
+}
+
+// MARK: - Testing Support
+
+extension DependencyContainer {
+    static func setOverrides(_ overrides: Overrides?) {
+        self.overrides = overrides
+    }
+
+    static func resetOverrides() {
+        overrides = nil
     }
 }
