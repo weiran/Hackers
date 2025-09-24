@@ -48,29 +48,17 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         NavigationStack {
             Form {
                 Section(footer: versionLabel) {
-                    HStack {
-                        Image(uiImage: Bundle.main.icon ?? UIImage())
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 80, height: 80)
-                        VStack(alignment: .leading) {
-                            Text("Hackers")
-                                .scaledFont(.title)
-                            Text("By Weiran Zhang")
-                                .scaledFont(.body)
-                        }
-                    }
                     Button(action: {
                         if let url = URL(string: "https://github.com/weiran/hackers") {
                             UIApplication.shared.open(url)
                         }
                     }, label: {
-                        Text("Hackers on GitHub")
+                        Label("Hackers on GitHub", systemImage: "link")
                     })
                     Button(action: {
                         showMailView.toggle()
                     }, label: {
-                        Text("Send Feedback")
+                        Label("Send Feedback", systemImage: "paperplane")
                     })
                     .disabled(!MFMailComposeViewController.canSendMail())
                     .sheet(isPresented: $showMailView) {
@@ -83,7 +71,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         )
                     }
                     Button(action: { onShowOnboarding() }, label: {
-                        Text("Show What's New")
+                        Label("Show What's New", systemImage: "sparkles")
                     })
                 }
 
@@ -93,8 +81,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             showLogin = true
                         },
                         label: {
-                            HStack {
-                                Text(isAuthenticated ? "Logged in as \(currentUsername ?? "")" : "Login")
+                            HStack(spacing: 12) {
+                                Label(isAuthenticated ? "Logged in as \(currentUsername ?? "")" : "Login",
+                                      systemImage: "person.crop.circle"
+                                )
                                 Spacer()
                                 if isAuthenticated {
                                     Image(systemName: "checkmark.circle.fill")
@@ -120,7 +110,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 Section(header: Text("Appearance")) {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("Text Size")
+                            Label("Text Size", systemImage: "textformat.size")
                             Spacer()
                             Text(viewModel.textSize.displayName)
                                 .foregroundColor(.secondary)
@@ -155,20 +145,22 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
 
                 Section(header: Text("Browser")) {
                     // Place default browser preference first
-                    Picker("Open Links Using", selection: $viewModel.openInDefaultBrowser) {
+                    Picker(selection: $viewModel.openInDefaultBrowser) {
                         Text("In-App Browser").tag(false)
                         Text("System Browser").tag(true)
+                    } label: {
+                        Label("Open Links Using", systemImage: "safari")
                     }
                     .pickerStyle(.menu)
 
                     Toggle(isOn: $viewModel.safariReaderMode) {
-                        Text("Open Safari in Reader Mode")
+                        Label("Open Safari in Reader Mode", systemImage: "doc.text.magnifyingglass")
                     }
                 }
 
                 Section(header: Text("Storage")) {
-                    HStack {
-                        Text("Storage Used")
+                    HStack(spacing: 12) {
+                        Label("Storage Used", systemImage: "externaldrive")
                         Spacer()
                         Text(viewModel.cacheUsageText)
                             .foregroundColor(.secondary)
@@ -177,7 +169,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     Button(role: .destructive) {
                         showClearCacheAlert = true
                     } label: {
-                        Text("Clear Cache")
+                        Label("Clear Cache", systemImage: "trash")
                     }
                     .alert("Clear Cache?", isPresented: $showClearCacheAlert) {
                         Button("Clear", role: .destructive) {
