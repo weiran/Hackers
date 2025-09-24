@@ -51,16 +51,6 @@ public struct LoginView: View {
             }
         }
         .textScaling(for: textSize)
-        .overlay(alignment: .top) {
-            if let toast = toastPresenter.message {
-                ToastBanner(message: toast)
-                    .padding(.horizontal)
-                    .padding(.top, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .allowsHitTesting(false)
-                    .textScaling(for: textSize)
-            }
-        }
     }
 
     private var loginView: some View {

@@ -118,3 +118,33 @@ public struct ToastBanner: View {
         }
     }
 }
+
+private struct ToastOverlayModifier: ViewModifier {
+    @ObservedObject private var presenter: ToastPresenter
+    private let isActive: Bool
+
+    init(presenter: ToastPresenter, isActive: Bool) {
+        self.presenter = presenter
+        self.isActive = isActive
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .top) {
+                if isActive, let toast = presenter.message {
+                    ToastBanner(message: toast)
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .allowsHitTesting(false)
+                        .zIndex(1)
+                }
+            }
+    }
+}
+
+public extension View {
+    func toastOverlay(_ presenter: ToastPresenter, isActive: Bool = true) -> some View {
+        modifier(ToastOverlayModifier(presenter: presenter, isActive: isActive))
+    }
+}

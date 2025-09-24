@@ -203,16 +203,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 .accessibilityLabel("Close"))
         }
         .textScaling(for: viewModel.textSize)
-        .overlay(alignment: .top) {
-            if let toast = toastPresenter.message {
-                ToastBanner(message: toast)
-                    .padding(.horizontal)
-                    .padding(.top, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .allowsHitTesting(false)
-                    .textScaling(for: viewModel.textSize)
-            }
-        }
     }
 
     private var versionLabel: some View {

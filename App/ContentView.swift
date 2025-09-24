@@ -80,17 +80,7 @@ struct MainContentView: View {
         .environmentObject(toastPresenter)
         .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
-        .overlay(alignment: .top) {
-            if let toast = toastPresenter.message {
-                ToastBanner(message: toast)
-                    .padding(.horizontal)
-                    .padding(.top, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .allowsHitTesting(false)
-                    .zIndex(1)
-                    .textScaling(for: settingsViewModel.textSize)
-            }
-        }
+        .toastOverlay(toastPresenter, isActive: !isPresentingModal)
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
@@ -105,6 +95,7 @@ struct MainContentView: View {
             )
             .environmentObject(toastPresenter)
             .textScaling(for: settingsViewModel.textSize)
+            .toastOverlay(toastPresenter)
         }
         .sheet(isPresented: $navigationStore.showingSettings) {
             SettingsView<NavigationStore>(
@@ -125,19 +116,26 @@ struct MainContentView: View {
             .environmentObject(sessionService)
             .environmentObject(toastPresenter)
             .textScaling(for: settingsViewModel.textSize)
+            .toastOverlay(toastPresenter)
         }
         .sheet(isPresented: $showOnboarding) {
             onboardingCoordinator
                 .makeOnboardingView {
                     showOnboarding = false
                 }
+                .environmentObject(toastPresenter)
                 .textScaling(for: settingsViewModel.textSize)
+                .toastOverlay(toastPresenter)
         }
         .task {
             if onboardingCoordinator.shouldShowOnboarding() {
                 showOnboarding = true
             }
         }
+    }
+
+    private var isPresentingModal: Bool {
+        navigationStore.showingLogin || navigationStore.showingSettings || showOnboarding
     }
 }
 
