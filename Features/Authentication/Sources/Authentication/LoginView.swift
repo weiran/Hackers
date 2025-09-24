@@ -1,28 +1,20 @@
 //
 //  LoginView.swift
-//  DesignSystem
+//  Authentication
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import DesignSystem
 import Domain
 import Shared
 import SwiftUI
 
 public struct LoginView: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
-    @State private var isAuthenticating = false
-    @State private var showAlert = false
+    @StateObject private var viewModel: LoginViewModel
     @FocusState private var focusedField: Field?
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var toastPresenter: ToastPresenter
-
-    let isAuthenticated: Bool
-    let currentUsername: String?
-    let onLogin: (String, String) async throws -> Void
-    let onLogout: () -> Void
-    let textSize: TextSize
 
     private enum Field {
         case username, password
@@ -35,22 +27,29 @@ public struct LoginView: View {
         onLogout: @escaping () -> Void,
         textSize: TextSize = .medium
     ) {
-        self.isAuthenticated = isAuthenticated
-        self.currentUsername = currentUsername
-        self.onLogin = onLogin
-        self.onLogout = onLogout
-        self.textSize = textSize
+        let viewModel = LoginViewModel(
+            isAuthenticated: isAuthenticated,
+            currentUsername: currentUsername,
+            onLogin: onLogin,
+            onLogout: onLogout,
+            textSize: textSize
+        )
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    public init(viewModel: LoginViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
         NavigationStack {
-            if !isAuthenticated {
+            if !viewModel.isAuthenticated {
                 loginView
             } else {
                 loggedInView
             }
         }
-        .textScaling(for: textSize)
+        .textScaling(for: viewModel.textSize)
     }
 
     private var loginView: some View {
@@ -70,15 +69,16 @@ public struct LoginView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    dismiss()
-                } label: {
+                Button(action: dismiss.callAsFunction) {
                     Image(systemName: "xmark")
                 }
                 .accessibilityLabel("Close")
             }
         }
-        .alert("Login Failed", isPresented: $showAlert) {
+        .alert("Login Failed", isPresented: Binding(
+            get: { viewModel.showAlert },
+            set: { viewModel.showAlert = $0 }
+        )) {
             Button("OK", role: .cancel) {}
         } message: {
             Text("Please check your username and password and try again.")
@@ -118,8 +118,8 @@ public struct LoginView: View {
             VStack(spacing: 20) {
                 AppTextField(
                     title: "Username",
-                    text: $username,
-                    isSecure: false,
+                    text: $viewModel.username,
+                    isSecure: false
                 )
                 .textContentType(.username)
                 .autocapitalization(.none)
@@ -131,13 +131,13 @@ public struct LoginView: View {
 
                 AppTextField(
                     title: "Password",
-                    text: $password,
-                    isSecure: true,
+                    text: $viewModel.password,
+                    isSecure: true
                 )
                 .textContentType(.password)
                 .focused($focusedField, equals: .password)
                 .onSubmit {
-                    if !username.isEmpty, !password.isEmpty {
+                    if viewModel.isLoginEnabled {
                         performLogin()
                     }
                 }
@@ -155,11 +155,9 @@ public struct LoginView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Button {
-                    performLogin()
-                } label: {
+                Button(action: performLogin) {
                     HStack {
-                        if isAuthenticating {
+                        if viewModel.isAuthenticating {
                             ProgressView()
                                 .controlSize(.small)
                                 .tint(.white)
@@ -169,7 +167,7 @@ public struct LoginView: View {
                                 .accessibilityHidden(true)
                         }
 
-                        Text(isAuthenticating ? "Signing in..." : "Sign In")
+                        Text(viewModel.isAuthenticating ? "Signing in..." : "Sign In")
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
@@ -178,22 +176,18 @@ public struct LoginView: View {
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppGradients.primaryButton(isEnabled: isLoginEnabled)),
+                            .fill(AppGradients.primaryButton(isEnabled: viewModel.isLoginEnabled))
                     )
-                    .scaleEffect(isAuthenticating ? 0.95 : 1.0)
-                    .animation(.easeInOut(duration: 0.1), value: isAuthenticating)
+                    .scaleEffect(viewModel.isAuthenticating ? 0.95 : 1.0)
+                    .animation(.easeInOut(duration: 0.1), value: viewModel.isAuthenticating)
                 }
-                .disabled(!isLoginEnabled)
+                .disabled(!viewModel.isLoginEnabled)
                 .padding(.horizontal, 20)
             }
 
             Spacer(minLength: 40)
         }
         .padding(.top, 32)
-    }
-
-    private var isLoginEnabled: Bool {
-        !isAuthenticating && !username.isEmpty && !password.isEmpty
     }
 
     private var loggedInView: some View {
@@ -212,7 +206,7 @@ public struct LoginView: View {
                         .font(.title2)
                         .foregroundStyle(.secondary)
 
-                    Text(currentUsername ?? "")
+                    Text(viewModel.currentUsername ?? "")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.primary)
@@ -221,7 +215,7 @@ public struct LoginView: View {
 
             VStack(spacing: 20) {
                 Button {
-                    onLogout()
+                    viewModel.logout()
                     toastPresenter.show(text: "Signed out", kind: .success)
                 } label: {
                     HStack {
@@ -238,7 +232,7 @@ public struct LoginView: View {
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppGradients.destructiveButton()),
+                            .fill(AppGradients.destructiveButton())
                     )
                 }
                 .padding(.horizontal, 20)
@@ -249,9 +243,7 @@ public struct LoginView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    dismiss()
-                } label: {
+                Button(action: dismiss.callAsFunction) {
                     Image(systemName: "xmark")
                 }
                 .accessibilityLabel("Close")
@@ -261,23 +253,14 @@ public struct LoginView: View {
 
     private func performLogin() {
         focusedField = nil
-        isAuthenticating = true
-
-        Task {
-            do {
-                try await onLogin(username, password)
-                await MainActor.run {
-                    isAuthenticating = false
-                    toastPresenter.show(text: "Welcome back, \(username)", kind: .success)
-                    dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    showAlert = true
-                    password = ""
-                    isAuthenticating = false
-                    focusedField = .password
-                }
+        Task { @MainActor in
+            let enteredUsername = viewModel.username
+            let success = await viewModel.performLogin()
+            if success {
+                toastPresenter.show(text: "Welcome back, \(enteredUsername)", kind: .success)
+                dismiss()
+            } else {
+                focusedField = .password
             }
         }
     }

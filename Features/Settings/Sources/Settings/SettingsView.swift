@@ -5,6 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Authentication
 import DesignSystem
 import Domain
 import MessageUI

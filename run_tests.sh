@@ -68,6 +68,7 @@ ALL_MODULES=(
     "Data:${BASE_DIR}/Data"
     "Networking:${BASE_DIR}/Networking"
     "DesignSystem:${BASE_DIR}/DesignSystem"
+    "Authentication:${BASE_DIR}/Features/Authentication"
     "Shared:${BASE_DIR}/Shared"
     "Feed:${BASE_DIR}/Features/Feed"
     "Comments:${BASE_DIR}/Features/Comments"
@@ -102,6 +103,7 @@ MODULES:
     Networking      Network manager tests
     DesignSystem    Design system tests
     Shared          Shared utilities tests
+    Authentication  Authentication feature tests
     Feed            Feed feature tests
     Comments        Comments feature tests
     Settings        Settings feature tests
