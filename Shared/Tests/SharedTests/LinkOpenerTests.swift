@@ -38,6 +38,8 @@ struct LinkOpenerTests {
     func presentsSafariViewController() {
         let settings = StubSettingsUseCase(safariReaderMode: true, openInDefaultBrowser: false)
         var capturedPresented: (UIViewController, SFSafariViewController)?
+        var capturedFactoryInput: (URL, SFSafariViewController.Configuration)?
+        var stubSafari: StubSafariViewController?
 
         LinkOpener.setEnvironmentForTesting(
             settings: { settings },
@@ -45,20 +47,37 @@ struct LinkOpenerTests {
             presenter: { StubPresenter() },
             presentSafari: { presenter, safari in
                 capturedPresented = (presenter, safari)
+            },
+            safariControllerFactory: { url, configuration in
+                capturedFactoryInput = (url, configuration)
+                let controller = StubSafariViewController(url: url, configuration: configuration)
+                stubSafari = controller
+                return controller
             }
         )
+
+        defer { LinkOpener.resetEnvironment() }
 
         let url = URL(string: "https://news.ycombinator.com")!
         LinkOpener.openURL(url)
 
-        guard let (_, safariController) = capturedPresented else {
+        guard let factoryInput = capturedFactoryInput else {
+            Issue.record("Expected safariControllerFactory to be invoked")
+            return
+        }
+
+        #expect(factoryInput.0 == url)
+        #expect(factoryInput.1.entersReaderIfAvailable)
+
+        guard let (presenter, safariController) = capturedPresented else {
             Issue.record("Expected Safari to be presented")
             return
         }
 
-        #expect(safariController.initialURL == url)
-        #expect(safariController.resolvedConfiguration.entersReaderIfAvailable)
-        LinkOpener.resetEnvironment()
+        #expect(presenter is StubPresenter)
+        #expect(safariController === stubSafari)
+        #expect(stubSafari?.capturedURL == url)
+        #expect(stubSafari?.capturedConfiguration.entersReaderIfAvailable == true)
     }
 
     @MainActor
@@ -121,15 +140,18 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
 
 private final class StubPresenter: UIViewController {}
 
-private extension SFSafariViewController {
-    var initialURL: URL {
-        // SFSafariViewController exposes the initial URL through private API, but we can rely on the
-        // view controller's `value(forKey:)` for testing purposes in the test bundle.
-        value(forKey: "URL") as? URL ?? URL(string: "about:blank")!
+private final class StubSafariViewController: SFSafariViewController {
+    let capturedURL: URL
+    let capturedConfiguration: SFSafariViewController.Configuration
+
+    override init(url: URL, configuration: SFSafariViewController.Configuration) {
+        capturedURL = url
+        capturedConfiguration = configuration
+        super.init(url: url, configuration: configuration)
     }
 
-    var resolvedConfiguration: SFSafariViewController.Configuration {
-        (value(forKey: "configuration") as? SFSafariViewController.Configuration)
-            ?? SFSafariViewController.Configuration()
+    @available(*, unavailable)
+    override required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

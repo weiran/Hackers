@@ -27,6 +27,10 @@ public enum LinkOpener {
         presenter.present(safariVC, animated: true)
     }
 
+    private static var safariControllerFactory: (URL, SFSafariViewController.Configuration) -> SFSafariViewController = { url, configuration in
+        SFSafariViewController(url: url, configuration: configuration)
+    }
+
     public static func openURL(_ url: URL, with _: Post? = nil) {
         // Determine user preference for opening links via injected settings use case
         let settings = settingsProvider()
@@ -40,7 +44,7 @@ public enum LinkOpener {
                 let config = SFSafariViewController.Configuration()
                 config.entersReaderIfAvailable = settings.safariReaderMode
 
-                let safariVC = SFSafariViewController(url: url, configuration: config)
+                let safariVC = safariControllerFactory(url, config)
                 safariPresenter(presenter, safariVC)
             } else {
                 // Fallback if we cannot present in-app browser
@@ -87,12 +91,14 @@ public enum LinkOpener {
         settings: (() -> any SettingsUseCase)? = nil,
         openURL: ((URL) -> Void)? = nil,
         presenter: (() -> UIViewController?)? = nil,
-        presentSafari: ((UIViewController, SFSafariViewController) -> Void)? = nil
+        presentSafari: ((UIViewController, SFSafariViewController) -> Void)? = nil,
+        safariControllerFactory: ((URL, SFSafariViewController.Configuration) -> SFSafariViewController)? = nil
     ) {
         if let settings { settingsProvider = settings }
         if let openURL { systemOpener = openURL }
         if let presenter { presenterProvider = presenter }
         if let presentSafari { safariPresenter = presentSafari }
+        if let safariControllerFactory { self.safariControllerFactory = safariControllerFactory }
     }
 
     static func resetEnvironment() {
@@ -100,5 +106,8 @@ public enum LinkOpener {
         systemOpener = { url in UIApplication.shared.open(url) }
         presenterProvider = { findPresenter() }
         safariPresenter = { presenter, safariVC in presenter.present(safariVC, animated: true) }
+        safariControllerFactory = { url, configuration in
+            SFSafariViewController(url: url, configuration: configuration)
+        }
     }
 }
