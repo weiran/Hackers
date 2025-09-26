@@ -220,9 +220,11 @@ struct CommentRow: View {
     let votingViewModel: VotingViewModel
     let onToggle: () -> Void
     let onHide: () -> Void
+    @Environment(\.textScaling) private var textScaling
 
     private var styledCommentText: AttributedString {
         var attributed = CommentHTMLParser.parseHTMLText(comment.text)
+        attributed = applyingCodeFontScaling(to: attributed)
         let linkColor = AppColors.appTintColor
 
         for run in attributed.runs {
@@ -232,6 +234,17 @@ struct CommentRow: View {
         }
 
         return attributed
+    }
+
+    private func applyingCodeFontScaling(to attributed: AttributedString) -> AttributedString {
+        var result = attributed
+        for run in result.runs {
+            guard run.inlinePresentationIntent?.contains(.code) == true else { continue }
+            let range = run.range
+            let scaledFont = Font.system(.subheadline, design: .monospaced).scaled(with: textScaling)
+            result[range].font = scaledFont
+        }
+        return result
     }
 
     var body: some View {

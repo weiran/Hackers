@@ -58,7 +58,7 @@ extension CommentHTMLParser {
 
                 var codeAttributedString = AttributedString(decodedCode)
                 let fullRange = codeAttributedString.startIndex ..< codeAttributedString.endIndex
-                codeAttributedString[fullRange].font = .body.monospaced()
+                codeAttributedString[fullRange].inlinePresentationIntent = .code
 
                 if !result.characters.isEmpty { result += createParagraphSpacing() }
                 result += codeAttributedString
