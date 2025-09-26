@@ -7,8 +7,10 @@
 
 import DesignSystem
 import Domain
+import Foundation
 import Shared
 import SwiftUI
+import UIKit
 
 struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
@@ -224,7 +226,7 @@ struct CommentRow: View {
 
     private var styledCommentText: AttributedString {
         var attributed = CommentHTMLParser.parseHTMLText(comment.text)
-        attributed = applyingCodeFontScaling(to: attributed)
+        attributed = applyingScaledCommentFonts(to: attributed, textScaling: textScaling)
         let linkColor = AppColors.appTintColor
 
         for run in attributed.runs {
@@ -236,13 +238,17 @@ struct CommentRow: View {
         return attributed
     }
 
-    private func applyingCodeFontScaling(to attributed: AttributedString) -> AttributedString {
+    private func applyingScaledCommentFonts(to attributed: AttributedString, textScaling: CGFloat) -> AttributedString {
         var result = attributed
+        let fontProvider = CommentFontProvider(textScaling: textScaling)
         for run in result.runs {
-            guard run.inlinePresentationIntent?.contains(.code) == true else { continue }
             let range = run.range
-            let scaledFont = Font.system(.subheadline, design: .monospaced).scaled(with: textScaling)
-            result[range].font = scaledFont
+            let intents = run.inlinePresentationIntent ?? []
+            result[range].font = fontProvider.font(
+                isCode: intents.contains(.code),
+                isBold: intents.contains(.stronglyEmphasized),
+                isItalic: intents.contains(.emphasized)
+            )
         }
         return result
     }
@@ -278,7 +284,6 @@ struct CommentRow: View {
             }
             if comment.visibility == .visible {
                 Text(styledCommentText)
-                    .scaledFont(.callout)
                     .foregroundColor(.primary)
             }
         }
@@ -303,6 +308,78 @@ struct CommentRow: View {
             }
         }
         .id(String(comment.id) + String(comment.visibility.rawValue))
+    }
+}
+
+/// Precomputes fonts for each inline presentation style so comment text scaling stays consistent.
+private struct CommentFontProvider {
+    private let base: Font
+    private let bold: Font
+    private let italic: Font
+    private let boldItalic: Font
+    private let code: Font
+    private let codeBold: Font
+    private let codeItalic: Font
+    private let codeBoldItalic: Font
+
+    init(textScaling: CGFloat) {
+        let basePointSize = UIFont.preferredFont(forTextStyle: .callout).pointSize * textScaling
+        let codePointSize = UIFont.preferredFont(forTextStyle: .subheadline).pointSize * textScaling
+
+        base = Self.makeFont(size: basePointSize, weight: .regular, italic: false, monospaced: false)
+        bold = Self.makeFont(size: basePointSize, weight: .semibold, italic: false, monospaced: false)
+        italic = Self.makeFont(size: basePointSize, weight: .regular, italic: true, monospaced: false)
+        boldItalic = Self.makeFont(size: basePointSize, weight: .semibold, italic: true, monospaced: false)
+
+        code = Self.makeFont(size: codePointSize, weight: .regular, italic: false, monospaced: true)
+        codeBold = Self.makeFont(size: codePointSize, weight: .semibold, italic: false, monospaced: true)
+        codeItalic = Self.makeFont(size: codePointSize, weight: .regular, italic: true, monospaced: true)
+        codeBoldItalic = Self.makeFont(size: codePointSize, weight: .semibold, italic: true, monospaced: true)
+    }
+
+    func font(isCode: Bool, isBold: Bool, isItalic: Bool) -> Font {
+        switch (isCode, isBold, isItalic) {
+        case (true, true, true):
+            return codeBoldItalic
+        case (true, true, false):
+            return codeBold
+        case (true, false, true):
+            return codeItalic
+        case (true, false, false):
+            return code
+        case (false, true, true):
+            return boldItalic
+        case (false, true, false):
+            return bold
+        case (false, false, true):
+            return italic
+        default:
+            return base
+        }
+    }
+
+    private static func makeFont(
+        size: CGFloat,
+        weight: UIFont.Weight,
+        italic: Bool,
+        monospaced: Bool
+    ) -> Font {
+        var font: UIFont
+        if monospaced {
+            font = UIFont.monospacedSystemFont(ofSize: size, weight: weight)
+        } else {
+            font = UIFont.systemFont(ofSize: size, weight: weight)
+        }
+
+        if italic {
+            if let italicDescriptor = font.fontDescriptor.withSymbolicTraits(.traitItalic) {
+                font = UIFont(descriptor: italicDescriptor, size: size)
+            } else {
+                font = UIFont.italicSystemFont(ofSize: size)
+            }
+        }
+
+        return Font(font)
     }
 }
 
