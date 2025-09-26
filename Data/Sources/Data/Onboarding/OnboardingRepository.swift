@@ -59,10 +59,46 @@ public final class OnboardingRepository: OnboardingUseCase, @unchecked Sendable 
 
         if forceShow { return true }
 
-        return versionStore.lastShownVersion() != currentVersion
+        guard let lastShownVersion = versionStore.lastShownVersion() else {
+            return true
+        }
+
+        return shouldShowBasedOnMinorRelease(currentVersion: currentVersion, lastShownVersion: lastShownVersion)
     }
 
     public func markOnboardingShown(for version: String) {
         versionStore.save(shownVersion: version)
+    }
+
+    private func shouldShowBasedOnMinorRelease(currentVersion: String, lastShownVersion: String) -> Bool {
+        guard
+            let current = SemanticVersion(versionString: currentVersion),
+            let last = SemanticVersion(versionString: lastShownVersion)
+        else {
+            return currentVersion != lastShownVersion
+        }
+
+        if current.major > last.major { return true }
+        if current.major < last.major { return false }
+
+        return current.minor > last.minor
+    }
+}
+
+private struct SemanticVersion {
+    let major: Int
+    let minor: Int
+
+    init?(versionString: String) {
+        let components = versionString.split(separator: ".")
+        guard let majorComponent = components.first, let major = Int(majorComponent) else {
+            return nil
+        }
+
+        let minorComponent = components.dropFirst().first
+        let minor = minorComponent.flatMap { Int($0) } ?? 0
+
+        self.major = major
+        self.minor = minor
     }
 }

@@ -30,6 +30,35 @@ struct OnboardingRepositoryTests {
         #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: false))
     }
 
+    @Test("Patch updates do not retrigger onboarding")
+    func patchUpdateDoesNotRetrigger() {
+        let store = MockStore(lastShownVersion: "5.1.0")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.1.1", forceShow: false) == false)
+    }
+
+    @Test("Minor updates retrigger onboarding once")
+    func minorUpdateRetriggersOnce() {
+        let store = MockStore(lastShownVersion: "5.1.2")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2.0", forceShow: false))
+    }
+
+    @Test("Major updates retrigger onboarding")
+    func majorUpdateRetriggers() {
+        let store = MockStore(lastShownVersion: "5.2.1")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "6.0.0", forceShow: false))
+    }
+
+    @Test("Falls back to string comparison for invalid versions")
+    func fallsBackForInvalidVersions() {
+        let store = MockStore(lastShownVersion: "beta")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "beta", forceShow: false) == false)
+        #expect(repository.shouldShowOnboarding(currentVersion: "rc1", forceShow: false))
+    }
+
     @Test("Marks onboarding as shown")
     func marksOnboardingAsShown() {
         let store = MockStore(lastShownVersion: nil)
