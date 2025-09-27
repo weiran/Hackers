@@ -99,7 +99,7 @@ public struct PostDisplayView: View {
                             Text("•")
                                 .foregroundColor(.secondary)
                                 .accessibilityHidden(true)
-                            Text(host)
+                            Text(truncatedHost(host))
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
                         }
@@ -157,6 +157,11 @@ public struct PostContextMenu: View {
             }
         }
     }
+}
+
+private func truncatedHost(_ host: String) -> String {
+    guard host.hasPrefix("www.") else { return host }
+    return String(host.dropFirst(4))
 }
 
 private func isHackerNewsItemURL(_ url: URL) -> Bool {
