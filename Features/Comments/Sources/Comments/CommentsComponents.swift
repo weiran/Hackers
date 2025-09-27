@@ -265,16 +265,18 @@ struct CommentRow: View {
                     .scaledFont(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
-                VoteIndicator(
-                    votingState: VotingState(
-                        isUpvoted: comment.upvoted,
-                        score: nil,
-                        canVote: comment.voteLinks?.upvote != nil,
-                        isVoting: votingViewModel.isVoting,
-                        error: votingViewModel.lastError,
-                    ),
-                    style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
-                )
+                if comment.upvoted {
+                    VoteIndicator(
+                        votingState: VotingState(
+                            isUpvoted: comment.upvoted,
+                            score: nil,
+                            canVote: comment.voteLinks?.upvote != nil,
+                            isVoting: votingViewModel.isVoting,
+                            error: votingViewModel.lastError,
+                        ),
+                        style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
+                    )
+                }
                 if comment.visibility == .compact {
                     Image(systemName: "chevron.down")
                         .scaledFont(.caption)

@@ -30,14 +30,12 @@ public struct VoteIndicator: View {
                     .animation(.easeInOut(duration: 0.2), value: score)
             }
 
-            if votingState.isUpvoted {
-                Image(systemName: style.upvotedIconName)
-                    .scaledFont(style.iconFont)
-                    .foregroundColor(style.upvotedColor)
-                    .scaleEffect(style.iconScale)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
-                    .accessibilityHidden(true)
-            }
+            Image(systemName: iconName)
+                .scaledFont(style.iconFont)
+                .foregroundColor(iconColor)
+                .scaleEffect(style.iconScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
+                .accessibilityHidden(true)
         }
         .animation(.easeInOut(duration: 0.2), value: votingState.canVote)
         .accessibilityElement(children: .ignore)
@@ -47,11 +45,19 @@ public struct VoteIndicator: View {
         }())
     }
 
+    private var iconName: String {
+        votingState.isUpvoted ? style.upvotedIconName : style.unvotedIconName
+    }
+
+    private var iconColor: Color {
+        votingState.isUpvoted ? style.upvotedColor : style.defaultColor
+    }
+
     private var scoreColor: Color {
         if votingState.isUpvoted {
             style.upvotedColor
         } else {
-            .secondary
+            style.defaultColor
         }
     }
 }
@@ -62,6 +68,7 @@ public struct VoteIndicatorStyle: Sendable {
     public let scoreFont: Font
     public let spacing: CGFloat
     public let iconScale: CGFloat
+    public let unvotedIconName: String
     public let upvotedIconName: String
     public let defaultColor: Color
     public let upvotedColor: Color
@@ -72,6 +79,7 @@ public struct VoteIndicatorStyle: Sendable {
         scoreFont: Font = .caption,
         spacing: CGFloat = 4,
         iconScale: CGFloat = 1.0,
+        unvotedIconName: String = "arrow.up",
         upvotedIconName: String = "arrow.up.circle.fill",
         defaultColor: Color = .secondary,
         upvotedColor: Color = AppColors.upvotedColor,
@@ -81,6 +89,7 @@ public struct VoteIndicatorStyle: Sendable {
         self.scoreFont = scoreFont
         self.spacing = spacing
         self.iconScale = iconScale
+        self.unvotedIconName = unvotedIconName
         self.upvotedIconName = upvotedIconName
         self.defaultColor = defaultColor
         self.upvotedColor = upvotedColor
