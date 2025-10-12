@@ -212,11 +212,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     .foregroundColor(.secondary)
             }
             .foregroundStyle(.primary)
-            .padding(.horizontal, 10)
-            // hacky way to adapt to iPad toolbar height being smaller
-            .padding(.vertical, UIDevice.current.userInterfaceIdiom == .pad ? 4 : 8)
-            .glassEffect(in: .rect(cornerRadius: 32.0))
+            .animation(.easeInOut(duration: 0.5), value: selectedPostType)
         }
+        .padding(.horizontal, 10)
+        // hacky way to adapt to iPad toolbar height being smaller
+        .padding(.vertical, UIDevice.current.userInterfaceIdiom == .pad ? 4 : 8)
+        .glassEffect()
+        .clipShape(RoundedRectangle(cornerRadius: 32.0))
     }
 
     @ViewBuilder
