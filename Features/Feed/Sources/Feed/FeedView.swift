@@ -212,7 +212,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                     .foregroundColor(.secondary)
             }
             .foregroundStyle(.primary)
-            .animation(.easeInOut(duration: 0.5), value: selectedPostType)
         }
         .padding(.horizontal, 10)
         // hacky way to adapt to iPad toolbar height being smaller
