@@ -217,6 +217,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         // hacky way to adapt to iPad toolbar height being smaller
         .padding(.vertical, UIDevice.current.userInterfaceIdiom == .pad ? 4 : 8)
         .glassEffect()
+        // hack to fix glitchy UI bug: https://github.com/weiran/Hackers/issues/313
         .clipShape(RoundedRectangle(cornerRadius: 32.0))
     }
 
