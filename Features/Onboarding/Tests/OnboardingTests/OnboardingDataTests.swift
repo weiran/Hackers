@@ -14,8 +14,9 @@ struct OnboardingDataTests {
         let data = OnboardingData.currentOnboarding()
 
         #expect(data.title == "What's New in Hackers 5.2")
-        #expect(data.items.count == 1)
-        #expect(data.items.contains { $0.title.contains("Embedded iPad Browser") })
+        #expect(data.items.count == 2)
+        #expect(data.items.contains { $0.title == "Remembers Your Feed" })
+        #expect(data.items.contains { $0.title == "Feed Thumbnails Toggle" })
     }
 
     @Test("OnboardingItem has proper initialization")

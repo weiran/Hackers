@@ -17,15 +17,21 @@ public struct OnboardingData: Sendable {
     }
 
     public static func currentOnboarding() -> OnboardingData {
-        let embeddedBrowser = OnboardingItem(
-            title: "Embedded iPad Browser",
-            subtitle: "Browse articles right beside the feed with the new split-view web experience for faster reading.",
-            systemImage: "safari.fill",
+        let rememberedFeed = OnboardingItem(
+            title: "Remembers Your Feed",
+            subtitle: "Hackers reopens in the last section you read so you never lose your place.",
+            systemImage: "list.bullet.rectangle",
+        )
+
+        let thumbnailToggle = OnboardingItem(
+            title: "Feed Thumbnails Toggle",
+            subtitle: "Choose whether story thumbnails appear in the feed.",
+            systemImage: "photo.on.rectangle",
         )
 
         return OnboardingData(
             title: "What's New in Hackers 5.2",
-            items: [embeddedBrowser],
+            items: [rememberedFeed, thumbnailToggle],
         )
     }
 }
