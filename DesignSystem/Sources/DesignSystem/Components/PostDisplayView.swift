@@ -34,17 +34,15 @@ public struct PostDisplayView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
                 // Thumbnail with proper loading
-                if showThumbnails {
-                    ThumbnailView(url: post.url)
-                        .frame(width: 55, height: 55)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onThumbnailTap?()
-                        }
-                        .accessibilityAddTraits(.isButton)
-                        .accessibilityLabel("Open link")
-                }
+                ThumbnailView(url: post.url, isEnabled: showThumbnails)
+                    .frame(width: 55, height: 55)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onThumbnailTap?()
+                    }
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityLabel("Open link")
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Title

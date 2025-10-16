@@ -100,49 +100,34 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == false)
     }
 
-    // MARK: - Removed Settings Tests
+    // MARK: - Thumbnail Settings Tests
 
-    // Note: showThumbnails and swipeActions settings have been removed from the app
+    @Test("Show thumbnails default value")
+    func showThumbnailsDefaultValue() {
+        mockUserDefaults.clearAll()
+        mockUserDefaults.set(true, forKey: "ShowThumbnails")
 
-    /*
-     @Test("Show thumbnails default value")
-     func showThumbnailsDefaultValue() {
-         // Default should be false for bool values
-         #expect(settingsRepository.showThumbnails == false)
-     }
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-     @Test("Show thumbnails setter and getter")
-     func showThumbnailsSetterAndGetter() {
-         // Test setting to true
-         settingsRepository.showThumbnails = true
-         #expect(settingsRepository.showThumbnails == true)
-         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
+        #expect(repository.showThumbnails == true)
+    }
 
-         // Test setting to false
-         settingsRepository.showThumbnails = false
-         #expect(settingsRepository.showThumbnails == false)
-         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == false)
-     }
+    @Test("Show thumbnails setter and getter")
+    func showThumbnailsSetterAndGetter() {
+        mockUserDefaults.clearAll()
 
-     @Test("Swipe actions default value")
-     func swipeActionsDefaultValue() {
-         // Default should be false for bool values
-         #expect(settingsRepository.swipeActions == false)
-     }
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-     @Test("Swipe actions setter and getter")
-     func swipeActionsSetterAndGetter() {
-         // Test setting to true
-         settingsRepository.swipeActions = true
-         #expect(settingsRepository.swipeActions == true)
-         #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == true)
+        // Test setting to false
+        repository.showThumbnails = false
+        #expect(repository.showThumbnails == false)
+        #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == false)
 
-         // Test setting to false
-         settingsRepository.swipeActions = false
-         #expect(settingsRepository.swipeActions == false)
-         #expect(mockUserDefaults.bool(forKey: "SwipeActionsEnabled") == false)
-     }
-     */
+        // Test setting to true
+        repository.showThumbnails = true
+        #expect(repository.showThumbnails == true)
+        #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
+    }
 
     // MARK: - Removed Settings (showComments)
 

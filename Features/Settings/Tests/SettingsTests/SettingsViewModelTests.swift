@@ -25,6 +25,7 @@ struct SettingsViewModelTests {
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
+        private var _showThumbnails = true
         private var _textSize: TextSize = .medium
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
@@ -55,6 +56,17 @@ struct SettingsViewModelTests {
             }
         }
 
+        var showThumbnails: Bool {
+            get {
+                getterCallCounts["showThumbnails", default: 0] += 1
+                return _showThumbnails
+            }
+            set {
+                setterCallCounts["showThumbnails", default: 0] += 1
+                _showThumbnails = newValue
+            }
+        }
+
         var textSize: TextSize {
             get {
                 getterCallCounts["textSize", default: 0] += 1
@@ -71,6 +83,7 @@ struct SettingsViewModelTests {
             setterCallCounts.removeAll()
             clearCacheCallCount = 0
             cacheUsageCallCount = 0
+            _showThumbnails = true
         }
 
         func clearCache() { clearCacheCallCount += 1 }
@@ -127,75 +140,39 @@ struct SettingsViewModelTests {
         #expect(settingsViewModel.safariReaderMode == false)
     }
 
-    // MARK: - Removed Settings Tests
+    // MARK: - Thumbnail Setting Tests
 
-    // Note: showThumbnails and swipeActions settings have been removed from the app
+    @Test("Show thumbnails getter")
+    func showThumbnailsGetter() {
+        mockSettingsUseCase.showThumbnails = false
 
-    /*
-     @Test("Show thumbnails getter")
-     func showThumbnailsGetter() {
-         mockSettingsUseCase._showThumbnails = true
+        let value = settingsViewModel.showThumbnails
 
-         let value = settingsViewModel.showThumbnails
+        #expect(value == false)
+        #expect(mockSettingsUseCase.getterCallCounts["showThumbnails"] == 1)
+    }
 
-         #expect(value == true)
-         #expect(mockSettingsUseCase.getterCallCounts["showThumbnails"] == 1)
-     }
+    @Test("Show thumbnails setter")
+    func showThumbnailsSetter() {
+        settingsViewModel.showThumbnails = false
 
-     @Test("Show thumbnails setter")
-     func showThumbnailsSetter() {
-         settingsViewModel.showThumbnails = true
+        #expect(mockSettingsUseCase.showThumbnails == false)
+        #expect(mockSettingsUseCase.setterCallCounts["showThumbnails"] == 1)
+    }
 
-         #expect(mockSettingsUseCase._showThumbnails == true)
-         #expect(mockSettingsUseCase.setterCallCounts["showThumbnails"] == 1)
-     }
+    @Test("Show thumbnails toggle")
+    func showThumbnailsToggle() {
+        // Start with true
+        #expect(settingsViewModel.showThumbnails == true)
 
-     @Test("Show thumbnails toggle")
-     func showThumbnailsToggle() {
-         // Start with false
-         #expect(settingsViewModel.showThumbnails == false)
+        // Toggle to false
+        settingsViewModel.showThumbnails = false
+        #expect(settingsViewModel.showThumbnails == false)
 
-         // Toggle to true
-         settingsViewModel.showThumbnails = true
-         #expect(settingsViewModel.showThumbnails == true)
-
-         // Toggle back to false
-         settingsViewModel.showThumbnails = false
-         #expect(settingsViewModel.showThumbnails == false)
-     }
-
-     @Test("Swipe actions getter")
-     func swipeActionsGetter() {
-         mockSettingsUseCase._swipeActions = true
-
-         let value = settingsViewModel.swipeActions
-
-         #expect(value == true)
-         #expect(mockSettingsUseCase.getterCallCounts["swipeActions"] == 1)
-     }
-
-     @Test("Swipe actions setter")
-     func swipeActionsSetter() {
-         settingsViewModel.swipeActions = true
-
-         #expect(mockSettingsUseCase._swipeActions == true)
-         #expect(mockSettingsUseCase.setterCallCounts["swipeActions"] == 1)
-     }
-
-     @Test("Swipe actions toggle")
-     func swipeActionsToggle() {
-         // Start with false
-         #expect(settingsViewModel.swipeActions == false)
-
-         // Toggle to true
-         settingsViewModel.swipeActions = true
-         #expect(settingsViewModel.swipeActions == true)
-
-         // Toggle back to false
-         settingsViewModel.swipeActions = false
-         #expect(settingsViewModel.swipeActions == false)
-     }
-     */
+        // Toggle back to true
+        settingsViewModel.showThumbnails = true
+        #expect(settingsViewModel.showThumbnails == true)
+    }
 
     // MARK: - Removed Settings (showComments)
 

@@ -5,6 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Combine
 import Domain
 import Foundation
 import Shared
@@ -15,6 +16,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     public let postID: Int
     public var post: Post?
     public var visibleComments: [Comment] = []
+    public var showThumbnails: Bool
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?
@@ -23,6 +25,8 @@ public final class CommentsViewModel: @unchecked Sendable {
     private let commentUseCase: any CommentUseCase
     private let voteUseCase: any VoteUseCase
     private let commentsLoader: LoadingStateManager<[Comment]>
+    private let settingsUseCase: any SettingsUseCase
+    private var settingsCancellable: AnyCancellable?
 
     public var comments: [Comment] { commentsLoader.data }
     public var isLoading: Bool { commentsLoader.isLoading }
@@ -34,7 +38,8 @@ public final class CommentsViewModel: @unchecked Sendable {
         initialPost: Post? = nil,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
     ) {
         self.postID = postID
         post = initialPost
@@ -42,6 +47,8 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.postUseCase = postUseCase
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
+        self.settingsUseCase = settingsUseCase
+        showThumbnails = settingsUseCase.showThumbnails
 
         let initialComments = initialPost?.comments ?? []
         commentsLoader = LoadingStateManager(initialData: initialComments)
@@ -56,20 +63,32 @@ public final class CommentsViewModel: @unchecked Sendable {
         )
 
         updateVisibleComments()
+
+        settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let currentValue = settingsUseCase.showThumbnails
+                if self.showThumbnails != currentValue {
+                    self.showThumbnails = currentValue
+                }
+            }
     }
 
     public convenience init(
         post: Post,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
-        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase()
+        voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
     ) {
         self.init(
             postID: post.id,
             initialPost: post,
             postUseCase: postUseCase,
             commentUseCase: commentUseCase,
-            voteUseCase: voteUseCase
+            voteUseCase: voteUseCase,
+            settingsUseCase: settingsUseCase
         )
     }
 

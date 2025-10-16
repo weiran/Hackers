@@ -33,6 +33,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
             userDefaults.register(defaults: [
                 "safariReaderMode": false,
                 "openInDefaultBrowser": false,
+                "ShowThumbnails": true,
                 "textSize": TextSize.medium.rawValue
             ])
         }
@@ -53,6 +54,15 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "openInDefaultBrowser")
+        }
+    }
+
+    public var showThumbnails: Bool {
+        get {
+            userDefaults.bool(forKey: "ShowThumbnails")
+        }
+        set {
+            userDefaults.set(newValue, forKey: "ShowThumbnails")
         }
     }
 

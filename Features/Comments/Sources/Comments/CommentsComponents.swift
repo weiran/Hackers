@@ -38,6 +38,7 @@ struct CommentsContentView: View {
                     PostHeader(
                         post: post,
                         votingViewModel: votingViewModel,
+                        showThumbnails: viewModel.showThumbnails,
                         onLinkTap: { handleLinkTap() },
                         onPostUpdate: { updated in
                             viewModel.post = updated
@@ -179,6 +180,7 @@ struct CommentsForEach: View {
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
+    let showThumbnails: Bool
     let onLinkTap: () -> Void
     let onPostUpdate: @Sendable (Post) -> Void
 
@@ -187,6 +189,7 @@ struct PostHeader: View {
             post: post,
             votingState: votingViewModel.votingState(for: post),
             showPostText: true,
+            showThumbnails: showThumbnails,
             onThumbnailTap: { onLinkTap() },
         )
         .contentShape(Rectangle())
@@ -388,11 +391,12 @@ private struct CommentFontProvider {
 struct ToolbarTitle: View {
     let post: Post
     let showTitle: Bool
+    let showThumbnails: Bool
     let onTap: () -> Void
 
     var body: some View {
         HStack {
-            ThumbnailView(url: post.url)
+            ThumbnailView(url: post.url, isEnabled: showThumbnails)
                 .frame(width: 33, height: 33)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
             Text(post.title)

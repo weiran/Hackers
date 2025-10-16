@@ -93,6 +93,27 @@ struct FeedViewModelTests {
         }
         #expect(voteUseCase.upvotePostCallCount == 2)
     }
+
+    @MainActor
+    @Test("Show thumbnails follows settings changes via notifications")
+    func showThumbnailsSyncsWithSettings() async throws {
+        let postUseCase = StubPostUseCase()
+        let voteUseCase = StubVoteUseCase()
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            settingsUseCase: settingsUseCase
+        )
+
+        #expect(viewModel.showThumbnails == true)
+
+        settingsUseCase.showThumbnails = false
+        try await Task.sleep(nanoseconds: 10_000_000)
+
+        #expect(viewModel.showThumbnails == false)
+    }
 }
 
 // MARK: - Test Doubles
@@ -138,6 +159,29 @@ private final class StubVoteUseCase: VoteUseCase, @unchecked Sendable {
     func upvote(comment _: Domain.Comment, for _: Post) async throws {
         if shouldThrow { throw StubError.network }
     }
+}
+
+private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
+    var safariReaderMode: Bool = false
+    var openInDefaultBrowser: Bool = false
+    private var storedShowThumbnails: Bool
+    var textSize: TextSize = .medium
+
+    init(showThumbnails: Bool) {
+        storedShowThumbnails = showThumbnails
+    }
+
+    var showThumbnails: Bool {
+        get { storedShowThumbnails }
+        set {
+            storedShowThumbnails = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    func clearCache() {}
+
+    func cacheUsageBytes() async -> Int64 { 0 }
 }
 
 private enum SampleData {

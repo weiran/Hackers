@@ -178,14 +178,17 @@ struct UseCaseTests {
 
         #expect(settingsUseCase.safariReaderMode == false)
         #expect(settingsUseCase.openInDefaultBrowser == false)
+        #expect(settingsUseCase.showThumbnails == true)
         #expect(settingsUseCase.textSize == .medium)
 
         settingsUseCase.safariReaderMode = true
         settingsUseCase.openInDefaultBrowser = true
+        settingsUseCase.showThumbnails = false
         settingsUseCase.textSize = .large
 
         #expect(settingsUseCase.safariReaderMode == true, "actual: \(settingsUseCase.safariReaderMode)")
         #expect(settingsUseCase.openInDefaultBrowser == true, "actual: \(settingsUseCase.openInDefaultBrowser)")
+        #expect(settingsUseCase.showThumbnails == false, "actual: \(settingsUseCase.showThumbnails)")
         #expect(settingsUseCase.textSize == .large, "actual: \(settingsUseCase.textSize)")
     }
 }
@@ -253,6 +256,7 @@ final class InMemoryUserDefaults: UserDefaultsProtocol, @unchecked Sendable {
     private var storage: [String: Any] = [
         "safariReaderMode": false,
         "openInDefaultBrowser": false,
+        "ShowThumbnails": true,
         "textSize": TextSize.medium.rawValue
     ]
 

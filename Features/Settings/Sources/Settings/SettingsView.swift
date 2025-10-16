@@ -141,6 +141,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         }
                     }
                     .padding(.vertical, 4)
+
+                    Toggle(isOn: $viewModel.showThumbnails) {
+                        Label("Show Thumbnails", systemImage: "photo.on.rectangle")
+                    }
                 }
 
                 Section(header: Text("Browser")) {

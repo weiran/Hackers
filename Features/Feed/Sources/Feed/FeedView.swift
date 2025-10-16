@@ -119,6 +119,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         PostRowView(
             post: post,
             votingViewModel: votingViewModel,
+            showThumbnails: viewModel.showThumbnails,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
         )
@@ -273,9 +274,11 @@ struct PostRowView: View {
     let votingViewModel: VotingViewModel
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
+    let showThumbnails: Bool
 
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
+         showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil)
     {
@@ -283,6 +286,7 @@ struct PostRowView: View {
         self.votingViewModel = votingViewModel
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
+        self.showThumbnails = showThumbnails
     }
 
     var body: some View {
@@ -290,6 +294,7 @@ struct PostRowView: View {
             post: post,
             votingState: votingViewModel.votingState(for: post),
             showPostText: false,
+            showThumbnails: showThumbnails,
             onThumbnailTap: onLinkTap,
         )
         .contentShape(Rectangle())

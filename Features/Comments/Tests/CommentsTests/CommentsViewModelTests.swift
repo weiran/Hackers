@@ -176,6 +176,26 @@ struct CommentsViewModelTests {
         #expect(viewModel.error == nil)
     }
 
+    @Test("Show thumbnails responds to settings notifications")
+    @MainActor
+    func showThumbnailsSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: false)
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase
+        )
+
+        #expect(viewModel.showThumbnails == false)
+
+        settingsUseCase.showThumbnails = true
+        try await Task.sleep(nanoseconds: 10_000_000)
+
+        #expect(viewModel.showThumbnails == true)
+    }
+
     // MARK: - Voting Tests
 
     @Test("Upvoting post updates state correctly", arguments: [
@@ -521,6 +541,29 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
             throw MockError.testError
         }
     }
+}
+
+final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
+    var safariReaderMode: Bool = false
+    var openInDefaultBrowser: Bool = false
+    private var storedShowThumbnails: Bool
+    var textSize: TextSize = .medium
+
+    init(showThumbnails: Bool) {
+        storedShowThumbnails = showThumbnails
+    }
+
+    var showThumbnails: Bool {
+        get { storedShowThumbnails }
+        set {
+            storedShowThumbnails = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    func clearCache() {}
+
+    func cacheUsageBytes() async -> Int64 { 0 }
 }
 
 enum MockError: Error {

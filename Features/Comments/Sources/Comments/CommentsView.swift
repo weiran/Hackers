@@ -93,6 +93,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
                     ToolbarTitle(
                         post: post,
                         showTitle: showTitle,
+                        showThumbnails: viewModel.showThumbnails,
                         onTap: handleLinkTap,
                     )
                 }

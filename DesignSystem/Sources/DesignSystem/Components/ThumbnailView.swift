@@ -9,9 +9,11 @@ import SwiftUI
 
 public struct ThumbnailView: View {
     let url: URL?
+    let isEnabled: Bool
 
-    public init(url: URL?) {
+    public init(url: URL?, isEnabled: Bool = true) {
         self.url = url
+        self.isEnabled = isEnabled
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
@@ -33,7 +35,7 @@ public struct ThumbnailView: View {
     }
 
     public var body: some View {
-        if let url, let thumbnailURL = thumbnailURL(for: url) {
+        if isEnabled, let url, let thumbnailURL = thumbnailURL(for: url) {
             AsyncImage(url: thumbnailURL) { image in
                 image
                     .resizable()

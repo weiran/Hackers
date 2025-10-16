@@ -5,6 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Combine
 import Domain
 import Foundation
 import Shared
@@ -23,17 +24,23 @@ public final class FeedViewModel: @unchecked Sendable {
     private let postUseCase: any PostUseCase
     private let voteUseCase: any VoteUseCase
     private let feedLoader: LoadingStateManager<[Domain.Post]>
+    private let settingsUseCase: any SettingsUseCase
+    private var settingsCancellable: AnyCancellable?
 
     public var posts: [Domain.Post] { feedLoader.data }
     public var isLoading: Bool { feedLoader.isLoading }
     public var error: Error? { feedLoader.error }
+    public var showThumbnails: Bool
 
     public init(
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
     ) {
         self.postUseCase = postUseCase
         self.voteUseCase = voteUseCase
+        self.settingsUseCase = settingsUseCase
+        showThumbnails = settingsUseCase.showThumbnails
         feedLoader = LoadingStateManager(initialData: [])
 
         // Set up the loading function after initialization
@@ -43,6 +50,16 @@ public final class FeedViewModel: @unchecked Sendable {
                 try await self?.fetchFeed() ?? []
             },
         )
+
+        settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let currentValue = settingsUseCase.showThumbnails
+                if self.showThumbnails != currentValue {
+                    self.showThumbnails = currentValue
+                }
+            }
     }
 
     @MainActor
