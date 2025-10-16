@@ -13,28 +13,28 @@ import Testing
 struct OnboardingRepositoryTests {
     @Test("Force show overrides stored state")
     func forceShowOverridesStoredState() {
-        let store = MockStore(lastShownVersion: "5.0")
+        let store = MockStore(lastShownVersion: "5.1")
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
-        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: true))
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: true))
     }
 
     @Test("Disable argument prevents onboarding when not forced")
     func disableArgumentPreventsOnboarding() {
         let repository = OnboardingRepository(versionStore: MockStore(lastShownVersion: nil), processArguments: ["disableOnboarding"])
-        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: false) == false)
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: false) == false)
     }
 
     @Test("Shows when onboarding not yet displayed")
     func showsWhenNotDisplayed() {
         let repository = OnboardingRepository(versionStore: MockStore(lastShownVersion: nil), processArguments: [])
-        #expect(repository.shouldShowOnboarding(currentVersion: "5.1", forceShow: false))
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: false))
     }
 
     @Test("Patch updates do not retrigger onboarding")
     func patchUpdateDoesNotRetrigger() {
-        let store = MockStore(lastShownVersion: "5.1.0")
+        let store = MockStore(lastShownVersion: "5.2.0")
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
-        #expect(repository.shouldShowOnboarding(currentVersion: "5.1.1", forceShow: false) == false)
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2.1", forceShow: false) == false)
     }
 
     @Test("Minor updates retrigger onboarding once")
@@ -63,8 +63,8 @@ struct OnboardingRepositoryTests {
     func marksOnboardingAsShown() {
         let store = MockStore(lastShownVersion: nil)
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
-        repository.markOnboardingShown(for: "5.1")
-        #expect(store.lastShownVersion() == "5.1")
+        repository.markOnboardingShown(for: "5.2")
+        #expect(store.lastShownVersion() == "5.2")
     }
 
     @Test("UserDefaults store defaults to false")
@@ -78,8 +78,8 @@ struct OnboardingRepositoryTests {
     func userDefaultsStoreRecordsShownState() {
         let defaults = makeIsolatedDefaults()
         let store = UserDefaultsOnboardingVersionStore(userDefaults: defaults)
-        store.save(shownVersion: "5.1")
-        #expect(store.lastShownVersion() == "5.1")
+        store.save(shownVersion: "5.2")
+        #expect(store.lastShownVersion() == "5.2")
     }
 
     final class MockStore: OnboardingVersionStore, @unchecked Sendable {

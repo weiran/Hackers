@@ -13,7 +13,7 @@ struct OnboardingDataTests {
     func currentOnboardingData() {
         let data = OnboardingData.currentOnboarding()
 
-        #expect(data.title == "What's New in Hackers 5.1")
+        #expect(data.title == "What's New in Hackers 5.2")
         #expect(data.items.count == 1)
         #expect(data.items.contains { $0.title.contains("Embedded iPad Browser") })
     }

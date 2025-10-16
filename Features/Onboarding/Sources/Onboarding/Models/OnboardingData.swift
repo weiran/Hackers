@@ -24,7 +24,7 @@ public struct OnboardingData: Sendable {
         )
 
         return OnboardingData(
-            title: "What's New in Hackers 5.1",
+            title: "What's New in Hackers 5.2",
             items: [embeddedBrowser],
         )
     }
