@@ -105,7 +105,7 @@ public struct SupportView: View {
                 }
                 .padding(.vertical, 4)
             } else if viewModel.isLoading {
-                ProgressView("Loading subscription…")
+                loadingStateView(title: "Loading subscription…")
             } else {
                 Text("Subscription currently unavailable. Pull to refresh and try again.")
                     .font(.footnote)
@@ -118,7 +118,7 @@ public struct SupportView: View {
         Section(header: Text("Leave a Tip")) {
             if viewModel.tipProducts.isEmpty {
                 if viewModel.isLoading {
-                    ProgressView("Loading tips…")
+                    loadingStateView(title: "Loading tips…")
                 } else {
                     Text("Tips are currently unavailable. Pull to refresh and try again.")
                         .font(.footnote)
@@ -204,6 +204,15 @@ public struct SupportView: View {
             .tint(AppColors.appTintColor)
         }
         .padding(.vertical, 4)
+    }
+
+    private func loadingStateView(title: String) -> some View {
+        HStack {
+            Spacer()
+            ProgressView(title)
+                .progressViewStyle(.circular)
+            Spacer()
+        }
     }
 
     private var restoreSection: some View {
