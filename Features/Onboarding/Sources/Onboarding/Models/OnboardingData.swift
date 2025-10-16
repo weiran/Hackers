@@ -29,9 +29,15 @@ public struct OnboardingData: Sendable {
             systemImage: "photo.on.rectangle",
         )
 
+        let supporterTips = OnboardingItem(
+            title: "Support the Developer",
+            subtitle: "Visit Settings to leave an optional tip or become a monthly supporter and keep Hackers improving.",
+            systemImage: "heart.circle",
+        )
+
         return OnboardingData(
             title: "What's New in Hackers 5.2",
-            items: [rememberedFeed, thumbnailToggle],
+            items: [rememberedFeed, thumbnailToggle, supporterTips],
         )
     }
 }

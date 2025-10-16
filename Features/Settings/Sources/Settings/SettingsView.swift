@@ -48,6 +48,11 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         NavigationStack {
             Form {
                 Section(footer: versionLabel) {
+                    NavigationLink {
+                        SupportView()
+                    } label: {
+                        Label("Support the App", systemImage: "heart.circle.fill")
+                    }
                     Button(action: {
                         if let url = URL(string: "https://github.com/weiran/hackers") {
                             UIApplication.shared.open(url)

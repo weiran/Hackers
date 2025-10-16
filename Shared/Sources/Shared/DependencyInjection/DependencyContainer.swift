@@ -19,6 +19,7 @@ public final class DependencyContainer: @unchecked Sendable {
         var voteUseCase: (() -> any VoteUseCase)?
         var commentUseCase: (() -> any CommentUseCase)?
         var settingsUseCase: (() -> any SettingsUseCase)?
+        var supportUseCase: (() -> any SupportUseCase)?
         var votingService: (() -> any VotingService)?
         var commentVotingService: (() -> any CommentVotingService)?
         var authenticationUseCase: (() -> any AuthenticationUseCase)?
@@ -31,6 +32,7 @@ public final class DependencyContainer: @unchecked Sendable {
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
     private static let postRepository: PostRepository = .init(networkManager: networkManager)
     private static let settingsRepository: SettingsRepository = .init()
+    private static let supportRepository: SupportPurchaseRepository = .init()
     private static let votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
     private static let authenticationRepository: AuthenticationRepository =
         .init(networkManager: networkManager)
@@ -60,6 +62,10 @@ public final class DependencyContainer: @unchecked Sendable {
 
     public func getSettingsUseCase() -> any SettingsUseCase {
         Self.overrides?.settingsUseCase?() ?? Self.settingsRepository
+    }
+
+    public func getSupportUseCase() -> any SupportUseCase {
+        Self.overrides?.supportUseCase?() ?? Self.supportRepository
     }
 
     public func getVotingService() -> any VotingService {
