@@ -116,8 +116,8 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
     var showThumbnails: Bool = true
-    var rememberLastPostType: Bool = false
-    var lastPostType: PostType?
+    var rememberFeedCategory: Bool = false
+    var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
     func clearCache() {}
     func cacheUsageBytes() async -> Int64 { 0 }

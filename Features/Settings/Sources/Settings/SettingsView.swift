@@ -163,8 +163,8 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 }
 
                 Section(header: Text("Feed")) {
-                    Toggle(isOn: $viewModel.rememberLastPostType) {
-                        Label("Remember Last Post Type", systemImage: "list.bullet")
+                    Toggle(isOn: $viewModel.rememberFeedCategory) {
+                        Label("Remember Feed Category", systemImage: "list.bullet")
                     }
                 }
 

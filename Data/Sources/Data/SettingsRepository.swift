@@ -35,7 +35,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
                 "safariReaderMode": false,
                 "openInDefaultBrowser": false,
                 "ShowThumbnails": true,
-                "RememberLastPostType": false,
+                "RememberFeedCategory": false,
                 "textSize": TextSize.medium.rawValue
             ])
         }
@@ -68,25 +68,25 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    public var rememberLastPostType: Bool {
+    public var rememberFeedCategory: Bool {
         get {
-            userDefaults.bool(forKey: "RememberLastPostType")
+            userDefaults.bool(forKey: "RememberFeedCategory")
         }
         set {
-            userDefaults.set(newValue, forKey: "RememberLastPostType")
+            userDefaults.set(newValue, forKey: "RememberFeedCategory")
             if newValue == false {
-                userDefaults.set(nil, forKey: "LastPostType")
+                userDefaults.set(nil, forKey: "LastFeedCategory")
             }
         }
     }
 
-    public var lastPostType: PostType? {
+    public var lastFeedCategory: PostType? {
         get {
-            guard let rawValue = userDefaults.string(forKey: "LastPostType") else { return nil }
+            guard let rawValue = userDefaults.string(forKey: "LastFeedCategory") else { return nil }
             return PostType(rawValue: rawValue)
         }
         set {
-            userDefaults.set(newValue?.rawValue, forKey: "LastPostType")
+            userDefaults.set(newValue?.rawValue, forKey: "LastFeedCategory")
         }
     }
 

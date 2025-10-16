@@ -39,8 +39,8 @@ public protocol SettingsUseCase: Sendable {
     var safariReaderMode: Bool { get set }
     var openInDefaultBrowser: Bool { get set }
     var showThumbnails: Bool { get set }
-    var rememberLastPostType: Bool { get set }
-    var lastPostType: PostType? { get set }
+    var rememberFeedCategory: Bool { get set }
+    var lastFeedCategory: PostType? { get set }
     var textSize: TextSize { get set }
     func clearCache()
     func cacheUsageBytes() async -> Int64

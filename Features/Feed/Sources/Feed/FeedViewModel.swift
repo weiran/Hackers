@@ -26,7 +26,7 @@ public final class FeedViewModel: @unchecked Sendable {
     private let feedLoader: LoadingStateManager<[Domain.Post]>
     private var settingsUseCase: any SettingsUseCase
     private var settingsCancellable: AnyCancellable?
-    private var rememberLastPostTypeSetting: Bool
+    private var rememberFeedCategorySetting: Bool
 
     public var posts: [Domain.Post] { feedLoader.data }
     public var isLoading: Bool { feedLoader.isLoading }
@@ -42,9 +42,9 @@ public final class FeedViewModel: @unchecked Sendable {
         self.voteUseCase = voteUseCase
         self.settingsUseCase = settingsUseCase
         showThumbnails = settingsUseCase.showThumbnails
-        let rememberSetting = settingsUseCase.rememberLastPostType
-        rememberLastPostTypeSetting = rememberSetting
-        if rememberSetting, let storedPostType = settingsUseCase.lastPostType {
+        let rememberSetting = settingsUseCase.rememberFeedCategory
+        rememberFeedCategorySetting = rememberSetting
+        if rememberSetting, let storedPostType = settingsUseCase.lastFeedCategory {
             postType = storedPostType
         }
         feedLoader = LoadingStateManager(initialData: [])
@@ -65,13 +65,13 @@ public final class FeedViewModel: @unchecked Sendable {
                 if self.showThumbnails != currentValue {
                     self.showThumbnails = currentValue
                 }
-                let rememberValue = self.settingsUseCase.rememberLastPostType
-                if self.rememberLastPostTypeSetting != rememberValue {
-                    self.rememberLastPostTypeSetting = rememberValue
+                let rememberValue = self.settingsUseCase.rememberFeedCategory
+                if self.rememberFeedCategorySetting != rememberValue {
+                    self.rememberFeedCategorySetting = rememberValue
                     if rememberValue {
-                        self.settingsUseCase.lastPostType = self.postType
+                        self.settingsUseCase.lastFeedCategory = self.postType
                     } else {
-                        self.settingsUseCase.lastPostType = nil
+                        self.settingsUseCase.lastFeedCategory = nil
                     }
                 }
             }
@@ -163,7 +163,7 @@ public final class FeedViewModel: @unchecked Sendable {
         guard postType != newType else { return }
 
         postType = newType
-        persistLastPostTypeIfNeeded()
+        persistLastFeedCategoryIfNeeded()
         await refreshFeed()
     }
 
@@ -176,9 +176,9 @@ public final class FeedViewModel: @unchecked Sendable {
         feedLoader.reset()
     }
 
-    private func persistLastPostTypeIfNeeded() {
-        guard rememberLastPostTypeSetting else { return }
-        settingsUseCase.lastPostType = postType
+    private func persistLastFeedCategoryIfNeeded() {
+        guard rememberFeedCategorySetting else { return }
+        settingsUseCase.lastFeedCategory = postType
     }
 
     // MARK: - Post Updates

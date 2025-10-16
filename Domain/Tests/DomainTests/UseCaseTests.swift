@@ -179,26 +179,26 @@ struct UseCaseTests {
         #expect(settingsUseCase.safariReaderMode == false)
         #expect(settingsUseCase.openInDefaultBrowser == false)
         #expect(settingsUseCase.showThumbnails == true)
-        #expect(settingsUseCase.rememberLastPostType == false)
-        #expect(settingsUseCase.lastPostType == nil)
+        #expect(settingsUseCase.rememberFeedCategory == false)
+        #expect(settingsUseCase.lastFeedCategory == nil)
         #expect(settingsUseCase.textSize == .medium)
 
         settingsUseCase.safariReaderMode = true
         settingsUseCase.openInDefaultBrowser = true
         settingsUseCase.showThumbnails = false
-        settingsUseCase.rememberLastPostType = true
-        settingsUseCase.lastPostType = .ask
+        settingsUseCase.rememberFeedCategory = true
+        settingsUseCase.lastFeedCategory = .ask
         settingsUseCase.textSize = .large
 
         #expect(settingsUseCase.safariReaderMode == true, "actual: \(settingsUseCase.safariReaderMode)")
         #expect(settingsUseCase.openInDefaultBrowser == true, "actual: \(settingsUseCase.openInDefaultBrowser)")
         #expect(settingsUseCase.showThumbnails == false, "actual: \(settingsUseCase.showThumbnails)")
-        #expect(settingsUseCase.rememberLastPostType == true, "actual: \(settingsUseCase.rememberLastPostType)")
-        #expect(settingsUseCase.lastPostType == .ask, "actual: \(String(describing: settingsUseCase.lastPostType))")
+        #expect(settingsUseCase.rememberFeedCategory == true, "actual: \(settingsUseCase.rememberFeedCategory)")
+        #expect(settingsUseCase.lastFeedCategory == .ask, "actual: \(String(describing: settingsUseCase.lastFeedCategory))")
 
-        settingsUseCase.rememberLastPostType = false
-        #expect(settingsUseCase.rememberLastPostType == false, "actual: \(settingsUseCase.rememberLastPostType)")
-        #expect(settingsUseCase.lastPostType == nil, "actual: \(String(describing: settingsUseCase.lastPostType))")
+        settingsUseCase.rememberFeedCategory = false
+        #expect(settingsUseCase.rememberFeedCategory == false, "actual: \(settingsUseCase.rememberFeedCategory)")
+        #expect(settingsUseCase.lastFeedCategory == nil, "actual: \(String(describing: settingsUseCase.lastFeedCategory))")
         #expect(settingsUseCase.textSize == .large, "actual: \(settingsUseCase.textSize)")
     }
 }
@@ -267,7 +267,7 @@ final class InMemoryUserDefaults: UserDefaultsProtocol, @unchecked Sendable {
         "safariReaderMode": false,
         "openInDefaultBrowser": false,
         "ShowThumbnails": true,
-        "RememberLastPostType": false,
+        "RememberFeedCategory": false,
         "textSize": TextSize.medium.rawValue
     ]
 

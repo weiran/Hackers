@@ -129,42 +129,42 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
     }
 
-    // MARK: - Remember Post Type Tests
+    // MARK: - Remember Feed Category Tests
 
-    @Test("Remember last post type default value")
-    func rememberLastPostTypeDefaultValue() {
+    @Test("Remember feed category default value")
+    func rememberFeedCategoryDefaultValue() {
         mockUserDefaults.clearAll()
 
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        #expect(repository.rememberLastPostType == false)
+        #expect(repository.rememberFeedCategory == false)
     }
 
-    @Test("Remember last post type setter clears stored type when disabled")
-    func rememberLastPostTypeSetter() {
+    @Test("Remember feed category setter clears stored category when disabled")
+    func rememberFeedCategorySetter() {
         mockUserDefaults.clearAll()
 
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        repository.rememberLastPostType = true
-        #expect(repository.rememberLastPostType == true)
-        repository.lastPostType = .ask
-        repository.rememberLastPostType = false
+        repository.rememberFeedCategory = true
+        #expect(repository.rememberFeedCategory == true)
+        repository.lastFeedCategory = .ask
+        repository.rememberFeedCategory = false
 
-        #expect(repository.rememberLastPostType == false)
-        #expect(repository.lastPostType == nil)
-        #expect(mockUserDefaults.string(forKey: "LastPostType") == nil)
+        #expect(repository.rememberFeedCategory == false)
+        #expect(repository.lastFeedCategory == nil)
+        #expect(mockUserDefaults.string(forKey: "LastFeedCategory") == nil)
     }
 
-    @Test("Last post type getter and setter")
-    func lastPostTypeGetterSetter() {
+    @Test("Last feed category getter and setter")
+    func lastFeedCategoryGetterSetter() {
         mockUserDefaults.clearAll()
 
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        repository.lastPostType = .best
-        #expect(repository.lastPostType == .best)
-        #expect(mockUserDefaults.string(forKey: "LastPostType") == PostType.best.rawValue)
+        repository.lastFeedCategory = .best
+        #expect(repository.lastFeedCategory == .best)
+        #expect(mockUserDefaults.string(forKey: "LastFeedCategory") == PostType.best.rawValue)
     }
 
     // MARK: - Removed Settings (showComments)

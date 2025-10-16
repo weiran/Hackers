@@ -116,14 +116,14 @@ struct FeedViewModelTests {
     }
 
     @MainActor
-    @Test("Initializes with stored post type when remember setting enabled")
-    func initializesWithStoredPostType() async {
+    @Test("Initializes with stored feed category when remember setting enabled")
+    func initializesWithStoredFeedCategory() async {
         let postUseCase = StubPostUseCase()
         let voteUseCase = StubVoteUseCase()
         let settingsUseCase = StubSettingsUseCase(
             showThumbnails: true,
-            rememberLastPostType: true,
-            lastPostType: .ask
+            rememberFeedCategory: true,
+            lastFeedCategory: .ask
         )
 
         let viewModel = FeedViewModel(
@@ -142,8 +142,8 @@ struct FeedViewModelTests {
         let voteUseCase = StubVoteUseCase()
         let settingsUseCase = StubSettingsUseCase(
             showThumbnails: true,
-            rememberLastPostType: true,
-            lastPostType: .news
+            rememberFeedCategory: true,
+            lastFeedCategory: .news
         )
 
         let viewModel = FeedViewModel(
@@ -153,7 +153,7 @@ struct FeedViewModelTests {
         )
 
         await viewModel.changePostType(.jobs)
-        #expect(settingsUseCase.lastPostType == .jobs)
+        #expect(settingsUseCase.lastFeedCategory == .jobs)
     }
 }
 
@@ -206,18 +206,18 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
     private var storedShowThumbnails: Bool
-    private var storedRememberLastPostType: Bool
-    private var storedLastPostType: PostType?
+    private var storedRememberFeedCategory: Bool
+    private var storedLastFeedCategory: PostType?
     var textSize: TextSize = .medium
 
     init(
         showThumbnails: Bool,
-        rememberLastPostType: Bool = false,
-        lastPostType: PostType? = nil
+        rememberFeedCategory: Bool = false,
+        lastFeedCategory: PostType? = nil
     ) {
         storedShowThumbnails = showThumbnails
-        storedRememberLastPostType = rememberLastPostType
-        storedLastPostType = lastPostType
+        storedRememberFeedCategory = rememberFeedCategory
+        storedLastFeedCategory = lastFeedCategory
     }
 
     var showThumbnails: Bool {
@@ -228,21 +228,21 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    var rememberLastPostType: Bool {
-        get { storedRememberLastPostType }
+    var rememberFeedCategory: Bool {
+        get { storedRememberFeedCategory }
         set {
-            storedRememberLastPostType = newValue
+            storedRememberFeedCategory = newValue
             if !newValue {
-                storedLastPostType = nil
+                storedLastFeedCategory = nil
             }
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }
 
-    var lastPostType: PostType? {
-        get { storedLastPostType }
+    var lastFeedCategory: PostType? {
+        get { storedLastFeedCategory }
         set {
-            storedLastPostType = newValue
+            storedLastFeedCategory = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

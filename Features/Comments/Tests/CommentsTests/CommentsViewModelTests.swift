@@ -547,8 +547,8 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
     private var storedShowThumbnails: Bool
-    private var storedRememberLastPostType: Bool = false
-    private var storedLastPostType: PostType?
+    private var storedRememberFeedCategory: Bool = false
+    private var storedLastFeedCategory: PostType?
     var textSize: TextSize = .medium
 
     init(showThumbnails: Bool) {
@@ -563,21 +563,21 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    var rememberLastPostType: Bool {
-        get { storedRememberLastPostType }
+    var rememberFeedCategory: Bool {
+        get { storedRememberFeedCategory }
         set {
-            storedRememberLastPostType = newValue
+            storedRememberFeedCategory = newValue
             if !newValue {
-                storedLastPostType = nil
+                storedLastFeedCategory = nil
             }
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }
 
-    var lastPostType: PostType? {
-        get { storedLastPostType }
+    var lastFeedCategory: PostType? {
+        get { storedLastFeedCategory }
         set {
-            storedLastPostType = newValue
+            storedLastFeedCategory = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

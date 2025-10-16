@@ -127,8 +127,8 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool
     var openInDefaultBrowser: Bool
     var showThumbnails: Bool = true
-    var rememberLastPostType: Bool = false
-    var lastPostType: PostType?
+    var rememberFeedCategory: Bool = false
+    var lastFeedCategory: PostType?
     var textSize: TextSize
 
     init(safariReaderMode: Bool = false, openInDefaultBrowser: Bool = false, textSize: TextSize = .medium) {
