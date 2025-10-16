@@ -398,7 +398,7 @@ struct ToolbarTitle: View {
         HStack {
             ThumbnailView(url: post.url, isEnabled: showThumbnails)
                 .frame(width: 33, height: 33)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             Text(post.title)
                 .scaledFont(.headline)
                 .lineLimit(1)

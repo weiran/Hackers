@@ -36,7 +36,7 @@ public struct PostDisplayView: View {
                 // Thumbnail with proper loading
                 ThumbnailView(url: post.url, isEnabled: showThumbnails)
                     .frame(width: 55, height: 55)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .contentShape(Rectangle())
                     .onTapGesture {
                         onThumbnailTap?()
