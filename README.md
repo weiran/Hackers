@@ -26,9 +26,9 @@ It’s **open source (MIT)**, rebuilt from the ground up in **version 5.0**, and
 ## 📲 Download
 
 - **App Store:** [Hackers for Hacker News](https://apps.apple.com/us/app/hackers-for-hacker-news/id603503901)  
-- **TestFlight (beta):** [Join here](https://testflight.apple.com/join/URL_GOES_HERE)  
+- **TestFlight (beta):** [Join here](https://testflight.apple.com/join/UDLeEQde)  
 
-Requires **iOS/iPadOS 15 or later**. Also runs on Apple Silicon Macs and visionOS.  
+Requires **iOS/iPadOS 26 or later**. Also runs on Apple Silicon Macs and visionOS.  
 
 ---
 
