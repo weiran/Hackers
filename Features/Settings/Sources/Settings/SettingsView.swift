@@ -63,11 +63,23 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     .disabled(!MFMailComposeViewController.canSendMail())
                     .sheet(isPresented: $showMailView) {
                         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+                        let deviceIdentifier = UIDevice.current.modelIdentifier
+                        let systemVersion = UIDevice.current.systemVersion
+                        let bodyLines = [
+                            "",
+                            "",
+                            "",
+                            "---",
+                            "App Version: \(version)",
+                            "Device Model: \(deviceIdentifier)",
+                            "iOS Version: \(systemVersion)",
+                        ]
+
                         MailView(
                             result: $mailResult,
                             recipients: ["weiran@zhang.me.uk"],
                             subject: "Hackers App Feedback",
-                            messageBody: "\n\n\n---\nApp Version: \(version)",
+                            messageBody: bodyLines.joined(separator: "\n"),
                         )
                     }
                     Button(action: { onShowOnboarding() }, label: {
@@ -216,6 +228,19 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                 .foregroundColor(.gray)
             Spacer()
         }
+    }
+}
+
+private extension UIDevice {
+    var modelIdentifier: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        // Mirror lets us turn the C char tuple into a Swift String.
+        let identifier = Mirror(reflecting: systemInfo.machine).children.reduce(into: "") { result, element in
+            guard let value = element.value as? Int8, value != 0 else { return }
+            result.append(Character(UnicodeScalar(UInt8(value))))
+        }
+        return identifier.isEmpty ? "Unknown" : identifier
     }
 }
 
