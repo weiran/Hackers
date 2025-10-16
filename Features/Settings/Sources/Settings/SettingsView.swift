@@ -65,7 +65,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
                         MailView(
                             result: $mailResult,
-                            recipients: ["me@weiran.co"],
+                            recipients: ["weiran@zhang.me.uk"],
                             subject: "Hackers App Feedback",
                             messageBody: "\n\n\n---\nApp Version: \(version)",
                         )
