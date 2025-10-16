@@ -115,6 +115,9 @@ private final class StubPostRepository: PostUseCase, VoteUseCase, CommentUseCase
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
+    var showThumbnails: Bool = true
+    var rememberLastPostType: Bool = false
+    var lastPostType: PostType?
     var textSize: TextSize = .medium
     func clearCache() {}
     func cacheUsageBytes() async -> Int64 { 0 }

@@ -114,6 +114,47 @@ struct FeedViewModelTests {
 
         #expect(viewModel.showThumbnails == false)
     }
+
+    @MainActor
+    @Test("Initializes with stored post type when remember setting enabled")
+    func initializesWithStoredPostType() async {
+        let postUseCase = StubPostUseCase()
+        let voteUseCase = StubVoteUseCase()
+        let settingsUseCase = StubSettingsUseCase(
+            showThumbnails: true,
+            rememberLastPostType: true,
+            lastPostType: .ask
+        )
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            settingsUseCase: settingsUseCase
+        )
+
+        #expect(viewModel.postType == .ask)
+    }
+
+    @MainActor
+    @Test("Changing post type persists when remember setting enabled")
+    func changePostTypePersistsWhenRememberEnabled() async {
+        let postUseCase = StubPostUseCase()
+        let voteUseCase = StubVoteUseCase()
+        let settingsUseCase = StubSettingsUseCase(
+            showThumbnails: true,
+            rememberLastPostType: true,
+            lastPostType: .news
+        )
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            settingsUseCase: settingsUseCase
+        )
+
+        await viewModel.changePostType(.jobs)
+        #expect(settingsUseCase.lastPostType == .jobs)
+    }
 }
 
 // MARK: - Test Doubles
@@ -165,16 +206,43 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
     private var storedShowThumbnails: Bool
+    private var storedRememberLastPostType: Bool
+    private var storedLastPostType: PostType?
     var textSize: TextSize = .medium
 
-    init(showThumbnails: Bool) {
+    init(
+        showThumbnails: Bool,
+        rememberLastPostType: Bool = false,
+        lastPostType: PostType? = nil
+    ) {
         storedShowThumbnails = showThumbnails
+        storedRememberLastPostType = rememberLastPostType
+        storedLastPostType = lastPostType
     }
 
     var showThumbnails: Bool {
         get { storedShowThumbnails }
         set {
             storedShowThumbnails = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var rememberLastPostType: Bool {
+        get { storedRememberLastPostType }
+        set {
+            storedRememberLastPostType = newValue
+            if !newValue {
+                storedLastPostType = nil
+            }
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var lastPostType: PostType? {
+        get { storedLastPostType }
+        set {
+            storedLastPostType = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

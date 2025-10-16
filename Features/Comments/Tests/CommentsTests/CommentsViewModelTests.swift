@@ -547,6 +547,8 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
     var openInDefaultBrowser: Bool = false
     private var storedShowThumbnails: Bool
+    private var storedRememberLastPostType: Bool = false
+    private var storedLastPostType: PostType?
     var textSize: TextSize = .medium
 
     init(showThumbnails: Bool) {
@@ -557,6 +559,25 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedShowThumbnails }
         set {
             storedShowThumbnails = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var rememberLastPostType: Bool {
+        get { storedRememberLastPostType }
+        set {
+            storedRememberLastPostType = newValue
+            if !newValue {
+                storedLastPostType = nil
+            }
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var lastPostType: PostType? {
+        get { storedLastPostType }
+        set {
+            storedLastPostType = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

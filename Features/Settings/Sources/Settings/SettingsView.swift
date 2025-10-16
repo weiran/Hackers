@@ -162,6 +162,12 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     }
                 }
 
+                Section(header: Text("Feed")) {
+                    Toggle(isOn: $viewModel.rememberLastPostType) {
+                        Label("Remember Last Post Type", systemImage: "list.bullet")
+                    }
+                }
+
                 Section(header: Text("Storage")) {
                     HStack(spacing: 12) {
                         Label("Storage Used", systemImage: "externaldrive")

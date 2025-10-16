@@ -16,6 +16,7 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     @Published public var safariReaderMode: Bool = false
     @Published public var openInDefaultBrowser: Bool = false
     @Published public var showThumbnails: Bool = true
+    @Published public var rememberLastPostType: Bool = false
     @Published public var textSize: TextSize = .medium
     @Published public var cacheUsageText: String = "Calculating…"
 
@@ -29,6 +30,7 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
         safariReaderMode = settingsUseCase.safariReaderMode
         openInDefaultBrowser = settingsUseCase.openInDefaultBrowser
         showThumbnails = settingsUseCase.showThumbnails
+        rememberLastPostType = settingsUseCase.rememberLastPostType
         textSize = settingsUseCase.textSize
 
         // Set up observers for changes
@@ -55,6 +57,13 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
             .dropFirst()
             .sink { [weak self] newValue in
                 self?.settingsUseCase.showThumbnails = newValue
+            }
+            .store(in: &cancellables)
+
+        $rememberLastPostType
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.rememberLastPostType = newValue
             }
             .store(in: &cancellables)
 

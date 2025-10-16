@@ -26,6 +26,8 @@ struct SettingsViewModelTests {
         private var _safariReaderMode = false
         private var _openInDefaultBrowser = false
         private var _showThumbnails = true
+        private var _rememberLastPostType = false
+        private var _lastPostType: PostType?
         private var _textSize: TextSize = .medium
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
@@ -67,6 +69,31 @@ struct SettingsViewModelTests {
             }
         }
 
+        var rememberLastPostType: Bool {
+            get {
+                getterCallCounts["rememberLastPostType", default: 0] += 1
+                return _rememberLastPostType
+            }
+            set {
+                setterCallCounts["rememberLastPostType", default: 0] += 1
+                _rememberLastPostType = newValue
+                if !newValue {
+                    _lastPostType = nil
+                }
+            }
+        }
+
+        var lastPostType: PostType? {
+            get {
+                getterCallCounts["lastPostType", default: 0] += 1
+                return _lastPostType
+            }
+            set {
+                setterCallCounts["lastPostType", default: 0] += 1
+                _lastPostType = newValue
+            }
+        }
+
         var textSize: TextSize {
             get {
                 getterCallCounts["textSize", default: 0] += 1
@@ -84,6 +111,8 @@ struct SettingsViewModelTests {
             clearCacheCallCount = 0
             cacheUsageCallCount = 0
             _showThumbnails = true
+            _rememberLastPostType = false
+            _lastPostType = nil
         }
 
         func clearCache() { clearCacheCallCount += 1 }
@@ -172,6 +201,44 @@ struct SettingsViewModelTests {
         // Toggle back to true
         settingsViewModel.showThumbnails = true
         #expect(settingsViewModel.showThumbnails == true)
+    }
+
+    // MARK: - Remember Post Type Tests
+
+    @Test("Remember last post type getter")
+    func rememberLastPostTypeGetter() {
+        mockSettingsUseCase.rememberLastPostType = true
+
+        let value = settingsViewModel.rememberLastPostType
+
+        #expect(value == true)
+        #expect(mockSettingsUseCase.getterCallCounts["rememberLastPostType"] == 1)
+    }
+
+    @Test("Remember last post type setter")
+    func rememberLastPostTypeSetter() {
+        settingsViewModel.rememberLastPostType = true
+
+        #expect(mockSettingsUseCase.rememberLastPostType == true)
+        #expect(mockSettingsUseCase.setterCallCounts["rememberLastPostType"] == 1)
+    }
+
+    @Test("Remember last post type toggle clears stored value when disabled")
+    func rememberLastPostTypeToggle() {
+        // Start with false
+        #expect(settingsViewModel.rememberLastPostType == false)
+
+        // Toggle to true
+        settingsViewModel.rememberLastPostType = true
+        #expect(settingsViewModel.rememberLastPostType == true)
+
+        // Simulate stored post type
+        mockSettingsUseCase.lastPostType = .ask
+
+        // Toggle back to false
+        settingsViewModel.rememberLastPostType = false
+        #expect(settingsViewModel.rememberLastPostType == false)
+        #expect(mockSettingsUseCase.lastPostType == nil)
     }
 
     // MARK: - Removed Settings (showComments)

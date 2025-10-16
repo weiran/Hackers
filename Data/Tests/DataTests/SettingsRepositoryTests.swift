@@ -35,6 +35,11 @@ struct SettingsRepositoryTests {
             return storage[defaultName] as? Int ?? 0
         }
 
+        func string(forKey defaultName: String) -> String? {
+            lock.lock(); defer { lock.unlock() }
+            return storage[defaultName] as? String
+        }
+
         func set(_ value: Bool, forKey defaultName: String) {
             lock.lock(); defer { lock.unlock() }
             storage[defaultName] = value
@@ -43,11 +48,6 @@ struct SettingsRepositoryTests {
         func set(_ value: Int, forKey defaultName: String) {
             lock.lock(); defer { lock.unlock() }
             storage[defaultName] = value
-        }
-
-        func string(forKey defaultName: String) -> String? {
-            lock.lock(); defer { lock.unlock() }
-            return storage[defaultName] as? String
         }
 
         func set(_ value: Any?, forKey defaultName: String) {
@@ -127,6 +127,44 @@ struct SettingsRepositoryTests {
         repository.showThumbnails = true
         #expect(repository.showThumbnails == true)
         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
+    }
+
+    // MARK: - Remember Post Type Tests
+
+    @Test("Remember last post type default value")
+    func rememberLastPostTypeDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.rememberLastPostType == false)
+    }
+
+    @Test("Remember last post type setter clears stored type when disabled")
+    func rememberLastPostTypeSetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.rememberLastPostType = true
+        #expect(repository.rememberLastPostType == true)
+        repository.lastPostType = .ask
+        repository.rememberLastPostType = false
+
+        #expect(repository.rememberLastPostType == false)
+        #expect(repository.lastPostType == nil)
+        #expect(mockUserDefaults.string(forKey: "LastPostType") == nil)
+    }
+
+    @Test("Last post type getter and setter")
+    func lastPostTypeGetterSetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.lastPostType = .best
+        #expect(repository.lastPostType == .best)
+        #expect(mockUserDefaults.string(forKey: "LastPostType") == PostType.best.rawValue)
     }
 
     // MARK: - Removed Settings (showComments)

@@ -13,7 +13,7 @@ import SwiftUI
 public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
-    @State private var selectedPostType: Domain.PostType = .news
+    @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
     @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var authService: AuthService
@@ -26,6 +26,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         isSidebar: Bool = false,
     ) {
         _viewModel = State(initialValue: viewModel)
+        _selectedPostType = State(initialValue: viewModel.postType)
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
             votingService: container.getVotingService(),

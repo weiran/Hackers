@@ -11,6 +11,7 @@ import Foundation
 public protocol UserDefaultsProtocol: Sendable {
     func bool(forKey defaultName: String) -> Bool
     func integer(forKey defaultName: String) -> Int
+    func string(forKey defaultName: String) -> String?
     func set(_ value: Bool, forKey defaultName: String)
     func set(_ value: Int, forKey defaultName: String)
     func set(_ value: Any?, forKey defaultName: String)
@@ -34,6 +35,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
                 "safariReaderMode": false,
                 "openInDefaultBrowser": false,
                 "ShowThumbnails": true,
+                "RememberLastPostType": false,
                 "textSize": TextSize.medium.rawValue
             ])
         }
@@ -63,6 +65,28 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "ShowThumbnails")
+        }
+    }
+
+    public var rememberLastPostType: Bool {
+        get {
+            userDefaults.bool(forKey: "RememberLastPostType")
+        }
+        set {
+            userDefaults.set(newValue, forKey: "RememberLastPostType")
+            if newValue == false {
+                userDefaults.set(nil, forKey: "LastPostType")
+            }
+        }
+    }
+
+    public var lastPostType: PostType? {
+        get {
+            guard let rawValue = userDefaults.string(forKey: "LastPostType") else { return nil }
+            return PostType(rawValue: rawValue)
+        }
+        set {
+            userDefaults.set(newValue?.rawValue, forKey: "LastPostType")
         }
     }
 
