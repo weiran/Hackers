@@ -22,9 +22,10 @@ struct DependencyContainerTests {
     func overridesInjectCustomDependencies() async {
         let stubRepository = StubPostRepository()
         let stubSettings = StubSettingsUseCase()
-        let stubVoting = StubVotingService()
+        let stubVoting = StubVotingStateProvider()
         let stubAuth = StubAuthenticationUseCase()
         let stubOnboarding = StubOnboardingUseCase()
+        let stubBookmarks = StubBookmarksUseCase()
         let sessionService = SessionService(authenticationUseCase: stubAuth)
         let toastPresenter = ToastPresenter()
 
@@ -34,8 +35,9 @@ struct DependencyContainerTests {
                 voteUseCase: { stubRepository },
                 commentUseCase: { stubRepository },
                 settingsUseCase: { stubSettings },
-                votingService: { stubVoting },
-                commentVotingService: { stubVoting },
+                bookmarksUseCase: { stubBookmarks },
+                votingStateProvider: { stubVoting },
+                commentVotingStateProvider: { stubVoting },
                 authenticationUseCase: { stubAuth },
                 onboardingUseCase: { stubOnboarding },
                 sessionService: { sessionService },
@@ -49,8 +51,11 @@ struct DependencyContainerTests {
         #expect((container.getVoteUseCase() as? StubPostRepository) === stubRepository)
         #expect((container.getCommentUseCase() as? StubPostRepository) === stubRepository)
         #expect((container.getSettingsUseCase() as? StubSettingsUseCase) === stubSettings)
-        #expect((container.getVotingService() as? StubVotingService) === stubVoting)
-        #expect((container.getCommentVotingService() as? StubVotingService) === stubVoting)
+        #expect((container.getBookmarksUseCase() as? StubBookmarksUseCase) === stubBookmarks)
+        #expect((container.getVotingStateProvider() as? StubVotingStateProvider) === stubVoting)
+        #expect(
+            (container.getCommentVotingStateProvider() as? StubVotingStateProvider) === stubVoting
+        )
         #expect((container.getAuthenticationUseCase() as? StubAuthenticationUseCase) === stubAuth)
         #expect((container.getOnboardingUseCase() as? StubOnboardingUseCase) === stubOnboarding)
         #expect(await container.makeSessionService() === sessionService)
@@ -123,7 +128,9 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     func cacheUsageBytes() async -> Int64 { 0 }
 }
 
-private final class StubVotingService: VotingService, CommentVotingService, @unchecked Sendable {
+private final class StubVotingStateProvider:
+    VotingStateProvider, CommentVotingStateProvider, @unchecked Sendable
+{
     func votingState(for item: any Votable) -> VotingState {
         VotingState(isUpvoted: item.upvoted, score: nil, canVote: true, isVoting: false)
     }
@@ -150,5 +157,30 @@ private final class StubOnboardingUseCase: OnboardingUseCase, @unchecked Sendabl
 
     func markOnboardingShown(for _: String) {
         shouldShow = false
+    }
+}
+
+private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
+    var toggledPosts: [Post] = []
+    var storedPosts: [Post] = []
+
+    func bookmarkedIDs() async -> Set<Int> {
+        Set(storedPosts.map(\.id))
+    }
+
+    func bookmarkedPosts() async -> [Post] {
+        storedPosts
+    }
+
+    @discardableResult
+    func toggleBookmark(post: Post) async throws -> Bool {
+        toggledPosts.append(post)
+        if let index = storedPosts.firstIndex(where: { $0.id == post.id }) {
+            storedPosts.remove(at: index)
+            return false
+        } else {
+            storedPosts.append(post)
+            return true
+        }
     }
 }

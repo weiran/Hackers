@@ -102,7 +102,7 @@ Module/Tests/ModuleTests/
 │   ├── FeedViewModelTests.swift
 │   └── CommentsViewModelTests.swift
 ├── Services/
-│   └── VotingServiceTests.swift
+│   └── VotingStateProviderTests.swift
 ├── Repositories/
 │   └── PostRepositoryTests.swift
 └── Utilities/
@@ -151,7 +151,7 @@ struct FeedViewModelTests {
 
         let viewModel = FeedViewModel(
             postUseCase: mockUseCase,
-            votingService: MockVotingService()
+            votingStateProvider: MockVotingStateProvider()
         )
 
         await viewModel.loadPosts()
@@ -165,7 +165,7 @@ struct FeedViewModelTests {
     private func makeFeedViewModel() -> FeedViewModel {
         FeedViewModel(
             postUseCase: MockPostUseCase(),
-            votingService: MockVotingService()
+            votingStateProvider: MockVotingStateProvider()
         )
     }
 }
@@ -180,10 +180,10 @@ struct FeedViewModelTests {
 func upvotePost() async {
     // Given
     let post = Post.preview
-    let mockVotingService = MockVotingService()
+    let mockVotingStateProvider = MockVotingStateProvider()
     let viewModel = FeedViewModel(
         postUseCase: MockPostUseCase(),
-        votingService: mockVotingService
+        votingStateProvider: mockVotingStateProvider
     )
     viewModel.posts = [post]
 
@@ -191,8 +191,8 @@ func upvotePost() async {
     await viewModel.upvote(post: post)
 
     // Then
-    #expect(mockVotingService.upvoteCallCount == 1)
-    #expect(mockVotingService.lastUpvotedPost?.id == post.id)
+    #expect(mockVotingStateProvider.upvoteCallCount == 1)
+    #expect(mockVotingStateProvider.lastUpvotedPost?.id == post.id)
 }
 ```
 
@@ -209,7 +209,7 @@ func loadComments() async {
     let viewModel = CommentsViewModel(
         post: post,
         commentUseCase: mockUseCase,
-        votingService: MockVotingService()
+        votingStateProvider: MockVotingStateProvider()
     )
 
     await viewModel.loadComments()
@@ -230,7 +230,7 @@ func networkError() async {
 
     let viewModel = FeedViewModel(
         postUseCase: mockUseCase,
-        votingService: MockVotingService()
+        votingStateProvider: MockVotingStateProvider()
     )
 
     await viewModel.loadPosts()
@@ -390,37 +390,34 @@ final class MockPostUseCase: PostUseCase {
     }
 }
 
-// Mock Service with Call Tracking
-final class MockVotingService: VotingService {
+// Mock provider with call tracking
+final class MockVotingStateProvider: VotingStateProvider, CommentVotingStateProvider {
     var upvoteCallCount = 0
     var lastUpvotedPost: Post?
     var lastUpvotedComment: Comment?
     var shouldThrowError = false
 
-    func upvote(post: Post) async throws {
+    func votingState(for item: any Votable) -> VotingState {
+        VotingState(isUpvoted: item.upvoted, canVote: true)
+    }
+
+    func upvote(item: any Votable) async throws {
         upvoteCallCount += 1
-        lastUpvotedPost = post
+        if let post = item as? Post {
+            lastUpvotedPost = post
+        }
 
         if shouldThrowError {
             throw HackersKitError.unauthenticated
         }
     }
 
-    func upvote(comment: Comment, for post: Post) async throws {
-        upvoteCallCount += 1
+    func upvoteComment(_ comment: Comment, for _: Post) async throws {
         lastUpvotedComment = comment
 
         if shouldThrowError {
             throw HackersKitError.unauthenticated
         }
-    }
-
-    func votingState(for post: Post) -> VotingState {
-        return .idle
-    }
-
-    func votingState(for comment: Comment) -> VotingState {
-        return .idle
     }
 }
 ```
@@ -596,10 +593,10 @@ test:
 ```swift
 // ✅ Reset mocks between tests
 @Suite struct MyTests {
-    var mockService: MockVotingService!
+    var mockStateProvider: MockVotingStateProvider!
 
     init() {
-        mockService = MockVotingService()
+        mockStateProvider = MockVotingStateProvider()
     }
 
     @Test func testOne() async {

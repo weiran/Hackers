@@ -19,6 +19,14 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
 
     let isSidebar: Bool
 
+    private var primaryPostTypes: [Domain.PostType] {
+        [.news, .ask, .show, .jobs, .newest, .best, .active]
+    }
+
+    private var secondaryPostTypes: [Domain.PostType] {
+        [.bookmarks]
+    }
+
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
@@ -28,8 +36,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         _selectedPostType = State(initialValue: viewModel.postType)
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
-            votingService: container.getVotingService(),
-            commentVotingService: container.getCommentVotingService(),
+            votingStateProvider: container.getVotingStateProvider(),
+            commentVotingStateProvider: container.getCommentVotingStateProvider(),
             authenticationUseCase: container.getAuthenticationUseCase()
         )
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
@@ -120,6 +128,9 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
             onUpvoteApplied: { postId in
                 viewModel.applyLocalUpvote(to: postId)
+            },
+            onBookmarkToggle: {
+                await viewModel.toggleBookmark(for: post)
             }
         )
         .if(isSidebar) { view in
@@ -192,21 +203,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     @ViewBuilder
     private var toolbarMenu: some View {
         Menu {
-            ForEach(Domain.PostType.allCases, id: \.self) { postType in
-                Button {
-                    selectedPostType = postType
-                    Task {
-                        await viewModel.changePostType(postType)
-                    }
-                } label: {
-                    HStack {
-                        Image(systemName: postType.iconName)
-                        Text(postType.displayName)
-                        if postType == selectedPostType {
-                            Spacer()
-                            Image(systemName: "checkmark")
-                        }
-                    }
+            ForEach(primaryPostTypes, id: \.self) { postType in
+                postTypeMenuButton(for: postType)
+            }
+            if !secondaryPostTypes.isEmpty {
+                Divider()
+                ForEach(secondaryPostTypes, id: \.self) { postType in
+                    postTypeMenuButton(for: postType)
                 }
             }
         } label: {
@@ -241,6 +244,25 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         .accessibilityLabel("Settings")
     }
 
+    @ViewBuilder
+    private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
+        Button {
+            selectedPostType = postType
+            Task {
+                await viewModel.changePostType(postType)
+            }
+        } label: {
+            HStack {
+                Image(systemName: postType.iconName)
+                Text(postType.displayName)
+                if postType == selectedPostType {
+                    Spacer()
+                    Image(systemName: "checkmark")
+                }
+            }
+        }
+    }
+
     private func handleLinkTap(post: Domain.Post) {
         guard !isHackerNewsItemURL(post.url) else {
             navigationStore.showPost(post)
@@ -271,13 +293,15 @@ struct PostRowView: View {
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
     let onUpvoteApplied: ((Int) -> Void)?
+    let onBookmarkToggle: (() async -> Bool)?
 
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
          showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil,
-         onUpvoteApplied: ((Int) -> Void)? = nil)
+         onUpvoteApplied: ((Int) -> Void)? = nil,
+         onBookmarkToggle: (() async -> Bool)? = nil)
     {
         self.post = post
         self.votingViewModel = votingViewModel
@@ -285,6 +309,7 @@ struct PostRowView: View {
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
         self.onUpvoteApplied = onUpvoteApplied
+        self.onBookmarkToggle = onBookmarkToggle
     }
 
     var body: some View {
@@ -294,7 +319,11 @@ struct PostRowView: View {
             showPostText: false,
             showThumbnails: showThumbnails,
             onThumbnailTap: onLinkTap,
-            onUpvoteTap: { await handleUpvoteTap() }
+            onUpvoteTap: { await handleUpvoteTap() },
+            onBookmarkTap: {
+                guard let onBookmarkToggle else { return post.isBookmarked }
+                return await onBookmarkToggle()
+            }
         )
         .contentShape(Rectangle())
         .if(onCommentsTap != nil) { view in

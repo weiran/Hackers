@@ -13,8 +13,8 @@ import SwiftUI
 @MainActor
 @Observable
 public final class VotingViewModel {
-    private let votingService: VotingService
-    private let commentVotingService: CommentVotingService
+    private let votingStateProvider: VotingStateProvider
+    private let commentVotingStateProvider: CommentVotingStateProvider
     private let authenticationUseCase: any AuthenticationUseCase
     public var navigationStore: NavigationStoreProtocol?
 
@@ -27,12 +27,12 @@ public final class VotingViewModel {
     }
 
     public init(
-        votingService: VotingService,
-        commentVotingService: CommentVotingService,
+        votingStateProvider: VotingStateProvider,
+        commentVotingStateProvider: CommentVotingStateProvider,
         authenticationUseCase: any AuthenticationUseCase,
     ) {
-        self.votingService = votingService
-        self.commentVotingService = commentVotingService
+        self.votingStateProvider = votingStateProvider
+        self.commentVotingStateProvider = commentVotingStateProvider
         self.authenticationUseCase = authenticationUseCase
     }
 
@@ -43,7 +43,7 @@ public final class VotingViewModel {
 
         let originalScore = post.score
 
-        // Create a copy of the post with the original state for the voting service
+        // Create a copy of the post with the original state for the voting provider
         var postForVoting = post
         postForVoting.upvoted = false
         postForVoting.score = originalScore
@@ -56,7 +56,7 @@ public final class VotingViewModel {
         lastError = nil
 
         do {
-            try await votingService.upvote(item: postForVoting)
+            try await votingStateProvider.upvote(item: postForVoting)
 
         } catch {
             // Revert optimistic changes on error
@@ -77,7 +77,7 @@ public final class VotingViewModel {
     public func upvote(comment: Comment, in post: Post) async {
         guard !comment.upvoted else { return }
 
-        // Create a copy of the comment with the original state for the voting service
+        // Create a copy of the comment with the original state for the voting provider
         var commentForVoting = comment
         commentForVoting.upvoted = false
 
@@ -88,7 +88,7 @@ public final class VotingViewModel {
         lastError = nil
 
         do {
-            try await commentVotingService.upvoteComment(commentForVoting, for: post)
+            try await commentVotingStateProvider.upvoteComment(commentForVoting, for: post)
         } catch {
             // Revert optimistic changes on error
             comment.upvoted = false
@@ -105,13 +105,13 @@ public final class VotingViewModel {
     // MARK: - State Helpers
 
     public func votingState(for item: any Votable) -> VotingState {
-        let score: Int? = (item as? any ScoredVotable)?.score
+        let baseState = votingStateProvider.votingState(for: item)
         return VotingState(
-            isUpvoted: item.upvoted,
-            score: score,
-            canVote: item.voteLinks?.upvote != nil,
+            isUpvoted: baseState.isUpvoted,
+            score: baseState.score,
+            canVote: baseState.canVote,
             isVoting: isVoting,
-            error: lastError,
+            error: lastError
         )
     }
 

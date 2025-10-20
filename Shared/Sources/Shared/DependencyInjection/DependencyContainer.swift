@@ -19,9 +19,10 @@ public final class DependencyContainer: @unchecked Sendable {
         var voteUseCase: (() -> any VoteUseCase)?
         var commentUseCase: (() -> any CommentUseCase)?
         var settingsUseCase: (() -> any SettingsUseCase)?
+        var bookmarksUseCase: (() -> any BookmarksUseCase)?
         var supportUseCase: (() -> any SupportUseCase)?
-        var votingService: (() -> any VotingService)?
-        var commentVotingService: (() -> any CommentVotingService)?
+        var votingStateProvider: (() -> any VotingStateProvider)?
+        var commentVotingStateProvider: (() -> any CommentVotingStateProvider)?
         var authenticationUseCase: (() -> any AuthenticationUseCase)?
         var onboardingUseCase: (() -> any OnboardingUseCase)?
         var sessionService: (@MainActor () -> SessionService)?
@@ -31,9 +32,11 @@ public final class DependencyContainer: @unchecked Sendable {
     // Use type-level singletons to guarantee identity across access sites and threads
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
     private static let postRepository: PostRepository = .init(networkManager: networkManager)
+    private static let bookmarksRepository: BookmarksRepository = .init()
     private static let settingsRepository: SettingsRepository = .init()
     private static let supportRepository: SupportPurchaseRepository = .init()
-    private static let votingService: VotingService = DefaultVotingService(voteUseCase: postRepository)
+    private static let votingStateProvider: VotingStateProvider =
+        DefaultVotingStateProvider(voteUseCase: postRepository)
     private static let authenticationRepository: AuthenticationRepository =
         .init(networkManager: networkManager)
     private static let onboardingRepository: OnboardingRepository = .init()
@@ -64,25 +67,29 @@ public final class DependencyContainer: @unchecked Sendable {
         Self.overrides?.settingsUseCase?() ?? Self.settingsRepository
     }
 
+    public func getBookmarksUseCase() -> any BookmarksUseCase {
+        Self.overrides?.bookmarksUseCase?() ?? Self.bookmarksRepository
+    }
+
     public func getSupportUseCase() -> any SupportUseCase {
         Self.overrides?.supportUseCase?() ?? Self.supportRepository
     }
 
-    public func getVotingService() -> any VotingService {
-        Self.overrides?.votingService?() ?? Self.votingService
+    public func getVotingStateProvider() -> any VotingStateProvider {
+        Self.overrides?.votingStateProvider?() ?? Self.votingStateProvider
     }
 
-    public func getCommentVotingService() -> any CommentVotingService {
-        if let override = Self.overrides?.commentVotingService?() {
+    public func getCommentVotingStateProvider() -> any CommentVotingStateProvider {
+        if let override = Self.overrides?.commentVotingStateProvider?() {
             return override
         }
 
-        let votingService = getVotingService()
-        if let commentVoting = votingService as? CommentVotingService {
+        let votingStateProvider = getVotingStateProvider()
+        if let commentVoting = votingStateProvider as? CommentVotingStateProvider {
             return commentVoting
         }
 
-        fatalError("VotingService must conform to CommentVotingService")
+        fatalError("VotingStateProvider must conform to CommentVotingStateProvider")
     }
 
     public func getAuthenticationUseCase() -> any AuthenticationUseCase {

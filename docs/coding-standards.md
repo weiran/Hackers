@@ -234,7 +234,7 @@ private let max = 3
 ```swift
 // ✅ Good: Capability-based naming
 protocol PostUseCase { }
-protocol VotingService { }
+protocol VotingStateProvider { }
 protocol NetworkManagerProtocol { }
 
 // ❌ Avoid: Generic or unclear protocol names
@@ -522,7 +522,7 @@ struct FeedViewModelTests {
     func initialState() {
         let viewModel = FeedViewModel(
             postUseCase: MockPostUseCase(),
-            votingService: MockVotingService()
+            votingStateProvider: MockVotingStateProvider()
         )
 
         #expect(viewModel.posts.isEmpty)
@@ -536,7 +536,7 @@ struct FeedViewModelTests {
 
         let viewModel = FeedViewModel(
             postUseCase: mockUseCase,
-            votingService: MockVotingService()
+            votingStateProvider: MockVotingStateProvider()
         )
 
         await viewModel.loadPosts()

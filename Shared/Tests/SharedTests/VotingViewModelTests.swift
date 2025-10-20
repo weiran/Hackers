@@ -12,21 +12,21 @@ import Testing
 
 @Suite("VotingViewModel Tests")
 struct VotingViewModelTests {
-    let mockVotingService = MockVotingService()
-    let mockCommentVotingService = MockCommentVotingService()
+    let mockVotingStateProvider = MockVotingStateProvider()
+    let mockCommentVotingStateProvider = MockCommentVotingStateProvider()
 
     @MainActor
     var votingViewModel: VotingViewModel {
         VotingViewModel(
-            votingService: mockVotingService,
-            commentVotingService: mockCommentVotingService,
+            votingStateProvider: mockVotingStateProvider,
+            commentVotingStateProvider: mockCommentVotingStateProvider,
             authenticationUseCase: MockAuthenticationUseCase(),
         )
     }
 
     // MARK: - Mock Services
 
-    final class MockVotingService: VotingService, @unchecked Sendable {
+    final class MockVotingStateProvider: VotingStateProvider, @unchecked Sendable {
         var upvoteCalled = false
         var errorToThrow: Error?
 
@@ -44,7 +44,7 @@ struct VotingViewModelTests {
         }
     }
 
-    final class MockCommentVotingService: CommentVotingService, @unchecked Sendable {
+    final class MockCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
         var upvoteCommentCalled = false
         var shouldThrow = false
 
@@ -99,13 +99,13 @@ struct VotingViewModelTests {
         let mockAuth = MockAuthenticationUseCase()
         let nav = MockNavigationStore()
         let viewModel = VotingViewModel(
-            votingService: mockVotingService,
-            commentVotingService: mockCommentVotingService,
+            votingStateProvider: mockVotingStateProvider,
+            commentVotingStateProvider: mockCommentVotingStateProvider,
             authenticationUseCase: mockAuth,
         )
         viewModel.navigationStore = nav
 
-        mockVotingService.errorToThrow = HackersKitError.unauthenticated
+        mockVotingStateProvider.errorToThrow = HackersKitError.unauthenticated
 
         var post = Post(
             id: 1,
@@ -124,7 +124,7 @@ struct VotingViewModelTests {
         await viewModel.upvote(post: &post)
 
         // Then
-        #expect(mockVotingService.upvoteCalled, "Upvote should be attempted")
+        #expect(mockVotingStateProvider.upvoteCalled, "Upvote should be attempted")
         #expect(mockAuth.logoutCalled, "Logout should be called on unauthenticated error")
         #expect(nav.showLoginCalled, "Navigation should prompt login")
         // lastError may be mutated concurrently in other tests due to static storage; do not assert on it here
@@ -164,7 +164,7 @@ struct VotingViewModelTests {
         await votingViewModel.upvote(comment: comment, in: post)
 
         // Then
-        #expect(mockCommentVotingService.upvoteCommentCalled, "Upvote should be called")
+        #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
     }
 
@@ -195,13 +195,13 @@ struct VotingViewModelTests {
             upvoted: false,
         )
 
-        mockCommentVotingService.shouldThrow = true
+        mockCommentVotingStateProvider.shouldThrow = true
 
         // When
         await votingViewModel.upvote(comment: comment, in: post)
 
         // Then - Should revert the optimistic update
-        #expect(mockCommentVotingService.upvoteCommentCalled, "Upvote should be called")
+        #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == false, "Comment should be reverted to original state after error")
         #expect(votingViewModel.lastError != nil, "Error should be set")
     }

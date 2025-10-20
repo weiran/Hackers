@@ -209,22 +209,19 @@ public protocol AuthenticationUseCase: Sendable {
 
 ## Service Protocols
 
-### VotingService
+### VotingStateProvider
 
 ```swift
-public protocol VotingService: Sendable {
-    func upvote(post: Post) async throws
-    func upvote(comment: Comment, for post: Post) async throws
-    func votingState(for post: Post) -> VotingState
-    func votingState(for comment: Comment) -> VotingState
+public protocol VotingStateProvider: Sendable {
+    func votingState(for item: any Votable) -> VotingState
+    func upvote(item: any Votable) async throws
 }
 ```
 
 **Implementation**:
 ```swift
-public final class DefaultVotingService: VotingService, @unchecked Sendable {
+public final class DefaultVotingStateProvider: VotingStateProvider, Sendable {
     private let voteUseCase: VoteUseCase
-    private let votingStates = ThreadSafeDict<Int, VotingState>()
 
     public init(voteUseCase: VoteUseCase) {
         self.voteUseCase = voteUseCase
@@ -294,7 +291,7 @@ public class FeedViewModel {
 
     public init(
         postUseCase: PostUseCase,
-        votingService: VotingService
+        votingStateProvider: VotingStateProvider
     )
 
     @MainActor
@@ -323,7 +320,7 @@ public class CommentsViewModel {
     public init(
         post: Post,
         commentUseCase: CommentUseCase,
-        votingService: VotingService
+        votingStateProvider: VotingStateProvider
     )
 
     @MainActor
@@ -466,7 +463,7 @@ public enum CommentHTMLParser {
 ```swift
 let viewModel = FeedViewModel(
     postUseCase: DependencyContainer.shared.postUseCase,
-    votingService: DependencyContainer.shared.votingService
+    votingStateProvider: DependencyContainer.shared.getVotingStateProvider()
 )
 
 await viewModel.loadPosts()
@@ -482,8 +479,8 @@ let comments = try await commentUseCase.getComments(for: post)
 ### Voting on Content
 
 ```swift
-let votingService = DependencyContainer.shared.votingService
-try await votingService.upvote(post: selectedPost)
+let votingStateProvider = DependencyContainer.shared.getVotingStateProvider()
+try await votingStateProvider.upvote(item: selectedPost)
 ```
 
 ---

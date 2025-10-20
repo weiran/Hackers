@@ -99,11 +99,11 @@ class FeedViewModel {
     var error: Error?
 
     private let postUseCase: PostUseCase
-    private let votingService: VotingService
+    private let votingStateProvider: VotingStateProvider
 
-    init(postUseCase: PostUseCase, votingService: VotingService) {
+    init(postUseCase: PostUseCase, votingStateProvider: VotingStateProvider) {
         self.postUseCase = postUseCase
-        self.votingService = votingService
+        self.votingStateProvider = votingStateProvider
     }
 }
 ```
@@ -145,7 +145,7 @@ Domain/Sources/Domain/
 │   ├── VoteUseCase.swift
 │   └── SettingsUseCase.swift
 └── Services/
-    └── VotingService.swift
+    └── VotingStateProvider.swift
 ```
 
 **Key Principles**:
@@ -292,8 +292,8 @@ class DependencyContainer {
         PostRepository(networkManager: networkManager)
     }()
 
-    lazy var votingService: VotingService = {
-        DefaultVotingService(voteUseCase: postUseCase)
+    lazy var votingStateProvider: VotingStateProvider = {
+        DefaultVotingStateProvider(voteUseCase: postUseCase)
     }()
 }
 ```

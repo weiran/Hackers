@@ -5,7 +5,7 @@
 * **Domain** (`Domain/`): Business logic, models, use case protocols
   - Models: Post, Comment, User, TextSize
   - Use Cases: PostUseCase, CommentUseCase, SettingsUseCase, VoteUseCase
-  - VotingService protocol and implementation
+  - VotingStateProvider protocol and implementation
 
 * **Data** (`Data/`): Repository implementations, API interactions
   - Implements Domain protocols (PostRepository → PostUseCase)

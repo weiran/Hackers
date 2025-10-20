@@ -38,8 +38,8 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         }
         let container = DependencyContainer.shared
         let defaultVotingViewModel = VotingViewModel(
-            votingService: container.getVotingService(),
-            commentVotingService: container.getCommentVotingService(),
+            votingStateProvider: container.getVotingStateProvider(),
+            commentVotingStateProvider: container.getCommentVotingStateProvider(),
             authenticationUseCase: container.getAuthenticationUseCase()
         )
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)

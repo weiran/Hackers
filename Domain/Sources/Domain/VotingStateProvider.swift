@@ -1,5 +1,5 @@
 //
-//  VotingService.swift
+//  VotingStateProvider.swift
 //  Domain
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -7,16 +7,16 @@
 
 import Foundation
 
-// MARK: - Voting Service Protocol
+// MARK: - Voting State Provider Protocol
 
-public protocol VotingService: Sendable {
+public protocol VotingStateProvider: Sendable {
     func votingState(for item: any Votable) -> VotingState
     func upvote(item: any Votable) async throws
 }
 
 // MARK: - Default Implementation
 
-public final class DefaultVotingService: VotingService, Sendable {
+public final class DefaultVotingStateProvider: VotingStateProvider, Sendable {
     private let voteUseCase: VoteUseCase
 
     public init(voteUseCase: VoteUseCase) {
@@ -46,13 +46,13 @@ public final class DefaultVotingService: VotingService, Sendable {
     }
 }
 
-// MARK: - Comment-Specific Voting Service
+// MARK: - Comment-Specific Voting State Provider
 
-public protocol CommentVotingService: Sendable {
+public protocol CommentVotingStateProvider: Sendable {
     func upvoteComment(_ comment: Comment, for post: Post) async throws
 }
 
-extension DefaultVotingService: CommentVotingService {
+extension DefaultVotingStateProvider: CommentVotingStateProvider {
     public func upvoteComment(_ comment: Comment, for post: Post) async throws {
         try await voteUseCase.upvote(comment: comment, for: post)
     }
