@@ -21,7 +21,9 @@ struct MainContentView: View {
     @StateObject private var sessionService: SessionService
     @StateObject private var toastPresenter: ToastPresenter
     @StateObject private var settingsViewModel = SettingsViewModel()
+    @StateObject private var feedViewModel = FeedViewModel()
     @State private var showOnboarding = false
+    @State private var feedSearchText = ""
     private let onboardingCoordinator: OnboardingCoordinator
 
     init(container: DependencyContainer = .shared) {
@@ -41,6 +43,7 @@ struct MainContentView: View {
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     FeedView<NavigationStore>(
+                        viewModel: feedViewModel,
                         isSidebar: false,
                     )
                     .environmentObject(navigationStore)
@@ -75,6 +78,10 @@ struct MainContentView: View {
                             .environmentObject(toastPresenter)
                         }
                     }
+                }
+                .searchable(text: $feedSearchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
+                .onChange(of: feedSearchText) { newValue in
+                    feedViewModel.updateSearchQuery(newValue)
                 }
             }
         }

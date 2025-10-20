@@ -15,7 +15,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
-    @State private var searchText: String = ""
     @EnvironmentObject private var navigationStore: NavigationStore
 
     let isSidebar: Bool
@@ -72,18 +71,14 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             contentView
                 .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
                 .navigationBarTitleDisplayMode(.inline)
-        }
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
-        .onChange(of: searchText) { newValue in
-            viewModel.updateSearchQuery(newValue)
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                settingsButton
-            }
-        }
-        .toolbarTitleMenu {
-            postTypeTitleMenu
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        settingsButton
+                    }
+                }
+                .toolbarTitleMenu {
+                    postTypeTitleMenu
+                }
         }
         .task { @Sendable in
             // Set the navigation store for the voting view model

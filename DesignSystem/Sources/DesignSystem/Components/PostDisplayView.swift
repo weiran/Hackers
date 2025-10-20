@@ -156,7 +156,7 @@ public struct PostDisplayView: View {
     }
 
     private var commentsPill: some View {
-        let commentTextColor: Color = .primary
+        let commentTextColor: Color = .secondary
         let commentBackgroundColor = Color.secondary.opacity(0.1)
         // Brighter styling keeps the comments count from reading as a disabled control
         return pillView(
