@@ -90,3 +90,4 @@ xcodebuild build -project Hackers.xcodeproj -scheme Hackers -destination 'platfo
 * NEVER proactively create documentation files
 * Never use `git add .` - add specific relevant changes only
 * Commit messages should be concise and descriptive
+* Never amend existing commits; always create a new commit for additional changes
