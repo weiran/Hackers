@@ -40,7 +40,7 @@ struct MainContentView: View {
                     .environmentObject(sessionService)
             } else {
                 NavigationStack(path: $navigationStore.path) {
-                    FeedView<NavigationStore, SessionService>(
+                    FeedView<NavigationStore>(
                         isSidebar: false,
                     )
                     .environmentObject(navigationStore)
@@ -148,7 +148,7 @@ struct AdaptiveSplitView: View {
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
-            FeedView<NavigationStore, SessionService>(
+            FeedView<NavigationStore>(
                 isSidebar: true,
             )
             .environmentObject(navigationStore)

@@ -10,13 +10,12 @@ import Domain
 import Shared
 import SwiftUI
 
-public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: AuthenticationServiceProtocol>: View {
+public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
     @EnvironmentObject private var navigationStore: NavigationStore
-    @EnvironmentObject private var authService: AuthService
 
     let isSidebar: Bool
 
@@ -61,10 +60,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
                 .navigationBarTitleDisplayMode(.inline)
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                userButton
-            }
-
             ToolbarItem(placement: .principal) {
                 toolbarMenu
             }
@@ -221,18 +216,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol, AuthService: Au
         .glassEffect()
         // hack to fix glitchy UI bug: https://github.com/weiran/Hackers/issues/313
         .clipShape(RoundedRectangle(cornerRadius: 32.0))
-    }
-
-    @ViewBuilder
-    private var userButton: some View {
-        Button {
-            navigationStore.showLogin()
-        } label: {
-            Image(systemName: authService.isAuthenticated ? "person.crop.circle.fill" : "person.crop.circle")
-                .font(.headline)
-                .foregroundColor(authService.isAuthenticated ? .primary : .secondary)
-        }
-        .accessibilityLabel(authService.isAuthenticated ? "Account" : "Login")
     }
 
     @ViewBuilder
