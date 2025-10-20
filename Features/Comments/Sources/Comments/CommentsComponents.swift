@@ -417,13 +417,8 @@ struct ShareMenu: View {
     let post: Post
 
     var body: some View {
-        Menu {
-            if post.url.host != nil {
-                Button("Article Link") { ContentSharePresenter.shared.shareURL(post.url, title: post.title) }
-                Button("Hacker News Link") { ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title) }
-            } else {
-                Button("Hacker News Link") { ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title) }
-            }
+        Button {
+            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .accessibilityLabel("Share")
