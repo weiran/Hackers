@@ -21,7 +21,7 @@ struct MainContentView: View {
     @StateObject private var sessionService: SessionService
     @StateObject private var toastPresenter: ToastPresenter
     @StateObject private var settingsViewModel = SettingsViewModel()
-    @StateObject private var feedViewModel = FeedViewModel()
+    @State private var feedViewModel = FeedViewModel()
     @State private var showOnboarding = false
     @State private var feedSearchText = ""
     private let onboardingCoordinator: OnboardingCoordinator
@@ -37,9 +37,13 @@ struct MainContentView: View {
     var body: some View {
         Group {
             if UIDevice.current.userInterfaceIdiom == .pad {
-                AdaptiveSplitView(settingsViewModel: settingsViewModel)
+                AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
                     .environmentObject(navigationStore)
                     .environmentObject(sessionService)
+                    .searchable(text: $feedSearchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
+                    .onChange(of: feedSearchText) { newValue in
+                        feedViewModel.updateSearchQuery(newValue)
+                    }
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     FeedView<NavigationStore>(
@@ -151,11 +155,13 @@ struct AdaptiveSplitView: View {
     @EnvironmentObject private var navigationStore: NavigationStore
     @EnvironmentObject private var sessionService: SessionService
     @StateObject var settingsViewModel: SettingsViewModel
+    let feedViewModel: FeedViewModel
 
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
             FeedView<NavigationStore>(
+                viewModel: feedViewModel,
                 isSidebar: true,
             )
             .environmentObject(navigationStore)

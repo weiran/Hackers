@@ -67,19 +67,17 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            contentView
-                .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        settingsButton
-                    }
+        contentView
+            .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    settingsButton
                 }
-                .toolbarTitleMenu {
-                    postTypeTitleMenu
-                }
-        }
+            }
+            .toolbarTitleMenu {
+                postTypeTitleMenu
+            }
         .task { @Sendable in
             // Set the navigation store for the voting view model
             votingViewModel.navigationStore = navigationStore
