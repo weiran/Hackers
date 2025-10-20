@@ -68,6 +68,7 @@ public struct Post: Sendable, Identifiable, Hashable {
     public var score: Int
     public let postType: PostType
     public var upvoted: Bool
+    public var isBookmarked: Bool
     public var voteLinks: VoteLinks?
     public var text: String?
     public var comments: [Comment]?
@@ -82,6 +83,7 @@ public struct Post: Sendable, Identifiable, Hashable {
         score: Int,
         postType: PostType,
         upvoted: Bool,
+        isBookmarked: Bool = false,
         voteLinks: VoteLinks? = nil,
         text: String? = nil,
         comments: [Comment]? = nil,
@@ -95,6 +97,7 @@ public struct Post: Sendable, Identifiable, Hashable {
         self.score = score
         self.postType = postType
         self.upvoted = upvoted
+        self.isBookmarked = isBookmarked
         self.voteLinks = voteLinks
         self.text = text
         self.comments = comments
@@ -109,6 +112,7 @@ public enum PostType: String, CaseIterable, Sendable {
     case newest
     case best
     case active
+    case bookmarks
 }
 
 public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
@@ -200,6 +204,7 @@ public extension PostType {
         case .newest: "New"
         case .best: "Best"
         case .active: "Active"
+        case .bookmarks: "Bookmarks"
         }
     }
 }

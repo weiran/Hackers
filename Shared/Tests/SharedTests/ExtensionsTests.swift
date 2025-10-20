@@ -25,6 +25,7 @@ struct ExtensionsTests {
             #expect(PostType.newest.displayName == "New")
             #expect(PostType.best.displayName == "Best")
             #expect(PostType.active.displayName == "Active")
+            #expect(PostType.bookmarks.displayName == "Bookmarks")
         }
 
         @Test("PostType iconName returns valid SF Symbol names")
@@ -36,11 +37,12 @@ struct ExtensionsTests {
             #expect(PostType.newest.iconName == "clock")
             #expect(PostType.best.iconName == "star")
             #expect(PostType.active.iconName == "bolt")
+            #expect(PostType.bookmarks.iconName == "bookmark")
         }
 
         @Test("All PostType cases have displayName")
         func allPostTypesHaveDisplayName() {
-            let allCases: [PostType] = [.news, .ask, .show, .jobs, .newest, .best, .active]
+            let allCases = PostType.allCases
 
             for postType in allCases {
                 #expect(postType.displayName.isEmpty == false)

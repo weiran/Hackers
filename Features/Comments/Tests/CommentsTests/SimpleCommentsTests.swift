@@ -16,6 +16,7 @@ struct SimpleCommentsTests {
     @Suite("CommentsViewModel")
     struct ViewModelTests {
         @Test("ViewModel initializes with correct default values")
+        @MainActor
         func viewModelInitialization() {
             // Given
             let post = Post(

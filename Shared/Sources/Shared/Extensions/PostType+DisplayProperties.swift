@@ -17,6 +17,7 @@ public extension PostType {
         case .newest: "New"
         case .best: "Best"
         case .active: "Active"
+        case .bookmarks: "Bookmarks"
         }
     }
 
@@ -29,6 +30,7 @@ public extension PostType {
         case .newest: "clock"
         case .best: "star"
         case .active: "bolt"
+        case .bookmarks: "bookmark"
         }
     }
 }

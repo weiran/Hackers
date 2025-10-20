@@ -8,6 +8,7 @@
 import Domain
 import Foundation
 @testable import Feed
+import Shared
 import Testing
 
 @Suite("FeedViewModel")
@@ -18,8 +19,14 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         let voteUseCase = StubVoteUseCase()
         postUseCase.enqueue(.success([SampleData.post(id: 1)]))
+        let bookmarksUseCase = StubBookmarksUseCase()
+        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
 
-        let viewModel = FeedViewModel(postUseCase: postUseCase, voteUseCase: voteUseCase)
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            bookmarksController: bookmarksController
+        )
         await viewModel.loadFeed()
 
         #expect(viewModel.posts.count == 1)
@@ -33,7 +40,12 @@ struct FeedViewModelTests {
     func loadFeedFailure() async {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.failure(StubError.network))
-        let viewModel = FeedViewModel(postUseCase: postUseCase, voteUseCase: StubVoteUseCase())
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController
+        )
 
         await viewModel.loadFeed()
 
@@ -48,8 +60,13 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.success([SampleData.post(id: 1), SampleData.post(id: 2)]))
         postUseCase.enqueue(.success([SampleData.post(id: 2), SampleData.post(id: 3)]))
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
 
-        let viewModel = FeedViewModel(postUseCase: postUseCase, voteUseCase: StubVoteUseCase())
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController
+        )
         await viewModel.loadFeed()
         await viewModel.loadNextPage()
 
@@ -64,8 +81,13 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.success([SampleData.post(id: 1)]))
         postUseCase.enqueue(.success([SampleData.post(id: 42, type: .ask)]))
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
 
-        let viewModel = FeedViewModel(postUseCase: postUseCase, voteUseCase: StubVoteUseCase())
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController
+        )
         await viewModel.loadFeed()
         await viewModel.changePostType(.ask)
 
@@ -81,7 +103,12 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.success([post]))
         let voteUseCase = StubVoteUseCase()
-        let viewModel = FeedViewModel(postUseCase: postUseCase, voteUseCase: voteUseCase)
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            bookmarksController: bookmarksController
+        )
         await viewModel.loadFeed()
 
         try await viewModel.vote(on: post, upvote: true)
@@ -100,11 +127,13 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         let voteUseCase = StubVoteUseCase()
         let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
-            settingsUseCase: settingsUseCase
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
         )
 
         #expect(viewModel.showThumbnails == true)
@@ -125,11 +154,13 @@ struct FeedViewModelTests {
             rememberFeedCategory: true,
             lastFeedCategory: .ask
         )
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
-            settingsUseCase: settingsUseCase
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
         )
 
         #expect(viewModel.postType == .ask)
@@ -145,15 +176,90 @@ struct FeedViewModelTests {
             rememberFeedCategory: true,
             lastFeedCategory: .news
         )
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
-            settingsUseCase: settingsUseCase
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
         )
 
         await viewModel.changePostType(.jobs)
         #expect(settingsUseCase.lastFeedCategory == .jobs)
+    }
+
+    @MainActor
+    @Test("Bookmarks post type loads stored posts")
+    func bookmarksCategoryLoadsStoredPosts() async {
+        let postUseCase = StubPostUseCase()
+        let voteUseCase = StubVoteUseCase()
+        var bookmarkedPost = SampleData.post(id: 99)
+        bookmarkedPost.isBookmarked = true
+        let bookmarksUseCase = StubBookmarksUseCase(posts: [bookmarkedPost])
+        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: voteUseCase,
+            bookmarksController: bookmarksController
+        )
+
+        await viewModel.changePostType(.bookmarks)
+
+        #expect(viewModel.postType == .bookmarks)
+        #expect(viewModel.posts.count == 1)
+        #expect(viewModel.posts.first?.id == 99)
+        #expect(viewModel.posts.first?.isBookmarked == true)
+    }
+
+    @MainActor
+    @Test("Toggling bookmark updates post state")
+    func togglingBookmarkUpdatesPostState() async {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 5)]))
+        let bookmarksUseCase = StubBookmarksUseCase()
+        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController
+        )
+
+        await viewModel.loadFeed()
+        #expect(viewModel.posts.first?.isBookmarked == false)
+
+        let didBookmark = await viewModel.toggleBookmark(for: viewModel.posts[0])
+        #expect(didBookmark == true)
+        #expect(viewModel.posts.first?.isBookmarked == true)
+
+        let didRemove = await viewModel.toggleBookmark(for: viewModel.posts[0])
+        #expect(didRemove == false)
+        #expect(viewModel.posts.first?.isBookmarked == false)
+    }
+
+    @MainActor
+    @Test("Bookmark notifications propagate to feed")
+    func bookmarkNotificationsPropagateToFeed() async throws {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 12)]))
+        let bookmarksUseCase = StubBookmarksUseCase()
+        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController
+        )
+
+        await viewModel.loadFeed()
+        #expect(viewModel.posts.first?.isBookmarked == false)
+
+        _ = await bookmarksController.toggle(post: viewModel.posts[0])
+        try await Task.sleep(nanoseconds: 20_000_000)
+
+        #expect(viewModel.posts.first?.isBookmarked == true)
     }
 }
 
@@ -199,6 +305,39 @@ private final class StubVoteUseCase: VoteUseCase, @unchecked Sendable {
 
     func upvote(comment _: Domain.Comment, for _: Post) async throws {
         if shouldThrow { throw StubError.network }
+    }
+}
+
+private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
+    private var posts: [Post]
+
+    init(posts: [Post] = []) {
+        self.posts = posts.map { post in
+            var mutablePost = post
+            mutablePost.isBookmarked = true
+            return mutablePost
+        }
+    }
+
+    func bookmarkedIDs() async -> Set<Int> {
+        Set(posts.map(\.id))
+    }
+
+    func bookmarkedPosts() async -> [Post] {
+        posts
+    }
+
+    @discardableResult
+    func toggleBookmark(post: Post) async throws -> Bool {
+        if let index = posts.firstIndex(where: { $0.id == post.id }) {
+            posts.remove(at: index)
+            return false
+        } else {
+            var mutablePost = post
+            mutablePost.isBookmarked = true
+            posts.insert(mutablePost, at: 0)
+            return true
+        }
     }
 }
 

@@ -13,13 +13,16 @@ public struct PostDisplayView: View {
     let post: Post
     let votingState: VotingState?
     let showPostText: Bool
-    let showThumbnails: Bool
+   let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
+    let onBookmarkTap: (() async -> Bool)?
 
     @State private var isSubmittingUpvote = false
+    @State private var isSubmittingBookmark = false
     @State private var displayedScore: Int
     @State private var displayedUpvoted: Bool
+    @State private var displayedBookmarked: Bool
 
     public init(
         post: Post,
@@ -27,7 +30,8 @@ public struct PostDisplayView: View {
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil,
-        onUpvoteTap: (() async -> Bool)? = nil
+        onUpvoteTap: (() async -> Bool)? = nil,
+        onBookmarkTap: (() async -> Bool)? = nil
     ) {
         self.post = post
         self.votingState = votingState
@@ -35,8 +39,10 @@ public struct PostDisplayView: View {
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
+        self.onBookmarkTap = onBookmarkTap
         _displayedScore = State(initialValue: post.score)
         _displayedUpvoted = State(initialValue: post.upvoted)
+        _displayedBookmarked = State(initialValue: post.isBookmarked)
     }
 
     public var body: some View {
@@ -73,6 +79,10 @@ public struct PostDisplayView: View {
                     HStack(spacing: 8) {
                         upvotePill
                         commentsPill
+                        Spacer(minLength: 8)
+                        if onBookmarkTap != nil {
+                            bookmarkPill
+                        }
                     }
                     .scaledFont(.caption)
                     .padding(.top, 2)
@@ -83,12 +93,16 @@ public struct PostDisplayView: View {
         .onChange(of: post.id) { _ in
             displayedScore = post.score
             displayedUpvoted = post.upvoted
+            displayedBookmarked = post.isBookmarked
         }
         .onChange(of: post.score) { newValue in
             displayedScore = newValue
         }
         .onChange(of: post.upvoted) { newValue in
             displayedUpvoted = newValue
+        }
+        .onChange(of: post.isBookmarked) { newValue in
+            displayedBookmarked = newValue
         }
         .onChange(of: votingState?.score) { newValue in
             if let newValue {
@@ -109,9 +123,9 @@ public struct PostDisplayView: View {
         let canVote = post.voteLinks?.upvote != nil
         let (backgroundColor, textColor): (Color, Color) = {
             if isUpvoted {
-                return (AppColors.upvotedColor.opacity(0.06), AppColors.upvotedColor)
+                return (AppColors.upvotedColor.opacity(0.1), AppColors.upvotedColor)
             } else {
-                return (Color.secondary.opacity(0.06), .secondary)
+                return (Color.secondary.opacity(0.1), .secondary)
             }
         }()
         let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
@@ -130,6 +144,7 @@ public struct PostDisplayView: View {
             textColor: textColor,
             backgroundColor: backgroundColor,
             accessibilityLabel: accessibilityLabel,
+            accessibilityHint: "Double tap to upvote",
             isHighlighted: isUpvoted,
             isLoading: isLoading,
             isEnabled: canVote && !isUpvoted && !isLoading,
@@ -148,6 +163,35 @@ public struct PostDisplayView: View {
             isHighlighted: false,
             isLoading: false,
             numericValue: post.commentsCount
+        )
+    }
+
+    private var bookmarkPill: some View {
+        let isBookmarked = displayedBookmarked
+        let backgroundColor: Color = {
+            if isBookmarked {
+                return AppColors.appTintColor.opacity(0.12)
+            }
+            return Color.secondary.opacity(0.06)
+        }()
+        let textColor: Color = isBookmarked ? AppColors.appTintColor : .secondary
+        let iconName = isBookmarked ? "bookmark.fill" : "bookmark"
+        let accessibilityLabel = isBookmarked ? "Remove bookmark" : "Save for later"
+        let accessibilityHint = isBookmarked
+            ? "Double tap to remove from bookmarks"
+            : "Double tap to add to bookmarks"
+
+        return pillView(
+            iconName: iconName,
+            text: isBookmarked ? "Saved" : "Save",
+            textColor: textColor,
+            backgroundColor: backgroundColor,
+            accessibilityLabel: accessibilityLabel,
+            accessibilityHint: accessibilityHint,
+            isHighlighted: isBookmarked,
+            isLoading: isSubmittingBookmark,
+            isEnabled: !isSubmittingBookmark,
+            action: makeBookmarkAction()
         )
     }
 
@@ -173,6 +217,27 @@ public struct PostDisplayView: View {
         }
     }
 
+    private func makeBookmarkAction() -> (() -> Void)? {
+        guard let onBookmarkTap else { return nil }
+        return {
+            guard !isSubmittingBookmark else { return }
+            isSubmittingBookmark = true
+            let previousState = displayedBookmarked
+            let optimisticState = !previousState
+            displayedBookmarked = optimisticState
+
+            Task {
+                let result = await onBookmarkTap()
+                await MainActor.run {
+                    if result != optimisticState {
+                        displayedBookmarked = result
+                    }
+                    isSubmittingBookmark = false
+                }
+            }
+        }
+    }
+
     @ViewBuilder
     private func pillView(
         iconName: String?,
@@ -180,6 +245,7 @@ public struct PostDisplayView: View {
         textColor: Color,
         backgroundColor: Color,
         accessibilityLabel: String,
+        accessibilityHint: String? = nil,
         isHighlighted _: Bool,
         isLoading: Bool,
         isEnabled: Bool = true,
@@ -220,7 +286,7 @@ public struct PostDisplayView: View {
             .disabled(!isEnabled || isLoading)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(accessibilityLabel)
-            .accessibilityHint(Text("Double tap to upvote"))
+            .accessibilityHint(accessibilityHint ?? "")
         } else {
             content
                 .accessibilityElement(children: .combine)

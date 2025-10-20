@@ -26,6 +26,7 @@ struct DependencyContainerTests {
         let stubAuth = StubAuthenticationUseCase()
         let stubOnboarding = StubOnboardingUseCase()
         let stubBookmarks = StubBookmarksUseCase()
+        let stubBookmarksController = BookmarksController(bookmarksUseCase: stubBookmarks)
         let sessionService = SessionService(authenticationUseCase: stubAuth)
         let toastPresenter = ToastPresenter()
 
@@ -41,7 +42,8 @@ struct DependencyContainerTests {
                 authenticationUseCase: { stubAuth },
                 onboardingUseCase: { stubOnboarding },
                 sessionService: { sessionService },
-                toastPresenter: { toastPresenter }
+                toastPresenter: { toastPresenter },
+                bookmarksController: { stubBookmarksController }
             )
         )
 
@@ -60,6 +62,7 @@ struct DependencyContainerTests {
         #expect((container.getOnboardingUseCase() as? StubOnboardingUseCase) === stubOnboarding)
         #expect(await container.makeSessionService() === sessionService)
         #expect(await container.makeToastPresenter() === toastPresenter)
+        #expect(await container.makeBookmarksController() === stubBookmarksController)
 
         DependencyContainer.resetOverrides()
     }

@@ -26,6 +26,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     private let voteUseCase: any VoteUseCase
     private let commentsLoader: LoadingStateManager<[Comment]>
     private let settingsUseCase: any SettingsUseCase
+    private let bookmarksController: BookmarksController
     private var settingsCancellable: AnyCancellable?
 
     public var comments: [Comment] { commentsLoader.data }
@@ -33,13 +34,15 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var error: Error? { commentsLoader.error }
     public private(set) var isPostLoading: Bool
 
+    @MainActor
     public init(
         postID: Int,
         initialPost: Post? = nil,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
         voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
-        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase(),
+        bookmarksController: BookmarksController? = nil
     ) {
         self.postID = postID
         post = initialPost
@@ -48,6 +51,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.commentUseCase = commentUseCase
         self.voteUseCase = voteUseCase
         self.settingsUseCase = settingsUseCase
+        self.bookmarksController = bookmarksController ?? DependencyContainer.shared.makeBookmarksController()
         showThumbnails = settingsUseCase.showThumbnails
 
         let initialComments = initialPost?.comments ?? []
@@ -75,12 +79,14 @@ public final class CommentsViewModel: @unchecked Sendable {
             }
     }
 
+    @MainActor
     public convenience init(
         post: Post,
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         commentUseCase: any CommentUseCase = DependencyContainer.shared.getCommentUseCase(),
         voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
-        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase(),
+        bookmarksController: BookmarksController? = nil
     ) {
         self.init(
             postID: post.id,
@@ -88,7 +94,8 @@ public final class CommentsViewModel: @unchecked Sendable {
             postUseCase: postUseCase,
             commentUseCase: commentUseCase,
             voteUseCase: voteUseCase,
-            settingsUseCase: settingsUseCase
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
         )
     }
 
@@ -96,6 +103,12 @@ public final class CommentsViewModel: @unchecked Sendable {
     public func loadComments() async {
         if post == nil {
             isPostLoading = true
+        }
+        if let currentPost = post {
+            await bookmarksController.refreshBookmarks()
+            var updatedPost = currentPost
+            updatedPost.isBookmarked = bookmarksController.isBookmarked(currentPost.id)
+            post = updatedPost
         }
         await commentsLoader.loadIfNeeded()
         updateVisibleComments()
@@ -106,6 +119,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         if post == nil {
             isPostLoading = true
         }
+        await bookmarksController.refreshBookmarks()
         await commentsLoader.refresh()
         updateVisibleComments()
     }
@@ -113,11 +127,15 @@ public final class CommentsViewModel: @unchecked Sendable {
     private func fetchComments() async throws -> [Comment] {
         do {
             let postWithComments = try await postUseCase.getPost(id: postID)
-            let loadedComments = postWithComments.comments ?? []
+            await bookmarksController.refreshBookmarks()
+            let annotatedPost = await MainActor.run {
+                bookmarksController.annotatedPosts(from: [postWithComments]).first ?? postWithComments
+            }
+            let loadedComments = annotatedPost.comments ?? []
             let commentCountExcludingStoryText = loadedComments.count(where: { $0.id >= 0 })
 
             await MainActor.run {
-                self.post = postWithComments
+                self.post = annotatedPost
                 self.post?.commentsCount = commentCountExcludingStoryText
                 self.isPostLoading = false
                 self.onCommentsLoaded?(loadedComments)
@@ -149,6 +167,16 @@ public final class CommentsViewModel: @unchecked Sendable {
             post = currentPost
             throw error
         }
+    }
+
+    @MainActor
+    public func toggleBookmark() async -> Bool {
+        guard let currentPost = post else { return false }
+        let newState = await bookmarksController.toggle(post: currentPost)
+        var updatedPost = currentPost
+        updatedPost.isBookmarked = newState
+        post = updatedPost
+        return newState
     }
 
     @MainActor

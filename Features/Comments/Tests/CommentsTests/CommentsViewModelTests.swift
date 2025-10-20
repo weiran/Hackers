@@ -16,13 +16,18 @@ struct CommentsViewModelTests {
     let mockPostUseCase: MockPostUseCase
     let mockCommentUseCase: MockCommentUseCase
     let mockVoteUseCase: MockVoteUseCase
+    let mockBookmarksUseCase: MockBookmarksUseCase
+    let bookmarksController: BookmarksController
     let testPost: Post
     let sut: CommentsViewModel
 
+    @MainActor
     init() {
         mockPostUseCase = MockPostUseCase()
         mockCommentUseCase = MockCommentUseCase()
         mockVoteUseCase = MockVoteUseCase()
+        mockBookmarksUseCase = MockBookmarksUseCase()
+        bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         testPost = Post(
             id: 1,
@@ -41,10 +46,13 @@ struct CommentsViewModelTests {
             postUseCase: mockPostUseCase,
             commentUseCase: mockCommentUseCase,
             voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
         )
     }
 
     @Test("Initializes in loading state when post is absent")
+    @MainActor
     func initializesWithoutPost() {
         // When
         let viewModel = CommentsViewModel(
@@ -52,7 +60,9 @@ struct CommentsViewModelTests {
             initialPost: nil,
             postUseCase: mockPostUseCase,
             commentUseCase: mockCommentUseCase,
-            voteUseCase: mockVoteUseCase
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
         )
 
         // Then
@@ -163,7 +173,9 @@ struct CommentsViewModelTests {
             initialPost: nil,
             postUseCase: mockPostUseCase,
             commentUseCase: mockCommentUseCase,
-            voteUseCase: mockVoteUseCase
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: BookmarksController(bookmarksUseCase: MockBookmarksUseCase())
         )
 
         await viewModel.loadComments()
@@ -185,7 +197,8 @@ struct CommentsViewModelTests {
             postUseCase: mockPostUseCase,
             commentUseCase: mockCommentUseCase,
             voteUseCase: mockVoteUseCase,
-            settingsUseCase: settingsUseCase
+            settingsUseCase: settingsUseCase,
+            bookmarksController: BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
         )
 
         #expect(viewModel.showThumbnails == false)
@@ -276,10 +289,12 @@ struct CommentsViewModelTests {
     // MARK: - Comment Visibility Tests
 
     @Suite("Comment Visibility")
+    @MainActor
     struct CommentVisibilityTests {
         let mockPostUseCase: MockPostUseCase
         let mockCommentUseCase: MockCommentUseCase
         let mockVoteUseCase: MockVoteUseCase
+        let mockBookmarksUseCase: MockBookmarksUseCase
         let testPost: Post
         let sut: CommentsViewModel
 
@@ -287,6 +302,7 @@ struct CommentsViewModelTests {
             mockPostUseCase = MockPostUseCase()
             mockCommentUseCase = MockCommentUseCase()
             mockVoteUseCase = MockVoteUseCase()
+            mockBookmarksUseCase = MockBookmarksUseCase()
 
             testPost = Post(
                 id: 1,
@@ -305,6 +321,8 @@ struct CommentsViewModelTests {
                 postUseCase: mockPostUseCase,
                 commentUseCase: mockCommentUseCase,
                 voteUseCase: mockVoteUseCase,
+                settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+                bookmarksController: BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
             )
         }
 
@@ -520,6 +538,37 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
 final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
     func getComments(for _: Post) async throws -> [Domain.Comment] {
         []
+    }
+}
+
+final class MockBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
+    var posts: [Post] = []
+    var toggleCalls: [Int] = []
+    var shouldThrow = false
+
+    func bookmarkedIDs() async -> Set<Int> {
+        Set(posts.map(\.id))
+    }
+
+    func bookmarkedPosts() async -> [Post] {
+        posts
+    }
+
+    @discardableResult
+    func toggleBookmark(post: Post) async throws -> Bool {
+        toggleCalls.append(post.id)
+        if shouldThrow {
+            throw MockError.testError
+        }
+        if let index = posts.firstIndex(where: { $0.id == post.id }) {
+            posts.remove(at: index)
+            return false
+        } else {
+            var mutablePost = post
+            mutablePost.isBookmarked = true
+            posts.append(mutablePost)
+            return true
+        }
     }
 }
 

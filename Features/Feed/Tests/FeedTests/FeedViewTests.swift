@@ -116,6 +116,33 @@ struct FeedViewTests {
         // Unvote removed
     }
 
+    final class MockBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
+        var storedPosts: [Post] = []
+        var toggleCalls: [Int] = []
+
+        func bookmarkedIDs() async -> Set<Int> {
+            Set(storedPosts.map(\.id))
+        }
+
+        func bookmarkedPosts() async -> [Post] {
+            storedPosts
+        }
+
+        @discardableResult
+        func toggleBookmark(post: Post) async throws -> Bool {
+            toggleCalls.append(post.id)
+            if let index = storedPosts.firstIndex(where: { $0.id == post.id }) {
+                storedPosts.remove(at: index)
+                return false
+            } else {
+                var newPost = post
+                newPost.isBookmarked = true
+                storedPosts.append(newPost)
+                return true
+            }
+        }
+    }
+
     private func createMockPost(id: Int, upvoted: Bool = false) -> Post {
         Post(
             id: id,
@@ -136,15 +163,18 @@ struct FeedViewTests {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
+        let mockBookmarksUseCase = MockBookmarksUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
             createMockPost(id: 3),
         ]
+        let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
+            bookmarksController: bookmarksController
         )
 
         // Act
@@ -165,14 +195,17 @@ struct FeedViewTests {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
+        let mockBookmarksUseCase = MockBookmarksUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
         ]
+        let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
+            bookmarksController: bookmarksController
         )
 
         // Act - Load first page
@@ -201,12 +234,15 @@ struct FeedViewTests {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
+        let mockBookmarksUseCase = MockBookmarksUseCase()
         let post = createMockPost(id: 1, upvoted: false)
         mockPostUseCase.mockPosts = [post]
+        let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: mockVoteUseCase,
+            bookmarksController: bookmarksController
         )
 
         await viewModel.loadFeed()
@@ -225,11 +261,14 @@ struct FeedViewTests {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
+        let mockBookmarksUseCase = MockBookmarksUseCase()
         mockPostUseCase.mockPosts = [createMockPost(id: 1)]
+        let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
+            bookmarksController: bookmarksController
         )
 
         // Act
@@ -247,15 +286,18 @@ struct FeedViewTests {
         // Arrange
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
+        let mockBookmarksUseCase = MockBookmarksUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
             createMockPost(id: 1), // Duplicate
         ]
+        let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: mockVoteUseCase,
+            bookmarksController: bookmarksController
         )
 
         // Act

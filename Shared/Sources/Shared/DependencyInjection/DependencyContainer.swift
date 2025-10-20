@@ -27,6 +27,7 @@ public final class DependencyContainer: @unchecked Sendable {
         var onboardingUseCase: (() -> any OnboardingUseCase)?
         var sessionService: (@MainActor () -> SessionService)?
         var toastPresenter: (@MainActor () -> ToastPresenter)?
+        var bookmarksController: (@MainActor () -> BookmarksController)?
     }
 
     // Use type-level singletons to guarantee identity across access sites and threads
@@ -48,6 +49,8 @@ public final class DependencyContainer: @unchecked Sendable {
 
     @MainActor
     private lazy var toastPresenter = ToastPresenter()
+    @MainActor
+    private lazy var bookmarksController = BookmarksController(bookmarksUseCase: getBookmarksUseCase())
 
     private init() {}
 
@@ -114,6 +117,14 @@ public final class DependencyContainer: @unchecked Sendable {
             return factory()
         }
         return toastPresenter
+    }
+
+    @MainActor
+    public func makeBookmarksController() -> BookmarksController {
+        if let factory = Self.overrides?.bookmarksController {
+            return factory()
+        }
+        return bookmarksController
     }
 }
 

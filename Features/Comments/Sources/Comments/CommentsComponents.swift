@@ -46,7 +46,8 @@ struct CommentsContentView: View {
                                 currentPost.score += 1
                                 viewModel.post = currentPost
                             }
-                        }
+                        },
+                        onBookmarkToggle: { await viewModel.toggleBookmark() }
                     )
                     .id("header")
                     .background(GeometryReader { geometry in
@@ -196,6 +197,7 @@ struct PostHeader: View {
     let showThumbnails: Bool
     let onLinkTap: () -> Void
     let onUpvoteApplied: @Sendable () -> Void
+    let onBookmarkToggle: @Sendable () async -> Bool
 
     var body: some View {
         PostDisplayView(
@@ -204,7 +206,8 @@ struct PostHeader: View {
             showPostText: true,
             showThumbnails: showThumbnails,
             onThumbnailTap: { onLinkTap() },
-            onUpvoteTap: { await handleUpvote() }
+            onUpvoteTap: { await handleUpvote() },
+            onBookmarkTap: { await onBookmarkToggle() }
         )
         .contentShape(Rectangle())
         .onTapGesture { onLinkTap() }

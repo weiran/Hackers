@@ -10,4 +10,5 @@ import Foundation
 public extension Notification.Name {
     static let refreshRequired = NSNotification.Name(rawValue: "RefreshRequiredNotification")
     static let userDidLogout = NSNotification.Name(rawValue: "UserDidLogoutNotification")
+    static let bookmarksDidChange = NSNotification.Name(rawValue: "BookmarksDidChangeNotification")
 }
