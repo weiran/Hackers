@@ -40,10 +40,6 @@ struct MainContentView: View {
                 AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
                     .environmentObject(navigationStore)
                     .environmentObject(sessionService)
-                    .searchable(text: $feedSearchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
-                    .onChange(of: feedSearchText) { newValue in
-                        feedViewModel.updateSearchQuery(newValue)
-                    }
             } else {
                 NavigationStack(path: $navigationStore.path) {
                     FeedView<NavigationStore>(
@@ -83,16 +79,17 @@ struct MainContentView: View {
                         }
                     }
                 }
-                .searchable(text: $feedSearchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
-                .onChange(of: feedSearchText) { newValue in
-                    feedViewModel.updateSearchQuery(newValue)
-                }
             }
         }
         .environmentObject(toastPresenter)
         .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
+
+        .searchable(text: $feedSearchText, prompt: "Search Hacker News")
+        .onChange(of: feedSearchText) { newValue in
+            feedViewModel.updateSearchQuery(newValue)
+        }
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
