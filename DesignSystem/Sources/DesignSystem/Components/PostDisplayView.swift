@@ -18,7 +18,6 @@ public struct PostDisplayView: View {
     let onUpvoteTap: (() async -> Bool)?
     let onBookmarkTap: (() async -> Bool)?
 
-    @Environment(\.colorScheme) private var colorScheme
     @State private var isSubmittingUpvote = false
     @State private var isSubmittingBookmark = false
     @State private var displayedScore: Int
@@ -157,8 +156,8 @@ public struct PostDisplayView: View {
     }
 
     private var commentsPill: some View {
-        let commentTextColor: Color = colorScheme == .dark ? .primary : .secondary
-        let commentBackgroundColor = Color.secondary.opacity(colorScheme == .dark ? 0.22 : 0.12)
+        let commentTextColor: Color = .primary
+        let commentBackgroundColor = Color.secondary.opacity(0.1)
         // Brighter styling keeps the comments count from reading as a disabled control
         pillView(
             iconName: "message",
