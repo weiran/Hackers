@@ -180,7 +180,7 @@ public struct PostDisplayView: View {
         textColor: Color,
         backgroundColor: Color,
         accessibilityLabel: String,
-        isHighlighted: Bool,
+        isHighlighted _: Bool,
         isLoading: Bool,
         isEnabled: Bool = true,
         numericValue: Int? = nil,
@@ -213,9 +213,6 @@ public struct PostDisplayView: View {
             Capsule()
                 .fill(backgroundColor)
         )
-        .scaleEffect(isHighlighted ? 1.05 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHighlighted)
-
         if let action {
             Button(action: action) {
                 content
