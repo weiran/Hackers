@@ -11,7 +11,7 @@ import Foundation
 @testable import Shared
 import Testing
 
-@Suite("DependencyContainer Overrides")
+@Suite("DependencyContainer Overrides", .serialized)
 struct DependencyContainerTests {
     init() {
         DependencyContainer.resetOverrides()
