@@ -189,4 +189,12 @@ public final class FeedViewModel: @unchecked Sendable {
             feedLoader.data[index] = updatedPost
         }
     }
+
+    @MainActor
+    public func applyLocalUpvote(to postId: Int) {
+        guard let index = feedLoader.data.firstIndex(where: { $0.id == postId }) else { return }
+        guard feedLoader.data[index].upvoted == false else { return }
+        feedLoader.data[index].upvoted = true
+        feedLoader.data[index].score += 1
+    }
 }

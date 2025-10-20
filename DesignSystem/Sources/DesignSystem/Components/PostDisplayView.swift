@@ -15,9 +15,11 @@ public struct PostDisplayView: View {
     let showPostText: Bool
     let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
-    let onUpvoteTap: (() async -> Void)?
+    let onUpvoteTap: (() async -> Bool)?
 
     @State private var isSubmittingUpvote = false
+    @State private var displayedScore: Int
+    @State private var displayedUpvoted: Bool
 
     public init(
         post: Post,
@@ -25,7 +27,7 @@ public struct PostDisplayView: View {
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil,
-        onUpvoteTap: (() async -> Void)? = nil
+        onUpvoteTap: (() async -> Bool)? = nil
     ) {
         self.post = post
         self.votingState = votingState
@@ -33,6 +35,8 @@ public struct PostDisplayView: View {
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
+        _displayedScore = State(initialValue: post.score)
+        _displayedUpvoted = State(initialValue: post.upvoted)
     }
 
     public var body: some View {
@@ -76,16 +80,41 @@ public struct PostDisplayView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onChange(of: post.id) { _ in
+            displayedScore = post.score
+            displayedUpvoted = post.upvoted
+        }
+        .onChange(of: post.score) { newValue in
+            displayedScore = newValue
+        }
+        .onChange(of: post.upvoted) { newValue in
+            displayedUpvoted = newValue
+        }
+        .onChange(of: votingState?.score) { newValue in
+            if let newValue {
+                displayedScore = newValue
+            }
+        }
+        .onChange(of: votingState?.isUpvoted) { newValue in
+            if let newValue {
+                displayedUpvoted = newValue
+            }
+        }
     }
 
     private var upvotePill: some View {
-        let score = votingState?.score ?? post.score
-        let isUpvoted = votingState?.isUpvoted ?? post.upvoted
+        let score = displayedScore
+        let isUpvoted = displayedUpvoted
         let isLoading = isSubmittingUpvote
         let canVote = post.voteLinks?.upvote != nil
-        let textColor = isUpvoted ? AppColors.upvotedColor : Color.secondary
-        let backgroundColor = Color.secondary.opacity(0.1)
-        let iconName = isLoading ? nil : (isUpvoted ? "arrow.up.circle.fill" : "arrow.up")
+        let (backgroundColor, textColor): (Color, Color) = {
+            if isUpvoted {
+                return (AppColors.upvotedColor.opacity(0.2), AppColors.upvotedColor)
+            } else {
+                return (Color.secondary.opacity(0.1), .secondary)
+            }
+        }()
+        let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
         let accessibilityLabel: String
         if isLoading {
             accessibilityLabel = "Submitting vote"
@@ -127,9 +156,17 @@ public struct PostDisplayView: View {
         return {
             guard !isSubmittingUpvote else { return }
             isSubmittingUpvote = true
+            let previousScore = displayedScore
+            let previousUpvoted = displayedUpvoted
+            displayedUpvoted = true
+            displayedScore += 1
             Task {
-                await onUpvoteTap()
+                let success = await onUpvoteTap()
                 await MainActor.run {
+                    if !success {
+                        displayedScore = previousScore
+                        displayedUpvoted = previousUpvoted
+                    }
                     isSubmittingUpvote = false
                 }
             }
@@ -151,12 +188,7 @@ public struct PostDisplayView: View {
     ) -> some View {
         let iconDimension: CGFloat = 12
         let content = HStack(spacing: 4) {
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .frame(width: iconDimension, height: iconDimension)
-                    .tint(textColor)
-            } else if let iconName {
+            if let iconName {
                 Image(systemName: iconName)
                     .scaledFont(.caption2)
                     .foregroundColor(textColor)
@@ -167,18 +199,22 @@ public struct PostDisplayView: View {
                     .scaledFont(.caption)
                     .foregroundColor(textColor)
                     .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.2), value: value)
             } else {
                 Text(text)
                     .scaledFont(.caption)
                     .foregroundColor(textColor)
             }
         }
+        .contentTransition(.opacity)
         .padding(.vertical, 6)
         .padding(.horizontal, 10)
         .background(
             Capsule()
                 .fill(backgroundColor)
         )
+        .scaleEffect(isHighlighted ? 1.05 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHighlighted)
 
         if let action {
             Button(action: action) {

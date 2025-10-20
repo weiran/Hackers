@@ -40,9 +40,13 @@ struct CommentsContentView: View {
                         votingViewModel: votingViewModel,
                         showThumbnails: viewModel.showThumbnails,
                         onLinkTap: { handleLinkTap() },
-                        onPostUpdate: { updated in
-                            viewModel.post = updated
-                        },
+                        onUpvoteApplied: {
+                            if var currentPost = viewModel.post, !currentPost.upvoted {
+                                currentPost.upvoted = true
+                                currentPost.score += 1
+                                viewModel.post = currentPost
+                            }
+                        }
                     )
                     .id("header")
                     .background(GeometryReader { geometry in
@@ -58,7 +62,16 @@ struct CommentsContentView: View {
                                 Task {
                                     var mutablePost = post
                                     await votingViewModel.upvote(post: &mutablePost)
-                                    await MainActor.run { viewModel.post = mutablePost }
+                                    await MainActor.run {
+                                        if mutablePost.upvoted,
+                                           var currentPost = viewModel.post,
+                                           !currentPost.upvoted
+                                        {
+                                            currentPost.upvoted = true
+                                            currentPost.score += 1
+                                            viewModel.post = currentPost
+                                        }
+                                    }
                                 }
                             } label: {
                                 Image(systemName: "arrow.up")
@@ -182,7 +195,7 @@ struct PostHeader: View {
     let votingViewModel: VotingViewModel
     let showThumbnails: Bool
     let onLinkTap: () -> Void
-    let onPostUpdate: @Sendable (Post) -> Void
+    let onUpvoteApplied: @Sendable () -> Void
 
     var body: some View {
         PostDisplayView(
@@ -213,14 +226,20 @@ struct PostHeader: View {
         }
     }
 
-    private func handleUpvote() async {
-        guard votingViewModel.canVote(item: post), !post.upvoted else { return }
+    private func handleUpvote() async -> Bool {
+        guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
 
         var mutablePost = post
         await votingViewModel.upvote(post: &mutablePost)
-        await MainActor.run {
-            onPostUpdate(mutablePost)
+        let wasUpvoted = mutablePost.upvoted
+
+        if wasUpvoted {
+            await MainActor.run {
+                onUpvoteApplied()
+            }
         }
+
+        return wasUpvoted
     }
 }
 

@@ -118,8 +118,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             showThumbnails: viewModel.showThumbnails,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
-            onPostUpdate: { updatedPost in
-                viewModel.replacePost(updatedPost)
+            onUpvoteApplied: { postId in
+                viewModel.applyLocalUpvote(to: postId)
             }
         )
         .if(isSidebar) { view in
@@ -146,7 +146,11 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             Task {
                 var mutablePost = post
                 await votingViewModel.upvote(post: &mutablePost)
-                await MainActor.run { viewModel.replacePost(mutablePost) }
+                await MainActor.run {
+                    if mutablePost.upvoted {
+                        viewModel.applyLocalUpvote(to: post.id)
+                    }
+                }
             }
         } label: {
             Image(systemName: "arrow.up")
@@ -163,7 +167,11 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                 Task {
                     var mutablePost = post
                     await votingViewModel.upvote(post: &mutablePost)
-                    await MainActor.run { viewModel.replacePost(mutablePost) }
+                    await MainActor.run {
+                        if mutablePost.upvoted {
+                            viewModel.applyLocalUpvote(to: post.id)
+                        }
+                    }
                 }
             },
         )
@@ -262,21 +270,21 @@ struct PostRowView: View {
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
-    let onPostUpdate: ((Domain.Post) -> Void)?
+    let onUpvoteApplied: ((Int) -> Void)?
 
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
          showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil,
-         onPostUpdate: ((Domain.Post) -> Void)? = nil)
+         onUpvoteApplied: ((Int) -> Void)? = nil)
     {
         self.post = post
         self.votingViewModel = votingViewModel
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
-        self.onPostUpdate = onPostUpdate
+        self.onUpvoteApplied = onUpvoteApplied
     }
 
     var body: some View {
@@ -301,13 +309,19 @@ struct PostRowView: View {
         }
     }
 
-    private func handleUpvoteTap() async {
-        guard votingViewModel.canVote(item: post), !post.upvoted else { return }
+    private func handleUpvoteTap() async -> Bool {
+        guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
 
         var mutablePost = post
         await votingViewModel.upvote(post: &mutablePost)
-        await MainActor.run {
-            onPostUpdate?(mutablePost)
+        let wasUpvoted = mutablePost.upvoted
+
+        if wasUpvoted {
+            await MainActor.run {
+                onUpvoteApplied?(mutablePost.id)
+            }
         }
+
+        return wasUpvoted
     }
 }
