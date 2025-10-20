@@ -26,6 +26,7 @@ struct DependencyContainerTests {
         let stubAuth = StubAuthenticationUseCase()
         let stubOnboarding = StubOnboardingUseCase()
         let stubBookmarks = StubBookmarksUseCase()
+        let stubSearch = StubSearchUseCase()
         let stubBookmarksController = BookmarksController(bookmarksUseCase: stubBookmarks)
         let sessionService = SessionService(authenticationUseCase: stubAuth)
         let toastPresenter = ToastPresenter()
@@ -37,6 +38,7 @@ struct DependencyContainerTests {
                 commentUseCase: { stubRepository },
                 settingsUseCase: { stubSettings },
                 bookmarksUseCase: { stubBookmarks },
+                searchUseCase: { stubSearch },
                 votingStateProvider: { stubVoting },
                 commentVotingStateProvider: { stubVoting },
                 authenticationUseCase: { stubAuth },
@@ -54,6 +56,7 @@ struct DependencyContainerTests {
         #expect((container.getCommentUseCase() as? StubPostRepository) === stubRepository)
         #expect((container.getSettingsUseCase() as? StubSettingsUseCase) === stubSettings)
         #expect((container.getBookmarksUseCase() as? StubBookmarksUseCase) === stubBookmarks)
+        #expect((container.getSearchUseCase() as? StubSearchUseCase) === stubSearch)
         #expect((container.getVotingStateProvider() as? StubVotingStateProvider) === stubVoting)
         #expect(
             (container.getCommentVotingStateProvider() as? StubVotingStateProvider) === stubVoting
@@ -186,4 +189,8 @@ private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable 
             return true
         }
     }
+}
+
+private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
+    func searchPosts(query _: String) async throws -> [Post] { [] }
 }

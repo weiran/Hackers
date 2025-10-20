@@ -21,11 +21,13 @@ struct FeedViewModelTests {
         postUseCase.enqueue(.success([SampleData.post(id: 1)]))
         let bookmarksUseCase = StubBookmarksUseCase()
         let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
         await viewModel.loadFeed()
 
@@ -41,10 +43,12 @@ struct FeedViewModelTests {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.failure(StubError.network))
         let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let searchUseCase = StubSearchUseCase()
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         await viewModel.loadFeed()
@@ -61,11 +65,13 @@ struct FeedViewModelTests {
         postUseCase.enqueue(.success([SampleData.post(id: 1), SampleData.post(id: 2)]))
         postUseCase.enqueue(.success([SampleData.post(id: 2), SampleData.post(id: 3)]))
         let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
         await viewModel.loadFeed()
         await viewModel.loadNextPage()
@@ -155,12 +161,14 @@ struct FeedViewModelTests {
             lastFeedCategory: .ask
         )
         let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
             settingsUseCase: settingsUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         #expect(viewModel.postType == .ask)
@@ -177,12 +185,14 @@ struct FeedViewModelTests {
             lastFeedCategory: .news
         )
         let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
             settingsUseCase: settingsUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         await viewModel.changePostType(.jobs)
@@ -198,11 +208,13 @@ struct FeedViewModelTests {
         bookmarkedPost.isBookmarked = true
         let bookmarksUseCase = StubBookmarksUseCase(posts: [bookmarkedPost])
         let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: voteUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         await viewModel.changePostType(.bookmarks)
@@ -220,11 +232,13 @@ struct FeedViewModelTests {
         postUseCase.enqueue(.success([SampleData.post(id: 5)]))
         let bookmarksUseCase = StubBookmarksUseCase()
         let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         await viewModel.loadFeed()
@@ -246,11 +260,13 @@ struct FeedViewModelTests {
         postUseCase.enqueue(.success([SampleData.post(id: 12)]))
         let bookmarksUseCase = StubBookmarksUseCase()
         let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+        let searchUseCase = StubSearchUseCase()
 
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
         )
 
         await viewModel.loadFeed()
@@ -260,6 +276,32 @@ struct FeedViewModelTests {
         try await Task.sleep(nanoseconds: 20_000_000)
 
         #expect(viewModel.posts.first?.isBookmarked == true)
+    }
+
+    @MainActor
+    @Test("Search query updates results")
+    func searchQueryUpdatesResults() async throws {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
+        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.nextResults = [SampleData.post(id: 42)]
+
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: bookmarksController,
+            searchUseCase: searchUseCase
+        )
+
+        await viewModel.loadFeed()
+        viewModel.updateSearchQuery("swift")
+        try await Task.sleep(nanoseconds: 50_000_000)
+
+        #expect(searchUseCase.receivedQueries.contains("swift"))
+        #expect(viewModel.searchResults.first?.id == 42)
+        #expect(viewModel.hasActiveSearch)
+        #expect(viewModel.isSearchInProgress == false)
     }
 }
 
@@ -338,6 +380,18 @@ private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable 
             posts.insert(mutablePost, at: 0)
             return true
         }
+    }
+}
+
+private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
+    var nextResults: [Post] = []
+    var receivedQueries: [String] = []
+    var shouldThrow = false
+
+    func searchPosts(query: String) async throws -> [Post] {
+        receivedQueries.append(query)
+        if shouldThrow { throw StubError.network }
+        return nextResults
     }
 }
 

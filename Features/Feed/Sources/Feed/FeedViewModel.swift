@@ -24,28 +24,42 @@ public final class FeedViewModel: @unchecked Sendable {
     private let postUseCase: any PostUseCase
     private let voteUseCase: any VoteUseCase
     private let bookmarksController: BookmarksController
+    private let searchUseCase: any SearchUseCase
     private let feedLoader: LoadingStateManager<[Domain.Post]>
     private var settingsUseCase: any SettingsUseCase
     private var settingsCancellable: AnyCancellable?
     private var bookmarksObservation: AnyCancellable?
+    private var searchTask: Task<Void, Never>?
     private var rememberFeedCategorySetting: Bool
 
     public var posts: [Domain.Post] { feedLoader.data }
     public var isLoading: Bool { feedLoader.isLoading }
     public var error: Error? { feedLoader.error }
     public var showThumbnails: Bool
+    public var searchQuery: String = ""
+    public var searchResults: [Domain.Post] = []
+    public var isSearchInProgress = false
+    public var searchError: Error?
+    public var hasActiveSearch: Bool {
+        !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    public var displayedPosts: [Domain.Post] {
+        hasActiveSearch ? searchResults : posts
+    }
 
     @MainActor
     public init(
         postUseCase: any PostUseCase = DependencyContainer.shared.getPostUseCase(),
         voteUseCase: any VoteUseCase = DependencyContainer.shared.getVoteUseCase(),
         settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase(),
-        bookmarksController: BookmarksController? = nil
+        bookmarksController: BookmarksController? = nil,
+        searchUseCase: any SearchUseCase = DependencyContainer.shared.getSearchUseCase()
     ) {
         self.postUseCase = postUseCase
         self.voteUseCase = voteUseCase
         self.settingsUseCase = settingsUseCase
         self.bookmarksController = bookmarksController ?? DependencyContainer.shared.makeBookmarksController()
+        self.searchUseCase = searchUseCase
         showThumbnails = settingsUseCase.showThumbnails
         let rememberSetting = settingsUseCase.rememberFeedCategory
         rememberFeedCategorySetting = rememberSetting
@@ -245,6 +259,9 @@ public final class FeedViewModel: @unchecked Sendable {
         if let index = feedLoader.data.firstIndex(where: { $0.id == postId }) {
             feedLoader.data[index].isBookmarked = isBookmarked
         }
+        if let index = searchResults.firstIndex(where: { $0.id == postId }) {
+            searchResults[index].isBookmarked = isBookmarked
+        }
     }
 
     @MainActor
@@ -255,6 +272,45 @@ public final class FeedViewModel: @unchecked Sendable {
             let posts = await bookmarksController.bookmarkedPosts()
             postIds = Set(posts.map(\.id))
             feedLoader.data = posts
+        }
+    }
+
+    @MainActor
+    public func updateSearchQuery(_ query: String) {
+        searchTask?.cancel()
+        searchQuery = query
+        searchError = nil
+
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            isSearchInProgress = false
+            searchResults = []
+            return
+        }
+
+        isSearchInProgress = true
+        let currentQuery = query
+        searchTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let results = try await self.searchUseCase.searchPosts(query: currentQuery)
+                if Task.isCancelled { return }
+                await self.bookmarksController.refreshBookmarks()
+                let annotated = await MainActor.run {
+                    self.bookmarksController.annotatedPosts(from: results)
+                }
+                await MainActor.run {
+                    self.searchResults = annotated
+                    self.isSearchInProgress = false
+                }
+            } catch {
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    self.searchResults = []
+                    self.isSearchInProgress = false
+                    self.searchError = error
+                }
+            }
         }
     }
 }

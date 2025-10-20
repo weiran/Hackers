@@ -15,6 +15,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
+    @State private var searchText: String = ""
     @EnvironmentObject private var navigationStore: NavigationStore
 
     let isSidebar: Bool
@@ -28,7 +29,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private var shouldShowBookmarksEmptyState: Bool {
-        viewModel.postType == .bookmarks && viewModel.posts.isEmpty && !viewModel.isLoading
+        viewModel.postType == .bookmarks && viewModel.posts.isEmpty && !viewModel.isLoading && !viewModel.hasActiveSearch
     }
 
     public init(
@@ -68,8 +69,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
 
     public var body: some View {
         NavigationStack {
-            contentView
-                .navigationBarTitleDisplayMode(.inline)
+            VStack(spacing: 0) {
+                searchBar
+                Divider()
+                    .padding(.bottom, 8)
+                contentView
+            }
+            .navigationBarTitleDisplayMode(.inline)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -104,32 +110,101 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         }
     }
 
-    @ViewBuilder
-    private var contentView: some View {
-        if viewModel.isLoading, viewModel.posts.isEmpty {
-            AppLoadingStateView(message: "Loading...")
-        } else if shouldShowBookmarksEmptyState {
-            AppEmptyStateView(
-                iconSystemName: "bookmark",
-                title: "No bookmarks yet",
-                subtitle: "Save stories to keep them here."
-            )
-        } else {
-            List(selection: selectionBinding) {
-                ForEach(viewModel.posts, id: \.id) { post in
-                    postRow(for: post)
-                }
+    private var searchBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            TextField("Search Hacker News", text: $searchText, onCommit: {
+                viewModel.updateSearchQuery(searchText)
+            })
+            .textInputAutocapitalization(.never)
+            .disableAutocorrection(true)
+            .submitLabel(.search)
+            .onChange(of: searchText) { newValue in
+                viewModel.updateSearchQuery(newValue)
             }
-            .if(isSidebar) { view in view.listStyle(.sidebar) }
-            .if(!isSidebar) { view in view.listStyle(.plain) }
-            .refreshable {
-                await viewModel.refreshFeed()
+            if viewModel.hasActiveSearch {
+                Button {
+                    searchText = ""
+                    viewModel.updateSearchQuery("")
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                        .imageScale(.medium)
+                }
+                .accessibilityLabel("Clear search")
             }
         }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(.secondarySystemBackground))
+        )
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
     }
 
     @ViewBuilder
-    private func postRow(for post: Domain.Post) -> some View {
+    private var contentView: some View {
+        Group {
+            if viewModel.hasActiveSearch {
+                searchContentView
+            } else if viewModel.isLoading, viewModel.posts.isEmpty {
+                AppLoadingStateView(message: "Loading...")
+            } else if shouldShowBookmarksEmptyState {
+                AppEmptyStateView(
+                    iconSystemName: "bookmark",
+                    title: "No bookmarks yet",
+                    subtitle: "Save stories to keep them here."
+                )
+            } else {
+                feedListView(posts: viewModel.posts, enablePagination: true)
+                    .refreshable {
+                        await viewModel.refreshFeed()
+                    }
+            }
+        }
+        .animation(.default, value: viewModel.hasActiveSearch)
+    }
+
+    @ViewBuilder
+    private var searchContentView: some View {
+        if viewModel.isSearchInProgress {
+            ProgressView("Searching...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let error = viewModel.searchError {
+            AppEmptyStateView(
+                iconSystemName: "exclamationmark.triangle",
+                title: "Search Failed",
+                subtitle: error.localizedDescription
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if viewModel.searchResults.isEmpty {
+            AppEmptyStateView(
+                iconSystemName: "magnifyingglass",
+                title: "No Results",
+                subtitle: "Try a different query."
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            feedListView(posts: viewModel.searchResults, enablePagination: false)
+        }
+    }
+
+    private func feedListView(posts: [Domain.Post], enablePagination: Bool) -> some View {
+        List(selection: selectionBinding) {
+            ForEach(posts, id: \.id) { post in
+                postRow(for: post, enablePagination: enablePagination)
+            }
+        }
+        .if(isSidebar) { view in view.listStyle(.sidebar) }
+        .if(!isSidebar) { view in view.listStyle(.plain) }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    @ViewBuilder
+    private func postRow(for post: Domain.Post, enablePagination: Bool = true) -> some View {
         PostRowView(
             post: post,
             votingViewModel: votingViewModel,
@@ -147,6 +222,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             view.tag(post.id)
         }
         .onAppear {
+            guard enablePagination else { return }
             if post == viewModel.posts.last {
                 Task {
                     await viewModel.loadNextPage()

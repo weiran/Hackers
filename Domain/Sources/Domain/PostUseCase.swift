@@ -18,3 +18,7 @@ public protocol BookmarksUseCase: Sendable {
     @discardableResult
     func toggleBookmark(post: Post) async throws -> Bool
 }
+
+public protocol SearchUseCase: Sendable {
+    func searchPosts(query: String) async throws -> [Post]
+}

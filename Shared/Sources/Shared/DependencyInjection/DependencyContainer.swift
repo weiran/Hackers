@@ -20,6 +20,7 @@ public final class DependencyContainer: @unchecked Sendable {
         var commentUseCase: (() -> any CommentUseCase)?
         var settingsUseCase: (() -> any SettingsUseCase)?
         var bookmarksUseCase: (() -> any BookmarksUseCase)?
+        var searchUseCase: (() -> any SearchUseCase)?
         var supportUseCase: (() -> any SupportUseCase)?
         var votingStateProvider: (() -> any VotingStateProvider)?
         var commentVotingStateProvider: (() -> any CommentVotingStateProvider)?
@@ -34,6 +35,7 @@ public final class DependencyContainer: @unchecked Sendable {
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
     private static let postRepository: PostRepository = .init(networkManager: networkManager)
     private static let bookmarksRepository: BookmarksRepository = .init()
+    private static let searchRepository: SearchRepository = .init()
     private static let settingsRepository: SettingsRepository = .init()
     private static let supportRepository: SupportPurchaseRepository = .init()
     private static let votingStateProvider: VotingStateProvider =
@@ -72,6 +74,10 @@ public final class DependencyContainer: @unchecked Sendable {
 
     public func getBookmarksUseCase() -> any BookmarksUseCase {
         Self.overrides?.bookmarksUseCase?() ?? Self.bookmarksRepository
+    }
+
+    public func getSearchUseCase() -> any SearchUseCase {
+        Self.overrides?.searchUseCase?() ?? Self.searchRepository
     }
 
     public func getSupportUseCase() -> any SupportUseCase {

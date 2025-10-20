@@ -143,6 +143,16 @@ struct FeedViewTests {
         }
     }
 
+    final class MockSearchUseCase: SearchUseCase, @unchecked Sendable {
+        var lastQuery: String?
+        var results: [Post] = []
+
+        func searchPosts(query: String) async throws -> [Post] {
+            lastQuery = query
+            return results
+        }
+    }
+
     private func createMockPost(id: Int, upvoted: Bool = false) -> Post {
         Post(
             id: id,
@@ -164,6 +174,7 @@ struct FeedViewTests {
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         let mockBookmarksUseCase = MockBookmarksUseCase()
+        let mockSearchUseCase = MockSearchUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
@@ -174,7 +185,8 @@ struct FeedViewTests {
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: mockSearchUseCase
         )
 
         // Act
@@ -196,6 +208,7 @@ struct FeedViewTests {
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         let mockBookmarksUseCase = MockBookmarksUseCase()
+        let mockSearchUseCase = MockSearchUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
@@ -205,7 +218,8 @@ struct FeedViewTests {
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: mockSearchUseCase
         )
 
         // Act - Load first page
@@ -235,6 +249,7 @@ struct FeedViewTests {
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         let mockBookmarksUseCase = MockBookmarksUseCase()
+        let mockSearchUseCase = MockSearchUseCase()
         let post = createMockPost(id: 1, upvoted: false)
         mockPostUseCase.mockPosts = [post]
         let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
@@ -242,7 +257,8 @@ struct FeedViewTests {
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: mockVoteUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: mockSearchUseCase
         )
 
         await viewModel.loadFeed()
@@ -262,13 +278,15 @@ struct FeedViewTests {
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         let mockBookmarksUseCase = MockBookmarksUseCase()
+        let mockSearchUseCase = MockSearchUseCase()
         mockPostUseCase.mockPosts = [createMockPost(id: 1)]
         let bookmarksController = BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
 
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: MockVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: mockSearchUseCase
         )
 
         // Act
@@ -287,6 +305,7 @@ struct FeedViewTests {
         let mockPostUseCase = MockPostUseCase()
         let mockVoteUseCase = MockVoteUseCase()
         let mockBookmarksUseCase = MockBookmarksUseCase()
+        let mockSearchUseCase = MockSearchUseCase()
         mockPostUseCase.mockPosts = [
             createMockPost(id: 1),
             createMockPost(id: 2),
@@ -297,7 +316,8 @@ struct FeedViewTests {
         let viewModel = FeedViewModel(
             postUseCase: mockPostUseCase,
             voteUseCase: mockVoteUseCase,
-            bookmarksController: bookmarksController
+            bookmarksController: bookmarksController,
+            searchUseCase: mockSearchUseCase
         )
 
         // Act
