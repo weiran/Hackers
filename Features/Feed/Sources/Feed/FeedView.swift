@@ -27,6 +27,10 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         [.bookmarks]
     }
 
+    private var shouldShowBookmarksEmptyState: Bool {
+        viewModel.postType == .bookmarks && viewModel.posts.isEmpty && !viewModel.isLoading
+    }
+
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
@@ -104,6 +108,12 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     private var contentView: some View {
         if viewModel.isLoading, viewModel.posts.isEmpty {
             AppLoadingStateView(message: "Loading...")
+        } else if shouldShowBookmarksEmptyState {
+            AppEmptyStateView(
+                iconSystemName: "bookmark",
+                title: "No bookmarks yet",
+                subtitle: "Save stories to keep them here."
+            )
         } else {
             List(selection: selectionBinding) {
                 ForEach(viewModel.posts, id: \.id) { post in
