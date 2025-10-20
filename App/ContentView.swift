@@ -23,7 +23,6 @@ struct MainContentView: View {
     @StateObject private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
     @State private var showOnboarding = false
-    @State private var feedSearchText = ""
     private let onboardingCoordinator: OnboardingCoordinator
 
     init(container: DependencyContainer = .shared) {
@@ -85,11 +84,6 @@ struct MainContentView: View {
         .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
-
-        .searchable(text: $feedSearchText, prompt: "Search Hacker News")
-        .onChange(of: feedSearchText) { newValue in
-            feedViewModel.updateSearchQuery(newValue)
-        }
         .sheet(isPresented: $navigationStore.showingLogin) {
             LoginView(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
