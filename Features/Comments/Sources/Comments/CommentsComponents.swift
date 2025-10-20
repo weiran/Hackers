@@ -191,19 +191,14 @@ struct PostHeader: View {
             showPostText: true,
             showThumbnails: showThumbnails,
             onThumbnailTap: { onLinkTap() },
+            onUpvoteTap: { await handleUpvote() }
         )
         .contentShape(Rectangle())
         .onTapGesture { onLinkTap() }
         .contextMenu {
             VotingContextMenuItems.postVotingMenuItems(
                 for: post,
-                onVote: {
-                    Task {
-                        var mutablePost = post
-                        await votingViewModel.upvote(post: &mutablePost)
-                        await MainActor.run { onPostUpdate(mutablePost) }
-                    }
-                },
+                onVote: { Task { await handleUpvote() } },
             )
 
             Divider()
@@ -215,6 +210,16 @@ struct PostHeader: View {
             Button { ContentSharePresenter.shared.shareURL(post.url, title: post.title) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
+        }
+    }
+
+    private func handleUpvote() async {
+        guard votingViewModel.canVote(item: post), !post.upvoted else { return }
+
+        var mutablePost = post
+        await votingViewModel.upvote(post: &mutablePost)
+        await MainActor.run {
+            onPostUpdate(mutablePost)
         }
     }
 }

@@ -15,6 +15,9 @@ public struct PostDisplayView: View {
     let showPostText: Bool
     let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
+    let onUpvoteTap: (() async -> Void)?
+
+    @State private var isSubmittingUpvote = false
 
     public init(
         post: Post,
@@ -22,17 +25,19 @@ public struct PostDisplayView: View {
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil,
+        onUpvoteTap: (() async -> Void)? = nil
     ) {
         self.post = post
         self.votingState = votingState
         self.showPostText = showPostText
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
+        self.onUpvoteTap = onUpvoteTap
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
                 // Thumbnail with proper loading
                 ThumbnailView(url: post.url, isEnabled: showThumbnails)
                     .frame(width: 55, height: 55)
@@ -44,69 +49,151 @@ public struct PostDisplayView: View {
                     .accessibilityAddTraits(.isButton)
                     .accessibilityLabel("Open link")
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
+                    if let host = post.url.host,
+                       !isHackerNewsItemURL(post.url)
+                    {
+                        Text(truncatedHost(host))
+                            .scaledFont(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+
                     // Title
                     Text(post.title)
                         .scaledFont(.headline)
                         .foregroundColor(.primary)
-                        .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Metadata row
-                    HStack(spacing: 3) {
-                        // Use new VoteIndicator if voting state is provided
-                        if let votingState {
-                            VoteIndicator(
-                                votingState: votingState,
-                                style: VoteIndicatorStyle(
-                                    iconFont: .caption2,
-                                    scoreFont: .subheadline,
-                                    spacing: 0,
-                                    defaultColor: .secondary,
-                                    upvotedColor: AppColors.upvotedColor,
-                                ),
-                            )
-                        } else {
-                            // Fallback to old display
-                            HStack(spacing: 0) {
-                                Text("\(post.score)")
-                                    .foregroundColor(post.upvoted ? AppColors.upvotedColor : .secondary)
-                                Image(systemName: "arrow.up")
-                                    .foregroundColor(post.upvoted ? AppColors.upvotedColor : .secondary)
-                                    .scaledFont(.caption2)
-                                    .accessibilityHidden(true)
-                            }
-                        }
-
-                        Text("•")
-                            .foregroundColor(.secondary)
-                            .accessibilityHidden(true)
-
-                        HStack(spacing: 0) {
-                            Text("\(post.commentsCount)")
-                                .foregroundColor(.secondary)
-                            Image(systemName: "message")
-                                .foregroundColor(.secondary)
-                                .scaledFont(.caption2)
-                                .accessibilityHidden(true)
-                        }
-
-                        if let host = post.url.host,
-                           !isHackerNewsItemURL(post.url)
-                        {
-                            Text("•")
-                                .foregroundColor(.secondary)
-                                .accessibilityHidden(true)
-                            Text(truncatedHost(host))
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
+                    HStack(spacing: 8) {
+                        upvotePill
+                        commentsPill
                     }
-                    .scaledFont(.subheadline)
+                    .scaledFont(.caption)
+                    .padding(.top, 2)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var upvotePill: some View {
+        let score = votingState?.score ?? post.score
+        let isUpvoted = votingState?.isUpvoted ?? post.upvoted
+        let isLoading = isSubmittingUpvote
+        let canVote = post.voteLinks?.upvote != nil
+        let textColor = isUpvoted ? AppColors.upvotedColor : Color.secondary
+        let backgroundColor = Color.secondary.opacity(0.1)
+        let iconName = isLoading ? nil : (isUpvoted ? "arrow.up.circle.fill" : "arrow.up")
+        let accessibilityLabel: String
+        if isLoading {
+            accessibilityLabel = "Submitting vote"
+        } else if isUpvoted {
+            accessibilityLabel = "\(score) points, upvoted"
+        } else {
+            accessibilityLabel = "\(score) points"
+        }
+
+        return pillView(
+            iconName: iconName,
+            text: "\(score)",
+            textColor: textColor,
+            backgroundColor: backgroundColor,
+            accessibilityLabel: accessibilityLabel,
+            isHighlighted: isUpvoted,
+            isLoading: isLoading,
+            isEnabled: canVote && !isUpvoted && !isLoading,
+            numericValue: score,
+            action: makeUpvoteAction()
+        )
+    }
+
+    private var commentsPill: some View {
+        pillView(
+            iconName: "message",
+            text: "\(post.commentsCount)",
+            textColor: .secondary,
+            backgroundColor: Color.secondary.opacity(0.1),
+            accessibilityLabel: "\(post.commentsCount) comments",
+            isHighlighted: false,
+            isLoading: false,
+            numericValue: post.commentsCount
+        )
+    }
+
+    private func makeUpvoteAction() -> (() -> Void)? {
+        guard let onUpvoteTap else { return nil }
+        return {
+            guard !isSubmittingUpvote else { return }
+            isSubmittingUpvote = true
+            Task {
+                await onUpvoteTap()
+                await MainActor.run {
+                    isSubmittingUpvote = false
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func pillView(
+        iconName: String?,
+        text: String,
+        textColor: Color,
+        backgroundColor: Color,
+        accessibilityLabel: String,
+        isHighlighted: Bool,
+        isLoading: Bool,
+        isEnabled: Bool = true,
+        numericValue: Int? = nil,
+        action: (() -> Void)? = nil
+    ) -> some View {
+        let iconDimension: CGFloat = 12
+        let content = HStack(spacing: 4) {
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(width: iconDimension, height: iconDimension)
+                    .tint(textColor)
+            } else if let iconName {
+                Image(systemName: iconName)
+                    .scaledFont(.caption2)
+                    .foregroundColor(textColor)
+                    .frame(width: iconDimension, height: iconDimension)
+            }
+            if let value = numericValue {
+                Text(text)
+                    .scaledFont(.caption)
+                    .foregroundColor(textColor)
+                    .contentTransition(.numericText())
+            } else {
+                Text(text)
+                    .scaledFont(.caption)
+                    .foregroundColor(textColor)
+            }
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .background(
+            Capsule()
+                .fill(backgroundColor)
+        )
+
+        if let action {
+            Button(action: action) {
+                content
+            }
+            .buttonStyle(.plain)
+            .disabled(!isEnabled || isLoading)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(Text("Double tap to upvote"))
+        } else {
+            content
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(accessibilityLabel)
+        }
     }
 }
 

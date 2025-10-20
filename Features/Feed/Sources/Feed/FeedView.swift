@@ -118,6 +118,9 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             showThumbnails: viewModel.showThumbnails,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
+            onPostUpdate: { updatedPost in
+                viewModel.replacePost(updatedPost)
+            }
         )
         .if(isSidebar) { view in
             view.tag(post.id)
@@ -259,18 +262,21 @@ struct PostRowView: View {
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
+    let onPostUpdate: ((Domain.Post) -> Void)?
 
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
          showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
-         onCommentsTap: (() -> Void)? = nil)
+         onCommentsTap: (() -> Void)? = nil,
+         onPostUpdate: ((Domain.Post) -> Void)? = nil)
     {
         self.post = post
         self.votingViewModel = votingViewModel
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
+        self.onPostUpdate = onPostUpdate
     }
 
     var body: some View {
@@ -280,6 +286,7 @@ struct PostRowView: View {
             showPostText: false,
             showThumbnails: showThumbnails,
             onThumbnailTap: onLinkTap,
+            onUpvoteTap: { await handleUpvoteTap() }
         )
         .contentShape(Rectangle())
         .if(onCommentsTap != nil) { view in
@@ -293,6 +300,14 @@ struct PostRowView: View {
                 .accessibilityHint("Open comments")
         }
     }
-}
 
-// moved 'if' View helper to Shared.Extensions
+    private func handleUpvoteTap() async {
+        guard votingViewModel.canVote(item: post), !post.upvoted else { return }
+
+        var mutablePost = post
+        await votingViewModel.upvote(post: &mutablePost)
+        await MainActor.run {
+            onPostUpdate?(mutablePost)
+        }
+    }
+}
