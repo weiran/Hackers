@@ -13,7 +13,7 @@ public enum AppColors {
         if UIColor(named: "upvotedColor", in: .main, compatibleWith: nil) != nil {
             return Color("upvotedColor", bundle: .main)
         }
-        return Color.orange
+        return Color(red: 1.0, green: 0.4, blue: 0.0)
     }
 
     public static var appTint: Color {
@@ -35,7 +35,7 @@ public enum AppColors {
         if UIColor(named: "upvotedColor") != nil {
             Color("upvotedColor")
         } else {
-            Color.orange
+            Color(red: 1.0, green: 0.4, blue: 0.0)
         }
     }
 
