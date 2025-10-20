@@ -204,7 +204,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     .font(.headline)
                 Text(selectedPostType.displayName)
                     .font(.headline)
-                Image(systemName: "chevron.down.circle.fill")
+                Image(systemName: "chevron.down")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
