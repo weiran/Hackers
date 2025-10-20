@@ -109,7 +109,7 @@ public struct PostDisplayView: View {
         let canVote = post.voteLinks?.upvote != nil
         let (backgroundColor, textColor): (Color, Color) = {
             if isUpvoted {
-                return (AppColors.upvotedColor.opacity(0.14), AppColors.upvotedColor)
+                return (AppColors.upvotedColor.opacity(0.06), AppColors.upvotedColor)
             } else {
                 return (Color.secondary.opacity(0.06), .secondary)
             }
@@ -206,7 +206,6 @@ public struct PostDisplayView: View {
                     .foregroundColor(textColor)
             }
         }
-        .contentTransition(.opacity)
         .padding(.vertical, 6)
         .padding(.horizontal, 10)
         .background(
