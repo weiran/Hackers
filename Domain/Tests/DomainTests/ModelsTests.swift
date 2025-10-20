@@ -188,11 +188,12 @@ struct ModelsTests {
         #expect(PostType.newest.rawValue == "newest")
         #expect(PostType.best.rawValue == "best")
         #expect(PostType.active.rawValue == "active")
+        #expect(PostType.bookmarks.rawValue == "bookmarks")
     }
 
     @Test("PostType allCases contains all expected cases")
     func postTypeAllCases() {
-        let expectedCases: [PostType] = [.news, .ask, .show, .jobs, .newest, .best, .active]
+        let expectedCases: [PostType] = [.news, .ask, .show, .jobs, .newest, .best, .active, .bookmarks]
         #expect(PostType.allCases == expectedCases)
     }
 
