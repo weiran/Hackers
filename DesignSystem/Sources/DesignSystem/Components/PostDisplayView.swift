@@ -121,6 +121,8 @@ public struct PostDisplayView: View {
         let isUpvoted = displayedUpvoted
         let isLoading = isSubmittingUpvote
         let canVote = post.voteLinks?.upvote != nil
+        let canInteract = canVote && !isUpvoted && !isLoading
+        // Avoid keeping a disabled Button so the upvoted state retains the bright tint
         let (backgroundColor, textColor): (Color, Color) = {
             if isUpvoted {
                 return (AppColors.upvotedColor.opacity(0.1), AppColors.upvotedColor)
@@ -147,9 +149,9 @@ public struct PostDisplayView: View {
             accessibilityHint: "Double tap to upvote",
             isHighlighted: isUpvoted,
             isLoading: isLoading,
-            isEnabled: canVote && !isUpvoted && !isLoading,
+            isEnabled: canInteract,
             numericValue: score,
-            action: makeUpvoteAction()
+            action: canInteract ? makeUpvoteAction() : nil
         )
     }
 
