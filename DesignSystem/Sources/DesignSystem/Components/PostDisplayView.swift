@@ -109,9 +109,9 @@ public struct PostDisplayView: View {
         let canVote = post.voteLinks?.upvote != nil
         let (backgroundColor, textColor): (Color, Color) = {
             if isUpvoted {
-                return (AppColors.upvotedColor.opacity(0.2), AppColors.upvotedColor)
+                return (AppColors.upvotedColor.opacity(0.14), AppColors.upvotedColor)
             } else {
-                return (Color.secondary.opacity(0.1), .secondary)
+                return (Color.secondary.opacity(0.06), .secondary)
             }
         }()
         let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
@@ -143,7 +143,7 @@ public struct PostDisplayView: View {
             iconName: "message",
             text: "\(post.commentsCount)",
             textColor: .secondary,
-            backgroundColor: Color.secondary.opacity(0.1),
+            backgroundColor: Color.secondary.opacity(0.06),
             accessibilityLabel: "\(post.commentsCount) comments",
             isHighlighted: false,
             isLoading: false,
