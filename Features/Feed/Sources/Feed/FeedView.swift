@@ -70,7 +70,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     public var body: some View {
         NavigationStack {
             contentView
-                .navigationTitle("Hackers")
+                .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
                 .navigationBarTitleDisplayMode(.inline)
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
@@ -78,13 +78,12 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             viewModel.updateSearchQuery(newValue)
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                toolbarMenu
-            }
-
             ToolbarItem(placement: .navigationBarTrailing) {
                 settingsButton
             }
+        }
+        .toolbarTitleMenu {
+            postTypeTitleMenu
         }
         .task { @Sendable in
             // Set the navigation store for the voting view model
@@ -252,35 +251,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     @ViewBuilder
-    private var toolbarMenu: some View {
-        Menu {
-            ForEach(primaryPostTypes, id: \.self) { postType in
+    private var postTypeTitleMenu: some View {
+        ForEach(primaryPostTypes, id: \.self) { postType in
+            postTypeMenuButton(for: postType)
+        }
+        if !secondaryPostTypes.isEmpty {
+            Divider()
+            ForEach(secondaryPostTypes, id: \.self) { postType in
                 postTypeMenuButton(for: postType)
             }
-            if !secondaryPostTypes.isEmpty {
-                Divider()
-                ForEach(secondaryPostTypes, id: \.self) { postType in
-                    postTypeMenuButton(for: postType)
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: selectedPostType.iconName)
-                    .font(.headline)
-                Text(selectedPostType.displayName)
-                    .font(.headline)
-                Image(systemName: "chevron.down")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .foregroundStyle(.primary)
         }
-        .padding(.horizontal, 10)
-        // hacky way to adapt to iPad toolbar height being smaller
-        .padding(.vertical, UIDevice.current.userInterfaceIdiom == .pad ? 4 : 8)
-        .glassEffect()
-        // hack to fix glitchy UI bug: https://github.com/weiran/Hackers/issues/313
-        .clipShape(RoundedRectangle(cornerRadius: 32.0))
     }
 
     @ViewBuilder
