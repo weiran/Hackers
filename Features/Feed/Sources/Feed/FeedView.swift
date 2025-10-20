@@ -69,16 +69,16 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
 
     public var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                searchBar
-                Divider()
-                    .padding(.bottom, 8)
-                contentView
-            }
-            .navigationBarTitleDisplayMode(.inline)
+            contentView
+                .navigationTitle("Hackers")
+                .navigationBarTitleDisplayMode(.inline)
+        }
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
+        .onChange(of: searchText) { newValue in
+            viewModel.updateSearchQuery(newValue)
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
+            ToolbarItem(placement: .navigationBarLeading) {
                 toolbarMenu
             }
 
@@ -108,41 +108,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             // Ensure the navigation store is set
             votingViewModel.navigationStore = navigationStore
         }
-    }
-
-    private var searchBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
-            TextField("Search Hacker News", text: $searchText, onCommit: {
-                viewModel.updateSearchQuery(searchText)
-            })
-            .textInputAutocapitalization(.never)
-            .disableAutocorrection(true)
-            .submitLabel(.search)
-            .onChange(of: searchText) { newValue in
-                viewModel.updateSearchQuery(newValue)
-            }
-            if viewModel.hasActiveSearch {
-                Button {
-                    searchText = ""
-                    viewModel.updateSearchQuery("")
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                        .imageScale(.medium)
-                }
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color(.secondarySystemBackground))
-        )
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
     }
 
     @ViewBuilder
