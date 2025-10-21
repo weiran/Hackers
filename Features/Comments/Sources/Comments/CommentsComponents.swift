@@ -254,8 +254,18 @@ struct CommentRow: View {
     let onHide: () -> Void
     @Environment(\.textScaling) private var textScaling
 
+    private var baseCommentText: AttributedString {
+        if let cached = comment.parsedText {
+            return cached
+        }
+
+        let parsed = CommentHTMLParser.parseHTMLText(comment.text)
+        comment.parsedText = parsed
+        return parsed
+    }
+
     private var styledCommentText: AttributedString {
-        var attributed = CommentHTMLParser.parseHTMLText(comment.text)
+        var attributed = baseCommentText
         attributed = applyingScaledCommentFonts(to: attributed, textScaling: textScaling)
         let linkColor = AppColors.appTintColor
 
