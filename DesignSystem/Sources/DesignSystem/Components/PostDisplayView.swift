@@ -288,7 +288,6 @@ public struct PostDisplayView: View {
                 .glassEffect()
         }
         .buttonStyle(.plain)
-        .disabled(!isEnabled || isLoading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint(accessibilityHint ?? "")
