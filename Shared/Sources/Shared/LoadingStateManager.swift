@@ -8,19 +8,19 @@
 import Foundation
 
 @Observable
-public final class LoadingStateManager<T>: @unchecked Sendable {
+public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
     public var data: T
     public private(set) var isLoading = false
     public private(set) var error: Error?
     public private(set) var hasAttemptedLoad = false
 
-    private var loadData: (() async throws -> T)?
-    private var shouldSkipLoad: ((T) -> Bool)?
+    private var loadData: (@Sendable () async throws -> T)?
+    private var shouldSkipLoad: (@Sendable (T) -> Bool)?
 
     public init(
         initialData: T,
-        shouldSkipLoad: @escaping (T) -> Bool = { _ in false },
-        loadData: @escaping () async throws -> T,
+        shouldSkipLoad: @escaping @Sendable (T) -> Bool = { _ in false },
+        loadData: @escaping @Sendable () async throws -> T,
     ) {
         data = initialData
         self.shouldSkipLoad = shouldSkipLoad
@@ -34,8 +34,8 @@ public final class LoadingStateManager<T>: @unchecked Sendable {
     }
 
     public func setLoadFunction(
-        shouldSkipLoad: @escaping (T) -> Bool = { _ in false },
-        loadData: @escaping () async throws -> T,
+        shouldSkipLoad: @escaping @Sendable (T) -> Bool = { _ in false },
+        loadData: @escaping @Sendable () async throws -> T,
     ) {
         self.shouldSkipLoad = shouldSkipLoad
         self.loadData = loadData
@@ -59,18 +59,21 @@ public final class LoadingStateManager<T>: @unchecked Sendable {
     @MainActor
     private func performLoad() async {
         guard let loadData else { return }
+        let loader = loadData
 
         isLoading = true
         error = nil
+        defer { isLoading = false }
 
         do {
-            data = try await loadData()
+            let result = try await Task.detached(priority: .userInitiated) {
+                try await loader()
+            }.value
+            data = result
             hasAttemptedLoad = true
-            isLoading = false
         } catch {
             self.error = error
             hasAttemptedLoad = true
-            isLoading = false
         }
     }
 
