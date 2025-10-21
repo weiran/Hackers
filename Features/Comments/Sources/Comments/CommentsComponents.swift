@@ -159,15 +159,10 @@ struct CommentsForEach: View {
             .id("comment-\(comment.id)")
             .background(GeometryReader { geometry in
                 Color.clear.preference(
-                    key: CommentPositionKey.self,
-                    value: CommentPosition(id: comment.id, frame: geometry.frame(in: .global)),
+                    key: CommentPositionsPreferenceKey.self,
+                    value: [comment.id: geometry.frame(in: .global)],
                 )
             })
-            .onPreferenceChange(CommentPositionKey.self) { position in
-                if let position {
-                    visibleCommentPositions[position.id] = position.frame
-                }
-            }
             .listRowSeparator(.hidden)
             .if(comment.voteLinks?.upvote != nil && !comment.upvoted) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -186,6 +181,11 @@ struct CommentsForEach: View {
                 Button { hideCommentBranch(comment) } label: {
                     Image(systemName: "minus.circle")
                 }
+            }
+        }
+        .onPreferenceChange(CommentPositionsPreferenceKey.self) { positions in
+            if visibleCommentPositions != positions {
+                visibleCommentPositions = positions
             }
         }
     }
@@ -264,33 +264,12 @@ struct CommentRow: View {
         return parsed
     }
 
-    private var styledCommentText: AttributedString {
-        var attributed = baseCommentText
-        attributed = applyingScaledCommentFonts(to: attributed, textScaling: textScaling)
-        let linkColor = AppColors.appTintColor
-
-        for run in attributed.runs {
-            if run.link != nil {
-                attributed[run.range].foregroundColor = linkColor
-            }
-        }
-
-        return attributed
-    }
-
-    private func applyingScaledCommentFonts(to attributed: AttributedString, textScaling: CGFloat) -> AttributedString {
-        var result = attributed
-        let fontProvider = CommentFontProvider(textScaling: textScaling)
-        for run in result.runs {
-            let range = run.range
-            let intents = run.inlinePresentationIntent ?? []
-            result[range].font = fontProvider.font(
-                isCode: intents.contains(.code),
-                isBold: intents.contains(.stronglyEmphasized),
-                isItalic: intents.contains(.emphasized)
-            )
-        }
-        return result
+    private func styledText(for textScaling: CGFloat) -> AttributedString {
+        StyledCommentTextCache.text(
+            commentID: comment.id,
+            textScaling: textScaling,
+            baseText: baseCommentText
+        )
     }
 
     var body: some View {
@@ -325,7 +304,7 @@ struct CommentRow: View {
                 }
             }
             if comment.visibility == .visible {
-                Text(styledCommentText)
+                Text(styledText(for: textScaling))
                     .foregroundColor(.primary)
             }
         }
@@ -354,7 +333,10 @@ struct CommentRow: View {
 }
 
 /// Precomputes fonts for each inline presentation style so comment text scaling stays consistent.
+@MainActor
 private struct CommentFontProvider {
+    private static var cache: [CGFloat: CommentFontProvider] = [:]
+
     private let base: Font
     private let bold: Font
     private let italic: Font
@@ -364,7 +346,16 @@ private struct CommentFontProvider {
     private let codeItalic: Font
     private let codeBoldItalic: Font
 
-    init(textScaling: CGFloat) {
+    static func cached(textScaling: CGFloat) -> CommentFontProvider {
+        if let cached = cache[textScaling] {
+            return cached
+        }
+        let provider = CommentFontProvider(textScaling: textScaling)
+        cache[textScaling] = provider
+        return provider
+    }
+
+    private init(textScaling: CGFloat) {
         let basePointSize = UIFont.preferredFont(forTextStyle: .callout).pointSize * textScaling
         let codePointSize = UIFont.preferredFont(forTextStyle: .subheadline).pointSize * textScaling
 
@@ -425,6 +416,49 @@ private struct CommentFontProvider {
     }
 }
 
+@MainActor
+private enum StyledCommentTextCache {
+    private struct CacheKey: Hashable {
+        let commentID: Int
+        let scale: CGFloat
+    }
+
+    private struct Entry {
+        let base: AttributedString
+        let styled: AttributedString
+    }
+
+    private static var cache: [CacheKey: Entry] = [:]
+
+    static func text(commentID: Int, textScaling: CGFloat, baseText: AttributedString) -> AttributedString {
+        let key = CacheKey(commentID: commentID, scale: textScaling)
+        if let cached = cache[key], cached.base == baseText {
+            return cached.styled
+        }
+
+        var attributed = baseText
+        let fontProvider = CommentFontProvider.cached(textScaling: textScaling)
+        let linkColor = AppColors.appTintColor
+
+        for run in attributed.runs {
+            let range = run.range
+            let intents = run.inlinePresentationIntent ?? []
+            attributed[range].font = fontProvider.font(
+                isCode: intents.contains(.code),
+                isBold: intents.contains(.stronglyEmphasized),
+                isItalic: intents.contains(.emphasized)
+            )
+        }
+
+        for run in attributed.runs where run.link != nil {
+            attributed[run.range].foregroundColor = linkColor
+        }
+
+        cache[key] = Entry(base: baseText, styled: attributed)
+        return attributed
+    }
+}
+
 struct ToolbarTitle: View {
     let post: Post
     let showTitle: Bool
@@ -481,15 +515,12 @@ struct ViewOffsetKey: PreferenceKey {
     static func reduce(value: inout Value, nextValue: () -> Value) { value += nextValue() }
 }
 
-struct CommentPosition: Equatable {
-    let id: Int
-    let frame: CGRect
-}
-
-struct CommentPositionKey: PreferenceKey {
-    typealias Value = CommentPosition?
-    static let defaultValue: CommentPosition? = nil
-    static func reduce(value: inout Value, nextValue: () -> Value) { value = value ?? nextValue() }
+struct CommentPositionsPreferenceKey: PreferenceKey {
+    typealias Value = [Int: CGRect]
+    static let defaultValue: [Int: CGRect] = [:]
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
+    }
 }
 
 // MARK: - Helpers
