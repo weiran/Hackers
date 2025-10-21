@@ -17,27 +17,27 @@ public struct OnboardingData: Sendable {
     }
 
     public static func currentOnboarding() -> OnboardingData {
-        let rememberedFeed = OnboardingItem(
-            title: "Remembers Your Feed",
-            subtitle: "Hackers reopens in the last section you read so you never lose your place.",
-            systemImage: "list.bullet.rectangle",
+        let smarterSearch = OnboardingItem(
+            title: "Smarter Search & Feed",
+            subtitle: "Find stories faster with Algolia search, remembered categories, and thumbnail controls.",
+            systemImage: "magnifyingglass.circle",
         )
 
-        let thumbnailToggle = OnboardingItem(
-            title: "Feed Thumbnails Toggle",
-            subtitle: "Choose whether story thumbnails appear in the feed.",
-            systemImage: "photo.on.rectangle",
+        let syncedBookmarks = OnboardingItem(
+            title: "Synced Bookmarks",
+            subtitle: "Save favourites across devices with shared bookmarks and smoother comments & feed updates.",
+            systemImage: "bookmark.circle",
         )
 
         let supporterTips = OnboardingItem(
             title: "Support the Developer",
-            subtitle: "Visit Settings to leave an optional tip or become a monthly supporter and keep Hackers improving.",
+            subtitle: "Visit Settings to tip or subscribe, keep Hackers improving, and help the app stay free.",
             systemImage: "heart.circle",
         )
 
         return OnboardingData(
             title: "What's New in Hackers 5.2",
-            items: [rememberedFeed, thumbnailToggle, supporterTips],
+            items: [smarterSearch, syncedBookmarks, supporterTips],
         )
     }
 }
