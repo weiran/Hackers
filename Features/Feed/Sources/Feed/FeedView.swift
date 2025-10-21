@@ -76,11 +76,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     settingsButton
                 }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
             .toolbarTitleMenu {
                 postTypeTitleMenu
             }
-            .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Search Hacker News")
+            .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
             .onChange(of: searchText) { newValue in
                 viewModel.updateSearchQuery(newValue)
