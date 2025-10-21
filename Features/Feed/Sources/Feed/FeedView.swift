@@ -361,7 +361,8 @@ struct PostRowView: View {
             onBookmarkTap: {
                 guard let onBookmarkToggle else { return post.isBookmarked }
                 return await onBookmarkToggle()
-            }
+            },
+            onCommentsTap: onCommentsTap
         )
         .contentShape(Rectangle())
         .if(onCommentsTap != nil) { view in

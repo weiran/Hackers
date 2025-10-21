@@ -13,10 +13,11 @@ public struct PostDisplayView: View {
     let post: Post
     let votingState: VotingState?
     let showPostText: Bool
-   let showThumbnails: Bool
+    let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
     let onBookmarkTap: (() async -> Bool)?
+    let onCommentsTap: (() -> Void)?
 
     @State private var isSubmittingUpvote = false
     @State private var isSubmittingBookmark = false
@@ -31,7 +32,8 @@ public struct PostDisplayView: View {
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil,
         onUpvoteTap: (() async -> Bool)? = nil,
-        onBookmarkTap: (() async -> Bool)? = nil
+        onBookmarkTap: (() async -> Bool)? = nil,
+        onCommentsTap: (() -> Void)? = nil
     ) {
         self.post = post
         self.votingState = votingState
@@ -40,6 +42,7 @@ public struct PostDisplayView: View {
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
         self.onBookmarkTap = onBookmarkTap
+        self.onCommentsTap = onCommentsTap
         _displayedScore = State(initialValue: post.score)
         _displayedUpvoted = State(initialValue: post.upvoted)
         _displayedBookmarked = State(initialValue: post.isBookmarked)
@@ -167,7 +170,8 @@ public struct PostDisplayView: View {
             accessibilityLabel: "\(post.commentsCount) comments",
             isHighlighted: false,
             isLoading: false,
-            numericValue: post.commentsCount
+            numericValue: post.commentsCount,
+            action: onCommentsTap
         )
     }
 
@@ -351,4 +355,3 @@ private func isHackerNewsItemURL(_ url: URL) -> Bool {
     guard let hnHost = url.host else { return false }
     return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
 }
-
