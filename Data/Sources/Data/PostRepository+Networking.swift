@@ -7,12 +7,9 @@
 
 import Domain
 import Foundation
-import SwiftSoup
 
 extension PostRepository {
     // MARK: - Networking helpers
-
-    private static let maxPostPages = 10
 
     func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         let url: URL
@@ -43,33 +40,21 @@ extension PostRepository {
 
     func fetchPostHtml(
         id: Int,
-        page: Int = 1,
-        recursive: Bool = true,
-        workingHtml: String = "",
     ) async throws -> String {
-        guard let url = hackerNewsURL(id: id, page: page) else {
+        guard let url = hackerNewsURL(id: id) else {
             throw HackersKitError.requestFailure
         }
 
-        let html = try await networkManager.get(url: url)
-        let document = try SwiftSoup.parse(html)
-        let moreLinkExists = try !document.select("a.morelink").isEmpty()
-
-        if moreLinkExists, recursive, page < Self.maxPostPages {
-            return try await fetchPostHtml(id: id, page: page + 1, recursive: recursive, workingHtml: workingHtml + html)
-        } else {
-            return workingHtml + html
-        }
+        return try await networkManager.get(url: url)
     }
 
-    func hackerNewsURL(id: Int, page: Int) -> URL? {
+    func hackerNewsURL(id: Int) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "news.ycombinator.com"
         components.path = "/item"
         components.queryItems = [
-            URLQueryItem(name: "id", value: String(id)),
-            URLQueryItem(name: "p", value: String(page))
+            URLQueryItem(name: "id", value: String(id))
         ]
         return components.url
     }

@@ -17,7 +17,7 @@ extension PostRepository {
     // MARK: - CommentUseCase
 
     public func getComments(for post: Post) async throws -> [Domain.Comment] {
-        let html = try await fetchPostHtml(id: post.id, recursive: true)
+        let html = try await fetchPostHtml(id: post.id)
         return try comments(from: html)
     }
 

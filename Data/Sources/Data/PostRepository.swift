@@ -33,7 +33,7 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
 
 private extension PostRepository {
     func loadPostResolvingCommentIfNeeded(id: Int) async throws -> Post {
-        let html = try await fetchPostHtml(id: id, recursive: true)
+        let html = try await fetchPostHtml(id: id)
         let document = try SwiftSoup.parse(html)
 
         if let fatitemTable = try document.select("table.fatitem").first(),
