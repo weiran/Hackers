@@ -112,6 +112,10 @@ extension PostRepository {
 
     func comments(from html: String) throws -> [Domain.Comment] {
         let document = try SwiftSoup.parse(html)
+        return try comments(from: document)
+    }
+
+    func comments(from document: Document) throws -> [Domain.Comment] {
         let commentElements = try document.select(".comtr")
 
         return commentElements.compactMap { element in

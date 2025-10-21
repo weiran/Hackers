@@ -39,7 +39,7 @@ private extension PostRepository {
         if let fatitemTable = try document.select("table.fatitem").first(),
            hasValidPostTitle(in: fatitemTable)
         {
-            return try makePost(from: fatitemTable, html: html)
+            return try makePost(from: fatitemTable, document: document)
         }
 
         if let parentID = try parentPostID(from: document), parentID != id {
@@ -53,13 +53,13 @@ private extension PostRepository {
         (try? element.select("span.titleline > a").first()) != nil
     }
 
-    func makePost(from fatitemTable: Element, html: String) throws -> Post {
+    func makePost(from fatitemTable: Element, document: Document) throws -> Post {
         let posts = try posts(from: fatitemTable, type: .news)
         guard var post = posts.first else {
             throw HackersKitError.scraperError
         }
 
-        var comments = try comments(from: html)
+        var comments = try comments(from: document)
 
         if let topTextHTML = try topTextHTML(from: fatitemTable) {
             post.text = topTextHTML
