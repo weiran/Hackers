@@ -66,31 +66,34 @@ extension PostRepository {
         from titleElement: Element,
         metadata metadataElement: Element? = nil,
     ) throws -> VoteLinkInfo {
-        let voteLinkElements = try titleElement.select("td.votelinks a")
-        var upvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "up_") }
+        let voteLinkElements = try titleElement.select("td.votelinks a").array()
+        let titleLinks = try titleElement.select("a").array()
+        let metadataLinks = try metadataElement?.select("a").array() ?? []
 
-        var unvoteLink = try voteLinkElements.first { try $0.attr("id").starts(with: "un_") }
-        if unvoteLink == nil {
-            unvoteLink = try voteLinkElements.first { try $0.text().lowercased() == "unvote" }
-        }
-
-        if unvoteLink == nil, let metadataElement {
-            let metadataUnvoteLinks = try metadataElement.select("a")
-            unvoteLink = try metadataUnvoteLinks.first { try $0.attr("id").starts(with: "un_") }
-            if unvoteLink == nil {
-                unvoteLink = try metadataUnvoteLinks.first { try $0.text().lowercased() == "unvote" }
+        func linkWithIDPrefix(_ prefix: String, in links: [Element]) throws -> Element? {
+            for link in links {
+                if try link.attr("id").starts(with: prefix) {
+                    return link
+                }
             }
+            return nil
         }
 
-        if upvoteLink == nil {
-            let anyLinks = try titleElement.select("a")
-            upvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "up_") }
+        func linkWithExactText(_ text: String, in links: [Element]) throws -> Element? {
+            for link in links {
+                if try link.text().localizedCaseInsensitiveCompare(text) == .orderedSame {
+                    return link
+                }
+            }
+            return nil
         }
-        if unvoteLink == nil {
-            let anyLinks = try titleElement.select("a")
-            unvoteLink = try anyLinks.first { try $0.attr("id").starts(with: "un_") }
-                ?? (anyLinks.first { try $0.text().lowercased() == "unvote" })
-        }
+
+        let upvoteLink = try linkWithIDPrefix("up_", in: voteLinkElements)
+            ?? linkWithIDPrefix("up_", in: titleLinks)
+
+        let unvoteCandidates = voteLinkElements + metadataLinks + titleLinks
+        let unvoteLink = try linkWithIDPrefix("un_", in: unvoteCandidates)
+            ?? linkWithExactText("unvote", in: unvoteCandidates)
 
         let upvoteURL = try upvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
         var derivedUnvoteURL = try unvoteLink.map { try URL(string: $0.attr("href")) } ?? nil
