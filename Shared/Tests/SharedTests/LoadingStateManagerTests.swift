@@ -8,6 +8,19 @@
 @testable import Shared
 import Testing
 
+private actor LoadCounter {
+    private var value = 0
+
+    func increment() -> Int {
+        value += 1
+        return value
+    }
+
+    func current() -> Int {
+        value
+    }
+}
+
 @Suite("LoadingStateManager Tests")
 struct LoadingStateManagerTests {
     @Test("Initial state is correct")
@@ -26,19 +39,20 @@ struct LoadingStateManagerTests {
 
     @Test("loadIfNeeded loads data on first call")
     func loadIfNeededFirstCall() async {
-        var loadCount = 0
+        let loadCounter = LoadCounter()
 
         let manager = LoadingStateManager(
             initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
-                loadCount += 1
+                _ = await loadCounter.increment()
                 return ["item1", "item2"]
             },
         )
 
         await manager.loadIfNeeded()
 
+        let loadCount = await loadCounter.current()
         #expect(loadCount == 1)
         #expect(manager.data == ["item1", "item2"])
         #expect(manager.hasAttemptedLoad == true)
@@ -48,54 +62,59 @@ struct LoadingStateManagerTests {
 
     @Test("loadIfNeeded skips loading when shouldSkipLoad returns true")
     func loadIfNeededSkipsWhenDataExists() async {
-        var loadCount = 0
+        let loadCounter = LoadCounter()
 
         let manager = LoadingStateManager(
             initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
-                loadCount += 1
-                return ["item\(loadCount)"]
+                let count = await loadCounter.increment()
+                return ["item\(count)"]
             },
         )
 
         // First load should work
         await manager.loadIfNeeded()
-        #expect(loadCount == 1)
+        let countAfterFirstLoad = await loadCounter.current()
+        #expect(countAfterFirstLoad == 1)
         #expect(manager.data == ["item1"])
 
         // Second load should be skipped because data is not empty
         await manager.loadIfNeeded()
-        #expect(loadCount == 1) // Should still be 1, not incremented
+        let countAfterSecondLoad = await loadCounter.current()
+        #expect(countAfterSecondLoad == 1) // Should still be 1, not incremented
         #expect(manager.data == ["item1"]) // Should remain the same
     }
 
     @Test("refresh always loads new data")
     func refreshAlwaysLoads() async {
-        var loadCount = 0
+        let loadCounter = LoadCounter()
 
         let manager = LoadingStateManager(
             initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
-                loadCount += 1
-                return ["refresh_item\(loadCount)"]
+                let count = await loadCounter.increment()
+                return ["refresh_item\(count)"]
             },
         )
 
         // Initial load
         await manager.loadIfNeeded()
-        #expect(loadCount == 1)
+        let countAfterFirstLoad = await loadCounter.current()
+        #expect(countAfterFirstLoad == 1)
         #expect(manager.data == ["refresh_item1"])
 
         // Refresh should load even though data exists
         await manager.refresh()
-        #expect(loadCount == 2)
+        let countAfterFirstRefresh = await loadCounter.current()
+        #expect(countAfterFirstRefresh == 2)
         #expect(manager.data == ["refresh_item2"])
 
         // Another refresh should also load
         await manager.refresh()
-        #expect(loadCount == 3)
+        let countAfterSecondRefresh = await loadCounter.current()
+        #expect(countAfterSecondRefresh == 3)
         #expect(manager.data == ["refresh_item3"])
     }
 
@@ -145,16 +164,16 @@ struct LoadingStateManagerTests {
 
     @Test("Concurrent loadIfNeeded calls don't cause multiple loads")
     func concurrentLoadIfNeeded() async {
-        var loadCount = 0
+        let loadCounter = LoadCounter()
 
         let manager = LoadingStateManager(
             initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
-                loadCount += 1
+                let count = await loadCounter.increment()
                 // Simulate some async work
                 try await Task.sleep(nanoseconds: 10_000_000) // 10ms
-                return ["concurrent_item\(loadCount)"]
+                return ["concurrent_item\(count)"]
             },
         )
 
@@ -168,39 +187,42 @@ struct LoadingStateManagerTests {
         await load3
 
         // Only one load should have occurred
+        let loadCount = await loadCounter.current()
         #expect(loadCount == 1)
         #expect(manager.data == ["concurrent_item1"])
     }
 
     @Test("loadIfNeeded with custom shouldSkipLoad logic")
     func customShouldSkipLogic() async {
-        var loadCount = 0
-        var currentData = ["initial"]
+        let loadCounter = LoadCounter()
 
         // Skip loading if we have more than 2 items
         let manager = LoadingStateManager(
-            initialData: currentData,
+            initialData: ["initial"],
             shouldSkipLoad: { $0.count > 2 },
             loadData: {
-                loadCount += 1
-                currentData += ["new_item\(loadCount)"]
-                return currentData
+                let count = await loadCounter.increment()
+                let newItems = (1...count).map { "new_item\($0)" }
+                return ["initial"] + newItems
             },
         )
 
         // First load: [initial] -> [initial, new_item1] (count = 2, should not skip)
         await manager.loadIfNeeded()
-        #expect(loadCount == 1)
+        let countAfterFirstLoad = await loadCounter.current()
+        #expect(countAfterFirstLoad == 1)
         #expect(manager.data == ["initial", "new_item1"])
 
         // Second load: [initial, new_item1] -> [initial, new_item1, new_item2] (count = 3, should skip next time)
         await manager.loadIfNeeded()
-        #expect(loadCount == 2)
+        let countAfterSecondLoad = await loadCounter.current()
+        #expect(countAfterSecondLoad == 2)
         #expect(manager.data == ["initial", "new_item1", "new_item2"])
 
         // Third load: count > 2, should skip
         await manager.loadIfNeeded()
-        #expect(loadCount == 2) // Should not increment
+        let countAfterThirdLoad = await loadCounter.current()
+        #expect(countAfterThirdLoad == 2) // Should not increment
         #expect(manager.data == ["initial", "new_item1", "new_item2"]) // Should not change
     }
 
@@ -220,7 +242,7 @@ struct LoadingStateManagerTests {
 
     @Test("setLoadFunction configures loading behavior")
     func testSetLoadFunction() async {
-        var loadCount = 0
+        let loadCounter = LoadCounter()
 
         let manager = LoadingStateManager(initialData: [] as [String])
 
@@ -232,13 +254,14 @@ struct LoadingStateManagerTests {
         manager.setLoadFunction(
             shouldSkipLoad: { !$0.isEmpty },
             loadData: {
-                loadCount += 1
-                return ["configured_item\(loadCount)"]
+                let count = await loadCounter.increment()
+                return ["configured_item\(count)"]
             },
         )
 
         // Now loadIfNeeded should work
         await manager.loadIfNeeded()
+        let loadCount = await loadCounter.current()
         #expect(loadCount == 1)
         #expect(manager.data == ["configured_item1"])
     }
