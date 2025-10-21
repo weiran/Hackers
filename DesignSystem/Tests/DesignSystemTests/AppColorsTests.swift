@@ -50,18 +50,18 @@ struct AppColorsTests {
 
     @Test("Semantic system colours retain expected RGB values")
     func semanticSystemColours() {
-        #expect(
-            resolvedColor(AppColors.success, style: .light)
-                .approximatelyEquals(UIColor.systemGreen)
-        )
-        #expect(
-            resolvedColor(AppColors.warning, style: .light)
-                .approximatelyEquals(UIColor.systemOrange)
-        )
-        #expect(
-            resolvedColor(AppColors.danger, style: .light)
-                .approximatelyEquals(UIColor.systemRed)
-        )
+        let trait = UITraitCollection(userInterfaceStyle: .light)
+        let success = resolvedColor(AppColors.success, style: .light)
+        let warning = resolvedColor(AppColors.warning, style: .light)
+        let danger = resolvedColor(AppColors.danger, style: .light)
+
+        let systemSuccess = UIColor.systemGreen.resolvedColor(with: trait)
+        let systemWarning = UIColor.systemOrange.resolvedColor(with: trait)
+        let systemDanger = UIColor.systemRed.resolvedColor(with: trait)
+
+        #expect(success.approximatelyEquals(systemSuccess))
+        #expect(warning.approximatelyEquals(systemWarning))
+        #expect(danger.approximatelyEquals(systemDanger))
     }
 
     @Test("Separator opacity adjusts with colour scheme")

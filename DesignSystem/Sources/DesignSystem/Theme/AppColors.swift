@@ -21,21 +21,9 @@ public enum AppColors {
     public static let secondaryBackground = Color(.secondarySystemBackground)
     public static let tertiaryBackground = Color(.tertiarySystemBackground)
     public static let groupedBackground = Color(.systemGroupedBackground)
-    public static let success = Color(
-        red: SystemColorComponents.success.red,
-        green: SystemColorComponents.success.green,
-        blue: SystemColorComponents.success.blue
-    )
-    public static let warning = Color(
-        red: SystemColorComponents.warning.red,
-        green: SystemColorComponents.warning.green,
-        blue: SystemColorComponents.warning.blue
-    )
-    public static let danger = Color(
-        red: SystemColorComponents.danger.red,
-        green: SystemColorComponents.danger.green,
-        blue: SystemColorComponents.danger.blue
-    )
+    public static let success = Color(uiColor: .systemGreen)
+    public static let warning = Color(uiColor: .systemOrange)
+    public static let danger = Color(uiColor: .systemRed)
 
     public static var upvotedColor: Color {
         Color(uiColor: ColorResolver.assetColor(named: "upvotedColor", fallback: .systemOrange))
@@ -114,12 +102,6 @@ public enum AppGradients {
             endPoint: .bottomTrailing,
         )
     }
-}
-
-private enum SystemColorComponents {
-    static let success: (red: Double, green: Double, blue: Double) = (0.2039215686, 0.7803921569, 0.3490196078)
-    static let warning: (red: Double, green: Double, blue: Double) = (1.0, 0.5725490196, 0.1882352941)
-    static let danger: (red: Double, green: Double, blue: Double) = (1.0, 0.2588235294, 0.2705882353)
 }
 
 public enum AppFieldTheme {
