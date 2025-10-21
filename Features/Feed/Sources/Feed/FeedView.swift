@@ -254,6 +254,17 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             }
         }
 
+        Button {
+            Task {
+                _ = await viewModel.toggleBookmark(for: post)
+            }
+        } label: {
+            Label(
+                post.isBookmarked ? "Remove Bookmark" : "Save Bookmark",
+                systemImage: post.isBookmarked ? "bookmark.slash" : "bookmark"
+            )
+        }
+
         Button { ContentSharePresenter.shared.sharePost(post) } label: {
             Label("Share", systemImage: "square.and.arrow.up")
         }
