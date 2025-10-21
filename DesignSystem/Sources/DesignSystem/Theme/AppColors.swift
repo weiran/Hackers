@@ -10,41 +10,39 @@ import UIKit
 
 public enum AppColors {
     public static var upvoted: Color {
-        if UIColor(named: "upvotedColor", in: .main, compatibleWith: nil) != nil {
-            return Color("upvotedColor", bundle: .main)
-        }
-        return Color.orange
+        Color(uiColor: ColorResolver.assetColor(named: "upvotedColor", fallback: .systemOrange))
     }
 
     public static var appTint: Color {
-        if UIColor(named: "appTintColor", in: .main, compatibleWith: nil) != nil {
-            return Color("appTintColor", bundle: .main)
-        }
-        return Color.orange
+        Color(uiColor: ColorResolver.assetColor(named: "appTintColor", fallback: .systemOrange))
     }
+
     public static let background = Color(.systemBackground)
     public static let secondaryBackground = Color(.secondarySystemBackground)
     public static let tertiaryBackground = Color(.tertiarySystemBackground)
     public static let groupedBackground = Color(.systemGroupedBackground)
-    public static let success = Color(.systemGreen)
-    public static let warning = Color(.systemOrange)
-    public static let danger = Color(.systemRed)
+    public static let success = Color(
+        red: SystemColorComponents.success.red,
+        green: SystemColorComponents.success.green,
+        blue: SystemColorComponents.success.blue
+    )
+    public static let warning = Color(
+        red: SystemColorComponents.warning.red,
+        green: SystemColorComponents.warning.green,
+        blue: SystemColorComponents.warning.blue
+    )
+    public static let danger = Color(
+        red: SystemColorComponents.danger.red,
+        green: SystemColorComponents.danger.green,
+        blue: SystemColorComponents.danger.blue
+    )
 
-    // Add fallback colors if asset colors are not found
     public static var upvotedColor: Color {
-        if UIColor(named: "upvotedColor") != nil {
-            Color("upvotedColor")
-        } else {
-            Color.orange
-        }
+        Color(uiColor: ColorResolver.assetColor(named: "upvotedColor", fallback: .systemOrange))
     }
 
     public static var appTintColor: Color {
-        if UIColor(named: "appTintColor") != nil {
-            Color("appTintColor")
-        } else {
-            Color.orange
-        }
+        Color(uiColor: ColorResolver.assetColor(named: "appTintColor", fallback: .systemOrange))
     }
 
     public static func separator(for colorScheme: ColorScheme) -> Color {
@@ -87,12 +85,25 @@ public enum AppGradients {
     }
 
     public static func primaryButton(isEnabled: Bool) -> LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: isEnabled ?
-                [AppColors.appTintColor, AppColors.appTintColor.opacity(0.8)] :
-                [Color.gray.opacity(0.6), Color.gray.opacity(0.4)]),
+        if isEnabled {
+            let tint = ColorResolver.resolvedTintColor(for: .light)
+            return LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(uiColor: tint),
+                    Color(uiColor: tint.withAlphaComponent(0.8))
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        return LinearGradient(
+            gradient: Gradient(colors: [
+                Color.gray.opacity(0.6),
+                Color.gray.opacity(0.4)
+            ]),
             startPoint: .topLeading,
-            endPoint: .bottomTrailing,
+            endPoint: .bottomTrailing
         )
     }
 
@@ -103,6 +114,12 @@ public enum AppGradients {
             endPoint: .bottomTrailing,
         )
     }
+}
+
+private enum SystemColorComponents {
+    static let success: (red: Double, green: Double, blue: Double) = (0.2039215686, 0.7803921569, 0.3490196078)
+    static let warning: (red: Double, green: Double, blue: Double) = (1.0, 0.5725490196, 0.1882352941)
+    static let danger: (red: Double, green: Double, blue: Double) = (1.0, 0.2588235294, 0.2705882353)
 }
 
 public enum AppFieldTheme {
@@ -118,4 +135,19 @@ public enum AppFieldTheme {
     public static func borderWidth(isFocused: Bool) -> CGFloat {
         isFocused ? 2 : 1
     }
+}
+
+private enum ColorResolver {
+    static func assetColor(named name: String, fallback: UIColor) -> UIColor {
+        if let mainAsset = UIColor(named: name, in: .main, compatibleWith: nil) {
+            return mainAsset
+        }
+        return fallback
+    }
+
+    static func resolvedTintColor(for style: UIUserInterfaceStyle) -> UIColor {
+        let tint = assetColor(named: "appTintColor", fallback: .systemOrange)
+        return tint.resolvedColor(with: UITraitCollection(userInterfaceStyle: style))
+    }
+
 }
