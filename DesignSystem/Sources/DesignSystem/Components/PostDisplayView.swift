@@ -283,20 +283,16 @@ public struct PostDisplayView: View {
             Capsule()
                 .fill(backgroundColor)
         )
-        if let action {
-            Button(action: action) {
-                content
-            }
-            .buttonStyle(.plain)
-            .disabled(!isEnabled || isLoading)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityHint(accessibilityHint ?? "")
-        } else {
+        Button(action: action ?? {}) {
             content
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(accessibilityLabel)
+                .glassEffect()
         }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled || isLoading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint(accessibilityHint ?? "")
+
     }
 }
 
@@ -356,3 +352,4 @@ private func isHackerNewsItemURL(_ url: URL) -> Bool {
     guard let hnHost = url.host else { return false }
     return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
 }
+
