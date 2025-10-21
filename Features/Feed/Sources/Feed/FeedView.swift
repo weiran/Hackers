@@ -205,6 +205,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                 voteSwipeAction(for: post)
             }
         }
+        .listRowSeparator(.hidden, edges: .top)
+        .listRowSeparator(.visible, edges: .bottom)
         .contextMenu { contextMenuContent(for: post) }
     }
 
