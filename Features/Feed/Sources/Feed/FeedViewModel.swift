@@ -270,8 +270,11 @@ public final class FeedViewModel: @unchecked Sendable {
 
         if postType == .bookmarks {
             let posts = await bookmarksController.bookmarkedPosts()
-            postIds = Set(posts.map(\.id))
-            feedLoader.data = posts
+            let updatedPostIds = Set(posts.map(\.id))
+            withAnimation(.easeInOut) {
+                postIds = updatedPostIds
+                feedLoader.data = posts
+            }
         }
     }
 
