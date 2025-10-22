@@ -128,7 +128,7 @@ public struct PostDisplayView: View {
         // Avoid keeping a disabled Button so the upvoted state retains the bright tint
         let (backgroundColor, textColor): (Color, Color) = {
             if isUpvoted {
-                return (AppColors.upvotedColor.opacity(0.1), AppColors.upvotedColor)
+                return (AppColors.upvotedColor.opacity(0.2), AppColors.upvotedColor)
             } else {
                 return (Color.secondary.opacity(0.1), .secondary)
             }
@@ -179,9 +179,9 @@ public struct PostDisplayView: View {
         let isBookmarked = displayedBookmarked
         let backgroundColor: Color = {
             if isBookmarked {
-                return AppColors.appTintColor.opacity(0.12)
+                return AppColors.appTintColor.opacity(0.1)
             }
-            return Color.secondary.opacity(0.06)
+            return Color.secondary.opacity(0.1)
         }()
         let textColor: Color = isBookmarked ? AppColors.appTintColor : .secondary
         let iconName = isBookmarked ? "bookmark.fill" : "bookmark"
