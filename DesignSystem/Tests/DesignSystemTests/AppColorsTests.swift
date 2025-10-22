@@ -127,7 +127,7 @@ struct AppColorsTests {
             AppColors.pillBackground(for: .comments, colorScheme: .light),
             style: .light
         )
-        let expectedNeutralBackground = resolvedColor(Color.secondary.opacity(0.1), style: .light)
+        let expectedNeutralBackground = resolvedColor(Color.secondary.opacity(0.14), style: .light)
         #expect(lightNeutralBackground.approximatelyEquals(expectedNeutralBackground, tolerance: 0.01))
 
         let lightAccentForeground = resolvedColor(
