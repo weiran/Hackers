@@ -113,6 +113,44 @@ struct AppColorsTests {
         #expect(unfocusedLight.approximatelyEquals(expectedLight))
         #expect(unfocusedDark.approximatelyEquals(expectedDark))
     }
+
+    @Test("Pill colour tokens reuse accent and neutral palettes")
+    func pillColourSemantics() {
+        let lightAccentBackground = resolvedColor(
+            AppColors.pillBackground(for: .upvote(isActive: true), colorScheme: .light),
+            style: .light
+        )
+        let expectedAccentBackground = resolvedColor(AppColors.upvotedColor.opacity(0.2), style: .light)
+        #expect(lightAccentBackground.approximatelyEquals(expectedAccentBackground, tolerance: 0.01))
+
+        let lightNeutralBackground = resolvedColor(
+            AppColors.pillBackground(for: .comments, colorScheme: .light),
+            style: .light
+        )
+        let expectedNeutralBackground = resolvedColor(Color.secondary.opacity(0.1), style: .light)
+        #expect(lightNeutralBackground.approximatelyEquals(expectedNeutralBackground, tolerance: 0.01))
+
+        let lightAccentForeground = resolvedColor(
+            AppColors.pillForeground(for: .bookmark(isSaved: true), colorScheme: .light),
+            style: .light
+        )
+        let expectedAccentForeground = resolvedColor(AppColors.appTintColor, style: .light)
+        #expect(lightAccentForeground.approximatelyEquals(expectedAccentForeground))
+
+        let lightNeutralForeground = resolvedColor(
+            AppColors.pillForeground(for: .upvote(isActive: false), colorScheme: .light),
+            style: .light
+        )
+        let expectedNeutralForeground = resolvedColor(Color.secondary, style: .light)
+        #expect(lightNeutralForeground.approximatelyEquals(expectedNeutralForeground))
+
+        let darkNeutralBackground = resolvedColor(
+            AppColors.pillBackground(for: .comments, colorScheme: .dark),
+            style: .dark
+        )
+        let expectedDarkNeutralBackground = resolvedColor(Color.secondary.opacity(0.1), style: .dark)
+        #expect(darkNeutralBackground.approximatelyEquals(expectedDarkNeutralBackground, tolerance: 0.01))
+    }
 }
 
 // MARK: - Test Helpers

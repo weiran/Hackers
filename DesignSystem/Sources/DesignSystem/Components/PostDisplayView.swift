@@ -19,6 +19,7 @@ public struct PostDisplayView: View {
     let onBookmarkTap: (() async -> Bool)?
     let onCommentsTap: (() -> Void)?
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var isSubmittingUpvote = false
     @State private var isSubmittingBookmark = false
     @State private var displayedScore: Int
@@ -127,11 +128,10 @@ public struct PostDisplayView: View {
         let canInteract = canVote && !isUpvoted && !isLoading
         // Avoid keeping a disabled Button so the upvoted state retains the bright tint
         let (backgroundColor, textColor): (Color, Color) = {
-            if isUpvoted {
-                return (AppColors.upvotedColor.opacity(0.2), AppColors.upvotedColor)
-            } else {
-                return (Color.secondary.opacity(0.1), .secondary)
-            }
+            let style = AppColors.PillStyle.upvote(isActive: isUpvoted)
+            let background = AppColors.pillBackground(for: style, colorScheme: colorScheme)
+            let foreground = AppColors.pillForeground(for: style, colorScheme: colorScheme)
+            return (background, foreground)
         }()
         let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
         let accessibilityLabel: String
@@ -159,8 +159,9 @@ public struct PostDisplayView: View {
     }
 
     private var commentsPill: some View {
-        let commentTextColor: Color = .secondary
-        let commentBackgroundColor = Color.secondary.opacity(0.1)
+        let style = AppColors.PillStyle.comments
+        let commentTextColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
+        let commentBackgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
         // Brighter styling keeps the comments count from reading as a disabled control
         return pillView(
             iconName: "message",
@@ -177,13 +178,9 @@ public struct PostDisplayView: View {
 
     private var bookmarkPill: some View {
         let isBookmarked = displayedBookmarked
-        let backgroundColor: Color = {
-            if isBookmarked {
-                return AppColors.appTintColor.opacity(0.1)
-            }
-            return Color.secondary.opacity(0.1)
-        }()
-        let textColor: Color = isBookmarked ? AppColors.appTintColor : .secondary
+        let style = AppColors.PillStyle.bookmark(isSaved: isBookmarked)
+        let backgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
+        let textColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
         let iconName = isBookmarked ? "bookmark.fill" : "bookmark"
         let accessibilityLabel = isBookmarked ? "Remove bookmark" : "Save for later"
         let accessibilityHint = isBookmarked

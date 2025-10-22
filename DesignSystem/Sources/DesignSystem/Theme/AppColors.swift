@@ -36,6 +36,71 @@ public enum AppColors {
     public static func separator(for colorScheme: ColorScheme) -> Color {
         Color(.separator).opacity(colorScheme == .dark ? 0.6 : 0.3)
     }
+
+    public static func pillBackground(for style: PillStyle, colorScheme: ColorScheme) -> Color {
+        switch style {
+        case .upvote(isActive: true):
+            return pillAccentBackground(for: upvotedColor, colorScheme: colorScheme)
+        case .upvote(isActive: false):
+            return pillNeutralBackground(for: colorScheme)
+        case .bookmark(isSaved: true):
+            return pillAccentBackground(for: appTintColor, colorScheme: colorScheme)
+        case .bookmark(isSaved: false):
+            return pillNeutralBackground(for: colorScheme)
+        case .comments:
+            return pillNeutralBackground(for: colorScheme)
+        }
+    }
+
+    public static func pillForeground(for style: PillStyle, colorScheme: ColorScheme) -> Color {
+        switch style {
+        case .upvote(isActive: true):
+            return upvotedColor
+        case .upvote(isActive: false):
+            return pillNeutralForeground(for: colorScheme)
+        case .bookmark(isSaved: true):
+            return appTintColor
+        case .bookmark(isSaved: false):
+            return pillNeutralForeground(for: colorScheme)
+        case .comments:
+            return pillNeutralForeground(for: colorScheme)
+        }
+    }
+
+    public enum PillStyle: Sendable {
+        case upvote(isActive: Bool)
+        case bookmark(isSaved: Bool)
+        case comments
+    }
+
+    private static func pillNeutralBackground(for colorScheme: ColorScheme) -> Color {
+        switch colorScheme {
+        case .light:
+            return Color.secondary.opacity(0.14)
+        case .dark:
+            return Color.secondary.opacity(0.1)
+        @unknown default:
+            return Color.secondary.opacity(0.1)
+        }
+    }
+
+    private static func pillAccentBackground(for baseColor: Color, colorScheme: ColorScheme) -> Color {
+        switch colorScheme {
+        case .light, .dark:
+            return baseColor.opacity(0.2)
+        @unknown default:
+            return baseColor.opacity(0.2)
+        }
+    }
+
+    private static func pillNeutralForeground(for colorScheme: ColorScheme) -> Color {
+        switch colorScheme {
+        case .light, .dark:
+            return Color.secondary
+        @unknown default:
+            return Color.secondary
+        }
+    }
 }
 
 public enum AppGradients {
