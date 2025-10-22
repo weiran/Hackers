@@ -88,7 +88,7 @@ public struct PostDisplayView: View {
                         }
                     }
                     .scaledFont(.caption)
-                    .padding(.top, 2)
+                    .padding(.top, 4)
                 }
             }
         }
