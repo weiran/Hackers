@@ -296,13 +296,24 @@ struct FeedViewModelTests {
 
         await viewModel.loadFeed()
         viewModel.updateSearchQuery("swift")
-        try await Task.sleep(nanoseconds: 50_000_000)
+        let searchCompleted = await waitForSearchCompletion(of: viewModel)
+        #expect(searchCompleted)
 
         #expect(searchUseCase.receivedQueries.contains("swift"))
         #expect(viewModel.searchResults.first?.id == 42)
         #expect(viewModel.hasActiveSearch)
         #expect(viewModel.isSearchInProgress == false)
     }
+}
+
+@MainActor
+private func waitForSearchCompletion(of viewModel: FeedViewModel, timeout: TimeInterval = 1, pollInterval: TimeInterval = 0.01) async -> Bool {
+    let deadline = Date().addingTimeInterval(timeout)
+    while viewModel.isSearchInProgress && Date() < deadline {
+        let nanos = UInt64(pollInterval * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: nanos)
+    }
+    return viewModel.isSearchInProgress == false
 }
 
 // MARK: - Test Doubles
