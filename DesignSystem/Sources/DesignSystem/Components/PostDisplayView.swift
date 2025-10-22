@@ -286,7 +286,6 @@ public struct PostDisplayView: View {
         )
         Button(action: action ?? {}) {
             content
-                .glassEffect()
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
