@@ -51,7 +51,7 @@ public struct PostDisplayView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
+            HStack(alignment: .center, spacing: 12) {
                 // Thumbnail with proper loading
                 ThumbnailView(url: post.url, isEnabled: showThumbnails)
                     .frame(width: 55, height: 55)
@@ -67,7 +67,7 @@ public struct PostDisplayView: View {
                     if let host = post.url.host,
                        !isHackerNewsItemURL(post.url)
                     {
-                        Text(truncatedHost(host))
+                        Text(truncatedHost(host).uppercased())
                             .scaledFont(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
