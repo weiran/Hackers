@@ -28,6 +28,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     private let settingsUseCase: any SettingsUseCase
     private let bookmarksController: BookmarksController
     private var settingsCancellable: AnyCancellable?
+    private var bookmarksObservation: AnyCancellable?
 
     public var comments: [Comment] { commentsLoader.data }
     public var isLoading: Bool { commentsLoader.isLoading }
@@ -75,6 +76,20 @@ public final class CommentsViewModel: @unchecked Sendable {
                 let currentValue = settingsUseCase.showThumbnails
                 if self.showThumbnails != currentValue {
                     self.showThumbnails = currentValue
+                }
+            }
+
+        bookmarksObservation = NotificationCenter.default.publisher(for: .bookmarksDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard let self else { return }
+                guard let postId = notification.userInfo?["postId"] as? Int,
+                      postId == self.postID,
+                      let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
+                else { return }
+                if var currentPost = self.post {
+                    currentPost.isBookmarked = isBookmarked
+                    self.post = currentPost
                 }
             }
     }

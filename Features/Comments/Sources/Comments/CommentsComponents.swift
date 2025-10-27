@@ -484,6 +484,32 @@ struct ToolbarTitle: View {
     }
 }
 
+struct BookmarkToolbarButton: View {
+    let isBookmarked: Bool
+    let toggleBookmark: @Sendable () async -> Bool
+    @State private var isSubmitting = false
+
+    var body: some View {
+        Button {
+            guard !isSubmitting else { return }
+            isSubmitting = true
+            Task { @MainActor in
+                _ = await toggleBookmark()
+                isSubmitting = false
+            }
+        } label: {
+            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+        }
+        .accessibilityLabel(isBookmarked ? "Remove Bookmark" : "Save Bookmark")
+        .accessibilityHint(
+            isBookmarked
+                ? "Double-tap to remove from bookmarks"
+                : "Double-tap to add to bookmarks"
+        )
+        .disabled(isSubmitting)
+    }
+}
+
 struct ShareMenu: View {
     let post: Post
 
