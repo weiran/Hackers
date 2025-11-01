@@ -125,7 +125,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         Group {
             if viewModel.hasActiveSearch {
                 searchContentView
-            } else if shouldShowLoadingState {
+            } else if viewModel.isLoading && viewModel.posts.isEmpty && viewModel.postType != .bookmarks {
                 AppLoadingStateView(message: "Loading...")
             } else if shouldShowBookmarksEmptyState {
                 AppEmptyStateView(
@@ -141,15 +141,6 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             }
         }
         .animation(.default, value: viewModel.hasActiveSearch)
-    }
-
-    private var shouldShowLoadingState: Bool {
-        // Show loading when changing categories (selectedPostType != viewModel.postType)
-        // or when initially loading (isLoading && posts.isEmpty)
-        // but not for bookmarks which load instantly
-        let isChangingCategory = selectedPostType != viewModel.postType && selectedPostType != .bookmarks
-        let isInitialLoad = viewModel.isLoading && viewModel.posts.isEmpty && viewModel.postType != .bookmarks
-        return isChangingCategory || isInitialLoad
     }
 
     @ViewBuilder

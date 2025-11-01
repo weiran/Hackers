@@ -213,7 +213,8 @@ public final class FeedViewModel: @unchecked Sendable {
 
         postType = newType
         persistLastFeedCategoryIfNeeded()
-        await refreshFeed()
+        reset()  // Clear posts immediately to prevent flash of old data
+        await feedLoader.refresh()
     }
 
     @MainActor
