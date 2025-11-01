@@ -15,7 +15,6 @@ import SwiftUI
 public final class FeedViewModel: @unchecked Sendable {
     public var isLoadingMore = false
     public var postType: Domain.PostType = .news
-    public var isChangingCategory = false
 
     private var postIds: Set<Int> = Set()
     private var pageIndex = 1
@@ -214,17 +213,7 @@ public final class FeedViewModel: @unchecked Sendable {
 
         postType = newType
         persistLastFeedCategoryIfNeeded()
-
-        // Show loading state for non-bookmark categories
-        if newType != .bookmarks {
-            isChangingCategory = true
-        }
-
         await refreshFeed()
-
-        if newType != .bookmarks {
-            isChangingCategory = false
-        }
     }
 
     @MainActor

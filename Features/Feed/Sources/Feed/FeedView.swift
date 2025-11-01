@@ -121,7 +121,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         Group {
             if viewModel.hasActiveSearch {
                 searchContentView
-            } else if viewModel.isChangingCategory || (viewModel.isLoading && viewModel.posts.isEmpty) {
+            } else if viewModel.isLoading && viewModel.posts.isEmpty && viewModel.postType != .bookmarks {
                 AppLoadingStateView(message: "Loading...")
             } else if shouldShowBookmarksEmptyState {
                 AppEmptyStateView(
