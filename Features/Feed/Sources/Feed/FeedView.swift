@@ -92,6 +92,10 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     searchText = newValue
                 }
             }
+            .onChange(of: selectedPostType) { _ in
+                // Clear selection when category changes to prevent stale sidebar selection
+                selectedPostId = nil
+            }
         .task { @Sendable in
             // Set the navigation store for the voting view model
             votingViewModel.navigationStore = navigationStore
