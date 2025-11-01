@@ -164,24 +164,15 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private func feedListView(posts: [Domain.Post], enablePagination: Bool) -> some View {
-        ScrollViewReader { proxy in
-            List(selection: selectionBinding) {
-                ForEach(posts, id: \.id) { post in
-                    postRow(for: post, enablePagination: enablePagination)
-                }
-            }
-            .if(isSidebar) { view in view.listStyle(.sidebar) }
-            .if(!isSidebar) { view in view.listStyle(.plain) }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onChange(of: selectedPostType) { _ in
-                // Scroll to top when category changes
-                if let firstPost = posts.first {
-                    withAnimation {
-                        proxy.scrollTo(firstPost.id, anchor: .top)
-                    }
-                }
+        List(selection: selectionBinding) {
+            ForEach(posts, id: \.id) { post in
+                postRow(for: post, enablePagination: enablePagination)
             }
         }
+        .if(isSidebar) { view in view.listStyle(.sidebar) }
+        .if(!isSidebar) { view in view.listStyle(.plain) }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .id(selectedPostType)
     }
 
     @ViewBuilder
