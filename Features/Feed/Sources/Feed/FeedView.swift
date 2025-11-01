@@ -121,7 +121,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         Group {
             if viewModel.hasActiveSearch {
                 searchContentView
-            } else if viewModel.isLoading, viewModel.posts.isEmpty {
+            } else if viewModel.isChangingCategory || (viewModel.isLoading && viewModel.posts.isEmpty) {
                 AppLoadingStateView(message: "Loading...")
             } else if shouldShowBookmarksEmptyState {
                 AppEmptyStateView(
@@ -164,14 +164,24 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     }
 
     private func feedListView(posts: [Domain.Post], enablePagination: Bool) -> some View {
-        List(selection: selectionBinding) {
-            ForEach(posts, id: \.id) { post in
-                postRow(for: post, enablePagination: enablePagination)
+        ScrollViewReader { proxy in
+            List(selection: selectionBinding) {
+                ForEach(posts, id: \.id) { post in
+                    postRow(for: post, enablePagination: enablePagination)
+                }
+            }
+            .if(isSidebar) { view in view.listStyle(.sidebar) }
+            .if(!isSidebar) { view in view.listStyle(.plain) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onChange(of: selectedPostType) { _ in
+                // Scroll to top when category changes
+                if let firstPost = posts.first {
+                    withAnimation {
+                        proxy.scrollTo(firstPost.id, anchor: .top)
+                    }
+                }
             }
         }
-        .if(isSidebar) { view in view.listStyle(.sidebar) }
-        .if(!isSidebar) { view in view.listStyle(.plain) }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     @ViewBuilder
