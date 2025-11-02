@@ -14,6 +14,7 @@ public struct VotingState: Sendable {
     public let isUpvoted: Bool
     public let score: Int?
     public let canVote: Bool
+    public let canUnvote: Bool
     public let isVoting: Bool
     public let error: Error?
 
@@ -21,12 +22,14 @@ public struct VotingState: Sendable {
         isUpvoted: Bool,
         score: Int? = nil,
         canVote: Bool,
+        canUnvote: Bool = false,
         isVoting: Bool = false,
         error: Error? = nil,
     ) {
         self.isUpvoted = isUpvoted
         self.score = score
         self.canVote = canVote
+        self.canUnvote = canUnvote
         self.isVoting = isVoting
         self.error = error
     }

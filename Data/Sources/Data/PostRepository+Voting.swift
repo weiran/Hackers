@@ -37,7 +37,23 @@ extension PostRepository {
         if containsLoginForm { throw HackersKitError.unauthenticated }
     }
 
-    // Unvote functionality removed
+    public func unvote(post: Post) async throws {
+        guard let voteLinks = post.voteLinks else { throw HackersKitError.unauthenticated }
+        guard let unvoteURL = voteLinks.unvote else {
+            throw HackersKitError.scraperError
+        }
+
+        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
+            ? unvoteURL.absoluteString
+            : urlBase + "/" + unvoteURL.absoluteString
+        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
+
+        let response = try await networkManager.get(url: realURL)
+        let containsLoginForm =
+            response.contains("<form action=\"/login") ||
+            response.contains("You have to be logged in")
+        if containsLoginForm { throw HackersKitError.unauthenticated }
+    }
 
     public func upvote(comment: Domain.Comment, for _: Post) async throws {
         guard let voteLinks = comment.voteLinks else { throw HackersKitError.unauthenticated }
@@ -58,7 +74,23 @@ extension PostRepository {
         await MainActor.run { comment.upvoted = true }
     }
 
-    // Unvote functionality removed
+    public func unvote(comment: Domain.Comment, for _: Post) async throws {
+        guard let voteLinks = comment.voteLinks else { throw HackersKitError.unauthenticated }
+        guard let unvoteURL = voteLinks.unvote else {
+            throw HackersKitError.scraperError
+        }
+
+        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
+            ? unvoteURL.absoluteString
+            : urlBase + "/" + unvoteURL.absoluteString
+        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
+
+        let response = try await networkManager.get(url: realURL)
+        let containsLoginForm = response.contains("<form action=\"/login")
+        if containsLoginForm { throw HackersKitError.unauthenticated }
+
+        await MainActor.run { comment.upvoted = false }
+    }
 
     // MARK: - Vote link extraction
 

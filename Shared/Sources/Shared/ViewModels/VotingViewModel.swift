@@ -69,7 +69,36 @@ public final class VotingViewModel {
         isVoting = false
     }
 
-    // Unvote removed
+    public func unvote(post: inout Post) async {
+        guard post.upvoted else { return }
+
+        let originalScore = post.score
+
+        // Create a copy of the post with the original state for the voting provider
+        var postForVoting = post
+        postForVoting.upvoted = true
+        postForVoting.score = originalScore
+
+        // Optimistic UI update
+        post.upvoted = false
+        post.score -= 1
+
+        isVoting = true
+        lastError = nil
+
+        do {
+            try await votingStateProvider.unvote(item: postForVoting)
+
+        } catch {
+            // Revert optimistic changes on error
+            post.upvoted = true
+            post.score = originalScore
+
+            await handleUnauthenticatedIfNeeded(error)
+        }
+
+        isVoting = false
+    }
 
     // MARK: - Comment Voting
 
@@ -100,7 +129,31 @@ public final class VotingViewModel {
         isVoting = false
     }
 
-    // Comment unvote removed
+    public func unvote(comment: Comment, in post: Post) async {
+        guard comment.upvoted else { return }
+
+        // Create a copy of the comment with the original state for the voting provider
+        var commentForVoting = comment
+        commentForVoting.upvoted = true
+
+        // Optimistic UI update
+        comment.upvoted = false
+
+        isVoting = true
+        lastError = nil
+
+        do {
+            try await commentVotingStateProvider.unvoteComment(commentForVoting, for: post)
+        } catch {
+            // Revert optimistic changes on error
+            comment.upvoted = true
+
+            // Check if error is unauthenticated and show login
+            await handleUnauthenticatedIfNeeded(error)
+        }
+
+        isVoting = false
+    }
 
     // MARK: - State Helpers
 
@@ -110,6 +163,7 @@ public final class VotingViewModel {
             isUpvoted: baseState.isUpvoted,
             score: baseState.score,
             canVote: baseState.canVote,
+            canUnvote: baseState.canUnvote,
             isVoting: isVoting,
             error: lastError
         )
@@ -117,6 +171,10 @@ public final class VotingViewModel {
 
     public func canVote(item: any Votable) -> Bool {
         item.voteLinks?.upvote != nil
+    }
+
+    public func canUnvote(item: any Votable) -> Bool {
+        item.voteLinks?.unvote != nil
     }
 
     public func clearError() {

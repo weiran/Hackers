@@ -200,7 +200,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                 }
             }
         }
-        .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
+        .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
             view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 voteSwipeAction(for: post)
             }
@@ -212,21 +212,41 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
 
     @ViewBuilder
     private func voteSwipeAction(for post: Domain.Post) -> some View {
-        Button {
-            Task {
-                var mutablePost = post
-                await votingViewModel.upvote(post: &mutablePost)
-                await MainActor.run {
-                    if mutablePost.upvoted {
-                        viewModel.applyLocalUpvote(to: post.id)
+        if post.upvoted && post.voteLinks?.unvote != nil {
+            // Unvote action
+            Button {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.unvote(post: &mutablePost)
+                    await MainActor.run {
+                        if !mutablePost.upvoted {
+                            viewModel.applyLocalUpvote(to: post.id)
+                        }
                     }
                 }
+            } label: {
+                Image(systemName: "arrow.uturn.down")
             }
-        } label: {
-            Image(systemName: "arrow.up")
+            .tint(.orange)
+            .accessibilityLabel("Unvote")
+        } else {
+            // Upvote action
+            Button {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.upvote(post: &mutablePost)
+                    await MainActor.run {
+                        if mutablePost.upvoted {
+                            viewModel.applyLocalUpvote(to: post.id)
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "arrow.up")
+            }
+            .tint(AppColors.upvotedColor)
+            .accessibilityLabel("Upvote")
         }
-        .tint(AppColors.upvotedColor)
-        .accessibilityLabel("Upvote")
     }
 
     @ViewBuilder
@@ -244,6 +264,17 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     }
                 }
             },
+            onUnvote: {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.unvote(post: &mutablePost)
+                    await MainActor.run {
+                        if !mutablePost.upvoted {
+                            viewModel.applyLocalUpvote(to: post.id)
+                        }
+                    }
+                }
+            }
         )
 
         Divider()
@@ -371,6 +402,7 @@ struct PostRowView: View {
             showThumbnails: showThumbnails,
             onThumbnailTap: onLinkTap,
             onUpvoteTap: { await handleUpvoteTap() },
+            onUnvoteTap: { await handleUnvoteTap() },
             onBookmarkTap: {
                 guard let onBookmarkToggle else { return post.isBookmarked }
                 return await onBookmarkToggle()
@@ -404,5 +436,21 @@ struct PostRowView: View {
         }
 
         return wasUpvoted
+    }
+
+    private func handleUnvoteTap() async -> Bool {
+        guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
+
+        var mutablePost = post
+        await votingViewModel.unvote(post: &mutablePost)
+        let wasUnvoted = !mutablePost.upvoted
+
+        if wasUnvoted {
+            await MainActor.run {
+                onUpvoteApplied?(mutablePost.id)
+            }
+        }
+
+        return wasUnvoted
     }
 }

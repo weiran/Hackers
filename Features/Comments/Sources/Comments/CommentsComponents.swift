@@ -57,28 +57,51 @@ struct CommentsContentView: View {
                         )
                     })
                     .listRowSeparator(.hidden)
-                    .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
+                    .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
                         view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                Task {
-                                    var mutablePost = post
-                                    await votingViewModel.upvote(post: &mutablePost)
-                                    await MainActor.run {
-                                        if mutablePost.upvoted,
-                                           var currentPost = viewModel.post,
-                                           !currentPost.upvoted
-                                        {
-                                            currentPost.upvoted = true
-                                            currentPost.score += 1
-                                            viewModel.post = currentPost
+                            if post.upvoted && post.voteLinks?.unvote != nil {
+                                Button {
+                                    Task {
+                                        var mutablePost = post
+                                        await votingViewModel.unvote(post: &mutablePost)
+                                        await MainActor.run {
+                                            if !mutablePost.upvoted,
+                                               var currentPost = viewModel.post,
+                                               currentPost.upvoted
+                                            {
+                                                currentPost.upvoted = false
+                                                currentPost.score -= 1
+                                                viewModel.post = currentPost
+                                            }
                                         }
                                     }
+                                } label: {
+                                    Image(systemName: "arrow.uturn.down")
                                 }
-                            } label: {
-                                Image(systemName: "arrow.up")
+                                .tint(.orange)
+                                .accessibilityLabel("Unvote")
+                            } else {
+                                Button {
+                                    Task {
+                                        var mutablePost = post
+                                        await votingViewModel.upvote(post: &mutablePost)
+                                        await MainActor.run {
+                                            if mutablePost.upvoted,
+                                               var currentPost = viewModel.post,
+                                               !currentPost.upvoted
+                                            {
+                                                currentPost.upvoted = true
+                                                currentPost.score += 1
+                                                viewModel.post = currentPost
+                                            }
+                                        }
+                                    }
+                                } label: {
+                                    Image(systemName: "arrow.up")
+                                }
+                                .tint(AppColors.upvotedColor)
+                                .accessibilityLabel("Upvote")
                             }
-                            .tint(AppColors.upvotedColor)
-                            .accessibilityLabel("Upvote")
                         }
                     }
 
@@ -164,17 +187,29 @@ struct CommentsForEach: View {
                 )
             })
             .listRowSeparator(.hidden)
-            .if(comment.voteLinks?.upvote != nil && !comment.upvoted) { view in
+            .if((comment.voteLinks?.upvote != nil && !comment.upvoted) || (comment.voteLinks?.unvote != nil && comment.upvoted)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        Task {
-                            await votingViewModel.upvote(comment: comment, in: post)
+                    if comment.upvoted && comment.voteLinks?.unvote != nil {
+                        Button {
+                            Task {
+                                await votingViewModel.unvote(comment: comment, in: post)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.uturn.down")
                         }
-                    } label: {
-                        Image(systemName: "arrow.up")
+                        .tint(.orange)
+                        .accessibilityLabel("Unvote")
+                    } else {
+                        Button {
+                            Task {
+                                await votingViewModel.upvote(comment: comment, in: post)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up")
+                        }
+                        .tint(AppColors.upvotedColor)
+                        .accessibilityLabel("Upvote")
                     }
-                    .tint(AppColors.upvotedColor)
-                    .accessibilityLabel("Upvote")
                 }
             }
             .swipeActions(edge: .trailing) {
@@ -207,6 +242,7 @@ struct PostHeader: View {
             showThumbnails: showThumbnails,
             onThumbnailTap: { onLinkTap() },
             onUpvoteTap: { await handleUpvote() },
+            onUnvoteTap: { await handleUnvote() },
             onBookmarkTap: { await onBookmarkToggle() }
         )
         .contentShape(Rectangle())
@@ -215,6 +251,7 @@ struct PostHeader: View {
             VotingContextMenuItems.postVotingMenuItems(
                 for: post,
                 onVote: { Task { await handleUpvote() } },
+                onUnvote: { Task { await handleUnvote() } }
             )
 
             Divider()
@@ -243,6 +280,22 @@ struct PostHeader: View {
         }
 
         return wasUpvoted
+    }
+
+    private func handleUnvote() async -> Bool {
+        guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
+
+        var mutablePost = post
+        await votingViewModel.unvote(post: &mutablePost)
+        let wasUnvoted = !mutablePost.upvoted
+
+        if wasUnvoted {
+            await MainActor.run {
+                onUpvoteApplied()
+            }
+        }
+
+        return wasUnvoted
     }
 }
 
@@ -290,6 +343,7 @@ struct CommentRow: View {
                             isUpvoted: comment.upvoted,
                             score: nil,
                             canVote: comment.voteLinks?.upvote != nil,
+                            canUnvote: comment.voteLinks?.unvote != nil,
                             isVoting: votingViewModel.isVoting,
                             error: votingViewModel.lastError,
                         ),
@@ -319,6 +373,9 @@ struct CommentRow: View {
                 onVote: {
                     Task { await votingViewModel.upvote(comment: comment, in: post) }
                 },
+                onUnvote: {
+                    Task { await votingViewModel.unvote(comment: comment, in: post) }
+                }
             )
             Button { UIPasteboard.general.string = comment.text.strippingHTML() } label: {
                 Label("Copy", systemImage: "doc.on.doc")
