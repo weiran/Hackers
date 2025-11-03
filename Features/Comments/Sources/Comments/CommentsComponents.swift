@@ -163,7 +163,7 @@ struct CommentsForEach: View {
                     value: [comment.id: geometry.frame(in: .global)],
                 )
             })
-            .listRowSeparator(.hidden)
+            .listRowSeparator(.visible)
             .if(comment.voteLinks?.upvote != nil && !comment.upvoted) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
@@ -274,7 +274,6 @@ struct CommentRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Divider().padding(.bottom, 6)
             HStack {
                 Text(comment.by)
                     .scaledFont(.subheadline)
