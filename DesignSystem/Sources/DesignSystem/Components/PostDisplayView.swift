@@ -27,12 +27,6 @@ public struct PostDisplayView: View {
     @State private var displayedUpvoted: Bool
     @State private var displayedBookmarked: Bool
     @State private var displayedVoteLinks: VoteLinks?
-    @State private var pendingVoteIntent: VoteIntent?
-
-    private enum VoteIntent {
-        case upvote
-        case unvote
-    }
 
     public init(
         post: Post,
@@ -133,11 +127,6 @@ public struct PostDisplayView: View {
                 displayedUpvoted = newValue
             }
         }
-        .onChange(of: votingState?.canUnvote) { _ in
-            if let voteLinks = post.voteLinks {
-                displayedVoteLinks = voteLinks
-            }
-        }
     }
 
     private var upvotePill: some View {
@@ -232,88 +221,55 @@ public struct PostDisplayView: View {
 
     private func makeUpvoteAction() -> (() -> Void)? {
         return {
+            guard !isSubmittingUpvote else { return }
+
+            let isCurrentlyUpvoted = displayedUpvoted
             let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
             let canUnvote = currentVoteLinks?.unvote != nil
-            let intent: VoteIntent = (displayedUpvoted && canUnvote) ? .unvote : .upvote
-            Task { @MainActor in
-                handleVoteIntent(intent)
-            }
-        }
-    }
 
-    @MainActor
-    private func handleVoteIntent(_ intent: VoteIntent) {
-        if isSubmittingUpvote {
-            pendingVoteIntent = intent
-            return
-        }
-        executeVoteIntent(intent)
-    }
-
-    @MainActor
-    private func executeVoteIntent(_ intent: VoteIntent) {
-        pendingVoteIntent = nil
-
-        let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
-        let previousScore = displayedScore
-        let previousUpvoted = displayedUpvoted
-        let previousVoteLinks = currentVoteLinks
-
-        switch intent {
-        case .unvote:
-            guard let onUnvoteTap else { return }
-            guard displayedUpvoted else { return }
-
-            isSubmittingUpvote = true
-            displayedUpvoted = false
-            displayedScore -= 1
-            displayedVoteLinks = VoteLinks(upvote: previousVoteLinks?.upvote, unvote: nil)
-
-            Task {
-                let success = await onUnvoteTap()
-                await MainActor.run {
-                    if !success {
-                        displayedScore = previousScore
-                        displayedUpvoted = previousUpvoted
-                        displayedVoteLinks = previousVoteLinks
+            // If already upvoted and can unvote, perform unvote
+            if isCurrentlyUpvoted && canUnvote {
+                guard let onUnvoteTap else { return }
+                isSubmittingUpvote = true
+                let previousScore = displayedScore
+                let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
+                displayedUpvoted = false
+                displayedScore -= 1
+                displayedVoteLinks = VoteLinks(upvote: previousVoteLinks?.upvote, unvote: nil)
+                Task {
+                    let success = await onUnvoteTap()
+                    await MainActor.run {
+                        if !success {
+                            displayedScore = previousScore
+                            displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
+                        }
+                        isSubmittingUpvote = false
                     }
-                    isSubmittingUpvote = false
-                    processPendingVoteIntentIfNeeded()
+                }
+            } else {
+                // Perform upvote
+                guard let onUpvoteTap else { return }
+                isSubmittingUpvote = true
+                let previousScore = displayedScore
+                let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
+                displayedUpvoted = true
+                displayedScore += 1
+                displayedVoteLinks = derivedVoteLinks(afterUpvoteFrom: previousVoteLinks)
+                Task {
+                    let success = await onUpvoteTap()
+                    await MainActor.run {
+                        if !success {
+                            displayedScore = previousScore
+                            displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
+                        }
+                        isSubmittingUpvote = false
+                    }
                 }
             }
-
-        case .upvote:
-            guard let onUpvoteTap else { return }
-            guard !displayedUpvoted else { return }
-            guard currentVoteLinks?.upvote != nil else { return }
-
-            isSubmittingUpvote = true
-            displayedUpvoted = true
-            displayedScore += 1
-            displayedVoteLinks = derivedVoteLinks(afterUpvoteFrom: previousVoteLinks)
-
-            Task {
-                let success = await onUpvoteTap()
-                await MainActor.run {
-                    if !success {
-                        displayedScore = previousScore
-                        displayedUpvoted = previousUpvoted
-                        displayedVoteLinks = previousVoteLinks
-                    } else {
-                        displayedVoteLinks = derivedVoteLinks(afterUpvoteFrom: displayedVoteLinks ?? previousVoteLinks)
-                    }
-                    isSubmittingUpvote = false
-                    processPendingVoteIntentIfNeeded()
-                }
-            }
-        }
-    }
-
-    @MainActor
-    private func processPendingVoteIntentIfNeeded() {
-        if let nextIntent = pendingVoteIntent {
-            pendingVoteIntent = nil
-            handleVoteIntent(nextIntent)
         }
     }
 
