@@ -356,14 +356,25 @@ public struct PostDisplayView: View {
             Capsule()
                 .fill(backgroundColor)
         )
-        Button(action: action ?? {}) {
-            content
+        return Button(action: action ?? {}) {
+            ZStack {
+                content
+                if isLoading {
+                    Capsule()
+                        .fill(backgroundColor.opacity(0.6))
+                    ProgressView()
+                        .scaleEffect(0.6)
+                        .tint(textColor)
+                }
+            }
         }
         .buttonStyle(.plain)
+        .disabled(!isEnabled || isLoading || action == nil)
+        .allowsHitTesting(isEnabled && !isLoading && action != nil)
+        .opacity(isEnabled && !isLoading ? 1.0 : 0.6)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint(accessibilityHint ?? "")
-
     }
 }
 
