@@ -356,17 +356,22 @@ public struct PostDisplayView: View {
             Capsule()
                 .fill(backgroundColor)
         )
-        return Button(action: action ?? {}) {
-            ZStack {
-                content
-                if isLoading {
-                    Capsule()
-                        .fill(backgroundColor.opacity(0.6))
-                    ProgressView()
-                        .scaleEffect(0.6)
-                        .tint(textColor)
-                }
+        .overlay {
+            if isLoading {
+                Capsule()
+                    .fill(backgroundColor.opacity(0.6))
             }
+        }
+        .overlay {
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .tint(textColor)
+            }
+        }
+
+        return Button(action: action ?? {}) {
+            content
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled || isLoading || action == nil)
