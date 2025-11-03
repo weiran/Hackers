@@ -100,6 +100,14 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 if let post = viewModel.post {
+                    BookmarkToolbarButton(
+                        isBookmarked: post.isBookmarked,
+                        toggleBookmark: { await viewModel.toggleBookmark() }
+                    )
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if let post = viewModel.post {
                     ShareMenu(post: post)
                 }
             }

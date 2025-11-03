@@ -209,6 +209,47 @@ struct CommentsViewModelTests {
         #expect(viewModel.showThumbnails == true)
     }
 
+    @Test("Bookmark notifications update local post state")
+    @MainActor
+    func bookmarkNotificationsUpdatePostState() async {
+        var unbookmarkedPost = testPost
+        unbookmarkedPost.isBookmarked = false
+        let viewModel = CommentsViewModel(
+            post: unbookmarkedPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
+        )
+
+        #expect(viewModel.post?.isBookmarked == false)
+
+        NotificationCenter.default.post(
+            name: .bookmarksDidChange,
+            object: nil,
+            userInfo: ["postId": unbookmarkedPost.id, "isBookmarked": true]
+        )
+        await Task.yield()
+        #expect(viewModel.post?.isBookmarked == true)
+
+        NotificationCenter.default.post(
+            name: .bookmarksDidChange,
+            object: nil,
+            userInfo: ["postId": unbookmarkedPost.id + 1, "isBookmarked": false]
+        )
+        await Task.yield()
+        #expect(viewModel.post?.isBookmarked == true)
+
+        NotificationCenter.default.post(
+            name: .bookmarksDidChange,
+            object: nil,
+            userInfo: ["postId": unbookmarkedPost.id, "isBookmarked": false]
+        )
+        await Task.yield()
+        #expect(viewModel.post?.isBookmarked == false)
+    }
+
     // MARK: - Voting Tests
 
     @Test("Upvoting post updates state correctly", arguments: [

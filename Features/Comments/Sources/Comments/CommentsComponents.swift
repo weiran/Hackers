@@ -163,7 +163,7 @@ struct CommentsForEach: View {
                     value: [comment.id: geometry.frame(in: .global)],
                 )
             })
-            .listRowSeparator(.hidden)
+            .listRowSeparator(.visible)
             .if(comment.voteLinks?.upvote != nil && !comment.upvoted) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
@@ -274,7 +274,6 @@ struct CommentRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Divider().padding(.bottom, 6)
             HStack {
                 Text(comment.by)
                     .scaledFont(.subheadline)
@@ -308,11 +307,12 @@ struct CommentRow: View {
                     .foregroundColor(.primary)
             }
         }
-        .listRowInsets(.init(top: 12, leading: CGFloat((comment.level + 1) * 16), bottom: 8, trailing: 16))
+        .listRowInsets([.top, .bottom, .trailing], 16)
+        .listRowInsets([.leading], CGFloat((comment.level + 1) * 16))
         .contentShape(Rectangle())
         .onTapGesture { onToggle() }
         .accessibilityAddTraits(.isButton)
-        .accessibilityHint(comment.visibility == .visible ? "Double-tap to collapse" : "Double-tap to expand")
+        .accessibilityHint(comment.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .contextMenu {
             VotingContextMenuItems.commentVotingMenuItems(
                 for: comment,
@@ -481,6 +481,32 @@ struct ToolbarTitle: View {
         .opacity(showTitle ? 1.0 : 0.0)
         .offset(y: showTitle ? 0 : 20)
         .animation(.easeInOut(duration: 0.3), value: showTitle)
+    }
+}
+
+struct BookmarkToolbarButton: View {
+    let isBookmarked: Bool
+    let toggleBookmark: @Sendable () async -> Bool
+    @State private var isSubmitting = false
+
+    var body: some View {
+        Button {
+            guard !isSubmitting else { return }
+            isSubmitting = true
+            Task { @MainActor in
+                _ = await toggleBookmark()
+                isSubmitting = false
+            }
+        } label: {
+            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+        }
+        .accessibilityLabel(isBookmarked ? "Remove Bookmark" : "Save Bookmark")
+        .accessibilityHint(
+            isBookmarked
+                ? "Double-tap to remove from bookmarks"
+                : "Double-tap to add to bookmarks"
+        )
+        .disabled(isSubmitting)
     }
 }
 
