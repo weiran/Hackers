@@ -182,8 +182,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             showThumbnails: viewModel.showThumbnails,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
-            onUpvoteApplied: { postId in
-                viewModel.applyLocalUpvote(to: postId)
+            onPostUpdated: { updatedPost in
+                viewModel.replacePost(updatedPost)
             },
             onBookmarkToggle: {
                 await viewModel.toggleBookmark(for: post)
@@ -220,7 +220,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {
                         if !mutablePost.upvoted {
-                            viewModel.applyLocalUpvote(to: post.id)
+                            viewModel.replacePost(mutablePost)
                         }
                     }
                 }
@@ -237,7 +237,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run {
                         if mutablePost.upvoted {
-                            viewModel.applyLocalUpvote(to: post.id)
+                            viewModel.replacePost(mutablePost)
                         }
                     }
                 }
@@ -259,7 +259,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run {
                         if mutablePost.upvoted {
-                            viewModel.applyLocalUpvote(to: post.id)
+                            viewModel.replacePost(mutablePost)
                         }
                     }
                 }
@@ -270,7 +270,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {
                         if !mutablePost.upvoted {
-                            viewModel.applyLocalUpvote(to: post.id)
+                            viewModel.replacePost(mutablePost)
                         }
                     }
                 }
@@ -374,7 +374,7 @@ struct PostRowView: View {
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
-    let onUpvoteApplied: ((Int) -> Void)?
+    let onPostUpdated: ((Domain.Post) -> Void)?
     let onBookmarkToggle: (() async -> Bool)?
 
     init(post: Domain.Post,
@@ -382,7 +382,7 @@ struct PostRowView: View {
          showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil,
-         onUpvoteApplied: ((Int) -> Void)? = nil,
+         onPostUpdated: ((Domain.Post) -> Void)? = nil,
          onBookmarkToggle: (() async -> Bool)? = nil)
     {
         self.post = post
@@ -390,7 +390,7 @@ struct PostRowView: View {
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
-        self.onUpvoteApplied = onUpvoteApplied
+        self.onPostUpdated = onPostUpdated
         self.onBookmarkToggle = onBookmarkToggle
     }
 
@@ -431,7 +431,7 @@ struct PostRowView: View {
 
         if wasUpvoted {
             await MainActor.run {
-                onUpvoteApplied?(mutablePost.id)
+                onPostUpdated?(mutablePost)
             }
         }
 
@@ -447,7 +447,7 @@ struct PostRowView: View {
 
         if wasUnvoted {
             await MainActor.run {
-                onUpvoteApplied?(mutablePost.id)
+                onPostUpdated?(mutablePost)
             }
         }
 

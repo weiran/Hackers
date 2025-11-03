@@ -631,6 +631,18 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
             throw MockError.testError
         }
     }
+
+    func unvote(post _: Post) async throws {
+        if shouldThrowError {
+            throw MockError.testError
+        }
+    }
+
+    func unvote(comment _: Domain.Comment, for _: Post) async throws {
+        if shouldThrowError {
+            throw MockError.testError
+        }
+    }
 }
 
 final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {

@@ -40,12 +40,8 @@ struct CommentsContentView: View {
                         votingViewModel: votingViewModel,
                         showThumbnails: viewModel.showThumbnails,
                         onLinkTap: { handleLinkTap() },
-                        onUpvoteApplied: {
-                            if var currentPost = viewModel.post, !currentPost.upvoted {
-                                currentPost.upvoted = true
-                                currentPost.score += 1
-                                viewModel.post = currentPost
-                            }
+                        onPostUpdated: { updatedPost in
+                            viewModel.post = updatedPost
                         },
                         onBookmarkToggle: { await viewModel.toggleBookmark() }
                     )
@@ -65,13 +61,8 @@ struct CommentsContentView: View {
                                         var mutablePost = post
                                         await votingViewModel.unvote(post: &mutablePost)
                                         await MainActor.run {
-                                            if !mutablePost.upvoted,
-                                               var currentPost = viewModel.post,
-                                               currentPost.upvoted
-                                            {
-                                                currentPost.upvoted = false
-                                                currentPost.score -= 1
-                                                viewModel.post = currentPost
+                                            if !mutablePost.upvoted {
+                                                viewModel.post = mutablePost
                                             }
                                         }
                                     }
@@ -86,13 +77,8 @@ struct CommentsContentView: View {
                                         var mutablePost = post
                                         await votingViewModel.upvote(post: &mutablePost)
                                         await MainActor.run {
-                                            if mutablePost.upvoted,
-                                               var currentPost = viewModel.post,
-                                               !currentPost.upvoted
-                                            {
-                                                currentPost.upvoted = true
-                                                currentPost.score += 1
-                                                viewModel.post = currentPost
+                                            if mutablePost.upvoted {
+                                                viewModel.post = mutablePost
                                             }
                                         }
                                     }
@@ -231,7 +217,7 @@ struct PostHeader: View {
     let votingViewModel: VotingViewModel
     let showThumbnails: Bool
     let onLinkTap: () -> Void
-    let onUpvoteApplied: @Sendable () -> Void
+    let onPostUpdated: @Sendable (Post) -> Void
     let onBookmarkToggle: @Sendable () async -> Bool
 
     var body: some View {
@@ -275,7 +261,7 @@ struct PostHeader: View {
 
         if wasUpvoted {
             await MainActor.run {
-                onUpvoteApplied()
+                onPostUpdated(mutablePost)
             }
         }
 
@@ -291,7 +277,7 @@ struct PostHeader: View {
 
         if wasUnvoted {
             await MainActor.run {
-                onUpvoteApplied()
+                onPostUpdated(mutablePost)
             }
         }
 

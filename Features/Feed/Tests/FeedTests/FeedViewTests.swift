@@ -113,7 +113,9 @@ struct FeedViewTests {
             // Not used in feed
         }
 
-        // Unvote removed
+        func unvote(post _: Post) async throws {}
+
+        func unvote(comment _: Domain.Comment, for _: Post) async throws {}
     }
 
     final class MockBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {

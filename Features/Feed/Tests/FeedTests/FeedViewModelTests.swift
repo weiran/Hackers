@@ -359,6 +359,14 @@ private final class StubVoteUseCase: VoteUseCase, @unchecked Sendable {
     func upvote(comment _: Domain.Comment, for _: Post) async throws {
         if shouldThrow { throw StubError.network }
     }
+
+    func unvote(post _: Post) async throws {
+        if shouldThrow { throw StubError.network }
+    }
+
+    func unvote(comment _: Domain.Comment, for _: Post) async throws {
+        if shouldThrow { throw StubError.network }
+    }
 }
 
 private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
