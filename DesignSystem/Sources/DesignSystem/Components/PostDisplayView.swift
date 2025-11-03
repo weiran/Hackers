@@ -26,6 +26,7 @@ public struct PostDisplayView: View {
     @State private var displayedScore: Int
     @State private var displayedUpvoted: Bool
     @State private var displayedBookmarked: Bool
+    @State private var displayedVoteLinks: VoteLinks?
 
     public init(
         post: Post,
@@ -50,6 +51,7 @@ public struct PostDisplayView: View {
         _displayedScore = State(initialValue: post.score)
         _displayedUpvoted = State(initialValue: post.upvoted)
         _displayedBookmarked = State(initialValue: post.isBookmarked)
+        _displayedVoteLinks = State(initialValue: post.voteLinks)
     }
 
     public var body: some View {
@@ -101,6 +103,7 @@ public struct PostDisplayView: View {
             displayedScore = post.score
             displayedUpvoted = post.upvoted
             displayedBookmarked = post.isBookmarked
+            displayedVoteLinks = post.voteLinks
         }
         .onChange(of: post.score) { newValue in
             displayedScore = newValue
@@ -110,6 +113,9 @@ public struct PostDisplayView: View {
         }
         .onChange(of: post.isBookmarked) { newValue in
             displayedBookmarked = newValue
+        }
+        .onChange(of: post.voteLinks) { newValue in
+            displayedVoteLinks = newValue
         }
         .onChange(of: votingState?.score) { newValue in
             if let newValue {
@@ -127,8 +133,9 @@ public struct PostDisplayView: View {
         let score = displayedScore
         let isUpvoted = displayedUpvoted
         let isLoading = isSubmittingUpvote
-        let canVote = post.voteLinks?.upvote != nil
-        let canUnvote = post.voteLinks?.unvote != nil
+        let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
+        let canVote = currentVoteLinks?.upvote != nil
+        let canUnvote = currentVoteLinks?.unvote != nil
         let canInteract = ((canVote && !isUpvoted) || (canUnvote && isUpvoted)) && !isLoading
         // Avoid keeping a disabled Button so the upvoted state retains the bright tint
         let (backgroundColor, textColor): (Color, Color) = {
@@ -217,7 +224,8 @@ public struct PostDisplayView: View {
             guard !isSubmittingUpvote else { return }
 
             let isCurrentlyUpvoted = displayedUpvoted
-            let canUnvote = post.voteLinks?.unvote != nil
+            let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
+            let canUnvote = currentVoteLinks?.unvote != nil
 
             // If already upvoted and can unvote, perform unvote
             if isCurrentlyUpvoted && canUnvote {
@@ -225,14 +233,17 @@ public struct PostDisplayView: View {
                 isSubmittingUpvote = true
                 let previousScore = displayedScore
                 let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
                 displayedUpvoted = false
                 displayedScore -= 1
+                displayedVoteLinks = VoteLinks(upvote: previousVoteLinks?.upvote, unvote: nil)
                 Task {
                     let success = await onUnvoteTap()
                     await MainActor.run {
                         if !success {
                             displayedScore = previousScore
                             displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
                         }
                         isSubmittingUpvote = false
                     }
@@ -243,20 +254,45 @@ public struct PostDisplayView: View {
                 isSubmittingUpvote = true
                 let previousScore = displayedScore
                 let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
                 displayedUpvoted = true
                 displayedScore += 1
+                displayedVoteLinks = derivedVoteLinks(afterUpvoteFrom: previousVoteLinks)
                 Task {
                     let success = await onUpvoteTap()
                     await MainActor.run {
                         if !success {
                             displayedScore = previousScore
                             displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
                         }
                         isSubmittingUpvote = false
                     }
                 }
             }
         }
+    }
+
+    private func derivedVoteLinks(afterUpvoteFrom voteLinks: VoteLinks?) -> VoteLinks? {
+        guard let voteLinks else { return nil }
+        if voteLinks.unvote != nil {
+            return voteLinks
+        }
+        guard let upvoteURL = voteLinks.upvote else {
+            return voteLinks
+        }
+        let absolute = upvoteURL.absoluteString
+        if absolute.contains("how=up"),
+           let unvoteURL = URL(string: absolute.replacingOccurrences(of: "how=up", with: "how=un"))
+        {
+            return VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
+        }
+        if absolute.contains("how%3Dup"),
+           let unvoteURL = URL(string: absolute.replacingOccurrences(of: "how%3Dup", with: "how%3Dun"))
+        {
+            return VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
+        }
+        return voteLinks
     }
 
     private func makeBookmarkAction() -> (() -> Void)? {

@@ -220,6 +220,9 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {
                         if !mutablePost.upvoted {
+                            if let existingLinks = mutablePost.voteLinks {
+                                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+                            }
                             viewModel.replacePost(mutablePost)
                         }
                     }
@@ -270,6 +273,9 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {
                         if !mutablePost.upvoted {
+                            if let existingLinks = mutablePost.voteLinks {
+                                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+                            }
                             viewModel.replacePost(mutablePost)
                         }
                     }
@@ -446,6 +452,9 @@ struct PostRowView: View {
         let wasUnvoted = !mutablePost.upvoted
 
         if wasUnvoted {
+            if let existingLinks = mutablePost.voteLinks {
+                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+            }
             await MainActor.run {
                 onPostUpdated?(mutablePost)
             }
