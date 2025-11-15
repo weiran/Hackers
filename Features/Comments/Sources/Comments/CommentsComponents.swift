@@ -38,6 +38,7 @@ struct CommentsContentView: View {
                     PostHeader(
                         post: post,
                         votingViewModel: votingViewModel,
+                        isLoadingComments: viewModel.isLoading,
                         showThumbnails: viewModel.showThumbnails,
                         onLinkTap: { handleLinkTap() },
                         onPostUpdated: { updatedPost in
@@ -57,6 +58,7 @@ struct CommentsContentView: View {
                         view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                             if post.upvoted && post.voteLinks?.unvote != nil {
                                 Button {
+                                    guard !viewModel.isLoading else { return }
                                     Task {
                                         var mutablePost = post
                                         await votingViewModel.unvote(post: &mutablePost)
@@ -74,8 +76,10 @@ struct CommentsContentView: View {
                                 }
                                 .tint(.orange)
                                 .accessibilityLabel("Unvote")
+                                .disabled(viewModel.isLoading)
                             } else {
                                 Button {
+                                    guard !viewModel.isLoading else { return }
                                     Task {
                                         var mutablePost = post
                                         await votingViewModel.upvote(post: &mutablePost)
@@ -90,6 +94,7 @@ struct CommentsContentView: View {
                                 }
                                 .tint(AppColors.upvotedColor)
                                 .accessibilityLabel("Upvote")
+                                .disabled(viewModel.isLoading)
                             }
                         }
                     }
@@ -218,6 +223,7 @@ struct CommentsForEach: View {
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
+    let isLoadingComments: Bool
     let showThumbnails: Bool
     let onLinkTap: () -> Void
     let onPostUpdated: @Sendable (Post) -> Void
@@ -256,6 +262,7 @@ struct PostHeader: View {
     }
 
     private func handleUpvote() async -> Bool {
+        guard !isLoadingComments else { return false }
         guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
 
         var mutablePost = post
@@ -272,6 +279,7 @@ struct PostHeader: View {
     }
 
     private func handleUnvote() async -> Bool {
+        guard !isLoadingComments else { return true }
         guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
 
         var mutablePost = post
