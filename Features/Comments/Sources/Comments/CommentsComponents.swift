@@ -63,12 +63,7 @@ struct CommentsContentView: View {
                                         var mutablePost = post
                                         await votingViewModel.unvote(post: &mutablePost)
                                         await MainActor.run {
-                                            if !mutablePost.upvoted {
-                                                if let existingLinks = mutablePost.voteLinks {
-                                                    mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
-                                                }
-                                                viewModel.post = mutablePost
-                                            }
+                                            viewModel.post = mutablePost
                                         }
                                     }
                                 } label: {
@@ -287,9 +282,6 @@ struct PostHeader: View {
         let wasUnvoted = !mutablePost.upvoted
 
         if wasUnvoted {
-            if let existingLinks = mutablePost.voteLinks {
-                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
-            }
             await MainActor.run {
                 onPostUpdated(mutablePost)
             }

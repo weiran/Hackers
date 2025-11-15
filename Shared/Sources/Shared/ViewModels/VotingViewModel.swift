@@ -86,6 +86,11 @@ public final class VotingViewModel {
         post.upvoted = false
         post.score -= 1
 
+        // Clear unvote link after successful unvote
+        if let existingLinks = post.voteLinks {
+            post.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+        }
+
         isVoting = true
         lastError = nil
 
