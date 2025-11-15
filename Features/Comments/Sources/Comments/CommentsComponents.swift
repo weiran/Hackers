@@ -319,7 +319,6 @@ struct CommentRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Divider().padding(.bottom, 6)
             HStack {
                 Text(comment.by)
                     .scaledFont(.subheadline)
@@ -354,11 +353,12 @@ struct CommentRow: View {
                     .foregroundColor(.primary)
             }
         }
-        .listRowInsets(.init(top: 12, leading: CGFloat((comment.level + 1) * 16), bottom: 8, trailing: 16))
+        .listRowInsets([.top, .bottom, .trailing], 16)
+        .listRowInsets([.leading], CGFloat((comment.level + 1) * 16))
         .contentShape(Rectangle())
         .onTapGesture { onToggle() }
         .accessibilityAddTraits(.isButton)
-        .accessibilityHint(comment.visibility == .visible ? "Double-tap to collapse" : "Double-tap to expand")
+        .accessibilityHint(comment.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .contextMenu {
             VotingContextMenuItems.commentVotingMenuItems(
                 for: comment,

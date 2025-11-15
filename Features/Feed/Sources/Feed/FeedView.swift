@@ -92,6 +92,10 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     searchText = newValue
                 }
             }
+            .onChange(of: selectedPostType) { _ in
+                // Clear selection when category changes to prevent stale sidebar selection
+                selectedPostId = nil
+            }
         .task { @Sendable in
             // Set the navigation store for the voting view model
             votingViewModel.navigationStore = navigationStore
@@ -128,7 +132,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         Group {
             if viewModel.hasActiveSearch {
                 searchContentView
-            } else if viewModel.isLoading, viewModel.posts.isEmpty {
+            } else if viewModel.isLoading && viewModel.posts.isEmpty && viewModel.postType != .bookmarks {
                 AppLoadingStateView(message: "Loading...")
             } else if shouldShowBookmarksEmptyState {
                 AppEmptyStateView(
@@ -179,6 +183,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         .if(isSidebar) { view in view.listStyle(.sidebar) }
         .if(!isSidebar) { view in view.listStyle(.plain) }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .id(selectedPostType)
     }
 
     @ViewBuilder

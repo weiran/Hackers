@@ -213,11 +213,15 @@ public final class FeedViewModel: @unchecked Sendable {
 
         postType = newType
         persistLastFeedCategoryIfNeeded()
-        await refreshFeed()
+        reset(clearPosts: true)  // Clear posts immediately to prevent flash of old data
+        await feedLoader.refresh()
     }
 
     @MainActor
-    private func reset() {
+    private func reset(clearPosts: Bool = false) {
+        if clearPosts {
+            feedLoader.data = []
+        }
         postIds = Set()
         pageIndex = 1
         lastPostId = 0
