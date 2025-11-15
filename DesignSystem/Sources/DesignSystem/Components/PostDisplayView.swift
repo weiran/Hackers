@@ -189,6 +189,7 @@ public struct PostDisplayView: View {
             accessibilityLabel: "\(post.commentsCount) comments",
             isHighlighted: false,
             isLoading: false,
+            isEnabled: true,
             numericValue: post.commentsCount,
             action: onCommentsTap
         )
@@ -370,16 +371,27 @@ public struct PostDisplayView: View {
             }
         }
 
-        return Button(action: action ?? {}) {
+        let shouldDisable = !isEnabled || isLoading
+        let shouldBeInteractive = isEnabled && !isLoading && action != nil
+
+        // If enabled but no action, render as static view to avoid disabled styling
+        if isEnabled && !isLoading && action == nil {
             content
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(accessibilityLabel)
+                .accessibilityHint(accessibilityHint ?? "")
+        } else {
+            Button(action: action ?? {}) {
+                content
+            }
+            .buttonStyle(.plain)
+            .disabled(!shouldBeInteractive)
+            .allowsHitTesting(shouldBeInteractive)
+            .opacity(shouldDisable ? 0.6 : 1.0)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(accessibilityHint ?? "")
         }
-        .buttonStyle(.plain)
-        .disabled(!isEnabled || isLoading || action == nil)
-        .allowsHitTesting(isEnabled && !isLoading && action != nil)
-        .opacity(isEnabled && !isLoading ? 1.0 : 0.6)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityHint(accessibilityHint ?? "")
     }
 }
 
