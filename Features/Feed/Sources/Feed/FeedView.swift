@@ -97,6 +97,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             votingViewModel.navigationStore = navigationStore
             await viewModel.loadFeed()
         }
+        .onChange(of: navigationStore.selectedPost) { oldPost, newPost in
+            // When selectedPost changes in navigation store (e.g., from comments view),
+            // update it in the feed
+            if let updatedPost = newPost {
+                viewModel.replacePost(updatedPost)
+            }
+        }
         .alert(
             "Vote Error",
             isPresented: Binding(
