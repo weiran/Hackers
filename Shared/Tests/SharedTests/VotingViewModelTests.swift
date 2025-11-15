@@ -42,6 +42,8 @@ struct VotingViewModelTests {
             upvoteCalled = true
             if let errorToThrow { throw errorToThrow }
         }
+
+        func unvote(item _: any Votable) async throws {}
     }
 
     final class MockCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
@@ -54,6 +56,8 @@ struct VotingViewModelTests {
                 throw HackersKitError.requestFailure
             }
         }
+
+        func unvoteComment(_: Domain.Comment, for _: Post) async throws {}
     }
 
     final class MockAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
@@ -131,6 +135,42 @@ struct VotingViewModelTests {
         #expect(post.upvoted == false && post.score == 10, "Optimistic state should be reverted")
     }
 
+    @Test("Post upvote synthesizes unvote URL when missing")
+    @MainActor
+    func postUpvoteSynthesizesUnvoteURL() async throws {
+        mockVotingStateProvider.upvoteCalled = false
+
+        var post = Post(
+            id: 42,
+            url: URL(string: "https://example.com")!,
+            title: "Synth Test",
+            age: "1h",
+            commentsCount: 2,
+            by: "tester",
+            score: 5,
+            postType: .news,
+            upvoted: false,
+            voteLinks: VoteLinks(
+                upvote: URL(string: "https://news.ycombinator.com/vote?id=42&how=up&auth=abc123&goto=news")!,
+                unvote: nil
+            )
+        )
+
+        await votingViewModel.upvote(post: &post)
+
+        #expect(mockVotingStateProvider.upvoteCalled, "Upvote should be attempted")
+
+        guard let unvoteURL = post.voteLinks?.unvote else {
+            Issue.record("Expected synthesized unvote URL")
+            return
+        }
+
+        let absolute = unvoteURL.absoluteString
+        #expect(absolute.contains("how=un"), "Unvote URL should set how=un")
+        #expect(absolute.contains("auth=abc123"), "Unvote URL should preserve auth token")
+        #expect(absolute.contains("goto=news"), "Unvote URL should preserve goto parameter")
+    }
+
     // MARK: - Comment Voting Tests
 
     @Test("Comment voting with MainActor")
@@ -166,6 +206,50 @@ struct VotingViewModelTests {
         // Then
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
+    }
+
+    @Test("Comment upvote synthesizes unvote URL when missing")
+    @MainActor
+    func commentUpvoteSynthesizesUnvoteURL() async throws {
+        mockCommentVotingStateProvider.shouldThrow = false
+        mockCommentVotingStateProvider.upvoteCommentCalled = false
+
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=123&how=up&auth=xyz&goto=item%3Fid%3D456")!,
+            unvote: nil
+        )
+        let comment = Domain.Comment(
+            id: 123,
+            age: "1h",
+            text: "Test comment",
+            by: "user",
+            level: 0,
+            upvoted: false,
+            voteLinks: voteLinks
+        )
+
+        let post = Post(
+            id: 456,
+            url: URL(string: "https://example.com")!,
+            title: "Test Post",
+            age: "2h",
+            commentsCount: 1,
+            by: "author",
+            score: 10,
+            postType: .news,
+            upvoted: false
+        )
+
+        await votingViewModel.upvote(comment: comment, in: post)
+
+        #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be attempted")
+        guard let commentUnvote = comment.voteLinks?.unvote else {
+            Issue.record("Expected synthesized unvote URL for comment")
+            return
+        }
+        let absolute = commentUnvote.absoluteString
+        #expect(absolute.contains("how=un"), "Unvote URL should use how=un")
+        #expect(absolute.contains("auth=xyz"), "Auth token should be preserved")
     }
 
     @Test("Comment voting error handling")

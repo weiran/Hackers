@@ -114,6 +114,12 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         }
         .task {
             votingViewModel.navigationStore = navigationStore
+            // Set up callback to update navigation store when post changes
+            viewModel.onPostUpdated = { [weak navigationStore] updatedPost in
+                if let updatedPost {
+                    navigationStore?.selectedPost = updatedPost
+                }
+            }
             await viewModel.loadComments()
             if let targetID = pendingCommentID {
                 _ = await viewModel.revealComment(withId: targetID)

@@ -14,12 +14,18 @@ import SwiftUI
 @Observable
 public final class CommentsViewModel: @unchecked Sendable {
     public let postID: Int
-    public var post: Post?
+    public var post: Post? {
+        didSet {
+            onPostUpdated?(post)
+        }
+    }
     public var visibleComments: [Comment] = []
     public var showThumbnails: Bool
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?
+    // Callback for when post is updated
+    public var onPostUpdated: ((Post?) -> Void)?
 
     private let postUseCase: any PostUseCase
     private let commentUseCase: any CommentUseCase

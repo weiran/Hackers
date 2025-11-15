@@ -16,6 +16,7 @@ public struct PostDisplayView: View {
     let showThumbnails: Bool
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
+    let onUnvoteTap: (() async -> Bool)?
     let onBookmarkTap: (() async -> Bool)?
     let onCommentsTap: (() -> Void)?
 
@@ -25,6 +26,7 @@ public struct PostDisplayView: View {
     @State private var displayedScore: Int
     @State private var displayedUpvoted: Bool
     @State private var displayedBookmarked: Bool
+    @State private var displayedVoteLinks: VoteLinks?
 
     public init(
         post: Post,
@@ -33,6 +35,7 @@ public struct PostDisplayView: View {
         showThumbnails: Bool = true,
         onThumbnailTap: (() -> Void)? = nil,
         onUpvoteTap: (() async -> Bool)? = nil,
+        onUnvoteTap: (() async -> Bool)? = nil,
         onBookmarkTap: (() async -> Bool)? = nil,
         onCommentsTap: (() -> Void)? = nil
     ) {
@@ -42,11 +45,13 @@ public struct PostDisplayView: View {
         self.showThumbnails = showThumbnails
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
+        self.onUnvoteTap = onUnvoteTap
         self.onBookmarkTap = onBookmarkTap
         self.onCommentsTap = onCommentsTap
         _displayedScore = State(initialValue: post.score)
         _displayedUpvoted = State(initialValue: post.upvoted)
         _displayedBookmarked = State(initialValue: post.isBookmarked)
+        _displayedVoteLinks = State(initialValue: post.voteLinks)
     }
 
     public var body: some View {
@@ -98,6 +103,7 @@ public struct PostDisplayView: View {
             displayedScore = post.score
             displayedUpvoted = post.upvoted
             displayedBookmarked = post.isBookmarked
+            displayedVoteLinks = post.voteLinks
         }
         .onChange(of: post.score) { newValue in
             displayedScore = newValue
@@ -107,6 +113,9 @@ public struct PostDisplayView: View {
         }
         .onChange(of: post.isBookmarked) { newValue in
             displayedBookmarked = newValue
+        }
+        .onChange(of: post.voteLinks) { newValue in
+            displayedVoteLinks = newValue
         }
         .onChange(of: votingState?.score) { newValue in
             if let newValue {
@@ -124,8 +133,10 @@ public struct PostDisplayView: View {
         let score = displayedScore
         let isUpvoted = displayedUpvoted
         let isLoading = isSubmittingUpvote
-        let canVote = post.voteLinks?.upvote != nil
-        let canInteract = canVote && !isUpvoted && !isLoading
+        let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
+        let canVote = currentVoteLinks?.upvote != nil
+        let canUnvote = currentVoteLinks?.unvote != nil
+        let canInteract = ((canVote && !isUpvoted) || (canUnvote && isUpvoted)) && !isLoading
         // Avoid keeping a disabled Button so the upvoted state retains the bright tint
         let (backgroundColor, textColor): (Color, Color) = {
             let style = AppColors.PillStyle.upvote(isActive: isUpvoted)
@@ -135,12 +146,19 @@ public struct PostDisplayView: View {
         }()
         let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
         let accessibilityLabel: String
+        let accessibilityHint: String
         if isLoading {
             accessibilityLabel = "Submitting vote"
+            accessibilityHint = ""
+        } else if isUpvoted && canUnvote {
+            accessibilityLabel = "\(score) points, upvoted"
+            accessibilityHint = "Double tap to unvote"
         } else if isUpvoted {
             accessibilityLabel = "\(score) points, upvoted"
+            accessibilityHint = ""
         } else {
             accessibilityLabel = "\(score) points"
+            accessibilityHint = "Double tap to upvote"
         }
 
         return pillView(
@@ -149,7 +167,7 @@ public struct PostDisplayView: View {
             textColor: textColor,
             backgroundColor: backgroundColor,
             accessibilityLabel: accessibilityLabel,
-            accessibilityHint: "Double tap to upvote",
+            accessibilityHint: accessibilityHint,
             isHighlighted: isUpvoted,
             isLoading: isLoading,
             isEnabled: canInteract,
@@ -171,6 +189,7 @@ public struct PostDisplayView: View {
             accessibilityLabel: "\(post.commentsCount) comments",
             isHighlighted: false,
             isLoading: false,
+            isEnabled: true,
             numericValue: post.commentsCount,
             action: onCommentsTap
         )
@@ -202,25 +221,79 @@ public struct PostDisplayView: View {
     }
 
     private func makeUpvoteAction() -> (() -> Void)? {
-        guard let onUpvoteTap else { return nil }
         return {
             guard !isSubmittingUpvote else { return }
-            isSubmittingUpvote = true
-            let previousScore = displayedScore
-            let previousUpvoted = displayedUpvoted
-            displayedUpvoted = true
-            displayedScore += 1
-            Task {
-                let success = await onUpvoteTap()
-                await MainActor.run {
-                    if !success {
-                        displayedScore = previousScore
-                        displayedUpvoted = previousUpvoted
+
+            let isCurrentlyUpvoted = displayedUpvoted
+            let currentVoteLinks = displayedVoteLinks ?? post.voteLinks
+            let canUnvote = currentVoteLinks?.unvote != nil
+
+            // If already upvoted and can unvote, perform unvote
+            if isCurrentlyUpvoted && canUnvote {
+                guard let onUnvoteTap else { return }
+                isSubmittingUpvote = true
+                let previousScore = displayedScore
+                let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
+                displayedUpvoted = false
+                displayedScore -= 1
+                displayedVoteLinks = VoteLinks(upvote: previousVoteLinks?.upvote, unvote: nil)
+                Task {
+                    let success = await onUnvoteTap()
+                    await MainActor.run {
+                        if !success {
+                            displayedScore = previousScore
+                            displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
+                        }
+                        isSubmittingUpvote = false
                     }
-                    isSubmittingUpvote = false
+                }
+            } else {
+                // Perform upvote
+                guard let onUpvoteTap else { return }
+                isSubmittingUpvote = true
+                let previousScore = displayedScore
+                let previousUpvoted = displayedUpvoted
+                let previousVoteLinks = currentVoteLinks
+                displayedUpvoted = true
+                displayedScore += 1
+                displayedVoteLinks = derivedVoteLinks(afterUpvoteFrom: previousVoteLinks)
+                Task {
+                    let success = await onUpvoteTap()
+                    await MainActor.run {
+                        if !success {
+                            displayedScore = previousScore
+                            displayedUpvoted = previousUpvoted
+                            displayedVoteLinks = previousVoteLinks
+                        }
+                        isSubmittingUpvote = false
+                    }
                 }
             }
         }
+    }
+
+    private func derivedVoteLinks(afterUpvoteFrom voteLinks: VoteLinks?) -> VoteLinks? {
+        guard let voteLinks else { return nil }
+        if voteLinks.unvote != nil {
+            return voteLinks
+        }
+        guard let upvoteURL = voteLinks.upvote else {
+            return voteLinks
+        }
+        let absolute = upvoteURL.absoluteString
+        if absolute.contains("how=up"),
+           let unvoteURL = URL(string: absolute.replacingOccurrences(of: "how=up", with: "how=un"))
+        {
+            return VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
+        }
+        if absolute.contains("how%3Dup"),
+           let unvoteURL = URL(string: absolute.replacingOccurrences(of: "how%3Dup", with: "how%3Dun"))
+        {
+            return VoteLinks(upvote: upvoteURL, unvote: unvoteURL)
+        }
+        return voteLinks
     }
 
     private func makeBookmarkAction() -> (() -> Void)? {
@@ -284,42 +357,80 @@ public struct PostDisplayView: View {
             Capsule()
                 .fill(backgroundColor)
         )
-        Button(action: action ?? {}) {
-            content
+        .overlay {
+            if isLoading {
+                Capsule()
+                    .fill(backgroundColor.opacity(0.6))
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityHint(accessibilityHint ?? "")
+        .overlay {
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .tint(textColor)
+            }
+        }
 
+        let shouldDisable = !isEnabled || isLoading
+        let shouldBeInteractive = isEnabled && !isLoading && action != nil
+
+        // If enabled but no action, render as static view to avoid disabled styling
+        if isEnabled && !isLoading && action == nil {
+            content
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(accessibilityLabel)
+                .accessibilityHint(accessibilityHint ?? "")
+        } else {
+            Button(action: action ?? {}) {
+                content
+            }
+            .buttonStyle(.plain)
+            .disabled(!shouldBeInteractive)
+            .allowsHitTesting(shouldBeInteractive)
+            .opacity(shouldDisable ? 0.6 : 1.0)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(accessibilityHint ?? "")
+        }
     }
 }
 
 public struct PostContextMenu: View {
     let post: Post
     let onVote: () -> Void
+    let onUnvote: () -> Void
     let onOpenLink: () -> Void
     let onShare: () -> Void
 
     public init(
         post: Post,
         onVote: @escaping () -> Void,
+        onUnvote: @escaping () -> Void = {},
         onOpenLink: @escaping () -> Void,
         onShare: @escaping () -> Void,
     ) {
         self.post = post
         self.onVote = onVote
+        self.onUnvote = onUnvote
         self.onOpenLink = onOpenLink
         self.onShare = onShare
     }
 
     public var body: some View {
         Group {
-            if post.voteLinks?.upvote != nil {
+            if post.voteLinks?.upvote != nil, !post.upvoted {
                 Button {
                     onVote()
                 } label: {
                     Label("Upvote", systemImage: "arrow.up")
+                }
+            }
+
+            if post.voteLinks?.unvote != nil, post.upvoted {
+                Button {
+                    onUnvote()
+                } label: {
+                    Label("Unvote", systemImage: "arrow.uturn.down")
                 }
             }
 

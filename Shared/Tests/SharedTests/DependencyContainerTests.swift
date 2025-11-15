@@ -121,6 +121,8 @@ private final class StubPostRepository: PostUseCase, VoteUseCase, CommentUseCase
     func getComments(for _: Post) async throws -> [Domain.Comment] { [] }
     func upvote(post _: Post) async throws {}
     func upvote(comment _: Domain.Comment, for _: Post) async throws {}
+    func unvote(post _: Post) async throws {}
+    func unvote(comment _: Domain.Comment, for _: Post) async throws {}
 }
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
@@ -144,6 +146,10 @@ private final class StubVotingStateProvider:
     func upvote(item _: any Votable) async throws {}
     func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
         comment.upvoted = true
+    }
+    func unvote(item _: any Votable) async throws {}
+    func unvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
+        comment.upvoted = false
     }
 }
 

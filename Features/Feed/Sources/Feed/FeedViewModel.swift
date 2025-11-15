@@ -241,14 +241,9 @@ public final class FeedViewModel: @unchecked Sendable {
         if let index = feedLoader.data.firstIndex(where: { $0.id == updatedPost.id }) {
             feedLoader.data[index] = updatedPost
         }
-    }
-
-    @MainActor
-    public func applyLocalUpvote(to postId: Int) {
-        guard let index = feedLoader.data.firstIndex(where: { $0.id == postId }) else { return }
-        guard feedLoader.data[index].upvoted == false else { return }
-        feedLoader.data[index].upvoted = true
-        feedLoader.data[index].score += 1
+        if let searchIndex = searchResults.firstIndex(where: { $0.id == updatedPost.id }) {
+            searchResults[searchIndex] = updatedPost
+        }
     }
 
     @MainActor

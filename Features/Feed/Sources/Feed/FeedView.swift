@@ -101,6 +101,13 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             votingViewModel.navigationStore = navigationStore
             await viewModel.loadFeed()
         }
+        .onChange(of: navigationStore.selectedPost) { oldPost, newPost in
+            // When selectedPost changes in navigation store (e.g., from comments view),
+            // update it in the feed
+            if let updatedPost = newPost {
+                viewModel.replacePost(updatedPost)
+            }
+        }
         .alert(
             "Vote Error",
             isPresented: Binding(
@@ -187,8 +194,8 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             showThumbnails: viewModel.showThumbnails,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
-            onUpvoteApplied: { postId in
-                viewModel.applyLocalUpvote(to: postId)
+            onPostUpdated: { updatedPost in
+                viewModel.replacePost(updatedPost)
             },
             onBookmarkToggle: {
                 await viewModel.toggleBookmark(for: post)
@@ -205,7 +212,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                 }
             }
         }
-        .if(post.voteLinks?.upvote != nil && !post.upvoted) { view in
+        .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
             view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 voteSwipeAction(for: post)
             }
@@ -217,21 +224,44 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
 
     @ViewBuilder
     private func voteSwipeAction(for post: Domain.Post) -> some View {
-        Button {
-            Task {
-                var mutablePost = post
-                await votingViewModel.upvote(post: &mutablePost)
-                await MainActor.run {
-                    if mutablePost.upvoted {
-                        viewModel.applyLocalUpvote(to: post.id)
+        if post.upvoted && post.voteLinks?.unvote != nil {
+            // Unvote action
+            Button {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.unvote(post: &mutablePost)
+                    await MainActor.run {
+                        if !mutablePost.upvoted {
+                            if let existingLinks = mutablePost.voteLinks {
+                                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+                            }
+                            viewModel.replacePost(mutablePost)
+                        }
                     }
                 }
+            } label: {
+                Image(systemName: "arrow.uturn.down")
             }
-        } label: {
-            Image(systemName: "arrow.up")
+            .tint(.orange)
+            .accessibilityLabel("Unvote")
+        } else {
+            // Upvote action
+            Button {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.upvote(post: &mutablePost)
+                    await MainActor.run {
+                        if mutablePost.upvoted {
+                            viewModel.replacePost(mutablePost)
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "arrow.up")
+            }
+            .tint(AppColors.upvotedColor)
+            .accessibilityLabel("Upvote")
         }
-        .tint(AppColors.upvotedColor)
-        .accessibilityLabel("Upvote")
     }
 
     @ViewBuilder
@@ -244,11 +274,25 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run {
                         if mutablePost.upvoted {
-                            viewModel.applyLocalUpvote(to: post.id)
+                            viewModel.replacePost(mutablePost)
                         }
                     }
                 }
             },
+            onUnvote: {
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.unvote(post: &mutablePost)
+                    await MainActor.run {
+                        if !mutablePost.upvoted {
+                            if let existingLinks = mutablePost.voteLinks {
+                                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+                            }
+                            viewModel.replacePost(mutablePost)
+                        }
+                    }
+                }
+            }
         )
 
         Divider()
@@ -348,7 +392,7 @@ struct PostRowView: View {
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
-    let onUpvoteApplied: ((Int) -> Void)?
+    let onPostUpdated: ((Domain.Post) -> Void)?
     let onBookmarkToggle: (() async -> Bool)?
 
     init(post: Domain.Post,
@@ -356,7 +400,7 @@ struct PostRowView: View {
          showThumbnails: Bool = true,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil,
-         onUpvoteApplied: ((Int) -> Void)? = nil,
+         onPostUpdated: ((Domain.Post) -> Void)? = nil,
          onBookmarkToggle: (() async -> Bool)? = nil)
     {
         self.post = post
@@ -364,7 +408,7 @@ struct PostRowView: View {
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
-        self.onUpvoteApplied = onUpvoteApplied
+        self.onPostUpdated = onPostUpdated
         self.onBookmarkToggle = onBookmarkToggle
     }
 
@@ -376,6 +420,7 @@ struct PostRowView: View {
             showThumbnails: showThumbnails,
             onThumbnailTap: onLinkTap,
             onUpvoteTap: { await handleUpvoteTap() },
+            onUnvoteTap: { await handleUnvoteTap() },
             onBookmarkTap: {
                 guard let onBookmarkToggle else { return post.isBookmarked }
                 return await onBookmarkToggle()
@@ -404,10 +449,29 @@ struct PostRowView: View {
 
         if wasUpvoted {
             await MainActor.run {
-                onUpvoteApplied?(mutablePost.id)
+                onPostUpdated?(mutablePost)
             }
         }
 
         return wasUpvoted
+    }
+
+    private func handleUnvoteTap() async -> Bool {
+        guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
+
+        var mutablePost = post
+        await votingViewModel.unvote(post: &mutablePost)
+        let wasUnvoted = !mutablePost.upvoted
+
+        if wasUnvoted {
+            if let existingLinks = mutablePost.voteLinks {
+                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
+            }
+            await MainActor.run {
+                onPostUpdated?(mutablePost)
+            }
+        }
+
+        return wasUnvoted
     }
 }
