@@ -175,7 +175,7 @@ struct CommentsForEach: View {
                     value: [comment.id: geometry.frame(in: .global)],
                 )
             })
-            .listRowSeparator(.hidden)
+            .listRowSeparator(.visible)
             .if((comment.voteLinks?.upvote != nil && !comment.upvoted) || (comment.voteLinks?.unvote != nil && comment.upvoted)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     if comment.upvoted && comment.voteLinks?.unvote != nil {
