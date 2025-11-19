@@ -132,6 +132,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var rememberFeedCategory: Bool = false
     var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
+    var compactFeedDesign: Bool = false
     func clearCache() {}
     func cacheUsageBytes() async -> Int64 { 0 }
 }

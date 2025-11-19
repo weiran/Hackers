@@ -130,6 +130,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var rememberFeedCategory: Bool = false
     var lastFeedCategory: PostType?
     var textSize: TextSize
+    var compactFeedDesign: Bool = false
 
     init(safariReaderMode: Bool = false, openInDefaultBrowser: Bool = false, textSize: TextSize = .medium) {
         self.safariReaderMode = safariReaderMode

@@ -42,6 +42,7 @@ public protocol SettingsUseCase: Sendable {
     var rememberFeedCategory: Bool { get set }
     var lastFeedCategory: PostType? { get set }
     var textSize: TextSize { get set }
+    var compactFeedDesign: Bool { get set }
     func clearCache()
     func cacheUsageBytes() async -> Int64
 }

@@ -192,6 +192,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             post: post,
             votingViewModel: votingViewModel,
             showThumbnails: viewModel.showThumbnails,
+            compactMode: viewModel.compactFeedDesign,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
             onPostUpdated: { updatedPost in
@@ -392,12 +393,14 @@ struct PostRowView: View {
     let onLinkTap: (() -> Void)?
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
+    let compactMode: Bool
     let onPostUpdated: ((Domain.Post) -> Void)?
     let onBookmarkToggle: (() async -> Bool)?
 
     init(post: Domain.Post,
          votingViewModel: VotingViewModel,
          showThumbnails: Bool = true,
+         compactMode: Bool = false,
          onLinkTap: (() -> Void)? = nil,
          onCommentsTap: (() -> Void)? = nil,
          onPostUpdated: ((Domain.Post) -> Void)? = nil,
@@ -408,6 +411,7 @@ struct PostRowView: View {
         self.onLinkTap = onLinkTap
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
+        self.compactMode = compactMode
         self.onPostUpdated = onPostUpdated
         self.onBookmarkToggle = onBookmarkToggle
     }
@@ -418,6 +422,7 @@ struct PostRowView: View {
             votingState: votingViewModel.votingState(for: post),
             showPostText: false,
             showThumbnails: showThumbnails,
+            compactMode: compactMode,
             onThumbnailTap: onLinkTap,
             onUpvoteTap: { await handleUpvoteTap() },
             onUnvoteTap: { await handleUnvoteTap() },

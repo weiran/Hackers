@@ -18,6 +18,7 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
     @Published public var showThumbnails: Bool = true
     @Published public var rememberFeedCategory: Bool = false
     @Published public var textSize: TextSize = .medium
+    @Published public var compactFeedDesign: Bool = false
     @Published public var cacheUsageText: String = "Calculating…"
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
@@ -32,6 +33,7 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
         showThumbnails = settingsUseCase.showThumbnails
         rememberFeedCategory = settingsUseCase.rememberFeedCategory
         textSize = settingsUseCase.textSize
+        compactFeedDesign = settingsUseCase.compactFeedDesign
 
         // Set up observers for changes
         setupBindings()
@@ -71,6 +73,13 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
             .dropFirst()
             .sink { [weak self] newValue in
                 self?.settingsUseCase.textSize = newValue
+            }
+            .store(in: &cancellables)
+
+        $compactFeedDesign
+            .dropFirst()
+            .sink { [weak self] newValue in
+                self?.settingsUseCase.compactFeedDesign = newValue
             }
             .store(in: &cancellables)
     }

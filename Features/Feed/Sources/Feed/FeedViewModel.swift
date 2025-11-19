@@ -36,6 +36,7 @@ public final class FeedViewModel: @unchecked Sendable {
     public var isLoading: Bool { feedLoader.isLoading }
     public var error: Error? { feedLoader.error }
     public var showThumbnails: Bool
+    public var compactFeedDesign: Bool
     public var searchQuery: String = ""
     public var searchResults: [Domain.Post] = []
     public var isSearchInProgress = false
@@ -61,6 +62,7 @@ public final class FeedViewModel: @unchecked Sendable {
         self.bookmarksController = bookmarksController ?? DependencyContainer.shared.makeBookmarksController()
         self.searchUseCase = searchUseCase
         showThumbnails = settingsUseCase.showThumbnails
+        compactFeedDesign = settingsUseCase.compactFeedDesign
         let rememberSetting = settingsUseCase.rememberFeedCategory
         rememberFeedCategorySetting = rememberSetting
         if rememberSetting, let storedPostType = settingsUseCase.lastFeedCategory {
@@ -83,6 +85,10 @@ public final class FeedViewModel: @unchecked Sendable {
                 let currentValue = self.settingsUseCase.showThumbnails
                 if self.showThumbnails != currentValue {
                     self.showThumbnails = currentValue
+                }
+                let compactValue = self.settingsUseCase.compactFeedDesign
+                if self.compactFeedDesign != compactValue {
+                    self.compactFeedDesign = compactValue
                 }
                 let rememberValue = self.settingsUseCase.rememberFeedCategory
                 if self.rememberFeedCategorySetting != rememberValue {

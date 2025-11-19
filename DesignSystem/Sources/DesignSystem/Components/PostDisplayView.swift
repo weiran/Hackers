@@ -14,6 +14,7 @@ public struct PostDisplayView: View {
     let votingState: VotingState?
     let showPostText: Bool
     let showThumbnails: Bool
+    let compactMode: Bool
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
     let onUnvoteTap: (() async -> Bool)?
@@ -33,6 +34,7 @@ public struct PostDisplayView: View {
         votingState: VotingState? = nil,
         showPostText: Bool = false,
         showThumbnails: Bool = true,
+        compactMode: Bool = false,
         onThumbnailTap: (() -> Void)? = nil,
         onUpvoteTap: (() async -> Bool)? = nil,
         onUnvoteTap: (() async -> Bool)? = nil,
@@ -43,6 +45,7 @@ public struct PostDisplayView: View {
         self.votingState = votingState
         self.showPostText = showPostText
         self.showThumbnails = showThumbnails
+        self.compactMode = compactMode
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
         self.onUnvoteTap = onUnvoteTap
@@ -69,13 +72,51 @@ public struct PostDisplayView: View {
                     .accessibilityLabel("Open link")
 
                 VStack(alignment: .leading, spacing: 6) {
-                    if let host = post.url.host,
-                       !isHackerNewsItemURL(post.url)
-                    {
-                        Text(truncatedHost(host).uppercased())
-                            .scaledFont(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
+                    if compactMode {
+                        // Compact mode: URL with inline stats
+                        if let host = post.url.host,
+                           !isHackerNewsItemURL(post.url)
+                        {
+                            HStack(spacing: 6) {
+                                Text(truncatedHost(host).uppercased())
+                                    .scaledFont(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+
+                                Text("•")
+                                    .scaledFont(.caption)
+                                    .foregroundColor(.secondary)
+
+                                inlineUpvoteStat
+
+                                Text("•")
+                                    .scaledFont(.caption)
+                                    .foregroundColor(.secondary)
+
+                                inlineCommentsStat
+                            }
+                        } else {
+                            // For HN item URLs, show stats without URL
+                            HStack(spacing: 6) {
+                                inlineUpvoteStat
+
+                                Text("•")
+                                    .scaledFont(.caption)
+                                    .foregroundColor(.secondary)
+
+                                inlineCommentsStat
+                            }
+                        }
+                    } else {
+                        // Normal mode: URL line
+                        if let host = post.url.host,
+                           !isHackerNewsItemURL(post.url)
+                        {
+                            Text(truncatedHost(host).uppercased())
+                                .scaledFont(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
                     }
 
                     // Title
@@ -84,17 +125,19 @@ public struct PostDisplayView: View {
                         .foregroundColor(.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    // Metadata row
-                    HStack(spacing: 8) {
-                        upvotePill
-                        commentsPill
-                        Spacer(minLength: 8)
-                        if onBookmarkTap != nil {
-                            bookmarkPill
+                    // Metadata row (only in normal mode)
+                    if !compactMode {
+                        HStack(spacing: 8) {
+                            upvotePill
+                            commentsPill
+                            Spacer(minLength: 8)
+                            if onBookmarkTap != nil {
+                                bookmarkPill
+                            }
                         }
+                        .scaledFont(.caption)
+                        .padding(.top, 4)
                     }
-                    .scaledFont(.caption)
-                    .padding(.top, 4)
                 }
             }
         }
@@ -126,6 +169,35 @@ public struct PostDisplayView: View {
             if let newValue {
                 displayedUpvoted = newValue
             }
+        }
+    }
+
+    private var inlineUpvoteStat: some View {
+        let score = displayedScore
+        let isUpvoted = displayedUpvoted
+        let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
+        let color: Color = isUpvoted ? AppColors.pillForeground(for: .upvote(isActive: true), colorScheme: colorScheme) : .secondary
+
+        return HStack(spacing: 3) {
+            Image(systemName: iconName)
+                .scaledFont(.caption2)
+                .foregroundColor(color)
+            Text("\(score)")
+                .scaledFont(.caption)
+                .foregroundColor(color)
+                .contentTransition(.numericText())
+                .animation(.easeInOut(duration: 0.2), value: score)
+        }
+    }
+
+    private var inlineCommentsStat: some View {
+        HStack(spacing: 3) {
+            Image(systemName: "message")
+                .scaledFont(.caption2)
+                .foregroundColor(.secondary)
+            Text("\(post.commentsCount)")
+                .scaledFont(.caption)
+                .foregroundColor(.secondary)
         }
     }
 

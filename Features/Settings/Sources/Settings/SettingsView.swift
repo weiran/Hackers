@@ -162,6 +162,10 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                     Toggle(isOn: $viewModel.showThumbnails) {
                         Label("Show Thumbnails", systemImage: "photo.on.rectangle")
                     }
+
+                    Toggle(isOn: $viewModel.compactFeedDesign) {
+                        Label("Compact Feed Design", systemImage: "list.bullet.rectangle")
+                    }
                 }
 
                 Section(header: Text("Browser")) {

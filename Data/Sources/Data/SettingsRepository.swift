@@ -36,7 +36,8 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
                 "openInDefaultBrowser": false,
                 "ShowThumbnails": true,
                 "RememberFeedCategory": false,
-                "textSize": TextSize.medium.rawValue
+                "textSize": TextSize.medium.rawValue,
+                "compactFeedDesign": false
             ])
         }
     }
@@ -97,6 +98,15 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue.rawValue, forKey: "textSize")
+        }
+    }
+
+    public var compactFeedDesign: Bool {
+        get {
+            userDefaults.bool(forKey: "compactFeedDesign")
+        }
+        set {
+            userDefaults.set(newValue, forKey: "compactFeedDesign")
         }
     }
 

@@ -29,6 +29,7 @@ struct SettingsViewModelTests {
         private var _rememberFeedCategory = false
         private var _lastFeedCategory: PostType?
         private var _textSize: TextSize = .medium
+        private var _compactFeedDesign = false
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
@@ -102,6 +103,17 @@ struct SettingsViewModelTests {
             set {
                 setterCallCounts["textSize", default: 0] += 1
                 _textSize = newValue
+            }
+        }
+
+        var compactFeedDesign: Bool {
+            get {
+                getterCallCounts["compactFeedDesign", default: 0] += 1
+                return _compactFeedDesign
+            }
+            set {
+                setterCallCounts["compactFeedDesign", default: 0] += 1
+                _compactFeedDesign = newValue
             }
         }
 
