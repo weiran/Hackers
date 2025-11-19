@@ -13,13 +13,12 @@ struct OnboardingDataTests {
     func currentOnboardingData() {
         let data = OnboardingData.currentOnboarding()
 
-        #expect(data.title == "What's New in Hackers 5.2")
-        #expect(data.items.count == 3)
-        #expect(data.items.contains { $0.title == "Smarter Search & Feed" })
-        #expect(data.items.contains { $0.title == "Synced Bookmarks" })
-        #expect(data.items.contains { $0.title == "Support the Developer" })
+        #expect(data.title == "What's New in Hackers 5.2.1")
+        #expect(data.items.count == 2)
+        #expect(data.items.contains { $0.title == "Compact Feed Design" })
+        #expect(data.items.contains { $0.title == "Unvote Your Upvotes" })
         #expect(data.items.contains {
-            $0.subtitle == "Visit Settings to tip or subscribe, keep Hackers improving, and help the app stay free."
+            $0.subtitle == "Choose a streamlined feed layout with inline upvote and comment counts for a cleaner reading experience."
         })
     }
 
