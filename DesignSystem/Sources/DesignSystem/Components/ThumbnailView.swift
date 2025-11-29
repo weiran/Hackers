@@ -17,12 +17,15 @@ public struct ThumbnailView: View {
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
+        guard let host = url.host else { return nil }
         var components = URLComponents()
         components.scheme = "https"
-        components.host = "hackers-thumbnails.weiranzhang.com"
-        components.path = "/api/FetchThumbnail"
-        let urlString = url.absoluteString
-        components.queryItems = [URLQueryItem(name: "url", value: urlString)]
+        components.host = "www.google.com"
+        components.path = "/s2/favicons"
+        components.queryItems = [
+            URLQueryItem(name: "domain", value: host),
+            URLQueryItem(name: "sz", value: "128")
+        ]
         return components.url
     }
 
