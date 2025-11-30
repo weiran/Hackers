@@ -37,7 +37,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
                 "ShowThumbnails": true,
                 "RememberFeedCategory": false,
                 "textSize": TextSize.medium.rawValue,
-                "compactFeedDesign": false
+                "compactFeedDesign": true
             ])
         }
     }
