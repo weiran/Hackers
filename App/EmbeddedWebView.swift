@@ -16,28 +16,53 @@ struct EmbeddedWebView: View {
 
     @State private var currentURL: URL?
     @State private var currentTitle: String?
+    @State private var canGoBack = false
+    @State private var canGoForward = false
+    @State private var page = WebPage()
 
     var body: some View {
-        WebKitView(
-            url: url,
-            onUpdate: { updatedURL, updatedTitle in
-                Task { @MainActor in
-                    currentURL = updatedURL
-                    currentTitle = updatedTitle
+        WebView(page)
+            .task(id: url) { await load(url) }
+            .task { await monitorNavigations() }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    shareButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    openInSafariButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if showsCloseButton {
+                        closeButton
+                    }
+                }
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button {
+                            goBack()
+                        } label: {
+                            Image(systemName: "chevron.backward")
+                        }
+                        .accessibilityLabel("Back")
+                        .disabled(!canGoBack)
+
+                        Button {
+                            goForward()
+                        } label: {
+                            Image(systemName: "chevron.forward")
+                        }
+                        .accessibilityLabel("Forward")
+                        .disabled(!canGoForward)
+
+                        Button {
+                            reload()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .accessibilityLabel("Reload")
+                    }
                 }
             }
-        )
-        .ignoresSafeArea(.container, edges: .all)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                shareButton
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if showsCloseButton {
-                    closeButton
-                }
-            }
-        }
     }
 
     private var shareButton: some View {
@@ -52,6 +77,18 @@ struct EmbeddedWebView: View {
         .accessibilityLabel("Share")
     }
 
+    private var openInSafariButton: some View {
+        Button {
+            Task { @MainActor in
+                let targetURL = currentURL ?? url
+                LinkOpener.openURL(targetURL)
+            }
+        } label: {
+            Image(systemName: "safari")
+        }
+        .accessibilityLabel("Open in Safari")
+    }
+
     private var closeButton: some View {
         Button {
             Task { @MainActor in onDismiss() }
@@ -60,62 +97,53 @@ struct EmbeddedWebView: View {
         }
         .accessibilityLabel("Close")
     }
-}
 
-// TODO: Replace WebKitView with native WebView once macOS Catalyst supports it.
-private struct WebKitView: UIViewRepresentable {
-    let url: URL
-    let onUpdate: (URL?, String?) -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onUpdate: onUpdate)
+    @MainActor
+    private func load(_ target: URL) async {
+        guard currentURL != target else { return }
+        currentURL = target
+        _ = page.load(target)
+        updateState()
     }
 
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView(frame: .zero)
-        webView.navigationDelegate = context.coordinator
-        context.coordinator.load(url: url, into: webView)
-        context.coordinator.forwardUpdate(from: webView)
-        return webView
-    }
-
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        context.coordinator.load(url: url, into: webView)
-        context.coordinator.forwardUpdate(from: webView)
-    }
-
-    final class Coordinator: NSObject, WKNavigationDelegate {
-        private let onUpdate: (URL?, String?) -> Void
-        private var lastRequestedURL: URL?
-
-        init(onUpdate: @escaping (URL?, String?) -> Void) {
-            self.onUpdate = onUpdate
-        }
-
-        func load(url: URL, into webView: WKWebView) {
-            guard lastRequestedURL != url else { return }
-            lastRequestedURL = url
-            let request = URLRequest(url: url)
-            webView.load(request)
-        }
-
-        func forwardUpdate(from webView: WKWebView) {
-            if let currentURL = webView.url {
-                lastRequestedURL = currentURL
+    @MainActor
+    private func monitorNavigations() async {
+        updateState()
+        do {
+            for try await _ in page.navigations {
+                updateState()
             }
-            onUpdate(webView.url, webView.title)
+        } catch {
+            // Ignore navigation stream errors; state updates happen on successful events.
         }
+    }
 
-        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-            forwardUpdate(from: webView)
-        }
+    @MainActor
+    private func updateState() {
+        currentURL = page.url ?? currentURL ?? url
+        currentTitle = page.title
+        let list = page.backForwardList
+        canGoBack = !list.backList.isEmpty
+        canGoForward = !list.forwardList.isEmpty
+    }
 
-        func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError _: Error) {
-            forwardUpdate(from: webView)
-        }
+    @MainActor
+    private func reload() {
+        _ = page.reload()
+        updateState()
+    }
 
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError _: Error) {
-            forwardUpdate(from: webView)
-        }
+    @MainActor
+    private func goBack() {
+        guard let item = page.backForwardList.backList.last else { return }
+        _ = page.load(item)
+        updateState()
+    }
+
+    @MainActor
+    private func goForward() {
+        guard let item = page.backForwardList.forwardList.first else { return }
+        _ = page.load(item)
+        updateState()
     }
 }
