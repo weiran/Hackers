@@ -9,13 +9,14 @@ import Domain
 import SwiftUI
 
 @MainActor
-public final class LoginViewModel: ObservableObject {
-    @Published public var username: String
-    @Published public var password: String
-    @Published public private(set) var isAuthenticating: Bool
-    @Published public var showAlert: Bool
-    @Published public var isAuthenticated: Bool
-    @Published public var currentUsername: String?
+@Observable
+public final class LoginViewModel {
+    public var username: String
+    public var password: String
+    public private(set) var isAuthenticating: Bool
+    public var showAlert: Bool
+    public var isAuthenticated: Bool
+    public var currentUsername: String?
 
     public let textSize: TextSize
 

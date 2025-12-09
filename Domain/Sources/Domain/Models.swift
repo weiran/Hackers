@@ -5,8 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Combine
 import Foundation
+import Observation
 
 // MARK: - Voting System
 
@@ -118,16 +118,17 @@ public enum PostType: String, CaseIterable, Sendable {
     case bookmarks
 }
 
-public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
-    public let id: Int
+@Observable
+public final class Comment: @unchecked Sendable {
+    public nonisolated(unsafe) let id: Int
     public let age: String
     public let text: String
     public let by: String
     public var level: Int
     public var upvoteLink: String?
-    @Published public var upvoted: Bool
-    public var voteLinks: VoteLinks?
-    @Published public var visibility: CommentVisibilityType
+    public nonisolated(unsafe) var upvoted: Bool
+    public nonisolated(unsafe) var voteLinks: VoteLinks?
+    public var visibility: CommentVisibilityType
     public var parsedText: AttributedString?
 
     public init(
@@ -154,11 +155,14 @@ public final class Comment: ObservableObject, Hashable, @unchecked Sendable {
         self.parsedText = parsedText
     }
 
-    public static func == (lhs: Comment, rhs: Comment) -> Bool {
+}
+
+extension Comment: Hashable {
+    public nonisolated(unsafe) static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
     }
 
-    public func hash(into hasher: inout Hasher) {
+    public nonisolated(unsafe) func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }

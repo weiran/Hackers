@@ -17,17 +17,39 @@ import UIKit
 
 @MainActor
 struct MainContentView: View {
-    @EnvironmentObject private var navigationStore: NavigationStore
-    @StateObject private var sessionService: SessionService
-    @StateObject private var toastPresenter: ToastPresenter
-    @StateObject private var settingsViewModel = SettingsViewModel()
+    @Environment(NavigationStore.self) private var navigationStore
+    @Environment(SessionService.self) private var sessionService
+    @Environment(ToastPresenter.self) private var toastPresenter
+    @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
     @State private var showOnboarding = false
     private let onboardingCoordinator: OnboardingCoordinator
+    private var navigationPathBinding: Binding<NavigationPath> {
+        Binding(
+            get: { navigationStore.path },
+            set: { navigationStore.path = $0 }
+        )
+    }
+    private var detailPathBinding: Binding<[NavigationDetailDestination]> {
+        Binding(
+            get: { navigationStore.detailPath },
+            set: { navigationStore.detailPath = $0 }
+        )
+    }
+    private var showingLoginBinding: Binding<Bool> {
+        Binding(
+            get: { navigationStore.showingLogin },
+            set: { navigationStore.showingLogin = $0 }
+        )
+    }
+    private var showingSettingsBinding: Binding<Bool> {
+        Binding(
+            get: { navigationStore.showingSettings },
+            set: { navigationStore.showingSettings = $0 }
+        )
+    }
 
     init(container: DependencyContainer = .shared) {
-        _sessionService = StateObject(wrappedValue: container.makeSessionService())
-        _toastPresenter = StateObject(wrappedValue: container.makeToastPresenter())
         onboardingCoordinator = OnboardingCoordinator(
             onboardingUseCase: container.getOnboardingUseCase()
         )
@@ -37,16 +59,12 @@ struct MainContentView: View {
         Group {
             if UIDevice.current.userInterfaceIdiom == .pad {
                 AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
-                    .environmentObject(navigationStore)
-                    .environmentObject(sessionService)
             } else {
-                NavigationStack(path: $navigationStore.path) {
+                NavigationStack(path: navigationPathBinding) {
                     FeedView<NavigationStore>(
                         viewModel: feedViewModel,
-                        isSidebar: false,
+                        isSidebar: false
                     )
-                    .environmentObject(navigationStore)
-                    .environmentObject(sessionService)
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
                         case let .comments(postID):
@@ -55,10 +73,8 @@ struct MainContentView: View {
                                 return navigationStore.selectedPost
                             }()
                             CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
-                                .environmentObject(navigationStore)
-                                .environmentObject(sessionService)
                         case .settings:
-                            SettingsView<NavigationStore>(
+                            SettingsView(
                                 viewModel: settingsViewModel,
                                 isAuthenticated: sessionService.authenticationState == .authenticated,
                                 currentUsername: sessionService.username,
@@ -70,21 +86,17 @@ struct MainContentView: View {
                                 },
                                 onShowOnboarding: {
                                     showOnboarding = true
-                                },
+                                }
                             )
-                            .environmentObject(navigationStore)
-                            .environmentObject(sessionService)
-                            .environmentObject(toastPresenter)
                         }
                     }
                 }
             }
         }
-        .environmentObject(toastPresenter)
         .textScaling(for: settingsViewModel.textSize)
         .accentColor(.accentColor)
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
-        .sheet(isPresented: $navigationStore.showingLogin) {
+        .sheet(isPresented: showingLoginBinding) {
             LoginView(
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
@@ -96,12 +108,11 @@ struct MainContentView: View {
                 },
                 textSize: settingsViewModel.textSize
             )
-            .environmentObject(toastPresenter)
             .textScaling(for: settingsViewModel.textSize)
-            .toastOverlay(toastPresenter)
+                .toastOverlay(toastPresenter)
         }
-        .sheet(isPresented: $navigationStore.showingSettings) {
-            SettingsView<NavigationStore>(
+        .sheet(isPresented: showingSettingsBinding) {
+            SettingsView(
                 viewModel: settingsViewModel,
                 isAuthenticated: sessionService.authenticationState == .authenticated,
                 currentUsername: sessionService.username,
@@ -113,11 +124,8 @@ struct MainContentView: View {
                 },
                 onShowOnboarding: {
                     showOnboarding = true
-                },
+                }
             )
-            .environmentObject(navigationStore)
-            .environmentObject(sessionService)
-            .environmentObject(toastPresenter)
             .textScaling(for: settingsViewModel.textSize)
             .toastOverlay(toastPresenter)
         }
@@ -126,7 +134,6 @@ struct MainContentView: View {
                 .makeOnboardingView {
                     showOnboarding = false
                 }
-                .environmentObject(toastPresenter)
                 .textScaling(for: settingsViewModel.textSize)
                 .toastOverlay(toastPresenter)
         }
@@ -143,24 +150,28 @@ struct MainContentView: View {
 }
 
 struct AdaptiveSplitView: View {
-    @EnvironmentObject private var navigationStore: NavigationStore
-    @EnvironmentObject private var sessionService: SessionService
-    @StateObject var settingsViewModel: SettingsViewModel
+    @Environment(NavigationStore.self) private var navigationStore
+    @Environment(SessionService.self) private var sessionService
+    @State var settingsViewModel: SettingsViewModel
     let feedViewModel: FeedViewModel
+    private var detailPathBinding: Binding<[NavigationDetailDestination]> {
+        Binding(
+            get: { navigationStore.detailPath },
+            set: { navigationStore.detailPath = $0 }
+        )
+    }
 
     var body: some View {
         NavigationSplitView {
             // Sidebar - FeedView
             FeedView<NavigationStore>(
                 viewModel: feedViewModel,
-                isSidebar: true,
+                isSidebar: true
             )
-            .environmentObject(navigationStore)
-            .environmentObject(sessionService)
             .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {
             // Detail - CommentsView or empty state
-            NavigationStack(path: $navigationStore.detailPath) {
+            NavigationStack(path: detailPathBinding) {
                 if let embeddedURL = navigationStore.embeddedBrowserURL {
                     EmbeddedWebView(url: embeddedURL,
                                     onDismiss: { navigationStore.dismissEmbeddedBrowser() },
@@ -168,13 +179,9 @@ struct AdaptiveSplitView: View {
                         .id(embeddedURL.absoluteString)
                 } else if let selectedPost = navigationStore.selectedPost {
                     CommentsView<NavigationStore>(postID: selectedPost.id, initialPost: selectedPost)
-                        .environmentObject(navigationStore)
-                        .environmentObject(sessionService)
                         .id(selectedPost.id) // Add id to force re-render when post changes
                 } else if let selectedPostId = navigationStore.selectedPostId {
                     CommentsView<NavigationStore>(postID: selectedPostId, initialPost: nil)
-                        .environmentObject(navigationStore)
-                        .environmentObject(sessionService)
                         .id(selectedPostId)
                 } else {
                     EmptyDetailView()
@@ -202,9 +209,4 @@ struct EmptyDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-#Preview {
-    MainContentView()
-        .environmentObject(NavigationStore())
 }

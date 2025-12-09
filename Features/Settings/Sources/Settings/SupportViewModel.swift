@@ -7,10 +7,12 @@
 
 import Domain
 import Foundation
+import Observation
 import Shared
 
 @MainActor
-public final class SupportViewModel: ObservableObject, @unchecked Sendable {
+@Observable
+public final class SupportViewModel: @unchecked Sendable {
     public struct AlertInfo: Identifiable, Sendable {
         public let id = UUID()
         public let title: String
@@ -24,13 +26,13 @@ public final class SupportViewModel: ObservableObject, @unchecked Sendable {
 
     private let supportUseCase: any SupportUseCase
 
-    @Published public private(set) var subscriptionProduct: SupportProduct?
-    @Published public private(set) var tipProducts: [SupportProduct] = []
-    @Published public private(set) var isLoading: Bool = false
-    @Published public private(set) var isRestoring: Bool = false
-    @Published public private(set) var processingProductId: String?
-    @Published public private(set) var isSubscribed: Bool = false
-    @Published public var alertInfo: AlertInfo?
+    public private(set) var subscriptionProduct: SupportProduct?
+    public private(set) var tipProducts: [SupportProduct] = []
+    public private(set) var isLoading: Bool = false
+    public private(set) var isRestoring: Bool = false
+    public private(set) var processingProductId: String?
+    public private(set) var isSubscribed: Bool = false
+    public var alertInfo: AlertInfo?
 
     private var hasLoadedProducts = false
 

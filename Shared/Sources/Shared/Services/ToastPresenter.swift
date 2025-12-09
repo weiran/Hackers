@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import Observation
 import SwiftUI
 
 public enum ToastKind: Sendable, Equatable {
@@ -29,8 +30,9 @@ public struct ToastMessage: Identifiable, Equatable, Sendable {
 }
 
 @MainActor
-public final class ToastPresenter: ObservableObject {
-    @Published public private(set) var message: ToastMessage?
+@Observable
+public final class ToastPresenter {
+    public private(set) var message: ToastMessage?
 
     private var dismissTask: Task<Void, Never>?
 

@@ -12,10 +12,9 @@ import MessageUI
 import Shared
 import SwiftUI
 
-public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
+public struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
-    @EnvironmentObject private var navigationStore: NavigationStore
-    @EnvironmentObject private var toastPresenter: ToastPresenter
+    @Environment(ToastPresenter.self) private var toastPresenter
     @Environment(\.dismiss) private var dismiss
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
@@ -34,7 +33,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onShowOnboarding: @escaping () -> Void = {},
+        onShowOnboarding: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
@@ -105,7 +104,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                                 Spacer()
                                 if isAuthenticated {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(AppColors.success)
+                                        .foregroundStyle(AppColors.success)
                                         .accessibilityHidden(true)
                                 }
                             }
@@ -119,7 +118,6 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             onLogout: onLogout,
                             textSize: viewModel.textSize
                         )
-                        .environmentObject(toastPresenter)
                         .textScaling(for: viewModel.textSize)
                     }
                 }
@@ -130,13 +128,13 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                             Label("Text Size", systemImage: "textformat.size")
                             Spacer()
                             Text(viewModel.textSize.displayName)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
 
                         HStack {
                             Text("A")
                                 .scaledFont(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
 
                             Slider(
                                 value: Binding(
@@ -154,7 +152,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
 
                             Text("A")
                                 .scaledFont(.title2)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .padding(.vertical, 4)
@@ -194,7 +192,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
                         Label("Storage Used", systemImage: "externaldrive")
                         Spacer()
                         Text(viewModel.cacheUsageText)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)
                     Button(role: .destructive) {
@@ -234,7 +232,7 @@ public struct SettingsView<NavigationStore: NavigationStoreProtocol>: View {
         return HStack {
             Spacer()
             Text("Version \(appVersion ?? "1.0")")
-                .foregroundColor(.gray)
+                .foregroundStyle(.gray)
             Spacer()
         }
     }

@@ -10,13 +10,13 @@ import Domain
 import Shared
 import SwiftUI
 
-public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
+public struct FeedView<Store: NavigationStoreProtocol>: View {
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
     @State private var searchText: String
-    @EnvironmentObject private var navigationStore: NavigationStore
+    @Environment(Store.self) private var navigationStore
 
     let isSidebar: Bool
 
@@ -35,7 +35,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
-        isSidebar: Bool = false,
+        isSidebar: Bool = false
     ) {
         _viewModel = State(initialValue: viewModel)
         _selectedPostType = State(initialValue: viewModel.postType)
@@ -84,15 +84,15 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
             }
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
-            .onChange(of: searchText) { newValue in
+            .onChange(of: searchText) { _, newValue in
                 viewModel.updateSearchQuery(newValue)
             }
-            .onChange(of: viewModel.searchQuery) { newValue in
+            .onChange(of: viewModel.searchQuery) { _, newValue in
                 if newValue != searchText {
                     searchText = newValue
                 }
             }
-            .onChange(of: selectedPostType) { _ in
+            .onChange(of: selectedPostType) { _, _ in
                 // Clear selection when category changes to prevent stale sidebar selection
                 selectedPostId = nil
             }
@@ -340,7 +340,7 @@ public struct FeedView<NavigationStore: NavigationStoreProtocol>: View {
         } label: {
             Image(systemName: "gearshape")
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundStyle(.primary)
         }
         .accessibilityLabel("Settings")
     }
@@ -417,31 +417,45 @@ struct PostRowView: View {
     }
 
     var body: some View {
-        PostDisplayView(
-            post: post,
-            votingState: votingViewModel.votingState(for: post),
-            showPostText: false,
-            showThumbnails: showThumbnails,
-            compactMode: compactMode,
-            onThumbnailTap: onLinkTap,
-            onUpvoteTap: { await handleUpvoteTap() },
-            onUnvoteTap: { await handleUnvoteTap() },
-            onBookmarkTap: {
-                guard let onBookmarkToggle else { return post.isBookmarked }
-                return await onBookmarkToggle()
-            },
-            onCommentsTap: onCommentsTap
-        )
-        .contentShape(Rectangle())
-        .if(onCommentsTap != nil) { view in
-            view.onTapGesture {
-                onCommentsTap?()
+        if let onCommentsTap {
+            Button(action: onCommentsTap) {
+                PostDisplayView(
+                    post: post,
+                    votingState: votingViewModel.votingState(for: post),
+                    showPostText: false,
+                    showThumbnails: showThumbnails,
+                    compactMode: compactMode,
+                    onThumbnailTap: onLinkTap,
+                    onUpvoteTap: { await handleUpvoteTap() },
+                    onUnvoteTap: { await handleUnvoteTap() },
+                    onBookmarkTap: {
+                        guard let onBookmarkToggle else { return post.isBookmarked }
+                        return await onBookmarkToggle()
+                    },
+                    onCommentsTap: onCommentsTap
+                )
+                .contentShape(Rectangle())
             }
-        }
-        .if(onCommentsTap != nil) { view in
-            view
-                .accessibilityAddTraits(.isButton)
-                .accessibilityHint("Open comments")
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint("Open comments")
+        } else {
+            PostDisplayView(
+                post: post,
+                votingState: votingViewModel.votingState(for: post),
+                showPostText: false,
+                showThumbnails: showThumbnails,
+                compactMode: compactMode,
+                onThumbnailTap: onLinkTap,
+                onUpvoteTap: { await handleUpvoteTap() },
+                onUnvoteTap: { await handleUnvoteTap() },
+                onBookmarkTap: {
+                    guard let onBookmarkToggle else { return post.isBookmarked }
+                    return await onBookmarkToggle()
+                },
+                onCommentsTap: onCommentsTap
+            )
+            .contentShape(Rectangle())
         }
     }
 

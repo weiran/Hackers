@@ -8,9 +8,11 @@
 import Combine
 import Domain
 import Foundation
+import Observation
 import Shared
 import SwiftUI
 
+@MainActor
 @Observable
 public final class FeedViewModel: @unchecked Sendable {
     public var isLoadingMore = false
@@ -79,32 +81,31 @@ public final class FeedViewModel: @unchecked Sendable {
         )
 
         settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                guard let self else { return }
-                let currentValue = self.settingsUseCase.showThumbnails
-                if self.showThumbnails != currentValue {
-                    self.showThumbnails = currentValue
-                }
-                let compactValue = self.settingsUseCase.compactFeedDesign
-                if self.compactFeedDesign != compactValue {
-                    self.compactFeedDesign = compactValue
-                }
-                let rememberValue = self.settingsUseCase.rememberFeedCategory
-                if self.rememberFeedCategorySetting != rememberValue {
-                    self.rememberFeedCategorySetting = rememberValue
-                    if rememberValue {
-                        self.settingsUseCase.lastFeedCategory = self.postType
-                    } else {
-                        self.settingsUseCase.lastFeedCategory = nil
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    let currentValue = self.settingsUseCase.showThumbnails
+                    if self.showThumbnails != currentValue {
+                        self.showThumbnails = currentValue
+                    }
+                    let compactValue = self.settingsUseCase.compactFeedDesign
+                    if self.compactFeedDesign != compactValue {
+                        self.compactFeedDesign = compactValue
+                    }
+                    let rememberValue = self.settingsUseCase.rememberFeedCategory
+                    if self.rememberFeedCategorySetting != rememberValue {
+                        self.rememberFeedCategorySetting = rememberValue
+                        if rememberValue {
+                            self.settingsUseCase.lastFeedCategory = self.postType
+                        } else {
+                            self.settingsUseCase.lastFeedCategory = nil
+                        }
                     }
                 }
             }
 
         bookmarksObservation = NotificationCenter.default.publisher(for: .bookmarksDidChange)
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
-                guard let self else { return }
                 guard
                     let postId = notification.userInfo?["postId"] as? Int,
                     let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool

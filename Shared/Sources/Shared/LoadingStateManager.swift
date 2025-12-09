@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import Observation
 
+@MainActor
 @Observable
 public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
     public var data: T

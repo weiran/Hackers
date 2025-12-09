@@ -5,21 +5,42 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Combine
 import Domain
 import Foundation
+import Observation
 import Shared
 
-public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
+@MainActor
+@Observable
+public final class SettingsViewModel: @unchecked Sendable {
     private var settingsUseCase: any SettingsUseCase
+    private var hasLoadedSettings = false
 
-    @Published public var safariReaderMode: Bool = false
-    @Published public var openInDefaultBrowser: Bool = false
-    @Published public var showThumbnails: Bool = true
-    @Published public var rememberFeedCategory: Bool = false
-    @Published public var textSize: TextSize = .medium
-    @Published public var compactFeedDesign: Bool = false
-    @Published public var cacheUsageText: String = "Calculating…"
+    public var safariReaderMode: Bool = false {
+        didSet { propagateChangesIfNeeded(\.safariReaderMode, safariReaderMode) }
+    }
+
+    public var openInDefaultBrowser: Bool = false {
+        didSet { propagateChangesIfNeeded(\.openInDefaultBrowser, openInDefaultBrowser) }
+    }
+
+    public var showThumbnails: Bool = true {
+        didSet { propagateChangesIfNeeded(\.showThumbnails, showThumbnails) }
+    }
+
+    public var rememberFeedCategory: Bool = false {
+        didSet { propagateChangesIfNeeded(\.rememberFeedCategory, rememberFeedCategory) }
+    }
+
+    public var textSize: TextSize = .medium {
+        didSet { propagateChangesIfNeeded(\.textSize, textSize) }
+    }
+
+    public var compactFeedDesign: Bool = false {
+        didSet { propagateChangesIfNeeded(\.compactFeedDesign, compactFeedDesign) }
+    }
+
+    public var cacheUsageText: String = "Calculating…"
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
         self.settingsUseCase = settingsUseCase
@@ -35,56 +56,28 @@ public final class SettingsViewModel: ObservableObject, @unchecked Sendable {
         textSize = settingsUseCase.textSize
         compactFeedDesign = settingsUseCase.compactFeedDesign
 
-        // Set up observers for changes
-        setupBindings()
+        hasLoadedSettings = true
     }
 
-    private func setupBindings() {
-        // Use combine to sync changes back to the use case
-        $safariReaderMode
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.safariReaderMode = newValue
-            }
-            .store(in: &cancellables)
-
-        $openInDefaultBrowser
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.openInDefaultBrowser = newValue
-            }
-            .store(in: &cancellables)
-
-        $showThumbnails
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.showThumbnails = newValue
-            }
-            .store(in: &cancellables)
-
-        $rememberFeedCategory
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.rememberFeedCategory = newValue
-            }
-            .store(in: &cancellables)
-
-        $textSize
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.textSize = newValue
-            }
-            .store(in: &cancellables)
-
-        $compactFeedDesign
-            .dropFirst()
-            .sink { [weak self] newValue in
-                self?.settingsUseCase.compactFeedDesign = newValue
-            }
-            .store(in: &cancellables)
+    private func propagateChangesIfNeeded<Value>(_ keyPath: KeyPath<SettingsViewModel, Value>, _ value: Value) {
+        guard hasLoadedSettings else { return }
+        switch keyPath {
+        case \.safariReaderMode:
+            settingsUseCase.safariReaderMode = value as! Bool
+        case \.openInDefaultBrowser:
+            settingsUseCase.openInDefaultBrowser = value as! Bool
+        case \.showThumbnails:
+            settingsUseCase.showThumbnails = value as! Bool
+        case \.rememberFeedCategory:
+            settingsUseCase.rememberFeedCategory = value as! Bool
+        case \.textSize:
+            settingsUseCase.textSize = value as! TextSize
+        case \.compactFeedDesign:
+            settingsUseCase.compactFeedDesign = value as! Bool
+        default:
+            break
+        }
     }
-
-    private var cancellables = Set<AnyCancellable>()
 
     // User actions
     public func clearCache() {

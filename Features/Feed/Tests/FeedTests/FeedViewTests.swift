@@ -15,7 +15,7 @@ import Testing
 struct FeedViewTests {
     // Mock Navigation Store
     @MainActor
-    final class MockNavigationStore: @MainActor NavigationStoreProtocol, ObservableObject, @unchecked Sendable {
+    final class MockNavigationStore: @MainActor NavigationStoreProtocol, @unchecked Sendable {
         var selectedPost: Post?
         var selectedPostId: Int?
         var showingLogin: Bool = false

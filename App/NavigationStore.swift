@@ -7,6 +7,7 @@
 
 import Combine
 import Domain
+import Observation
 import Shared
 import SwiftUI
 import UIKit
@@ -20,16 +21,18 @@ enum NavigationDetailDestination: Hashable {
     case web(URL)
 }
 
-class NavigationStore: ObservableObject, NavigationStoreProtocol {
-    @Published var path: NavigationPath = .init()
-    @Published var selectedPost: Domain.Post?
-    @Published var selectedPostId: Int?
-    @Published var selectedPostType: Domain.PostType = .news
-    @Published var showingLogin = false
-    @Published var showingSettings = false
-    @Published var pendingPostId: Int?
-    @Published var embeddedBrowserURL: URL?
-    @Published var detailPath: [NavigationDetailDestination] = []
+@MainActor
+@Observable
+class NavigationStore: NavigationStoreProtocol {
+    var path: NavigationPath = .init()
+    var selectedPost: Domain.Post?
+    var selectedPostId: Int?
+    var selectedPostType: Domain.PostType = .news
+    var showingLogin = false
+    var showingSettings = false
+    var pendingPostId: Int?
+    var embeddedBrowserURL: URL?
+    var detailPath: [NavigationDetailDestination] = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -37,8 +40,7 @@ class NavigationStore: ObservableObject, NavigationStoreProtocol {
         // Listen for refresh notifications
         NotificationCenter.default.publisher(for: Notification.Name.refreshRequired)
             .sink { [weak self] _ in
-                // Trigger refresh
-                self?.objectWillChange.send()
+                self?.path = self?.path ?? .init()
             }
             .store(in: &cancellables)
     }

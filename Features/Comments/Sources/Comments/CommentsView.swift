@@ -11,7 +11,7 @@ import Foundation
 import Shared
 import SwiftUI
 
-public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
+public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
@@ -19,7 +19,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var pendingCommentID: Int?
     @State private var listAnimationsEnabled = false
-    @EnvironmentObject private var navigationStore: NavigationStore
+    @Environment(Store.self) private var navigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -152,7 +152,9 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         } message: {
             Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
         }
-        .onAppear { votingViewModel.navigationStore = navigationStore }
+        .task { @MainActor in
+            votingViewModel.navigationStore = navigationStore
+        }
     }
 
     private func handleLinkTap() {
@@ -188,14 +190,14 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
         }
 
         if wasVisible, !isCommentVisibleOnScreen(comment) {
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 withAnimation(.easeInOut(duration: 0.3)) {
                     scrollTo("comment-\(comment.id)")
                 }
                 listAnimationsEnabled = false
             }
         } else {
-            DispatchQueue.main.async { listAnimationsEnabled = false }
+            Task { @MainActor in listAnimationsEnabled = false }
         }
     }
 
@@ -205,7 +207,7 @@ public struct CommentsView<NavigationStore: NavigationStoreProtocol>: View {
             viewModel.hideCommentBranch(comment)
         }
 
-        DispatchQueue.main.async {
+        Task { @MainActor in
             if let root = collapsedRoot {
                 withAnimation(.easeInOut(duration: 0.3)) {
                     scrollTo("comment-\(root.id)")

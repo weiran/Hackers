@@ -5,11 +5,14 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Shared
 import SwiftUI
 
 @main
 struct HackersApp: App {
-    @StateObject private var navigationStore = NavigationStore()
+    @State private var navigationStore = NavigationStore()
+    @State private var sessionService = DependencyContainer.shared.makeSessionService()
+    @State private var toastPresenter = DependencyContainer.shared.makeToastPresenter()
 
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -17,7 +20,9 @@ struct HackersApp: App {
     var body: some Scene {
         WindowGroup {
             MainContentView()
-                .environmentObject(navigationStore)
+                .environment(navigationStore)
+                .environment(sessionService)
+                .environment(toastPresenter)
                 .onAppear {
                     setupAppearance()
                 }

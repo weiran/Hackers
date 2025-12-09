@@ -8,9 +8,11 @@
 import Combine
 import Domain
 import Foundation
+import Observation
 import Shared
 import SwiftUI
 
+@MainActor
 @Observable
 public final class CommentsViewModel: @unchecked Sendable {
     public let postID: Int
@@ -66,7 +68,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         commentsLoader.setLoadFunction(
             shouldSkipLoad: { [weak self] comments in
                 guard let self else { return false }
-                return !comments.isEmpty && post != nil
+                return !comments.isEmpty
             },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
@@ -76,26 +78,29 @@ public final class CommentsViewModel: @unchecked Sendable {
         updateVisibleComments()
 
         settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                guard let self else { return }
-                let currentValue = settingsUseCase.showThumbnails
-                if self.showThumbnails != currentValue {
-                    self.showThumbnails = currentValue
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    let currentValue = settingsUseCase.showThumbnails
+                    if self.showThumbnails != currentValue {
+                        self.showThumbnails = currentValue
+                    }
                 }
             }
 
         bookmarksObservation = NotificationCenter.default.publisher(for: .bookmarksDidChange)
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let self else { return }
                 guard let postId = notification.userInfo?["postId"] as? Int,
                       postId == self.postID,
                       let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
                 else { return }
-                if var currentPost = self.post {
-                    currentPost.isBookmarked = isBookmarked
-                    self.post = currentPost
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if var currentPost = self.post {
+                        currentPost.isBookmarked = isBookmarked
+                        self.post = currentPost
+                    }
                 }
             }
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol AuthenticationServiceProtocol: ObservableObject {
+public protocol AuthenticationServiceProtocol: AnyObject {
     var isAuthenticated: Bool { get }
     var username: String? { get }
 

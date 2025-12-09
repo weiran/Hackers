@@ -8,10 +8,12 @@
 import Combine
 import Domain
 import Foundation
+import Observation
 
 @MainActor
-public final class SessionService: ObservableObject, AuthenticationServiceProtocol {
-    @Published private var user: Domain.User?
+@Observable
+public final class SessionService: AuthenticationServiceProtocol {
+    private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
     private nonisolated(unsafe) var logoutObserver: NSObjectProtocol?
 

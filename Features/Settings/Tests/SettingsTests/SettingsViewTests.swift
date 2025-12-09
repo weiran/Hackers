@@ -54,7 +54,7 @@ struct SettingsViewTests {
 
     @Test("SettingsView creation")
     func settingsViewCreation() {
-        let settingsView = SettingsView<MockNavigationStore>()
+        let settingsView = SettingsView()
         #expect(settingsView != nil)
     }
 
