@@ -21,6 +21,7 @@ private actor LoadCounter {
     }
 }
 
+@MainActor
 @Suite("LoadingStateManager Tests")
 struct LoadingStateManagerTests {
     @Test("Initial state is correct")

@@ -13,6 +13,7 @@ import Observation
 @testable import Settings
 import Testing
 
+@MainActor
 @Suite("SettingsViewModel Tests")
 struct SettingsViewModelTests {
     let mockSettingsUseCase = MockSettingsUseCase()
