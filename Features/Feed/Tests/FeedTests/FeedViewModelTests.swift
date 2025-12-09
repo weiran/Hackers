@@ -145,7 +145,7 @@ struct FeedViewModelTests {
         #expect(viewModel.showThumbnails == true)
 
         settingsUseCase.showThumbnails = false
-        try await Task.sleep(nanoseconds: 10_000_000)
+        try await Task.sleep(for: .milliseconds(10))
 
         #expect(viewModel.showThumbnails == false)
     }
@@ -273,7 +273,7 @@ struct FeedViewModelTests {
         #expect(viewModel.posts.first?.isBookmarked == false)
 
         _ = await bookmarksController.toggle(post: viewModel.posts[0])
-        try await Task.sleep(nanoseconds: 20_000_000)
+        try await Task.sleep(for: .milliseconds(20))
 
         #expect(viewModel.posts.first?.isBookmarked == true)
     }
@@ -311,7 +311,7 @@ private func waitForSearchCompletion(of viewModel: FeedViewModel, timeout: TimeI
     let deadline = Date().addingTimeInterval(timeout)
     while viewModel.isSearchInProgress && Date() < deadline {
         let nanos = UInt64(pollInterval * 1_000_000_000)
-        try? await Task.sleep(nanoseconds: nanos)
+        try? await Task.sleep(for: .nanoseconds(nanos))
     }
     return viewModel.isSearchInProgress == false
 }

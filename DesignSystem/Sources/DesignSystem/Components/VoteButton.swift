@@ -29,18 +29,18 @@ public struct VoteButton: View {
                 if votingState.isVoting {
                     ProgressView()
                         .scaleEffect(style.progressScale)
-                        .foregroundColor(style.foregroundColor(for: votingState))
+                        .foregroundStyle(style.foregroundColor(for: votingState))
                 } else {
                     Image(systemName: iconName)
                         .scaledFont(style.iconFont)
-                        .foregroundColor(style.foregroundColor(for: votingState))
+                        .foregroundStyle(style.foregroundColor(for: votingState))
                         .accessibilityHidden(true)
                 }
 
                 if style.showScore, let score = votingState.score {
                     Text("\(score)")
                         .scaledFont(style.scoreFont)
-                        .foregroundColor(style.foregroundColor(for: votingState))
+                        .foregroundStyle(style.foregroundColor(for: votingState))
                 }
             }
         }

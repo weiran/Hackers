@@ -32,7 +32,7 @@ struct OnboardingItemView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(item.title)
                 .scaledFont(.headline)
-                .fontWeight(.medium)
+                .bold()
 
             Text(item.subtitle)
                 .scaledFont(.body)

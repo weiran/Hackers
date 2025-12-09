@@ -25,14 +25,14 @@ public struct VoteIndicator: View {
             if style.showScore, let score = votingState.score {
                 Text("\(score)")
                     .scaledFont(style.scoreFont)
-                    .foregroundColor(scoreColor)
+                    .foregroundStyle(scoreColor)
                     .contentTransition(.numericText())
                     .animation(.easeInOut(duration: 0.2), value: score)
             }
 
             Image(systemName: iconName)
                 .scaledFont(style.iconFont)
-                .foregroundColor(iconColor)
+                .foregroundStyle(iconColor)
                 .scaleEffect(style.iconScale)
                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: votingState.isUpvoted)
                 .accessibilityHidden(true)

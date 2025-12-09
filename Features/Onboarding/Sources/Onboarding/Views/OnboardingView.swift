@@ -18,7 +18,7 @@ public struct OnboardingView: View {
     }
 
     public var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(spacing: 32) {
@@ -39,22 +39,22 @@ public struct OnboardingView: View {
             .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: onDismiss) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .medium))
+                        Button(action: onDismiss) {
+                            Image(systemName: "xmark")
+                                .font(.headline)
+                        }
+                        .foregroundStyle(AppColors.appTintColor)
+                        .accessibilityLabel("Close")
                     }
-                    .foregroundStyle(AppColors.appTintColor)
-                    .accessibilityLabel("Close")
                 }
             }
-        }
     }
 
     private var headerView: some View {
         VStack(spacing: 12) {
             Text(onboardingData.title)
                 .scaledFont(.largeTitle)
-                .fontWeight(.bold)
+                .bold()
                 .multilineTextAlignment(.center)
         }
     }
@@ -87,7 +87,7 @@ public struct OnboardingView: View {
                     .frame(height: 50)
                     .background(AppColors.appTintColor)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(.rect(cornerRadius: 12))
             .buttonStyle(.plain)
         }
     }

@@ -7,13 +7,14 @@
 
 import DesignSystem
 import Domain
+import Observation
 import SwiftUI
 
 public struct SupportView: View {
-    @StateObject private var viewModel: SupportViewModel
+    @State private var viewModel: SupportViewModel
 
     public init(viewModel: SupportViewModel = SupportViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
     }
 
     public var body: some View {
@@ -76,13 +77,13 @@ public struct SupportView: View {
 
                     Text("Become a monthly supporter to help me keep improving Hackers. You can manage or cancel the subscription anytime in your App Store settings.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     Button(action: { viewModel.purchase(product: product) }) {
                         HStack {
                             Image(systemName: "heart.fill")
                             Text("Subscribe for \(product.displayPrice)/month")
-                                .fontWeight(.semibold)
+                                .bold()
                         }
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
@@ -101,7 +102,7 @@ public struct SupportView: View {
 
                     Text("The subscription renews automatically each month until you cancel. Apple handles billing securely, and you'll receive a confirmation for every renewal.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
             } else if viewModel.isLoading {
@@ -109,7 +110,7 @@ public struct SupportView: View {
             } else {
                 Text("Subscription currently unavailable. Pull to refresh and try again.")
                     .font(.footnote)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -122,28 +123,28 @@ public struct SupportView: View {
                 } else {
                     Text("Tips are currently unavailable. Pull to refresh and try again.")
                         .font(.footnote)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             } else {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("One-off tips are perfect if you prefer to chip in now and then. Choose whichever amount feels right.")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
 
                     ForEach(viewModel.tipProducts, id: \.id) { product in
                         Button(action: { viewModel.purchase(product: product) }) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(product.displayName)
-                                        .fontWeight(.semibold)
+                                        .bold()
                                     Text(tipDescription(for: product))
                                         .font(.footnote)
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                         .lineLimit(2)
                                 }
                                 Spacer()
                                 Text(product.displayPrice)
-                                    .fontWeight(.semibold)
+                                    .bold()
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
@@ -170,7 +171,7 @@ public struct SupportView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Image(systemName: "heart.circle.fill")
-                    .foregroundColor(AppColors.appTintColor)
+                    .foregroundStyle(AppColors.appTintColor)
                     .imageScale(.large)
                 Text("Thank you for supporting Hackers!")
                     .font(.title3.weight(.semibold))
@@ -179,11 +180,11 @@ public struct SupportView: View {
             if let product {
                 Text("Your \(product.displayName) subscription keeps the app running smoothly and lets me focus on polishing new features.")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else {
                 Text("Your monthly support keeps the app running smoothly and lets me focus on polishing new features.")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
 
             Button {
@@ -194,7 +195,7 @@ public struct SupportView: View {
                 HStack {
                     Image(systemName: "arrow.up.right.square")
                     Text("Manage Subscription")
-                        .fontWeight(.semibold)
+                        .bold()
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)

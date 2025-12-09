@@ -6,6 +6,7 @@
 //
 
 import Shared
+import Observation
 import SwiftUI
 
 public struct AppLoadingStateView: View {
@@ -93,7 +94,7 @@ public struct ToastBanner: View {
 
             Text(toast.text)
                 .scaledFont(.callout)
-                .fontWeight(.semibold)
+                .bold()
                 .foregroundStyle(.primary)
         }
         .padding(.horizontal, 16)
@@ -120,11 +121,11 @@ public struct ToastBanner: View {
 }
 
 private struct ToastOverlayModifier: ViewModifier {
-    @ObservedObject private var presenter: ToastPresenter
+    @Bindable private var presenter: ToastPresenter
     private let isActive: Bool
 
     init(presenter: ToastPresenter, isActive: Bool) {
-        self.presenter = presenter
+        _presenter = Bindable(wrappedValue: presenter)
         self.isActive = isActive
     }
 

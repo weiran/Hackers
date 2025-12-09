@@ -24,7 +24,7 @@ public struct AppTextField: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.subheadline)
-                .fontWeight(.medium)
+                .bold()
                 .foregroundStyle(.secondary)
                 .padding(.leading, 4)
 
@@ -38,17 +38,15 @@ public struct AppTextField: View {
             .font(.body)
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(
+            .background(AppFieldTheme.background(for: colorScheme))
+            .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(AppFieldTheme.background(for: colorScheme))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(
-                                AppFieldTheme.borderColor(for: colorScheme, isFocused: isFocused),
-                                lineWidth: AppFieldTheme.borderWidth(isFocused: isFocused)
-                            ),
-                    ),
+                    .strokeBorder(
+                        AppFieldTheme.borderColor(for: colorScheme, isFocused: isFocused),
+                        lineWidth: AppFieldTheme.borderWidth(isFocused: isFocused)
+                    )
             )
+            .clipShape(.rect(cornerRadius: 12))
             .focused($isFocused)
         }
         .padding(.horizontal, 20)

@@ -378,7 +378,7 @@ struct SettingsViewModelTests {
         var iterations = 0
         while !predicate() && iterations < timeoutMilliseconds {
             iterations += 1
-            try? await Task.sleep(nanoseconds: 5_000_000)
+            try? await Task.sleep(for: .milliseconds(5))
         }
         if iterations == timeoutMilliseconds {
             Issue.record("Timed out waiting for condition")

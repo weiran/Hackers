@@ -26,7 +26,7 @@ class OpenInViewController: UIViewController {
                        let id = Int(idString),
                        let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)")
                     {
-                        DispatchQueue.main.async {
+                        Task { @MainActor in
                             self.openURL(openInURL)
                             self.close()
                         }

@@ -37,7 +37,7 @@ public enum ReviewPromptController {
         }
 
         if shouldRequest {
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                     SKStoreReviewController.requestReview(in: windowScene)
                     UserDefaults.standard.set(Date(), forKey: lastRequestTimeKey)

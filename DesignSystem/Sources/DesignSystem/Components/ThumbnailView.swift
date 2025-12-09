@@ -36,7 +36,7 @@ public struct ThumbnailView: View {
     private var placeholderImage: some View {
         Image(systemName: "safari")
             .font(.title2)
-            .foregroundColor(.secondary)
+            .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.secondary.opacity(0.1))
     }

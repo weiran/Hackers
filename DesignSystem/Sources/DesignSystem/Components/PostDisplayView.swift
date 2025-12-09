@@ -61,15 +61,15 @@ public struct PostDisplayView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
                 // Thumbnail with proper loading
-                ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                    .frame(width: 55, height: 55)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        onThumbnailTap?()
-                    }
-                    .accessibilityAddTraits(.isButton)
-                    .accessibilityLabel("Open link")
+                Button(action: { onThumbnailTap?() }) {
+                    ThumbnailView(url: post.url, isEnabled: showThumbnails)
+                        .frame(width: 55, height: 55)
+                        .clipShape(.rect(cornerRadius: 16))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel("Open link")
 
                 VStack(alignment: .leading, spacing: 6) {
                     if compactMode {
@@ -80,18 +80,18 @@ public struct PostDisplayView: View {
                             HStack(spacing: 6) {
                                 Text(truncatedHost(host).uppercased())
                                     .scaledFont(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
 
                                 Text("•")
                                     .scaledFont(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
 
                                 inlineUpvoteStat
 
                                 Text("•")
                                     .scaledFont(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
 
                                 inlineCommentsStat
                             }
@@ -102,7 +102,7 @@ public struct PostDisplayView: View {
 
                                 Text("•")
                                     .scaledFont(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
 
                                 inlineCommentsStat
                             }
@@ -114,7 +114,7 @@ public struct PostDisplayView: View {
                         {
                             Text(truncatedHost(host).uppercased())
                                 .scaledFont(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .lineLimit(1)
                         }
                     }
@@ -122,7 +122,7 @@ public struct PostDisplayView: View {
                     // Title
                     Text(post.title)
                         .scaledFont(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Metadata row (only in normal mode)
@@ -142,30 +142,30 @@ public struct PostDisplayView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .onChange(of: post.id) { _ in
+        .onChange(of: post.id) { _, _ in
             displayedScore = post.score
             displayedUpvoted = post.upvoted
             displayedBookmarked = post.isBookmarked
             displayedVoteLinks = post.voteLinks
         }
-        .onChange(of: post.score) { newValue in
+        .onChange(of: post.score) { _, newValue in
             displayedScore = newValue
         }
-        .onChange(of: post.upvoted) { newValue in
+        .onChange(of: post.upvoted) { _, newValue in
             displayedUpvoted = newValue
         }
-        .onChange(of: post.isBookmarked) { newValue in
+        .onChange(of: post.isBookmarked) { _, newValue in
             displayedBookmarked = newValue
         }
-        .onChange(of: post.voteLinks) { newValue in
+        .onChange(of: post.voteLinks) { _, newValue in
             displayedVoteLinks = newValue
         }
-        .onChange(of: votingState?.score) { newValue in
+        .onChange(of: votingState?.score) { _, newValue in
             if let newValue {
                 displayedScore = newValue
             }
         }
-        .onChange(of: votingState?.isUpvoted) { newValue in
+        .onChange(of: votingState?.isUpvoted) { _, newValue in
             if let newValue {
                 displayedUpvoted = newValue
             }
@@ -181,10 +181,10 @@ public struct PostDisplayView: View {
         return HStack(spacing: 3) {
             Image(systemName: iconName)
                 .scaledFont(.caption2)
-                .foregroundColor(color)
+                .foregroundStyle(color)
             Text("\(score)")
                 .scaledFont(.caption)
-                .foregroundColor(color)
+                .foregroundStyle(color)
                 .contentTransition(.numericText())
                 .animation(.easeInOut(duration: 0.2), value: score)
         }
@@ -194,10 +194,10 @@ public struct PostDisplayView: View {
         HStack(spacing: 3) {
             Image(systemName: "message")
                 .scaledFont(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Text("\(post.commentsCount)")
                 .scaledFont(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -408,19 +408,19 @@ public struct PostDisplayView: View {
             if let iconName {
                 Image(systemName: iconName)
                     .scaledFont(.caption2)
-                    .foregroundColor(textColor)
+                    .foregroundStyle(textColor)
                     .frame(width: iconDimension, height: iconDimension)
             }
             if let value = numericValue {
                 Text(text)
                     .scaledFont(.caption)
-                    .foregroundColor(textColor)
+                    .foregroundStyle(textColor)
                     .contentTransition(.numericText())
                     .animation(.easeInOut(duration: 0.2), value: value)
             } else {
                 Text(text)
                     .scaledFont(.caption)
-                    .foregroundColor(textColor)
+                    .foregroundStyle(textColor)
             }
         }
         .padding(.vertical, 6)

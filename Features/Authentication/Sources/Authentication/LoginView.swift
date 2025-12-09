@@ -11,10 +11,10 @@ import Shared
 import SwiftUI
 
 public struct LoginView: View {
-    @StateObject private var viewModel: LoginViewModel
+    @State private var viewModel: LoginViewModel
     @FocusState private var focusedField: Field?
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var toastPresenter: ToastPresenter
+    @Environment(ToastPresenter.self) private var toastPresenter
 
     private enum Field {
         case username, password
@@ -34,11 +34,11 @@ public struct LoginView: View {
             onLogout: onLogout,
             textSize: textSize
         )
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
     }
 
     public init(viewModel: LoginViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -103,7 +103,7 @@ public struct LoginView: View {
 
                     Text("Hacker News")
                         .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .bold()
                         .foregroundStyle(.primary)
                 }
             }
@@ -169,15 +169,13 @@ public struct LoginView: View {
 
                         Text(viewModel.isAuthenticating ? "Signing in..." : "Sign In")
                             .font(.headline)
-                            .fontWeight(.semibold)
+                            .bold()
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .foregroundColor(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppGradients.primaryButton(isEnabled: viewModel.isLoginEnabled))
-                    )
+                    .foregroundStyle(.white)
+                    .background(AppGradients.primaryButton(isEnabled: viewModel.isLoginEnabled))
+                    .clipShape(.rect(cornerRadius: 16))
                     .scaleEffect(viewModel.isAuthenticating ? 0.95 : 1.0)
                     .animation(.easeInOut(duration: 0.1), value: viewModel.isAuthenticating)
                 }
@@ -208,7 +206,7 @@ public struct LoginView: View {
 
                     Text(viewModel.currentUsername ?? "")
                         .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .bold()
                         .foregroundStyle(.primary)
                 }
             }
@@ -225,15 +223,13 @@ public struct LoginView: View {
 
                         Text("Sign Out")
                             .font(.headline)
-                            .fontWeight(.semibold)
+                            .bold()
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .foregroundColor(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppGradients.destructiveButton())
-                    )
+                    .foregroundStyle(.white)
+                    .background(AppGradients.destructiveButton())
+                    .clipShape(.rect(cornerRadius: 16))
                 }
                 .padding(.horizontal, 20)
             }

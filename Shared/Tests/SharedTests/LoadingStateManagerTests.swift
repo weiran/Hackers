@@ -172,7 +172,7 @@ struct LoadingStateManagerTests {
             loadData: {
                 let count = await loadCounter.increment()
                 // Simulate some async work
-                try await Task.sleep(nanoseconds: 10_000_000) // 10ms
+                try await Task.sleep(for: .milliseconds(10))
                 return ["concurrent_item\(count)"]
             },
         )

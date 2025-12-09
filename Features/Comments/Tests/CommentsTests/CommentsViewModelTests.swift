@@ -145,7 +145,7 @@ struct CommentsViewModelTests {
         }
 
         // Brief delay to ensure first load has started
-        try? await Task.sleep(nanoseconds: 10_000_000) // 0.01 seconds
+        try? await Task.sleep(for: .milliseconds(10))
 
         // When - Try to load again while first load is in progress
         await sut.loadComments()
@@ -204,7 +204,7 @@ struct CommentsViewModelTests {
         #expect(viewModel.showThumbnails == false)
 
         settingsUseCase.showThumbnails = true
-        try await Task.sleep(nanoseconds: 10_000_000)
+        try await Task.sleep(for: .milliseconds(10))
 
         #expect(viewModel.showThumbnails == true)
     }
@@ -550,7 +550,7 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
     func getPost(id: Int) async throws -> Post {
         getPostCallCount += 1
         if shouldDelay {
-            try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            try await Task.sleep(for: .milliseconds(100))
         }
         if shouldThrowError {
             throw MockError.testError

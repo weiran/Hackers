@@ -8,6 +8,7 @@
 import DesignSystem
 import Domain
 import Foundation
+import Observation
 import Shared
 import SwiftUI
 import UIKit
@@ -128,10 +129,10 @@ struct CommentsContentView: View {
                 .transaction { transaction in
                     transaction.disablesAnimations = !listAnimationsEnabled
                 }
-                .onChange(of: pendingCommentID) { _ in
+                .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(with: proxy)
                 }
-                .onChange(of: viewModel.visibleComments) { _ in
+                .onChange(of: viewModel.visibleComments) { _, _ in
                     scrollToPendingComment(with: proxy)
                 }
             }
@@ -142,7 +143,7 @@ struct CommentsContentView: View {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
-        DispatchQueue.main.async {
+        Task { @MainActor in
             withAnimation(.easeInOut) {
                 proxy.scrollTo("comment-\(targetID)", anchor: .top)
             }
@@ -225,18 +226,20 @@ struct PostHeader: View {
     let onBookmarkToggle: @Sendable () async -> Bool
 
     var body: some View {
-        PostDisplayView(
-            post: post,
-            votingState: votingViewModel.votingState(for: post),
-            showPostText: true,
-            showThumbnails: showThumbnails,
-            onThumbnailTap: { onLinkTap() },
-            onUpvoteTap: { await handleUpvote() },
-            onUnvoteTap: { await handleUnvote() },
-            onBookmarkTap: { await onBookmarkToggle() }
-        )
-        .contentShape(Rectangle())
-        .onTapGesture { onLinkTap() }
+        Button(action: onLinkTap) {
+            PostDisplayView(
+                post: post,
+                votingState: votingViewModel.votingState(for: post),
+                showPostText: true,
+                showThumbnails: showThumbnails,
+                onThumbnailTap: { onLinkTap() },
+                onUpvoteTap: { await handleUpvote() },
+                onUnvoteTap: { await handleUnvote() },
+                onBookmarkTap: { await onBookmarkToggle() }
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
         .contextMenu {
             VotingContextMenuItems.postVotingMenuItems(
                 for: post,
@@ -292,7 +295,7 @@ struct PostHeader: View {
 }
 
 struct CommentRow: View {
-    @ObservedObject var comment: Comment
+    @Bindable var comment: Comment
     let post: Post
     let votingViewModel: VotingViewModel
     let onToggle: () -> Void
@@ -318,45 +321,47 @@ struct CommentRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(comment.by)
-                    .scaledFont(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(comment.by == post.by ? AppColors.appTintColor : .primary)
-                Text(comment.age)
-                    .scaledFont(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                if comment.upvoted {
-                    VoteIndicator(
-                        votingState: VotingState(
-                            isUpvoted: comment.upvoted,
-                            score: nil,
-                            canVote: comment.voteLinks?.upvote != nil,
-                            canUnvote: comment.voteLinks?.unvote != nil,
-                            isVoting: votingViewModel.isVoting,
-                            error: votingViewModel.lastError,
-                        ),
-                        style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
-                    )
+        Button(action: onToggle) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(comment.by)
+                        .scaledFont(.subheadline)
+                        .bold()
+                        .foregroundStyle(comment.by == post.by ? AppColors.appTintColor : .primary)
+                    Text(comment.age)
+                        .scaledFont(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    if comment.upvoted {
+                        VoteIndicator(
+                            votingState: VotingState(
+                                isUpvoted: comment.upvoted,
+                                score: nil,
+                                canVote: comment.voteLinks?.upvote != nil,
+                                canUnvote: comment.voteLinks?.unvote != nil,
+                                isVoting: votingViewModel.isVoting,
+                                error: votingViewModel.lastError,
+                            ),
+                            style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
+                        )
+                    }
+                    if comment.visibility == .compact {
+                        Image(systemName: "chevron.down")
+                            .scaledFont(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                    }
                 }
-                if comment.visibility == .compact {
-                    Image(systemName: "chevron.down")
-                        .scaledFont(.caption)
-                        .foregroundColor(.secondary)
-                        .accessibilityHidden(true)
+                if comment.visibility == .visible {
+                    Text(styledText(for: textScaling))
+                        .foregroundStyle(.primary)
                 }
             }
-            if comment.visibility == .visible {
-                Text(styledText(for: textScaling))
-                    .foregroundColor(.primary)
-            }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .listRowInsets([.top, .bottom, .trailing], 16)
         .listRowInsets([.leading], CGFloat((comment.level + 1) * 16))
-        .contentShape(Rectangle())
-        .onTapGesture { onToggle() }
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(comment.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .contextMenu {
@@ -515,16 +520,18 @@ struct ToolbarTitle: View {
     let onTap: () -> Void
 
     var body: some View {
-        HStack {
-            ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                .frame(width: 33, height: 33)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            Text(post.title)
-                .scaledFont(.headline)
-                .lineLimit(1)
-                .truncationMode(.tail)
+        Button(action: onTap) {
+            HStack {
+                ThumbnailView(url: post.url, isEnabled: showThumbnails)
+                    .frame(width: 33, height: 33)
+                    .clipShape(.rect(cornerRadius: 10))
+                Text(post.title)
+                    .scaledFont(.headline)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
         }
-        .onTapGesture { onTap() }
+        .buttonStyle(.plain)
         .accessibilityAddTraits(.isButton)
         .accessibilityHint("Open link")
         .opacity(showTitle ? 1.0 : 0.0)

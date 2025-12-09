@@ -16,7 +16,7 @@ class ActionViewController: OpenInViewController {
     }
 
     override func error() {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             self.infoLabel.isHidden = false
         }
     }
