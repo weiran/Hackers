@@ -37,11 +37,25 @@ struct OnboardingRepositoryTests {
         #expect(repository.shouldShowOnboarding(currentVersion: "5.2.1", forceShow: false) == false)
     }
 
+    @Test("Revision bump does not retrigger onboarding")
+    func revisionBumpDoesNotRetrigger() {
+        let store = MockStore(lastShownVersion: "5.2.1")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2.2", forceShow: false) == false)
+    }
+
     @Test("Minor updates retrigger onboarding once")
     func minorUpdateRetriggersOnce() {
         let store = MockStore(lastShownVersion: "5.1.2")
         let repository = OnboardingRepository(versionStore: store, processArguments: [])
         #expect(repository.shouldShowOnboarding(currentVersion: "5.2.0", forceShow: false))
+    }
+
+    @Test("Minor bump retriggers onboarding even without patch component")
+    func minorBumpWithoutPatchComponentRetriggers() {
+        let store = MockStore(lastShownVersion: "5.2.1")
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.3", forceShow: false))
     }
 
     @Test("Major updates retrigger onboarding")
