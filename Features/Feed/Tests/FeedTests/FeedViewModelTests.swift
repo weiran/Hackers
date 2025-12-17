@@ -416,7 +416,7 @@ private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
-    var openInDefaultBrowser: Bool = false
+    var linkBrowserMode: LinkBrowserMode = .inAppBrowser
     private var storedShowThumbnails: Bool
     private var storedRememberFeedCategory: Bool
     private var storedLastFeedCategory: PostType?

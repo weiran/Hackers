@@ -73,6 +73,8 @@ struct MainContentView: View {
                                 return navigationStore.selectedPost
                             }()
                             CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
+                        case let .postBrowser(post):
+                            PostLinkBrowserView(post: post)
                         case .settings:
                             SettingsView(
                                 viewModel: settingsViewModel,

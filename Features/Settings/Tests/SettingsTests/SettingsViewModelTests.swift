@@ -25,7 +25,7 @@ struct SettingsViewModelTests {
 
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         private var _safariReaderMode = false
-        private var _openInDefaultBrowser = false
+        private var _linkBrowserMode: LinkBrowserMode = .customBrowser
         private var _showThumbnails = true
         private var _rememberFeedCategory = false
         private var _lastFeedCategory: PostType?
@@ -49,14 +49,14 @@ struct SettingsViewModelTests {
             }
         }
 
-        var openInDefaultBrowser: Bool {
+        var linkBrowserMode: LinkBrowserMode {
             get {
-                getterCallCounts["openInDefaultBrowser", default: 0] += 1
-                return _openInDefaultBrowser
+                getterCallCounts["linkBrowserMode", default: 0] += 1
+                return _linkBrowserMode
             }
             set {
-                setterCallCounts["openInDefaultBrowser", default: 0] += 1
-                _openInDefaultBrowser = newValue
+                setterCallCounts["linkBrowserMode", default: 0] += 1
+                _linkBrowserMode = newValue
             }
         }
 
@@ -123,6 +123,7 @@ struct SettingsViewModelTests {
             setterCallCounts.removeAll()
             clearCacheCallCount = 0
             cacheUsageCallCount = 0
+            _linkBrowserMode = .customBrowser
             _showThumbnails = true
             _rememberFeedCategory = false
             _lastFeedCategory = nil
@@ -258,38 +259,35 @@ struct SettingsViewModelTests {
 
     // Note: showComments setting has been removed from the app
 
-    // MARK: - Open In Default Browser Tests
+    // MARK: - Link Browser Mode Tests
 
-    @Test("Open in default browser getter")
-    func openInDefaultBrowserGetter() {
-        mockSettingsUseCase.openInDefaultBrowser = true
+    @Test("Link browser mode getter")
+    func linkBrowserModeGetter() {
+        mockSettingsUseCase.linkBrowserMode = .systemBrowser
 
-        let value = settingsViewModel.openInDefaultBrowser
+        let value = settingsViewModel.linkBrowserMode
 
-        #expect(value == true)
-        #expect(mockSettingsUseCase.getterCallCounts["openInDefaultBrowser"] == 1)
+        #expect(value == .systemBrowser)
+        #expect(mockSettingsUseCase.getterCallCounts["linkBrowserMode"] == 1)
     }
 
-    @Test("Open in default browser setter")
-    func openInDefaultBrowserSetter() {
-        settingsViewModel.openInDefaultBrowser = true
+    @Test("Link browser mode setter")
+    func linkBrowserModeSetter() {
+        settingsViewModel.linkBrowserMode = .customBrowser
 
-        #expect(mockSettingsUseCase.openInDefaultBrowser == true)
-        #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == 1)
+        #expect(mockSettingsUseCase.linkBrowserMode == .customBrowser)
+        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == 1)
     }
 
-    @Test("Open in default browser toggle")
-    func openInDefaultBrowserToggle() {
-        // Start with false
-        #expect(settingsViewModel.openInDefaultBrowser == false)
+    @Test("Link browser mode cycles values")
+    func linkBrowserModeCyclesValues() {
+        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
 
-        // Toggle to true
-        settingsViewModel.openInDefaultBrowser = true
-        #expect(settingsViewModel.openInDefaultBrowser == true)
+        settingsViewModel.linkBrowserMode = .systemBrowser
+        #expect(settingsViewModel.linkBrowserMode == .systemBrowser)
 
-        // Toggle back to false
-        settingsViewModel.openInDefaultBrowser = false
-        #expect(settingsViewModel.openInDefaultBrowser == false)
+        settingsViewModel.linkBrowserMode = .inAppBrowser
+        #expect(settingsViewModel.linkBrowserMode == .inAppBrowser)
     }
 
     // MARK: - Multiple Settings Tests
@@ -298,15 +296,15 @@ struct SettingsViewModelTests {
     func multipleSettingsChanges() {
         // Change multiple settings
         settingsViewModel.safariReaderMode = true
-        settingsViewModel.openInDefaultBrowser = true
+        settingsViewModel.linkBrowserMode = .customBrowser
 
         // Verify all changes are reflected
         #expect(settingsViewModel.safariReaderMode == true)
-        #expect(settingsViewModel.openInDefaultBrowser == true)
+        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
 
         // Verify the underlying use case was called correctly
         #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == 1)
+        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == 1)
     }
 
     @Test("Settings independence")
@@ -315,11 +313,11 @@ struct SettingsViewModelTests {
         settingsViewModel.safariReaderMode = true
 
         // Other settings should remain at their default values
-        #expect(settingsViewModel.openInDefaultBrowser == false)
+        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
 
         // Only safari reader mode setter should have been called
         #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["openInDefaultBrowser"] == nil)
+        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == nil)
     }
 
     // MARK: - Observation Tests (for @Observable macro)

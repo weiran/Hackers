@@ -20,8 +20,8 @@ public final class SettingsViewModel: @unchecked Sendable {
         didSet { propagateChangesIfNeeded(\.safariReaderMode, safariReaderMode) }
     }
 
-    public var openInDefaultBrowser: Bool = false {
-        didSet { propagateChangesIfNeeded(\.openInDefaultBrowser, openInDefaultBrowser) }
+    public var linkBrowserMode: LinkBrowserMode = .inAppBrowser {
+        didSet { propagateChangesIfNeeded(\.linkBrowserMode, linkBrowserMode) }
     }
 
     public var showThumbnails: Bool = true {
@@ -50,7 +50,7 @@ public final class SettingsViewModel: @unchecked Sendable {
 
     private func loadSettings() {
         safariReaderMode = settingsUseCase.safariReaderMode
-        openInDefaultBrowser = settingsUseCase.openInDefaultBrowser
+        linkBrowserMode = settingsUseCase.linkBrowserMode
         showThumbnails = settingsUseCase.showThumbnails
         rememberFeedCategory = settingsUseCase.rememberFeedCategory
         textSize = settingsUseCase.textSize
@@ -64,8 +64,8 @@ public final class SettingsViewModel: @unchecked Sendable {
         switch keyPath {
         case \.safariReaderMode:
             settingsUseCase.safariReaderMode = value as! Bool
-        case \.openInDefaultBrowser:
-            settingsUseCase.openInDefaultBrowser = value as! Bool
+        case \.linkBrowserMode:
+            settingsUseCase.linkBrowserMode = value as! LinkBrowserMode
         case \.showThumbnails:
             settingsUseCase.showThumbnails = value as! Bool
         case \.rememberFeedCategory:

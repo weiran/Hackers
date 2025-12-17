@@ -184,10 +184,10 @@ public struct SettingsView: View {
 #endif
 
                 Section(header: Text("Browser")) {
-                    // Place default browser preference first
-                    Picker(selection: $viewModel.openInDefaultBrowser) {
-                        Text("In-App Browser").tag(false)
-                        Text("System Browser").tag(true)
+                    Picker(selection: $viewModel.linkBrowserMode) {
+                        Text("In-App Browser").tag(LinkBrowserMode.inAppBrowser)
+                        Text("Custom Browser").tag(LinkBrowserMode.customBrowser)
+                        Text("System Browser").tag(LinkBrowserMode.systemBrowser)
                     } label: {
                         Label("Open Links Using", systemImage: "safari")
                     }

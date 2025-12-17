@@ -14,6 +14,7 @@ import SwiftUI
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
+    private let showsPostHeader: Bool
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
@@ -27,9 +28,11 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         postID: Int,
         initialPost: Post? = nil,
         targetCommentID: Int? = nil,
+        showsPostHeader: Bool = true,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
+        self.showsPostHeader = showsPostHeader
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -48,6 +51,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     public init(
         post: Post,
         targetCommentID: Int? = nil,
+        showsPostHeader: Bool = true,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -55,6 +59,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             postID: post.id,
             initialPost: post,
             targetCommentID: targetCommentID,
+            showsPostHeader: showsPostHeader,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -66,6 +71,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                 CommentsContentView(
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
+                    showsPostHeader: showsPostHeader,
                     showTitle: $showTitle,
                     visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
@@ -160,6 +166,11 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private func handleLinkTap() {
         guard let post = viewModel.post else { return }
         if navigationStore.openURLInPrimaryContext(post.url) {
+            return
+        }
+        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
+        if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
+            navigationStore.showPostLink(post)
             return
         }
         LinkOpener.openURL(post.url, with: post)

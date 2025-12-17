@@ -16,6 +16,7 @@ import UIKit
 struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
+    let showsPostHeader: Bool
     @Binding var showTitle: Bool
     @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var pendingCommentID: Int?
@@ -36,61 +37,63 @@ struct CommentsContentView: View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
-                    PostHeader(
-                        post: post,
-                        votingViewModel: votingViewModel,
-                        isLoadingComments: viewModel.isLoading,
-                        showThumbnails: viewModel.showThumbnails,
-                        onLinkTap: { handleLinkTap() },
-                        onPostUpdated: { updatedPost in
-                            viewModel.post = updatedPost
-                        },
-                        onBookmarkToggle: { await viewModel.toggleBookmark() }
-                    )
-                    .id("header")
-                    .background(GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: ViewOffsetKey.self,
-                            value: geometry.frame(in: .global).minY,
+                    if showsPostHeader {
+                        PostHeader(
+                            post: post,
+                            votingViewModel: votingViewModel,
+                            isLoadingComments: viewModel.isLoading,
+                            showThumbnails: viewModel.showThumbnails,
+                            onLinkTap: { handleLinkTap() },
+                            onPostUpdated: { updatedPost in
+                                viewModel.post = updatedPost
+                            },
+                            onBookmarkToggle: { await viewModel.toggleBookmark() }
                         )
-                    })
-                    .listRowSeparator(.hidden)
-                    .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
-                        view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            if post.upvoted && post.voteLinks?.unvote != nil {
-                                Button {
-                                    guard !viewModel.isLoading else { return }
-                                    Task {
-                                        var mutablePost = post
-                                        await votingViewModel.unvote(post: &mutablePost)
-                                        await MainActor.run {
-                                            viewModel.post = mutablePost
-                                        }
-                                    }
-                                } label: {
-                                    Image(systemName: "arrow.uturn.down")
-                                }
-                                .tint(.orange)
-                                .accessibilityLabel("Unvote")
-                                .disabled(viewModel.isLoading)
-                            } else {
-                                Button {
-                                    guard !viewModel.isLoading else { return }
-                                    Task {
-                                        var mutablePost = post
-                                        await votingViewModel.upvote(post: &mutablePost)
-                                        await MainActor.run {
-                                            if mutablePost.upvoted {
+                        .id("header")
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(
+                                key: ViewOffsetKey.self,
+                                value: geometry.frame(in: .global).minY,
+                            )
+                        })
+                        .listRowSeparator(.hidden)
+                        .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
+                            view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                if post.upvoted && post.voteLinks?.unvote != nil {
+                                    Button {
+                                        guard !viewModel.isLoading else { return }
+                                        Task {
+                                            var mutablePost = post
+                                            await votingViewModel.unvote(post: &mutablePost)
+                                            await MainActor.run {
                                                 viewModel.post = mutablePost
                                             }
                                         }
+                                    } label: {
+                                        Image(systemName: "arrow.uturn.down")
                                     }
-                                } label: {
-                                    Image(systemName: "arrow.up")
+                                    .tint(.orange)
+                                    .accessibilityLabel("Unvote")
+                                    .disabled(viewModel.isLoading)
+                                } else {
+                                    Button {
+                                        guard !viewModel.isLoading else { return }
+                                        Task {
+                                            var mutablePost = post
+                                            await votingViewModel.upvote(post: &mutablePost)
+                                            await MainActor.run {
+                                                if mutablePost.upvoted {
+                                                    viewModel.post = mutablePost
+                                                }
+                                            }
+                                        }
+                                    } label: {
+                                        Image(systemName: "arrow.up")
+                                    }
+                                    .tint(AppColors.upvotedColor)
+                                    .accessibilityLabel("Upvote")
+                                    .disabled(viewModel.isLoading)
                                 }
-                                .tint(AppColors.upvotedColor)
-                                .accessibilityLabel("Upvote")
-                                .disabled(viewModel.isLoading)
                             }
                         }
                     }

@@ -9,6 +9,7 @@ import Domain
 import Foundation
 
 public protocol UserDefaultsProtocol: Sendable {
+    func object(forKey defaultName: String) -> Any?
     func bool(forKey defaultName: String) -> Bool
     func integer(forKey defaultName: String) -> Int
     func string(forKey defaultName: String) -> String?
@@ -28,18 +29,37 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
     }
 
     private func registerDefaults() {
-        // Register default values for fresh installs
-        // Note: This only sets defaults for keys that don't exist yet
-        if let userDefaults = userDefaults as? UserDefaults {
-            userDefaults.register(defaults: [
-                "safariReaderMode": false,
-                "openInDefaultBrowser": false,
-                "ShowThumbnails": true,
-                "RememberFeedCategory": false,
-                "textSize": TextSize.medium.rawValue,
-                "compactFeedDesign": true
-            ])
+        migrateLinkBrowserModeIfNeeded()
+
+        setDefaultIfNeeded(false, forKey: "safariReaderMode")
+        setDefaultIfNeeded(LinkBrowserMode.customBrowser.rawValue, forKey: "linkBrowserMode")
+        setDefaultIfNeeded(true, forKey: "ShowThumbnails")
+        setDefaultIfNeeded(false, forKey: "RememberFeedCategory")
+        setDefaultIfNeeded(TextSize.medium.rawValue, forKey: "textSize")
+        setDefaultIfNeeded(true, forKey: "compactFeedDesign")
+    }
+
+    private func migrateLinkBrowserModeIfNeeded() {
+        if let existing = userDefaults.object(forKey: "linkBrowserMode") as? Int,
+           let mode = LinkBrowserMode(rawValue: existing)
+        {
+            if mode == .inAppBrowser {
+                userDefaults.set(LinkBrowserMode.customBrowser.rawValue, forKey: "linkBrowserMode")
+            }
+            return
         }
+
+        let legacyOpenInDefaultBrowser = userDefaults.object(forKey: "openInDefaultBrowser") as? Bool
+        // Legacy behavior:
+        // - System Browser stays system browser
+        // - In-app browser users are migrated to the new Custom Browser by default
+        let mode: LinkBrowserMode = legacyOpenInDefaultBrowser == true ? .systemBrowser : .customBrowser
+        userDefaults.set(mode.rawValue, forKey: "linkBrowserMode")
+    }
+
+    private func setDefaultIfNeeded(_ value: Any, forKey key: String) {
+        guard userDefaults.object(forKey: key) == nil else { return }
+        userDefaults.set(value, forKey: key)
     }
 
     public var safariReaderMode: Bool {
@@ -51,12 +71,12 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    public var openInDefaultBrowser: Bool {
+    public var linkBrowserMode: LinkBrowserMode {
         get {
-            userDefaults.bool(forKey: "openInDefaultBrowser")
+            LinkBrowserMode(rawValue: userDefaults.integer(forKey: "linkBrowserMode")) ?? .inAppBrowser
         }
         set {
-            userDefaults.set(newValue, forKey: "openInDefaultBrowser")
+            userDefaults.set(newValue.rawValue, forKey: "linkBrowserMode")
         }
     }
 

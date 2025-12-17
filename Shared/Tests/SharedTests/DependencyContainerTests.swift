@@ -127,7 +127,7 @@ private final class StubPostRepository: PostUseCase, VoteUseCase, CommentUseCase
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
-    var openInDefaultBrowser: Bool = false
+    var linkBrowserMode: LinkBrowserMode = .inAppBrowser
     var showThumbnails: Bool = true
     var rememberFeedCategory: Bool = false
     var lastFeedCategory: PostType?

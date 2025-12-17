@@ -14,6 +14,7 @@ import UIKit
 
 enum NavigationDestination: Hashable {
     case comments(postID: Int)
+    case postBrowser(post: Post)
     case settings
 }
 
@@ -58,6 +59,24 @@ class NavigationStore: NavigationStoreProtocol {
         }
     }
 
+    func showPostLink(_ post: Domain.Post) {
+        embeddedBrowserURL = nil
+        detailPath.removeAll()
+        selectedPost = post
+        selectedPostId = post.id
+
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            path.append(NavigationDestination.postBrowser(post: post))
+            return
+        }
+
+        if openURLInPrimaryContext(post.url) {
+            return
+        }
+
+        LinkOpener.openURL(post.url, with: post)
+    }
+
     func showPost(withId id: Int) {
         embeddedBrowserURL = nil
         detailPath.removeAll()
@@ -96,7 +115,7 @@ class NavigationStore: NavigationStoreProtocol {
         guard url.scheme == "http" || url.scheme == "https" else { return false }
 
         let settings = DependencyContainer.shared.getSettingsUseCase()
-        if settings.openInDefaultBrowser {
+        if settings.linkBrowserMode == .systemBrowser {
             return false
         }
 

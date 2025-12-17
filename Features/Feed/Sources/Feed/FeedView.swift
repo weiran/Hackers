@@ -370,6 +370,12 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             return
         }
 
+        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
+        if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
+            navigationStore.showPostLink(post)
+            return
+        }
+
         if isSidebar {
             navigationStore.showPost(post)
             selectedPostId = post.id
@@ -378,7 +384,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         if navigationStore.openURLInPrimaryContext(post.url, pushOntoDetailStack: !isSidebar) {
             return
         }
-        LinkOpener.openURL(post.url, with: nil)
+        LinkOpener.openURL(post.url, with: post)
     }
 
     private func isHackerNewsItemURL(_ url: URL) -> Bool {

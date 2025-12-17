@@ -16,6 +16,7 @@ public protocol NavigationStoreProtocol: AnyObject, Observable {
     var showingLogin: Bool { get set }
     var showingSettings: Bool { get set }
     func showPost(_ post: Post)
+    func showPostLink(_ post: Post)
     func showPost(withId id: Int)
     func showLogin()
     func showSettings()

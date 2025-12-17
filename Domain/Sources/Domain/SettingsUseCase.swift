@@ -37,7 +37,7 @@ public enum TextSize: Int, CaseIterable, Sendable {
 
 public protocol SettingsUseCase: Sendable {
     var safariReaderMode: Bool { get set }
-    var openInDefaultBrowser: Bool { get set }
+    var linkBrowserMode: LinkBrowserMode { get set }
     var showThumbnails: Bool { get set }
     var rememberFeedCategory: Bool { get set }
     var lastFeedCategory: PostType? { get set }
@@ -45,4 +45,10 @@ public protocol SettingsUseCase: Sendable {
     var compactFeedDesign: Bool { get set }
     func clearCache()
     func cacheUsageBytes() async -> Int64
+}
+
+public enum LinkBrowserMode: Int, CaseIterable, Sendable {
+    case inAppBrowser = 0
+    case customBrowser = 1
+    case systemBrowser = 2
 }

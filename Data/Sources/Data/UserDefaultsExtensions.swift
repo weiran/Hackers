@@ -5,6 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
+import Domain
 import Foundation
 
 public extension UserDefaults {
@@ -17,24 +18,23 @@ public extension UserDefaults {
         set(enabled, forKey: UserDefaultsKeys.safariReaderMode.rawValue)
     }
 
-    var openInDefaultBrowser: Bool {
-        let openInDefaultBrowser = bool(forKey: UserDefaultsKeys.openInDefaultBrowser.rawValue)
-        return openInDefaultBrowser
+    var linkBrowserMode: LinkBrowserMode {
+        LinkBrowserMode(rawValue: integer(forKey: UserDefaultsKeys.linkBrowserMode.rawValue)) ?? .inAppBrowser
     }
 
-    func setOpenInDefaultBrowser(_ enabled: Bool) {
-        set(enabled, forKey: UserDefaultsKeys.openInDefaultBrowser.rawValue)
+    func setLinkBrowserMode(_ mode: LinkBrowserMode) {
+        set(mode.rawValue, forKey: UserDefaultsKeys.linkBrowserMode.rawValue)
     }
 
     func registerDefaults() {
         register(defaults: [
             UserDefaultsKeys.safariReaderMode.rawValue: false,
-            UserDefaultsKeys.openInDefaultBrowser.rawValue: false
+            UserDefaultsKeys.linkBrowserMode.rawValue: LinkBrowserMode.customBrowser.rawValue
         ])
     }
 }
 
 public enum UserDefaultsKeys: String {
     case safariReaderMode
-    case openInDefaultBrowser
+    case linkBrowserMode
 }

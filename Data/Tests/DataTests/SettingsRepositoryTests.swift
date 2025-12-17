@@ -25,6 +25,11 @@ struct SettingsRepositoryTests {
         private var storage: [String: Any] = [:]
         private let lock = NSLock()
 
+        func object(forKey defaultName: String) -> Any? {
+            lock.lock(); defer { lock.unlock() }
+            return storage[defaultName]
+        }
+
         func bool(forKey defaultName: String) -> Bool {
             lock.lock(); defer { lock.unlock() }
             return storage[defaultName] as? Bool ?? false
@@ -171,25 +176,23 @@ struct SettingsRepositoryTests {
 
     // Note: showComments setting has been removed from the app
 
-    // MARK: - Open In Default Browser Tests
+    // MARK: - Link Browser Mode Tests
 
-    @Test("Open in default browser default value")
-    func openInDefaultBrowserDefaultValue() {
-        // Default should be false for bool values
-        #expect(settingsRepository.openInDefaultBrowser == false)
+    @Test("Link browser mode default value")
+    func linkBrowserModeDefaultValue() {
+        #expect(settingsRepository.linkBrowserMode == .customBrowser)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
-    @Test("Open in default browser setter and getter")
-    func openInDefaultBrowserSetterAndGetter() {
-        // Test setting to true
-        settingsRepository.openInDefaultBrowser = true
-        #expect(settingsRepository.openInDefaultBrowser == true)
-        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
+    @Test("Link browser mode setter and getter")
+    func linkBrowserModeSetterAndGetter() {
+        settingsRepository.linkBrowserMode = .systemBrowser
+        #expect(settingsRepository.linkBrowserMode == .systemBrowser)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.systemBrowser.rawValue)
 
-        // Test setting to false
-        settingsRepository.openInDefaultBrowser = false
-        #expect(settingsRepository.openInDefaultBrowser == false)
-        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == false)
+        settingsRepository.linkBrowserMode = .customBrowser
+        #expect(settingsRepository.linkBrowserMode == .customBrowser)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
     // MARK: - Integration Tests
@@ -198,15 +201,15 @@ struct SettingsRepositoryTests {
     func multipleSettingsChangesPersist() {
         // Change multiple settings
         settingsRepository.safariReaderMode = true
-        settingsRepository.openInDefaultBrowser = true
+        settingsRepository.linkBrowserMode = .customBrowser
 
         // Verify all changes persist
         #expect(settingsRepository.safariReaderMode == true)
-        #expect(settingsRepository.openInDefaultBrowser == true)
+        #expect(settingsRepository.linkBrowserMode == .customBrowser)
 
         // Verify underlying storage
         #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
     @Test("Settings independence")
@@ -215,7 +218,7 @@ struct SettingsRepositoryTests {
         settingsRepository.safariReaderMode = true
 
         // Other settings should remain at their default values
-        #expect(settingsRepository.openInDefaultBrowser == false)
+        #expect(settingsRepository.linkBrowserMode == .customBrowser)
     }
 
     // MARK: - Use Case Protocol Conformance Tests
@@ -229,8 +232,8 @@ struct SettingsRepositoryTests {
         useCase.safariReaderMode = true
         #expect(useCase.safariReaderMode == true)
 
-        useCase.openInDefaultBrowser = true
-        #expect(useCase.openInDefaultBrowser == true)
+        useCase.linkBrowserMode = .systemBrowser
+        #expect(useCase.linkBrowserMode == .systemBrowser)
     }
 
     // MARK: - Key Consistency Tests
@@ -239,11 +242,11 @@ struct SettingsRepositoryTests {
     func userDefaultsKeys() {
         // Test that the correct keys are being used for UserDefaults
         settingsRepository.safariReaderMode = true
-        settingsRepository.openInDefaultBrowser = true
+        settingsRepository.linkBrowserMode = .customBrowser
 
         // Verify the keys match what's expected
         #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.bool(forKey: "openInDefaultBrowser") == true)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
     // MARK: - Thread Safety Tests
@@ -256,16 +259,16 @@ struct SettingsRepositoryTests {
             for _ in 0 ..< 10 {
                 group.addTask {
                     settingsRepository.safariReaderMode = true
-                    settingsRepository.openInDefaultBrowser = true
+                    settingsRepository.linkBrowserMode = .customBrowser
                 }
             }
         }
 
         // After concurrent operations, both values should be true
         let safariMode = settingsRepository.safariReaderMode
-        let browser = settingsRepository.openInDefaultBrowser
+        let mode = settingsRepository.linkBrowserMode
 
         #expect(safariMode == true)
-        #expect(browser == true)
+        #expect(mode == .customBrowser)
     }
 }
