@@ -15,12 +15,41 @@ public struct ThumbnailView: View {
 
     @State private var image: Image?
 
+#if DEBUG
+    @AppStorage("devThumbnailProvider") private var thumbnailProviderRawValue = "weiranzhang"
+    private enum ThumbnailProvider: String {
+        case weiranzhang
+        case google
+        case duckduckgo
+    }
+
+    private var thumbnailProvider: ThumbnailProvider {
+        ThumbnailProvider(rawValue: thumbnailProviderRawValue) ?? .weiranzhang
+    }
+#endif
+
     public init(url: URL?, isEnabled: Bool = true) {
         self.url = url
         self.isEnabled = isEnabled
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
+#if DEBUG
+        switch thumbnailProvider {
+        case .weiranzhang:
+            return weiranzhangThumbnailURL(for: url)
+        case .google:
+            return googleFaviconURL(for: url)
+        case .duckduckgo:
+            return duckDuckGoFaviconURL(for: url)
+        }
+#else
+        return weiranzhangThumbnailURL(for: url)
+#endif
+    }
+
+#if DEBUG
+    private func googleFaviconURL(for url: URL) -> URL? {
         guard let host = url.host else { return nil }
         var components = URLComponents()
         components.scheme = "https"
@@ -32,6 +61,27 @@ public struct ThumbnailView: View {
         ]
         return components.url
     }
+#endif
+
+    private func weiranzhangThumbnailURL(for url: URL) -> URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "hackers-thumbnails.weiranzhang.com"
+        components.path = "/api/FetchThumbnail"
+        components.queryItems = [URLQueryItem(name: "url", value: url.absoluteString)]
+        return components.url
+    }
+
+#if DEBUG
+    private func duckDuckGoFaviconURL(for url: URL) -> URL? {
+        guard let host = url.host else { return nil }
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "icons.duckduckgo.com"
+        components.path = "/ip3/\(host).ico"
+        return components.url
+    }
+#endif
 
     private var placeholderImage: some View {
         Image(systemName: "safari")

@@ -20,6 +20,9 @@ public struct SettingsView: View {
     @State private var showMailView = false
     @State private var showLogin = false
     @State private var showClearCacheAlert = false
+#if DEBUG
+    @AppStorage("devThumbnailProvider") private var devThumbnailProvider = "weiranzhang"
+#endif
 
     let isAuthenticated: Bool
     let currentUsername: String?
@@ -166,6 +169,20 @@ public struct SettingsView: View {
                     }
                 }
 
+#if DEBUG
+                Section(header: Text("Developer")) {
+                    Picker(selection: $devThumbnailProvider) {
+                        Text("Weiranzhang.com").tag("weiranzhang")
+                        Text("Google").tag("google")
+                        Text("DuckDuckGo").tag("duckduckgo")
+                    } label: {
+                        Label("Thumbnail Provider", systemImage: "photo.on.rectangle.angled")
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(!viewModel.showThumbnails)
+                }
+#endif
+
                 Section(header: Text("Browser")) {
                     // Place default browser preference first
                     Picker(selection: $viewModel.openInDefaultBrowser) {
@@ -236,6 +253,7 @@ public struct SettingsView: View {
             Spacer()
         }
     }
+
 }
 
 private extension UIDevice {
