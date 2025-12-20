@@ -59,21 +59,40 @@ public final class SettingsViewModel: @unchecked Sendable {
         hasLoadedSettings = true
     }
 
-    private func propagateChangesIfNeeded<Value>(_ keyPath: KeyPath<SettingsViewModel, Value>, _ value: Value) {
+    private func propagateChangesIfNeeded(_ keyPath: KeyPath<SettingsViewModel, Bool>, _ value: Bool) {
         guard hasLoadedSettings else { return }
         switch keyPath {
         case \.safariReaderMode:
-            settingsUseCase.safariReaderMode = value as! Bool
-        case \.linkBrowserMode:
-            settingsUseCase.linkBrowserMode = value as! LinkBrowserMode
+            settingsUseCase.safariReaderMode = value
         case \.showThumbnails:
-            settingsUseCase.showThumbnails = value as! Bool
+            settingsUseCase.showThumbnails = value
         case \.rememberFeedCategory:
-            settingsUseCase.rememberFeedCategory = value as! Bool
-        case \.textSize:
-            settingsUseCase.textSize = value as! TextSize
+            settingsUseCase.rememberFeedCategory = value
         case \.compactFeedDesign:
-            settingsUseCase.compactFeedDesign = value as! Bool
+            settingsUseCase.compactFeedDesign = value
+        default:
+            break
+        }
+    }
+
+    private func propagateChangesIfNeeded(
+        _ keyPath: KeyPath<SettingsViewModel, LinkBrowserMode>,
+        _ value: LinkBrowserMode
+    ) {
+        guard hasLoadedSettings else { return }
+        switch keyPath {
+        case \.linkBrowserMode:
+            settingsUseCase.linkBrowserMode = value
+        default:
+            break
+        }
+    }
+
+    private func propagateChangesIfNeeded(_ keyPath: KeyPath<SettingsViewModel, TextSize>, _ value: TextSize) {
+        guard hasLoadedSettings else { return }
+        switch keyPath {
+        case \.textSize:
+            settingsUseCase.textSize = value
         default:
             break
         }
