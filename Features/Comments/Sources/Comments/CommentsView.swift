@@ -15,6 +15,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     private let showsPostHeader: Bool
+    private let allowsRefresh: Bool
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
@@ -29,10 +30,12 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         initialPost: Post? = nil,
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
+        allowsRefresh: Bool = true,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
         self.showsPostHeader = showsPostHeader
+        self.allowsRefresh = allowsRefresh
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -52,6 +55,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         post: Post,
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
+        allowsRefresh: Bool = true,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -60,6 +64,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             initialPost: post,
             targetCommentID: targetCommentID,
             showsPostHeader: showsPostHeader,
+            allowsRefresh: allowsRefresh,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -131,10 +136,12 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                 _ = await viewModel.revealComment(withId: targetID)
             }
         }
-        .refreshable {
-            await viewModel.refreshComments()
-            if let targetID = pendingCommentID {
-                _ = await viewModel.revealComment(withId: targetID)
+        .if(allowsRefresh) { view in
+            view.refreshable {
+                await viewModel.refreshComments()
+                if let targetID = pendingCommentID {
+                    _ = await viewModel.revealComment(withId: targetID)
+                }
             }
         }
         .environment(\.openURL, OpenURLAction { url in
