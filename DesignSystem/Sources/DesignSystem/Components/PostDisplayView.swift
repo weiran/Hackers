@@ -21,13 +21,13 @@ public struct PostDisplayView: View {
     let onBookmarkTap: (() async -> Bool)?
     let onCommentsTap: (() -> Void)?
 
-    @Environment(\.colorScheme) private var colorScheme
-    @State private var isSubmittingUpvote = false
-    @State private var isSubmittingBookmark = false
-    @State private var displayedScore: Int
-    @State private var displayedUpvoted: Bool
-    @State private var displayedBookmarked: Bool
-    @State private var displayedVoteLinks: VoteLinks?
+    @Environment(\.colorScheme) var colorScheme
+    @State var isSubmittingUpvote = false
+    @State var isSubmittingBookmark = false
+    @State var displayedScore: Int
+    @State var displayedUpvoted: Bool
+    @State var displayedBookmarked: Bool
+    @State var displayedVoteLinks: VoteLinks?
 
     public init(
         post: Post,

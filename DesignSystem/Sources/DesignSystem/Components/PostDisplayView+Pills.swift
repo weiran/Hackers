@@ -8,7 +8,7 @@
 import Domain
 import SwiftUI
 
-private struct PillConfiguration {
+fileprivate struct PillConfiguration {
     let iconName: String?
     let text: String
     let textColor: Color
@@ -20,7 +20,7 @@ private struct PillConfiguration {
     let numericValue: Int?
 }
 
-private extension PostDisplayView {
+extension PostDisplayView {
     var inlineUpvoteStat: some View {
         let score = displayedScore
         let isUpvoted = displayedUpvoted
@@ -244,7 +244,7 @@ private extension PostDisplayView {
     }
 
     @ViewBuilder
-    func pillView(
+    fileprivate func pillView(
         configuration: PillConfiguration,
         action: (() -> Void)? = nil
     ) -> some View {
@@ -273,7 +273,7 @@ private extension PostDisplayView {
     }
 
     @ViewBuilder
-    func pillContent(configuration: PillConfiguration) -> some View {
+    fileprivate func pillContent(configuration: PillConfiguration) -> some View {
         let iconDimension: CGFloat = 12
         HStack(spacing: 4) {
             if let iconName = configuration.iconName {
