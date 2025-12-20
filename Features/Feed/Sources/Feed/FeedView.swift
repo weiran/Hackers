@@ -3,8 +3,6 @@
 //  Feed
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
-//
-
 import DesignSystem
 import Domain
 import Shared
@@ -17,21 +15,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
     @State private var selectedPostId: Int?
     @State private var searchText: String
     @Environment(Store.self) private var navigationStore
-
     let isSidebar: Bool
-
-    private var primaryPostTypes: [Domain.PostType] {
-        [.news, .ask, .show, .jobs, .newest, .best, .active]
-    }
-
-    private var secondaryPostTypes: [Domain.PostType] {
-        [.bookmarks]
-    }
-
-    private var shouldShowBookmarksEmptyState: Bool {
-        viewModel.postType == .bookmarks && viewModel.posts.isEmpty && !viewModel.isLoading && !viewModel.hasActiveSearch
-    }
-
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
@@ -49,25 +33,6 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         _searchText = State(initialValue: viewModel.searchQuery)
         self.isSidebar = isSidebar
     }
-
-    private var selectionBinding: Binding<Int?> {
-        if isSidebar {
-            Binding(
-                get: { selectedPostId },
-                set: { newPostId in
-                    if let postId = newPostId,
-                       let selectedPost = viewModel.posts.first(where: { $0.id == postId })
-                    {
-                        selectedPostId = postId
-                        navigationStore.showPost(selectedPost)
-                    }
-                },
-            )
-        } else {
-            .constant(nil)
-        }
-    }
-
     public var body: some View {
         contentView
             .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
@@ -101,7 +66,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             votingViewModel.navigationStore = navigationStore
             await viewModel.loadFeed()
         }
-        .onChange(of: navigationStore.selectedPost) { oldPost, newPost in
+        .onChange(of: navigationStore.selectedPost) { _, newPost in
             // When selectedPost changes in navigation store (e.g., from comments view),
             // update it in the feed
             if let updatedPost = newPost {
@@ -126,9 +91,43 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             votingViewModel.navigationStore = navigationStore
         }
     }
+}
+
+private extension FeedView {
+    var primaryPostTypes: [Domain.PostType] {
+        [.news, .ask, .show, .jobs, .newest, .best, .active]
+    }
+
+    var secondaryPostTypes: [Domain.PostType] {
+        [.bookmarks]
+    }
+
+    var shouldShowBookmarksEmptyState: Bool {
+        viewModel.postType == .bookmarks
+            && viewModel.posts.isEmpty
+            && !viewModel.isLoading
+            && !viewModel.hasActiveSearch
+    }
+
+    var selectionBinding: Binding<Int?> {
+        if isSidebar {
+            Binding(
+                get: { selectedPostId },
+                set: { newPostId in
+                    if let postId = newPostId,
+                       let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
+                        selectedPostId = postId
+                        navigationStore.showPost(selectedPost)
+                    }
+                }
+            )
+        } else {
+            .constant(nil)
+        }
+    }
 
     @ViewBuilder
-    private var contentView: some View {
+    var contentView: some View {
         Group {
             if viewModel.hasActiveSearch {
                 searchContentView
@@ -213,7 +212,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                 }
             }
         }
-        .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
+        .if(shouldShowVoteActions(for: post)) { view in
             view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 voteSwipeAction(for: post)
             }
@@ -391,112 +390,9 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         guard let hnHost = url.host else { return false }
         return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
     }
-}
 
-struct PostRowView: View {
-    let post: Domain.Post
-    let votingViewModel: VotingViewModel
-    let onLinkTap: (() -> Void)?
-    let onCommentsTap: (() -> Void)?
-    let showThumbnails: Bool
-    let compactMode: Bool
-    let onPostUpdated: ((Domain.Post) -> Void)?
-    let onBookmarkToggle: (() async -> Bool)?
-
-    init(post: Domain.Post,
-         votingViewModel: VotingViewModel,
-         showThumbnails: Bool = true,
-         compactMode: Bool = false,
-         onLinkTap: (() -> Void)? = nil,
-         onCommentsTap: (() -> Void)? = nil,
-         onPostUpdated: ((Domain.Post) -> Void)? = nil,
-         onBookmarkToggle: (() async -> Bool)? = nil)
-    {
-        self.post = post
-        self.votingViewModel = votingViewModel
-        self.onLinkTap = onLinkTap
-        self.onCommentsTap = onCommentsTap
-        self.showThumbnails = showThumbnails
-        self.compactMode = compactMode
-        self.onPostUpdated = onPostUpdated
-        self.onBookmarkToggle = onBookmarkToggle
-    }
-
-    var body: some View {
-        if let onCommentsTap {
-            Button(action: onCommentsTap) {
-                PostDisplayView(
-                    post: post,
-                    votingState: votingViewModel.votingState(for: post),
-                    showPostText: false,
-                    showThumbnails: showThumbnails,
-                    compactMode: compactMode,
-                    onThumbnailTap: onLinkTap,
-                    onUpvoteTap: { await handleUpvoteTap() },
-                    onUnvoteTap: { await handleUnvoteTap() },
-                    onBookmarkTap: {
-                        guard let onBookmarkToggle else { return post.isBookmarked }
-                        return await onBookmarkToggle()
-                    },
-                    onCommentsTap: onCommentsTap
-                )
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Open comments")
-        } else {
-            PostDisplayView(
-                post: post,
-                votingState: votingViewModel.votingState(for: post),
-                showPostText: false,
-                showThumbnails: showThumbnails,
-                compactMode: compactMode,
-                onThumbnailTap: onLinkTap,
-                onUpvoteTap: { await handleUpvoteTap() },
-                onUnvoteTap: { await handleUnvoteTap() },
-                onBookmarkTap: {
-                    guard let onBookmarkToggle else { return post.isBookmarked }
-                    return await onBookmarkToggle()
-                },
-                onCommentsTap: onCommentsTap
-            )
-            .contentShape(Rectangle())
-        }
-    }
-
-    private func handleUpvoteTap() async -> Bool {
-        guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
-
-        var mutablePost = post
-        await votingViewModel.upvote(post: &mutablePost)
-        let wasUpvoted = mutablePost.upvoted
-
-        if wasUpvoted {
-            await MainActor.run {
-                onPostUpdated?(mutablePost)
-            }
-        }
-
-        return wasUpvoted
-    }
-
-    private func handleUnvoteTap() async -> Bool {
-        guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
-
-        var mutablePost = post
-        await votingViewModel.unvote(post: &mutablePost)
-        let wasUnvoted = !mutablePost.upvoted
-
-        if wasUnvoted {
-            if let existingLinks = mutablePost.voteLinks {
-                mutablePost.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
-            }
-            await MainActor.run {
-                onPostUpdated?(mutablePost)
-            }
-        }
-
-        return wasUnvoted
+    private func shouldShowVoteActions(for post: Domain.Post) -> Bool {
+        (post.voteLinks?.upvote != nil && !post.upvoted)
+            || (post.voteLinks?.unvote != nil && post.upvoted)
     }
 }

@@ -24,7 +24,6 @@ struct CommentsContentView: View {
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
     let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
-
     var body: some View {
         Group {
             if let post = viewModel.post {
@@ -32,7 +31,6 @@ struct CommentsContentView: View {
             }
         }
     }
-
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
@@ -58,7 +56,6 @@ struct CommentsContentView: View {
             }
         }
     }
-
     @ViewBuilder
     private func postHeaderSection(for post: Post) -> some View {
         if showsPostHeader {
@@ -81,48 +78,55 @@ struct CommentsContentView: View {
                 )
             })
             .listRowSeparator(.hidden)
-            .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
+            .if(shouldShowVoteActions(for: post)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    if post.upvoted && post.voteLinks?.unvote != nil {
-                        Button {
-                            guard !viewModel.isLoading else { return }
-                            Task {
-                                var mutablePost = post
-                                await votingViewModel.unvote(post: &mutablePost)
-                                await MainActor.run {
-                                    viewModel.post = mutablePost
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "arrow.uturn.down")
-                        }
-                        .tint(.orange)
-                        .accessibilityLabel("Unvote")
-                        .disabled(viewModel.isLoading)
-                    } else {
-                        Button {
-                            guard !viewModel.isLoading else { return }
-                            Task {
-                                var mutablePost = post
-                                await votingViewModel.upvote(post: &mutablePost)
-                                await MainActor.run {
-                                    if mutablePost.upvoted {
-                                        viewModel.post = mutablePost
-                                    }
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up")
-                        }
-                        .tint(AppColors.upvotedColor)
-                        .accessibilityLabel("Upvote")
-                        .disabled(viewModel.isLoading)
-                    }
+                    postHeaderSwipeActions(for: post)
                 }
             }
         }
     }
-
+    private func shouldShowVoteActions(for post: Post) -> Bool {
+        (post.voteLinks?.upvote != nil && !post.upvoted)
+            || (post.voteLinks?.unvote != nil && post.upvoted)
+    }
+    @ViewBuilder
+    private func postHeaderSwipeActions(for post: Post) -> some View {
+        if post.upvoted && post.voteLinks?.unvote != nil {
+            Button {
+                guard !viewModel.isLoading else { return }
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.unvote(post: &mutablePost)
+                    await MainActor.run {
+                        viewModel.post = mutablePost
+                    }
+                }
+            } label: {
+                Image(systemName: "arrow.uturn.down")
+            }
+            .tint(.orange)
+            .accessibilityLabel("Unvote")
+            .disabled(viewModel.isLoading)
+        } else {
+            Button {
+                guard !viewModel.isLoading else { return }
+                Task {
+                    var mutablePost = post
+                    await votingViewModel.upvote(post: &mutablePost)
+                    await MainActor.run {
+                        if mutablePost.upvoted {
+                            viewModel.post = mutablePost
+                        }
+                    }
+                }
+            } label: {
+                Image(systemName: "arrow.up")
+            }
+            .tint(AppColors.upvotedColor)
+            .accessibilityLabel("Upvote")
+            .disabled(viewModel.isLoading)
+        }
+    }
     @ViewBuilder
     private func commentsSection(for post: Post, proxy: ScrollViewProxy) -> some View {
         if viewModel.isLoading {
@@ -150,7 +154,6 @@ struct CommentsContentView: View {
             )
         }
     }
-
     private func scrollToPendingComment(with proxy: ScrollViewProxy) {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
@@ -163,7 +166,6 @@ struct CommentsContentView: View {
         }
     }
 }
-
 struct CommentsForEach: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
@@ -171,7 +173,6 @@ struct CommentsForEach: View {
     @Binding var visibleCommentPositions: [Int: CGRect]
     let toggleCommentVisibility: (Comment) -> Void
     let hideCommentBranch: (Comment) -> Void
-
     var body: some View {
         ForEach(viewModel.visibleComments, id: \.id) { comment in
             CommentRow(
@@ -189,7 +190,7 @@ struct CommentsForEach: View {
                 )
             })
             .listRowSeparator(.visible)
-            .if((comment.voteLinks?.upvote != nil && !comment.upvoted) || (comment.voteLinks?.unvote != nil && comment.upvoted)) { view in
+            .if(shouldShowVoteActions(for: comment)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     if comment.upvoted && comment.voteLinks?.unvote != nil {
                         Button {
@@ -226,8 +227,11 @@ struct CommentsForEach: View {
             }
         }
     }
+    private func shouldShowVoteActions(for comment: Comment) -> Bool {
+        (comment.voteLinks?.upvote != nil && !comment.upvoted)
+            || (comment.voteLinks?.unvote != nil && comment.upvoted)
+    }
 }
-
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
@@ -258,13 +262,10 @@ struct PostHeader: View {
                 onVote: { Task { await handleUpvote() } },
                 onUnvote: { Task { await handleUnvote() } }
             )
-
             Divider()
-
             Button { onLinkTap() } label: {
                 Label("Open Link", systemImage: "safari")
             }
-
             Button { ContentSharePresenter.shared.shareURL(post.url, title: post.title) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
@@ -305,226 +306,6 @@ struct PostHeader: View {
         return wasUnvoted
     }
 }
-
-struct CommentRow: View {
-    @Bindable var comment: Comment
-    let post: Post
-    let votingViewModel: VotingViewModel
-    let onToggle: () -> Void
-    let onHide: () -> Void
-    @Environment(\.textScaling) private var textScaling
-
-    private var baseCommentText: AttributedString {
-        if let cached = comment.parsedText {
-            return cached
-        }
-
-        let parsed = CommentHTMLParser.parseHTMLText(comment.text)
-        comment.parsedText = parsed
-        return parsed
-    }
-
-    private func styledText(for textScaling: CGFloat) -> AttributedString {
-        StyledCommentTextCache.text(
-            commentID: comment.id,
-            textScaling: textScaling,
-            baseText: baseCommentText
-        )
-    }
-
-    var body: some View {
-        Button(action: onToggle) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(comment.by)
-                        .scaledFont(.subheadline)
-                        .bold()
-                        .foregroundStyle(comment.by == post.by ? AppColors.appTintColor : .primary)
-                    Text(comment.age)
-                        .scaledFont(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    if comment.upvoted {
-                        VoteIndicator(
-                            votingState: VotingState(
-                                isUpvoted: comment.upvoted,
-                                score: nil,
-                                canVote: comment.voteLinks?.upvote != nil,
-                                canUnvote: comment.voteLinks?.unvote != nil,
-                                isVoting: votingViewModel.isVoting,
-                                error: votingViewModel.lastError,
-                            ),
-                            style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
-                        )
-                    }
-                    if comment.visibility == .compact {
-                        Image(systemName: "chevron.down")
-                            .scaledFont(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityHidden(true)
-                    }
-                }
-                if comment.visibility == .visible {
-                    Text(styledText(for: textScaling))
-                        .foregroundStyle(.primary)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .listRowInsets([.top, .bottom, .trailing], 16)
-        .listRowInsets([.leading], CGFloat((comment.level + 1) * 16))
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint(comment.visibility == .visible ? "Tap to collapse" : "Tap to expand")
-        .contextMenu {
-            VotingContextMenuItems.commentVotingMenuItems(
-                for: comment,
-                onVote: {
-                    Task { await votingViewModel.upvote(comment: comment, in: post) }
-                },
-                onUnvote: {
-                    Task { await votingViewModel.unvote(comment: comment, in: post) }
-                }
-            )
-            Button { UIPasteboard.general.string = comment.text.strippingHTML() } label: {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-            Divider()
-            Button { ContentSharePresenter.shared.shareComment(comment) } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
-        }
-        .id(String(comment.id) + String(comment.visibility.rawValue))
-    }
-}
-
-/// Precomputes fonts for each inline presentation style so comment text scaling stays consistent.
-@MainActor
-private struct CommentFontProvider {
-    private static var cache: [CGFloat: CommentFontProvider] = [:]
-
-    private let base: Font
-    private let bold: Font
-    private let italic: Font
-    private let boldItalic: Font
-    private let code: Font
-    private let codeBold: Font
-    private let codeItalic: Font
-    private let codeBoldItalic: Font
-
-    static func cached(textScaling: CGFloat) -> CommentFontProvider {
-        if let cached = cache[textScaling] {
-            return cached
-        }
-        let provider = CommentFontProvider(textScaling: textScaling)
-        cache[textScaling] = provider
-        return provider
-    }
-
-    private init(textScaling: CGFloat) {
-        let basePointSize = UIFont.preferredFont(forTextStyle: .callout).pointSize * textScaling
-        let codePointSize = UIFont.preferredFont(forTextStyle: .subheadline).pointSize * textScaling
-
-        base = Self.makeFont(size: basePointSize, weight: .regular, italic: false, monospaced: false)
-        bold = Self.makeFont(size: basePointSize, weight: .semibold, italic: false, monospaced: false)
-        italic = Self.makeFont(size: basePointSize, weight: .regular, italic: true, monospaced: false)
-        boldItalic = Self.makeFont(size: basePointSize, weight: .semibold, italic: true, monospaced: false)
-
-        code = Self.makeFont(size: codePointSize, weight: .regular, italic: false, monospaced: true)
-        codeBold = Self.makeFont(size: codePointSize, weight: .semibold, italic: false, monospaced: true)
-        codeItalic = Self.makeFont(size: codePointSize, weight: .regular, italic: true, monospaced: true)
-        codeBoldItalic = Self.makeFont(size: codePointSize, weight: .semibold, italic: true, monospaced: true)
-    }
-
-    func font(isCode: Bool, isBold: Bool, isItalic: Bool) -> Font {
-        switch (isCode, isBold, isItalic) {
-        case (true, true, true):
-            return codeBoldItalic
-        case (true, true, false):
-            return codeBold
-        case (true, false, true):
-            return codeItalic
-        case (true, false, false):
-            return code
-        case (false, true, true):
-            return boldItalic
-        case (false, true, false):
-            return bold
-        case (false, false, true):
-            return italic
-        default:
-            return base
-        }
-    }
-
-    private static func makeFont(
-        size: CGFloat,
-        weight: UIFont.Weight,
-        italic: Bool,
-        monospaced: Bool
-    ) -> Font {
-        var font: UIFont
-        if monospaced {
-            font = UIFont.monospacedSystemFont(ofSize: size, weight: weight)
-        } else {
-            font = UIFont.systemFont(ofSize: size, weight: weight)
-        }
-
-        if italic {
-            if let italicDescriptor = font.fontDescriptor.withSymbolicTraits(.traitItalic) {
-                font = UIFont(descriptor: italicDescriptor, size: size)
-            } else {
-                font = UIFont.italicSystemFont(ofSize: size)
-            }
-        }
-
-        return Font(font)
-    }
-}
-
-@MainActor
-private enum StyledCommentTextCache {
-    private struct CacheKey: Hashable {
-        let commentID: Int
-        let scale: CGFloat
-    }
-
-    private struct Entry {
-        let base: AttributedString
-        let styled: AttributedString
-    }
-
-    private static var cache: [CacheKey: Entry] = [:]
-
-    static func text(commentID: Int, textScaling: CGFloat, baseText: AttributedString) -> AttributedString {
-        let key = CacheKey(commentID: commentID, scale: textScaling)
-        if let cached = cache[key], cached.base == baseText {
-            return cached.styled
-        }
-
-        var attributed = baseText
-        let fontProvider = CommentFontProvider.cached(textScaling: textScaling)
-        let linkColor = AppColors.appTintColor
-
-        for run in attributed.runs {
-            let range = run.range
-            let intents = run.inlinePresentationIntent ?? []
-            attributed[range].font = fontProvider.font(
-                isCode: intents.contains(.code),
-                isBold: intents.contains(.stronglyEmphasized),
-                isItalic: intents.contains(.emphasized)
-            )
-        }
-
-        for run in attributed.runs where run.link != nil {
-            attributed[run.range].foregroundColor = linkColor
-        }
-
-        cache[key] = Entry(base: baseText, styled: attributed)
-        return attributed
-    }
-}
-
 struct ToolbarTitle: View {
     let post: Post
     let showTitle: Bool
@@ -551,7 +332,6 @@ struct ToolbarTitle: View {
         .animation(.easeInOut(duration: 0.3), value: showTitle)
     }
 }
-
 struct BookmarkToolbarButton: View {
     let isBookmarked: Bool
     let toggleBookmark: @Sendable () async -> Bool
@@ -577,7 +357,6 @@ struct BookmarkToolbarButton: View {
         .disabled(isSubmitting)
     }
 }
-
 struct ShareMenu: View {
     let post: Post
 
@@ -590,25 +369,21 @@ struct ShareMenu: View {
         }
     }
 }
-
 struct LoadingView: View {
     var body: some View {
         AppLoadingStateView(message: "Loading...")
     }
 }
-
 struct EmptyCommentsView: View {
     var body: some View {
         AppEmptyStateView(iconSystemName: "bubble.left", title: "No comments yet")
     }
 }
-
 struct ViewOffsetKey: PreferenceKey {
     typealias Value = CGFloat
     static let defaultValue = CGFloat.zero
     static func reduce(value: inout Value, nextValue: () -> Value) { value += nextValue() }
 }
-
 struct CommentPositionsPreferenceKey: PreferenceKey {
     typealias Value = [Int: CGRect]
     static let defaultValue: [Int: CGRect] = [:]
@@ -616,9 +391,7 @@ struct CommentPositionsPreferenceKey: PreferenceKey {
         value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
-
 // MARK: - Helpers
-
 extension View {
     func plainListRow() -> some View {
         listRowSeparator(.hidden)

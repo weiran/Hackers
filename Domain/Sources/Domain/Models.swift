@@ -120,14 +120,14 @@ public enum PostType: String, CaseIterable, Sendable {
 
 @Observable
 public final class Comment: @unchecked Sendable {
-    public nonisolated(unsafe) let id: Int
+    nonisolated(unsafe) public let id: Int
     public let age: String
     public let text: String
     public let by: String
     public var level: Int
     public var upvoteLink: String?
-    public nonisolated(unsafe) var upvoted: Bool
-    public nonisolated(unsafe) var voteLinks: VoteLinks?
+    nonisolated(unsafe) public var upvoted: Bool
+    nonisolated(unsafe) public var voteLinks: VoteLinks?
     public var visibility: CommentVisibilityType
     public var parsedText: AttributedString?
 
@@ -158,11 +158,11 @@ public final class Comment: @unchecked Sendable {
 }
 
 extension Comment: Hashable {
-    public nonisolated(unsafe) static func == (lhs: Comment, rhs: Comment) -> Bool {
+    nonisolated(unsafe) public static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
     }
 
-    public nonisolated(unsafe) func hash(into hasher: inout Hasher) {
+    nonisolated(unsafe) public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }

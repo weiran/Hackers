@@ -103,19 +103,15 @@ extension PostRepository {
         let metadataLinks = try metadataElement?.select("a").array() ?? []
 
         func linkWithIDPrefix(_ prefix: String, in links: [Element]) throws -> Element? {
-            for link in links {
-                if try link.attr("id").starts(with: prefix) {
-                    return link
-                }
+            for link in links where try link.attr("id").starts(with: prefix) {
+                return link
             }
             return nil
         }
 
         func linkWithExactText(_ text: String, in links: [Element]) throws -> Element? {
-            for link in links {
-                if try link.text().localizedCaseInsensitiveCompare(text) == .orderedSame {
-                    return link
-                }
+            for link in links where try link.text().localizedCaseInsensitiveCompare(text) == .orderedSame {
+                return link
             }
             return nil
         }

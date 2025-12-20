@@ -15,8 +15,7 @@ public protocol NetworkManagerProtocol: Sendable {
 }
 
 public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskDelegate,
-    NetworkManagerProtocol, Sendable
-{
+    NetworkManagerProtocol, Sendable {
     private let session: URLSession
 
     override public init() {

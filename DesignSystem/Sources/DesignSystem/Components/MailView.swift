@@ -54,7 +54,7 @@ public struct MailView: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        public nonisolated func mailComposeController(
+        nonisolated public func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
             error: Error?,

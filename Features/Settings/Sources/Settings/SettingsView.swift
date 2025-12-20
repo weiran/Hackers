@@ -79,7 +79,7 @@ public struct SettingsView: View {
                             "---",
                             "App Version: \(version)",
                             "Device Model: \(deviceIdentifier)",
-                            "iOS Version: \(systemVersion)",
+                            "iOS Version: \(systemVersion)"
                         ]
 
                         MailView(
@@ -274,8 +274,7 @@ public extension Bundle {
         if let icons = infoDictionary?["CFBundleIcons"] as? [String: Any],
            let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
            let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
-           let lastIcon = iconFiles.last
-        {
+           let lastIcon = iconFiles.last {
             return UIImage(named: lastIcon)
         }
         return nil

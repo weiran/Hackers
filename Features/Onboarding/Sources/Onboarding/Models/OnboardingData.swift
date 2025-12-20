@@ -19,13 +19,15 @@ public struct OnboardingData: Sendable {
     public static func currentOnboarding() -> OnboardingData {
         let compactFeed = OnboardingItem(
             title: "Compact Feed Design",
-            subtitle: "Choose a streamlined feed layout with inline upvote and comment counts for a cleaner reading experience.",
+            subtitle: "Choose a streamlined feed layout with inline upvote and comment counts "
+                + "for a cleaner reading experience.",
             systemImage: "rectangle.compress.vertical",
         )
 
         let unvoteFeature = OnboardingItem(
             title: "Unvote Your Upvotes",
-            subtitle: "Changed your mind? Remove upvotes from posts and comments within Hacker News's 1-hour window.",
+            subtitle: "Changed your mind? Remove upvotes from posts and comments within "
+                + "Hacker News's 1-hour window.",
             systemImage: "arrow.uturn.down.circle",
         )
 

@@ -71,50 +71,9 @@ public final class FeedViewModel: @unchecked Sendable {
             postType = storedPostType
         }
         feedLoader = LoadingStateManager(initialData: [])
-
-        // Set up the loading function after initialization
-        feedLoader.setLoadFunction(
-            shouldSkipLoad: { !$0.isEmpty },
-            loadData: { [weak self] in
-                try await self?.fetchFeed() ?? []
-            },
-        )
-
-        settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self else { return }
-                let currentValue = self.settingsUseCase.showThumbnails
-                if self.showThumbnails != currentValue {
-                    self.showThumbnails = currentValue
-                }
-                let compactValue = self.settingsUseCase.compactFeedDesign
-                if self.compactFeedDesign != compactValue {
-                    self.compactFeedDesign = compactValue
-                }
-                let rememberValue = self.settingsUseCase.rememberFeedCategory
-                if self.rememberFeedCategorySetting != rememberValue {
-                    self.rememberFeedCategorySetting = rememberValue
-                    if rememberValue {
-                        self.settingsUseCase.lastFeedCategory = self.postType
-                    } else {
-                        self.settingsUseCase.lastFeedCategory = nil
-                    }
-                }
-            }
-
-        bookmarksObservation = NotificationCenter.default.publisher(for: .bookmarksDidChange)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard
-                    let postId = notification.userInfo?["postId"] as? Int,
-                    let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
-                else { return }
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
-                }
-            }
+        configureFeedLoader()
+        settingsCancellable = startObservingSettings()
+        bookmarksObservation = startObservingBookmarks()
     }
 
     @MainActor
@@ -321,5 +280,57 @@ public final class FeedViewModel: @unchecked Sendable {
                 }
             }
         }
+    }
+}
+
+private extension FeedViewModel {
+    func configureFeedLoader() {
+        // Set up the loading function after initialization.
+        feedLoader.setLoadFunction(
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { [weak self] in
+                try await self?.fetchFeed() ?? []
+            }
+        )
+    }
+
+    func startObservingSettings() -> AnyCancellable {
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let currentValue = self.settingsUseCase.showThumbnails
+                if self.showThumbnails != currentValue {
+                    self.showThumbnails = currentValue
+                }
+                let compactValue = self.settingsUseCase.compactFeedDesign
+                if self.compactFeedDesign != compactValue {
+                    self.compactFeedDesign = compactValue
+                }
+                let rememberValue = self.settingsUseCase.rememberFeedCategory
+                if self.rememberFeedCategorySetting != rememberValue {
+                    self.rememberFeedCategorySetting = rememberValue
+                    if rememberValue {
+                        self.settingsUseCase.lastFeedCategory = self.postType
+                    } else {
+                        self.settingsUseCase.lastFeedCategory = nil
+                    }
+                }
+            }
+    }
+
+    func startObservingBookmarks() -> AnyCancellable {
+        NotificationCenter.default.publisher(for: .bookmarksDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard
+                    let postId = notification.userInfo?["postId"] as? Int,
+                    let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
+                else { return }
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
+                }
+            }
     }
 }

@@ -27,7 +27,8 @@ public enum LinkOpener {
         presenter.present(safariVC, animated: true)
     }
 
-    private static var safariControllerFactory: (URL, SFSafariViewController.Configuration) -> SFSafariViewController = { url, configuration in
+    private static var safariControllerFactory:
+        (URL, SFSafariViewController.Configuration) -> SFSafariViewController = { url, configuration in
         SFSafariViewController(url: url, configuration: configuration)
     }
 

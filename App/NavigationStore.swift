@@ -161,8 +161,7 @@ class NavigationStore: NavigationStoreProtocol {
         switch view {
         case "item":
             if let idString = parameters["id"],
-               let id = Int(idString)
-            {
+               let id = Int(idString) {
                 navigateToPost(withId: id)
             }
         default:

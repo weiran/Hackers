@@ -41,8 +41,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
 
     private func migrateLinkBrowserModeIfNeeded() {
         if let existing = userDefaults.object(forKey: "linkBrowserMode") as? Int,
-           let mode = LinkBrowserMode(rawValue: existing)
-        {
+           let mode = LinkBrowserMode(rawValue: existing) {
             if mode == .inAppBrowser {
                 userDefaults.set(LinkBrowserMode.customBrowser.rawValue, forKey: "linkBrowserMode")
             }

@@ -37,8 +37,7 @@ private extension PostRepository {
         let document = try SwiftSoup.parse(html)
 
         if let fatitemTable = try document.select("table.fatitem").first(),
-           hasValidPostTitle(in: fatitemTable)
-        {
+           hasValidPostTitle(in: fatitemTable) {
             return try makePost(from: fatitemTable, document: document)
         }
 
