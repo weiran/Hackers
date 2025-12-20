@@ -47,8 +47,8 @@ public struct VoteButton: View {
         .disabled((!votingState.canVote && !votingState.canUnvote) || votingState.isVoting)
         .scaleEffect(votingState.isVoting ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: votingState.isVoting)
-        .accessibilityLabel(votingState.isUpvoted && votingState.canUnvote ? "Unvote" : (votingState.isUpvoted ? "Upvoted" : "Upvote"))
-        .accessibilityHint(votingState.isUpvoted && votingState.canUnvote ? "Double-tap to unvote" : (votingState.isUpvoted ? "Already upvoted" : (votingState.canVote ? "Double-tap to upvote" : "Voting unavailable")))
+        .accessibilityLabel(accessibilityLabelText)
+        .accessibilityHint(accessibilityHintText)
         .accessibilityValue({ () -> String in
             if let score = votingState.score { return "\(score) points" }
             return ""
@@ -61,6 +61,20 @@ public struct VoteButton: View {
         } else {
             style.defaultIconName
         }
+    }
+
+    private var accessibilityLabelText: String {
+        if votingState.isUpvoted {
+            return votingState.canUnvote ? "Unvote" : "Upvoted"
+        }
+        return "Upvote"
+    }
+
+    private var accessibilityHintText: String {
+        if votingState.isUpvoted {
+            return votingState.canUnvote ? "Double-tap to unvote" : "Already upvoted"
+        }
+        return votingState.canVote ? "Double-tap to upvote" : "Voting unavailable"
     }
 }
 

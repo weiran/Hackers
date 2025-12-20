@@ -171,12 +171,16 @@ public struct PostDisplayView: View {
             }
         }
     }
+}
 
-    private var inlineUpvoteStat: some View {
+private extension PostDisplayView {
+    var inlineUpvoteStat: some View {
         let score = displayedScore
         let isUpvoted = displayedUpvoted
         let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
-        let color: Color = isUpvoted ? AppColors.pillForeground(for: .upvote(isActive: true), colorScheme: colorScheme) : .secondary
+        let color: Color = isUpvoted
+            ? AppColors.pillForeground(for: .upvote(isActive: true), colorScheme: colorScheme)
+            : .secondary
 
         return HStack(spacing: 3) {
             Image(systemName: iconName)
@@ -190,7 +194,7 @@ public struct PostDisplayView: View {
         }
     }
 
-    private var inlineCommentsStat: some View {
+    var inlineCommentsStat: some View {
         HStack(spacing: 3) {
             Image(systemName: "message")
                 .scaledFont(.caption2)
@@ -201,7 +205,7 @@ public struct PostDisplayView: View {
         }
     }
 
-    private var upvotePill: some View {
+    var upvotePill: some View {
         let score = displayedScore
         let isUpvoted = displayedUpvoted
         let isLoading = isSubmittingUpvote
@@ -248,7 +252,7 @@ public struct PostDisplayView: View {
         )
     }
 
-    private var commentsPill: some View {
+    var commentsPill: some View {
         let style = AppColors.PillStyle.comments
         let commentTextColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
         let commentBackgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
@@ -267,7 +271,7 @@ public struct PostDisplayView: View {
         )
     }
 
-    private var bookmarkPill: some View {
+    var bookmarkPill: some View {
         let isBookmarked = displayedBookmarked
         let style = AppColors.PillStyle.bookmark(isSaved: isBookmarked)
         let backgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
@@ -292,7 +296,7 @@ public struct PostDisplayView: View {
         )
     }
 
-    private func makeUpvoteAction() -> (() -> Void)? {
+    func makeUpvoteAction() -> (() -> Void)? {
         return {
             guard !isSubmittingUpvote else { return }
 
@@ -346,7 +350,7 @@ public struct PostDisplayView: View {
         }
     }
 
-    private func derivedVoteLinks(afterUpvoteFrom voteLinks: VoteLinks?) -> VoteLinks? {
+    func derivedVoteLinks(afterUpvoteFrom voteLinks: VoteLinks?) -> VoteLinks? {
         guard let voteLinks else { return nil }
         if voteLinks.unvote != nil {
             return voteLinks
@@ -368,7 +372,7 @@ public struct PostDisplayView: View {
         return voteLinks
     }
 
-    private func makeBookmarkAction() -> (() -> Void)? {
+    func makeBookmarkAction() -> (() -> Void)? {
         guard let onBookmarkTap else { return nil }
         return {
             guard !isSubmittingBookmark else { return }
@@ -390,7 +394,7 @@ public struct PostDisplayView: View {
     }
 
     @ViewBuilder
-    private func pillView(
+    func pillView(
         iconName: String?,
         text: String,
         textColor: Color,

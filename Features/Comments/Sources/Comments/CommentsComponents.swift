@@ -37,91 +37,8 @@ struct CommentsContentView: View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
-                    if showsPostHeader {
-                        PostHeader(
-                            post: post,
-                            votingViewModel: votingViewModel,
-                            isLoadingComments: viewModel.isLoading,
-                            showThumbnails: viewModel.showThumbnails,
-                            onLinkTap: { handleLinkTap() },
-                            onPostUpdated: { updatedPost in
-                                viewModel.post = updatedPost
-                            },
-                            onBookmarkToggle: { await viewModel.toggleBookmark() }
-                        )
-                        .id("header")
-                        .background(GeometryReader { geometry in
-                            Color.clear.preference(
-                                key: ViewOffsetKey.self,
-                                value: geometry.frame(in: .global).minY,
-                            )
-                        })
-                        .listRowSeparator(.hidden)
-                        .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
-                            view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                if post.upvoted && post.voteLinks?.unvote != nil {
-                                    Button {
-                                        guard !viewModel.isLoading else { return }
-                                        Task {
-                                            var mutablePost = post
-                                            await votingViewModel.unvote(post: &mutablePost)
-                                            await MainActor.run {
-                                                viewModel.post = mutablePost
-                                            }
-                                        }
-                                    } label: {
-                                        Image(systemName: "arrow.uturn.down")
-                                    }
-                                    .tint(.orange)
-                                    .accessibilityLabel("Unvote")
-                                    .disabled(viewModel.isLoading)
-                                } else {
-                                    Button {
-                                        guard !viewModel.isLoading else { return }
-                                        Task {
-                                            var mutablePost = post
-                                            await votingViewModel.upvote(post: &mutablePost)
-                                            await MainActor.run {
-                                                if mutablePost.upvoted {
-                                                    viewModel.post = mutablePost
-                                                }
-                                            }
-                                        }
-                                    } label: {
-                                        Image(systemName: "arrow.up")
-                                    }
-                                    .tint(AppColors.upvotedColor)
-                                    .accessibilityLabel("Upvote")
-                                    .disabled(viewModel.isLoading)
-                                }
-                            }
-                        }
-                    }
-
-                    if viewModel.isLoading {
-                        LoadingView()
-                            .plainListRow()
-                    } else if viewModel.comments.isEmpty {
-                        EmptyCommentsView()
-                            .plainListRow()
-                    } else {
-                        CommentsForEach(
-                            viewModel: viewModel,
-                            votingViewModel: votingViewModel,
-                            post: post,
-                            visibleCommentPositions: $visibleCommentPositions,
-                            toggleCommentVisibility: { comment in
-                                toggleCommentVisibility(comment) { id in
-                                    proxy.scrollTo(id, anchor: .top)
-                                }
-                            },
-                            hideCommentBranch: { comment in
-                                hideCommentBranch(comment) { id in
-                                    proxy.scrollTo(id, anchor: .top)
-                                }
-                            },
-                        )
-                    }
+                    postHeaderSection(for: post)
+                    commentsSection(for: post, proxy: proxy)
                 }
                 .onScrollGeometryChange(for: Bool.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top > 40
@@ -139,6 +56,98 @@ struct CommentsContentView: View {
                     scrollToPendingComment(with: proxy)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func postHeaderSection(for post: Post) -> some View {
+        if showsPostHeader {
+            PostHeader(
+                post: post,
+                votingViewModel: votingViewModel,
+                isLoadingComments: viewModel.isLoading,
+                showThumbnails: viewModel.showThumbnails,
+                onLinkTap: { handleLinkTap() },
+                onPostUpdated: { updatedPost in
+                    viewModel.post = updatedPost
+                },
+                onBookmarkToggle: { await viewModel.toggleBookmark() }
+            )
+            .id("header")
+            .background(GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ViewOffsetKey.self,
+                    value: geometry.frame(in: .global).minY,
+                )
+            })
+            .listRowSeparator(.hidden)
+            .if((post.voteLinks?.upvote != nil && !post.upvoted) || (post.voteLinks?.unvote != nil && post.upvoted)) { view in
+                view.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    if post.upvoted && post.voteLinks?.unvote != nil {
+                        Button {
+                            guard !viewModel.isLoading else { return }
+                            Task {
+                                var mutablePost = post
+                                await votingViewModel.unvote(post: &mutablePost)
+                                await MainActor.run {
+                                    viewModel.post = mutablePost
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.uturn.down")
+                        }
+                        .tint(.orange)
+                        .accessibilityLabel("Unvote")
+                        .disabled(viewModel.isLoading)
+                    } else {
+                        Button {
+                            guard !viewModel.isLoading else { return }
+                            Task {
+                                var mutablePost = post
+                                await votingViewModel.upvote(post: &mutablePost)
+                                await MainActor.run {
+                                    if mutablePost.upvoted {
+                                        viewModel.post = mutablePost
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up")
+                        }
+                        .tint(AppColors.upvotedColor)
+                        .accessibilityLabel("Upvote")
+                        .disabled(viewModel.isLoading)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func commentsSection(for post: Post, proxy: ScrollViewProxy) -> some View {
+        if viewModel.isLoading {
+            LoadingView()
+                .plainListRow()
+        } else if viewModel.comments.isEmpty {
+            EmptyCommentsView()
+                .plainListRow()
+        } else {
+            CommentsForEach(
+                viewModel: viewModel,
+                votingViewModel: votingViewModel,
+                post: post,
+                visibleCommentPositions: $visibleCommentPositions,
+                toggleCommentVisibility: { comment in
+                    toggleCommentVisibility(comment) { id in
+                        proxy.scrollTo(id, anchor: .top)
+                    }
+                },
+                hideCommentBranch: { comment in
+                    hideCommentBranch(comment) { id in
+                        proxy.scrollTo(id, anchor: .top)
+                    }
+                },
+            )
         }
     }
 
