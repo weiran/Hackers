@@ -78,29 +78,26 @@ public final class CommentsViewModel: @unchecked Sendable {
         updateVisibleComments()
 
         settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    let currentValue = settingsUseCase.showThumbnails
-                    if self.showThumbnails != currentValue {
-                        self.showThumbnails = currentValue
-                    }
+                guard let self else { return }
+                let currentValue = settingsUseCase.showThumbnails
+                if self.showThumbnails != currentValue {
+                    self.showThumbnails = currentValue
                 }
             }
 
         bookmarksObservation = NotificationCenter.default.publisher(for: .bookmarksDidChange)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let self else { return }
                 guard let postId = notification.userInfo?["postId"] as? Int,
                       postId == self.postID,
                       let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
                 else { return }
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    if var currentPost = self.post {
-                        currentPost.isBookmarked = isBookmarked
-                        self.post = currentPost
-                    }
+                if var currentPost = self.post {
+                    currentPost.isBookmarked = isBookmarked
+                    self.post = currentPost
                 }
             }
     }

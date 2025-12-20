@@ -39,6 +39,7 @@ class NavigationStore: NavigationStoreProtocol {
     init() {
         // Listen for refresh notifications
         NotificationCenter.default.publisher(for: Notification.Name.refreshRequired)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.path = self?.path ?? .init()
             }
