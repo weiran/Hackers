@@ -15,6 +15,7 @@ public struct PostDisplayView: View {
     let showPostText: Bool
     let showThumbnails: Bool
     let compactMode: Bool
+    let titleLineLimit: Int?
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
     let onUnvoteTap: (() async -> Bool)?
@@ -35,6 +36,7 @@ public struct PostDisplayView: View {
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         compactMode: Bool = false,
+        titleLineLimit: Int? = nil,
         onThumbnailTap: (() -> Void)? = nil,
         onUpvoteTap: (() async -> Bool)? = nil,
         onUnvoteTap: (() async -> Bool)? = nil,
@@ -46,6 +48,7 @@ public struct PostDisplayView: View {
         self.showPostText = showPostText
         self.showThumbnails = showThumbnails
         self.compactMode = compactMode
+        self.titleLineLimit = titleLineLimit
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
         self.onUnvoteTap = onUnvoteTap
@@ -121,6 +124,7 @@ public struct PostDisplayView: View {
                     Text(post.title)
                         .scaledFont(.headline)
                         .foregroundStyle(.primary)
+                        .lineLimit(titleLineLimit)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Metadata row (only in normal mode)

@@ -224,6 +224,7 @@ private struct PostCommentsSheet: View {
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @ObservedObject private var browserController: BrowserController
+    private let settingsUseCase: any SettingsUseCase
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
 
@@ -235,6 +236,7 @@ private struct PostCommentsSheet: View {
             commentVotingStateProvider: container.getCommentVotingStateProvider(),
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
+        settingsUseCase = container.getSettingsUseCase()
         _browserController = ObservedObject(wrappedValue: controller)
         self.onDismiss = onDismiss
         fallbackURL = post.url
@@ -260,6 +262,8 @@ private struct PostCommentsSheet: View {
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
+
+                collapsedHeaderMeasurement(width: screenSize.width)
 
                 sheetContent(expandedTop: expandedTop, collapsedTop: collapsedTop)
                     .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
@@ -380,20 +384,44 @@ private struct PostCommentsSheet: View {
     }
 
     private var collapsedHeader: some View {
-        Group {
-            if let post = viewModel.post {
-                CollapsedPostHeaderView(post: post) {
-                    sheetState = .expanded
-                }
-            } else {
-                CollapsedPostHeaderLoadingView()
-            }
-        }
+        collapsedHeaderView(onExpand: { sheetState = .expanded })
         .background(
             GeometryReader { proxy in
                 Color.clear.preference(key: CollapsedHeaderHeightPreferenceKey.self, value: proxy.size.height)
             }
         )
+    }
+
+    private func collapsedHeaderMeasurement(width: CGFloat) -> some View {
+        collapsedHeaderView(onExpand: {})
+            .frame(width: width, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .opacity(0)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .background(
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: CollapsedHeaderHeightPreferenceKey.self,
+                        value: proxy.size.height
+                    )
+                }
+            )
+    }
+
+    @ViewBuilder
+    private func collapsedHeaderView(onExpand: @escaping () -> Void) -> some View {
+        if let post = viewModel.post {
+            CollapsedPostHeaderView(
+                post: post,
+                votingState: votingViewModel.votingState(for: post),
+                showThumbnails: settingsUseCase.showThumbnails,
+                compactMode: settingsUseCase.compactFeedDesign,
+                onExpand: onExpand
+            )
+        } else {
+            CollapsedPostHeaderLoadingView()
+        }
     }
 
     private var sheetShape: UnevenRoundedRectangle {
@@ -577,21 +605,22 @@ private enum ControlsHeightPreferenceKey: PreferenceKey {
 
 private struct CollapsedPostHeaderView: View {
     let post: Post
+    let votingState: VotingState?
+    let showThumbnails: Bool
+    let compactMode: Bool
     let onExpand: () -> Void
 
     var body: some View {
         Button(action: onExpand) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(post.title)
-                    .scaledFont(.headline)
-                    .foregroundStyle(.primary)
-                    .lineLimit(2)
-
-                Text(metadataText)
-                    .scaledFont(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
+            PostDisplayView(
+                post: post,
+                votingState: votingState,
+                showPostText: false,
+                showThumbnails: showThumbnails,
+                compactMode: compactMode,
+                titleLineLimit: 2
+            )
+            .allowsHitTesting(false)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
             .padding(.top, 12)
@@ -599,12 +628,6 @@ private struct CollapsedPostHeaderView: View {
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())
-    }
-
-    private var metadataText: String {
-        let points = post.score == 1 ? "point" : "points"
-        let comments = post.commentsCount == 1 ? "comment" : "comments"
-        return "\(post.score) \(points) • \(post.commentsCount) \(comments) • \(post.age)"
     }
 }
 
