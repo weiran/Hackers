@@ -462,6 +462,27 @@ private struct BrowserControlsView: View {
     let onDismiss: @MainActor () -> Void
 
     var body: some View {
+        ZStack {
+            HStack {
+                Spacer()
+                controlsGroup
+                Spacer()
+            }
+
+            HStack {
+                closeButton
+                    .padding(.leading, safeInsetPadding)
+                Spacer()
+            }
+        }
+    }
+
+    private var safeInsetPadding: CGFloat {
+        let inset = PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets.left ?? 0
+        return max(inset, 12)
+    }
+
+    private var controlsGroup: some View {
         HStack(spacing: 18) {
             controlButton(systemName: "chevron.backward", isEnabled: controller.canGoBack) {
                 controller.goBack()
@@ -486,10 +507,6 @@ private struct BrowserControlsView: View {
                 let targetURL = controller.currentURL ?? fallbackURL
                 LinkOpener.openURL(targetURL)
             }
-
-            controlButton(systemName: "xmark") {
-                Task { @MainActor in onDismiss() }
-            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -500,6 +517,22 @@ private struct BrowserControlsView: View {
         )
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
     }
+
+    private var closeButton: some View {
+        Button {
+            Task { @MainActor in onDismiss() }
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 14, weight: .semibold))
+                .frame(width: 20, height: 20)
+                .padding(10)
+                .background(.thinMaterial, in: Circle())
+        }
+        .foregroundStyle(.primary)
+        .accessibilityLabel("Close")
+        .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
+    }
+
 
     private func controlButton(
         systemName: String,
