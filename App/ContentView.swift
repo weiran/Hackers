@@ -20,10 +20,10 @@ struct MainContentView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
     @Environment(ToastPresenter.self) private var toastPresenter
+    private let onboardingCoordinator: OnboardingCoordinator
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
     @State private var showOnboarding = false
-    private let onboardingCoordinator: OnboardingCoordinator
     private var navigationPathBinding: Binding<NavigationPath> {
         Binding(
             get: { navigationStore.path },
@@ -48,6 +48,9 @@ struct MainContentView: View {
             set: { navigationStore.showingSettings = $0 }
         )
     }
+    private var isPresentingModal: Bool {
+        navigationStore.showingLogin || navigationStore.showingSettings || showOnboarding
+    }
 
     init(container: DependencyContainer = .shared) {
         onboardingCoordinator = OnboardingCoordinator(
@@ -58,7 +61,7 @@ struct MainContentView: View {
     var body: some View {
         Group {
             if UIDevice.current.userInterfaceIdiom == .pad {
-                AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
+                AdaptiveSplitView(feedViewModel: feedViewModel, settingsViewModel: settingsViewModel)
             } else {
                 NavigationStack(path: navigationPathBinding) {
                     FeedView<NavigationStore>(
@@ -145,17 +148,13 @@ struct MainContentView: View {
             }
         }
     }
-
-    private var isPresentingModal: Bool {
-        navigationStore.showingLogin || navigationStore.showingSettings || showOnboarding
-    }
 }
 
 struct AdaptiveSplitView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
-    @State var settingsViewModel: SettingsViewModel
     let feedViewModel: FeedViewModel
+    @State var settingsViewModel: SettingsViewModel
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
         Binding(
             get: { navigationStore.detailPath },

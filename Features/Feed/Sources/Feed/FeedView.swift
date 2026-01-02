@@ -9,13 +9,14 @@ import Shared
 import SwiftUI
 
 public struct FeedView<Store: NavigationStoreProtocol>: View {
+    @Environment(Store.self) private var navigationStore
+    let isSidebar: Bool
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
     @State private var searchText: String
-    @Environment(Store.self) private var navigationStore
-    let isSidebar: Bool
+
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,

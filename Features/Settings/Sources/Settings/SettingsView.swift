@@ -13,9 +13,14 @@ import Shared
 import SwiftUI
 
 public struct SettingsView: View {
-    @State private var viewModel: SettingsViewModel
     @Environment(ToastPresenter.self) private var toastPresenter
     @Environment(\.dismiss) private var dismiss
+    let isAuthenticated: Bool
+    let currentUsername: String?
+    let onLogin: (String, String) async throws -> Void
+    let onLogout: () -> Void
+    let onShowOnboarding: () -> Void
+    @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
@@ -23,12 +28,6 @@ public struct SettingsView: View {
 #if DEBUG
     @AppStorage("devThumbnailProvider") private var devThumbnailProvider = "weiranzhang"
 #endif
-
-    let isAuthenticated: Bool
-    let currentUsername: String?
-    let onLogin: (String, String) async throws -> Void
-    let onLogout: () -> Void
-    let onShowOnboarding: () -> Void
 
     public init(
         viewModel: SettingsViewModel = SettingsViewModel(),

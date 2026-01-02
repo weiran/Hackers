@@ -14,17 +14,18 @@ import SwiftUI
 import UIKit
 
 struct CommentsContentView: View {
-    @State var viewModel: CommentsViewModel
-    @State var votingViewModel: VotingViewModel
     let showsPostHeader: Bool
-    @Binding var showTitle: Bool
-    @Binding var visibleCommentPositions: [Int: CGRect]
-    @Binding var pendingCommentID: Int?
-    @Binding var listAnimationsEnabled: Bool
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
     let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
     let updateIsAtTop: ((Bool) -> Void)?
+    @State var viewModel: CommentsViewModel
+    @State var votingViewModel: VotingViewModel
+    @Binding var showTitle: Bool
+    @Binding var visibleCommentPositions: [Int: CGRect]
+    @Binding var pendingCommentID: Int?
+    @Binding var listAnimationsEnabled: Bool
+
     var body: some View {
         Group {
             if let post = viewModel.post {
@@ -139,10 +140,7 @@ struct CommentsContentView: View {
                 .plainListRow()
         } else {
             CommentsForEach(
-                viewModel: viewModel,
-                votingViewModel: votingViewModel,
                 post: post,
-                visibleCommentPositions: $visibleCommentPositions,
                 toggleCommentVisibility: { comment in
                     toggleCommentVisibility(comment) { id in
                         proxy.scrollTo(id, anchor: .top)
@@ -153,6 +151,9 @@ struct CommentsContentView: View {
                         proxy.scrollTo(id, anchor: .top)
                     }
                 },
+                viewModel: viewModel,
+                votingViewModel: votingViewModel,
+                visibleCommentPositions: $visibleCommentPositions,
             )
         }
     }
@@ -169,20 +170,21 @@ struct CommentsContentView: View {
     }
 }
 struct CommentsForEach: View {
-    @State var viewModel: CommentsViewModel
-    @State var votingViewModel: VotingViewModel
     let post: Post
-    @Binding var visibleCommentPositions: [Int: CGRect]
     let toggleCommentVisibility: (Comment) -> Void
     let hideCommentBranch: (Comment) -> Void
+    @State var viewModel: CommentsViewModel
+    @State var votingViewModel: VotingViewModel
+    @Binding var visibleCommentPositions: [Int: CGRect]
+
     var body: some View {
         ForEach(viewModel.visibleComments, id: \.id) { comment in
             CommentRow(
-                comment: comment,
                 post: post,
                 votingViewModel: votingViewModel,
                 onToggle: { toggleCommentVisibility(comment) },
                 onHide: { hideCommentBranch(comment) },
+                comment: comment,
             )
             .id("comment-\(comment.id)")
             .background(GeometryReader { geometry in

@@ -10,6 +10,7 @@ import Shared
 import SwiftUI
 
 public struct PostDisplayView: View {
+    @Environment(\.colorScheme) var colorScheme
     let post: Post
     let votingState: VotingState?
     let showPostText: Bool
@@ -21,8 +22,6 @@ public struct PostDisplayView: View {
     let onUnvoteTap: (() async -> Bool)?
     let onBookmarkTap: (() async -> Bool)?
     let onCommentsTap: (() -> Void)?
-
-    @Environment(\.colorScheme) var colorScheme
     @State var isSubmittingUpvote = false
     @State var isSubmittingBookmark = false
     @State var displayedScore: Int

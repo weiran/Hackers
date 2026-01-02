@@ -12,19 +12,19 @@ import Shared
 import SwiftUI
 
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
-    @State private var viewModel: CommentsViewModel
-    @State private var votingViewModel: VotingViewModel
+    @Environment(Store.self) private var navigationStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
+    private let isAtTop: Binding<Bool>?
+    @State private var viewModel: CommentsViewModel
+    @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
     @State private var hasMeasuredInitialOffset = false
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var pendingCommentID: Int?
     @State private var listAnimationsEnabled = false
-    @Environment(Store.self) private var navigationStore
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
-    private let isAtTop: Binding<Bool>?
 
     public init(
         postID: Int,
@@ -79,17 +79,17 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         Group {
             if let post = viewModel.post {
                 CommentsContentView(
+                    showsPostHeader: showsPostHeader,
+                    handleLinkTap: handleLinkTap,
+                    toggleCommentVisibility: toggleCommentVisibility,
+                    hideCommentBranch: hideCommentBranch,
+                    updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
-                    showsPostHeader: showsPostHeader,
                     showTitle: $showTitle,
                     visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
                     listAnimationsEnabled: $listAnimationsEnabled,
-                    handleLinkTap: handleLinkTap,
-                    toggleCommentVisibility: toggleCommentVisibility,
-                    hideCommentBranch: hideCommentBranch,
-                    updateIsAtTop: { isAtTop?.wrappedValue = $0 }
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")

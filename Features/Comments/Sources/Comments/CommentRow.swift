@@ -13,12 +13,12 @@ import SwiftUI
 import UIKit
 
 struct CommentRow: View {
-    @Bindable var comment: Comment
+    @Environment(\.textScaling) private var textScaling
     let post: Post
     let votingViewModel: VotingViewModel
     let onToggle: () -> Void
     let onHide: () -> Void
-    @Environment(\.textScaling) private var textScaling
+    @Bindable var comment: Comment
 
     private var baseCommentText: AttributedString {
         if let cached = comment.parsedText {
@@ -28,14 +28,6 @@ struct CommentRow: View {
         let parsed = CommentHTMLParser.parseHTMLText(comment.text)
         comment.parsedText = parsed
         return parsed
-    }
-
-    private func styledText(for textScaling: CGFloat) -> AttributedString {
-        StyledCommentTextCache.text(
-            commentID: comment.id,
-            textScaling: textScaling,
-            baseText: baseCommentText
-        )
     }
 
     var body: some View {
@@ -101,6 +93,14 @@ struct CommentRow: View {
             }
         }
         .id(String(comment.id) + String(comment.visibility.rawValue))
+    }
+
+    private func styledText(for textScaling: CGFloat) -> AttributedString {
+        StyledCommentTextCache.text(
+            commentID: comment.id,
+            textScaling: textScaling,
+            baseText: baseCommentText
+        )
     }
 }
 

@@ -121,8 +121,8 @@ public struct ToastBanner: View {
 }
 
 private struct ToastOverlayModifier: ViewModifier {
-    @Bindable private var presenter: ToastPresenter
     private let isActive: Bool
+    @Bindable private var presenter: ToastPresenter
 
     init(presenter: ToastPresenter, isActive: Bool) {
         _presenter = Bindable(wrappedValue: presenter)

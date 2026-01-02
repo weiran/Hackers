@@ -175,8 +175,8 @@ struct EmbeddedWebView: View {
 }
 
 struct PostLinkBrowserView: View {
-    let post: Post
     @Environment(\.dismiss) private var dismiss
+    let post: Post
     @State private var showingCommentsPane = false
     @StateObject private var browserController = BrowserController()
 
@@ -216,6 +216,10 @@ private struct PostCommentsSheet: View {
     private static let handleVerticalPadding: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
 
+    private let settingsUseCase: any SettingsUseCase
+    let onDismiss: @MainActor () -> Void
+    let fallbackURL: URL
+    @ObservedObject private var browserController: BrowserController
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
@@ -225,10 +229,6 @@ private struct PostCommentsSheet: View {
     @State private var dragStartAllowsSheetDrag = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
-    @ObservedObject private var browserController: BrowserController
-    private let settingsUseCase: any SettingsUseCase
-    let onDismiss: @MainActor () -> Void
-    let fallbackURL: URL
 
     init(post: Post, controller: BrowserController, onDismiss: @MainActor @escaping () -> Void) {
         _viewModel = State(initialValue: CommentsViewModel(post: post))
@@ -281,9 +281,9 @@ private struct PostCommentsSheet: View {
 
                 if isCollapsed {
                     BrowserControlsView(
-                        controller: browserController,
                         fallbackURL: fallbackURL,
-                        onDismiss: onDismiss
+                        onDismiss: onDismiss,
+                        controller: browserController
                     )
                     .frame(width: screenSize.width, alignment: .center)
                     .offset(y: controlsTop)
@@ -495,9 +495,9 @@ private enum SheetState {
 }
 
 private struct BrowserControlsView: View {
-    @ObservedObject var controller: BrowserController
     let fallbackURL: URL
     let onDismiss: @MainActor () -> Void
+    @ObservedObject var controller: BrowserController
 
     var body: some View {
         ZStack {
