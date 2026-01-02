@@ -220,7 +220,9 @@ private struct PostCommentsSheet: View {
     @State private var votingViewModel: VotingViewModel
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var sheetState: SheetState = .collapsed
-    @GestureState private var dragTranslation: CGFloat = 0
+    @State private var dragTranslation: CGFloat = 0
+    @State private var isTrackingDrag = false
+    @State private var dragStartAllowsSheetDrag = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @ObservedObject private var browserController: BrowserController
@@ -247,7 +249,7 @@ private struct PostCommentsSheet: View {
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let screenSize = resolvedScreenSize(for: proxy)
             let handleHeight = handleAreaHeight
-            let expandedTop = safeInsets.top
+            let expandedTop: CGFloat = 0
             let collapsedTop = max(
                 screenSize.height - (collapsedHeight + handleHeight + safeInsets.bottom),
                 expandedTop
@@ -257,15 +259,20 @@ private struct PostCommentsSheet: View {
             let clampedTop = min(max(proposedTop, expandedTop), collapsedTop)
             let alignedTop = floor(clampedTop)
             let sheetHeight = ceil(screenSize.height - alignedTop) + 1
-            let controlsOffset = max(controlsHeight, 44) + Self.controlsSpacing
+            let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
+            let handleTopInset: CGFloat = 0
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
 
                 collapsedHeaderMeasurement(width: screenSize.width)
 
-                sheetContent(expandedTop: expandedTop, collapsedTop: collapsedTop)
+                sheetContent(
+                    expandedTop: expandedTop,
+                    collapsedTop: collapsedTop,
+                    handleTopInset: handleTopInset
+                )
                     .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
                     .background(sheetBackground)
                     .clipShape(sheetShape)
@@ -297,8 +304,10 @@ private struct PostCommentsSheet: View {
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
                 guard updated.isFinite, updated > 60 else { return }
-                guard abs(updated - collapsedHeight) > 0.5 else { return }
-                collapsedHeight = updated
+                let handlePadding = Self.handleVerticalPadding * 2
+                let paddedHeight = updated + handlePadding + 16
+                guard abs(paddedHeight - collapsedHeight) > 0.5 else { return }
+                collapsedHeight = paddedHeight
             }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
@@ -317,17 +326,21 @@ private struct PostCommentsSheet: View {
         !isExpanded
     }
 
-    private var shouldAllowSheetDrag: Bool {
-        isCollapsed || (isExpanded && isScrollAtTop)
-    }
-
     private var handleAreaHeight: CGFloat {
         Self.handleThickness + (Self.handleVerticalPadding * 2)
     }
 
-    private func sheetContent(expandedTop: CGFloat, collapsedTop: CGFloat) -> some View {
+    private func sheetContent(
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat,
+        handleTopInset: CGFloat
+    ) -> some View {
         VStack(spacing: 0) {
-            sheetHandle(expandedTop: expandedTop, collapsedTop: collapsedTop)
+            sheetHandle(
+                expandedTop: expandedTop,
+                collapsedTop: collapsedTop,
+                handleTopInset: handleTopInset
+            )
 
             ZStack(alignment: .top) {
                 CommentsView<NavigationStore>(
@@ -350,12 +363,14 @@ private struct PostCommentsSheet: View {
             }
         }
         .contentShape(Rectangle())
-        .if(shouldAllowSheetDrag) { view in
-            view.simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-        }
+        .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
-    private func sheetHandle(expandedTop: CGFloat, collapsedTop: CGFloat) -> some View {
+    private func sheetHandle(
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat,
+        handleTopInset: CGFloat
+    ) -> some View {
         ZStack {
             Capsule()
                 .fill(.secondary.opacity(0.35))
@@ -377,10 +392,9 @@ private struct PostCommentsSheet: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, Self.handleVerticalPadding)
+        .padding(.top, Self.handleVerticalPadding + handleTopInset)
         .padding(.bottom, Self.handleVerticalPadding)
         .contentShape(Rectangle())
-        .gesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
     private var collapsedHeader: some View {
@@ -461,10 +475,21 @@ private struct PostCommentsSheet: View {
 
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .global)
-            .updating($dragTranslation) { value, state, _ in
-                state = value.translation.height
+            .onChanged { value in
+                if !isTrackingDrag {
+                    dragStartAllowsSheetDrag = isCollapsed || isScrollAtTop
+                    isTrackingDrag = true
+                }
+                guard dragStartAllowsSheetDrag else { return }
+                dragTranslation = value.translation.height
             }
             .onEnded { value in
+                defer {
+                    dragTranslation = 0
+                    isTrackingDrag = false
+                    dragStartAllowsSheetDrag = false
+                }
+                guard dragStartAllowsSheetDrag else { return }
                 let baseTop = isExpanded ? expandedTop : collapsedTop
                 let predictedTop = baseTop + value.predictedEndTranslation.height
                 let midpoint = (expandedTop + collapsedTop) / 2
