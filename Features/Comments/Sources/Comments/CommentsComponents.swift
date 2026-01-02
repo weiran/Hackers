@@ -24,6 +24,7 @@ struct CommentsContentView: View {
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
     let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
+    let updateIsAtTop: ((Bool) -> Void)?
     var body: some View {
         Group {
             if let post = viewModel.post {
@@ -38,10 +39,11 @@ struct CommentsContentView: View {
                     postHeaderSection(for: post)
                     commentsSection(for: post, proxy: proxy)
                 }
-                .onScrollGeometryChange(for: Bool.self, of: { geometry in
-                    geometry.contentOffset.y + geometry.contentInsets.top > 40
+                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                    geometry.contentOffset.y + geometry.contentInsets.top
                 }, action: { _, newValue in
-                    showTitle = newValue
+                    showTitle = newValue > 40
+                    updateIsAtTop?(newValue <= 2)
                 })
                 .listStyle(.plain)
                 .transaction { transaction in

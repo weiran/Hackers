@@ -24,6 +24,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    private let isAtTop: Binding<Bool>?
 
     public init(
         postID: Int,
@@ -31,11 +32,13 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
+        isAtTop: Binding<Bool>? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
         self.showsPostHeader = showsPostHeader
         self.allowsRefresh = allowsRefresh
+        self.isAtTop = isAtTop
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -56,6 +59,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
+        isAtTop: Binding<Bool>? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -65,6 +69,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             targetCommentID: targetCommentID,
             showsPostHeader: showsPostHeader,
             allowsRefresh: allowsRefresh,
+            isAtTop: isAtTop,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -84,6 +89,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     handleLinkTap: handleLinkTap,
                     toggleCommentVisibility: toggleCommentVisibility,
                     hideCommentBranch: hideCommentBranch,
+                    updateIsAtTop: { isAtTop?.wrappedValue = $0 }
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")

@@ -224,6 +224,7 @@ private struct PostCommentsSheet: View {
     @State private var sheetState: SheetState = .collapsed
     @GestureState private var dragTranslation: CGFloat = 0
     @State private var controlsHeight: CGFloat = 0
+    @State private var isScrollAtTop = true
     @ObservedObject private var browserController: BrowserController
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
@@ -314,6 +315,10 @@ private struct PostCommentsSheet: View {
         !isExpanded
     }
 
+    private var shouldAllowSheetDrag: Bool {
+        isCollapsed || (isExpanded && isScrollAtTop)
+    }
+
     private var handleAreaHeight: CGFloat {
         Self.handleThickness + (Self.handleVerticalPadding * 2)
     }
@@ -328,6 +333,7 @@ private struct PostCommentsSheet: View {
                     initialPost: viewModel.post,
                     showsPostHeader: isExpanded,
                     allowsRefresh: false,
+                    isAtTop: $isScrollAtTop,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel
                 )
@@ -340,6 +346,10 @@ private struct PostCommentsSheet: View {
                     .opacity(isExpanded ? 0 : 1)
                     .allowsHitTesting(!isExpanded)
             }
+        }
+        .contentShape(Rectangle())
+        .if(shouldAllowSheetDrag) { view in
+            view.simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         }
     }
 
