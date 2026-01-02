@@ -189,7 +189,6 @@ struct PostLinkBrowserView: View {
                 showsToolbar: false,
                 controller: browserController
             )
-            .ignoresSafeArea()
 
             if showingCommentsPane {
                 PostCommentsSheet(
@@ -200,7 +199,6 @@ struct PostLinkBrowserView: View {
                 .transition(.move(edge: .bottom))
             }
         }
-        .ignoresSafeArea()
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .task {
