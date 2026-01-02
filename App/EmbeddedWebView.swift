@@ -376,20 +376,7 @@ private struct PostCommentsSheet: View {
                 .fill(.secondary.opacity(0.35))
                 .frame(width: Self.handleWidth, height: Self.handleThickness)
 
-            if isExpanded {
-                HStack {
-                    Spacer()
-                    Button {
-                        Task { @MainActor in onDismiss() }
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .semibold))
-                            .padding(6)
-                            .background(.thinMaterial, in: Circle())
-                    }
-                    .accessibilityLabel("Close")
-                }
-            }
+            EmptyView()
         }
         .frame(maxWidth: .infinity)
         .padding(.top, Self.handleVerticalPadding + handleTopInset)
