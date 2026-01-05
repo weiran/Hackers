@@ -20,6 +20,70 @@ fileprivate struct PillConfiguration {
     let numericValue: Int?
 }
 
+public struct PostPillView: View {
+    let iconName: String?
+    let text: String
+    let textColor: Color
+    let backgroundColor: Color
+    let isLoading: Bool
+    let numericValue: Int?
+
+    public init(
+        iconName: String?,
+        text: String,
+        textColor: Color,
+        backgroundColor: Color,
+        isLoading: Bool = false,
+        numericValue: Int? = nil
+    ) {
+        self.iconName = iconName
+        self.text = text
+        self.textColor = textColor
+        self.backgroundColor = backgroundColor
+        self.isLoading = isLoading
+        self.numericValue = numericValue
+    }
+
+    public var body: some View {
+        let iconDimension: CGFloat = 12
+        HStack(spacing: 4) {
+            if let iconName {
+                Image(systemName: iconName)
+                    .scaledFont(.caption2)
+                    .foregroundStyle(textColor)
+                    .frame(width: iconDimension, height: iconDimension)
+            }
+            if let numericValue {
+                Text(text)
+                    .scaledFont(.caption)
+                    .foregroundStyle(textColor)
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.2), value: numericValue)
+            } else {
+                Text(text)
+                    .scaledFont(.caption)
+                    .foregroundStyle(textColor)
+            }
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .background(Capsule().fill(backgroundColor))
+        .overlay {
+            if isLoading {
+                Capsule()
+                    .fill(backgroundColor.opacity(0.6))
+            }
+        }
+        .overlay {
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .tint(textColor)
+            }
+        }
+    }
+}
+
 extension PostDisplayView {
     var inlineUpvoteStat: some View {
         let score = displayedScore
@@ -274,41 +338,13 @@ extension PostDisplayView {
 
     @ViewBuilder
     fileprivate func pillContent(configuration: PillConfiguration) -> some View {
-        let iconDimension: CGFloat = 12
-        HStack(spacing: 4) {
-            if let iconName = configuration.iconName {
-                Image(systemName: iconName)
-                    .scaledFont(.caption2)
-                    .foregroundStyle(configuration.textColor)
-                    .frame(width: iconDimension, height: iconDimension)
-            }
-            if let value = configuration.numericValue {
-                Text(configuration.text)
-                    .scaledFont(.caption)
-                    .foregroundStyle(configuration.textColor)
-                    .contentTransition(.numericText())
-                    .animation(.easeInOut(duration: 0.2), value: value)
-            } else {
-                Text(configuration.text)
-                    .scaledFont(.caption)
-                    .foregroundStyle(configuration.textColor)
-            }
-        }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 10)
-        .background(Capsule().fill(configuration.backgroundColor))
-        .overlay {
-            if configuration.isLoading {
-                Capsule()
-                    .fill(configuration.backgroundColor.opacity(0.6))
-            }
-        }
-        .overlay {
-            if configuration.isLoading {
-                ProgressView()
-                    .scaleEffect(0.6)
-                    .tint(configuration.textColor)
-            }
-        }
+        PostPillView(
+            iconName: configuration.iconName,
+            text: configuration.text,
+            textColor: configuration.textColor,
+            backgroundColor: configuration.backgroundColor,
+            isLoading: configuration.isLoading,
+            numericValue: configuration.numericValue
+        )
     }
 }

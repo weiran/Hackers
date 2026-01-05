@@ -254,7 +254,6 @@ private struct PostCommentsSheet: View {
     private static let handleVerticalPadding: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
 
-    private let settingsUseCase: any SettingsUseCase
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
@@ -276,7 +275,6 @@ private struct PostCommentsSheet: View {
             commentVotingStateProvider: container.getCommentVotingStateProvider(),
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
-        settingsUseCase = container.getSettingsUseCase()
         _browserController = ObservedObject(wrappedValue: controller)
         self.onDismiss = onDismiss
         fallbackURL = post.url
@@ -433,12 +431,32 @@ private struct PostCommentsSheet: View {
             CollapsedPostHeaderView(
                 post: post,
                 votingState: votingViewModel.votingState(for: post),
-                showThumbnails: settingsUseCase.showThumbnails,
-                compactMode: settingsUseCase.compactFeedDesign,
+                isLoading: viewModel.isLoading,
+                onUpvote: { handleCollapsedUpvote(for: post) },
                 onExpand: onExpand
             )
         } else {
             CollapsedPostHeaderLoadingView()
+        }
+    }
+
+    private func handleCollapsedUpvote(for post: Post) {
+        let state = votingViewModel.votingState(for: post)
+        guard !state.isVoting else { return }
+        let canUpvote = state.canVote && !state.isUpvoted
+        let canUnvote = state.canUnvote && state.isUpvoted
+        guard canUpvote || canUnvote else { return }
+
+        Task {
+            var updatedPost = post
+            if updatedPost.upvoted {
+                await votingViewModel.unvote(post: &updatedPost)
+            } else {
+                await votingViewModel.upvote(post: &updatedPost)
+            }
+            await MainActor.run {
+                viewModel.post = updatedPost
+            }
         }
     }
 
@@ -635,33 +653,88 @@ private enum ControlsHeightPreferenceKey: PreferenceKey {
 }
 
 private struct CollapsedPostHeaderView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let post: Post
     let votingState: VotingState?
-    let showThumbnails: Bool
-    let compactMode: Bool
+    let isLoading: Bool
+    let onUpvote: () -> Void
     let onExpand: () -> Void
-    private static let collapsedThumbnailSize: CGFloat = 20
     private static let collapsedVerticalPadding: CGFloat = 2
+    private static let collapsedHorizontalPadding: CGFloat = 20
+    private static let collapsedThumbnailSize: CGFloat = 28
 
     var body: some View {
-        Button(action: onExpand) {
-            PostDisplayView(
-                post: post,
-                votingState: votingState,
-                showPostText: false,
-                showThumbnails: showThumbnails,
-                compactMode: true,
-                titleLineLimit: nil,
-                showsTitle: false,
-                thumbnailSize: Self.collapsedThumbnailSize
+        HStack(spacing: 12) {
+            ThumbnailView(url: post.url, isEnabled: true)
+                .frame(width: Self.collapsedThumbnailSize, height: Self.collapsedThumbnailSize)
+                .clipShape(.rect(cornerRadius: min(16, Self.collapsedThumbnailSize * 0.3)))
+
+            Text(domainText)
+                .scaledFont(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 8) {
+                upvoteButton
+                commentsPill
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, Self.collapsedHorizontalPadding)
+        .padding(.vertical, Self.collapsedVerticalPadding)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onExpand)
+    }
+
+    private var domainText: String {
+        let host = post.url.host ?? "Hackers"
+        let trimmed = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+        return trimmed.uppercased()
+    }
+
+    private var commentsPill: some View {
+        let style = AppColors.PillStyle.comments
+        let textColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
+        let backgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
+
+        return PostPillView(
+            iconName: "message",
+            text: "\(post.commentsCount)",
+            textColor: textColor,
+            backgroundColor: backgroundColor,
+            numericValue: post.commentsCount
+        )
+        .accessibilityLabel("\(post.commentsCount) comments")
+    }
+
+    private var upvoteButton: some View {
+        let isUpvoted = votingState?.isUpvoted ?? post.upvoted
+        let score = votingState?.score ?? post.score
+        let canVote = votingState?.canVote ?? (post.voteLinks?.upvote != nil)
+        let canUnvote = votingState?.canUnvote ?? (post.voteLinks?.unvote != nil)
+        let isVoting = votingState?.isVoting ?? isLoading
+        let canInteract = ((canVote && !isUpvoted) || (canUnvote && isUpvoted)) && !isVoting
+        let iconName = isUpvoted ? "arrow.up.circle.fill" : "arrow.up"
+        let style = AppColors.PillStyle.upvote(isActive: isUpvoted)
+        let textColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
+        let backgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
+
+        return Button(action: onUpvote) {
+            PostPillView(
+                iconName: iconName,
+                text: "\(score)",
+                textColor: textColor,
+                backgroundColor: backgroundColor,
+                isLoading: isVoting,
+                numericValue: score
             )
-            .allowsHitTesting(false)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            .padding(.vertical, Self.collapsedVerticalPadding)
         }
         .buttonStyle(.plain)
-        .contentShape(Rectangle())
+        .disabled(!canInteract)
+        .opacity(canInteract ? 1 : 0.55)
+        .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
     }
 }
 
@@ -669,13 +742,18 @@ private struct CollapsedPostHeaderLoadingView: View {
     var body: some View {
         HStack(spacing: 12) {
             Text("Loading...")
-                .scaledFont(.headline)
-            Spacer()
-            ProgressView()
+                .scaledFont(.caption)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 8)
+            Capsule()
+                .fill(.secondary.opacity(0.2))
+                .frame(width: 52, height: 22)
+            Capsule()
+                .fill(.secondary.opacity(0.2))
+                .frame(width: 52, height: 22)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 2)
     }
 }
 
