@@ -10,6 +10,7 @@ import DesignSystem
 import Domain
 import Shared
 import SwiftUI
+import UIKit
 import WebKit
 
 @MainActor
@@ -206,6 +207,43 @@ struct PostLinkBrowserView: View {
                 showingCommentsPane = true
             }
         }
+        .background(InteractivePopGestureEnabler().allowsHitTesting(false))
+    }
+}
+
+private struct InteractivePopGestureEnabler: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        let controller = UIViewController()
+        controller.view.backgroundColor = .clear
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        guard let navigationController = uiViewController.navigationController else { return }
+        context.coordinator.navigationController = navigationController
+        if navigationController.interactivePopGestureRecognizer?.delegate !== context.coordinator {
+            navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
+        }
+        navigationController.interactivePopGestureRecognizer?.isEnabled = true
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        weak var navigationController: UINavigationController?
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            (navigationController?.viewControllers.count ?? 0) > 1
+        }
+
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            true
+        }
     }
 }
 
@@ -215,6 +253,7 @@ private struct PostCommentsSheet: View {
     private static let handleThickness: CGFloat = 5
     private static let handleVerticalPadding: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
+    private static let collapsedHeightPadding: CGFloat = 0
 
     private let settingsUseCase: any SettingsUseCase
     let onDismiss: @MainActor () -> Void
@@ -248,17 +287,16 @@ private struct PostCommentsSheet: View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let screenSize = resolvedScreenSize(for: proxy)
-            let handleHeight = handleAreaHeight
             let expandedTop: CGFloat = 0
             let collapsedTop = max(
-                screenSize.height - (collapsedHeight + handleHeight + safeInsets.bottom),
+                screenSize.height - (collapsedHeight + safeInsets.bottom),
                 expandedTop
             )
             let baseTop = isExpanded ? expandedTop : collapsedTop
             let proposedTop = baseTop + dragTranslation
             let clampedTop = min(max(proposedTop, expandedTop), collapsedTop)
-            let alignedTop = floor(clampedTop)
-            let sheetHeight = ceil(screenSize.height - alignedTop) + 1
+            let alignedTop = clampedTop
+            let sheetHeight = max(screenSize.height - alignedTop, 0)
             let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
             let handleTopInset: CGFloat = 0
@@ -266,17 +304,18 @@ private struct PostCommentsSheet: View {
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
 
-                collapsedHeaderMeasurement(width: screenSize.width)
-
                 sheetContent(
                     expandedTop: expandedTop,
                     collapsedTop: collapsedTop,
                     handleTopInset: handleTopInset
                 )
                     .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
-                    .background(sheetBackground)
+                    .background(
+                        sheetShape
+                            .fill(.background)
+                            .shadow(color: .black.opacity(0.18), radius: 16, x: 0, y: -6)
+                    )
                     .clipShape(sheetShape)
-                    .shadow(color: .black.opacity(0.18), radius: 16, x: 0, y: -6)
                     .offset(y: alignedTop)
 
                 if isCollapsed {
@@ -298,16 +337,15 @@ private struct PostCommentsSheet: View {
                 }
             }
             .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
-            .ignoresSafeArea(.container, edges: [.horizontal, .bottom])
+            .ignoresSafeArea(.container)
             .animation(.easeInOut(duration: 0.25), value: sheetState)
             .animation(.easeInOut(duration: 0.2), value: collapsedHeight)
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
-                guard updated.isFinite, updated > 60 else { return }
-                let handlePadding = Self.handleVerticalPadding * 2
-                let paddedHeight = updated + handlePadding + 16
-                guard abs(paddedHeight - collapsedHeight) > 0.5 else { return }
-                collapsedHeight = paddedHeight
+                guard updated.isFinite, updated > 0 else { return }
+                let totalHeight = updated + handleAreaHeight + Self.collapsedHeightPadding
+                guard abs(totalHeight - collapsedHeight) > 0.5 else { return }
+                collapsedHeight = totalHeight
             }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
@@ -393,23 +431,6 @@ private struct PostCommentsSheet: View {
         )
     }
 
-    private func collapsedHeaderMeasurement(width: CGFloat) -> some View {
-        collapsedHeaderView(onExpand: {})
-            .frame(width: width, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
-            .opacity(0)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: CollapsedHeaderHeightPreferenceKey.self,
-                        value: proxy.size.height
-                    )
-                }
-            )
-    }
-
     @ViewBuilder
     private func collapsedHeaderView(onExpand: @escaping () -> Void) -> some View {
         if let post = viewModel.post {
@@ -432,10 +453,6 @@ private struct PostCommentsSheet: View {
             bottomTrailingRadius: 0,
             topTrailingRadius: 20
         )
-    }
-
-    private var sheetBackground: some View {
-        sheetShape.fill(.background)
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {

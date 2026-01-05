@@ -25,6 +25,7 @@ struct CommentsContentView: View {
     @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var pendingCommentID: Int?
     @Binding var listAnimationsEnabled: Bool
+    @State private var lastIsAtTop = true
 
     var body: some View {
         Group {
@@ -43,8 +44,15 @@ struct CommentsContentView: View {
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 }, action: { _, newValue in
-                    showTitle = newValue > 40
-                    updateIsAtTop?(newValue <= 2)
+                    let shouldShowTitle = newValue > 40
+                    if shouldShowTitle != showTitle {
+                        showTitle = shouldShowTitle
+                    }
+                    let isAtTop = newValue <= 2
+                    if isAtTop != lastIsAtTop {
+                        lastIsAtTop = isAtTop
+                        updateIsAtTop?(isAtTop)
+                    }
                 })
                 .listStyle(.plain)
                 .transaction { transaction in
