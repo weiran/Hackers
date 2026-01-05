@@ -310,13 +310,11 @@ private struct PostCommentsSheet: View {
                     handleTopInset: handleTopInset
                 )
                     .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
-                    .background(
-                        sheetShape
-                            .fill(.background)
-                            .shadow(color: .black.opacity(0.18), radius: 16, x: 0, y: -6)
-                    )
+                    .background(sheetBackground)
                     .clipShape(sheetShape)
                     .offset(y: alignedTop)
+
+                sheetTopShadow(top: alignedTop, width: screenSize.width)
 
                 if isCollapsed {
                     BrowserControlsView(
@@ -453,6 +451,24 @@ private struct PostCommentsSheet: View {
             bottomTrailingRadius: 0,
             topTrailingRadius: 20
         )
+    }
+
+    private var sheetBackground: some View {
+        sheetShape
+            .fill(.background)
+    }
+
+    private func sheetTopShadow(top: CGFloat, width: CGFloat) -> some View {
+        let shadowHeight: CGFloat = 12
+        let shadowTop = max(top - shadowHeight, 0)
+        return LinearGradient(
+            colors: [.clear, .black.opacity(0.12)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .frame(width: width, height: shadowHeight)
+        .offset(y: shadowTop)
+        .allowsHitTesting(false)
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
@@ -647,13 +663,14 @@ private struct CollapsedPostHeaderView: View {
                 showPostText: false,
                 showThumbnails: showThumbnails,
                 compactMode: compactMode,
-                titleLineLimit: 2
+                titleLineLimit: nil,
+                showsTitle: false,
+                thumbnailSize: 28
             )
             .allowsHitTesting(false)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 12)
+            .padding(.vertical, 8)
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())

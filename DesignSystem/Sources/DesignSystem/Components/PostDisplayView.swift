@@ -17,6 +17,8 @@ public struct PostDisplayView: View {
     let showThumbnails: Bool
     let compactMode: Bool
     let titleLineLimit: Int?
+    let showsTitle: Bool
+    let thumbnailSize: CGFloat
     let onThumbnailTap: (() -> Void)?
     let onUpvoteTap: (() async -> Bool)?
     let onUnvoteTap: (() async -> Bool)?
@@ -36,6 +38,8 @@ public struct PostDisplayView: View {
         showThumbnails: Bool = true,
         compactMode: Bool = false,
         titleLineLimit: Int? = nil,
+        showsTitle: Bool = true,
+        thumbnailSize: CGFloat = 55,
         onThumbnailTap: (() -> Void)? = nil,
         onUpvoteTap: (() async -> Bool)? = nil,
         onUnvoteTap: (() async -> Bool)? = nil,
@@ -48,6 +52,8 @@ public struct PostDisplayView: View {
         self.showThumbnails = showThumbnails
         self.compactMode = compactMode
         self.titleLineLimit = titleLineLimit
+        self.showsTitle = showsTitle
+        self.thumbnailSize = thumbnailSize
         self.onThumbnailTap = onThumbnailTap
         self.onUpvoteTap = onUpvoteTap
         self.onUnvoteTap = onUnvoteTap
@@ -65,8 +71,8 @@ public struct PostDisplayView: View {
                 // Thumbnail with proper loading
                 Button(action: { onThumbnailTap?() }, label: {
                     ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                        .frame(width: 55, height: 55)
-                        .clipShape(.rect(cornerRadius: 16))
+                        .frame(width: thumbnailSize, height: thumbnailSize)
+                        .clipShape(.rect(cornerRadius: min(16, thumbnailSize * 0.3)))
                         .contentShape(Rectangle())
                 })
                 .buttonStyle(.plain)
@@ -120,11 +126,13 @@ public struct PostDisplayView: View {
                     }
 
                     // Title
-                    Text(post.title)
-                        .scaledFont(.headline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(titleLineLimit)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if showsTitle {
+                        Text(post.title)
+                            .scaledFont(.headline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(titleLineLimit)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
                     // Metadata row (only in normal mode)
                     if !compactMode {
