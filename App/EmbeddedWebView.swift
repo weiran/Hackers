@@ -312,9 +312,8 @@ private struct PostCommentsSheet: View {
                     .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
                     .background(sheetBackground)
                     .clipShape(sheetShape)
+                    .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: -5)
                     .offset(y: alignedTop)
-
-                sheetTopShadow(top: alignedTop, width: screenSize.width)
 
                 if isCollapsed {
                     BrowserControlsView(
@@ -446,10 +445,10 @@ private struct PostCommentsSheet: View {
 
     private var sheetShape: UnevenRoundedRectangle {
         UnevenRoundedRectangle(
-            topLeadingRadius: 20,
+            topLeadingRadius: 24,
             bottomLeadingRadius: 0,
             bottomTrailingRadius: 0,
-            topTrailingRadius: 20
+            topTrailingRadius: 24
         )
     }
 
@@ -458,18 +457,6 @@ private struct PostCommentsSheet: View {
             .fill(.background)
     }
 
-    private func sheetTopShadow(top: CGFloat, width: CGFloat) -> some View {
-        let shadowHeight: CGFloat = 12
-        let shadowTop = max(top - shadowHeight, 0)
-        return LinearGradient(
-            colors: [.clear, .black.opacity(0.12)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .frame(width: width, height: shadowHeight)
-        .offset(y: shadowTop)
-        .allowsHitTesting(false)
-    }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
         let insets = proxy.safeAreaInsets
