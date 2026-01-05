@@ -253,6 +253,7 @@ private struct PostCommentsSheet: View {
     private static let handleThickness: CGFloat = 5
     private static let handleVerticalPadding: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
+    private static let navigationBarTopSpacing: CGFloat = 6
 
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
@@ -296,7 +297,7 @@ private struct PostCommentsSheet: View {
             let sheetHeight = max(screenSize.height - alignedTop, 0)
             let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
-            let handleTopInset: CGFloat = 0
+            let handleTopInset = isExpanded ? safeInsets.top : 0
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -374,6 +375,17 @@ private struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset
             )
 
+            if isExpanded {
+                ExpandedPanelNavigationBar(
+                    post: viewModel.post,
+                    onBack: onDismiss,
+                    onToggleBookmark: { await viewModel.toggleBookmark() }
+                )
+                .padding(.top, Self.navigationBarTopSpacing)
+                .padding(.bottom, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
             ZStack(alignment: .top) {
                 CommentsView<NavigationStore>(
                     postID: viewModel.postID,
@@ -396,6 +408,7 @@ private struct PostCommentsSheet: View {
         }
         .contentShape(Rectangle())
         .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+        .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 
     private func sheetHandle(
@@ -735,6 +748,70 @@ private struct CollapsedPostHeaderView: View {
         .disabled(!canInteract)
         .opacity(canInteract ? 1 : 0.55)
         .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
+    }
+}
+
+private struct ExpandedPanelNavigationBar: View {
+    let post: Post?
+    let onBack: @MainActor () -> Void
+    let onToggleBookmark: @Sendable () async -> Bool
+    @State private var isSubmittingBookmark = false
+
+    var body: some View {
+        HStack {
+            backButton
+
+            Spacer(minLength: 12)
+
+            if let post {
+                HStack(spacing: 16) {
+                    bookmarkButton(for: post)
+                    shareButton(for: post)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private var backButton: some View {
+        Button {
+            Task { @MainActor in onBack() }
+        } label: {
+            Label("Back", systemImage: "chevron.left")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Back")
+    }
+
+    private func bookmarkButton(for post: Post) -> some View {
+        Button {
+            guard !isSubmittingBookmark else { return }
+            isSubmittingBookmark = true
+            Task { @MainActor in
+                _ = await onToggleBookmark()
+                isSubmittingBookmark = false
+            }
+        } label: {
+            Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
+        .accessibilityHint(
+            post.isBookmarked
+                ? "Double-tap to remove from bookmarks"
+                : "Double-tap to add to bookmarks"
+        )
+        .disabled(isSubmittingBookmark)
+    }
+
+    private func shareButton(for post: Post) -> some View {
+        Button {
+            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Share")
     }
 }
 
