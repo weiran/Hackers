@@ -253,7 +253,6 @@ private struct PostCommentsSheet: View {
     private static let handleThickness: CGFloat = 5
     private static let handleVerticalPadding: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
-    private static let collapsedHeightPadding: CGFloat = 0
 
     private let settingsUseCase: any SettingsUseCase
     let onDismiss: @MainActor () -> Void
@@ -340,7 +339,7 @@ private struct PostCommentsSheet: View {
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
                 guard updated.isFinite, updated > 0 else { return }
-                let totalHeight = updated + handleAreaHeight + Self.collapsedHeightPadding
+                let totalHeight = updated + handleAreaHeight
                 guard abs(totalHeight - collapsedHeight) > 0.5 else { return }
                 collapsedHeight = totalHeight
             }
@@ -641,6 +640,8 @@ private struct CollapsedPostHeaderView: View {
     let showThumbnails: Bool
     let compactMode: Bool
     let onExpand: () -> Void
+    private static let collapsedThumbnailSize: CGFloat = 20
+    private static let collapsedVerticalPadding: CGFloat = 2
 
     var body: some View {
         Button(action: onExpand) {
@@ -649,15 +650,15 @@ private struct CollapsedPostHeaderView: View {
                 votingState: votingState,
                 showPostText: false,
                 showThumbnails: showThumbnails,
-                compactMode: compactMode,
+                compactMode: true,
                 titleLineLimit: nil,
                 showsTitle: false,
-                thumbnailSize: 28
+                thumbnailSize: Self.collapsedThumbnailSize
             )
             .allowsHitTesting(false)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.vertical, Self.collapsedVerticalPadding)
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())
