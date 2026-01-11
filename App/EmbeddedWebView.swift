@@ -408,7 +408,6 @@ private struct PostCommentsSheet: View {
                             } label: {
                                 Label("Back", systemImage: "chevron.left")
                             }
-                            .buttonStyle(.glass)
                             .accessibilityLabel("Back")
                         }
                     }
