@@ -267,6 +267,7 @@ private struct PostCommentsSheet: View {
     @State private var dragStartAllowsSheetDrag = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
+    @State private var showsExpandedToolbar = false
 
     init(post: Post, controller: BrowserController, onDismiss: @MainActor @escaping () -> Void) {
         _viewModel = State(initialValue: CommentsViewModel(post: post))
@@ -348,6 +349,19 @@ private struct PostCommentsSheet: View {
                 guard abs(updated - controlsHeight) > 0.5 else { return }
                 controlsHeight = updated
             }
+            .onChange(of: isExpanded) { newValue in
+                if newValue {
+                    showsExpandedToolbar = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        guard isExpanded else { return }
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showsExpandedToolbar = true
+                        }
+                    }
+                } else {
+                    showsExpandedToolbar = false
+                }
+            }
         }
     }
 
@@ -375,29 +389,33 @@ private struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset
             )
 
-            if isExpanded {
-                ExpandedPanelNavigationBar(
-                    post: viewModel.post,
-                    onBack: onDismiss,
-                    onToggleBookmark: { await viewModel.toggleBookmark() }
-                )
-                .padding(.top, Self.navigationBarTopSpacing)
-                .padding(.bottom, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-
             ZStack(alignment: .top) {
-                CommentsView<NavigationStore>(
-                    postID: viewModel.postID,
-                    initialPost: viewModel.post,
-                    showsPostHeader: isExpanded,
-                    allowsRefresh: false,
-                    isAtTop: $isScrollAtTop,
-                    viewModel: viewModel,
-                    votingViewModel: votingViewModel
-                )
-                .toolbar(.hidden, for: .navigationBar)
-                .scrollDisabled(!isExpanded)
+                NavigationView {
+                    CommentsView<NavigationStore>(
+                        postID: viewModel.postID,
+                        initialPost: viewModel.post,
+                        showsPostHeader: isExpanded,
+                        allowsRefresh: false,
+                        isAtTop: $isScrollAtTop,
+                        viewModel: viewModel,
+                        votingViewModel: votingViewModel
+                    )
+                    .scrollDisabled(!isExpanded)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                Task { @MainActor in onDismiss() }
+                            } label: {
+                                Label("Back", systemImage: "chevron.left")
+                            }
+                            .buttonStyle(.glass)
+                            .accessibilityLabel("Back")
+                        }
+                    }
+                    .toolbar(showsExpandedToolbar ? .visible : .hidden, for: .navigationBar)
+                }
+                .navigationViewStyle(.stack)
+                .padding(.top, isExpanded ? Self.navigationBarTopSpacing : 0)
                 .opacity(isExpanded ? 1 : 0)
                 .allowsHitTesting(isExpanded)
 
@@ -748,70 +766,6 @@ private struct CollapsedPostHeaderView: View {
         .disabled(!canInteract)
         .opacity(canInteract ? 1 : 0.55)
         .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
-    }
-}
-
-private struct ExpandedPanelNavigationBar: View {
-    let post: Post?
-    let onBack: @MainActor () -> Void
-    let onToggleBookmark: @Sendable () async -> Bool
-    @State private var isSubmittingBookmark = false
-
-    var body: some View {
-        HStack {
-            backButton
-
-            Spacer(minLength: 12)
-
-            if let post {
-                HStack(spacing: 16) {
-                    bookmarkButton(for: post)
-                    shareButton(for: post)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-
-    private var backButton: some View {
-        Button {
-            Task { @MainActor in onBack() }
-        } label: {
-            Label("Back", systemImage: "chevron.left")
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Back")
-    }
-
-    private func bookmarkButton(for post: Post) -> some View {
-        Button {
-            guard !isSubmittingBookmark else { return }
-            isSubmittingBookmark = true
-            Task { @MainActor in
-                _ = await onToggleBookmark()
-                isSubmittingBookmark = false
-            }
-        } label: {
-            Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
-        .accessibilityHint(
-            post.isBookmarked
-                ? "Double-tap to remove from bookmarks"
-                : "Double-tap to add to bookmarks"
-        )
-        .disabled(isSubmittingBookmark)
-    }
-
-    private func shareButton(for post: Post) -> some View {
-        Button {
-            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
-        } label: {
-            Image(systemName: "square.and.arrow.up")
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Share")
     }
 }
 

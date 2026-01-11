@@ -360,6 +360,7 @@ struct BookmarkToolbarButton: View {
         } label: {
             Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
         }
+        .buttonStyle(.glass)
         .accessibilityLabel(isBookmarked ? "Remove Bookmark" : "Save Bookmark")
         .accessibilityHint(
             isBookmarked
@@ -379,6 +380,7 @@ struct ShareMenu: View {
             Image(systemName: "square.and.arrow.up")
                 .accessibilityLabel("Share")
         }
+        .buttonStyle(.glass)
     }
 }
 struct LoadingView: View {
