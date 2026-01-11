@@ -265,6 +265,7 @@ private struct PostCommentsSheet: View {
     @State private var dragTranslation: CGFloat = 0
     @State private var isTrackingDrag = false
     @State private var dragStartAllowsSheetDrag = false
+    @State private var isHandleDragActive = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @State private var showsExpandedToolbar = false
@@ -444,6 +445,7 @@ private struct PostCommentsSheet: View {
         .padding(.top, Self.handleVerticalPadding + handleTopInset)
         .padding(.bottom, Self.handleVerticalPadding)
         .contentShape(Rectangle())
+        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
     private var collapsedHeader: some View {
@@ -530,6 +532,7 @@ private struct PostCommentsSheet: View {
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .global)
             .onChanged { value in
+                guard !isHandleDragActive else { return }
                 if !isTrackingDrag {
                     dragStartAllowsSheetDrag = isCollapsed || isScrollAtTop
                     isTrackingDrag = true
@@ -538,20 +541,45 @@ private struct PostCommentsSheet: View {
                 dragTranslation = value.translation.height
             }
             .onEnded { value in
-                defer {
-                    dragTranslation = 0
-                    isTrackingDrag = false
-                    dragStartAllowsSheetDrag = false
-                }
+                guard !isHandleDragActive else { return }
                 guard dragStartAllowsSheetDrag else { return }
                 let baseTop = isExpanded ? expandedTop : collapsedTop
                 let predictedTop = baseTop + value.predictedEndTranslation.height
                 let midpoint = (expandedTop + collapsedTop) / 2
-                if predictedTop <= midpoint {
-                    sheetState = .expanded
-                } else {
-                    sheetState = .collapsed
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    dragTranslation = 0
+                    if predictedTop <= midpoint {
+                        sheetState = .expanded
+                    } else {
+                        sheetState = .collapsed
+                    }
                 }
+                isTrackingDrag = false
+                dragStartAllowsSheetDrag = false
+            }
+    }
+
+    private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+            .onChanged { value in
+                isHandleDragActive = true
+                dragTranslation = value.translation.height
+            }
+            .onEnded { value in
+                let baseTop = isExpanded ? expandedTop : collapsedTop
+                let predictedTop = baseTop + value.predictedEndTranslation.height
+                let midpoint = (expandedTop + collapsedTop) / 2
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    dragTranslation = 0
+                    if predictedTop <= midpoint {
+                        sheetState = .expanded
+                    } else {
+                        sheetState = .collapsed
+                    }
+                }
+                isTrackingDrag = false
+                dragStartAllowsSheetDrag = false
+                isHandleDragActive = false
             }
     }
 }
