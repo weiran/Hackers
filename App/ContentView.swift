@@ -14,6 +14,7 @@ import Settings
 import Shared
 import SwiftUI
 import UIKit
+import Foundation
 
 @MainActor
 struct MainContentView: View {
@@ -57,7 +58,7 @@ struct MainContentView: View {
 
     var body: some View {
         Group {
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            if isPadLayout {
                 AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
             } else {
                 NavigationStack(path: navigationPathBinding) {
@@ -146,6 +147,14 @@ struct MainContentView: View {
 
     private var isPresentingModal: Bool {
         navigationStore.showingLogin || navigationStore.showingSettings || showOnboarding
+    }
+
+    private var isPadLayout: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
+        #endif
     }
 }
 

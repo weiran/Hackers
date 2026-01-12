@@ -53,7 +53,7 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPostId = post.id
 
         // For iPhone navigation, use NavigationPath
-        if UIDevice.current.userInterfaceIdiom != .pad {
+        if UIDevice.current.userInterfaceIdiom != .pad && !isRunningOnMac {
             path.append(NavigationDestination.comments(postID: post.id))
         }
     }
@@ -64,7 +64,7 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPost = nil
         selectedPostId = id
 
-        if UIDevice.current.userInterfaceIdiom != .pad {
+        if UIDevice.current.userInterfaceIdiom != .pad && !isRunningOnMac {
             path.append(NavigationDestination.comments(postID: id))
         }
     }
@@ -92,7 +92,7 @@ class NavigationStore: NavigationStoreProtocol {
 
     @MainActor
     func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool = true) -> Bool {
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        guard UIDevice.current.userInterfaceIdiom == .pad || isRunningOnMac else { return false }
         guard url.scheme == "http" || url.scheme == "https" else { return false }
 
         let settings = DependencyContainer.shared.getSettingsUseCase()
@@ -108,6 +108,14 @@ class NavigationStore: NavigationStoreProtocol {
         embeddedBrowserURL = url
         detailPath.removeAll()
         return true
+    }
+
+    private var isRunningOnMac: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return ProcessInfo.processInfo.isiOSAppOnMac
+        #endif
     }
 
     @MainActor
