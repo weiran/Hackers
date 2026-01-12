@@ -8,6 +8,7 @@
 import Comments
 import DesignSystem
 import Domain
+import Foundation
 import Shared
 import SwiftUI
 import UIKit
@@ -94,7 +95,7 @@ struct EmbeddedWebView: View {
                             closeButton
                         }
                     }
-                    if UIDevice.current.userInterfaceIdiom == .pad {
+                    if isPadLayout {
                         ToolbarItemGroup(placement: .bottomBar) {
                             Button {
                                 controller.goBack()
@@ -122,6 +123,14 @@ struct EmbeddedWebView: View {
                     }
                 }
             }
+    }
+
+    private var isPadLayout: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
+        #endif
     }
 
     private var shareButton: some View {

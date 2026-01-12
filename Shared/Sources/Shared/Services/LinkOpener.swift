@@ -35,7 +35,7 @@ public enum LinkOpener {
     public static func openURL(_ url: URL, with _: Post? = nil) {
         // Determine user preference for opening links via injected settings use case
         let settings = settingsProvider()
-        let preferSystemBrowser = settings.linkBrowserMode == .systemBrowser
+        let preferSystemBrowser = settings.linkBrowserMode == .systemBrowser || isRunningOnMac
 
         // For http/https, either open in-app (SFSafariViewController) or system browser based on preference
         if isWebURL(url) {
@@ -84,6 +84,14 @@ public enum LinkOpener {
         }
 
         return top(from: root)
+    }
+
+    private static var isRunningOnMac: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return ProcessInfo.processInfo.isiOSAppOnMac
+        #endif
     }
 
     // MARK: - Test Hooks
