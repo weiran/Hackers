@@ -41,19 +41,21 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
 
     private func migrateLinkBrowserModeIfNeeded() {
         if let existing = userDefaults.object(forKey: "linkBrowserMode") as? Int,
-           let mode = LinkBrowserMode(rawValue: existing) {
-            if mode == .inAppBrowser {
-                userDefaults.set(LinkBrowserMode.customBrowser.rawValue, forKey: "linkBrowserMode")
-            }
+           LinkBrowserMode(rawValue: existing) != nil {
             return
         }
 
-        let legacyOpenInDefaultBrowser = userDefaults.object(forKey: "openInDefaultBrowser") as? Bool
-        // Legacy behavior:
-        // - System Browser stays system browser
-        // - In-app browser users are migrated to the new Custom Browser by default
-        let mode: LinkBrowserMode = legacyOpenInDefaultBrowser == true ? .systemBrowser : .customBrowser
-        userDefaults.set(mode.rawValue, forKey: "linkBrowserMode")
+        if let legacyOpenInDefaultBrowser = userDefaults.object(forKey: "openInDefaultBrowser") as? Bool {
+            // Legacy behavior:
+            // - System Browser stays system browser
+            // - Keep in-app users on the in-app browser
+            let mode: LinkBrowserMode = legacyOpenInDefaultBrowser ? .systemBrowser : .inAppBrowser
+            userDefaults.set(mode.rawValue, forKey: "linkBrowserMode")
+            return
+        }
+
+        // New installs default to the custom browser.
+        userDefaults.set(LinkBrowserMode.customBrowser.rawValue, forKey: "linkBrowserMode")
     }
 
     private func setDefaultIfNeeded(_ value: Any, forKey key: String) {
