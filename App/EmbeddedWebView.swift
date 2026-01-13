@@ -20,6 +20,7 @@ final class BrowserController: ObservableObject {
     @Published var currentTitle: String?
     @Published var canGoBack = false
     @Published var canGoForward = false
+    @Published var isLoading = false
     var fallbackURL: URL?
     let page = WebPage()
 
@@ -37,10 +38,16 @@ final class BrowserController: ObservableObject {
         let list = page.backForwardList
         canGoBack = !list.backList.isEmpty
         canGoForward = !list.forwardList.isEmpty
+        isLoading = page.isLoading
     }
 
     func reload() {
         _ = page.reload()
+        updateState()
+    }
+
+    func stopLoading() {
+        page.stopLoading()
         updateState()
     }
 
@@ -113,12 +120,7 @@ struct EmbeddedWebView: View {
                             .accessibilityLabel("Forward")
                             .disabled(!controller.canGoForward)
 
-                            Button {
-                                controller.reload()
-                            } label: {
-                                Image(systemName: "arrow.clockwise")
-                            }
-                            .accessibilityLabel("Reload")
+                            reloadButton
                         }
                     }
                 }
@@ -164,6 +166,19 @@ struct EmbeddedWebView: View {
             Image(systemName: "xmark")
         }
         .accessibilityLabel("Close")
+    }
+
+    private var reloadButton: some View {
+        Button {
+            if controller.isLoading {
+                controller.stopLoading()
+            } else {
+                controller.reload()
+            }
+        } label: {
+            Image(systemName: controller.isLoading ? "xmark" : "arrow.clockwise")
+        }
+        .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
     @MainActor
@@ -660,8 +675,12 @@ private struct BrowserControlsView: View {
                 controller.goForward()
             }
 
-            controlButton(systemName: "arrow.clockwise") {
-                controller.reload()
+            controlButton(systemName: controller.isLoading ? "xmark" : "arrow.clockwise") {
+                if controller.isLoading {
+                    controller.stopLoading()
+                } else {
+                    controller.reload()
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -730,12 +749,12 @@ private struct BrowserControlsView: View {
             return "Forward"
         case "arrow.clockwise":
             return "Reload"
+        case "xmark":
+            return "Stop"
         case "square.and.arrow.up":
             return "Share"
         case "safari":
             return "Open in Safari"
-        case "xmark":
-            return "Close"
         default:
             return "Button"
         }
