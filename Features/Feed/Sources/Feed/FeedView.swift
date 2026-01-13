@@ -118,7 +118,7 @@ private extension FeedView {
                     if let postId = newPostId,
                        let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
                         selectedPostId = postId
-                        navigationStore.showPost(selectedPost)
+                        handlePostTap(post: selectedPost)
                     }
                 }
             )
@@ -194,7 +194,7 @@ private extension FeedView {
             showThumbnails: viewModel.showThumbnails,
             compactMode: viewModel.compactFeedDesign,
             onLinkTap: { handleLinkTap(post: post) },
-            onCommentsTap: isSidebar ? nil : { navigationStore.showPost(post) },
+            onCommentsTap: isSidebar ? nil : { handlePostTap(post: post) },
             onPostUpdated: { updatedPost in
                 viewModel.replacePost(updatedPost)
             },
@@ -362,6 +362,15 @@ private extension FeedView {
                 }
             }
         }
+    }
+
+    private func handlePostTap(post: Domain.Post) {
+        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
+        if mode == .customBrowser {
+            navigationStore.showPostLink(post)
+            return
+        }
+        navigationStore.showPost(post)
     }
 
     private func handleLinkTap(post: Domain.Post) {
