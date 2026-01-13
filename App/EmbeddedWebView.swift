@@ -554,6 +554,9 @@ private struct PostCommentsSheet: View {
 
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
+        if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
+            return insets
+        }
         let insets = proxy.safeAreaInsets
         if insets.top != 0 || insets.leading != 0 || insets.bottom != 0 || insets.trailing != 0 {
             return UIEdgeInsets(
@@ -563,11 +566,11 @@ private struct PostCommentsSheet: View {
                 right: insets.trailing
             )
         }
-        return PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets ?? .zero
+        return .zero
     }
 
     private func resolvedScreenSize(for proxy: GeometryProxy) -> CGSize {
-        if let bounds = PresentationContextProvider.shared.windowScene?.windows.first?.bounds,
+        if let bounds = PresentationContextProvider.shared.keyWindow?.bounds,
            bounds.width > 0,
            bounds.height > 0 {
             return bounds.size
@@ -666,12 +669,12 @@ private struct BrowserControlsView: View {
     }
 
     private var safeInsetPaddingLeft: CGFloat {
-        let inset = PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets.left ?? 0
+        let inset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
         return max(inset, 12)
     }
 
     private var safeInsetPaddingRight: CGFloat {
-        let inset = PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets.right ?? 0
+        let inset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.right ?? 0
         return max(inset, 12)
     }
 
