@@ -18,6 +18,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
     private let isAtTop: Binding<Bool>?
+    private let onPostLinkTap: (() -> Void)?
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
@@ -33,12 +34,14 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
         isAtTop: Binding<Bool>? = nil,
+        onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
         self.showsPostHeader = showsPostHeader
         self.allowsRefresh = allowsRefresh
         self.isAtTop = isAtTop
+        self.onPostLinkTap = onPostLinkTap
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -60,6 +63,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
         isAtTop: Binding<Bool>? = nil,
+        onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -70,6 +74,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             showsPostHeader: showsPostHeader,
             allowsRefresh: allowsRefresh,
             isAtTop: isAtTop,
+            onPostLinkTap: onPostLinkTap,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -177,6 +182,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     }
 
     private func handleLinkTap() {
+        if let onPostLinkTap {
+            onPostLinkTap()
+            return
+        }
         guard let post = viewModel.post else { return }
         if navigationStore.openURLInPrimaryContext(post.url) {
             return

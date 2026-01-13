@@ -383,6 +383,17 @@ private struct PostCommentsSheet: View {
         !isExpanded
     }
 
+    private func collapseSheet() {
+        guard isExpanded else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            sheetState = .collapsed
+            dragTranslation = 0
+            isTrackingDrag = false
+            dragStartAllowsSheetDrag = false
+            isHandleDragActive = false
+        }
+    }
+
     private var handleAreaHeight: CGFloat {
         Self.handleThickness + (Self.handleVerticalPadding * 2)
     }
@@ -407,6 +418,7 @@ private struct PostCommentsSheet: View {
                         showsPostHeader: isExpanded,
                         allowsRefresh: false,
                         isAtTop: $isScrollAtTop,
+                        onPostLinkTap: collapseSheet,
                         viewModel: viewModel,
                         votingViewModel: votingViewModel
                     )
