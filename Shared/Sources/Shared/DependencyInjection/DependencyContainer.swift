@@ -25,7 +25,7 @@ public final class DependencyContainer: @unchecked Sendable {
         var votingStateProvider: (() -> any VotingStateProvider)?
         var commentVotingStateProvider: (() -> any CommentVotingStateProvider)?
         var authenticationUseCase: (() -> any AuthenticationUseCase)?
-        var onboardingUseCase: (() -> any OnboardingUseCase)?
+        var whatsNewUseCase: (() -> any WhatsNewUseCase)?
         var sessionService: (@MainActor () -> SessionService)?
         var toastPresenter: (@MainActor () -> ToastPresenter)?
         var bookmarksController: (@MainActor () -> BookmarksController)?
@@ -42,7 +42,7 @@ public final class DependencyContainer: @unchecked Sendable {
         DefaultVotingStateProvider(voteUseCase: postRepository)
     private static let authenticationRepository: AuthenticationRepository =
         .init(networkManager: networkManager)
-    private static let onboardingRepository: OnboardingRepository = .init()
+    private static let whatsNewRepository: WhatsNewRepository = .init()
     private static let overridesLock = OSAllocatedUnfairLock<Overrides?>(initialState: nil)
     private static var overrides: Overrides? {
         get { overridesLock.withLock { $0 } }
@@ -105,8 +105,8 @@ public final class DependencyContainer: @unchecked Sendable {
         Self.overrides?.authenticationUseCase?() ?? Self.authenticationRepository
     }
 
-    public func getOnboardingUseCase() -> any OnboardingUseCase {
-        Self.overrides?.onboardingUseCase?() ?? Self.onboardingRepository
+    public func getWhatsNewUseCase() -> any WhatsNewUseCase {
+        Self.overrides?.whatsNewUseCase?() ?? Self.whatsNewRepository
     }
 
     @MainActor

@@ -24,12 +24,12 @@ let package = Package(
         .package(path: "../../Shared"),
         .package(path: "../../DesignSystem"),
         .package(path: "../Authentication"),
-        .package(path: "../Onboarding")
+        .package(path: "../WhatsNew")
     ],
     targets: [
         .target(
             name: "Settings",
-            dependencies: ["Domain", "Shared", "DesignSystem", "Authentication", "Onboarding"],
+            dependencies: ["Domain", "Shared", "DesignSystem", "Authentication", "WhatsNew"],
         ),
         .testTarget(
             name: "SettingsTests",

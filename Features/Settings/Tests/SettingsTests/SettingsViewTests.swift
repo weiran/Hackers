@@ -84,7 +84,7 @@ struct SettingsViewTests {
         }
     }
 
-    // MARK: - Onboarding Tests
+    // MARK: - WhatsNew Tests
 
     // MARK: - SwiftUI Integration Tests
 }

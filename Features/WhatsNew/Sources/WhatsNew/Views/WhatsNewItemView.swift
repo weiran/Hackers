@@ -1,5 +1,5 @@
 //
-//  OnboardingItemView.swift
+//  WhatsNewItemView.swift
 //  Hackers
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -8,8 +8,8 @@
 import DesignSystem
 import SwiftUI
 
-struct OnboardingItemView: View {
-    let item: OnboardingItem
+struct WhatsNewItemView: View {
+    let item: WhatsNewItem
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {

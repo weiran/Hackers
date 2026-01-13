@@ -19,7 +19,7 @@ public struct SettingsView: View {
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
-    let onShowOnboarding: () -> Void
+    let onShowWhatsNew: () -> Void
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
@@ -35,14 +35,14 @@ public struct SettingsView: View {
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onShowOnboarding: @escaping () -> Void = {}
+        onShowWhatsNew: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
         self.onLogout = onLogout
-        self.onShowOnboarding = onShowOnboarding
+        self.onShowWhatsNew = onShowWhatsNew
     }
 
     public var body: some View {
@@ -88,7 +88,7 @@ public struct SettingsView: View {
                             messageBody: bodyLines.joined(separator: "\n"),
                         )
                     }
-                    Button(action: { onShowOnboarding() }, label: {
+                    Button(action: { onShowWhatsNew() }, label: {
                         Label("Show What's New", systemImage: "sparkles")
                     })
                 }

@@ -1,5 +1,5 @@
 //
-//  OnboardingRepository.swift
+//  WhatsNewRepository.swift
 //  Data
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -8,14 +8,14 @@
 import Domain
 import Foundation
 
-public protocol OnboardingVersionStore: Sendable {
+public protocol WhatsNewVersionStore: Sendable {
     func lastShownVersion() -> String?
     func save(shownVersion: String)
 }
 
-public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @unchecked Sendable {
+public final class UserDefaultsWhatsNewVersionStore: WhatsNewVersionStore, @unchecked Sendable {
     private let userDefaults: UserDefaults
-    private let key = "com.weiran.hackers.onboarding.shownVersion"
+    private let key = "com.weiran.hackers.whatsnew.shownVersion"
 
     private init(storage: UserDefaults) {
         userDefaults = storage
@@ -26,7 +26,7 @@ public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @
     }
 
     public convenience init() {
-        let suite = "com.weiran.hackers.onboarding"
+        let suite = "com.weiran.hackers.whatsnew"
         let defaults = UserDefaults(suiteName: suite) ?? .standard
         self.init(storage: defaults)
     }
@@ -40,20 +40,20 @@ public final class UserDefaultsOnboardingVersionStore: OnboardingVersionStore, @
     }
 }
 
-public final class OnboardingRepository: OnboardingUseCase, @unchecked Sendable {
-    private let versionStore: OnboardingVersionStore
+public final class WhatsNewRepository: WhatsNewUseCase, @unchecked Sendable {
+    private let versionStore: WhatsNewVersionStore
     private let processArguments: [String]
 
     public init(
-        versionStore: OnboardingVersionStore = UserDefaultsOnboardingVersionStore(),
+        versionStore: WhatsNewVersionStore = UserDefaultsWhatsNewVersionStore(),
         processArguments: [String] = ProcessInfo.processInfo.arguments
     ) {
         self.versionStore = versionStore
         self.processArguments = processArguments
     }
 
-    public func shouldShowOnboarding(currentVersion: String, forceShow: Bool) -> Bool {
-        if processArguments.contains("disableOnboarding"), !forceShow {
+    public func shouldShowWhatsNew(currentVersion: String, forceShow: Bool) -> Bool {
+        if processArguments.contains("disableWhatsNew"), !forceShow {
             return false
         }
 
@@ -67,7 +67,7 @@ public final class OnboardingRepository: OnboardingUseCase, @unchecked Sendable 
         return shouldShowBasedOnMinorRelease(currentVersion: currentVersion, lastShownVersion: lastShownVersion)
     }
 
-    public func markOnboardingShown(for version: String) {
+    public func markWhatsNewShown(for version: String) {
         versionStore.save(shownVersion: version)
     }
 

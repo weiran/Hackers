@@ -1,17 +1,17 @@
 //
-//  OnboardingDataTests.swift
-//  OnboardingTests
+//  WhatsNewDataTests.swift
+//  WhatsNewTests
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-@testable import Onboarding
+@testable import WhatsNew
 import Testing
 
-struct OnboardingDataTests {
-    @Test("Current onboarding data contains expected items")
-    func currentOnboardingData() {
-        let data = OnboardingData.currentOnboarding()
+struct WhatsNewDataTests {
+    @Test("Current whats new data contains expected items")
+    func currentWhatsNewData() {
+        let data = WhatsNewData.currentWhatsNew()
 
         #expect(data.title == "What's New in Hackers 5.2.1")
         #expect(data.items.count == 2)
@@ -22,9 +22,9 @@ struct OnboardingDataTests {
         })
     }
 
-    @Test("OnboardingItem has proper initialization")
-    func onboardingItemInitialization() {
-        let item = OnboardingItem(
+    @Test("WhatsNewItem has proper initialization")
+    func whatsNewItemInitialization() {
+        let item = WhatsNewItem(
             title: "Test Title",
             subtitle: "Test Subtitle",
             systemImage: "star",

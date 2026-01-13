@@ -1,5 +1,5 @@
 //
-//  OnboardingView.swift
+//  WhatsNewView.swift
 //  Hackers
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -8,12 +8,12 @@
 import DesignSystem
 import SwiftUI
 
-public struct OnboardingView: View {
-    private let onboardingData: OnboardingData
+public struct WhatsNewView: View {
+    private let whatsNewData: WhatsNewData
     private let onDismiss: () -> Void
 
-    public init(onboardingData: OnboardingData, onDismiss: @escaping () -> Void) {
-        self.onboardingData = onboardingData
+    public init(whatsNewData: WhatsNewData, onDismiss: @escaping () -> Void) {
+        self.whatsNewData = whatsNewData
         self.onDismiss = onDismiss
     }
 
@@ -39,20 +39,19 @@ public struct OnboardingView: View {
             .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: onDismiss) {
-                            Image(systemName: "xmark")
-                                .font(.headline)
-                        }
-                        .foregroundStyle(AppColors.appTintColor)
-                        .accessibilityLabel("Close")
+                    Button(action: onDismiss) {
+                        Image(systemName: "xmark")
+                            .font(.headline)
                     }
+                    .foregroundStyle(AppColors.appTintColor)
+                    .accessibilityLabel("Close")
                 }
             }
     }
 
     private var headerView: some View {
         VStack(spacing: 12) {
-            Text(onboardingData.title)
+            Text(whatsNewData.title)
                 .scaledFont(.largeTitle)
                 .bold()
                 .multilineTextAlignment(.center)
@@ -61,8 +60,8 @@ public struct OnboardingView: View {
 
     private var itemsList: some View {
         LazyVStack(spacing: 24) {
-            ForEach(onboardingData.items) { item in
-                OnboardingItemView(item: item)
+            ForEach(whatsNewData.items) { item in
+                WhatsNewItemView(item: item)
             }
         }
     }

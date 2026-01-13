@@ -1,5 +1,5 @@
 //
-//  OnboardingItem.swift
+//  WhatsNewItem.swift
 //  Hackers
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct OnboardingItem: Identifiable, Sendable {
+public struct WhatsNewItem: Identifiable, Sendable {
     public let id = UUID()
     public let title: String
     public let subtitle: String
