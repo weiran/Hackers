@@ -125,6 +125,11 @@ struct EmbeddedWebView: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if bottomPanelInsetHeight > 0 {
+                    Color.clear.frame(height: bottomPanelInsetHeight)
+                }
+            }
     }
 
     private var isPadLayout: Bool {
@@ -133,6 +138,11 @@ struct EmbeddedWebView: View {
         #else
         return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
         #endif
+    }
+
+    private var bottomPanelInsetHeight: CGFloat {
+        guard !showsToolbar else { return 0 }
+        return PostCommentsSheet.initialCollapsedHeight
     }
 
     private var shareButton: some View {
