@@ -604,27 +604,41 @@ private struct BrowserControlsView: View {
     @ObservedObject var controller: BrowserController
 
     var body: some View {
-        ZStack {
-            HStack {
-                Spacer()
-                controlsGroup
-                Spacer()
-            }
-
-            HStack {
-                closeButton
-                    .padding(.leading, safeInsetPadding)
-                Spacer()
-            }
+        GlassEffectContainer(spacing: 18) {
+            controlsLayout
         }
     }
 
-    private var safeInsetPadding: CGFloat {
+    private var controlsLayout: some View {
+        ZStack {
+            navigationControlsGroup
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            HStack {
+                closeButton
+                    .padding(.leading, safeInsetPaddingLeft)
+
+                Spacer()
+
+                shareControlsGroup
+                    .padding(.trailing, safeInsetPaddingRight)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var safeInsetPaddingLeft: CGFloat {
         let inset = PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets.left ?? 0
         return max(inset, 12)
     }
 
-    private var controlsGroup: some View {
+    private var safeInsetPaddingRight: CGFloat {
+        let inset = PresentationContextProvider.shared.windowScene?.windows.first?.safeAreaInsets.right ?? 0
+        return max(inset, 12)
+    }
+
+    private var navigationControlsGroup: some View {
         HStack(spacing: 18) {
             controlButton(systemName: "chevron.backward", isEnabled: controller.canGoBack) {
                 controller.goBack()
@@ -637,7 +651,15 @@ private struct BrowserControlsView: View {
             controlButton(systemName: "arrow.clockwise") {
                 controller.reload()
             }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .modifier(GlassCapsuleBackground())
+        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+    }
 
+    private var shareControlsGroup: some View {
+        HStack(spacing: 18) {
             controlButton(systemName: "square.and.arrow.up") {
                 Task { @MainActor in
                     let targetURL = controller.currentURL ?? fallbackURL
@@ -652,11 +674,7 @@ private struct BrowserControlsView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(.thinMaterial, in: Capsule())
-        .overlay(
-            Capsule()
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
+        .modifier(GlassCapsuleBackground())
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
     }
 
@@ -668,10 +686,10 @@ private struct BrowserControlsView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .frame(width: 20, height: 20)
                 .padding(10)
-                .background(.thinMaterial, in: Circle())
         }
         .foregroundStyle(.primary)
         .accessibilityLabel("Close")
+        .modifier(GlassCircleBackground())
         .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
     }
 
@@ -709,6 +727,20 @@ private struct BrowserControlsView: View {
         default:
             return "Button"
         }
+    }
+}
+
+private struct GlassCapsuleBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .glassEffect(.regular.interactive(), in: .capsule)
+    }
+}
+
+private struct GlassCircleBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .glassEffect(.regular.interactive(), in: .circle)
     }
 }
 
