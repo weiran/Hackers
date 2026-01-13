@@ -87,14 +87,15 @@ public struct WhatsNewView: View {
     private var enableEmbeddedBrowserButton: some View {
         actionButton(
             title: embeddedBrowserEnabled ? "Embedded Browser Enabled" : "Enable Embedded Browser",
-            isEnabled: !embeddedBrowserEnabled
+            isEnabled: !embeddedBrowserEnabled,
+            style: .primary
         ) {
             enableEmbeddedBrowser()
         }
     }
 
     private var continueButton: some View {
-        actionButton(title: "Continue") {
+        actionButton(title: "Continue", style: .secondary) {
             onDismiss()
         }
     }
@@ -103,34 +104,42 @@ public struct WhatsNewView: View {
         guard !embeddedBrowserEnabled else { return }
         settingsUseCase.linkBrowserMode = .customBrowser
         embeddedBrowserEnabled = true
+        onDismiss()
+    }
+
+    private enum ActionButtonStyle {
+        case primary
+        case secondary
     }
 
     @ViewBuilder
     private func actionButton(
         title: String,
         isEnabled: Bool = true,
+        style: ActionButtonStyle = .primary,
         action: @escaping () -> Void
     ) -> some View {
+        let isPrimary = style == .primary
         let label = Text(title)
             .scaledFont(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(isPrimary ? .white : .primary)
             .frame(maxWidth: .infinity)
             .frame(height: 50)
 
-        if #available(iOS 26.0, *) {
+        if isPrimary {
             Button(action: action) {
                 label
             }
-            .glassEffect(.regular.tint(AppColors.appTintColor))
+            .buttonStyle(.glassProminent)
+            .tint(AppColors.appTintColor)
             .disabled(!isEnabled)
             .opacity(isEnabled ? 1 : 0.7)
         } else {
             Button(action: action) {
                 label
-                    .background(AppColors.appTintColor)
             }
-            .clipShape(.rect(cornerRadius: 12))
-            .buttonStyle(.plain)
+            .buttonStyle(.glass)
+            .tint(.secondary)
             .disabled(!isEnabled)
             .opacity(isEnabled ? 1 : 0.7)
         }
