@@ -24,10 +24,12 @@ struct OnboardingRepositoryTests {
         #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: false) == false)
     }
 
-    @Test("Shows when onboarding not yet displayed")
-    func showsWhenNotDisplayed() {
-        let repository = OnboardingRepository(versionStore: MockStore(lastShownVersion: nil), processArguments: [])
-        #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: false))
+    @Test("Does not show for first-time installs")
+    func doesNotShowForFirstTimeInstalls() {
+        let store = MockStore(lastShownVersion: nil)
+        let repository = OnboardingRepository(versionStore: store, processArguments: [])
+        #expect(repository.shouldShowOnboarding(currentVersion: "5.2", forceShow: false) == false)
+        #expect(store.lastShownVersion() == "5.2")
     }
 
     @Test("Patch updates do not retrigger onboarding")

@@ -60,7 +60,8 @@ public final class OnboardingRepository: OnboardingUseCase, @unchecked Sendable 
         if forceShow { return true }
 
         guard let lastShownVersion = versionStore.lastShownVersion() else {
-            return true
+            versionStore.save(shownVersion: currentVersion)
+            return false
         }
 
         return shouldShowBasedOnMinorRelease(currentVersion: currentVersion, lastShownVersion: lastShownVersion)
