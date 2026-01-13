@@ -47,6 +47,7 @@ public struct WhatsNewView: View {
                     .accessibilityLabel("Close")
                 }
             }
+        }
     }
 
     private var headerView: some View {
