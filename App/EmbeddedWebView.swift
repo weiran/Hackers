@@ -359,7 +359,7 @@ private struct PostCommentsSheet: View {
                 guard abs(updated - controlsHeight) > 0.5 else { return }
                 controlsHeight = updated
             }
-            .onChange(of: isExpanded) { newValue in
+            .onChange(of: isExpanded) { _, newValue in
                 if newValue {
                     showsExpandedToolbar = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
