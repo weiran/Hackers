@@ -17,23 +17,22 @@ public struct WhatsNewData: Sendable {
     }
 
     public static func currentWhatsNew() -> WhatsNewData {
-        let compactFeed = WhatsNewItem(
-            title: "Compact Feed Design",
-            subtitle: "Choose a streamlined feed layout with inline upvote and comment counts "
-                + "for a cleaner reading experience.",
-            systemImage: "rectangle.compress.vertical",
+        let embeddedBrowser = WhatsNewItem(
+            title: "Embedded Browser",
+            subtitle: "Open stories inside Hackers with a built-in browser so you stay in the flow.",
+            systemImage: "safari",
         )
 
-        let unvoteFeature = WhatsNewItem(
-            title: "Unvote Your Upvotes",
-            subtitle: "Changed your mind? Remove upvotes from posts and comments within "
-                + "Hacker News's 1-hour window.",
-            systemImage: "arrow.uturn.down.circle",
+        let commentsDrawer = WhatsNewItem(
+            title: "Comments Drawer",
+            subtitle: "Swipe up to read comments while the article stays loaded, with quick "
+                + "back, forward, reload, and share controls.",
+            systemImage: "bubble.left.and.bubble.right",
         )
 
         return WhatsNewData(
-            title: "What's New in Hackers 5.2.1",
-            items: [compactFeed, unvoteFeature],
+            title: "What's New in Hackers 5.3",
+            items: [embeddedBrowser, commentsDrawer],
         )
     }
 }

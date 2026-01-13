@@ -35,7 +35,7 @@ public enum TextSize: Int, CaseIterable, Sendable {
     }
 }
 
-public protocol SettingsUseCase: Sendable {
+public protocol SettingsUseCase: AnyObject, Sendable {
     var safariReaderMode: Bool { get set }
     var linkBrowserMode: LinkBrowserMode { get set }
     var showThumbnails: Bool { get set }

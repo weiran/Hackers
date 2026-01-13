@@ -6,15 +6,25 @@
 //
 
 import DesignSystem
+import Domain
+import Shared
 import SwiftUI
 
 public struct WhatsNewView: View {
     private let whatsNewData: WhatsNewData
     private let onDismiss: () -> Void
+    private let settingsUseCase: any SettingsUseCase
+    @State private var embeddedBrowserEnabled: Bool
 
-    public init(whatsNewData: WhatsNewData, onDismiss: @escaping () -> Void) {
+    public init(
+        whatsNewData: WhatsNewData,
+        onDismiss: @escaping () -> Void,
+        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
+    ) {
         self.whatsNewData = whatsNewData
         self.onDismiss = onDismiss
+        self.settingsUseCase = settingsUseCase
+        _embeddedBrowserEnabled = State(initialValue: settingsUseCase.linkBrowserMode == .customBrowser)
     }
 
     public var body: some View {
@@ -29,7 +39,7 @@ public struct WhatsNewView: View {
                     .padding(.top, 16)
                 }
 
-                continueButton
+                actionButtons
                     .padding(.horizontal, 24)
                     .padding(.bottom, 24)
                     .padding(.top, 16)
@@ -67,28 +77,62 @@ public struct WhatsNewView: View {
         }
     }
 
-    @ViewBuilder
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            enableEmbeddedBrowserButton
+            continueButton
+        }
+    }
+
+    private var enableEmbeddedBrowserButton: some View {
+        actionButton(
+            title: embeddedBrowserEnabled ? "Embedded Browser Enabled" : "Enable Embedded Browser",
+            isEnabled: !embeddedBrowserEnabled
+        ) {
+            enableEmbeddedBrowser()
+        }
+    }
+
     private var continueButton: some View {
+        actionButton(title: "Continue") {
+            onDismiss()
+        }
+    }
+
+    private func enableEmbeddedBrowser() {
+        guard !embeddedBrowserEnabled else { return }
+        settingsUseCase.linkBrowserMode = .customBrowser
+        embeddedBrowserEnabled = true
+    }
+
+    @ViewBuilder
+    private func actionButton(
+        title: String,
+        isEnabled: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
+        let label = Text(title)
+            .scaledFont(.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+
         if #available(iOS 26.0, *) {
-            Button(action: onDismiss) {
-                Text("Continue")
-                    .scaledFont(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+            Button(action: action) {
+                label
             }
             .glassEffect(.regular.tint(AppColors.appTintColor))
+            .disabled(!isEnabled)
+            .opacity(isEnabled ? 1 : 0.7)
         } else {
-            Button(action: onDismiss) {
-                Text("Continue")
-                    .scaledFont(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+            Button(action: action) {
+                label
                     .background(AppColors.appTintColor)
             }
             .clipShape(.rect(cornerRadius: 12))
             .buttonStyle(.plain)
+            .disabled(!isEnabled)
+            .opacity(isEnabled ? 1 : 0.7)
         }
     }
 }
