@@ -64,6 +64,12 @@ final class BrowserController: ObservableObject {
     }
 }
 
+private enum WebViewAnimations {
+    static let standard = Animation.easeInOut(duration: 0.25)
+    static let fast = Animation.easeInOut(duration: 0.2)
+    static let revealDelay: TimeInterval = 0.15
+}
+
 struct EmbeddedWebView: View {
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -237,7 +243,7 @@ struct PostLinkBrowserView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            withAnimation(.easeInOut(duration: 0.25)) {
+            withAnimation(WebViewAnimations.standard) {
                 showingCommentsPane = true
             }
         }
@@ -369,8 +375,7 @@ private struct PostCommentsSheet: View {
             }
             .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
             .ignoresSafeArea(.container)
-            .animation(.easeInOut(duration: 0.25), value: sheetState)
-            .animation(.easeInOut(duration: 0.2), value: collapsedHeight)
+            .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newValue in
                 let updated = ceil(newValue)
                 guard updated.isFinite, updated > 0 else { return }
@@ -387,9 +392,9 @@ private struct PostCommentsSheet: View {
             .onChange(of: isExpanded) { _, newValue in
                 if newValue {
                     showsExpandedToolbar = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + WebViewAnimations.revealDelay) {
                         guard isExpanded else { return }
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(WebViewAnimations.fast) {
                             showsExpandedToolbar = true
                         }
                     }
@@ -408,9 +413,15 @@ private struct PostCommentsSheet: View {
         !isExpanded
     }
 
+    private func animateSheet(_ animation: Animation = WebViewAnimations.standard, _ updates: () -> Void) {
+        withAnimation(animation) {
+            updates()
+        }
+    }
+
     private func collapseSheet() {
         guard isExpanded else { return }
-        withAnimation(.easeInOut(duration: 0.2)) {
+        animateSheet {
             sheetState = .collapsed
             dragTranslation = 0
             isTrackingDrag = false
@@ -472,7 +483,6 @@ private struct PostCommentsSheet: View {
         }
         .contentShape(Rectangle())
         .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-        .animation(.easeInOut(duration: 0.25), value: isExpanded)
     }
 
     private func sheetHandle(
@@ -495,7 +505,11 @@ private struct PostCommentsSheet: View {
     }
 
     private var collapsedHeader: some View {
-        collapsedHeaderView(onExpand: { sheetState = .expanded })
+        collapsedHeaderView(onExpand: {
+            animateSheet {
+                sheetState = .expanded
+            }
+        })
         .background(
             GeometryReader { proxy in
                 Color.clear.preference(key: CollapsedHeaderHeightPreferenceKey.self, value: proxy.size.height)
@@ -595,7 +609,7 @@ private struct PostCommentsSheet: View {
                 let baseTop = isExpanded ? expandedTop : collapsedTop
                 let predictedTop = baseTop + value.predictedEndTranslation.height
                 let midpoint = (expandedTop + collapsedTop) / 2
-                withAnimation(.easeInOut(duration: 0.2)) {
+                animateSheet {
                     dragTranslation = 0
                     if predictedTop <= midpoint {
                         sheetState = .expanded
@@ -618,7 +632,7 @@ private struct PostCommentsSheet: View {
                 let baseTop = isExpanded ? expandedTop : collapsedTop
                 let predictedTop = baseTop + value.predictedEndTranslation.height
                 let midpoint = (expandedTop + collapsedTop) / 2
-                withAnimation(.easeInOut(duration: 0.2)) {
+                animateSheet {
                     dragTranslation = 0
                     if predictedTop <= midpoint {
                         sheetState = .expanded
