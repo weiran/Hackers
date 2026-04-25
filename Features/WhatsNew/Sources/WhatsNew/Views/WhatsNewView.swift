@@ -79,7 +79,9 @@ public struct WhatsNewView: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            enableEmbeddedBrowserButton
+            if LinkBrowserMode.isCustomBrowserAvailable {
+                enableEmbeddedBrowserButton
+            }
             continueButton
         }
     }

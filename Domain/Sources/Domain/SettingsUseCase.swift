@@ -51,4 +51,19 @@ public enum LinkBrowserMode: Int, CaseIterable, Sendable {
     case inAppBrowser = 0
     case customBrowser = 1
     case systemBrowser = 2
+
+    public static var isCustomBrowserAvailable: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
+    public static var availableModes: [LinkBrowserMode] {
+        if isCustomBrowserAvailable {
+            return [.inAppBrowser, .customBrowser, .systemBrowser]
+        }
+        return [.inAppBrowser, .systemBrowser]
+    }
 }

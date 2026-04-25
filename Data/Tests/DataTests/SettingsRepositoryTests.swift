@@ -18,6 +18,12 @@ struct SettingsRepositoryTests {
     var settingsRepository: SettingsRepository {
         SettingsRepository(userDefaults: mockUserDefaults)
     }
+    private var expectedDefaultLinkMode: LinkBrowserMode {
+        LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
+    }
+    private var expectedStoredCustomMode: LinkBrowserMode {
+        LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
+    }
 
     // MARK: - Mock UserDefaults
 
@@ -180,8 +186,8 @@ struct SettingsRepositoryTests {
 
     @Test("Link browser mode default value")
     func linkBrowserModeDefaultValue() {
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
+        #expect(settingsRepository.linkBrowserMode == expectedDefaultLinkMode)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == expectedDefaultLinkMode.rawValue)
     }
 
     @Test("Link browser mode setter and getter")
@@ -191,8 +197,8 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.systemBrowser.rawValue)
 
         settingsRepository.linkBrowserMode = .customBrowser
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
+        #expect(settingsRepository.linkBrowserMode == expectedStoredCustomMode)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == expectedStoredCustomMode.rawValue)
     }
 
     // MARK: - Integration Tests
@@ -205,11 +211,11 @@ struct SettingsRepositoryTests {
 
         // Verify all changes persist
         #expect(settingsRepository.safariReaderMode == true)
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
+        #expect(settingsRepository.linkBrowserMode == expectedStoredCustomMode)
 
         // Verify underlying storage
         #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == expectedStoredCustomMode.rawValue)
     }
 
     @Test("Settings independence")
@@ -218,7 +224,7 @@ struct SettingsRepositoryTests {
         settingsRepository.safariReaderMode = true
 
         // Other settings should remain at their default values
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
+        #expect(settingsRepository.linkBrowserMode == expectedDefaultLinkMode)
     }
 
     // MARK: - Use Case Protocol Conformance Tests
@@ -246,7 +252,7 @@ struct SettingsRepositoryTests {
 
         // Verify the keys match what's expected
         #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
+        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == expectedStoredCustomMode.rawValue)
     }
 
     // MARK: - Thread Safety Tests
@@ -269,6 +275,6 @@ struct SettingsRepositoryTests {
         let mode = settingsRepository.linkBrowserMode
 
         #expect(safariMode == true)
-        #expect(mode == .customBrowser)
+        #expect(mode == expectedStoredCustomMode)
     }
 }
