@@ -184,9 +184,11 @@ public struct SettingsView: View {
 
                 Section(header: Text("Browser")) {
                     Picker(selection: $viewModel.linkBrowserMode) {
-                        ForEach(LinkBrowserMode.availableModes, id: \.self) { mode in
-                            Text(browserModeTitle(for: mode)).tag(mode)
-                        }
+                        Text("In-App Browser").tag(LinkBrowserMode.inAppBrowser)
+                        #if DEBUG
+                        Text("Custom Browser").tag(LinkBrowserMode.customBrowser)
+                        #endif
+                        Text("System Browser").tag(LinkBrowserMode.systemBrowser)
                     } label: {
                         Label("Open Links Using", systemImage: "safari")
                     }
@@ -250,17 +252,6 @@ public struct SettingsView: View {
             Text("Version \(appVersion ?? "1.0")")
                 .foregroundStyle(.gray)
             Spacer()
-        }
-    }
-
-    private func browserModeTitle(for mode: LinkBrowserMode) -> String {
-        switch mode {
-        case .inAppBrowser:
-            "In-App Browser"
-        case .customBrowser:
-            "Custom Browser"
-        case .systemBrowser:
-            "System Browser"
         }
     }
 

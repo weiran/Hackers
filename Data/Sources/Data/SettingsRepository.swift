@@ -22,9 +22,15 @@ extension UserDefaults: UserDefaultsProtocol {}
 
 public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
     private let userDefaults: UserDefaultsProtocol
+    private let isCustomBrowserFeatureEnabled: Bool
 
     public init(userDefaults: UserDefaultsProtocol = UserDefaults.standard) {
         self.userDefaults = userDefaults
+        #if DEBUG
+        isCustomBrowserFeatureEnabled = true
+        #else
+        isCustomBrowserFeatureEnabled = false
+        #endif
         registerDefaults()
     }
 
@@ -32,7 +38,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         migrateLinkBrowserModeIfNeeded()
 
         setDefaultIfNeeded(false, forKey: "safariReaderMode")
-        let defaultLinkBrowserMode: LinkBrowserMode = LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
+        let defaultLinkBrowserMode: LinkBrowserMode = isCustomBrowserFeatureEnabled ? .customBrowser : .inAppBrowser
         setDefaultIfNeeded(defaultLinkBrowserMode.rawValue, forKey: "linkBrowserMode")
         setDefaultIfNeeded(true, forKey: "ShowThumbnails")
         setDefaultIfNeeded(false, forKey: "RememberFeedCategory")
@@ -56,7 +62,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
 
         // New installs default to custom browser in development and in-app browser in production.
-        let defaultMode: LinkBrowserMode = LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
+        let defaultMode: LinkBrowserMode = isCustomBrowserFeatureEnabled ? .customBrowser : .inAppBrowser
         userDefaults.set(defaultMode.rawValue, forKey: "linkBrowserMode")
     }
 
@@ -77,13 +83,13 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
     public var linkBrowserMode: LinkBrowserMode {
         get {
             let storedMode = LinkBrowserMode(rawValue: userDefaults.integer(forKey: "linkBrowserMode")) ?? .inAppBrowser
-            if LinkBrowserMode.isCustomBrowserAvailable {
-                return storedMode
+            guard isCustomBrowserFeatureEnabled == false || storedMode != .customBrowser else {
+                return .customBrowser
             }
             return storedMode == .customBrowser ? .inAppBrowser : storedMode
         }
         set {
-            let modeToStore = LinkBrowserMode.isCustomBrowserAvailable == false && newValue == .customBrowser
+            let modeToStore = isCustomBrowserFeatureEnabled == false && newValue == .customBrowser
                 ? LinkBrowserMode.inAppBrowser
                 : newValue
             userDefaults.set(modeToStore.rawValue, forKey: "linkBrowserMode")

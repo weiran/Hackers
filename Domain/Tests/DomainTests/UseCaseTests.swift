@@ -175,11 +175,9 @@ struct UseCaseTests {
     @Test("Settings repository persists changes through protocol")
     func settingsUseCasePersistsValues() {
         var settingsUseCase: any SettingsUseCase = settingsRepository
-        let expectedDefaultLinkMode: LinkBrowserMode = LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
-        let expectedStoredCustomMode: LinkBrowserMode = LinkBrowserMode.isCustomBrowserAvailable ? .customBrowser : .inAppBrowser
 
         #expect(settingsUseCase.safariReaderMode == false)
-        #expect(settingsUseCase.linkBrowserMode == expectedDefaultLinkMode)
+        #expect(settingsUseCase.linkBrowserMode == .customBrowser)
         #expect(settingsUseCase.showThumbnails == true)
         #expect(settingsUseCase.rememberFeedCategory == false)
         #expect(settingsUseCase.lastFeedCategory == nil)
@@ -193,7 +191,7 @@ struct UseCaseTests {
         settingsUseCase.textSize = .large
 
         #expect(settingsUseCase.safariReaderMode == true, "actual: \(settingsUseCase.safariReaderMode)")
-        #expect(settingsUseCase.linkBrowserMode == expectedStoredCustomMode, "actual: \(settingsUseCase.linkBrowserMode)")
+        #expect(settingsUseCase.linkBrowserMode == .customBrowser, "actual: \(settingsUseCase.linkBrowserMode)")
         #expect(settingsUseCase.showThumbnails == false, "actual: \(settingsUseCase.showThumbnails)")
         #expect(settingsUseCase.rememberFeedCategory == true, "actual: \(settingsUseCase.rememberFeedCategory)")
         #expect(settingsUseCase.lastFeedCategory == .ask, "actual: \(String(describing: settingsUseCase.lastFeedCategory))")
