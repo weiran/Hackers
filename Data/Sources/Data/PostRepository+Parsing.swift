@@ -83,14 +83,11 @@ extension PostRepository {
             return text?.contains("comment") == true
         }
 
-        let commentsCount: Int = if let commentLinkText = try commentLinkElement?.text(),
-                                    let commentsCountString = commentLinkText.components(separatedBy: .whitespaces).first,
-                                    let count = Int(String(commentsCountString))
-        {
-            count
-        } else {
-            0
-        }
+        let commentLinkText = try commentLinkElement?.text()
+        let commentsCountString = commentLinkText?
+            .components(separatedBy: .whitespaces)
+            .first
+        let commentsCount = Int(commentsCountString ?? "") ?? 0
 
         let voteLinks = try voteLinks(from: titleElement, metadata: metadataElement)
         let hasAnyVoteLink = voteLinks.upvote != nil || voteLinks.unvote != nil

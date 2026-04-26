@@ -62,8 +62,8 @@ VERBOSE=false
 
 # All available modules
 ALL_MODULES=(
-    # Run Onboarding first to avoid any prior defaults pollution from other modules
-    "Onboarding:${BASE_DIR}/Features/Onboarding"
+    # Run WhatsNew first to avoid any prior defaults pollution from other modules
+    "WhatsNew:${BASE_DIR}/Features/WhatsNew"
     "Domain:${BASE_DIR}/Domain"
     "Data:${BASE_DIR}/Data"
     "Networking:${BASE_DIR}/Networking"
@@ -107,7 +107,7 @@ MODULES:
     Feed            Feed feature tests
     Comments        Comments feature tests
     Settings        Settings feature tests
-    Onboarding      Onboarding feature tests
+    WhatsNew        WhatsNew feature tests
 
 EXAMPLES:
     ./run_tests.sh                           # Run all modules (quiet)
@@ -233,9 +233,9 @@ run_module_tests() {
 
     # Per-module environment resets to avoid cross-module state leakage
     case "$module_name" in
-        Onboarding)
-            # Ensure a clean suite for onboarding defaults
-            defaults delete com.weiran.hackers.onboarding.tests >/dev/null 2>&1 || true
+        WhatsNew)
+            # Ensure a clean suite for whats new defaults
+            defaults delete com.weiran.hackers.whatsnew.tests >/dev/null 2>&1 || true
             ;;
         Networking)
             # Clear global cookie storage to avoid cross-test bleedthrough
@@ -389,7 +389,7 @@ while [[ $# -gt 0 ]]; do
                 MODULES_TO_RUN+=("$1")
             else
                 print_status $RED "Error: Unknown module '$1'"
-                print_status $YELLOW "Available modules: Domain, Data, Networking, DesignSystem, Shared, Feed, Comments, Settings, Onboarding"
+                print_status $YELLOW "Available modules: Domain, Data, Networking, DesignSystem, Shared, Feed, Comments, Settings, WhatsNew"
                 exit 1
             fi
             shift

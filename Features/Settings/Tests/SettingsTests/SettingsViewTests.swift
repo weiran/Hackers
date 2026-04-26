@@ -29,6 +29,11 @@ struct SettingsViewTests {
             selectedPostId = post.id
         }
 
+        func showPostLink(_ post: Post) {
+            selectedPost = post
+            selectedPostId = post.id
+        }
+
         func showPost(withId id: Int) {
             selectedPostId = id
             selectedPost = nil
@@ -79,7 +84,7 @@ struct SettingsViewTests {
         }
     }
 
-    // MARK: - Onboarding Tests
+    // MARK: - WhatsNew Tests
 
     // MARK: - SwiftUI Integration Tests
 }

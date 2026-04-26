@@ -30,6 +30,10 @@ struct FeedViewTests {
             selectedPostId = post.id
         }
 
+        func showPostLink(_ post: Post) {
+            selectedPostId = post.id
+        }
+
         func showPost(withId id: Int) {
             selectedPostId = id
         }

@@ -53,10 +53,12 @@ public struct SupportView: View {
                 Text("Hi, I'm Weiran")
                     .font(.title2.weight(.semibold))
                 Text(
-                    "I love building open source apps and Hackers is one of my proudest projects - the app that thousands reach for every day to catch up with Hacker News."
+                    "I love building open source apps and Hackers is one of my proudest projects - "
+                        + "the app that thousands reach for every day to catch up with Hacker News."
                 )
                 Text(
-                    "If Hackers helps you stay informed or makes keeping up with the community a little easier, becoming a supporter gives me time to keep maintaining and improving the app."
+                    "If Hackers helps you stay informed or makes keeping up with the community a little easier, "
+                        + "becoming a supporter gives me time to keep maintaining and improving the app."
                 )
                 Text(
                     "Every contribution keeps the app fast, reliable, and up to date."
@@ -75,11 +77,14 @@ public struct SupportView: View {
                     Text(product.displayName)
                         .font(.headline)
 
-                    Text("Become a monthly supporter to help me keep improving Hackers. You can manage or cancel the subscription anytime in your App Store settings.")
+                    Text(
+                        "Become a monthly supporter to help me keep improving Hackers. "
+                            + "You can manage or cancel the subscription anytime in your App Store settings."
+                    )
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    Button(action: { viewModel.purchase(product: product) }) {
+                    Button(action: { viewModel.purchase(product: product) }, label: {
                         HStack {
                             Image(systemName: "heart.fill")
                             Text("Subscribe for \(product.displayPrice)/month")
@@ -88,7 +93,7 @@ public struct SupportView: View {
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
                         .frame(maxWidth: .infinity)
-                    }
+                    })
                     .buttonStyle(.glassProminent)
                     .tint(AppColors.appTintColor)
                     .disabled(viewModel.processingProductId == product.id)
@@ -100,7 +105,10 @@ public struct SupportView: View {
                         }
                     }
 
-                    Text("The subscription renews automatically each month until you cancel. Apple handles billing securely, and you'll receive a confirmation for every renewal.")
+                    Text(
+                        "The subscription renews automatically each month until you cancel. "
+                            + "Apple handles billing securely, and you'll receive a confirmation for every renewal."
+                    )
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -127,12 +135,15 @@ public struct SupportView: View {
                 }
             } else {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("One-off tips are perfect if you prefer to chip in now and then. Choose whichever amount feels right.")
+                    Text(
+                        "One-off tips are perfect if you prefer to chip in now and then. "
+                            + "Choose whichever amount feels right."
+                    )
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
                     ForEach(viewModel.tipProducts, id: \.id) { product in
-                        Button(action: { viewModel.purchase(product: product) }) {
+                        Button(action: { viewModel.purchase(product: product) }, label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(product.displayName)
@@ -148,7 +159,7 @@ public struct SupportView: View {
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
-                        }
+                        })
                         .buttonStyle(.glass)
                         .tint(AppColors.appTintColor)
                         .disabled(viewModel.processingProductId == product.id)
@@ -178,7 +189,10 @@ public struct SupportView: View {
             }
 
             if let product {
-                Text("Your \(product.displayName) subscription keeps the app running smoothly and lets me focus on polishing new features.")
+                Text(
+                    "Your \(product.displayName) subscription keeps the app running smoothly and lets me focus "
+                        + "on polishing new features."
+                )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -233,7 +247,10 @@ public struct SupportView: View {
             }
             .disabled(viewModel.isRestoring)
         } footer: {
-            Text("If you've previously subscribed or tipped using the same Apple ID, tap restore to make sure those purchases are applied.")
+            Text(
+                "If you've previously subscribed or tipped using the same Apple ID, tap restore to make sure "
+                    + "those purchases are applied."
+            )
                 .font(.footnote)
         }
     }

@@ -263,16 +263,18 @@ public final class CommentsViewModel: @unchecked Sendable {
         toggleCommentVisibility(rootComment)
         return rootComment
     }
+}
 
-    private func updateVisibleComments() {
+private extension CommentsViewModel {
+    func updateVisibleComments() {
         visibleComments = comments.filter { $0.visibility != .hidden }
     }
 
-    private func indexOfComment(_ comment: Comment, source: [Comment]) -> Int? {
+    func indexOfComment(_ comment: Comment, source: [Comment]) -> Int? {
         source.firstIndex(where: { $0.id == comment.id })
     }
 
-    private func indexOfVisibleRootComment(of comment: Comment) -> Int? {
+    func indexOfVisibleRootComment(of comment: Comment) -> Int? {
         guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
 
         for index in (0 ... commentIndex).reversed() where visibleComments[index].level == 0 {
@@ -282,7 +284,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         return nil
     }
 
-    private func countChildren(_ comment: Comment) -> Int {
+    func countChildren(_ comment: Comment) -> Int {
         guard let startIndex = indexOfComment(comment, source: comments) else { return 0 }
         let nextIndex = startIndex + 1
         var count = 0
@@ -303,7 +305,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         return count
     }
 
-    private func ensureAncestorVisibility(forCommentAt index: Int) {
+    func ensureAncestorVisibility(forCommentAt index: Int) {
         var remainingLevel = comments[index].level
         guard remainingLevel > 0 else { return }
 

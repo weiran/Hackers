@@ -8,10 +8,10 @@
 import SwiftUI
 
 public struct AppTextField: View {
-    private let title: String
-    @Binding private var text: String
-    private let isSecure: Bool
     @Environment(\.colorScheme) private var colorScheme
+    private let title: String
+    private let isSecure: Bool
+    @Binding private var text: String
     @FocusState private var isFocused: Bool
 
     public init(title: String, text: Binding<String>, isSecure: Bool) {

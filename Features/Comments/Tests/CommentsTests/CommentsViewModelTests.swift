@@ -647,7 +647,7 @@ final class MockVoteUseCase: VoteUseCase, @unchecked Sendable {
 
 final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
-    var openInDefaultBrowser: Bool = false
+    var linkBrowserMode: LinkBrowserMode = .inAppBrowser
     private var storedShowThumbnails: Bool
     private var storedRememberFeedCategory: Bool = false
     private var storedLastFeedCategory: PostType?

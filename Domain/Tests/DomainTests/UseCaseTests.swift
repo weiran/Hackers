@@ -177,21 +177,21 @@ struct UseCaseTests {
         var settingsUseCase: any SettingsUseCase = settingsRepository
 
         #expect(settingsUseCase.safariReaderMode == false)
-        #expect(settingsUseCase.openInDefaultBrowser == false)
+        #expect(settingsUseCase.linkBrowserMode == .customBrowser)
         #expect(settingsUseCase.showThumbnails == true)
         #expect(settingsUseCase.rememberFeedCategory == false)
         #expect(settingsUseCase.lastFeedCategory == nil)
         #expect(settingsUseCase.textSize == .medium)
 
         settingsUseCase.safariReaderMode = true
-        settingsUseCase.openInDefaultBrowser = true
+        settingsUseCase.linkBrowserMode = .customBrowser
         settingsUseCase.showThumbnails = false
         settingsUseCase.rememberFeedCategory = true
         settingsUseCase.lastFeedCategory = .ask
         settingsUseCase.textSize = .large
 
         #expect(settingsUseCase.safariReaderMode == true, "actual: \(settingsUseCase.safariReaderMode)")
-        #expect(settingsUseCase.openInDefaultBrowser == true, "actual: \(settingsUseCase.openInDefaultBrowser)")
+        #expect(settingsUseCase.linkBrowserMode == .customBrowser, "actual: \(settingsUseCase.linkBrowserMode)")
         #expect(settingsUseCase.showThumbnails == false, "actual: \(settingsUseCase.showThumbnails)")
         #expect(settingsUseCase.rememberFeedCategory == true, "actual: \(settingsUseCase.rememberFeedCategory)")
         #expect(settingsUseCase.lastFeedCategory == .ask, "actual: \(String(describing: settingsUseCase.lastFeedCategory))")
@@ -265,11 +265,15 @@ final class StubNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
 final class InMemoryUserDefaults: UserDefaultsProtocol, @unchecked Sendable {
     private var storage: [String: Any] = [
         "safariReaderMode": false,
-        "openInDefaultBrowser": false,
+        "linkBrowserMode": LinkBrowserMode.customBrowser.rawValue,
         "ShowThumbnails": true,
         "RememberFeedCategory": false,
         "textSize": TextSize.medium.rawValue
     ]
+
+    func object(forKey defaultName: String) -> Any? {
+        storage[defaultName]
+    }
 
     func bool(forKey defaultName: String) -> Bool {
         storage[defaultName] as? Bool ?? false

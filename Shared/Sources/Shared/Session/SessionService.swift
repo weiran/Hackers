@@ -15,7 +15,7 @@ import Observation
 public final class SessionService: AuthenticationServiceProtocol {
     private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
-    private nonisolated(unsafe) var logoutObserver: NSObjectProtocol?
+    nonisolated(unsafe) private var logoutObserver: NSObjectProtocol?
 
     public init(authenticationUseCase: any AuthenticationUseCase) {
         self.authenticationUseCase = authenticationUseCase

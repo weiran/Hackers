@@ -123,7 +123,8 @@ public final class SupportViewModel: @unchecked Sendable {
             case .tip:
                 alertInfo = AlertInfo(
                     title: "Thank You!",
-                    message: "Your tip helps keep Hackers fast, polished, and ready for the next big Hacker News discussion."
+                    message: "Your tip helps keep Hackers fast, polished, "
+                        + "and ready for the next big Hacker News discussion."
                 )
             }
         case .pending:

@@ -9,14 +9,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "Onboarding",
+    name: "WhatsNew",
     platforms: [
         .iOS(.v26)
     ],
     products: [
         .library(
-            name: "Onboarding",
-            targets: ["Onboarding"],
+            name: "WhatsNew",
+            targets: ["WhatsNew"],
         )
     ],
     dependencies: [
@@ -26,13 +26,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Onboarding",
+            name: "WhatsNew",
             dependencies: ["Domain", "Shared", "DesignSystem"],
         ),
         .testTarget(
-            name: "OnboardingTests",
-            dependencies: ["Onboarding"],
-            path: "Tests/OnboardingTests",
+            name: "WhatsNewTests",
+            dependencies: ["WhatsNew"],
+            path: "Tests/WhatsNewTests",
         )
     ],
 )

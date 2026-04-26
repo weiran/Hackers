@@ -14,10 +14,19 @@ public final class PresentationContextProvider: @unchecked Sendable {
     private init() {}
 
     public var windowScene: UIWindowScene? {
-        UIApplication.shared.connectedScenes.first as? UIWindowScene
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        if let activeScene = scenes.first(where: { $0.activationState == .foregroundActive }) {
+            return activeScene
+        }
+        return scenes.first
+    }
+
+    public var keyWindow: UIWindow? {
+        guard let windowScene else { return nil }
+        return windowScene.windows.first(where: { $0.isKeyWindow }) ?? windowScene.windows.first
     }
 
     public var rootViewController: UIViewController? {
-        windowScene?.windows.first?.rootViewController
+        keyWindow?.rootViewController
     }
 }

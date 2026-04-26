@@ -11,10 +11,10 @@ import Shared
 import SwiftUI
 
 public struct LoginView: View {
-    @State private var viewModel: LoginViewModel
-    @FocusState private var focusedField: Field?
     @Environment(\.dismiss) private var dismiss
     @Environment(ToastPresenter.self) private var toastPresenter
+    @State private var viewModel: LoginViewModel
+    @FocusState private var focusedField: Field?
 
     private enum Field {
         case username, password

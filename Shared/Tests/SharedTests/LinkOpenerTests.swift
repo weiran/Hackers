@@ -16,7 +16,7 @@ struct LinkOpenerTests {
     @MainActor
     @Test("System browser preference forwards URL to opener")
     func prefersSystemBrowser() {
-        let settings = StubSettingsUseCase(openInDefaultBrowser: true)
+        let settings = StubSettingsUseCase(linkBrowserMode: .systemBrowser)
         var openedURLs: [URL] = []
 
         LinkOpener.setEnvironmentForTesting(
@@ -36,7 +36,7 @@ struct LinkOpenerTests {
     @MainActor
     @Test("In-app browser presents Safari with reader mode setting")
     func presentsSafariViewController() {
-        let settings = StubSettingsUseCase(safariReaderMode: true, openInDefaultBrowser: false)
+        let settings = StubSettingsUseCase(safariReaderMode: true, linkBrowserMode: .inAppBrowser)
         var capturedPresented: (UIViewController, SFSafariViewController)?
         var capturedFactoryInput: (URL, SFSafariViewController.Configuration)?
         var stubSafari: StubSafariViewController?
@@ -83,7 +83,7 @@ struct LinkOpenerTests {
     @MainActor
     @Test("Missing presenter falls back to system opener")
     func missingPresenterFallsBack() {
-        let settings = StubSettingsUseCase(openInDefaultBrowser: false)
+        let settings = StubSettingsUseCase(linkBrowserMode: .inAppBrowser)
         var openedURLs: [URL] = []
 
         LinkOpener.setEnvironmentForTesting(
@@ -103,7 +103,7 @@ struct LinkOpenerTests {
     @MainActor
     @Test("Non-web schemes always use system opener")
     func nonWebSchemesUseSystemOpener() {
-        let settings = StubSettingsUseCase(openInDefaultBrowser: false)
+        let settings = StubSettingsUseCase(linkBrowserMode: .inAppBrowser)
         var openedURLs: [URL] = []
 
         LinkOpener.setEnvironmentForTesting(
@@ -125,16 +125,16 @@ struct LinkOpenerTests {
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool
-    var openInDefaultBrowser: Bool
+    var linkBrowserMode: LinkBrowserMode
     var showThumbnails: Bool = true
     var rememberFeedCategory: Bool = false
     var lastFeedCategory: PostType?
     var textSize: TextSize
     var compactFeedDesign: Bool = false
 
-    init(safariReaderMode: Bool = false, openInDefaultBrowser: Bool = false, textSize: TextSize = .medium) {
+    init(safariReaderMode: Bool = false, linkBrowserMode: LinkBrowserMode = .inAppBrowser, textSize: TextSize = .medium) {
         self.safariReaderMode = safariReaderMode
-        self.openInDefaultBrowser = openInDefaultBrowser
+        self.linkBrowserMode = linkBrowserMode
         self.textSize = textSize
     }
 

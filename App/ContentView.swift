@@ -21,10 +21,10 @@ struct MainContentView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
     @Environment(ToastPresenter.self) private var toastPresenter
+    private let whatsNewCoordinator: WhatsNewCoordinator
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
-    @State private var showOnboarding = false
-    private let onboardingCoordinator: OnboardingCoordinator
+    @State private var showWhatsNew = false
     private var navigationPathBinding: Binding<NavigationPath> {
         Binding(
             get: { navigationStore.path },
@@ -49,17 +49,27 @@ struct MainContentView: View {
             set: { navigationStore.showingSettings = $0 }
         )
     }
+    private var isPresentingModal: Bool {
+        navigationStore.showingLogin || navigationStore.showingSettings || showWhatsNew
+    }
+    private var isPadLayout: Bool {
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
+        #endif
+    }
 
     init(container: DependencyContainer = .shared) {
-        onboardingCoordinator = OnboardingCoordinator(
-            onboardingUseCase: container.getOnboardingUseCase()
+        whatsNewCoordinator = WhatsNewCoordinator(
+            whatsNewUseCase: container.getWhatsNewUseCase()
         )
     }
 
     var body: some View {
         Group {
             if isPadLayout {
-                AdaptiveSplitView(settingsViewModel: settingsViewModel, feedViewModel: feedViewModel)
+                AdaptiveSplitView(feedViewModel: feedViewModel, settingsViewModel: settingsViewModel)
             } else {
                 NavigationStack(path: navigationPathBinding) {
                     FeedView<NavigationStore>(
@@ -74,6 +84,8 @@ struct MainContentView: View {
                                 return navigationStore.selectedPost
                             }()
                             CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
+                        case let .postBrowser(post):
+                            PostLinkBrowserView(post: post)
                         case .settings:
                             SettingsView(
                                 viewModel: settingsViewModel,
@@ -85,8 +97,8 @@ struct MainContentView: View {
                                 onLogout: {
                                     sessionService.unauthenticate()
                                 },
-                                onShowOnboarding: {
-                                    showOnboarding = true
+                                onShowWhatsNew: {
+                                    showWhatsNew = true
                                 }
                             )
                         }
@@ -123,46 +135,34 @@ struct MainContentView: View {
                 onLogout: {
                     sessionService.unauthenticate()
                 },
-                onShowOnboarding: {
-                    showOnboarding = true
+                onShowWhatsNew: {
+                    showWhatsNew = true
                 }
             )
             .textScaling(for: settingsViewModel.textSize)
             .toastOverlay(toastPresenter)
         }
-        .sheet(isPresented: $showOnboarding) {
-            onboardingCoordinator
-                .makeOnboardingView {
-                    showOnboarding = false
+        .sheet(isPresented: $showWhatsNew) {
+            whatsNewCoordinator
+                .makeWhatsNewView {
+                    showWhatsNew = false
                 }
                 .textScaling(for: settingsViewModel.textSize)
                 .toastOverlay(toastPresenter)
         }
         .task {
-            if onboardingCoordinator.shouldShowOnboarding() {
-                showOnboarding = true
+            if whatsNewCoordinator.shouldShowWhatsNew() {
+                showWhatsNew = true
             }
         }
-    }
-
-    private var isPresentingModal: Bool {
-        navigationStore.showingLogin || navigationStore.showingSettings || showOnboarding
-    }
-
-    private var isPadLayout: Bool {
-        #if targetEnvironment(macCatalyst)
-        return true
-        #else
-        return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
-        #endif
     }
 }
 
 struct AdaptiveSplitView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
-    @State var settingsViewModel: SettingsViewModel
     let feedViewModel: FeedViewModel
+    @State var settingsViewModel: SettingsViewModel
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
         Binding(
             get: { navigationStore.detailPath },

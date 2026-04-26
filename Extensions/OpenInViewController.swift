@@ -13,8 +13,7 @@ class OpenInViewController: UIViewController {
 
         if let item = extensionContext?.inputItems.first as? NSExtensionItem,
            let itemProvider = item.attachments?.first,
-           itemProvider.hasItemConformingToTypeIdentifier("public.url")
-        {
+           itemProvider.hasItemConformingToTypeIdentifier("public.url") {
             itemProvider.loadItem(
                 forTypeIdentifier: "public.url",
                 options: nil,
@@ -24,8 +23,7 @@ class OpenInViewController: UIViewController {
                        let components = URLComponents(url: shareURL, resolvingAgainstBaseURL: true),
                        let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
                        let id = Int(idString),
-                       let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)")
-                    {
+                       let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)") {
                         Task { @MainActor in
                             self.openURL(openInURL)
                             self.close()

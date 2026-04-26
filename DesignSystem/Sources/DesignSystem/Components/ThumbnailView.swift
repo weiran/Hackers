@@ -33,6 +33,35 @@ public struct ThumbnailView: View {
         self.isEnabled = isEnabled
     }
 
+    public var body: some View {
+        if isEnabled, let url, let thumbnailURL = thumbnailURL(for: url) {
+            ZStack {
+                if let image {
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    placeholderImage
+                }
+            }
+            .task(id: thumbnailURL) {
+                await loadThumbnail(from: thumbnailURL)
+            }
+            .accessibilityHidden(true)
+        } else {
+            placeholderImage
+                .accessibilityHidden(true)
+        }
+    }
+
+    private var placeholderImage: some View {
+        Image(systemName: "safari")
+            .font(.title2)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.secondary.opacity(0.1))
+    }
+
     private func thumbnailURL(for url: URL) -> URL? {
 #if DEBUG
         switch thumbnailProvider {
@@ -83,14 +112,6 @@ public struct ThumbnailView: View {
     }
 #endif
 
-    private var placeholderImage: some View {
-        Image(systemName: "safari")
-            .font(.title2)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.secondary.opacity(0.1))
-    }
-
     private func loadThumbnail(from thumbnailURL: URL) async {
         await MainActor.run {
             image = nil
@@ -122,26 +143,5 @@ public struct ThumbnailView: View {
     private func cgImage(from data: Data) -> CGImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         return CGImageSourceCreateImageAtIndex(source, 0, nil)
-    }
-
-    public var body: some View {
-        if isEnabled, let url, let thumbnailURL = thumbnailURL(for: url) {
-            ZStack {
-                if let image {
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } else {
-                    placeholderImage
-                }
-            }
-            .task(id: thumbnailURL) {
-                await loadThumbnail(from: thumbnailURL)
-            }
-            .accessibilityHidden(true)
-        } else {
-            placeholderImage
-                .accessibilityHidden(true)
-        }
     }
 }

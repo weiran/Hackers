@@ -9,10 +9,10 @@ import MessageUI
 import SwiftUI
 
 public struct MailView: UIViewControllerRepresentable {
-    @Binding var result: Result<MFMailComposeResult, Error>?
     let recipients: [String]
     let subject: String
     let messageBody: String
+    @Binding var result: Result<MFMailComposeResult, Error>?
 
     public init(
         result: Binding<Result<MFMailComposeResult, Error>?>,
@@ -54,7 +54,7 @@ public struct MailView: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        public nonisolated func mailComposeController(
+        nonisolated public func mailComposeController(
             _ controller: MFMailComposeViewController,
             didFinishWith result: MFMailComposeResult,
             error: Error?,

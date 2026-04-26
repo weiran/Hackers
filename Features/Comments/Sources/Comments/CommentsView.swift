@@ -12,6 +12,13 @@ import Shared
 import SwiftUI
 
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
+    @Environment(Store.self) private var navigationStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    private let showsPostHeader: Bool
+    private let allowsRefresh: Bool
+    private let isAtTop: Binding<Bool>?
+    private let onPostLinkTap: (() -> Void)?
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
@@ -19,17 +26,22 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var pendingCommentID: Int?
     @State private var listAnimationsEnabled = false
-    @Environment(Store.self) private var navigationStore
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     public init(
         postID: Int,
         initialPost: Post? = nil,
         targetCommentID: Int? = nil,
+        showsPostHeader: Bool = true,
+        allowsRefresh: Bool = true,
+        isAtTop: Binding<Bool>? = nil,
+        onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
+        self.showsPostHeader = showsPostHeader
+        self.allowsRefresh = allowsRefresh
+        self.isAtTop = isAtTop
+        self.onPostLinkTap = onPostLinkTap
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -48,6 +60,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     public init(
         post: Post,
         targetCommentID: Int? = nil,
+        showsPostHeader: Bool = true,
+        allowsRefresh: Bool = true,
+        isAtTop: Binding<Bool>? = nil,
+        onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -55,6 +71,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             postID: post.id,
             initialPost: post,
             targetCommentID: targetCommentID,
+            showsPostHeader: showsPostHeader,
+            allowsRefresh: allowsRefresh,
+            isAtTop: isAtTop,
+            onPostLinkTap: onPostLinkTap,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -64,15 +84,17 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         Group {
             if let post = viewModel.post {
                 CommentsContentView(
+                    showsPostHeader: showsPostHeader,
+                    handleLinkTap: handleLinkTap,
+                    toggleCommentVisibility: toggleCommentVisibility,
+                    hideCommentBranch: hideCommentBranch,
+                    updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,
                     visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
                     listAnimationsEnabled: $listAnimationsEnabled,
-                    handleLinkTap: handleLinkTap,
-                    toggleCommentVisibility: toggleCommentVisibility,
-                    hideCommentBranch: hideCommentBranch,
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")
@@ -125,10 +147,12 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                 _ = await viewModel.revealComment(withId: targetID)
             }
         }
-        .refreshable {
-            await viewModel.refreshComments()
-            if let targetID = pendingCommentID {
-                _ = await viewModel.revealComment(withId: targetID)
+        .if(allowsRefresh) { view in
+            view.refreshable {
+                await viewModel.refreshComments()
+                if let targetID = pendingCommentID {
+                    _ = await viewModel.revealComment(withId: targetID)
+                }
             }
         }
         .environment(\.openURL, OpenURLAction { url in
@@ -158,8 +182,17 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     }
 
     private func handleLinkTap() {
+        if let onPostLinkTap {
+            onPostLinkTap()
+            return
+        }
         guard let post = viewModel.post else { return }
         if navigationStore.openURLInPrimaryContext(post.url) {
+            return
+        }
+        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
+        if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
+            navigationStore.showPostLink(post)
             return
         }
         LinkOpener.openURL(post.url, with: post)

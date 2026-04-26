@@ -78,7 +78,7 @@ public enum AppColors {
         case .light:
             return Color.secondary.opacity(0.14)
         case .dark:
-            return Color.secondary.opacity(0.1)
+            return Color.secondary.opacity(0.18)
         @unknown default:
             return Color.secondary.opacity(0.14)
         }

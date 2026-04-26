@@ -13,9 +13,14 @@ import Shared
 import SwiftUI
 
 public struct SettingsView: View {
-    @State private var viewModel: SettingsViewModel
     @Environment(ToastPresenter.self) private var toastPresenter
     @Environment(\.dismiss) private var dismiss
+    let isAuthenticated: Bool
+    let currentUsername: String?
+    let onLogin: (String, String) async throws -> Void
+    let onLogout: () -> Void
+    let onShowWhatsNew: () -> Void
+    @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
@@ -24,26 +29,20 @@ public struct SettingsView: View {
     @AppStorage("devThumbnailProvider") private var devThumbnailProvider = "weiranzhang"
 #endif
 
-    let isAuthenticated: Bool
-    let currentUsername: String?
-    let onLogin: (String, String) async throws -> Void
-    let onLogout: () -> Void
-    let onShowOnboarding: () -> Void
-
     public init(
         viewModel: SettingsViewModel = SettingsViewModel(),
         isAuthenticated: Bool = false,
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onShowOnboarding: @escaping () -> Void = {}
+        onShowWhatsNew: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
         self.onLogout = onLogout
-        self.onShowOnboarding = onShowOnboarding
+        self.onShowWhatsNew = onShowWhatsNew
     }
 
     public var body: some View {
@@ -79,7 +78,7 @@ public struct SettingsView: View {
                             "---",
                             "App Version: \(version)",
                             "Device Model: \(deviceIdentifier)",
-                            "iOS Version: \(systemVersion)",
+                            "iOS Version: \(systemVersion)"
                         ]
 
                         MailView(
@@ -89,7 +88,7 @@ public struct SettingsView: View {
                             messageBody: bodyLines.joined(separator: "\n"),
                         )
                     }
-                    Button(action: { onShowOnboarding() }, label: {
+                    Button(action: { onShowWhatsNew() }, label: {
                         Label("Show What's New", systemImage: "sparkles")
                     })
                 }
@@ -184,10 +183,12 @@ public struct SettingsView: View {
 #endif
 
                 Section(header: Text("Browser")) {
-                    // Place default browser preference first
-                    Picker(selection: $viewModel.openInDefaultBrowser) {
-                        Text("In-App Browser").tag(false)
-                        Text("System Browser").tag(true)
+                    Picker(selection: $viewModel.linkBrowserMode) {
+                        Text("In-App Browser").tag(LinkBrowserMode.inAppBrowser)
+                        #if DEBUG
+                        Text("Custom Browser").tag(LinkBrowserMode.customBrowser)
+                        #endif
+                        Text("System Browser").tag(LinkBrowserMode.systemBrowser)
                     } label: {
                         Label("Open Links Using", systemImage: "safari")
                     }
@@ -274,8 +275,7 @@ public extension Bundle {
         if let icons = infoDictionary?["CFBundleIcons"] as? [String: Any],
            let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
            let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
-           let lastIcon = iconFiles.last
-        {
+           let lastIcon = iconFiles.last {
             return UIImage(named: lastIcon)
         }
         return nil

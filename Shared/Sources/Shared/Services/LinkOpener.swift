@@ -27,14 +27,15 @@ public enum LinkOpener {
         presenter.present(safariVC, animated: true)
     }
 
-    private static var safariControllerFactory: (URL, SFSafariViewController.Configuration) -> SFSafariViewController = { url, configuration in
+    private static var safariControllerFactory:
+        (URL, SFSafariViewController.Configuration) -> SFSafariViewController = { url, configuration in
         SFSafariViewController(url: url, configuration: configuration)
     }
 
     public static func openURL(_ url: URL, with _: Post? = nil) {
         // Determine user preference for opening links via injected settings use case
         let settings = settingsProvider()
-        let preferSystemBrowser = settings.openInDefaultBrowser || isRunningOnMac
+        let preferSystemBrowser = settings.linkBrowserMode == .systemBrowser || isRunningOnMac
 
         // For http/https, either open in-app (SFSafariViewController) or system browser based on preference
         if isWebURL(url) {

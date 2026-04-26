@@ -148,7 +148,7 @@ struct AppColorsTests {
             AppColors.pillBackground(for: .comments, colorScheme: .dark),
             style: .dark
         )
-        let expectedDarkNeutralBackground = resolvedColor(Color.secondary.opacity(0.1), style: .dark)
+        let expectedDarkNeutralBackground = resolvedColor(Color.secondary.opacity(0.18), style: .dark)
         #expect(darkNeutralBackground.approximatelyEquals(expectedDarkNeutralBackground, tolerance: 0.01))
     }
 }

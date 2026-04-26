@@ -24,7 +24,7 @@ struct DependencyContainerTests {
         let stubSettings = StubSettingsUseCase()
         let stubVoting = StubVotingStateProvider()
         let stubAuth = StubAuthenticationUseCase()
-        let stubOnboarding = StubOnboardingUseCase()
+        let stubWhatsNew = StubWhatsNewUseCase()
         let stubBookmarks = StubBookmarksUseCase()
         let stubSearch = StubSearchUseCase()
         let stubBookmarksController = BookmarksController(bookmarksUseCase: stubBookmarks)
@@ -42,7 +42,7 @@ struct DependencyContainerTests {
                 votingStateProvider: { stubVoting },
                 commentVotingStateProvider: { stubVoting },
                 authenticationUseCase: { stubAuth },
-                onboardingUseCase: { stubOnboarding },
+                whatsNewUseCase: { stubWhatsNew },
                 sessionService: { sessionService },
                 toastPresenter: { toastPresenter },
                 bookmarksController: { stubBookmarksController }
@@ -62,7 +62,7 @@ struct DependencyContainerTests {
             (container.getCommentVotingStateProvider() as? StubVotingStateProvider) === stubVoting
         )
         #expect((container.getAuthenticationUseCase() as? StubAuthenticationUseCase) === stubAuth)
-        #expect((container.getOnboardingUseCase() as? StubOnboardingUseCase) === stubOnboarding)
+        #expect((container.getWhatsNewUseCase() as? StubWhatsNewUseCase) === stubWhatsNew)
         #expect(await container.makeSessionService() === sessionService)
         #expect(await container.makeToastPresenter() === toastPresenter)
         #expect(await container.makeBookmarksController() === stubBookmarksController)
@@ -127,7 +127,7 @@ private final class StubPostRepository: PostUseCase, VoteUseCase, CommentUseCase
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode: Bool = false
-    var openInDefaultBrowser: Bool = false
+    var linkBrowserMode: LinkBrowserMode = .inAppBrowser
     var showThumbnails: Bool = true
     var rememberFeedCategory: Bool = false
     var lastFeedCategory: PostType?
@@ -161,14 +161,14 @@ private final class StubAuthenticationUseCase: AuthenticationUseCase, @unchecked
     func getCurrentUser() async -> User? { nil }
 }
 
-private final class StubOnboardingUseCase: OnboardingUseCase, @unchecked Sendable {
+private final class StubWhatsNewUseCase: WhatsNewUseCase, @unchecked Sendable {
     private var shouldShow = true
 
-    func shouldShowOnboarding(currentVersion _: String, forceShow: Bool) -> Bool {
+    func shouldShowWhatsNew(currentVersion _: String, forceShow: Bool) -> Bool {
         forceShow || shouldShow
     }
 
-    func markOnboardingShown(for _: String) {
+    func markWhatsNewShown(for _: String) {
         shouldShow = false
     }
 }
