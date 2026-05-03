@@ -20,6 +20,31 @@ print_diagnostics() {
 
 trap print_diagnostics ERR
 
+run_with_timeout() {
+  local seconds="$1"
+  shift
+
+  "$@" &
+  local pid=$!
+
+  (
+    sleep "$seconds"
+    kill -TERM "$pid" 2>/dev/null || true
+  ) &
+  local watchdog=$!
+
+  local status=0
+  wait "$pid" || status=$?
+  kill "$watchdog" 2>/dev/null || true
+  wait "$watchdog" 2>/dev/null || true
+
+  if [[ "$status" -eq 143 ]]; then
+    echo "Command timed out after ${seconds}s: $*" >&2
+  fi
+
+  return "$status"
+}
+
 has_available_ios_runtime() {
   xcrun simctl list runtimes -j | ruby -rjson -e '
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
@@ -49,13 +74,13 @@ xcode-select -p
 xcodebuild -version
 echo "::endgroup::"
 
-sudo xcodebuild -runFirstLaunch
+run_with_timeout 300 sudo xcodebuild -runFirstLaunch
 
 if has_available_ios_runtime; then
   echo "An available iOS simulator runtime is already installed."
 else
   echo "No available iOS simulator runtime found; downloading iOS platform."
-  timeout 900 xcodebuild -downloadPlatform iOS
+  run_with_timeout 900 xcodebuild -downloadPlatform iOS
 fi
 
 RUNTIME_ID="$(
@@ -94,7 +119,9 @@ if [[ -z "$DEVICE_UDID" ]]; then
 fi
 
 xcrun simctl boot "$DEVICE_UDID" || true
-xcrun simctl bootstatus "$DEVICE_UDID" -b
+if ! run_with_timeout 180 xcrun simctl bootstatus "$DEVICE_UDID" -b; then
+  echo "Simulator did not report a completed boot within the timeout; continuing with xcodebuild-managed boot."
+fi
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
   echo "CI_DEVICE_UDID=$DEVICE_UDID" >> "$GITHUB_ENV"
