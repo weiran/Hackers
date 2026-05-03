@@ -57,6 +57,32 @@ def set_build_number(build_number)
   project.save
 end
 
+def set_app_store_signing
+  require "xcodeproj"
+
+  profiles = {
+    "Hackers" => "match AppStore #{APP_IDENTIFIER}",
+    "HackersActionExtension" => "match AppStore #{EXTENSION_IDENTIFIER}"
+  }
+
+  project = Xcodeproj::Project.open(PROJECT)
+  profiles.each do |target_name, profile_name|
+    target = project.targets.find { |item| item.name == target_name }
+    UI.user_error!("Target not found: #{target_name}") unless target
+
+    target.build_configurations.each do |config|
+      next unless config.name == "Release"
+
+      config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+      config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+      config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
+      config.build_settings["DEVELOPMENT_TEAM"] = TEAM_ID
+      config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_name
+    end
+  end
+  project.save
+end
+
 def validate_release_tag!(tag)
   UI.user_error!("Release tag is required") if tag.to_s.empty?
   UI.user_error!("Release tag must be vX.Y.Z, got #{tag}") unless tag.match?(/\Av\d+\.\d+\.\d+\z/)
@@ -129,6 +155,8 @@ platform :ios do
       app_identifier: [APP_IDENTIFIER, EXTENSION_IDENTIFIER],
       team_id: TEAM_ID
     )
+
+    set_app_store_signing
 
     build_app(
       project: PROJECT,
