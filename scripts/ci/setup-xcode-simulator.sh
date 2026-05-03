@@ -61,7 +61,16 @@ else
 fi
 
 if [[ -n "$XCODE_VERSION" ]]; then
-  for candidate in "/Applications/Xcode_${XCODE_VERSION}.app" "/Applications/Xcode-${XCODE_VERSION}.app"; do
+  shopt -s nullglob
+  candidates=(
+    "/Applications/Xcode_${XCODE_VERSION}.app"
+    "/Applications/Xcode_${XCODE_VERSION}"*.app
+    "/Applications/Xcode-${XCODE_VERSION}.app"
+    "/Applications/Xcode-${XCODE_VERSION}"*.app
+  )
+  shopt -u nullglob
+
+  for candidate in "${candidates[@]}"; do
     if [[ -d "$candidate" ]]; then
       sudo xcode-select -s "$candidate/Contents/Developer"
       break
