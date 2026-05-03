@@ -146,6 +146,8 @@ platform :ios do
     build_number = options[:build_number]
     set_build_number(build_number) if build_number
 
+    setup_ci if ENV["CI"]
+
     api_key = app_store_connect_key
 
     match(
