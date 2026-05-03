@@ -39,7 +39,9 @@ jobs:
         run: scripts/ci/setup-xcode-simulator.sh
 
       - name: Install Bundler dependencies
-        run: bundle install --path vendor/bundle
+        run: |
+          bundle config set path vendor/bundle
+          bundle install
 
       - name: Resolve release notes
         env:
