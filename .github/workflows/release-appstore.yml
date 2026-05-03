@@ -1,0 +1,31 @@
+name: Release App Store
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to promote manually later, for example v5.3.0"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-appstore-${{ github.event.inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  protected-placeholder:
+    name: appstore protected placeholder
+    runs-on: macos-26
+    environment: appstore
+    steps:
+      - name: Record promotion guardrail
+        run: |
+          {
+            echo "## App Store Promotion"
+            echo
+            echo "Automatic App Review submission is intentionally disabled."
+            echo "Promote tag ${{ github.event.inputs.release_tag }} manually from App Store Connect after TestFlight validation."
+          } >> "$GITHUB_STEP_SUMMARY"

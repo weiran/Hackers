@@ -1,0 +1,183 @@
+default_platform(:ios)
+
+require "shellwords"
+
+PROJECT = "Hackers.xcodeproj"
+SCHEME = "Hackers"
+APP_IDENTIFIER = "com.weiranzhang.Hackers"
+EXTENSION_IDENTIFIER = "com.weiranzhang.Hackers.ActionExtension"
+TEAM_ID = "2KB59GPA9B"
+DESTINATION = "platform=iOS Simulator,name=iPhone 17 Pro"
+RELEASE_DIR = "artifacts/release"
+
+def app_store_connect_key
+  app_store_connect_api_key(
+    key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+    issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+    key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_P8"),
+    is_key_content_base64: false
+  )
+end
+
+def project_build_setting(setting, target_name: "Hackers")
+  require "xcodeproj"
+
+  project = Xcodeproj::Project.open(PROJECT)
+  target = project.targets.find { |item| item.name == target_name }
+  UI.user_error!("Target not found: #{target_name}") unless target
+
+  values = target.build_configurations.map { |config| config.build_settings[setting].to_s }.uniq
+  UI.user_error!("No #{setting} found for #{target_name}") if values.empty?
+  UI.user_error!("Mismatched #{setting} values for #{target_name}: #{values.join(', ')}") if values.length > 1
+  values.first
+end
+
+def marketing_version
+  project_build_setting("MARKETING_VERSION")
+end
+
+def source_build_number
+  project_build_setting("CURRENT_PROJECT_VERSION").to_i
+end
+
+def set_build_number(build_number)
+  require "xcodeproj"
+
+  project = Xcodeproj::Project.open(PROJECT)
+  ["Hackers", "HackersActionExtension"].each do |target_name|
+    target = project.targets.find { |item| item.name == target_name }
+    UI.user_error!("Target not found: #{target_name}") unless target
+
+    target.build_configurations.each do |config|
+      config.build_settings["CURRENT_PROJECT_VERSION"] = build_number.to_s
+    end
+  end
+  project.save
+end
+
+def validate_release_tag!(tag)
+  UI.user_error!("Release tag is required") if tag.to_s.empty?
+  UI.user_error!("Release tag must be vX.Y.Z, got #{tag}") unless tag.match?(/\Av\d+\.\d+\.\d+\z/)
+
+  tag_version = tag.delete_prefix("v")
+  current_version = marketing_version
+  return if tag_version == current_version
+
+  UI.user_error!("Tag #{tag} does not match MARKETING_VERSION #{current_version}")
+end
+
+def latest_build_number(api_key, version)
+  testflight = latest_testflight_build_number(
+    api_key: api_key,
+    app_identifier: APP_IDENTIFIER,
+    version: version,
+    initial_build_number: 0
+  ).to_i
+
+  app_store = begin
+    app_store_build_number(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      version: version,
+      live: false
+    ).to_i
+  rescue => error
+    UI.message("No App Store build number found for #{version}: #{error.message}")
+    0
+  end
+
+  [testflight, app_store].max
+end
+
+def release_notes
+  path = ENV["WHAT_TO_TEST_FILE"]
+  return File.read(path).strip if path && File.exist?(path)
+
+  ENV.fetch("WHAT_TO_TEST", "").strip
+end
+
+platform :ios do
+  desc "Run SwiftLint"
+  lane :lint do
+    sh("swiftlint lint --config .swiftlint.yml")
+  end
+
+  desc "Build the app for the iOS simulator"
+  lane :build_debug do
+    sh("xcodebuild build -project #{PROJECT.shellescape} -scheme #{SCHEME.shellescape} -destination #{DESTINATION.shellescape}")
+  end
+
+  desc "Run the full module test suite"
+  lane :test do
+    sh("./run_tests.sh -v")
+  end
+
+  desc "Archive and export a signed App Store build"
+  lane :archive do |options|
+    build_number = options[:build_number]
+    set_build_number(build_number) if build_number
+
+    api_key = app_store_connect_key
+
+    match(
+      api_key: api_key,
+      type: "appstore",
+      readonly: true,
+      app_identifier: [APP_IDENTIFIER, EXTENSION_IDENTIFIER],
+      team_id: TEAM_ID
+    )
+
+    build_app(
+      project: PROJECT,
+      scheme: SCHEME,
+      configuration: "Release",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        uploadSymbols: true,
+        signingStyle: "manual",
+        provisioningProfiles: {
+          APP_IDENTIFIER => "match AppStore #{APP_IDENTIFIER}",
+          EXTENSION_IDENTIFIER => "match AppStore #{EXTENSION_IDENTIFIER}"
+        }
+      },
+      archive_path: "#{RELEASE_DIR}/Hackers.xcarchive",
+      output_directory: RELEASE_DIR,
+      output_name: "Hackers.ipa",
+      result_bundle: true,
+      result_bundle_path: "#{RELEASE_DIR}/Hackers-Release.xcresult",
+      buildlog_path: "artifacts/logs"
+    )
+  end
+
+  desc "Resolve the next build number, archive, and upload to TestFlight"
+  lane :beta do |options|
+    tag = options[:release_tag] || ENV["RELEASE_TAG"]
+    validate_release_tag!(tag)
+
+    api_key = app_store_connect_key
+    version = marketing_version
+    latest = latest_build_number(api_key, version)
+    next_build = latest.zero? ? [source_build_number, 1].max : latest + 1
+    notes = release_notes
+    UI.user_error!("GitHub Release notes are required for TestFlight What to Test") if notes.empty?
+
+    set_build_number(next_build)
+
+    archive(build_number: next_build)
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: "#{RELEASE_DIR}/Hackers.ipa",
+      changelog: notes,
+      distribute_external: false,
+      skip_waiting_for_build_processing: false
+    )
+
+    FileUtils.mkdir_p(RELEASE_DIR)
+    File.write("#{RELEASE_DIR}/build-number.txt", "#{next_build}\n")
+    UI.success("Uploaded Hackers #{version} (#{next_build}) to TestFlight")
+  end
+end

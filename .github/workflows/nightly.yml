@@ -1,0 +1,65 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CI_DEVICE_NAME: iPhone 17 Pro
+  XCODE_VERSION_FILE: .github/xcode-version
+
+jobs:
+  clean-validation:
+    name: clean validation
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Xcode and simulator
+        run: scripts/ci/setup-xcode-simulator.sh
+
+      - name: Install SwiftLint
+        run: |
+          if ! command -v swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+
+      - name: SwiftLint
+        run: swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
+
+      - name: Clean build
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/logs artifacts/xcresults
+          xcodebuild clean build \
+            -project Hackers.xcodeproj \
+            -scheme Hackers \
+            -destination "$CI_DESTINATION" \
+            -resultBundlePath artifacts/xcresults/Hackers-Nightly-Build.xcresult \
+            2>&1 | tee artifacts/logs/nightly-build.log
+
+      - name: Run module tests
+        run: |
+          set -o pipefail
+          ./run_tests.sh -v 2>&1 | tee artifacts/logs/nightly-tests.log
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-diagnostics
+          path: |
+            artifacts/logs
+            artifacts/xcresults
+            **/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 14

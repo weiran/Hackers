@@ -1,0 +1,109 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      fastlane:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Domain
+    schedule:
+      interval: weekly
+    groups:
+      swift-domain:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Data
+    schedule:
+      interval: weekly
+    groups:
+      swift-data:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Networking
+    schedule:
+      interval: weekly
+    groups:
+      swift-networking:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /DesignSystem
+    schedule:
+      interval: weekly
+    groups:
+      swift-design-system:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Shared
+    schedule:
+      interval: weekly
+    groups:
+      swift-shared:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Features/Authentication
+    schedule:
+      interval: weekly
+    groups:
+      swift-authentication:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Features/Comments
+    schedule:
+      interval: weekly
+    groups:
+      swift-comments:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Features/Feed
+    schedule:
+      interval: weekly
+    groups:
+      swift-feed:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Features/Settings
+    schedule:
+      interval: weekly
+    groups:
+      swift-settings:
+        patterns:
+          - "*"
+
+  - package-ecosystem: swift
+    directory: /Features/WhatsNew
+    schedule:
+      interval: weekly
+    groups:
+      swift-whats-new:
+        patterns:
+          - "*"

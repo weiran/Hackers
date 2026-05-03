@@ -1,0 +1,96 @@
+name: PR
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI_DEVICE_NAME: iPhone 17 Pro
+  XCODE_VERSION_FILE: .github/xcode-version
+
+jobs:
+  lint:
+    name: lint
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: |
+          if ! command -v swiftlint >/dev/null 2>&1; then
+            brew install swiftlint
+          fi
+
+      - name: SwiftLint
+        run: swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
+
+  build:
+    name: build
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Xcode and simulator
+        run: scripts/ci/setup-xcode-simulator.sh
+
+      - name: Build Debug
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/logs artifacts/xcresults
+          xcodebuild build \
+            -project Hackers.xcodeproj \
+            -scheme Hackers \
+            -destination "$CI_DESTINATION" \
+            -resultBundlePath artifacts/xcresults/Hackers-Build.xcresult \
+            2>&1 | tee artifacts/logs/build.log
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-diagnostics
+          path: |
+            artifacts/logs
+            artifacts/xcresults
+          if-no-files-found: ignore
+          retention-days: 14
+
+  test:
+    name: test
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Xcode and simulator
+        run: scripts/ci/setup-xcode-simulator.sh
+
+      - name: Run module tests
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/logs
+          ./run_tests.sh -v 2>&1 | tee artifacts/logs/run-tests.log
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-diagnostics
+          path: |
+            artifacts/logs
+            **/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 14

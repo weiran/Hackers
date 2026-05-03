@@ -1,0 +1,91 @@
+name: Release TestFlight
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to upload, for example v5.3.0"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-testflight-${{ github.event.inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CI_DEVICE_NAME: iPhone 17 Pro
+  XCODE_VERSION_FILE: .github/xcode-version
+  BUNDLE_WITHOUT: development
+
+jobs:
+  testflight:
+    name: testflight
+    runs-on: macos-26
+    timeout-minutes: 120
+    environment: testflight
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.release_tag || github.ref }}
+
+      - name: Prepare Xcode and simulator
+        run: scripts/ci/setup-xcode-simulator.sh
+
+      - name: Install Bundler dependencies
+        run: bundle install --path vendor/bundle
+
+      - name: Resolve release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+        run: |
+          mkdir -p artifacts/release
+          gh release view "$RELEASE_TAG" --json body -q .body > artifacts/release/what-to-test.txt
+          if [ ! -s artifacts/release/what-to-test.txt ]; then
+            echo "GitHub Release body is required for TestFlight What to Test" >&2
+            exit 1
+          fi
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
+        run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
+
+      - name: Release summary
+        if: always()
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+        run: |
+          {
+            echo "## TestFlight Release"
+            echo
+            echo "- Tag: ${RELEASE_TAG}"
+            if [ -f artifacts/release/build-number.txt ]; then
+              echo "- Uploaded build: $(cat artifacts/release/build-number.txt)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload release artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight-artifacts
+          path: |
+            artifacts/release
+            artifacts/logs
+          if-no-files-found: ignore
+          retention-days: 90

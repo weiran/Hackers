@@ -1,0 +1,9 @@
+git_url(ENV.fetch("MATCH_GIT_URL", "https://github.com/weiran/Hackers-match.git"))
+storage_mode("git")
+type("appstore")
+readonly(true)
+app_identifier([
+  "com.weiranzhang.Hackers",
+  "com.weiranzhang.Hackers.ActionExtension"
+])
+team_id("2KB59GPA9B")
