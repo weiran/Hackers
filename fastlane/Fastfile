@@ -2,13 +2,15 @@ default_platform(:ios)
 
 require "shellwords"
 
-PROJECT = "Hackers.xcodeproj"
+REPO_ROOT = File.expand_path("..", __dir__)
+PROJECT = File.join(REPO_ROOT, "Hackers.xcodeproj")
 SCHEME = "Hackers"
 APP_IDENTIFIER = "com.weiranzhang.Hackers"
 EXTENSION_IDENTIFIER = "com.weiranzhang.Hackers.ActionExtension"
 TEAM_ID = "2KB59GPA9B"
 DESTINATION = "platform=iOS Simulator,name=iPhone 17 Pro"
-RELEASE_DIR = "artifacts/release"
+RELEASE_DIR = File.join(REPO_ROOT, "artifacts/release")
+LOG_DIR = File.join(REPO_ROOT, "artifacts/logs")
 
 def app_store_connect_key
   app_store_connect_api_key(
@@ -99,7 +101,7 @@ end
 platform :ios do
   desc "Run SwiftLint"
   lane :lint do
-    sh("swiftlint lint --config .swiftlint.yml")
+    sh("swiftlint lint --config #{File.join(REPO_ROOT, ".swiftlint.yml").shellescape}")
   end
 
   desc "Build the app for the iOS simulator"
@@ -109,7 +111,7 @@ platform :ios do
 
   desc "Run the full module test suite"
   lane :test do
-    sh("./run_tests.sh -v")
+    sh(File.join(REPO_ROOT, "run_tests.sh").shellescape + " -v")
   end
 
   desc "Archive and export a signed App Store build"
@@ -147,7 +149,7 @@ platform :ios do
       output_name: "Hackers.ipa",
       result_bundle: true,
       result_bundle_path: "#{RELEASE_DIR}/Hackers-Release.xcresult",
-      buildlog_path: "artifacts/logs"
+      buildlog_path: LOG_DIR
     )
   end
 
