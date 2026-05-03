@@ -20,6 +20,15 @@ print_diagnostics() {
 
 trap print_diagnostics ERR
 
+has_available_ios_runtime() {
+  xcrun simctl list runtimes -j | ruby -rjson -e '
+    runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
+    exit(runtimes.any? { |runtime|
+      runtime["platform"] == "iOS" && runtime["isAvailable"] != false
+    } ? 0 : 1)
+  '
+}
+
 if [[ -f "$XCODE_VERSION_FILE" ]]; then
   XCODE_VERSION="$(tr -d '[:space:]' < "$XCODE_VERSION_FILE")"
 else
@@ -41,7 +50,13 @@ xcodebuild -version
 echo "::endgroup::"
 
 sudo xcodebuild -runFirstLaunch
-xcodebuild -downloadPlatform iOS || true
+
+if has_available_ios_runtime; then
+  echo "An available iOS simulator runtime is already installed."
+else
+  echo "No available iOS simulator runtime found; downloading iOS platform."
+  timeout 900 xcodebuild -downloadPlatform iOS
+fi
 
 RUNTIME_ID="$(
   xcrun simctl list runtimes -j | ruby -rjson -e '
