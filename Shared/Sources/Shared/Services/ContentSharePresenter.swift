@@ -6,6 +6,7 @@
 //
 
 import Domain
+import LinkPresentation
 import SwiftUI
 import UIKit
 
@@ -16,25 +17,17 @@ public final class ContentSharePresenter: @unchecked Sendable {
 
     @MainActor
     public func sharePost(_ post: Post) {
-        let items: [Any] = [post.title, post.url]
-        showShareSheet(items: items)
+        showShareSheet(items: Self.items(for: post))
     }
 
     @MainActor
     public func shareURL(_ url: URL, title: String? = nil) {
-        var items: [Any] = []
-        if let title {
-            items.append(title)
-        }
-        items.append(url)
-        showShareSheet(items: items)
+        showShareSheet(items: Self.items(for: url, title: title))
     }
 
     @MainActor
     public func shareComment(_ comment: Comment) {
-        let text = comment.text.strippingHTML()
-        let items: [Any] = [text]
-        showShareSheet(items: items)
+        showShareSheet(items: Self.items(for: comment))
     }
 
     @MainActor
@@ -53,5 +46,63 @@ public final class ContentSharePresenter: @unchecked Sendable {
 
             rootViewController.present(activityVC, animated: true)
         }
+    }
+}
+
+extension ContentSharePresenter {
+    static func items(for post: Post) -> [Any] {
+        items(for: post.url, title: post.title)
+    }
+
+    static func items(for url: URL, title: String? = nil) -> [Any] {
+        [URLActivityItemSource(url: url, title: title)]
+    }
+
+    static func items(for comment: Comment) -> [Any] {
+        [comment.text.strippingHTML()]
+    }
+}
+
+final class URLActivityItemSource: NSObject, UIActivityItemSource {
+    let url: URL
+    private let title: String?
+
+    init(url: URL, title: String?) {
+        self.url = url
+        self.title = title
+    }
+
+    func activityViewControllerPlaceholderItem(_: UIActivityViewController) -> Any {
+        return url
+    }
+
+    func activityViewController(
+        _: UIActivityViewController,
+        itemForActivityType activityType: UIActivity.ActivityType?
+    ) -> Any? {
+        if activityType == .copyToPasteboard {
+            return url.absoluteString
+        }
+
+        return url
+    }
+
+    func activityViewController(
+        _: UIActivityViewController,
+        subjectForActivityType activityType: UIActivity.ActivityType?
+    ) -> String {
+        if activityType == .copyToPasteboard {
+            return ""
+        }
+
+        return title ?? ""
+    }
+
+    func activityViewControllerLinkMetadata(_: UIActivityViewController) -> LPLinkMetadata? {
+        let metadata = LPLinkMetadata()
+        metadata.title = title
+        metadata.url = url
+        metadata.originalURL = url
+        return metadata
     }
 }
