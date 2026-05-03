@@ -93,6 +93,7 @@ end
 
 def release_notes
   path = ENV["WHAT_TO_TEST_FILE"]
+  path = File.expand_path(path, REPO_ROOT) if path && !path.start_with?("/")
   return File.read(path).strip if path && File.exist?(path)
 
   ENV.fetch("WHAT_TO_TEST", "").strip
