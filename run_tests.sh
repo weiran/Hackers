@@ -61,18 +61,19 @@ DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro"
 VERBOSE=false
 
 # All available modules
+# Format: ModuleName:PackagePath:Scheme:OnlyTestingTarget
 ALL_MODULES=(
     # Run WhatsNew first to avoid any prior defaults pollution from other modules
-    "WhatsNew:${BASE_DIR}/Features/WhatsNew"
-    "Domain:${BASE_DIR}/Domain"
-    "Data:${BASE_DIR}/Data"
-    "Networking:${BASE_DIR}/Networking"
-    "DesignSystem:${BASE_DIR}/DesignSystem"
-    "Authentication:${BASE_DIR}/Features/Authentication"
-    "Shared:${BASE_DIR}/Shared"
-    "Feed:${BASE_DIR}/Features/Feed"
-    "Comments:${BASE_DIR}/Features/Comments"
-    "Settings:${BASE_DIR}/Features/Settings"
+    "WhatsNew:${BASE_DIR}/Features:Features-Package:WhatsNewTests"
+    "Domain:${BASE_DIR}/Domain:Domain:"
+    "Data:${BASE_DIR}/Data:Data:"
+    "Networking:${BASE_DIR}/Networking:Networking:"
+    "DesignSystem:${BASE_DIR}/DesignSystem:DesignSystem:"
+    "Authentication:${BASE_DIR}/Features:Features-Package:AuthenticationTests"
+    "Shared:${BASE_DIR}/Shared:Shared:"
+    "Feed:${BASE_DIR}/Features:Features-Package:FeedTests"
+    "Comments:${BASE_DIR}/Features:Features-Package:CommentsTests"
+    "Settings:${BASE_DIR}/Features:Features-Package:SettingsTests"
 )
 
 # Function to print colored output
@@ -228,8 +229,15 @@ extract_individual_tests() {
 run_module_tests() {
     local module_name=$1
     local module_path=$2
+    local test_scheme=$3
+    local only_testing=$4
     local temp_output=$(mktemp)
     local start_time=$(date +%s)
+    local xcodebuild_args=(test -scheme "$test_scheme" -destination "$DESTINATION")
+
+    if [ -n "$only_testing" ]; then
+        xcodebuild_args+=("-only-testing:$only_testing")
+    fi
 
     # Per-module environment resets to avoid cross-module state leakage
     case "$module_name" in
@@ -247,6 +255,10 @@ run_module_tests() {
     if [ "$VERBOSE" = true ]; then
         print_status $YELLOW "🧪 Running tests for ${module_name}..."
         print_status $BLUE "   📁 Path: ${module_path}"
+        print_status $BLUE "   🎯 Scheme: ${test_scheme}"
+        if [ -n "$only_testing" ]; then
+            print_status $BLUE "   🔎 Filter: ${only_testing}"
+        fi
     else
         print_status $YELLOW "🧪 Testing ${module_name}..."
     fi
@@ -257,11 +269,11 @@ run_module_tests() {
     # Run the tests and capture output
     exit_code=0
     if [ "$VERBOSE" = true ]; then
-        xcodebuild test -scheme "$module_name" -destination "$DESTINATION" \
+        xcodebuild "${xcodebuild_args[@]}" \
             > >(tee "$temp_output") 2>&1 &
         child_pid=$!
     else
-        xcodebuild test -scheme "$module_name" -destination "$DESTINATION" \
+        xcodebuild "${xcodebuild_args[@]}" \
             > "$temp_output" 2>&1 &
         child_pid=$!
     fi
@@ -363,7 +375,7 @@ run_module_tests() {
 validate_module() {
     local module_name=$1
     for module in "${ALL_MODULES[@]}"; do
-        IFS=':' read -r name path <<< "$module"
+        IFS=':' read -r name path scheme only_testing <<< "$module"
         if [ "$name" = "$module_name" ]; then
             return 0
         fi
@@ -400,7 +412,7 @@ done
 # If no modules specified, run all
 if [ ${#MODULES_TO_RUN[@]} -eq 0 ]; then
     for module in "${ALL_MODULES[@]}"; do
-        IFS=':' read -r name path <<< "$module"
+        IFS=':' read -r name path scheme only_testing <<< "$module"
         MODULES_TO_RUN+=("$name")
     done
 fi
@@ -430,10 +442,14 @@ overall_start_time=$(date +%s)
 for module_name in "${MODULES_TO_RUN[@]}"; do
     # Find the module path
     module_path=""
+    test_scheme=""
+    only_testing=""
     for module in "${ALL_MODULES[@]}"; do
-        IFS=':' read -r name path <<< "$module"
+        IFS=':' read -r name path scheme filter <<< "$module"
         if [ "$name" = "$module_name" ]; then
             module_path="$path"
+            test_scheme="$scheme"
+            only_testing="$filter"
             break
         fi
     done
@@ -445,7 +461,7 @@ for module_name in "${MODULES_TO_RUN[@]}"; do
 
     total_modules=$((total_modules + 1))
 
-    if run_module_tests "$module_name" "$module_path"; then
+    if run_module_tests "$module_name" "$module_path" "$test_scheme" "$only_testing"; then
         passed_modules=$((passed_modules + 1))
     else
         # If interrupted, stop the loop immediately
@@ -490,6 +506,6 @@ else
     print_status $YELLOW "💡 Tips:"
     print_status $YELLOW "   • Run with -v flag for detailed output"
     print_status $YELLOW "   • Test individual modules: ./run_tests.sh ModuleName"
-    print_status $YELLOW "   • Manual test: cd [path] && xcodebuild test -scheme [Module] -destination '$DESTINATION'"
+    print_status $YELLOW "   • Feature tests use the Features-Package scheme with -only-testing:[Module]Tests"
     exit 1
 fi

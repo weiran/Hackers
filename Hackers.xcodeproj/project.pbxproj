@@ -230,13 +230,9 @@
 				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */,
 				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
-				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */,
-				241E802C2E55B5F40013EEA1 /* XCLocalSwiftPackageReference "Features/Comments" */,
+				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */,
 				248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */,
 				248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */,
-				248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */,
-				2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/WhatsNew" */,
-				52A3FC99203E47A9B5690643 /* XCLocalSwiftPackageReference "Features/Authentication" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -340,7 +336,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+			SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -376,7 +372,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
+			SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -515,7 +511,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+			SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -545,7 +541,7 @@
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-				SWIFT_VERSION = 5.0;
+			SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -592,13 +588,9 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = DesignSystem;
 		};
-		241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features/Settings" */ = {
+		241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Features/Settings;
-		};
-		241E802C2E55B5F40013EEA1 /* XCLocalSwiftPackageReference "Features/Comments" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Features/Comments;
+			relativePath = Features;
 		};
 		248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */ = {
 			isa = XCLocalSwiftPackageReference;
@@ -607,18 +599,6 @@
 		248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Networking;
-		};
-		248256FC2E59D2660068E91E /* XCLocalSwiftPackageReference "Features/Feed" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Features/Feed;
-		};
-		2482576C2E5B38190068E91E /* XCLocalSwiftPackageReference "Features/WhatsNew" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Features/WhatsNew;
-		};
-		52A3FC99203E47A9B5690643 /* XCLocalSwiftPackageReference "Features/Authentication" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Features/Authentication;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -645,10 +625,12 @@
 		};
 		241E7B482E51D1C80013EEA1 /* Settings */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */;
 			productName = Settings;
 		};
 		241E802D2E55B5F40013EEA1 /* Comments */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */;
 			productName = Comments;
 		};
 		248256F72E59D2460068E91E /* Domain */ = {
@@ -661,14 +643,17 @@
 		};
 		248256FD2E59D2660068E91E /* Feed */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */;
 			productName = Feed;
 		};
 		2482576D2E5B38190068E91E /* WhatsNew */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */;
 			productName = WhatsNew;
 		};
 		B2F5BEA03AC34B9DB788D8E2 /* Authentication */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */;
 			productName = Authentication;
 		};
 /* End XCSwiftPackageProductDependency section */

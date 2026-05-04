@@ -19,20 +19,13 @@ let package = Package(
             targets: ["Domain"],
         )
     ],
-    dependencies: [
-        .package(path: "../Data"),
-        .package(path: "../Networking")
-    ],
     targets: [
         .target(
             name: "Domain",
         ),
         .testTarget(
             name: "DomainTests",
-            dependencies: [
-                .product(name: "Data", package: "Data"),
-                .product(name: "Networking", package: "Networking")
-            ],
+            dependencies: ["Domain"],
             path: "Tests/DomainTests",
         )
     ],

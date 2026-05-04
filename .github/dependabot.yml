@@ -64,46 +64,10 @@ updates:
           - "*"
 
   - package-ecosystem: swift
-    directory: /Features/Authentication
+    directory: /Features
     schedule:
       interval: weekly
     groups:
-      swift-authentication:
-        patterns:
-          - "*"
-
-  - package-ecosystem: swift
-    directory: /Features/Comments
-    schedule:
-      interval: weekly
-    groups:
-      swift-comments:
-        patterns:
-          - "*"
-
-  - package-ecosystem: swift
-    directory: /Features/Feed
-    schedule:
-      interval: weekly
-    groups:
-      swift-feed:
-        patterns:
-          - "*"
-
-  - package-ecosystem: swift
-    directory: /Features/Settings
-    schedule:
-      interval: weekly
-    groups:
-      swift-settings:
-        patterns:
-          - "*"
-
-  - package-ecosystem: swift
-    directory: /Features/WhatsNew
-    schedule:
-      interval: weekly
-    groups:
-      swift-whats-new:
+      swift-features:
         patterns:
           - "*"
