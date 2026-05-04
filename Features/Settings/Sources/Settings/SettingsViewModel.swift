@@ -40,6 +40,10 @@ public final class SettingsViewModel: @unchecked Sendable {
         didSet { propagateChangesIfNeeded(\.compactFeedDesign, compactFeedDesign) }
     }
 
+    public var dimReadPosts: Bool = true {
+        didSet { propagateChangesIfNeeded(\.dimReadPosts, dimReadPosts) }
+    }
+
     public var cacheUsageText: String = "Calculating…"
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
@@ -55,6 +59,7 @@ public final class SettingsViewModel: @unchecked Sendable {
         rememberFeedCategory = settingsUseCase.rememberFeedCategory
         textSize = settingsUseCase.textSize
         compactFeedDesign = settingsUseCase.compactFeedDesign
+        dimReadPosts = settingsUseCase.dimReadPosts
 
         hasLoadedSettings = true
     }
@@ -70,6 +75,8 @@ public final class SettingsViewModel: @unchecked Sendable {
             settingsUseCase.rememberFeedCategory = value
         case \.compactFeedDesign:
             settingsUseCase.compactFeedDesign = value
+        case \.dimReadPosts:
+            settingsUseCase.dimReadPosts = value
         default:
             break
         }

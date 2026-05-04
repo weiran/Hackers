@@ -183,6 +183,7 @@ private extension FeedView {
             votingViewModel: votingViewModel,
             showThumbnails: viewModel.showThumbnails,
             compactMode: viewModel.compactFeedDesign,
+            dimReadPost: viewModel.dimReadPosts,
             onLinkTap: { handleLinkTap(post: post) },
             onCommentsTap: isSidebar ? nil : { handlePostTap(post: post) },
             onPostUpdated: { updatedPost in
@@ -354,6 +355,7 @@ private extension FeedView {
     }
 
     private func handlePostTap(post: Domain.Post) {
+        viewModel.markPostRead(post)
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
         if mode == .customBrowser {
             navigationStore.showPostLink(post)

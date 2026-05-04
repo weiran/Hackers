@@ -656,6 +656,7 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     private var storedLastFeedCategory: PostType?
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
+    var dimReadPosts: Bool = true
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails

@@ -205,6 +205,11 @@ public struct SettingsView: View {
                     Toggle(isOn: $viewModel.rememberFeedCategory) {
                         Label("Remember Feed Category", systemImage: "list.bullet")
                     }
+
+                    Toggle(isOn: $viewModel.dimReadPosts) {
+                        Label("Dim Read Posts", systemImage: "circle.lefthalf.filled")
+                    }
+                    .accessibilityIdentifier("settings.dimReadPosts")
                 }
 
                 Section(header: Text("Storage")) {

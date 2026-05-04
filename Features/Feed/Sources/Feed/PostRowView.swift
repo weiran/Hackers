@@ -17,6 +17,7 @@ struct PostRowView: View {
     let onCommentsTap: (() -> Void)?
     let showThumbnails: Bool
     let compactMode: Bool
+    let dimReadPost: Bool
     let onPostUpdated: ((Domain.Post) -> Void)?
     let onBookmarkToggle: (() async -> Bool)?
 
@@ -25,6 +26,7 @@ struct PostRowView: View {
         votingViewModel: VotingViewModel,
         showThumbnails: Bool = true,
         compactMode: Bool = false,
+        dimReadPost: Bool = false,
         onLinkTap: (() -> Void)? = nil,
         onCommentsTap: (() -> Void)? = nil,
         onPostUpdated: ((Domain.Post) -> Void)? = nil,
@@ -36,6 +38,7 @@ struct PostRowView: View {
         self.onCommentsTap = onCommentsTap
         self.showThumbnails = showThumbnails
         self.compactMode = compactMode
+        self.dimReadPost = dimReadPost
         self.onPostUpdated = onPostUpdated
         self.onBookmarkToggle = onBookmarkToggle
     }
@@ -49,6 +52,7 @@ struct PostRowView: View {
                     showPostText: false,
                     showThumbnails: showThumbnails,
                     compactMode: compactMode,
+                    dimReadPost: dimReadPost,
                     onThumbnailTap: onLinkTap,
                     onUpvoteTap: { await handleUpvoteTap() },
                     onUnvoteTap: { await handleUnvoteTap() },
@@ -70,6 +74,7 @@ struct PostRowView: View {
                 showPostText: false,
                 showThumbnails: showThumbnails,
                 compactMode: compactMode,
+                dimReadPost: dimReadPost,
                 onThumbnailTap: onLinkTap,
                 onUpvoteTap: { await handleUpvoteTap() },
                 onUnvoteTap: { await handleUnvoteTap() },

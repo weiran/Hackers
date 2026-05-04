@@ -21,8 +21,10 @@ enum UITestingBootstrap {
         let authenticationUseCase = UITestAuthenticationUseCase()
         let fixtures = UITestFixtures()
         let bookmarksUseCase = UITestBookmarksUseCase()
+        let readStatusUseCase = UITestReadStatusUseCase()
         let votingStateProvider = UITestVotingStateProvider()
         let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
+        let readStatusController = ReadStatusController(readStatusUseCase: readStatusUseCase)
 
         DependencyContainer.setOverrides(DependencyContainer.Overrides(
             postUseCase: { fixtures },
@@ -30,6 +32,7 @@ enum UITestingBootstrap {
             commentUseCase: { fixtures },
             settingsUseCase: { settingsUseCase },
             bookmarksUseCase: { bookmarksUseCase },
+            readStatusUseCase: { readStatusUseCase },
             searchUseCase: { fixtures },
             supportUseCase: { UITestSupportUseCase() },
             votingStateProvider: { votingStateProvider },
@@ -37,7 +40,8 @@ enum UITestingBootstrap {
             authenticationUseCase: { authenticationUseCase },
             whatsNewUseCase: { UITestWhatsNewUseCase() },
             sessionService: { SessionService(authenticationUseCase: authenticationUseCase) },
-            bookmarksController: { bookmarksController }
+            bookmarksController: { bookmarksController },
+            readStatusController: { readStatusController }
         ))
     }
 }
@@ -234,6 +238,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
     var compactFeedDesign = false
+    var dimReadPosts = true
 
     init() {
         let mode = ProcessInfo.processInfo.environment["HACKERS_UI_LINK_BROWSER_MODE"]
@@ -267,6 +272,21 @@ final class UITestBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
             }
             postsByID[post.id] = nil
             return false
+        }
+    }
+}
+
+final class UITestReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
+    private let lock = NSLock()
+    private var readIDs: Set<Int> = []
+
+    func readPostIDs() async -> Set<Int> {
+        lock.withLock { readIDs }
+    }
+
+    func markPostRead(id: Int) async {
+        lock.withLock {
+            readIDs.insert(id)
         }
     }
 }

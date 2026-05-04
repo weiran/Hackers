@@ -72,6 +72,7 @@ public struct Post: Sendable, Identifiable, Hashable {
     public let postType: PostType
     public var upvoted: Bool
     public var isBookmarked: Bool
+    public var isRead: Bool
     public var voteLinks: VoteLinks?
     public var text: String?
     public var comments: [Comment]?
@@ -87,6 +88,7 @@ public struct Post: Sendable, Identifiable, Hashable {
         postType: PostType,
         upvoted: Bool,
         isBookmarked: Bool = false,
+        isRead: Bool = false,
         voteLinks: VoteLinks? = nil,
         text: String? = nil,
         comments: [Comment]? = nil,
@@ -101,6 +103,7 @@ public struct Post: Sendable, Identifiable, Hashable {
         self.postType = postType
         self.upvoted = upvoted
         self.isBookmarked = isBookmarked
+        self.isRead = isRead
         self.voteLinks = voteLinks
         self.text = text
         self.comments = comments

@@ -44,6 +44,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         setDefaultIfNeeded(false, forKey: "RememberFeedCategory")
         setDefaultIfNeeded(TextSize.medium.rawValue, forKey: "textSize")
         setDefaultIfNeeded(true, forKey: "compactFeedDesign")
+        setDefaultIfNeeded(true, forKey: "DimReadPosts")
     }
 
     private func migrateLinkBrowserModeIfNeeded() {
@@ -143,6 +144,15 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "compactFeedDesign")
+        }
+    }
+
+    public var dimReadPosts: Bool {
+        get {
+            userDefaults.bool(forKey: "DimReadPosts")
+        }
+        set {
+            userDefaults.set(newValue, forKey: "DimReadPosts")
         }
     }
 

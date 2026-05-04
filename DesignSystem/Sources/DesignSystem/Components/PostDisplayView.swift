@@ -16,6 +16,7 @@ public struct PostDisplayView: View {
     let showPostText: Bool
     let showThumbnails: Bool
     let compactMode: Bool
+    let dimReadPost: Bool
     let titleLineLimit: Int?
     let showsTitle: Bool
     let thumbnailSize: CGFloat
@@ -37,6 +38,7 @@ public struct PostDisplayView: View {
         showPostText: Bool = false,
         showThumbnails: Bool = true,
         compactMode: Bool = false,
+        dimReadPost: Bool = false,
         titleLineLimit: Int? = nil,
         showsTitle: Bool = true,
         thumbnailSize: CGFloat = 55,
@@ -51,6 +53,7 @@ public struct PostDisplayView: View {
         self.showPostText = showPostText
         self.showThumbnails = showThumbnails
         self.compactMode = compactMode
+        self.dimReadPost = dimReadPost
         self.titleLineLimit = titleLineLimit
         self.showsTitle = showsTitle
         self.thumbnailSize = thumbnailSize
@@ -151,6 +154,7 @@ public struct PostDisplayView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .opacity(dimReadPost && post.isRead ? 0.55 : 1.0)
         .onChange(of: post.id) { _, _ in
             displayedScore = post.score
             displayedUpvoted = post.upvoted

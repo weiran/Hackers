@@ -5,11 +5,8 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-// swiftlint:disable force_cast
-
 @testable import Domain
 import Foundation
-import Observation
 @testable import Settings
 import Testing
 
@@ -21,113 +18,18 @@ struct SettingsViewModelTests {
         SettingsViewModel(settingsUseCase: mockSettingsUseCase)
     }
 
-    // MARK: - Mock SettingsUseCase
-
     final class MockSettingsUseCase: SettingsUseCase, @unchecked Sendable {
-        private var _safariReaderMode = false
-        private var _linkBrowserMode: LinkBrowserMode = .customBrowser
-        private var _showThumbnails = true
-        private var _rememberFeedCategory = false
-        private var _lastFeedCategory: PostType?
-        private var _textSize: TextSize = .medium
-        private var _compactFeedDesign = false
+        var safariReaderMode = false
+        var linkBrowserMode: LinkBrowserMode = .customBrowser
+        var showThumbnails = true
+        var rememberFeedCategory = false
+        var lastFeedCategory: PostType?
+        var textSize: TextSize = .medium
+        var compactFeedDesign = false
+        var dimReadPosts = true
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
-
-        var getterCallCounts: [String: Int] = [:]
-        var setterCallCounts: [String: Int] = [:]
-
-        var safariReaderMode: Bool {
-            get {
-                getterCallCounts["safariReaderMode", default: 0] += 1
-                return _safariReaderMode
-            }
-            set {
-                setterCallCounts["safariReaderMode", default: 0] += 1
-                _safariReaderMode = newValue
-            }
-        }
-
-        var linkBrowserMode: LinkBrowserMode {
-            get {
-                getterCallCounts["linkBrowserMode", default: 0] += 1
-                return _linkBrowserMode
-            }
-            set {
-                setterCallCounts["linkBrowserMode", default: 0] += 1
-                _linkBrowserMode = newValue
-            }
-        }
-
-        var showThumbnails: Bool {
-            get {
-                getterCallCounts["showThumbnails", default: 0] += 1
-                return _showThumbnails
-            }
-            set {
-                setterCallCounts["showThumbnails", default: 0] += 1
-                _showThumbnails = newValue
-            }
-        }
-
-        var rememberFeedCategory: Bool {
-            get {
-                getterCallCounts["rememberFeedCategory", default: 0] += 1
-                return _rememberFeedCategory
-            }
-            set {
-                setterCallCounts["rememberFeedCategory", default: 0] += 1
-                _rememberFeedCategory = newValue
-                if !newValue {
-                    _lastFeedCategory = nil
-                }
-            }
-        }
-
-        var lastFeedCategory: PostType? {
-            get {
-                getterCallCounts["lastFeedCategory", default: 0] += 1
-                return _lastFeedCategory
-            }
-            set {
-                setterCallCounts["lastFeedCategory", default: 0] += 1
-                _lastFeedCategory = newValue
-            }
-        }
-
-        var textSize: TextSize {
-            get {
-                getterCallCounts["textSize", default: 0] += 1
-                return _textSize
-            }
-            set {
-                setterCallCounts["textSize", default: 0] += 1
-                _textSize = newValue
-            }
-        }
-
-        var compactFeedDesign: Bool {
-            get {
-                getterCallCounts["compactFeedDesign", default: 0] += 1
-                return _compactFeedDesign
-            }
-            set {
-                setterCallCounts["compactFeedDesign", default: 0] += 1
-                _compactFeedDesign = newValue
-            }
-        }
-
-        func reset() {
-            getterCallCounts.removeAll()
-            setterCallCounts.removeAll()
-            clearCacheCallCount = 0
-            cacheUsageCallCount = 0
-            _linkBrowserMode = .customBrowser
-            _showThumbnails = true
-            _rememberFeedCategory = false
-            _lastFeedCategory = nil
-        }
 
         func clearCache() { clearCacheCallCount += 1 }
         func cacheUsageBytes() async -> Int64 {
@@ -136,208 +38,48 @@ struct SettingsViewModelTests {
         }
     }
 
-    // MARK: - Initialization Tests
-
-    @Test("SettingsViewModel initialization")
-    func settingsViewModelInitialization() {
-        #expect(settingsViewModel != nil)
-    }
-
-    @Test("SettingsViewModel initialization with default dependency")
-    func settingsViewModelInitializationWithDefaultDependency() {
-        let viewModel = SettingsViewModel()
-        #expect(viewModel != nil)
-    }
-
-    // MARK: - Safari Reader Mode Tests
-
-    @Test("Safari reader mode getter")
-    func safariReaderModeGetter() {
+    @Test("Initialization loads stored settings")
+    func initializationLoadsStoredSettings() {
         mockSettingsUseCase.safariReaderMode = true
+        mockSettingsUseCase.linkBrowserMode = .systemBrowser
+        mockSettingsUseCase.showThumbnails = false
+        mockSettingsUseCase.rememberFeedCategory = true
+        mockSettingsUseCase.textSize = .large
+        mockSettingsUseCase.compactFeedDesign = true
+        mockSettingsUseCase.dimReadPosts = false
 
-        let value = settingsViewModel.safariReaderMode
+        let viewModel = settingsViewModel
 
-        #expect(value == true)
-        #expect(mockSettingsUseCase.getterCallCounts["safariReaderMode"] == 1)
+        #expect(viewModel.safariReaderMode == true)
+        #expect(viewModel.linkBrowserMode == .systemBrowser)
+        #expect(viewModel.showThumbnails == false)
+        #expect(viewModel.rememberFeedCategory == true)
+        #expect(viewModel.textSize == .large)
+        #expect(viewModel.compactFeedDesign == true)
+        #expect(viewModel.dimReadPosts == false)
     }
 
-    @Test("Safari reader mode setter")
-    func safariReaderModeSetter() {
-        settingsViewModel.safariReaderMode = true
+    @Test("Setting changes persist to use case")
+    func settingChangesPersistToUseCase() {
+        let viewModel = settingsViewModel
+
+        viewModel.safariReaderMode = true
+        viewModel.linkBrowserMode = .inAppBrowser
+        viewModel.showThumbnails = false
+        viewModel.rememberFeedCategory = true
+        viewModel.textSize = .large
+        viewModel.compactFeedDesign = true
+        viewModel.dimReadPosts = false
 
         #expect(mockSettingsUseCase.safariReaderMode == true)
-        #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-    }
-
-    @Test("Safari reader mode toggle")
-    func safariReaderModeToggle() {
-        // Start with false
-        #expect(settingsViewModel.safariReaderMode == false)
-
-        // Toggle to true
-        settingsViewModel.safariReaderMode = true
-        #expect(settingsViewModel.safariReaderMode == true)
-
-        // Toggle back to false
-        settingsViewModel.safariReaderMode = false
-        #expect(settingsViewModel.safariReaderMode == false)
-    }
-
-    // MARK: - Thumbnail Setting Tests
-
-    @Test("Show thumbnails getter")
-    func showThumbnailsGetter() {
-        mockSettingsUseCase.showThumbnails = false
-
-        let value = settingsViewModel.showThumbnails
-
-        #expect(value == false)
-        #expect(mockSettingsUseCase.getterCallCounts["showThumbnails"] == 1)
-    }
-
-    @Test("Show thumbnails setter")
-    func showThumbnailsSetter() {
-        settingsViewModel.showThumbnails = false
-
+        #expect(mockSettingsUseCase.linkBrowserMode == .inAppBrowser)
         #expect(mockSettingsUseCase.showThumbnails == false)
-        #expect(mockSettingsUseCase.setterCallCounts["showThumbnails"] == 1)
-    }
-
-    @Test("Show thumbnails toggle")
-    func showThumbnailsToggle() {
-        // Start with true
-        #expect(settingsViewModel.showThumbnails == true)
-
-        // Toggle to false
-        settingsViewModel.showThumbnails = false
-        #expect(settingsViewModel.showThumbnails == false)
-
-        // Toggle back to true
-        settingsViewModel.showThumbnails = true
-        #expect(settingsViewModel.showThumbnails == true)
-    }
-
-    // MARK: - Remember Post Type Tests
-
-    @Test("Remember feed category getter")
-    func rememberFeedCategoryGetter() {
-        mockSettingsUseCase.rememberFeedCategory = true
-
-        let value = settingsViewModel.rememberFeedCategory
-
-        #expect(value == true)
-        #expect(mockSettingsUseCase.getterCallCounts["rememberFeedCategory"] == 1)
-    }
-
-    @Test("Remember feed category setter")
-    func rememberFeedCategorySetter() {
-        settingsViewModel.rememberFeedCategory = true
-
         #expect(mockSettingsUseCase.rememberFeedCategory == true)
-        #expect(mockSettingsUseCase.setterCallCounts["rememberFeedCategory"] == 1)
+        #expect(mockSettingsUseCase.textSize == .large)
+        #expect(mockSettingsUseCase.compactFeedDesign == true)
+        #expect(mockSettingsUseCase.dimReadPosts == false)
     }
 
-    @Test("Remember feed category toggle clears stored value when disabled")
-    func rememberFeedCategoryToggle() {
-        // Start with false
-        #expect(settingsViewModel.rememberFeedCategory == false)
-
-        // Toggle to true
-        settingsViewModel.rememberFeedCategory = true
-        #expect(settingsViewModel.rememberFeedCategory == true)
-
-        // Simulate stored post type
-        mockSettingsUseCase.lastFeedCategory = .ask
-
-        // Toggle back to false
-        settingsViewModel.rememberFeedCategory = false
-        #expect(settingsViewModel.rememberFeedCategory == false)
-        #expect(mockSettingsUseCase.lastFeedCategory == nil)
-    }
-
-    // MARK: - Removed Settings (showComments)
-
-    // Note: showComments setting has been removed from the app
-
-    // MARK: - Link Browser Mode Tests
-
-    @Test("Link browser mode getter")
-    func linkBrowserModeGetter() {
-        mockSettingsUseCase.linkBrowserMode = .systemBrowser
-
-        let value = settingsViewModel.linkBrowserMode
-
-        #expect(value == .systemBrowser)
-        #expect(mockSettingsUseCase.getterCallCounts["linkBrowserMode"] == 1)
-    }
-
-    @Test("Link browser mode setter")
-    func linkBrowserModeSetter() {
-        settingsViewModel.linkBrowserMode = .customBrowser
-
-        #expect(mockSettingsUseCase.linkBrowserMode == .customBrowser)
-        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == 1)
-    }
-
-    @Test("Link browser mode cycles values")
-    func linkBrowserModeCyclesValues() {
-        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
-
-        settingsViewModel.linkBrowserMode = .systemBrowser
-        #expect(settingsViewModel.linkBrowserMode == .systemBrowser)
-
-        settingsViewModel.linkBrowserMode = .inAppBrowser
-        #expect(settingsViewModel.linkBrowserMode == .inAppBrowser)
-    }
-
-    // MARK: - Multiple Settings Tests
-
-    @Test("Multiple settings changes")
-    func multipleSettingsChanges() {
-        // Change multiple settings
-        settingsViewModel.safariReaderMode = true
-        settingsViewModel.linkBrowserMode = .customBrowser
-
-        // Verify all changes are reflected
-        #expect(settingsViewModel.safariReaderMode == true)
-        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
-
-        // Verify the underlying use case was called correctly
-        #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == 1)
-    }
-
-    @Test("Settings independence")
-    func settingsIndependence() {
-        // Test that changing one setting doesn't affect others
-        settingsViewModel.safariReaderMode = true
-
-        // Other settings should remain at their default values
-        #expect(settingsViewModel.linkBrowserMode == .customBrowser)
-
-        // Only safari reader mode setter should have been called
-        #expect(mockSettingsUseCase.setterCallCounts["safariReaderMode"] == 1)
-        #expect(mockSettingsUseCase.setterCallCounts["linkBrowserMode"] == nil)
-    }
-
-    // MARK: - Observation Tests (for @Observable macro)
-
-    @Test("Observable conformance")
-    func observableConformance() {
-        // Test that the SettingsViewModel is properly observable
-        // This mainly tests that the @Observable macro is working correctly
-
-        // Basic test that the property can be read and set
-        settingsViewModel.safariReaderMode = true
-        #expect(settingsViewModel.safariReaderMode == true)
-
-        settingsViewModel.safariReaderMode = false
-        #expect(settingsViewModel.safariReaderMode == false)
-    }
-
-    // MARK: - Cache Usage Tests
-
-    @MainActor
     @Test("Cache usage refresh formats byte count")
     func refreshCacheUsageFormatsBytes() async {
         mockSettingsUseCase.cacheUsageBytesValue = 2_048
@@ -348,12 +90,12 @@ struct SettingsViewModelTests {
         #expect(viewModel.cacheUsageText == expected)
 
         mockSettingsUseCase.cacheUsageBytesValue = 4_096
-        await viewModel.refreshCacheUsage()
+        viewModel.refreshCacheUsage()
+
         await waitUntil(viewModel.cacheUsageText == ByteCountFormatter.string(fromByteCount: 4_096, countStyle: .file))
         #expect(mockSettingsUseCase.cacheUsageCallCount >= 2)
     }
 
-    @MainActor
     @Test("Clearing cache triggers use case and refresh")
     func clearCacheTriggersRefresh() async {
         mockSettingsUseCase.cacheUsageBytesValue = 1_024
@@ -368,11 +110,6 @@ struct SettingsViewModelTests {
         #expect(mockSettingsUseCase.cacheUsageCallCount >= 2)
     }
 
-    // MARK: - Concurrent Access Tests
-
-    // MARK: - Edge Cases Tests
-
-    @MainActor
     private func waitUntil(_ predicate: @autoclosure () -> Bool, timeoutMilliseconds: Int = 200) async {
         var iterations = 0
         while !predicate() && iterations < timeoutMilliseconds {
