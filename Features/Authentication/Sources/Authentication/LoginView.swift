@@ -73,6 +73,7 @@ public struct LoginView: View {
                     Image(systemName: "xmark")
                 }
                 .accessibilityLabel("Close")
+                .accessibilityIdentifier("login.close")
             }
         }
         .alert("Login Failed", isPresented: Binding(
@@ -125,6 +126,7 @@ public struct LoginView: View {
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 .focused($focusedField, equals: .username)
+                .accessibilityIdentifier("login.username")
                 .onSubmit {
                     focusedField = .password
                 }
@@ -136,6 +138,7 @@ public struct LoginView: View {
                 )
                 .textContentType(.password)
                 .focused($focusedField, equals: .password)
+                .accessibilityIdentifier("login.password")
                 .onSubmit {
                     if viewModel.isLoginEnabled {
                         performLogin()
@@ -181,6 +184,7 @@ public struct LoginView: View {
                 }
                 .disabled(!viewModel.isLoginEnabled)
                 .padding(.horizontal, 20)
+                .accessibilityIdentifier("login.signIn")
             }
 
             Spacer(minLength: 40)
@@ -243,6 +247,7 @@ public struct LoginView: View {
                     Image(systemName: "xmark")
                 }
                 .accessibilityLabel("Close")
+                .accessibilityIdentifier("login.close")
             }
         }
     }

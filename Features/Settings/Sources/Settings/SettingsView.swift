@@ -162,10 +162,12 @@ public struct SettingsView: View {
                     Toggle(isOn: $viewModel.showThumbnails) {
                         Label("Show Thumbnails", systemImage: "photo.on.rectangle")
                     }
+                    .accessibilityIdentifier("settings.showThumbnails")
 
                     Toggle(isOn: $viewModel.compactFeedDesign) {
                         Label("Compact Feed Design", systemImage: "list.bullet.rectangle")
                     }
+                    .accessibilityIdentifier("settings.compactFeed")
                 }
 
 #if DEBUG
@@ -230,6 +232,7 @@ public struct SettingsView: View {
                 }
             }
             .listStyle(GroupedListStyle())
+            .accessibilityIdentifier("settings.form")
             .navigationBarTitle(Text("Settings"))
             .navigationBarItems(trailing:
                 Button(
@@ -240,7 +243,8 @@ public struct SettingsView: View {
                         Image(systemName: "xmark")
                     },
                 )
-                .accessibilityLabel("Close"))
+                .accessibilityLabel("Close")
+                .accessibilityIdentifier("settings.close"))
         }
         .textScaling(for: viewModel.textSize)
     }

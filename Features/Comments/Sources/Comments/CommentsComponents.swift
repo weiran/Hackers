@@ -56,6 +56,7 @@ struct CommentsContentView: View {
                     }
                 })
                 .listStyle(.plain)
+                .accessibilityIdentifier("comments.list")
                 .transaction { transaction in
                     transaction.disablesAnimations = !listAnimationsEnabled
                 }
@@ -209,6 +210,7 @@ struct CommentsForEach: View {
                 )
             })
             .listRowSeparator(.visible)
+            .accessibilityIdentifier("comments.comment.\(comment.id)")
             .if(shouldShowVoteActions(for: comment)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
                     if comment.upvoted && comment.voteLinks?.unvote != nil {
