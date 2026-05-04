@@ -16,6 +16,7 @@ This documentation suite is designed to be both human and machine readable, prov
 | [Design System](./design-system.md) | UI components and design guidelines | Frontend developers |
 | [Testing Guide](./testing-guide.md) | Testing strategies and test running | All developers |
 | [Development Setup](./development-setup.md) | Local development and tooling | New developers |
+| [Release Process](./release-process.md) | TestFlight release workflow and operational runbook | Maintainers |
 
 ## 🏗️ Architecture at a Glance
 
@@ -72,6 +73,7 @@ This documentation includes structured metadata for automated tools:
 | design-system.md | 2025-09-15 | 1.0.0 | ✅ Current |
 | testing-guide.md | 2025-09-15 | 1.0.0 | ✅ Current |
 | development-setup.md | 2025-09-15 | 1.0.0 | ✅ Current |
+| release-process.md | 2026-05-04 | 1.0.0 | ✅ Current |
 
 ---
 
