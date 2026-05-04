@@ -1,8 +1,3 @@
-//
-//  FeedView.swift
-//  Feed
-//
-//  Copyright © 2025 Weiran Zhang. All rights reserved.
 import DesignSystem
 import Domain
 import Shared
@@ -34,6 +29,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         _searchText = State(initialValue: viewModel.searchQuery)
         self.isSidebar = isSidebar
     }
+
     public var body: some View {
         contentView
             .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
@@ -59,38 +55,33 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                 }
             }
             .onChange(of: selectedPostType) { _, _ in
-                // Clear selection when category changes to prevent stale sidebar selection
                 selectedPostId = nil
             }
-        .task { @Sendable in
-            // Set the navigation store for the voting view model
-            votingViewModel.navigationStore = navigationStore
-            await viewModel.loadFeed()
-        }
-        .onChange(of: navigationStore.selectedPost) { _, newPost in
-            // When selectedPost changes in navigation store (e.g., from comments view),
-            // update it in the feed
-            if let updatedPost = newPost {
-                viewModel.replacePost(updatedPost)
+            .task { @Sendable in
+                votingViewModel.navigationStore = navigationStore
+                await viewModel.loadFeed()
             }
-        }
-        .alert(
-            "Vote Error",
-            isPresented: Binding(
-                get: { votingViewModel.lastError != nil },
-                set: { newValue in
-                    if newValue == false { votingViewModel.clearError() }
-                },
-            ),
-        ) {
-            Button("OK") { votingViewModel.clearError() }
-        } message: {
-            Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
-        }
-        .onAppear {
-            // Ensure the navigation store is set
-            votingViewModel.navigationStore = navigationStore
-        }
+            .onChange(of: navigationStore.selectedPost) { _, newPost in
+                if let updatedPost = newPost {
+                    viewModel.replacePost(updatedPost)
+                }
+            }
+            .alert(
+                "Vote Error",
+                isPresented: Binding(
+                    get: { votingViewModel.lastError != nil },
+                    set: { newValue in
+                        if newValue == false { votingViewModel.clearError() }
+                    },
+                ),
+            ) {
+                Button("OK") { votingViewModel.clearError() }
+            } message: {
+                Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
+            }
+            .onAppear {
+                votingViewModel.navigationStore = navigationStore
+            }
     }
 }
 
@@ -127,7 +118,6 @@ private extension FeedView {
         }
     }
 
-    @ViewBuilder
     var contentView: some View {
         Group {
             if viewModel.hasActiveSearch {
@@ -186,7 +176,6 @@ private extension FeedView {
         .id(selectedPostType)
     }
 
-    @ViewBuilder
     private func postRow(for post: Domain.Post, enablePagination: Bool = true) -> some View {
         PostRowView(
             post: post,
@@ -226,7 +215,6 @@ private extension FeedView {
     @ViewBuilder
     private func voteSwipeAction(for post: Domain.Post) -> some View {
         if post.upvoted && post.voteLinks?.unvote != nil {
-            // Unvote action
             Button {
                 Task {
                     var mutablePost = post
@@ -246,7 +234,6 @@ private extension FeedView {
             .tint(.orange)
             .accessibilityLabel("Unvote")
         } else {
-            // Upvote action
             Button {
                 Task {
                     var mutablePost = post
@@ -333,7 +320,6 @@ private extension FeedView {
         }
     }
 
-    @ViewBuilder
     private var settingsButton: some View {
         Button {
             navigationStore.showSettings()
@@ -345,7 +331,6 @@ private extension FeedView {
         .accessibilityLabel("Settings")
     }
 
-    @ViewBuilder
     private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
         Button {
             selectedPostType = postType

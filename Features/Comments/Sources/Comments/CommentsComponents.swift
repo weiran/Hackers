@@ -34,6 +34,7 @@ struct CommentsContentView: View {
             }
         }
     }
+
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
@@ -67,6 +68,7 @@ struct CommentsContentView: View {
             }
         }
     }
+
     @ViewBuilder
     private func postHeaderSection(for post: Post) -> some View {
         if showsPostHeader {
@@ -96,10 +98,12 @@ struct CommentsContentView: View {
             }
         }
     }
+
     private func shouldShowVoteActions(for post: Post) -> Bool {
         (post.voteLinks?.upvote != nil && !post.upvoted)
             || (post.voteLinks?.unvote != nil && post.upvoted)
     }
+
     @ViewBuilder
     private func postHeaderSwipeActions(for post: Post) -> some View {
         if post.upvoted && post.voteLinks?.unvote != nil {
@@ -138,6 +142,7 @@ struct CommentsContentView: View {
             .disabled(viewModel.isLoading)
         }
     }
+
     @ViewBuilder
     private func commentsSection(for post: Post, proxy: ScrollViewProxy) -> some View {
         if viewModel.isLoading {
@@ -165,6 +170,7 @@ struct CommentsContentView: View {
             )
         }
     }
+
     private func scrollToPendingComment(with proxy: ScrollViewProxy) {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
@@ -177,6 +183,7 @@ struct CommentsContentView: View {
         }
     }
 }
+
 struct CommentsForEach: View {
     let post: Post
     let toggleCommentVisibility: (Comment) -> Void
@@ -239,11 +246,13 @@ struct CommentsForEach: View {
             }
         }
     }
+
     private func shouldShowVoteActions(for comment: Comment) -> Bool {
         (comment.voteLinks?.upvote != nil && !comment.upvoted)
             || (comment.voteLinks?.unvote != nil && comment.upvoted)
     }
 }
+
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
@@ -316,97 +325,5 @@ struct PostHeader: View {
         }
 
         return wasUnvoted
-    }
-}
-struct ToolbarTitle: View {
-    let post: Post
-    let showTitle: Bool
-    let showThumbnails: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack {
-                ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                    .frame(width: 33, height: 33)
-                    .clipShape(.rect(cornerRadius: 10))
-                Text(post.title)
-                    .scaledFont(.headline)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint("Open link")
-        .opacity(showTitle ? 1.0 : 0.0)
-        .offset(y: showTitle ? 0 : 20)
-        .animation(.easeInOut(duration: 0.3), value: showTitle)
-    }
-}
-struct BookmarkToolbarButton: View {
-    let isBookmarked: Bool
-    let toggleBookmark: @Sendable () async -> Bool
-    @State private var isSubmitting = false
-
-    var body: some View {
-        Button {
-            guard !isSubmitting else { return }
-            isSubmitting = true
-            Task { @MainActor in
-                _ = await toggleBookmark()
-                isSubmitting = false
-            }
-        } label: {
-            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-        }
-        .accessibilityLabel(isBookmarked ? "Remove Bookmark" : "Save Bookmark")
-        .accessibilityHint(
-            isBookmarked
-                ? "Double-tap to remove from bookmarks"
-                : "Double-tap to add to bookmarks"
-        )
-        .disabled(isSubmitting)
-    }
-}
-struct ShareMenu: View {
-    let post: Post
-
-    var body: some View {
-        Button {
-            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
-        } label: {
-            Image(systemName: "square.and.arrow.up")
-                .accessibilityLabel("Share")
-        }
-    }
-}
-struct LoadingView: View {
-    var body: some View {
-        AppLoadingStateView(message: "Loading...")
-    }
-}
-struct EmptyCommentsView: View {
-    var body: some View {
-        AppEmptyStateView(iconSystemName: "bubble.left", title: "No comments yet")
-    }
-}
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
-    static let defaultValue = CGFloat.zero
-    static func reduce(value: inout Value, nextValue: () -> Value) { value += nextValue() }
-}
-struct CommentPositionsPreferenceKey: PreferenceKey {
-    typealias Value = [Int: CGRect]
-    static let defaultValue: [Int: CGRect] = [:]
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
-    }
-}
-// MARK: - Helpers
-extension View {
-    func plainListRow() -> some View {
-        listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets())
     }
 }
