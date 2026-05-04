@@ -4,7 +4,43 @@ set -euo pipefail
 DEVICE_NAME="${CI_DEVICE_NAME:-iPhone 17 Pro}"
 XCODE_VERSION_FILE="${XCODE_VERSION_FILE:-.github/xcode-version}"
 DIAGNOSTICS_PATH="${CI_DIAGNOSTICS_PATH:-artifacts/logs/simulator-diagnostics.txt}"
+MODE="boot-simulator"
+DOWNLOAD_IOS_PLATFORM="${CI_DOWNLOAD_IOS_PLATFORM:-0}"
 export DEVICE_NAME
+
+usage() {
+  cat <<'USAGE'
+Usage: scripts/ci/setup-xcode-simulator.sh [--boot-simulator|--xcode-only] [--download-ios-platform]
+
+  --boot-simulator        Select Xcode, verify an iOS runtime, and boot CI_DEVICE_NAME.
+  --xcode-only            Select Xcode and run first launch setup only.
+  --download-ios-platform Download the iOS platform if no runtime is installed.
+USAGE
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --boot-simulator)
+      MODE="boot-simulator"
+      ;;
+    --xcode-only)
+      MODE="xcode-only"
+      ;;
+    --download-ios-platform)
+      DOWNLOAD_IOS_PLATFORM="1"
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
 
 print_diagnostics() {
   mkdir -p "$(dirname "$DIAGNOSTICS_PATH")"
@@ -85,11 +121,24 @@ echo "::endgroup::"
 
 run_with_timeout 300 sudo xcodebuild -runFirstLaunch
 
+if [[ "$MODE" == "xcode-only" ]]; then
+  if [[ -n "${GITHUB_ENV:-}" ]]; then
+    echo "CI_DESTINATION=generic/platform=iOS Simulator" >> "$GITHUB_ENV"
+  fi
+  exit 0
+fi
+
 if has_available_ios_runtime; then
   echo "An available iOS simulator runtime is already installed."
 else
-  echo "No available iOS simulator runtime found; downloading iOS platform."
-  run_with_timeout 900 xcodebuild -downloadPlatform iOS
+  if [[ "$DOWNLOAD_IOS_PLATFORM" == "1" ]]; then
+    echo "No available iOS simulator runtime found; downloading iOS platform."
+    run_with_timeout 900 xcodebuild -downloadPlatform iOS
+  else
+    echo "No available iOS simulator runtime found on this runner image." >&2
+    echo "Set CI_DOWNLOAD_IOS_PLATFORM=1 or pass --download-ios-platform to allow an on-runner download." >&2
+    exit 1
+  fi
 fi
 
 RUNTIME_ID="$(
@@ -136,5 +185,3 @@ if [[ -n "${GITHUB_ENV:-}" ]]; then
   echo "CI_DEVICE_UDID=$DEVICE_UDID" >> "$GITHUB_ENV"
   echo "CI_DESTINATION=platform=iOS Simulator,name=$DEVICE_NAME" >> "$GITHUB_ENV"
 fi
-
-print_diagnostics

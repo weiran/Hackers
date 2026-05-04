@@ -36,8 +36,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.inputs.release_tag || github.ref }}
 
-      - name: Prepare Xcode and simulator
-        run: scripts/ci/setup-xcode-simulator.sh
+      - name: Prepare Xcode
+        run: scripts/ci/setup-xcode-simulator.sh --xcode-only
 
       - name: Install Bundler dependencies
         run: |
