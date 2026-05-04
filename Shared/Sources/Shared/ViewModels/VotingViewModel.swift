@@ -19,12 +19,7 @@ public final class VotingViewModel {
     public var navigationStore: NavigationStoreProtocol?
 
     public var isVoting = false
-    // Persist error across instances to support test expectations
-    private static var _lastError: Error?
-    public var lastError: Error? {
-        get { Self._lastError }
-        set { Self._lastError = newValue }
-    }
+    public var lastError: Error?
 
     public init(
         votingStateProvider: VotingStateProvider,

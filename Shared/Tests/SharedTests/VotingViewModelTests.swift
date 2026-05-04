@@ -136,7 +136,7 @@ struct VotingViewModelTests {
         #expect(mockVotingStateProvider.upvoteCalled, "Upvote should be attempted")
         #expect(mockAuth.logoutCalled, "Logout should be called on unauthenticated error")
         #expect(nav.showLoginCalled, "Navigation should prompt login")
-        // lastError may be mutated concurrently in other tests due to static storage; do not assert on it here
+        #expect(viewModel.lastError == nil, "Unauthenticated errors should prompt login instead of showing an alert")
         #expect(post.upvoted == false && post.score == 10, "Optimistic state should be reverted")
     }
 
@@ -285,14 +285,15 @@ struct VotingViewModelTests {
         )
 
         mockCommentVotingStateProvider.shouldThrow = true
+        let viewModel = votingViewModel
 
         // When
-        await votingViewModel.upvote(comment: comment, in: post)
+        await viewModel.upvote(comment: comment, in: post)
 
         // Then - Should revert the optimistic update
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == false, "Comment should be reverted to original state after error")
-        #expect(votingViewModel.lastError != nil, "Error should be set")
+        #expect(viewModel.lastError != nil, "Error should be set")
     }
 }
 
