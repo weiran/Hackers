@@ -12,6 +12,7 @@
 #   ./run_tests.sh -v                        # Run all modules (verbose)
 #   ./run_tests.sh Domain Data               # Run specific modules (quiet)
 #   ./run_tests.sh -v Feed Comments Settings # Run specific modules (verbose)
+#   ./run_tests.sh Feed Comments Settings    # Feature modules are grouped into one xcodebuild run
 
 set -e  # Exit on any error
 
@@ -236,12 +237,14 @@ run_module_tests() {
     local xcodebuild_args=(test -scheme "$test_scheme" -destination "$DESTINATION")
 
     if [ -n "$only_testing" ]; then
-        xcodebuild_args+=("-only-testing:$only_testing")
+        for test_filter in $only_testing; do
+            xcodebuild_args+=("-only-testing:$test_filter")
+        done
     fi
 
     # Per-module environment resets to avoid cross-module state leakage
     case "$module_name" in
-        WhatsNew)
+        Features|WhatsNew)
             # Ensure a clean suite for whats new defaults
             defaults delete com.weiran.hackers.whatsnew.tests >/dev/null 2>&1 || true
             ;;
@@ -351,7 +354,9 @@ run_module_tests() {
         local test_summary=$(grep -E "Executed [0-9]+ tests|✔.*tests.*passed" "$temp_output" | tail -1)
         local swift_summary=$(grep -E "✔ Test run with [0-9]+ tests" "$temp_output" | tail -1)
 
-        if [ -n "$swift_summary" ]; then
+        if [[ "$only_testing" == *" "* ]]; then
+            print_status $GREEN "✅ ${module_name} tests passed (${duration}s)"
+        elif [ -n "$swift_summary" ]; then
             print_status $GREEN "✅ ${module_name} - $swift_summary (${duration}s)"
         elif [ -n "$test_summary" ]; then
             print_status $GREEN "✅ ${module_name} - $test_summary (${duration}s)"
@@ -405,6 +410,19 @@ validate_module() {
     return 1
 }
 
+# Function to find module metadata by name
+module_metadata() {
+    local module_name=$1
+    for module in "${ALL_MODULES[@]}"; do
+        IFS=':' read -r name path scheme filter <<< "$module"
+        if [ "$name" = "$module_name" ]; then
+            echo "$module"
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Parse command line arguments
 MODULES_TO_RUN=()
 while [[ $# -gt 0 ]]; do
@@ -439,6 +457,33 @@ if [ ${#MODULES_TO_RUN[@]} -eq 0 ]; then
     done
 fi
 
+# Group feature package tests into one xcodebuild invocation when more than one
+# feature module is selected. This avoids repeated Features-Package startup cost
+# while preserving individual module selection for focused runs.
+RUN_GROUPS=()
+feature_module_count=0
+feature_filters=()
+feature_names=()
+
+for module_name in "${MODULES_TO_RUN[@]}"; do
+    module=$(module_metadata "$module_name")
+    IFS=':' read -r name path scheme filter <<< "$module"
+
+    if [ "$scheme" = "Features-Package" ]; then
+        feature_module_count=$((feature_module_count + 1))
+        feature_filters+=("$filter")
+        feature_names+=("$name")
+    else
+        RUN_GROUPS+=("$module")
+    fi
+done
+
+if [ $feature_module_count -eq 1 ]; then
+    RUN_GROUPS=("$(module_metadata "${feature_names[0]}")" "${RUN_GROUPS[@]}")
+elif [ $feature_module_count -gt 1 ]; then
+    RUN_GROUPS=("Features:${BASE_DIR}/Features:Features-Package:${feature_filters[*]}" "${RUN_GROUPS[@]}")
+fi
+
 # Check if we're in the right directory
 if [ ! -d "$BASE_DIR" ]; then
     print_status $RED "Error: Base directory $BASE_DIR not found"
@@ -452,45 +497,41 @@ print_status $CYAN "🚀 Hackers iOS Test Runner"
 print_status $BLUE "📱 Target: iOS Simulator (iPhone 17 Pro)"
 print_status $BLUE "📊 Mode: $([ "$VERBOSE" = true ] && echo "Verbose" || echo "Quiet")"
 print_status $BLUE "📦 Modules: ${MODULES_TO_RUN[*]}"
+if [ ${#RUN_GROUPS[@]} -ne ${#MODULES_TO_RUN[@]} ]; then
+    group_names=()
+    for group in "${RUN_GROUPS[@]}"; do
+        IFS=':' read -r name path scheme filter <<< "$group"
+        group_names+=("$name")
+    done
+    print_status $BLUE "🧩 Test groups: ${group_names[*]}"
+fi
 echo
 
 # Track results
-total_modules=0
-passed_modules=0
-failed_modules=()
+total_groups=0
+passed_groups=0
+failed_groups=()
 overall_start_time=$(date +%s)
 
-# Run tests for selected modules
-for module_name in "${MODULES_TO_RUN[@]}"; do
-    # Find the module path
-    module_path=""
-    test_scheme=""
-    only_testing=""
-    for module in "${ALL_MODULES[@]}"; do
-        IFS=':' read -r name path scheme filter <<< "$module"
-        if [ "$name" = "$module_name" ]; then
-            module_path="$path"
-            test_scheme="$scheme"
-            only_testing="$filter"
-            break
-        fi
-    done
+# Run tests for selected groups
+for group in "${RUN_GROUPS[@]}"; do
+    IFS=':' read -r module_name module_path test_scheme only_testing <<< "$group"
 
     if [ -z "$module_path" ]; then
-        print_status $RED "Error: Could not find path for module $module_name"
+        print_status $RED "Error: Could not find path for test group $module_name"
         continue
     fi
 
-    total_modules=$((total_modules + 1))
+    total_groups=$((total_groups + 1))
 
     if run_module_tests "$module_name" "$module_path" "$test_scheme" "$only_testing"; then
-        passed_modules=$((passed_modules + 1))
+        passed_groups=$((passed_groups + 1))
     else
         # If interrupted, stop the loop immediately
         if [ "$INTERRUPTED" = true ]; then
             break
         fi
-        failed_modules+=("$module_name")
+        failed_groups+=("$module_name")
     fi
 
     echo
@@ -512,17 +553,17 @@ echo "================================================================"
 print_status $CYAN "📊 FINAL TEST SUMMARY"
 echo "================================================================"
 print_status $BLUE "⏱️  Total duration: ${total_duration}s"
-print_status $BLUE "🎯 Success rate: ${passed_modules}/${total_modules} modules"
+print_status $BLUE "🎯 Success rate: ${passed_groups}/${total_groups} test groups"
 
-if [ ${#failed_modules[@]} -eq 0 ]; then
+if [ ${#failed_groups[@]} -eq 0 ]; then
     print_status $GREEN "🎉 All tests passed successfully!"
-    print_status $GREEN "✨ ${total_modules}/${total_modules} modules completed"
+    print_status $GREEN "✨ ${passed_groups}/${total_groups} test groups completed"
     exit 0
 else
     echo
-    print_status $RED "❌ Failed modules (${#failed_modules[@]}):"
-    for failed_module in "${failed_modules[@]}"; do
-        print_status $RED "   • ${failed_module}"
+    print_status $RED "❌ Failed test groups (${#failed_groups[@]}):"
+    for failed_group in "${failed_groups[@]}"; do
+        print_status $RED "   • ${failed_group}"
     done
     echo
     print_status $YELLOW "💡 Tips:"
