@@ -1,6 +1,6 @@
 # Hackers — Hacker News for iOS & iPadOS
 
-[![Made with Swift](https://img.shields.io/badge/Swift-6.2-orange.svg?logo=swift&logoColor=white)](https://swift.org) ![Platform](https://img.shields.io/badge/platforms-iOS%20%7C%20iPadOS%20%7C%20macOS%20(Apple%20Silicon)%20%7C%20visionOS-blue) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![TestFlight](https://img.shields.io/badge/TestFlight-Beta-blue)](https://testflight.apple.com/join/UDLeEQde) [![CI](https://github.com/weiran/Hackers/actions/workflows/ci.yml/badge.svg)](https://github.com/weiran/Hackers/actions/workflows/ci.yml)
+[![Made with Swift](https://img.shields.io/badge/Swift-6.2-orange.svg?logo=swift&logoColor=white)](https://swift.org) ![Platform](https://img.shields.io/badge/platforms-iOS%20%7C%20iPadOS%20%7C%20macOS%20(Apple%20Silicon)%20%7C%20visionOS-blue) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![TestFlight](https://img.shields.io/badge/TestFlight-Beta-blue)](https://testflight.apple.com/join/UDLeEQde) [![CI](https://github.com/weiran/Hackers/actions/workflows/pr.yml/badge.svg)](https://github.com/weiran/Hackers/actions/workflows/pr.yml)
 
 Hackers is a fast, elegant, and accessible way to read [Hacker News](https://news.ycombinator.com) on iPhone and iPad.  
 It’s **open source (MIT)**, rebuilt from the ground up in **version 5.0**, and obsessively focused on performance, readability, and accessibility.
@@ -32,15 +32,12 @@ Requires **iOS/iPadOS 26 or later**. Also runs on Apple Silicon Macs and visionO
 
 ---
 
-## 🆕 What’s New in 5.0
+## 🆕 What’s New
 
-- Complete rewrite with modern iOS frameworks  
-- Cleaner UI and smoother navigation  
-- New *Active* feed  
-- Faster pagination and rendering  
-- Improved comment collapsing/expanding  
-- Accessibility upgrades across the app  
-- Foundation laid for future features and stability  
+- Modern SwiftUI reading experience with feed, comments, bookmarks, search, and voting  
+- Embedded browser with an optional comments drawer  
+- iPad split-view support, Share Extension, Apple Silicon Mac, and visionOS support  
+- Dynamic Type, VoiceOver, dark mode, and high-contrast-friendly styling  
 
 See the full changelog on the [Releases page](../../releases).  
 

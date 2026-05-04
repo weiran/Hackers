@@ -8,7 +8,7 @@
 import Domain
 import SwiftUI
 
-fileprivate struct PillConfiguration {
+private struct PillConfiguration {
     let iconName: String?
     let text: String
     let textColor: Color
