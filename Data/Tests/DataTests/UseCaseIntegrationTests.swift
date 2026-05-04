@@ -1,6 +1,6 @@
 //
-//  UseCaseTests.swift
-//  DomainTests
+//  UseCaseIntegrationTests.swift
+//  DataTests
 //
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
