@@ -12,10 +12,15 @@ import SwiftSoup
 
 public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     private let networkManager: NetworkManagerProtocol
+    private let userDefaults: UserDefaultsProtocol
     private let urlBase = "https://news.ycombinator.com"
 
-    public init(networkManager: NetworkManagerProtocol) {
+    public init(
+        networkManager: NetworkManagerProtocol,
+        userDefaults: UserDefaultsProtocol = UserDefaults.standard
+    ) {
         self.networkManager = networkManager
+        self.userDefaults = userDefaults
     }
 
     public func authenticate(username: String, password: String) async throws {
@@ -41,9 +46,7 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         }
 
         // Store username locally for reference
-        UserDefaults.standard.set(username, forKey: "hn_username")
-
-        print("🔍 AuthenticationRepository: Login successful for user: \(username)")
+        userDefaults.set(username, forKey: "hn_username")
     }
 
     public func logout() async throws {
@@ -51,9 +54,7 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         networkManager.clearCookies()
 
         // Clear stored username
-        UserDefaults.standard.removeObject(forKey: "hn_username")
-
-        print("🔍 AuthenticationRepository: Logged out successfully")
+        userDefaults.set(nil, forKey: "hn_username")
     }
 
     public func isAuthenticated() async -> Bool {
@@ -61,13 +62,13 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         guard let hnURL = URL(string: urlBase) else { return false }
 
         let hasCookies = networkManager.containsCookie(for: hnURL)
-        let hasStoredUsername = UserDefaults.standard.string(forKey: "hn_username") != nil
+        let hasStoredUsername = userDefaults.string(forKey: "hn_username") != nil
 
         return hasCookies && hasStoredUsername
     }
 
     public func getCurrentUser() async -> User? {
-        guard let username = UserDefaults.standard.string(forKey: "hn_username") else {
+        guard let username = userDefaults.string(forKey: "hn_username") else {
             return nil
         }
 

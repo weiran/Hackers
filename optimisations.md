@@ -1,8 +1,8 @@
 ## Comments Screen Performance Optimisations
 
-### 1. Move Comment Fetching off the Main Actor
-- **Problem**: `LoadingStateManager.performLoad()` runs under `@MainActor`, so `CommentsViewModel.fetchComments()` performs HTML downloads and parsing on the main thread, stalling the UI for ~7 s (`Shared/Sources/Shared/LoadingStateManager.swift`).
-- **Improvement**: Run `loadData` inside a detached task (or drop `@MainActor` until the data is ready) and hop back to `MainActor` only to publish state. This frees the UI thread while comments load.
+### 1. Keep Comment Fetching off the Main Actor
+- **Current state**: `LoadingStateManager.performLoad()` now executes its loader in a detached task and publishes the result back to observable state (`Shared/Sources/Shared/LoadingStateManager.swift`).
+- **Next improvement**: Continue profiling comment loads to confirm expensive HTML parsing and attributed text work stay off the main actor as the comments pipeline evolves.
 
 ### 2. Avoid Re-parsing the Post HTML
 - **Problem**: `PostRepository.makePost` calls `comments(from:)` with the raw HTML, causing SwiftSoup to parse the entire document a second time (~2.7 s) even though a `Document` was already created (`Data/Sources/Data/PostRepository.swift`, `Data/Sources/Data/PostRepository+Parsing.swift`).
