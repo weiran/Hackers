@@ -281,8 +281,11 @@ run_module_tests() {
     # Record child PID for cleanup on Ctrl-C
     CURRENT_CHILD_PID=$child_pid
 
-    # Wait for completion capturing non-zero without tripping set -e
-    if ! wait "$child_pid"; then
+    # Wait for completion capturing the real xcodebuild status without tripping set -e.
+    # Do not use `if ! wait ...`; `$?` would be the negated status, masking crashes.
+    if wait "$child_pid"; then
+        exit_code=0
+    else
         exit_code=$?
     fi
 
@@ -302,6 +305,7 @@ run_module_tests() {
     local has_xctest_fail=1
     local has_compilation_error=1
     local has_pass_summary=1
+    local has_process_crash=1
     if grep -qE "(^|[[:space:]])✘ |failed after [0-9.]+ seconds with [0-9]+ issue|recorded an issue at|✘ Test run with [0-9]+ tests .* failed" "$temp_output"; then
         has_swift_fail=0
     fi
@@ -314,12 +318,26 @@ run_module_tests() {
     if grep -qE "✔ Test run with [0-9]+ tests in [0-9]+ suites passed|Test Suite '.*' passed" "$temp_output"; then
         has_pass_summary=0
     fi
-    # If xcodebuild failed but there are no actual failing tests recorded and no compilation errors, treat as success
-    if [ "${exit_code:-0}" -ne 0 ] && [ $has_swift_fail -ne 0 ] && [ $has_xctest_fail -ne 0 ] && [ $has_compilation_error -ne 0 ]; then
-        exit_code=0
+    if [ "${exit_code:-0}" -ge 128 ] || grep -qiE "segmentation fault|abort trap|bus error|trace/bpt trap|killed:|crashed" "$temp_output"; then
+        has_process_crash=0
     fi
-    # If we detected real test failures or compilation errors, force a non-zero exit code
-    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ] || [ $has_compilation_error -eq 0 ]; then
+
+    # If xcodebuild failed without a test/build failure, only normalize to success when
+    # the output contains a definitive pass summary and the process itself did not crash.
+    if [ "${exit_code:-0}" -ne 0 ]; then
+        if [ $has_swift_fail -ne 0 ] && \
+           [ $has_xctest_fail -ne 0 ] && \
+           [ $has_compilation_error -ne 0 ] && \
+           [ $has_pass_summary -eq 0 ] && \
+           [ $has_process_crash -ne 0 ]; then
+            exit_code=0
+        else
+            exit_code=1
+        fi
+    fi
+
+    # If we detected real test failures, compilation errors, or a tool crash, force failure.
+    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ] || [ $has_compilation_error -eq 0 ] || [ $has_process_crash -eq 0 ]; then
         exit_code=1
     fi
 
@@ -359,6 +377,10 @@ run_module_tests() {
 
         # Parse and display specific failures
         parse_test_failures "$temp_output" "$module_name"
+
+        if [ $has_process_crash -eq 0 ]; then
+            print_status $RED "   💥 xcodebuild crashed or was terminated unexpectedly"
+        fi
 
         # If not verbose, show last few lines for context
         if [ "$VERBOSE" = false ]; then
