@@ -144,8 +144,11 @@ struct CommentsViewModelTests {
             await sut.loadComments()
         }
 
-        // Brief delay to ensure first load has started
-        try? await Task.sleep(for: .milliseconds(10))
+        // Wait until the first load has definitely entered the loading state.
+        for _ in 0..<100 where !sut.isLoading {
+            try? await Task.sleep(for: .milliseconds(1))
+        }
+        #expect(sut.isLoading)
 
         // When - Try to load again while first load is in progress
         await sut.loadComments()
