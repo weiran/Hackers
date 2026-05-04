@@ -90,9 +90,7 @@ struct EmbeddedWebView: View {
     }
 
     var body: some View {
-        WebView(controller.page)
-            .task(id: url) { await load(url) }
-            .task { await monitorNavigations() }
+        content
             .toolbar {
                 if showsToolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -134,6 +132,26 @@ struct EmbeddedWebView: View {
                     Color.clear.frame(height: bottomPanelInsetHeight)
                 }
             }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        #if DEBUG
+        if let article = UITestArticleFixtures.article(for: url) {
+            UITestArticleView(article: article)
+                .accessibilityIdentifier("browser.mockArticle")
+        } else {
+            webView
+        }
+        #else
+        webView
+        #endif
+    }
+
+    private var webView: some View {
+        WebView(controller.page)
+            .task(id: url) { await load(url) }
+            .task { await monitorNavigations() }
     }
 
     private var isPadLayout: Bool {
@@ -213,6 +231,26 @@ struct EmbeddedWebView: View {
     }
 }
 
+#if DEBUG
+private struct UITestArticleView: View {
+    let article: UITestArticleContent
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(article.title)
+                    .font(.title2)
+                    .bold()
+                Text(article.body)
+                    .font(.body)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+        }
+    }
+}
+#endif
+
 struct PostLinkBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     let post: Post
@@ -238,6 +276,7 @@ struct PostLinkBrowserView: View {
                 .transition(.move(edge: .bottom))
             }
         }
+        .accessibilityIdentifier("browser.view")
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .task {

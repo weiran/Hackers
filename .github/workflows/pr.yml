@@ -94,3 +94,30 @@ jobs:
             **/*.xcresult
           if-no-files-found: ignore
           retention-days: 14
+
+  ui-smoke:
+    name: ui smoke
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Prepare Xcode and simulator
+        run: scripts/ci/setup-xcode-simulator.sh
+
+      - name: Run UI smoke tests
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/logs
+          ./run_ui_tests.sh smoke 2>&1 | tee artifacts/logs/ui-smoke.log
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ui-smoke-diagnostics
+          path: |
+            artifacts/logs
+            artifacts/xcresults
+          if-no-files-found: ignore
+          retention-days: 14

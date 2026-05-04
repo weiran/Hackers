@@ -10,12 +10,21 @@ import SwiftUI
 
 @main
 struct HackersApp: App {
-    @State private var navigationStore = NavigationStore()
-    @State private var sessionService = DependencyContainer.shared.makeSessionService()
-    @State private var toastPresenter = DependencyContainer.shared.makeToastPresenter()
+    @State private var navigationStore: NavigationStore
+    @State private var sessionService: SessionService
+    @State private var toastPresenter: ToastPresenter
 
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    init() {
+        #if DEBUG
+        UITestingBootstrap.configureIfNeeded()
+        #endif
+        _navigationStore = State(initialValue: NavigationStore())
+        _sessionService = State(initialValue: DependencyContainer.shared.makeSessionService())
+        _toastPresenter = State(initialValue: DependencyContainer.shared.makeToastPresenter())
+    }
 
     var body: some Scene {
         WindowGroup {

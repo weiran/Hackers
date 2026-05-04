@@ -14,21 +14,53 @@ import os
 public final class DependencyContainer: @unchecked Sendable {
     public static let shared = DependencyContainer()
 
-    struct Overrides: @unchecked Sendable {
-        var postUseCase: (() -> any PostUseCase)?
-        var voteUseCase: (() -> any VoteUseCase)?
-        var commentUseCase: (() -> any CommentUseCase)?
-        var settingsUseCase: (() -> any SettingsUseCase)?
-        var bookmarksUseCase: (() -> any BookmarksUseCase)?
-        var searchUseCase: (() -> any SearchUseCase)?
-        var supportUseCase: (() -> any SupportUseCase)?
-        var votingStateProvider: (() -> any VotingStateProvider)?
-        var commentVotingStateProvider: (() -> any CommentVotingStateProvider)?
-        var authenticationUseCase: (() -> any AuthenticationUseCase)?
-        var whatsNewUseCase: (() -> any WhatsNewUseCase)?
-        var sessionService: (@MainActor () -> SessionService)?
-        var toastPresenter: (@MainActor () -> ToastPresenter)?
-        var bookmarksController: (@MainActor () -> BookmarksController)?
+    public struct Overrides: @unchecked Sendable {
+        public var postUseCase: (() -> any PostUseCase)?
+        public var voteUseCase: (() -> any VoteUseCase)?
+        public var commentUseCase: (() -> any CommentUseCase)?
+        public var settingsUseCase: (() -> any SettingsUseCase)?
+        public var bookmarksUseCase: (() -> any BookmarksUseCase)?
+        public var searchUseCase: (() -> any SearchUseCase)?
+        public var supportUseCase: (() -> any SupportUseCase)?
+        public var votingStateProvider: (() -> any VotingStateProvider)?
+        public var commentVotingStateProvider: (() -> any CommentVotingStateProvider)?
+        public var authenticationUseCase: (() -> any AuthenticationUseCase)?
+        public var whatsNewUseCase: (() -> any WhatsNewUseCase)?
+        public var sessionService: (@MainActor () -> SessionService)?
+        public var toastPresenter: (@MainActor () -> ToastPresenter)?
+        public var bookmarksController: (@MainActor () -> BookmarksController)?
+
+        public init(
+            postUseCase: (() -> any PostUseCase)? = nil,
+            voteUseCase: (() -> any VoteUseCase)? = nil,
+            commentUseCase: (() -> any CommentUseCase)? = nil,
+            settingsUseCase: (() -> any SettingsUseCase)? = nil,
+            bookmarksUseCase: (() -> any BookmarksUseCase)? = nil,
+            searchUseCase: (() -> any SearchUseCase)? = nil,
+            supportUseCase: (() -> any SupportUseCase)? = nil,
+            votingStateProvider: (() -> any VotingStateProvider)? = nil,
+            commentVotingStateProvider: (() -> any CommentVotingStateProvider)? = nil,
+            authenticationUseCase: (() -> any AuthenticationUseCase)? = nil,
+            whatsNewUseCase: (() -> any WhatsNewUseCase)? = nil,
+            sessionService: (@MainActor () -> SessionService)? = nil,
+            toastPresenter: (@MainActor () -> ToastPresenter)? = nil,
+            bookmarksController: (@MainActor () -> BookmarksController)? = nil
+        ) {
+            self.postUseCase = postUseCase
+            self.voteUseCase = voteUseCase
+            self.commentUseCase = commentUseCase
+            self.settingsUseCase = settingsUseCase
+            self.bookmarksUseCase = bookmarksUseCase
+            self.searchUseCase = searchUseCase
+            self.supportUseCase = supportUseCase
+            self.votingStateProvider = votingStateProvider
+            self.commentVotingStateProvider = commentVotingStateProvider
+            self.authenticationUseCase = authenticationUseCase
+            self.whatsNewUseCase = whatsNewUseCase
+            self.sessionService = sessionService
+            self.toastPresenter = toastPresenter
+            self.bookmarksController = bookmarksController
+        }
     }
 
     // Use type-level singletons to guarantee identity across access sites and threads
@@ -137,11 +169,11 @@ public final class DependencyContainer: @unchecked Sendable {
 // MARK: - Testing Support
 
 extension DependencyContainer {
-    static func setOverrides(_ overrides: Overrides?) {
+    public static func setOverrides(_ overrides: Overrides?) {
         self.overrides = overrides
     }
 
-    static func resetOverrides() {
+    public static func resetOverrides() {
         overrides = nil
     }
 }

@@ -174,6 +174,7 @@ private extension FeedView {
         .if(!isSidebar) { view in view.listStyle(.plain) }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .id(selectedPostType)
+        .accessibilityIdentifier("feed.list")
     }
 
     private func postRow(for post: Domain.Post, enablePagination: Bool = true) -> some View {
@@ -210,6 +211,7 @@ private extension FeedView {
         .listRowSeparator(.hidden, edges: .top)
         .listRowSeparator(.visible, edges: .bottom)
         .contextMenu { contextMenuContent(for: post) }
+        .accessibilityIdentifier("feed.post.\(post.id)")
     }
 
     @ViewBuilder
@@ -329,6 +331,7 @@ private extension FeedView {
                 .foregroundStyle(.primary)
         }
         .accessibilityLabel("Settings")
+        .accessibilityIdentifier("settings.button")
     }
 
     private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
@@ -347,6 +350,7 @@ private extension FeedView {
                 }
             }
         }
+        .accessibilityIdentifier("feed.category.\(postType.rawValue)")
     }
 
     private func handlePostTap(post: Domain.Post) {

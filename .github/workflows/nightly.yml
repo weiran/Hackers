@@ -52,6 +52,11 @@ jobs:
           set -o pipefail
           ./run_tests.sh -v 2>&1 | tee artifacts/logs/nightly-tests.log
 
+      - name: Run full UI tests
+        run: |
+          set -o pipefail
+          ./run_ui_tests.sh full 2>&1 | tee artifacts/logs/nightly-ui-tests.log
+
       - name: Upload failure diagnostics
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
