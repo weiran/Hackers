@@ -566,7 +566,6 @@ private struct PostCommentsSheet: View {
             .fill(.background)
     }
 
-
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
         if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
             return insets
@@ -751,7 +750,6 @@ private struct BrowserControlsView: View {
         .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
     }
 
-
     private func controlButton(
         systemName: String,
         isEnabled: Bool = true,
@@ -803,7 +801,7 @@ private struct GlassCircleBackground: ViewModifier {
 }
 
 private enum ControlsHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
     }
@@ -915,7 +913,7 @@ private struct CollapsedPostHeaderLoadingView: View {
 }
 
 private enum CollapsedHeaderHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
     }

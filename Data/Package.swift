@@ -22,7 +22,7 @@ let package = Package(
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Networking"),
-        .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.2")
+        .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.13.4")
     ],
     targets: [
         .target(

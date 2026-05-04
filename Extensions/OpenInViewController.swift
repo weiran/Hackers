@@ -29,7 +29,7 @@ class OpenInViewController: UIViewController {
                             self.close()
                         }
                     } else {
-                        self.error()
+                        Task { @MainActor in self.error() }
                     }
                 },
             )
