@@ -26,6 +26,7 @@ struct SettingsViewModelTests {
         var lastFeedCategory: PostType?
         var textSize: TextSize = .medium
         var compactFeedDesign = false
+        var dimReadPosts = true
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
@@ -45,6 +46,7 @@ struct SettingsViewModelTests {
         mockSettingsUseCase.rememberFeedCategory = true
         mockSettingsUseCase.textSize = .large
         mockSettingsUseCase.compactFeedDesign = true
+        mockSettingsUseCase.dimReadPosts = false
 
         let viewModel = settingsViewModel
 
@@ -54,6 +56,7 @@ struct SettingsViewModelTests {
         #expect(viewModel.rememberFeedCategory == true)
         #expect(viewModel.textSize == .large)
         #expect(viewModel.compactFeedDesign == true)
+        #expect(viewModel.dimReadPosts == false)
     }
 
     @Test("Setting changes persist to use case")
@@ -66,6 +69,7 @@ struct SettingsViewModelTests {
         viewModel.rememberFeedCategory = true
         viewModel.textSize = .large
         viewModel.compactFeedDesign = true
+        viewModel.dimReadPosts = false
 
         #expect(mockSettingsUseCase.safariReaderMode == true)
         #expect(mockSettingsUseCase.linkBrowserMode == .inAppBrowser)
@@ -73,6 +77,7 @@ struct SettingsViewModelTests {
         #expect(mockSettingsUseCase.rememberFeedCategory == true)
         #expect(mockSettingsUseCase.textSize == .large)
         #expect(mockSettingsUseCase.compactFeedDesign == true)
+        #expect(mockSettingsUseCase.dimReadPosts == false)
     }
 
     @Test("Cache usage refresh formats byte count")

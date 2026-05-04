@@ -19,6 +19,11 @@ public protocol BookmarksUseCase: Sendable {
     func toggleBookmark(post: Post) async throws -> Bool
 }
 
+public protocol ReadStatusUseCase: Sendable {
+    func readPostIDs() async -> Set<Int>
+    func markPostRead(id: Int) async
+}
+
 public protocol SearchUseCase: Sendable {
     func searchPosts(query: String) async throws -> [Post]
 }

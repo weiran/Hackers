@@ -26,8 +26,10 @@ struct DependencyContainerTests {
         let stubAuth = StubAuthenticationUseCase()
         let stubWhatsNew = StubWhatsNewUseCase()
         let stubBookmarks = StubBookmarksUseCase()
+        let stubReadStatus = StubReadStatusUseCase()
         let stubSearch = StubSearchUseCase()
         let stubBookmarksController = BookmarksController(bookmarksUseCase: stubBookmarks)
+        let stubReadStatusController = ReadStatusController(readStatusUseCase: stubReadStatus)
         let sessionService = SessionService(authenticationUseCase: stubAuth)
         let toastPresenter = ToastPresenter()
 
@@ -38,6 +40,7 @@ struct DependencyContainerTests {
                 commentUseCase: { stubRepository },
                 settingsUseCase: { stubSettings },
                 bookmarksUseCase: { stubBookmarks },
+                readStatusUseCase: { stubReadStatus },
                 searchUseCase: { stubSearch },
                 votingStateProvider: { stubVoting },
                 commentVotingStateProvider: { stubVoting },
@@ -45,7 +48,8 @@ struct DependencyContainerTests {
                 whatsNewUseCase: { stubWhatsNew },
                 sessionService: { sessionService },
                 toastPresenter: { toastPresenter },
-                bookmarksController: { stubBookmarksController }
+                bookmarksController: { stubBookmarksController },
+                readStatusController: { stubReadStatusController }
             )
         )
 
@@ -56,6 +60,7 @@ struct DependencyContainerTests {
         #expect((container.getCommentUseCase() as? StubPostRepository) === stubRepository)
         #expect((container.getSettingsUseCase() as? StubSettingsUseCase) === stubSettings)
         #expect((container.getBookmarksUseCase() as? StubBookmarksUseCase) === stubBookmarks)
+        #expect((container.getReadStatusUseCase() as? StubReadStatusUseCase) === stubReadStatus)
         #expect((container.getSearchUseCase() as? StubSearchUseCase) === stubSearch)
         #expect((container.getVotingStateProvider() as? StubVotingStateProvider) === stubVoting)
         #expect(
@@ -66,6 +71,7 @@ struct DependencyContainerTests {
         #expect(await container.makeSessionService() === sessionService)
         #expect(await container.makeToastPresenter() === toastPresenter)
         #expect(await container.makeBookmarksController() === stubBookmarksController)
+        #expect(await container.makeReadStatusController() === stubReadStatusController)
 
         DependencyContainer.resetOverrides()
     }
@@ -79,6 +85,7 @@ struct DependencyContainerTests {
         let postUseCase2 = container.getPostUseCase()
         #expect((postUseCase1 as? PostRepository) === (postUseCase2 as? PostRepository))
         #expect((container.getSettingsUseCase() as? SettingsRepository) != nil)
+        #expect((container.getReadStatusUseCase() as? ReadStatusRepository) != nil)
     }
 
     @Test("Default graph shares post repository across protocols")
@@ -133,6 +140,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
+    var dimReadPosts: Bool = true
     func clearCache() {}
     func cacheUsageBytes() async -> Int64 { 0 }
 }
@@ -195,6 +203,18 @@ private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable 
             storedPosts.append(post)
             return true
         }
+    }
+}
+
+private final class StubReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
+    var readIDs: Set<Int> = []
+
+    func readPostIDs() async -> Set<Int> {
+        readIDs
+    }
+
+    func markPostRead(id: Int) async {
+        readIDs.insert(id)
     }
 }
 

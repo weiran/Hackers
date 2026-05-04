@@ -20,6 +20,7 @@ public final class DependencyContainer: @unchecked Sendable {
         public var commentUseCase: (() -> any CommentUseCase)?
         public var settingsUseCase: (() -> any SettingsUseCase)?
         public var bookmarksUseCase: (() -> any BookmarksUseCase)?
+        public var readStatusUseCase: (() -> any ReadStatusUseCase)?
         public var searchUseCase: (() -> any SearchUseCase)?
         public var supportUseCase: (() -> any SupportUseCase)?
         public var votingStateProvider: (() -> any VotingStateProvider)?
@@ -29,6 +30,7 @@ public final class DependencyContainer: @unchecked Sendable {
         public var sessionService: (@MainActor () -> SessionService)?
         public var toastPresenter: (@MainActor () -> ToastPresenter)?
         public var bookmarksController: (@MainActor () -> BookmarksController)?
+        public var readStatusController: (@MainActor () -> ReadStatusController)?
 
         public init(
             postUseCase: (() -> any PostUseCase)? = nil,
@@ -36,6 +38,7 @@ public final class DependencyContainer: @unchecked Sendable {
             commentUseCase: (() -> any CommentUseCase)? = nil,
             settingsUseCase: (() -> any SettingsUseCase)? = nil,
             bookmarksUseCase: (() -> any BookmarksUseCase)? = nil,
+            readStatusUseCase: (() -> any ReadStatusUseCase)? = nil,
             searchUseCase: (() -> any SearchUseCase)? = nil,
             supportUseCase: (() -> any SupportUseCase)? = nil,
             votingStateProvider: (() -> any VotingStateProvider)? = nil,
@@ -44,13 +47,15 @@ public final class DependencyContainer: @unchecked Sendable {
             whatsNewUseCase: (() -> any WhatsNewUseCase)? = nil,
             sessionService: (@MainActor () -> SessionService)? = nil,
             toastPresenter: (@MainActor () -> ToastPresenter)? = nil,
-            bookmarksController: (@MainActor () -> BookmarksController)? = nil
+            bookmarksController: (@MainActor () -> BookmarksController)? = nil,
+            readStatusController: (@MainActor () -> ReadStatusController)? = nil
         ) {
             self.postUseCase = postUseCase
             self.voteUseCase = voteUseCase
             self.commentUseCase = commentUseCase
             self.settingsUseCase = settingsUseCase
             self.bookmarksUseCase = bookmarksUseCase
+            self.readStatusUseCase = readStatusUseCase
             self.searchUseCase = searchUseCase
             self.supportUseCase = supportUseCase
             self.votingStateProvider = votingStateProvider
@@ -60,6 +65,7 @@ public final class DependencyContainer: @unchecked Sendable {
             self.sessionService = sessionService
             self.toastPresenter = toastPresenter
             self.bookmarksController = bookmarksController
+            self.readStatusController = readStatusController
         }
     }
 
@@ -67,6 +73,7 @@ public final class DependencyContainer: @unchecked Sendable {
     private static let networkManager: NetworkManagerProtocol = NetworkManager()
     private static let postRepository: PostRepository = .init(networkManager: networkManager)
     private static let bookmarksRepository: BookmarksRepository = .init()
+    private static let readStatusRepository: ReadStatusRepository = .init()
     private static let searchRepository: SearchRepository = .init()
     private static let settingsRepository: SettingsRepository = .init()
     private static let supportRepository: SupportPurchaseRepository = .init()
@@ -85,6 +92,8 @@ public final class DependencyContainer: @unchecked Sendable {
     private lazy var toastPresenter = ToastPresenter()
     @MainActor
     private lazy var bookmarksController = BookmarksController(bookmarksUseCase: getBookmarksUseCase())
+    @MainActor
+    private lazy var readStatusController = ReadStatusController(readStatusUseCase: getReadStatusUseCase())
 
     private init() {}
 
@@ -106,6 +115,10 @@ public final class DependencyContainer: @unchecked Sendable {
 
     public func getBookmarksUseCase() -> any BookmarksUseCase {
         Self.overrides?.bookmarksUseCase?() ?? Self.bookmarksRepository
+    }
+
+    public func getReadStatusUseCase() -> any ReadStatusUseCase {
+        Self.overrides?.readStatusUseCase?() ?? Self.readStatusRepository
     }
 
     public func getSearchUseCase() -> any SearchUseCase {
@@ -163,6 +176,14 @@ public final class DependencyContainer: @unchecked Sendable {
             return factory()
         }
         return bookmarksController
+    }
+
+    @MainActor
+    public func makeReadStatusController() -> ReadStatusController {
+        if let factory = Self.overrides?.readStatusController {
+            return factory()
+        }
+        return readStatusController
     }
 }
 

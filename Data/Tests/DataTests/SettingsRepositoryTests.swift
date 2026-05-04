@@ -134,6 +134,30 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "ShowThumbnails") == true)
     }
 
+    @Test("Dim read posts default value")
+    func dimReadPostsDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.dimReadPosts == true)
+    }
+
+    @Test("Dim read posts setter and getter")
+    func dimReadPostsSetterAndGetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.dimReadPosts = false
+        #expect(repository.dimReadPosts == false)
+        #expect(mockUserDefaults.bool(forKey: "DimReadPosts") == false)
+
+        repository.dimReadPosts = true
+        #expect(repository.dimReadPosts == true)
+        #expect(mockUserDefaults.bool(forKey: "DimReadPosts") == true)
+    }
+
     // MARK: - Remember Feed Category Tests
 
     @Test("Remember feed category default value")

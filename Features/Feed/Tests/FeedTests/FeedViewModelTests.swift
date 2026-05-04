@@ -279,6 +279,69 @@ struct FeedViewModelTests {
     }
 
     @MainActor
+    @Test("Read status annotates loaded posts")
+    func readStatusAnnotatesLoadedPosts() async {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 12), SampleData.post(id: 13)]))
+        let readStatusUseCase = StubReadStatusUseCase(readIDs: [12])
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            readStatusController: ReadStatusController(readStatusUseCase: readStatusUseCase),
+            searchUseCase: StubSearchUseCase()
+        )
+
+        await viewModel.loadFeed()
+
+        #expect(viewModel.posts.first(where: { $0.id == 12 })?.isRead == true)
+        #expect(viewModel.posts.first(where: { $0.id == 13 })?.isRead == false)
+    }
+
+    @MainActor
+    @Test("Marking post read updates loaded post state")
+    func markingPostReadUpdatesState() async {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 21)]))
+        let readStatusUseCase = StubReadStatusUseCase()
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            readStatusController: ReadStatusController(readStatusUseCase: readStatusUseCase),
+            searchUseCase: StubSearchUseCase()
+        )
+
+        await viewModel.loadFeed()
+        viewModel.markPostRead(viewModel.posts[0])
+        try? await Task.sleep(for: .milliseconds(20))
+
+        #expect(viewModel.posts.first?.isRead == true)
+        #expect(readStatusUseCase.readIDs.contains(21))
+    }
+
+    @MainActor
+    @Test("Dim read posts follows settings changes via notifications")
+    func dimReadPostsSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true, dimReadPosts: true)
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            settingsUseCase: settingsUseCase,
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            readStatusController: ReadStatusController(readStatusUseCase: StubReadStatusUseCase()),
+            searchUseCase: StubSearchUseCase()
+        )
+
+        #expect(viewModel.dimReadPosts == true)
+
+        settingsUseCase.dimReadPosts = false
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.dimReadPosts == false)
+    }
+
+    @MainActor
     @Test("Search query updates results")
     func searchQueryUpdatesResults() async throws {
         let postUseCase = StubPostUseCase()
@@ -402,6 +465,22 @@ private final class StubBookmarksUseCase: BookmarksUseCase, @unchecked Sendable 
     }
 }
 
+private final class StubReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
+    var readIDs: Set<Int>
+
+    init(readIDs: Set<Int> = []) {
+        self.readIDs = readIDs
+    }
+
+    func readPostIDs() async -> Set<Int> {
+        readIDs
+    }
+
+    func markPostRead(id: Int) async {
+        readIDs.insert(id)
+    }
+}
+
 private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
     var nextResults: [Post] = []
     var receivedQueries: [String] = []
@@ -422,15 +501,18 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     private var storedLastFeedCategory: PostType?
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
+    private var storedDimReadPosts: Bool
 
     init(
         showThumbnails: Bool,
         rememberFeedCategory: Bool = false,
-        lastFeedCategory: PostType? = nil
+        lastFeedCategory: PostType? = nil,
+        dimReadPosts: Bool = true
     ) {
         storedShowThumbnails = showThumbnails
         storedRememberFeedCategory = rememberFeedCategory
         storedLastFeedCategory = lastFeedCategory
+        storedDimReadPosts = dimReadPosts
     }
 
     var showThumbnails: Bool {
@@ -456,6 +538,14 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedLastFeedCategory }
         set {
             storedLastFeedCategory = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var dimReadPosts: Bool {
+        get { storedDimReadPosts }
+        set {
+            storedDimReadPosts = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }
