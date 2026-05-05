@@ -189,7 +189,7 @@ struct PostCommentsSheet: View {
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
-        .scrollDisabled(!isExpanded || isTrackingDrag || isHandleDragActive)
+        .scrollDisabled(!isExpanded || dragStartAllowsSheetDrag || isHandleDragActive)
     }
 
     private func expandedTopOverlay(
@@ -428,8 +428,11 @@ private extension PostCommentsSheet {
                 guard !isHandleDragActive else { return }
                 if !isTrackingDrag {
                     dragStartSheetState = sheetState
-                    dragStartAllowsSheetDrag = isCollapsed || isScrollAtTop
+                    dragStartAllowsSheetDrag = isCollapsed
                     isTrackingDrag = true
+                }
+                if isExpanded, isScrollAtTop, value.translation.height > 0 {
+                    dragStartAllowsSheetDrag = true
                 }
                 guard dragStartAllowsSheetDrag else { return }
                 if isCollapsed, value.translation.height < -1 {
