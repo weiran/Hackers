@@ -173,6 +173,7 @@ struct CollapsedPostHeaderView: View {
     let onUpvote: () -> Void
     let onExpand: () -> Void
     let leadingGestureExclusionWidth: CGFloat
+    let disablesUpvote: Bool
     private static let collapsedVerticalPadding: CGFloat = 2
     private static let collapsedHorizontalPadding: CGFloat = 20
     private static let collapsedThumbnailSize: CGFloat = 28
@@ -246,7 +247,7 @@ struct CollapsedPostHeaderView: View {
             )
         }
         .buttonStyle(.plain)
-        .disabled(!canInteract)
+        .disabled(!canInteract || disablesUpvote)
         .opacity(canInteract ? 1 : 0.55)
         .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
     }

@@ -33,6 +33,7 @@ struct PostCommentsSheet: View {
     @State private var isScrollAtTop = true
     @State private var showsExpandedToolbar = false
     @State private var showsExpandedTitle = false
+    @State private var suppressesCollapsedUpvote = false
 
     init(post: Post, controller: BrowserController, onDismiss: @MainActor @escaping () -> Void) {
         _viewModel = State(initialValue: CommentsViewModel(post: post))
@@ -321,7 +322,8 @@ struct PostCommentsSheet: View {
                 isLoading: viewModel.isLoading,
                 onUpvote: { handleCollapsedUpvote(for: post) },
                 onExpand: onExpand,
-                leadingGestureExclusionWidth: systemBackGestureEdgeWidth
+                leadingGestureExclusionWidth: systemBackGestureEdgeWidth,
+                disablesUpvote: suppressesCollapsedUpvote
             )
         } else {
             CollapsedPostHeaderLoadingView()
@@ -329,6 +331,7 @@ struct PostCommentsSheet: View {
     }
 
     private func handleCollapsedUpvote(for post: Post) {
+        guard !suppressesCollapsedUpvote else { return }
         let state = votingViewModel.votingState(for: post)
         guard !state.isVoting else { return }
         let canUpvote = state.canVote && !state.isUpvoted
@@ -437,6 +440,7 @@ private extension PostCommentsSheet {
                     dragStartSheetState = sheetState
                     dragStartAllowsSheetDrag = isCollapsed
                     isTrackingDrag = true
+                    suppressesCollapsedUpvote = true
                 }
                 if isExpanded,
                    isScrollAtTop,
@@ -473,6 +477,7 @@ private extension PostCommentsSheet {
                 guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
                 if !isHandleDragActive {
                     dragStartSheetState = sheetState
+                    suppressesCollapsedUpvote = true
                 }
                 isHandleDragActive = true
                 if isCollapsed, value.translation.height < -1 {
@@ -515,6 +520,7 @@ private extension PostCommentsSheet {
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
         dragStartSheetState = nil
+        scheduleCollapsedUpvoteReenable()
     }
 
     private func scheduleCollapsedPresentation() {
@@ -534,6 +540,14 @@ private extension PostCommentsSheet {
         dragStartAllowsSheetDrag = false
         dragStartSheetState = nil
         dragTranslation = 0
+        scheduleCollapsedUpvoteReenable()
+    }
+
+    private func scheduleCollapsedUpvoteReenable() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.sheetAnimationDuration) {
+            guard !isTrackingDrag, !isHandleDragActive else { return }
+            suppressesCollapsedUpvote = false
+        }
     }
 }
 
