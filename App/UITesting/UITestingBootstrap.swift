@@ -177,14 +177,33 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         try await getPost(id: post.id).comments ?? []
     }
 
-    func searchPosts(query: String) async throws -> [Post] {
+    func searchPosts(
+        query: String,
+        sort _: SearchSort,
+        dateRange _: SearchDateRange,
+        page: Int,
+        hitsPerPage: Int
+    ) async throws -> SearchResultsPage {
         let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !normalizedQuery.isEmpty else { return [] }
-        return posts.filter { post in
+        guard !normalizedQuery.isEmpty else {
+            return SearchResultsPage(posts: [], page: page, totalPages: 0, totalResults: 0, hasMore: false)
+        }
+        let matches = posts.filter { post in
             post.title.lowercased().contains(normalizedQuery)
                 || post.by.lowercased().contains(normalizedQuery)
                 || post.url.host?.lowercased().contains(normalizedQuery) == true
         }
+        let pageSize = max(hitsPerPage, 1)
+        let start = page * pageSize
+        let pagePosts = start < matches.count ? Array(matches.dropFirst(start).prefix(pageSize)) : []
+        let totalPages = Int(ceil(Double(matches.count) / Double(pageSize)))
+        return SearchResultsPage(
+            posts: pagePosts,
+            page: page,
+            totalPages: totalPages,
+            totalResults: matches.count,
+            hasMore: page + 1 < totalPages
+        )
     }
 
     private var askPost: Post {

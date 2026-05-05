@@ -25,5 +25,40 @@ public protocol ReadStatusUseCase: Sendable {
 }
 
 public protocol SearchUseCase: Sendable {
-    func searchPosts(query: String) async throws -> [Post]
+    func searchPosts(
+        query: String,
+        sort: SearchSort,
+        dateRange: SearchDateRange,
+        page: Int,
+        hitsPerPage: Int
+    ) async throws -> SearchResultsPage
+}
+
+public enum SearchSort: String, CaseIterable, Sendable {
+    case popular
+    case recent
+}
+
+public enum SearchDateRange: String, CaseIterable, Sendable {
+    case allTime
+    case last24Hours
+    case pastWeek
+    case pastMonth
+    case pastYear
+}
+
+public struct SearchResultsPage: Sendable, Equatable {
+    public let posts: [Post]
+    public let page: Int
+    public let totalPages: Int
+    public let totalResults: Int
+    public let hasMore: Bool
+
+    public init(posts: [Post], page: Int, totalPages: Int, totalResults: Int, hasMore: Bool) {
+        self.posts = posts
+        self.page = page
+        self.totalPages = totalPages
+        self.totalResults = totalResults
+        self.hasMore = hasMore
+    }
 }

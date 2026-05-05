@@ -219,5 +219,13 @@ private final class StubReadStatusUseCase: ReadStatusUseCase, @unchecked Sendabl
 }
 
 private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
-    func searchPosts(query _: String) async throws -> [Post] { [] }
+    func searchPosts(
+        query _: String,
+        sort _: SearchSort,
+        dateRange _: SearchDateRange,
+        page: Int,
+        hitsPerPage _: Int
+    ) async throws -> SearchResultsPage {
+        SearchResultsPage(posts: [], page: page, totalPages: 0, totalResults: 0, hasMore: false)
+    }
 }

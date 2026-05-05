@@ -35,6 +35,8 @@ public final class FeedViewModel: @unchecked Sendable {
     private var readStatusObservation: AnyCancellable?
     private var searchTask: Task<Void, Never>?
     private var rememberFeedCategorySetting: Bool
+    private var searchResultIds: Set<Int> = Set()
+    private let searchHitsPerPage = 20
 
     public var posts: [Domain.Post] { feedLoader.data }
     public var isLoading: Bool { feedLoader.isLoading }
@@ -45,7 +47,12 @@ public final class FeedViewModel: @unchecked Sendable {
     public var searchQuery: String = ""
     public var searchResults: [Domain.Post] = []
     public var isSearchInProgress = false
+    public var isLoadingMoreSearchResults = false
     public var searchError: Error?
+    public var searchSort: SearchSort = .popular
+    public var searchDateRange: SearchDateRange = .allTime
+    public var searchPage = 0
+    public var canLoadMoreSearchResults = false
     public var hasActiveSearch: Bool {
         !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -285,35 +292,104 @@ public final class FeedViewModel: @unchecked Sendable {
         searchTask?.cancel()
         searchQuery = query
         searchError = nil
+        isLoadingMoreSearchResults = false
 
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             isSearchInProgress = false
             searchResults = []
+            searchResultIds = Set()
+            searchPage = 0
+            canLoadMoreSearchResults = false
             return
         }
 
+        searchPage = 0
+        canLoadMoreSearchResults = false
+        searchResultIds = Set()
+        searchResults = []
         isSearchInProgress = true
-        let currentQuery = query
+        loadSearchPage(query: trimmed, page: 0, replaceResults: true)
+    }
+
+    @MainActor
+    public func updateSearchSort(_ sort: SearchSort) {
+        guard searchSort != sort else { return }
+        searchSort = sort
+        guard hasActiveSearch else { return }
+        updateSearchQuery(searchQuery)
+    }
+
+    @MainActor
+    public func updateSearchDateRange(_ dateRange: SearchDateRange) {
+        guard searchDateRange != dateRange else { return }
+        searchDateRange = dateRange
+        guard hasActiveSearch else { return }
+        updateSearchQuery(searchQuery)
+    }
+
+    @MainActor
+    public func loadNextSearchPage() async {
+        guard hasActiveSearch,
+              canLoadMoreSearchResults,
+              !isSearchInProgress,
+              !isLoadingMoreSearchResults
+        else { return }
+
+        isLoadingMoreSearchResults = true
+        searchError = nil
+        let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        loadSearchPage(query: trimmed, page: searchPage + 1, replaceResults: false)
+    }
+
+    private func loadSearchPage(query: String, page: Int, replaceResults: Bool) {
+        let currentSort = searchSort
+        let currentDateRange = searchDateRange
         searchTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let results = try await self.searchUseCase.searchPosts(query: currentQuery)
+                let resultsPage = try await self.searchUseCase.searchPosts(
+                    query: query,
+                    sort: currentSort,
+                    dateRange: currentDateRange,
+                    page: page,
+                    hitsPerPage: self.searchHitsPerPage
+                )
                 if Task.isCancelled { return }
                 await self.bookmarksController.refreshBookmarks()
                 await self.readStatusController.refreshReadStatus()
                 let annotated = await MainActor.run {
-                    self.annotatedPosts(from: results)
+                    self.annotatedPosts(from: resultsPage.posts)
                 }
                 await MainActor.run {
-                    self.searchResults = annotated
+                    if replaceResults {
+                        self.searchResultIds = Set()
+                        self.searchResults = []
+                    }
+                    let uniquePosts = annotated.filter { post in
+                        if self.searchResultIds.contains(post.id) {
+                            return false
+                        }
+                        self.searchResultIds.insert(post.id)
+                        return true
+                    }
+                    self.searchResults.append(contentsOf: uniquePosts)
+                    self.searchPage = resultsPage.page
+                    self.canLoadMoreSearchResults = resultsPage.hasMore
                     self.isSearchInProgress = false
+                    self.isLoadingMoreSearchResults = false
+                    self.searchError = nil
                 }
             } catch {
                 if Task.isCancelled { return }
                 await MainActor.run {
-                    self.searchResults = []
+                    if replaceResults {
+                        self.searchResults = []
+                        self.searchResultIds = Set()
+                    }
                     self.isSearchInProgress = false
+                    self.isLoadingMoreSearchResults = false
+                    self.canLoadMoreSearchResults = false
                     self.searchError = error
                 }
             }

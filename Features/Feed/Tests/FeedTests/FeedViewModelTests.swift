@@ -367,16 +367,154 @@ struct FeedViewModelTests {
         #expect(viewModel.hasActiveSearch)
         #expect(viewModel.isSearchInProgress == false)
     }
+
+    @MainActor
+    @Test("Loading next search page appends unique results")
+    func loadingNextSearchPageAppendsUniqueResults() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1), SampleData.post(id: 2)], page: 0, totalPages: 2)
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 2), SampleData.post(id: 3)], page: 1, totalPages: 2)
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+        await viewModel.loadNextSearchPage()
+        #expect(await waitForSearchCompletion(of: viewModel))
+
+        #expect(viewModel.searchResults.map(\.id) == [1, 2, 3])
+        #expect(viewModel.searchPage == 1)
+        #expect(viewModel.canLoadMoreSearchResults == false)
+        #expect(searchUseCase.receivedRequests.map(\.page) == [0, 1])
+    }
+
+    @MainActor
+    @Test("Search final page disables loading more")
+    func searchFinalPageDisablesLoadingMore() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1)], page: 0, totalPages: 1)
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+
+        #expect(viewModel.canLoadMoreSearchResults == false)
+    }
+
+    @MainActor
+    @Test("Changing search filters resets results and page")
+    func changingSearchFiltersResetsResultsAndPage() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1)], page: 0, totalPages: 2)
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 2)], page: 1, totalPages: 2)
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 9)], page: 0, totalPages: 1)
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+        await viewModel.loadNextSearchPage()
+        #expect(await waitForSearchCompletion(of: viewModel))
+        viewModel.updateSearchSort(.recent)
+        #expect(viewModel.searchResults.isEmpty)
+        #expect(viewModel.searchPage == 0)
+        #expect(await waitForSearchCompletion(of: viewModel))
+
+        #expect(viewModel.searchResults.map(\.id) == [9])
+        #expect(searchUseCase.receivedRequests.map(\.sort) == [.popular, .popular, .recent])
+        #expect(searchUseCase.receivedRequests.map(\.page) == [0, 1, 0])
+    }
+
+    @MainActor
+    @Test("Blank search query clears search state")
+    func blankSearchQueryClearsSearchState() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1)], page: 0, totalPages: 2)
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+        viewModel.updateSearchQuery("   ")
+
+        #expect(viewModel.hasActiveSearch == false)
+        #expect(viewModel.searchResults.isEmpty)
+        #expect(viewModel.canLoadMoreSearchResults == false)
+        #expect(viewModel.isSearchInProgress == false)
+        #expect(viewModel.isLoadingMoreSearchResults == false)
+    }
+
+    @MainActor
+    @Test("First page search error clears results")
+    func firstPageSearchErrorClearsResults() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1)], page: 0, totalPages: 1)
+        searchUseCase.enqueue(.failure(StubError.network))
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+        viewModel.updateSearchQuery("kotlin")
+        #expect(await waitForSearchCompletion(of: viewModel))
+
+        #expect(viewModel.searchResults.isEmpty)
+        #expect(viewModel.searchError is StubError)
+    }
+
+    @MainActor
+    @Test("Next page search error preserves existing results")
+    func nextPageSearchErrorPreservesExistingResults() async throws {
+        let searchUseCase = StubSearchUseCase()
+        searchUseCase.enqueuePage(posts: [SampleData.post(id: 1)], page: 0, totalPages: 2)
+        searchUseCase.enqueue(.failure(StubError.network))
+        let viewModel = FeedViewModel(
+            postUseCase: StubPostUseCase(),
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase()),
+            searchUseCase: searchUseCase
+        )
+
+        viewModel.updateSearchQuery("swift")
+        #expect(await waitForSearchCompletion(of: viewModel))
+        await viewModel.loadNextSearchPage()
+        #expect(await waitForSearchCompletion(of: viewModel))
+
+        #expect(viewModel.searchResults.map(\.id) == [1])
+        #expect(viewModel.searchError is StubError)
+        #expect(viewModel.isLoadingMoreSearchResults == false)
+    }
 }
 
 @MainActor
 private func waitForSearchCompletion(of viewModel: FeedViewModel, timeout: TimeInterval = 1, pollInterval: TimeInterval = 0.01) async -> Bool {
     let deadline = Date().addingTimeInterval(timeout)
-    while viewModel.isSearchInProgress && Date() < deadline {
+    while (viewModel.isSearchInProgress || viewModel.isLoadingMoreSearchResults) && Date() < deadline {
         let nanos = UInt64(pollInterval * 1_000_000_000)
         try? await Task.sleep(for: .nanoseconds(nanos))
     }
-    return viewModel.isSearchInProgress == false
+    return viewModel.isSearchInProgress == false && viewModel.isLoadingMoreSearchResults == false
 }
 
 // MARK: - Test Doubles
@@ -484,13 +622,65 @@ private final class StubReadStatusUseCase: ReadStatusUseCase, @unchecked Sendabl
 private final class StubSearchUseCase: SearchUseCase, @unchecked Sendable {
     var nextResults: [Post] = []
     var receivedQueries: [String] = []
+    var receivedRequests: [SearchRequest] = []
     var shouldThrow = false
+    private var responses: [Result<SearchResultsPage, Error>] = []
 
-    func searchPosts(query: String) async throws -> [Post] {
-        receivedQueries.append(query)
-        if shouldThrow { throw StubError.network }
-        return nextResults
+    func enqueue(_ result: Result<SearchResultsPage, Error>) {
+        responses.append(result)
     }
+
+    func enqueuePage(posts: [Post], page: Int, totalPages: Int, totalResults: Int? = nil) {
+        responses.append(.success(SearchResultsPage(
+            posts: posts,
+            page: page,
+            totalPages: totalPages,
+            totalResults: totalResults ?? posts.count,
+            hasMore: page + 1 < totalPages
+        )))
+    }
+
+    func searchPosts(
+        query: String,
+        sort: SearchSort,
+        dateRange: SearchDateRange,
+        page: Int,
+        hitsPerPage: Int
+    ) async throws -> SearchResultsPage {
+        receivedQueries.append(query)
+        receivedRequests.append(SearchRequest(
+            query: query,
+            sort: sort,
+            dateRange: dateRange,
+            page: page,
+            hitsPerPage: hitsPerPage
+        ))
+        if shouldThrow { throw StubError.network }
+        if !responses.isEmpty {
+            let result = responses.removeFirst()
+            switch result {
+            case let .success(page):
+                return page
+            case let .failure(error):
+                throw error
+            }
+        }
+        return SearchResultsPage(
+            posts: nextResults,
+            page: page,
+            totalPages: 1,
+            totalResults: nextResults.count,
+            hasMore: false
+        )
+    }
+}
+
+private struct SearchRequest {
+    let query: String
+    let sort: SearchSort
+    let dateRange: SearchDateRange
+    let page: Int
+    let hitsPerPage: Int
 }
 
 private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {

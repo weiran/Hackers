@@ -42,7 +42,9 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
             .toolbarTitleMenu {
-                postTypeTitleMenu
+                if !viewModel.hasActiveSearch {
+                    postTypeTitleMenu
+                }
             }
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
@@ -142,10 +144,19 @@ private extension FeedView {
 
     @ViewBuilder
     private var searchContentView: some View {
-        if viewModel.isSearchInProgress {
+        VStack(spacing: 0) {
+            searchFilterBar
+            Divider()
+            searchResultsContent
+        }
+    }
+
+    @ViewBuilder
+    private var searchResultsContent: some View {
+        if viewModel.isSearchInProgress && viewModel.searchResults.isEmpty {
             ProgressView("Searching...")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let error = viewModel.searchError {
+        } else if let error = viewModel.searchError, viewModel.searchResults.isEmpty {
             AppEmptyStateView(
                 iconSystemName: "exclamationmark.triangle",
                 title: "Search Failed",
@@ -160,14 +171,25 @@ private extension FeedView {
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            feedListView(posts: viewModel.searchResults, enablePagination: false)
+            feedListView(posts: viewModel.searchResults, enablePagination: false, enableSearchPagination: true)
         }
     }
 
-    private func feedListView(posts: [Domain.Post], enablePagination: Bool) -> some View {
+    private func feedListView(
+        posts: [Domain.Post],
+        enablePagination: Bool,
+        enableSearchPagination: Bool = false
+    ) -> some View {
         List(selection: selectionBinding) {
             ForEach(posts, id: \.id) { post in
-                postRow(for: post, enablePagination: enablePagination)
+                postRow(
+                    for: post,
+                    enablePagination: enablePagination,
+                    enableSearchPagination: enableSearchPagination
+                )
+            }
+            if enableSearchPagination {
+                searchPaginationFooter
             }
         }
         .if(isSidebar) { view in view.listStyle(.sidebar) }
@@ -177,7 +199,11 @@ private extension FeedView {
         .accessibilityIdentifier("feed.list")
     }
 
-    private func postRow(for post: Domain.Post, enablePagination: Bool = true) -> some View {
+    private func postRow(
+        for post: Domain.Post,
+        enablePagination: Bool = true,
+        enableSearchPagination: Bool = false
+    ) -> some View {
         PostRowView(
             post: post,
             votingViewModel: votingViewModel,
@@ -197,10 +223,14 @@ private extension FeedView {
             view.tag(post.id)
         }
         .onAppear {
-            guard enablePagination else { return }
-            if post == viewModel.posts.last {
+            if enablePagination, post == viewModel.posts.last {
                 Task {
                     await viewModel.loadNextPage()
+                }
+            }
+            if enableSearchPagination, post == viewModel.searchResults.last {
+                Task {
+                    await viewModel.loadNextSearchPage()
                 }
             }
         }
@@ -335,6 +365,81 @@ private extension FeedView {
         .accessibilityIdentifier("settings.button")
     }
 
+    private var searchSortMenu: some View {
+        Menu {
+            ForEach(SearchSort.allCases, id: \.self) { sort in
+                Button {
+                    viewModel.updateSearchSort(sort)
+                } label: {
+                    HStack {
+                        Text(sort.displayName)
+                        if sort == viewModel.searchSort {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Label(viewModel.searchSort.displayName, systemImage: "arrow.up.arrow.down")
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .accessibilityIdentifier("search.sort.menu")
+    }
+
+    private var searchDateRangeMenu: some View {
+        Menu {
+            ForEach(SearchDateRange.allCases, id: \.self) { dateRange in
+                Button {
+                    viewModel.updateSearchDateRange(dateRange)
+                } label: {
+                    HStack {
+                        Text(dateRange.displayName)
+                        if dateRange == viewModel.searchDateRange {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Label(viewModel.searchDateRange.displayName, systemImage: "calendar")
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .accessibilityIdentifier("search.date.menu")
+    }
+
+    private var searchFilterBar: some View {
+        HStack(spacing: 12) {
+            searchSortMenu
+            searchDateRangeMenu
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.bar)
+    }
+
+    @ViewBuilder
+    private var searchPaginationFooter: some View {
+        if viewModel.isLoadingMoreSearchResults {
+            HStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+            .listRowSeparator(.hidden)
+        } else if let error = viewModel.searchError, !viewModel.searchResults.isEmpty {
+            Text(error.localizedDescription)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .listRowSeparator(.hidden)
+        }
+    }
+
     private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
         Button {
             selectedPostType = postType
@@ -395,5 +500,33 @@ private extension FeedView {
     private func shouldShowVoteActions(for post: Domain.Post) -> Bool {
         (post.voteLinks?.upvote != nil && !post.upvoted)
             || (post.voteLinks?.unvote != nil && post.upvoted)
+    }
+}
+
+private extension SearchSort {
+    var displayName: String {
+        switch self {
+        case .popular:
+            "Popular"
+        case .recent:
+            "Recent"
+        }
+    }
+}
+
+private extension SearchDateRange {
+    var displayName: String {
+        switch self {
+        case .allTime:
+            "All Time"
+        case .last24Hours:
+            "Last 24 Hours"
+        case .pastWeek:
+            "Past Week"
+        case .pastMonth:
+            "Past Month"
+        case .pastYear:
+            "Past Year"
+        }
     }
 }
