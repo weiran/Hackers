@@ -171,7 +171,7 @@ struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset
             )
         }
-        .contentShape(Rectangle())
+        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
         .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
@@ -182,6 +182,7 @@ struct PostCommentsSheet: View {
             showsPostHeader: showsPostHeader,
             allowsRefresh: false,
             showsToolbar: false,
+            controlsNavigationBarVisibility: false,
             topContentInset: topContentInset,
             titleVisible: $showsExpandedTitle,
             isAtTop: $isScrollAtTop,
@@ -293,7 +294,7 @@ struct PostCommentsSheet: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
-        .contentShape(Rectangle())
+        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
         .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
@@ -319,7 +320,8 @@ struct PostCommentsSheet: View {
                 votingState: votingViewModel.votingState(for: post),
                 isLoading: viewModel.isLoading,
                 onUpvote: { handleCollapsedUpvote(for: post) },
-                onExpand: onExpand
+                onExpand: onExpand,
+                leadingGestureExclusionWidth: systemBackGestureEdgeWidth
             )
         } else {
             CollapsedPostHeaderLoadingView()
@@ -426,12 +428,21 @@ private extension PostCommentsSheet {
         DragGesture(minimumDistance: 6, coordinateSpace: .global)
             .onChanged { value in
                 guard !isHandleDragActive else { return }
+                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
+                let verticalMovement = abs(value.translation.height)
+                let horizontalMovement = abs(value.translation.width)
+                let isMostlyVertical = verticalMovement > horizontalMovement * 1.2
+
                 if !isTrackingDrag {
                     dragStartSheetState = sheetState
                     dragStartAllowsSheetDrag = isCollapsed
                     isTrackingDrag = true
                 }
-                if isExpanded, isScrollAtTop, value.translation.height > 0 {
+                if isExpanded,
+                   isScrollAtTop,
+                   isMostlyVertical,
+                   value.translation.height > 0,
+                   value.startLocation.x > systemBackGestureEdgeWidth {
                     dragStartAllowsSheetDrag = true
                 }
                 guard dragStartAllowsSheetDrag else { return }
@@ -440,15 +451,16 @@ private extension PostCommentsSheet {
                         presentedSheetState = .expanded
                     }
                 }
-                dragTranslation = value.translation.height
+                dragTranslation = isExpanded ? max(0, value.translation.height) : value.translation.height
             }
             .onEnded { value in
                 guard !isHandleDragActive else { return }
+                guard value.startLocation.x > systemBackGestureEdgeWidth else {
+                    resetDragTracking()
+                    return
+                }
                 guard dragStartAllowsSheetDrag else {
-                    isTrackingDrag = false
-                    dragStartAllowsSheetDrag = false
-                    dragStartSheetState = nil
-                    dragTranslation = 0
+                    resetDragTracking()
                     return
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
@@ -458,6 +470,7 @@ private extension PostCommentsSheet {
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
+                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
                 if !isHandleDragActive {
                     dragStartSheetState = sheetState
                 }
@@ -470,6 +483,11 @@ private extension PostCommentsSheet {
                 dragTranslation = value.translation.height
             }
             .onEnded { value in
+                guard value.startLocation.x > systemBackGestureEdgeWidth else {
+                    isHandleDragActive = false
+                    resetDragTracking()
+                    return
+                }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
                 isHandleDragActive = false
             }
@@ -504,6 +522,18 @@ private extension PostCommentsSheet {
             guard sheetState == .collapsed, !isTrackingDrag, !isHandleDragActive else { return }
             presentedSheetState = .collapsed
         }
+    }
+
+    private var systemBackGestureEdgeWidth: CGFloat {
+        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
+        return leadingInset + 32
+    }
+
+    private func resetDragTracking() {
+        isTrackingDrag = false
+        dragStartAllowsSheetDrag = false
+        dragStartSheetState = nil
+        dragTranslation = 0
     }
 }
 

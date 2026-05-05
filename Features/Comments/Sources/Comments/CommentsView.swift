@@ -18,6 +18,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
     private let showsToolbar: Bool
+    private let controlsNavigationBarVisibility: Bool
     private let topContentInset: CGFloat
     private let titleVisible: Binding<Bool>?
     private let isAtTop: Binding<Bool>?
@@ -37,6 +38,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
         showsToolbar: Bool = true,
+        controlsNavigationBarVisibility: Bool = true,
         topContentInset: CGFloat = 0,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
@@ -47,6 +49,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.showsPostHeader = showsPostHeader
         self.allowsRefresh = allowsRefresh
         self.showsToolbar = showsToolbar
+        self.controlsNavigationBarVisibility = controlsNavigationBarVisibility
         self.topContentInset = topContentInset
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
@@ -72,6 +75,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
         showsToolbar: Bool = true,
+        controlsNavigationBarVisibility: Bool = true,
         topContentInset: CGFloat = 0,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
@@ -86,6 +90,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             showsPostHeader: showsPostHeader,
             allowsRefresh: allowsRefresh,
             showsToolbar: showsToolbar,
+            controlsNavigationBarVisibility: controlsNavigationBarVisibility,
             topContentInset: topContentInset,
             titleVisible: titleVisible,
             isAtTop: isAtTop,
@@ -125,10 +130,13 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                 AppLoadingStateView(message: "Loading...")
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
+        .if(controlsNavigationBarVisibility) { view in
+            view
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
+        }
         .toolbar {
-            if showsToolbar {
+            if controlsNavigationBarVisibility && showsToolbar {
                 ToolbarItem(placement: .principal) {
                     if let post = viewModel.post {
                         ToolbarTitle(

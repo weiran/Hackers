@@ -3,6 +3,21 @@ import Domain
 import Shared
 import SwiftUI
 
+struct LeadingEdgeExcludedRectangle: Shape {
+    let excludedWidth: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let clampedWidth = min(max(excludedWidth, 0), rect.width)
+        let hitRect = CGRect(
+            x: rect.minX + clampedWidth,
+            y: rect.minY,
+            width: rect.width - clampedWidth,
+            height: rect.height
+        )
+        return Path(hitRect)
+    }
+}
+
 struct BrowserControlsView: View {
     let fallbackURL: URL
     let onDismiss: @MainActor () -> Void
@@ -157,6 +172,7 @@ struct CollapsedPostHeaderView: View {
     let isLoading: Bool
     let onUpvote: () -> Void
     let onExpand: () -> Void
+    let leadingGestureExclusionWidth: CGFloat
     private static let collapsedVerticalPadding: CGFloat = 2
     private static let collapsedHorizontalPadding: CGFloat = 20
     private static let collapsedThumbnailSize: CGFloat = 28
@@ -182,7 +198,7 @@ struct CollapsedPostHeaderView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, Self.collapsedHorizontalPadding)
         .padding(.vertical, Self.collapsedVerticalPadding)
-        .contentShape(Rectangle())
+        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: leadingGestureExclusionWidth))
         .onTapGesture(perform: onExpand)
     }
 
