@@ -14,6 +14,7 @@ struct PostCommentsSheet: View {
     private static let expandedToolbarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
+    private static let sheetAnimationDuration: TimeInterval = 0.25
 
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
@@ -22,9 +23,11 @@ struct PostCommentsSheet: View {
     @State private var votingViewModel: VotingViewModel
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var sheetState: SheetState = .collapsed
+    @State private var presentedSheetState: SheetState = .collapsed
     @State private var dragTranslation: CGFloat = 0
     @State private var isTrackingDrag = false
     @State private var dragStartAllowsSheetDrag = false
+    @State private var dragStartSheetState: SheetState?
     @State private var isHandleDragActive = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
@@ -57,9 +60,14 @@ struct PostCommentsSheet: View {
             let sheetHeight = max(screenSize.height - alignedTop, 0)
             let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
-            let showsExpandedPresentation = isExpanded
+            let showsExpandedPresentation = presentedSheetState == .expanded
             let showsCollapsedControls = sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
-            let handleTopInset = showsExpandedPresentation ? safeInsets.top : 0
+            let expansionProgress: CGFloat = if collapsedTop > expandedTop {
+                1 - ((alignedTop - expandedTop) / (collapsedTop - expandedTop))
+            } else {
+                isExpanded ? 1 : 0
+            }
+            let handleTopInset = safeInsets.top * min(max(expansionProgress, 0), 1)
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -138,36 +146,40 @@ struct PostCommentsSheet: View {
     ) -> some View {
         ZStack(alignment: .top) {
             if showsExpandedPresentation {
-                expandedCommentsView(topContentInset: expandedTopOverlayHeight(handleTopInset: handleTopInset))
+                expandedCommentsView(
+                    topContentInset: expandedTopOverlayHeight(handleTopInset: handleTopInset),
+                    showsPostHeader: presentedSheetState == .expanded
+                )
                     .allowsHitTesting(true)
 
                 expandedTopOverlay(
-                    expandedTop: expandedTop,
-                    collapsedTop: collapsedTop,
                     handleTopInset: handleTopInset
                 )
             } else {
                 VStack(spacing: 0) {
-                    sheetHandle(
-                        expandedTop: expandedTop,
-                        collapsedTop: collapsedTop,
-                        handleTopInset: handleTopInset
-                    )
+                    Color.clear
+                        .frame(height: Self.handleAreaHeight + handleTopInset)
 
                     collapsedHeader
                         .allowsHitTesting(true)
                 }
             }
+
+            sheetHandle(
+                expandedTop: expandedTop,
+                collapsedTop: collapsedTop,
+                handleTopInset: handleTopInset
+            )
         }
         .contentShape(Rectangle())
         .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
 
-    private func expandedCommentsView(topContentInset: CGFloat) -> some View {
+    private func expandedCommentsView(topContentInset: CGFloat, showsPostHeader: Bool) -> some View {
         CommentsView<NavigationStore>(
             postID: viewModel.postID,
             initialPost: viewModel.post,
-            showsPostHeader: isExpanded,
+            showsPostHeader: showsPostHeader,
             allowsRefresh: false,
             showsToolbar: false,
             topContentInset: topContentInset,
@@ -177,79 +189,71 @@ struct PostCommentsSheet: View {
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
-        .scrollDisabled(!isExpanded)
+        .scrollDisabled(!isExpanded || isTrackingDrag || isHandleDragActive)
     }
 
     private func expandedTopOverlay(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat,
         handleTopInset: CGFloat
     ) -> some View {
         VStack(spacing: 0) {
-            sheetHandle(
-                expandedTop: expandedTop,
-                collapsedTop: collapsedTop,
-                handleTopInset: handleTopInset
-            )
-
             Spacer()
-                .frame(height: Self.handleToolbarSpacing)
+                .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
 
             GlassEffectContainer(spacing: 10) {
                 HStack(spacing: 10) {
-                Button {
-                    Task { @MainActor in onDismiss() }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.weight(.medium))
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Back")
-                .modifier(GlassCircleBackground())
+                    Button {
+                        Task { @MainActor in onDismiss() }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title3.weight(.medium))
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Back")
+                    .modifier(GlassCircleBackground())
 
-                if let post = viewModel.post {
-                    Button(action: collapseSheet) {
-                        HStack(spacing: 8) {
-                            ThumbnailView(url: post.url, isEnabled: viewModel.showThumbnails)
-                                .frame(width: 33, height: 33)
-                                .clipShape(.rect(cornerRadius: 10))
-                            Text(post.title)
-                                .font(.headline)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
+                    if let post = viewModel.post {
+                        Button(action: collapseSheet) {
+                            HStack(spacing: 8) {
+                                ThumbnailView(url: post.url, isEnabled: viewModel.showThumbnails)
+                                    .frame(width: 33, height: 33)
+                                    .clipShape(.rect(cornerRadius: 10))
+                                Text(post.title)
+                                    .font(.headline)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
                         }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .opacity(showsExpandedTitle ? 1.0 : 0.0)
+                        .offset(y: showsExpandedTitle ? 0 : 20)
+                        .animation(.easeInOut(duration: 0.3), value: showsExpandedTitle)
+                    } else {
+                        Spacer()
                     }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .opacity(showsExpandedTitle ? 1.0 : 0.0)
-                    .offset(y: showsExpandedTitle ? 0 : 20)
-                    .animation(.easeInOut(duration: 0.3), value: showsExpandedTitle)
-                } else {
-                    Spacer()
-                }
 
-                if let post = viewModel.post {
-                    Button {
-                        Task { await viewModel.toggleBookmark() }
-                    } label: {
-                        Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
-                    .modifier(GlassCircleBackground())
+                    if let post = viewModel.post {
+                        Button {
+                            Task { await viewModel.toggleBookmark() }
+                        } label: {
+                            Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
+                                .frame(width: 44, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
+                        .modifier(GlassCircleBackground())
 
-                    Button {
-                        ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                            .frame(width: 44, height: 44)
+                        Button {
+                            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+                        } label: {
+                            Image(systemName: "square.and.arrow.up")
+                                .frame(width: 44, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Share")
+                        .modifier(GlassCircleBackground())
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Share")
-                    .modifier(GlassCircleBackground())
-                }
                 }
             }
             .padding(.horizontal, 16)
@@ -295,6 +299,7 @@ struct PostCommentsSheet: View {
 
     private var collapsedHeader: some View {
         collapsedHeaderView(onExpand: {
+            presentedSheetState = .expanded
             animateSheet {
                 sheetState = .expanded
             }
@@ -354,8 +359,10 @@ struct PostCommentsSheet: View {
             dragTranslation = 0
             isTrackingDrag = false
             dragStartAllowsSheetDrag = false
+            dragStartSheetState = nil
             isHandleDragActive = false
         }
+        scheduleCollapsedPresentation()
     }
 }
 
@@ -420,10 +427,16 @@ private extension PostCommentsSheet {
             .onChanged { value in
                 guard !isHandleDragActive else { return }
                 if !isTrackingDrag {
+                    dragStartSheetState = sheetState
                     dragStartAllowsSheetDrag = isCollapsed || isScrollAtTop
                     isTrackingDrag = true
                 }
                 guard dragStartAllowsSheetDrag else { return }
+                if isCollapsed, value.translation.height < -1 {
+                    withAnimation(WebViewAnimations.fast) {
+                        presentedSheetState = .expanded
+                    }
+                }
                 dragTranslation = value.translation.height
             }
             .onEnded { value in
@@ -431,6 +444,7 @@ private extension PostCommentsSheet {
                 guard dragStartAllowsSheetDrag else {
                     isTrackingDrag = false
                     dragStartAllowsSheetDrag = false
+                    dragStartSheetState = nil
                     dragTranslation = 0
                     return
                 }
@@ -441,7 +455,15 @@ private extension PostCommentsSheet {
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
+                if !isHandleDragActive {
+                    dragStartSheetState = sheetState
+                }
                 isHandleDragActive = true
+                if isCollapsed, value.translation.height < -1 {
+                    withAnimation(WebViewAnimations.fast) {
+                        presentedSheetState = .expanded
+                    }
+                }
                 dragTranslation = value.translation.height
             }
             .onEnded { value in
@@ -454,12 +476,31 @@ private extension PostCommentsSheet {
         let baseTop = isExpanded ? expandedTop : collapsedTop
         let predictedTop = baseTop + predictedTranslation
         let midpoint = (expandedTop + collapsedTop) / 2
+        let targetState: SheetState = predictedTop <= midpoint ? .expanded : .collapsed
+        if targetState == .expanded {
+            presentedSheetState = .expanded
+        }
         animateSheet {
             dragTranslation = 0
-            sheetState = predictedTop <= midpoint ? .expanded : .collapsed
+            sheetState = targetState
+        }
+        if targetState == .collapsed {
+            if dragStartSheetState == .collapsed {
+                presentedSheetState = .collapsed
+            } else {
+                scheduleCollapsedPresentation()
+            }
         }
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
+        dragStartSheetState = nil
+    }
+
+    private func scheduleCollapsedPresentation() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.sheetAnimationDuration) {
+            guard sheetState == .collapsed, !isTrackingDrag, !isHandleDragActive else { return }
+            presentedSheetState = .collapsed
+        }
     }
 }
 
