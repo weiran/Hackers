@@ -17,6 +17,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(\.openURL) private var openURL
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
+    private let showsToolbar: Bool
+    private let topContentInset: CGFloat
+    private let titleVisible: Binding<Bool>?
     private let isAtTop: Binding<Bool>?
     private let onPostLinkTap: (() -> Void)?
     @State private var viewModel: CommentsViewModel
@@ -33,6 +36,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
+        showsToolbar: Bool = true,
+        topContentInset: CGFloat = 0,
+        titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
@@ -40,6 +46,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     ) {
         self.showsPostHeader = showsPostHeader
         self.allowsRefresh = allowsRefresh
+        self.showsToolbar = showsToolbar
+        self.topContentInset = topContentInset
+        self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
@@ -62,6 +71,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
         allowsRefresh: Bool = true,
+        showsToolbar: Bool = true,
+        topContentInset: CGFloat = 0,
+        titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
@@ -73,6 +85,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             targetCommentID: targetCommentID,
             showsPostHeader: showsPostHeader,
             allowsRefresh: allowsRefresh,
+            showsToolbar: showsToolbar,
+            topContentInset: topContentInset,
+            titleVisible: titleVisible,
             isAtTop: isAtTop,
             onPostLinkTap: onPostLinkTap,
             viewModel: viewModel,
@@ -89,6 +104,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     toggleCommentVisibility: toggleCommentVisibility,
                     hideCommentBranch: hideCommentBranch,
                     updateIsAtTop: { isAtTop?.wrappedValue = $0 },
+                    updateTitleVisibility: { titleVisible?.wrappedValue = $0 },
+                    topContentInset: topContentInset,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,
@@ -109,28 +126,31 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                if let post = viewModel.post {
-                    ToolbarTitle(
-                        post: post,
-                        showTitle: showTitle,
-                        showThumbnails: viewModel.showThumbnails,
-                        onTap: handleLinkTap,
-                    )
+            if showsToolbar {
+                ToolbarItem(placement: .principal) {
+                    if let post = viewModel.post {
+                        ToolbarTitle(
+                            post: post,
+                            showTitle: showTitle,
+                            showThumbnails: viewModel.showThumbnails,
+                            onTap: handleLinkTap,
+                        )
+                    }
                 }
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if let post = viewModel.post {
-                    BookmarkToolbarButton(
-                        isBookmarked: post.isBookmarked,
-                        toggleBookmark: { await viewModel.toggleBookmark() }
-                    )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if let post = viewModel.post {
+                        BookmarkToolbarButton(
+                            isBookmarked: post.isBookmarked,
+                            toggleBookmark: { await viewModel.toggleBookmark() }
+                        )
+                    }
                 }
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                if let post = viewModel.post {
-                    ShareMenu(post: post)
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if let post = viewModel.post {
+                        ShareMenu(post: post)
+                    }
                 }
             }
         }

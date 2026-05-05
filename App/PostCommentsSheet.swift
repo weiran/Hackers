@@ -9,9 +9,11 @@ struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = 150
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
-    private static let handleVerticalPadding: CGFloat = 8
+    private static let handleAreaHeight: CGFloat = 22
+    private static let handleToolbarSpacing: CGFloat = 8
+    private static let expandedToolbarHeight: CGFloat = 44
+    private static let expandedContentSpacing: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
-    private static let navigationBarTopSpacing: CGFloat = 6
 
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
@@ -27,6 +29,7 @@ struct PostCommentsSheet: View {
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @State private var showsExpandedToolbar = false
+    @State private var showsExpandedTitle = false
 
     init(post: Post, controller: BrowserController, onDismiss: @MainActor @escaping () -> Void) {
         _viewModel = State(initialValue: CommentsViewModel(post: post))
@@ -54,7 +57,9 @@ struct PostCommentsSheet: View {
             let sheetHeight = max(screenSize.height - alignedTop, 0)
             let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
-            let handleTopInset = isExpanded ? safeInsets.top : 0
+            let showsExpandedPresentation = isExpanded
+            let showsCollapsedControls = sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
+            let handleTopInset = showsExpandedPresentation ? safeInsets.top : 0
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -62,7 +67,8 @@ struct PostCommentsSheet: View {
                 sheetContent(
                     expandedTop: expandedTop,
                     collapsedTop: collapsedTop,
-                    handleTopInset: handleTopInset
+                    handleTopInset: handleTopInset,
+                    showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
                 .background(sheetBackground)
@@ -70,7 +76,7 @@ struct PostCommentsSheet: View {
                 .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: -5)
                 .offset(y: alignedTop)
 
-                if isCollapsed {
+                if showsCollapsedControls {
                     BrowserControlsView(
                         fallbackURL: fallbackURL,
                         onDismiss: onDismiss,
@@ -108,7 +114,7 @@ struct PostCommentsSheet: View {
     }
 
     private var handleAreaHeight: CGFloat {
-        Self.handleThickness + (Self.handleVerticalPadding * 2)
+        Self.handleAreaHeight
     }
 
     private var sheetShape: UnevenRoundedRectangle {
@@ -127,6 +133,56 @@ struct PostCommentsSheet: View {
     private func sheetContent(
         expandedTop: CGFloat,
         collapsedTop: CGFloat,
+        handleTopInset: CGFloat,
+        showsExpandedPresentation: Bool
+    ) -> some View {
+        ZStack(alignment: .top) {
+            if showsExpandedPresentation {
+                expandedCommentsView(topContentInset: expandedTopOverlayHeight(handleTopInset: handleTopInset))
+                    .allowsHitTesting(true)
+
+                expandedTopOverlay(
+                    expandedTop: expandedTop,
+                    collapsedTop: collapsedTop,
+                    handleTopInset: handleTopInset
+                )
+            } else {
+                VStack(spacing: 0) {
+                    sheetHandle(
+                        expandedTop: expandedTop,
+                        collapsedTop: collapsedTop,
+                        handleTopInset: handleTopInset
+                    )
+
+                    collapsedHeader
+                        .allowsHitTesting(true)
+                }
+            }
+        }
+        .contentShape(Rectangle())
+        .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+    }
+
+    private func expandedCommentsView(topContentInset: CGFloat) -> some View {
+        CommentsView<NavigationStore>(
+            postID: viewModel.postID,
+            initialPost: viewModel.post,
+            showsPostHeader: isExpanded,
+            allowsRefresh: false,
+            showsToolbar: false,
+            topContentInset: topContentInset,
+            titleVisible: $showsExpandedTitle,
+            isAtTop: $isScrollAtTop,
+            onPostLinkTap: collapseSheet,
+            viewModel: viewModel,
+            votingViewModel: votingViewModel
+        )
+        .scrollDisabled(!isExpanded)
+    }
+
+    private func expandedTopOverlay(
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat,
         handleTopInset: CGFloat
     ) -> some View {
         VStack(spacing: 0) {
@@ -136,47 +192,88 @@ struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset
             )
 
-            ZStack(alignment: .top) {
-                expandedCommentsView
-                    .opacity(isExpanded ? 1 : 0)
-                    .allowsHitTesting(isExpanded)
+            Spacer()
+                .frame(height: Self.handleToolbarSpacing)
 
-                collapsedHeader
-                    .opacity(isExpanded ? 0 : 1)
-                    .allowsHitTesting(!isExpanded)
-            }
-        }
-        .contentShape(Rectangle())
-        .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-    }
+            GlassEffectContainer(spacing: 10) {
+                HStack(spacing: 10) {
+                Button {
+                    Task { @MainActor in onDismiss() }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.title3.weight(.medium))
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+                .modifier(GlassCircleBackground())
 
-    private var expandedCommentsView: some View {
-        NavigationView {
-            CommentsView<NavigationStore>(
-                postID: viewModel.postID,
-                initialPost: viewModel.post,
-                showsPostHeader: isExpanded,
-                allowsRefresh: false,
-                isAtTop: $isScrollAtTop,
-                onPostLinkTap: collapseSheet,
-                viewModel: viewModel,
-                votingViewModel: votingViewModel
-            )
-            .scrollDisabled(!isExpanded)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        Task { @MainActor in onDismiss() }
-                    } label: {
-                        Label("Back", systemImage: "chevron.left")
+                if let post = viewModel.post {
+                    Button(action: collapseSheet) {
+                        HStack(spacing: 8) {
+                            ThumbnailView(url: post.url, isEnabled: viewModel.showThumbnails)
+                                .frame(width: 33, height: 33)
+                                .clipShape(.rect(cornerRadius: 10))
+                            Text(post.title)
+                                .font(.headline)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
                     }
-                    .accessibilityLabel("Back")
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .opacity(showsExpandedTitle ? 1.0 : 0.0)
+                    .offset(y: showsExpandedTitle ? 0 : 20)
+                    .animation(.easeInOut(duration: 0.3), value: showsExpandedTitle)
+                } else {
+                    Spacer()
+                }
+
+                if let post = viewModel.post {
+                    Button {
+                        Task { await viewModel.toggleBookmark() }
+                    } label: {
+                        Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
+                    .modifier(GlassCircleBackground())
+
+                    Button {
+                        ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Share")
+                    .modifier(GlassCircleBackground())
+                }
                 }
             }
-            .toolbar(showsExpandedToolbar ? .visible : .hidden, for: .navigationBar)
+            .padding(.horizontal, 16)
+            .frame(height: Self.expandedToolbarHeight)
+            .opacity(showsExpandedToolbar ? 1 : 0)
         }
-        .navigationViewStyle(.stack)
-        .padding(.top, isExpanded ? Self.navigationBarTopSpacing : 0)
+        .allowsHitTesting(showsExpandedToolbar)
+        .background(alignment: .top) {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .mask(
+                    LinearGradient(
+                        colors: [.black, .black.opacity(0.82), .clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .frame(height: expandedTopOverlayHeight(handleTopInset: handleTopInset))
+                .opacity(showsExpandedToolbar ? 1 : 0)
+        }
+    }
+
+    private func expandedTopOverlayHeight(handleTopInset: CGFloat) -> CGFloat {
+        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarHeight + Self.expandedContentSpacing
     }
 
     private func sheetHandle(
@@ -184,16 +281,14 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat
     ) -> some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Capsule()
                 .fill(.secondary.opacity(0.35))
                 .frame(width: Self.handleWidth, height: Self.handleThickness)
-
-            EmptyView()
+                .padding(.bottom, (Self.handleAreaHeight - Self.handleThickness) / 2)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, Self.handleVerticalPadding + handleTopInset)
-        .padding(.bottom, Self.handleVerticalPadding)
+        .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
         .contentShape(Rectangle())
         .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
     }
@@ -291,6 +386,7 @@ private extension PostCommentsSheet {
             }
         } else {
             showsExpandedToolbar = false
+            showsExpandedTitle = false
         }
     }
 
@@ -332,7 +428,12 @@ private extension PostCommentsSheet {
             }
             .onEnded { value in
                 guard !isHandleDragActive else { return }
-                guard dragStartAllowsSheetDrag else { return }
+                guard dragStartAllowsSheetDrag else {
+                    isTrackingDrag = false
+                    dragStartAllowsSheetDrag = false
+                    dragTranslation = 0
+                    return
+                }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
             }
     }

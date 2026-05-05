@@ -19,6 +19,8 @@ struct CommentsContentView: View {
     let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
     let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
     let updateIsAtTop: ((Bool) -> Void)?
+    let updateTitleVisibility: ((Bool) -> Void)?
+    let topContentInset: CGFloat
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
@@ -39,6 +41,7 @@ struct CommentsContentView: View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
+                    topSpacerRow
                     postHeaderSection(for: post)
                     commentsSection(for: post, proxy: proxy)
                 }
@@ -48,6 +51,7 @@ struct CommentsContentView: View {
                     let shouldShowTitle = newValue > 40
                     if shouldShowTitle != showTitle {
                         showTitle = shouldShowTitle
+                        updateTitleVisibility?(shouldShowTitle)
                     }
                     let isAtTop = newValue <= 2
                     if isAtTop != lastIsAtTop {
@@ -67,6 +71,17 @@ struct CommentsContentView: View {
                     scrollToPendingComment(with: proxy)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var topSpacerRow: some View {
+        if topContentInset > 0 {
+            Color.clear
+                .frame(height: topContentInset)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
         }
     }
 
