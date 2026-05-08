@@ -1,7 +1,59 @@
 import DesignSystem
 import Domain
+import ProgressiveBlurHeader
 import Shared
 import SwiftUI
+import VariableBlur
+
+public struct ProgressiveHeaderBlurBackground: View {
+    private let height: CGFloat
+    private let fadeExtension: CGFloat
+    private let maxBlurRadius: CGFloat
+    private let tintOpacityTop: Double
+    private let tintOpacityMiddle: Double
+    @Environment(\.colorScheme) private var colorScheme
+
+    public init(
+        height: CGFloat,
+        fadeExtension: CGFloat = 64,
+        maxBlurRadius: CGFloat = 5,
+        tintOpacityTop: Double = 0.7,
+        tintOpacityMiddle: Double = 0.5
+    ) {
+        self.height = height
+        self.fadeExtension = fadeExtension
+        self.maxBlurRadius = maxBlurRadius
+        self.tintOpacityTop = tintOpacityTop
+        self.tintOpacityMiddle = tintOpacityMiddle
+    }
+
+    public var body: some View {
+        let totalHeight = max(height + fadeExtension, 1)
+
+        VariableBlurView(
+            maxBlurRadius: maxBlurRadius,
+            direction: .blurredTopClearBottom
+        )
+        .overlay {
+            LinearGradient(
+                stops: [
+                    .init(color: fadeTint.opacity(tintOpacityTop), location: 0),
+                    .init(color: fadeTint.opacity(tintOpacityMiddle), location: min(90 / totalHeight, 1)),
+                    .init(color: fadeTint.opacity(0), location: 1)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+        .frame(height: totalHeight)
+        .ignoresSafeArea(edges: .top)
+        .allowsHitTesting(false)
+    }
+
+    private var fadeTint: Color {
+        colorScheme == .dark ? .black : .white
+    }
+}
 
 struct ToolbarTitle: View {
     let post: Post

@@ -134,6 +134,12 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             view
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .overlay(alignment: .top) {
+                    if showsToolbar {
+                        commentsHeaderBlur
+                    }
+                }
         }
         .toolbar {
             if controlsNavigationBarVisibility && showsToolbar {
@@ -207,6 +213,17 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         .task { @MainActor in
             votingViewModel.navigationStore = navigationStore
         }
+    }
+
+    private var commentsHeaderBlur: some View {
+        GeometryReader { proxy in
+            ProgressiveHeaderBlurBackground(
+                height: proxy.safeAreaInsets.top + 44,
+                fadeExtension: 32
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .allowsHitTesting(false)
     }
 
     private func handleLinkTap() {

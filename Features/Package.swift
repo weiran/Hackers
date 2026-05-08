@@ -23,7 +23,9 @@ let package = Package(
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Shared"),
-        .package(path: "../DesignSystem")
+        .package(path: "../DesignSystem"),
+        .package(url: "https://github.com/dominikmartn/ProgressiveBlurHeader", branch: "main"),
+        .package(url: "https://github.com/nikstar/VariableBlur", branch: "main")
     ],
     targets: [
         .target(
@@ -38,7 +40,13 @@ let package = Package(
         ),
         .target(
             name: "Comments",
-            dependencies: ["Domain", "Shared", "DesignSystem"],
+            dependencies: [
+                "Domain",
+                "Shared",
+                "DesignSystem",
+                "ProgressiveBlurHeader",
+                .product(name: "VariableBlur", package: "VariableBlur")
+            ],
             path: "Comments/Sources/Comments"
         ),
         .testTarget(

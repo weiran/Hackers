@@ -267,22 +267,20 @@ struct PostCommentsSheet: View {
         }
         .allowsHitTesting(showsExpandedToolbar)
         .background(alignment: .top) {
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .mask(
-                    LinearGradient(
-                        colors: [.black, .black.opacity(0.82), .clear],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(height: expandedTopOverlayHeight(handleTopInset: handleTopInset))
+            ProgressiveHeaderBlurBackground(
+                height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
+                fadeExtension: Self.expandedContentSpacing
+            )
                 .opacity(showsExpandedToolbar ? 1 : 0)
         }
     }
 
     private func expandedTopOverlayHeight(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarHeight + Self.expandedContentSpacing
+        expandedHeaderBlurHeight(handleTopInset: handleTopInset) + Self.expandedContentSpacing
+    }
+
+    private func expandedHeaderBlurHeight(handleTopInset: CGFloat) -> CGFloat {
+        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarHeight
     }
 
     private func sheetHandle(
