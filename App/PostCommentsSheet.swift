@@ -111,6 +111,9 @@ struct PostCommentsSheet: View {
             .onChange(of: isExpanded) { _, newValue in
                 updateExpandedToolbarVisibility(isExpanded: newValue)
             }
+            .task {
+                await viewModel.loadComments()
+            }
         }
     }
 
