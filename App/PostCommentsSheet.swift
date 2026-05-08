@@ -240,16 +240,6 @@ struct PostCommentsSheet: View {
 
                     if let post = viewModel.post {
                         Button {
-                            Task { await viewModel.toggleBookmark() }
-                        } label: {
-                            Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(post.isBookmarked ? "Remove Bookmark" : "Save Bookmark")
-                        .modifier(GlassCircleBackground())
-
-                        Button {
                             ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
                         } label: {
                             Image(systemName: "square.and.arrow.up")
