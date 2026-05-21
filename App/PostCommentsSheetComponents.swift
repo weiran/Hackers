@@ -59,7 +59,7 @@ struct BrowserControlsView: View {
     }
 
     private var navigationControlsGroup: some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 0) {
             controlButton(systemName: "chevron.backward", isEnabled: controller.canGoBack) {
                 controller.goBack()
             }
@@ -76,14 +76,13 @@ struct BrowserControlsView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
         .modifier(GlassCapsuleBackground())
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
     }
 
     private var shareControlsGroup: some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 0) {
             controlButton(systemName: "square.and.arrow.up") {
                 Task { @MainActor in
                     let targetURL = controller.currentURL ?? fallbackURL
@@ -96,8 +95,7 @@ struct BrowserControlsView: View {
                 LinkOpener.openURL(targetURL)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
         .modifier(GlassCapsuleBackground())
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
     }
@@ -125,8 +123,10 @@ struct BrowserControlsView: View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 14, weight: .semibold))
-                .frame(width: 20, height: 20)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .foregroundStyle(.primary)
         .opacity(isEnabled ? 1 : 0.35)
         .disabled(!isEnabled)
