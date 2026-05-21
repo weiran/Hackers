@@ -176,7 +176,9 @@ struct PostCommentsSheet: View {
                 .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
-                    handleTopInset: handleTopInset
+                    handleTopInset: handleTopInset,
+                    expandedTop: expandedTop,
+                    collapsedTop: collapsedTop
                 )
             } else {
                 VStack(spacing: 0) {
@@ -217,7 +219,9 @@ struct PostCommentsSheet: View {
     }
 
     private func expandedTopOverlay(
-        handleTopInset: CGFloat
+        handleTopInset: CGFloat,
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat
     ) -> some View {
         VStack(spacing: 0) {
             Spacer()
@@ -276,6 +280,8 @@ struct PostCommentsSheet: View {
             .frame(height: Self.expandedToolbarHeight)
             .opacity(showsExpandedToolbar ? 1 : 0)
         }
+        .contentShape(Rectangle())
+        .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .allowsHitTesting(showsExpandedToolbar)
         .background(alignment: .top) {
             ProgressiveHeaderBlurBackground(
@@ -494,6 +500,34 @@ private extension PostCommentsSheet {
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
                 isHandleDragActive = false
+            }
+    }
+
+    private func expandedToolbarDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 18, coordinateSpace: .global)
+            .onChanged { value in
+                guard isExpanded, !isHandleDragActive else { return }
+                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
+
+                let verticalMovement = abs(value.translation.height)
+                let horizontalMovement = abs(value.translation.width)
+                let isDownwardDrag = value.translation.height > 0
+                let isMostlyVertical = verticalMovement > horizontalMovement * 1.2
+
+                guard isDownwardDrag, isMostlyVertical else { return }
+                if !isTrackingDrag {
+                    isTrackingDrag = true
+                    dragStartAllowsSheetDrag = true
+                    suppressesCollapsedUpvote = true
+                }
+                dragTranslation = max(0, value.translation.height)
+            }
+            .onEnded { value in
+                guard isTrackingDrag, dragStartAllowsSheetDrag else {
+                    resetDragTracking()
+                    return
+                }
+                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
             }
     }
 
