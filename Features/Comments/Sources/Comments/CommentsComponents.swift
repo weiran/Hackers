@@ -13,14 +13,20 @@ import Shared
 import SwiftUI
 import UIKit
 
+private enum CommentScrollTarget {
+    static func rowID(for commentID: Int) -> String {
+        "comment-\(commentID)"
+    }
+}
+
 struct CommentsContentView: View {
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
-    let toggleCommentVisibility: (Comment, @escaping (String) -> Void) -> Void
-    let hideCommentBranch: (Comment, @escaping (String) -> Void) -> Void
+    let toggleCommentVisibility: (Comment, @escaping (Int) -> Void) -> Void
+    let hideCommentBranch: (Comment, @escaping (Int) -> Void) -> Void
     let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
-    let topContentInset: CGFloat
+    let presentationState: CommentsPresentationState
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
@@ -37,11 +43,14 @@ struct CommentsContentView: View {
         }
     }
 
+    private var commentScrollTopInset: CGFloat {
+        presentationState.commentScrollTopInset
+    }
+
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
                 List {
-                    topSpacerRow
                     postHeaderSection(for: post)
                     commentsSection(for: post, proxy: proxy)
                 }
@@ -61,6 +70,9 @@ struct CommentsContentView: View {
                 })
                 .listStyle(.plain)
                 .accessibilityIdentifier("comments.list")
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    commentScrollTopSafeAreaInset
+                }
                 .transaction { transaction in
                     transaction.disablesAnimations = !listAnimationsEnabled
                 }
@@ -75,13 +87,11 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private var topSpacerRow: some View {
-        if topContentInset > 0 {
+    private var commentScrollTopSafeAreaInset: some View {
+        if commentScrollTopInset > 0 {
             Color.clear
-                .frame(height: topContentInset)
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                .frame(height: commentScrollTopInset)
+                .allowsHitTesting(false)
         }
     }
 
@@ -171,14 +181,10 @@ struct CommentsContentView: View {
             CommentsForEach(
                 post: post,
                 toggleCommentVisibility: { comment in
-                    toggleCommentVisibility(comment) { id in
-                        proxy.scrollTo(id, anchor: .top)
-                    }
+                    toggleCommentVisibility(comment) { scrollToComment(withID: $0, proxy: proxy) }
                 },
                 hideCommentBranch: { comment in
-                    hideCommentBranch(comment) { id in
-                        proxy.scrollTo(id, anchor: .top)
-                    }
+                    hideCommentBranch(comment) { scrollToComment(withID: $0, proxy: proxy) }
                 },
                 viewModel: viewModel,
                 votingViewModel: votingViewModel,
@@ -192,10 +198,26 @@ struct CommentsContentView: View {
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
         Task { @MainActor in
-            withAnimation(.easeInOut) {
-                proxy.scrollTo("comment-\(targetID)", anchor: .top)
-            }
+            scrollToComment(withID: targetID, proxy: proxy, animation: .easeInOut)
             pendingCommentID = nil
+        }
+    }
+
+    private func scrollToComment(
+        withID commentID: Int,
+        proxy: ScrollViewProxy,
+        animation: Animation? = nil
+    ) {
+        let updates = {
+            proxy.scrollTo(CommentScrollTarget.rowID(for: commentID), anchor: .top)
+        }
+
+        if let animation {
+            withAnimation(animation) {
+                updates()
+            }
+        } else {
+            updates()
         }
     }
 }
@@ -217,7 +239,7 @@ struct CommentsForEach: View {
                 onHide: { hideCommentBranch(comment) },
                 comment: comment,
             )
-            .id("comment-\(comment.id)")
+            .id(CommentScrollTarget.rowID(for: comment.id))
             .background(GeometryReader { geometry in
                 Color.clear.preference(
                     key: CommentPositionsPreferenceKey.self,

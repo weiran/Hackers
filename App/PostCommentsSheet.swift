@@ -187,7 +187,7 @@ struct PostCommentsSheet: View {
             allowsRefresh: false,
             showsToolbar: false,
             controlsNavigationBarVisibility: false,
-            topContentInset: topContentInset,
+            presentationState: .customBrowser(topContentInset: topContentInset),
             titleVisible: $showsExpandedTitle,
             isAtTop: $isScrollAtTop,
             onPostLinkTap: collapseSheet,

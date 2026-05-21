@@ -11,6 +11,20 @@ import Foundation
 import Shared
 import SwiftUI
 
+public enum CommentsPresentationState: Equatable, Sendable {
+    case standard
+    case customBrowser(topContentInset: CGFloat)
+
+    var commentScrollTopInset: CGFloat {
+        switch self {
+        case .standard:
+            0
+        case let .customBrowser(topContentInset):
+            max(topContentInset, 0)
+        }
+    }
+}
+
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     @Environment(\.dismiss) private var dismiss
@@ -19,7 +33,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let allowsRefresh: Bool
     private let showsToolbar: Bool
     private let controlsNavigationBarVisibility: Bool
-    private let topContentInset: CGFloat
+    private let presentationState: CommentsPresentationState
     private let titleVisible: Binding<Bool>?
     private let isAtTop: Binding<Bool>?
     private let onPostLinkTap: (() -> Void)?
@@ -39,7 +53,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         allowsRefresh: Bool = true,
         showsToolbar: Bool = true,
         controlsNavigationBarVisibility: Bool = true,
-        topContentInset: CGFloat = 0,
+        presentationState: CommentsPresentationState = .standard,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -50,7 +64,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.allowsRefresh = allowsRefresh
         self.showsToolbar = showsToolbar
         self.controlsNavigationBarVisibility = controlsNavigationBarVisibility
-        self.topContentInset = topContentInset
+        self.presentationState = presentationState
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
@@ -76,7 +90,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         allowsRefresh: Bool = true,
         showsToolbar: Bool = true,
         controlsNavigationBarVisibility: Bool = true,
-        topContentInset: CGFloat = 0,
+        presentationState: CommentsPresentationState = .standard,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -91,7 +105,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             allowsRefresh: allowsRefresh,
             showsToolbar: showsToolbar,
             controlsNavigationBarVisibility: controlsNavigationBarVisibility,
-            topContentInset: topContentInset,
+            presentationState: presentationState,
             titleVisible: titleVisible,
             isAtTop: isAtTop,
             onPostLinkTap: onPostLinkTap,
@@ -110,7 +124,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     hideCommentBranch: hideCommentBranch,
                     updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     updateTitleVisibility: { titleVisible?.wrappedValue = $0 },
-                    topContentInset: topContentInset,
+                    presentationState: presentationState,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,
@@ -251,7 +265,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         return true
     }
 
-    private func toggleCommentVisibility(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
+    private func toggleCommentVisibility(_ comment: Comment, scrollToComment: @escaping (Int) -> Void) {
         listAnimationsEnabled = true
         let wasVisible = comment.visibility == .visible
 
@@ -262,7 +276,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         if wasVisible, !isCommentVisibleOnScreen(comment) {
             Task { @MainActor in
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    scrollTo("comment-\(comment.id)")
+                    scrollToComment(comment.id)
                 }
                 listAnimationsEnabled = false
             }
@@ -271,7 +285,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
     }
 
-    private func hideCommentBranch(_ comment: Comment, scrollTo: @escaping (String) -> Void) {
+    private func hideCommentBranch(_ comment: Comment, scrollToComment: @escaping (Int) -> Void) {
         listAnimationsEnabled = true
         let collapsedRoot = withAnimation(.easeInOut(duration: 0.3)) {
             viewModel.hideCommentBranch(comment)
@@ -280,7 +294,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         Task { @MainActor in
             if let root = collapsedRoot {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    scrollTo("comment-\(root.id)")
+                    scrollToComment(root.id)
                 }
             }
             listAnimationsEnabled = false
@@ -290,8 +304,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
         guard let commentFrame = visibleCommentPositions[comment.id] else { return false }
         guard let window = PresentationContextProvider.shared.windowScene?.windows.first else { return false }
-        let screenBounds = window.bounds
-        return screenBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
+        let visibleBounds = window.bounds.inset(
+            by: UIEdgeInsets(top: presentationState.commentScrollTopInset, left: 0, bottom: 0, right: 0)
+        )
+        return visibleBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
     }
 }
 
