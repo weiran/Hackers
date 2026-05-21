@@ -151,6 +151,8 @@ public struct PostDisplayView: View {
                         .padding(.top, 4)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(1)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
