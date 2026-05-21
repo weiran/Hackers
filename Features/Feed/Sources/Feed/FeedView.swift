@@ -463,7 +463,7 @@ private extension FeedView {
         viewModel.markPostRead(post)
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
         if mode == .customBrowser {
-            navigationStore.showPostLink(post)
+            navigationStore.showPostLink(post, presentation: .expandedComments)
             return
         }
         navigationStore.showPost(post)
@@ -477,7 +477,7 @@ private extension FeedView {
 
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
         if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
-            navigationStore.showPostLink(post)
+            navigationStore.showPostLink(post, presentation: .collapsedBrowser)
             return
         }
 

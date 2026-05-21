@@ -14,7 +14,7 @@ import UIKit
 
 enum NavigationDestination: Hashable {
     case comments(postID: Int)
-    case postBrowser(post: Post)
+    case postBrowser(post: Post, presentation: PostLinkPresentation)
     case settings
 }
 
@@ -59,14 +59,14 @@ class NavigationStore: NavigationStoreProtocol {
         }
     }
 
-    func showPostLink(_ post: Domain.Post) {
+    func showPostLink(_ post: Domain.Post, presentation: PostLinkPresentation) {
         embeddedBrowserURL = nil
         detailPath.removeAll()
         selectedPost = post
         selectedPostId = post.id
 
         if UIDevice.current.userInterfaceIdiom != .pad {
-            path.append(NavigationDestination.postBrowser(post: post))
+            path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
             return
         }
 

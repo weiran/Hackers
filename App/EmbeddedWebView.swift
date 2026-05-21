@@ -254,8 +254,15 @@ private struct UITestArticleView: View {
 struct PostLinkBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     let post: Post
+    let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
     @StateObject private var browserController = BrowserController()
+
+    init(post: Post, presentation: PostLinkPresentation) {
+        self.post = post
+        self.presentation = presentation
+        _showingCommentsPane = State(initialValue: presentation == .expandedComments)
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -271,6 +278,7 @@ struct PostLinkBrowserView: View {
                 PostCommentsSheet(
                     post: post,
                     controller: browserController,
+                    initialPresentation: presentation,
                     onDismiss: { dismiss() }
                 )
                 .transition(.move(edge: .bottom))
@@ -283,6 +291,7 @@ struct PostLinkBrowserView: View {
         .navigationBarTitleDisplayMode(.inline)
         .nativeInteractivePopGesture(edgeOnly: true)
         .task {
+            guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.standard) {
                 showingCommentsPane = true
             }

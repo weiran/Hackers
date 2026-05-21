@@ -82,7 +82,7 @@ struct VotingViewModelTests {
             selectedPostId = post.id
         }
 
-        func showPostLink(_ post: Post) {
+        func showPostLink(_ post: Post, presentation _: PostLinkPresentation) {
             selectedPost = post
             selectedPostId = post.id
         }
@@ -314,7 +314,7 @@ struct NavigationStoreProtocolDefaultsTests {
             selectedPostId = post.id
         }
 
-        func showPostLink(_ post: Post) {
+        func showPostLink(_ post: Post, presentation _: PostLinkPresentation) {
             selectedPost = post
             selectedPostId = post.id
         }

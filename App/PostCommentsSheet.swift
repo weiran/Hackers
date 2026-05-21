@@ -35,7 +35,19 @@ struct PostCommentsSheet: View {
     @State private var showsExpandedTitle = false
     @State private var suppressesCollapsedUpvote = false
 
-    init(post: Post, controller: BrowserController, onDismiss: @MainActor @escaping () -> Void) {
+    init(
+        post: Post,
+        controller: BrowserController,
+        initialPresentation: PostLinkPresentation = .collapsedBrowser,
+        onDismiss: @MainActor @escaping () -> Void
+    ) {
+        let initialSheetState: SheetState = switch initialPresentation {
+        case .collapsedBrowser:
+            .collapsed
+        case .expandedComments:
+            .expanded
+        }
+
         _viewModel = State(initialValue: CommentsViewModel(post: post))
         let container = DependencyContainer.shared
         _votingViewModel = State(initialValue: VotingViewModel(
@@ -44,6 +56,9 @@ struct PostCommentsSheet: View {
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
         _browserController = ObservedObject(wrappedValue: controller)
+        _sheetState = State(initialValue: initialSheetState)
+        _presentedSheetState = State(initialValue: initialSheetState)
+        _showsExpandedToolbar = State(initialValue: initialSheetState == .expanded)
         self.onDismiss = onDismiss
         fallbackURL = post.url
     }

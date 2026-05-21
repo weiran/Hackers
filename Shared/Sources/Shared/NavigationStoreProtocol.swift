@@ -9,6 +9,11 @@ import Domain
 import Foundation
 import Observation
 
+public enum PostLinkPresentation: Hashable, Sendable {
+    case collapsedBrowser
+    case expandedComments
+}
+
 @MainActor
 public protocol NavigationStoreProtocol: AnyObject, Observable {
     var selectedPost: Post? { get set }
@@ -16,7 +21,7 @@ public protocol NavigationStoreProtocol: AnyObject, Observable {
     var showingLogin: Bool { get set }
     var showingSettings: Bool { get set }
     func showPost(_ post: Post)
-    func showPostLink(_ post: Post)
+    func showPostLink(_ post: Post, presentation: PostLinkPresentation)
     func showPost(withId id: Int)
     func showLogin()
     func showSettings()
@@ -25,6 +30,10 @@ public protocol NavigationStoreProtocol: AnyObject, Observable {
 }
 
 public extension NavigationStoreProtocol {
+    func showPostLink(_ post: Post) {
+        showPostLink(post, presentation: .collapsedBrowser)
+    }
+
     func openURLInPrimaryContext(_ url: URL) -> Bool {
         openURLInPrimaryContext(url, pushOntoDetailStack: true)
     }
