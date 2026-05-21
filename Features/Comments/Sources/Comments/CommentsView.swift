@@ -23,6 +23,33 @@ public enum CommentsPresentationState: Equatable, Sendable {
             max(topContentInset, 0)
         }
     }
+
+    var headerBlurTopInset: CGFloat {
+        switch self {
+        case .standard:
+            0
+        case let .customBrowser(topContentInset):
+            max(topContentInset, 0)
+        }
+    }
+
+    var headerBlurFadeExtension: CGFloat {
+        switch self {
+        case .standard:
+            0
+        case .customBrowser:
+            32
+        }
+    }
+
+    var usesCustomHeaderBlur: Bool {
+        switch self {
+        case .standard:
+            false
+        case .customBrowser:
+            true
+        }
+    }
 }
 
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
@@ -148,9 +175,12 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             view
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
-                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbarBackground(
+                    presentationState.usesCustomHeaderBlur ? .hidden : .automatic,
+                    for: .navigationBar
+                )
                 .overlay(alignment: .top) {
-                    if showsToolbar {
+                    if showsToolbar, presentationState.usesCustomHeaderBlur {
                         commentsHeaderBlur
                     }
                 }
@@ -224,8 +254,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private var commentsHeaderBlur: some View {
         GeometryReader { proxy in
             ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top + 44,
-                fadeExtension: 32
+                height: proxy.safeAreaInsets.top + 44 + presentationState.headerBlurTopInset,
+                fadeExtension: presentationState.headerBlurFadeExtension
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
