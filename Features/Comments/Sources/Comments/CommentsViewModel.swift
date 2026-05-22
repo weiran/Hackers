@@ -22,6 +22,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         }
     }
     public var visibleComments: [Comment] = []
+    public private(set) var visibleRevision = 0
     public var showThumbnails: Bool
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
@@ -37,6 +38,10 @@ public final class CommentsViewModel: @unchecked Sendable {
     private let bookmarksController: BookmarksController
     private var settingsCancellable: AnyCancellable?
     private var bookmarksObservation: AnyCancellable?
+    private var indexByID: [Int: Int] = [:]
+    private var parentIndexByID: [Int: Int] = [:]
+    private var subtreeEndIndexByID: [Int: Int] = [:]
+    private var visibleSignature: [VisibleCommentSignature] = []
 
     public var comments: [Comment] { commentsLoader.data }
     public var isLoading: Bool { commentsLoader.isLoading }
@@ -75,6 +80,7 @@ public final class CommentsViewModel: @unchecked Sendable {
             }
         )
 
+        rebuildCommentIndexes()
         updateVisibleComments()
 
         settingsCancellable = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
@@ -134,6 +140,7 @@ public final class CommentsViewModel: @unchecked Sendable {
             post = updatedPost
         }
         await commentsLoader.loadIfNeeded()
+        rebuildCommentIndexes()
         updateVisibleComments()
     }
 
@@ -144,6 +151,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         }
         await bookmarksController.refreshBookmarks()
         await commentsLoader.refresh()
+        rebuildCommentIndexes()
         updateVisibleComments()
     }
 
@@ -220,7 +228,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     @discardableResult
     public func revealComment(withId id: Int) -> Bool {
-        guard let index = comments.firstIndex(where: { $0.id == id }) else { return false }
+        guard let index = indexByID[id] else { return false }
         let targetComment = comments[index]
         targetComment.visibility = .visible
 
@@ -237,15 +245,15 @@ public final class CommentsViewModel: @unchecked Sendable {
         let visible = comment.visibility == .visible
         comment.visibility = visible ? .compact : .visible
 
-        if let commentIndex = indexOfComment(comment, source: comments) {
-            let childrenCount = countChildren(comment)
+        if let commentIndex = indexByID[comment.id] {
+            let subtreeEndIndex = subtreeEndIndexByID[comment.id] ?? (commentIndex + 1)
 
-            if childrenCount > 0 {
-                for childIndex in 1 ... childrenCount {
-                    let currentComment = comments[commentIndex + childIndex]
-
-                    if visible, currentComment.visibility == .hidden { continue }
-
+            if commentIndex + 1 < subtreeEndIndex {
+                for childIndex in (commentIndex + 1) ..< subtreeEndIndex {
+                    let currentComment = comments[childIndex]
+                    if visible, currentComment.visibility == .hidden {
+                        continue
+                    }
                     currentComment.visibility = visible ? .hidden : .visible
                 }
             }
@@ -257,66 +265,74 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     @discardableResult
     public func hideCommentBranch(_ comment: Comment) -> Comment? {
-        guard let rootIndex = indexOfVisibleRootComment(of: comment) else { return nil }
+        guard let rootComment = visibleRootComment(of: comment) else { return nil }
 
-        let rootComment = visibleComments[rootIndex]
         toggleCommentVisibility(rootComment)
         return rootComment
     }
 }
 
 private extension CommentsViewModel {
+    struct VisibleCommentSignature: Equatable {
+        let id: Int
+        let visibility: CommentVisibilityType
+    }
+
+    func rebuildCommentIndexes() {
+        indexByID = [:]
+        parentIndexByID = [:]
+        subtreeEndIndexByID = [:]
+
+        var stack: [(index: Int, id: Int, level: Int)] = []
+        for index in comments.indices {
+            let comment = comments[index]
+            indexByID[comment.id] = index
+
+            while let last = stack.last, comment.level <= last.level {
+                subtreeEndIndexByID[last.id] = index
+                stack.removeLast()
+            }
+
+            if let parent = stack.last {
+                parentIndexByID[comment.id] = parent.index
+            }
+
+            stack.append((index: index, id: comment.id, level: comment.level))
+        }
+
+        for item in stack {
+            subtreeEndIndexByID[item.id] = comments.endIndex
+        }
+    }
+
     func updateVisibleComments() {
-        visibleComments = comments.filter { $0.visibility != .hidden }
+        let updatedComments = comments.filter { $0.visibility != .hidden }
+        let updatedSignature = updatedComments.map {
+            VisibleCommentSignature(id: $0.id, visibility: $0.visibility)
+        }
+
+        guard updatedSignature != visibleSignature else { return }
+        visibleComments = updatedComments
+        visibleSignature = updatedSignature
+        visibleRevision += 1
     }
 
-    func indexOfComment(_ comment: Comment, source: [Comment]) -> Int? {
-        source.firstIndex(where: { $0.id == comment.id })
-    }
+    func visibleRootComment(of comment: Comment) -> Comment? {
+        guard let commentIndex = indexByID[comment.id] else { return nil }
 
-    func indexOfVisibleRootComment(of comment: Comment) -> Int? {
-        guard let commentIndex = indexOfComment(comment, source: visibleComments) else { return nil }
-
-        for index in (0 ... commentIndex).reversed() where visibleComments[index].level == 0 {
-            return index
+        for index in (0 ... commentIndex).reversed()
+            where comments[index].level == 0 && comments[index].visibility != .hidden {
+            return comments[index]
         }
 
         return nil
     }
 
-    func countChildren(_ comment: Comment) -> Int {
-        guard let startIndex = indexOfComment(comment, source: comments) else { return 0 }
-        let nextIndex = startIndex + 1
-        var count = 0
-
-        guard nextIndex < comments.count else {
-            return 0
-        }
-
-        for index in nextIndex ..< comments.count {
-            let currentComment = comments[index]
-            if currentComment.level > comment.level {
-                count += 1
-            } else {
-                break
-            }
-        }
-
-        return count
-    }
-
     func ensureAncestorVisibility(forCommentAt index: Int) {
-        var remainingLevel = comments[index].level
-        guard remainingLevel > 0 else { return }
-
-        var searchIndex = index - 1
-        while searchIndex >= 0, remainingLevel > 0 {
-            let candidate = comments[searchIndex]
-            if candidate.level == remainingLevel - 1 {
-                candidate.visibility = .visible
-                remainingLevel -= 1
-            }
-            searchIndex -= 1
+        var currentCommentID = comments[index].id
+        while let parentIndex = parentIndexByID[currentCommentID] {
+            comments[parentIndex].visibility = .visible
+            currentCommentID = comments[parentIndex].id
         }
     }
 }

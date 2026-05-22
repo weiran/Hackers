@@ -107,22 +107,6 @@ struct EmptyCommentsView: View {
     }
 }
 
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
-    static let defaultValue = CGFloat.zero
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value += nextValue()
-    }
-}
-
-struct CommentPositionsPreferenceKey: PreferenceKey {
-    typealias Value = [Int: CGRect]
-    static let defaultValue: [Int: CGRect] = [:]
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
-    }
-}
-
 extension View {
     func plainListRow() -> some View {
         listRowSeparator(.hidden)

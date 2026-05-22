@@ -23,7 +23,6 @@ struct PostCommentsSheet: View {
     @State private var votingViewModel: VotingViewModel
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var sheetState: SheetState = .collapsed
-    @State private var presentedSheetState: SheetState = .collapsed
     @State private var dragTranslation: CGFloat = 0
     @State private var isTrackingDrag = false
     @State private var dragStartAllowsSheetDrag = false
@@ -56,7 +55,6 @@ struct PostCommentsSheet: View {
         ))
         _browserController = ObservedObject(wrappedValue: controller)
         _sheetState = State(initialValue: initialSheetState)
-        _presentedSheetState = State(initialValue: initialSheetState)
         _showsExpandedToolbar = State(initialValue: initialSheetState == .expanded)
         self.onDismiss = onDismiss
         fallbackURL = post.url
@@ -72,10 +70,9 @@ struct PostCommentsSheet: View {
             let proposedTop = baseTop + dragTranslation
             let clampedTop = min(max(proposedTop, expandedTop), collapsedTop)
             let alignedTop = clampedTop
-            let sheetHeight = max(screenSize.height - alignedTop, 0)
             let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
             let controlsTop = alignedTop - controlsOffset
-            let showsExpandedPresentation = presentedSheetState == .expanded
+            let showsExpandedPresentation = viewModel.post != nil
             let showsCollapsedControls = sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
             let expansionProgress: CGFloat = if collapsedTop > expandedTop {
                 1 - ((alignedTop - expandedTop) / (collapsedTop - expandedTop))
@@ -85,6 +82,8 @@ struct PostCommentsSheet: View {
             let handleTopInset = safeInsets.top * min(max(expansionProgress, 0), 1)
             // Keep the comments list's inset stable while sheet chrome animates.
             let expandedCommentsTopInset = expandedTopOverlayHeight(handleTopInset: safeInsets.top)
+            let contentFadeProgress = min(max(expansionProgress, 0), 1)
+            let isInteractiveMove = isTrackingDrag || isHandleDragActive
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -94,12 +93,19 @@ struct PostCommentsSheet: View {
                     collapsedTop: collapsedTop,
                     handleTopInset: handleTopInset,
                     commentsTopContentInset: expandedCommentsTopInset,
+                    contentFadeProgress: contentFadeProgress,
+                    isInteractiveMove: isInteractiveMove,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
-                .frame(width: screenSize.width, height: sheetHeight, alignment: .top)
+                .frame(width: screenSize.width, height: screenSize.height, alignment: .top)
                 .background(sheetBackground)
                 .clipShape(sheetShape)
-                .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: -5)
+                .shadow(
+                    color: isInteractiveMove ? .clear : .black.opacity(0.12),
+                    radius: isInteractiveMove ? 0 : 10,
+                    x: 0,
+                    y: isInteractiveMove ? 0 : -5
+                )
                 .offset(y: alignedTop)
 
                 if showsCollapsedControls {
@@ -127,9 +133,6 @@ struct PostCommentsSheet: View {
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
             .onChange(of: isExpanded) { _, newValue in
                 updateExpandedToolbarVisibility(isExpanded: newValue)
-            }
-            .task {
-                await viewModel.loadComments()
             }
         }
     }
@@ -164,33 +167,52 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
         commentsTopContentInset: CGFloat,
+        contentFadeProgress: CGFloat,
+        isInteractiveMove: Bool,
         showsExpandedPresentation: Bool
     ) -> some View {
         ZStack(alignment: .top) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
-                    showsPostHeader: presentedSheetState == .expanded
+                    showsPostHeader: true
                 )
-                .allowsHitTesting(true)
+                .overlay {
+                    if contentFadeProgress < 0.01 {
+                        Rectangle()
+                            .fill(.background)
+                            .allowsHitTesting(false)
+                    } else if !isInteractiveMove, contentFadeProgress < 1 {
+                        Rectangle()
+                            .fill(.background)
+                            .opacity(1 - contentFadeProgress)
+                            .allowsHitTesting(false)
+                    }
+                }
+                .allowsHitTesting(contentFadeProgress >= 0.5)
                 .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
                     expandedTop: expandedTop,
-                    collapsedTop: collapsedTop
+                    collapsedTop: collapsedTop,
+                    isInteractiveMove: isInteractiveMove
                 )
-            } else {
-                VStack(spacing: 0) {
-                    Color.clear
-                        .frame(height: Self.handleAreaHeight + handleTopInset)
-
-                    collapsedHeader
-                        .allowsHitTesting(true)
-                }
-                .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-                .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                .opacity(contentFadeProgress)
+                .allowsHitTesting(contentFadeProgress >= 0.5)
             }
+
+            VStack(spacing: 0) {
+                Color.clear
+                    .frame(height: Self.handleAreaHeight + handleTopInset)
+
+                collapsedHeader
+                    .allowsHitTesting(true)
+            }
+            .opacity(1 - contentFadeProgress)
+            .allowsHitTesting(contentFadeProgress < 0.5)
+            .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
+            .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
             sheetHandle(
                 expandedTop: expandedTop,
@@ -200,28 +222,29 @@ struct PostCommentsSheet: View {
         }
     }
 
-    private func expandedCommentsView(topContentInset: CGFloat, showsPostHeader: Bool) -> some View {
-        CommentsView<NavigationStore>(
+    private func expandedCommentsView(
+        topContentInset: CGFloat,
+        showsPostHeader: Bool
+    ) -> some View {
+        StableCommentsHost(
             postID: viewModel.postID,
-            initialPost: viewModel.post,
+            topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            allowsRefresh: false,
-            showsToolbar: false,
-            controlsNavigationBarVisibility: false,
-            presentationState: .customBrowser(topContentInset: topContentInset),
+            scrollDisabled: !isExpanded || dragStartAllowsSheetDrag || isHandleDragActive,
+            viewModel: viewModel,
+            votingViewModel: votingViewModel,
             titleVisible: $showsExpandedTitle,
             isAtTop: $isScrollAtTop,
-            onPostLinkTap: collapseSheet,
-            viewModel: viewModel,
-            votingViewModel: votingViewModel
+            onPostLinkTap: collapseSheet
         )
-        .scrollDisabled(!isExpanded || dragStartAllowsSheetDrag || isHandleDragActive)
+        .equatable()
     }
 
     private func expandedTopOverlay(
         handleTopInset: CGFloat,
         expandedTop: CGFloat,
-        collapsedTop: CGFloat
+        collapsedTop: CGFloat,
+        isInteractiveMove: Bool
     ) -> some View {
         VStack(spacing: 0) {
             Spacer()
@@ -284,11 +307,15 @@ struct PostCommentsSheet: View {
         .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .allowsHitTesting(showsExpandedToolbar)
         .background(alignment: .top) {
-            ProgressiveHeaderBlurBackground(
-                height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
-                fadeExtension: Self.expandedContentSpacing
-            )
+            if isInteractiveMove {
+                Color.clear
+            } else {
+                ProgressiveHeaderBlurBackground(
+                    height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
+                    fadeExtension: Self.expandedContentSpacing
+                )
                 .opacity(showsExpandedToolbar ? 1 : 0)
+            }
         }
     }
 
@@ -322,7 +349,6 @@ struct PostCommentsSheet: View {
             animateSheet {
                 sheetState = .expanded
             }
-            scheduleExpandedPresentation()
         })
         .background(
             GeometryReader { proxy in
@@ -377,7 +403,6 @@ struct PostCommentsSheet: View {
 
     private func collapseSheet() {
         guard isExpanded else { return }
-        presentedSheetState = .collapsed
         animateSheet {
             sheetState = .collapsed
             dragTranslation = 0
@@ -536,26 +561,13 @@ private extension PostCommentsSheet {
         let predictedTop = baseTop + predictedTranslation
         let midpoint = (expandedTop + collapsedTop) / 2
         let targetState: SheetState = predictedTop <= midpoint ? .expanded : .collapsed
-        if targetState == .collapsed {
-            presentedSheetState = .collapsed
-        }
         animateSheet {
             dragTranslation = 0
             sheetState = targetState
         }
-        if targetState == .expanded {
-            scheduleExpandedPresentation()
-        }
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
         scheduleCollapsedUpvoteReenable()
-    }
-
-    private func scheduleExpandedPresentation() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + Self.sheetAnimationDuration) {
-            guard sheetState == .expanded, !isTrackingDrag, !isHandleDragActive else { return }
-            presentedSheetState = .expanded
-        }
     }
 
     private var systemBackGestureEdgeWidth: CGFloat {
@@ -581,4 +593,42 @@ private extension PostCommentsSheet {
 enum SheetState {
     case collapsed
     case expanded
+}
+
+private struct StableCommentsHost: View, @preconcurrency Equatable {
+    let postID: Int
+    let topContentInset: CGFloat
+    let showsPostHeader: Bool
+    let scrollDisabled: Bool
+    let viewModel: CommentsViewModel
+    let votingViewModel: VotingViewModel
+    @Binding var titleVisible: Bool
+    @Binding var isAtTop: Bool
+    let onPostLinkTap: () -> Void
+
+    static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
+        lhs.postID == rhs.postID
+            && lhs.topContentInset == rhs.topContentInset
+            && lhs.showsPostHeader == rhs.showsPostHeader
+            && lhs.scrollDisabled == rhs.scrollDisabled
+            && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
+            && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
+    }
+
+    var body: some View {
+        CommentsView<NavigationStore>(
+            postID: postID,
+            showsPostHeader: showsPostHeader,
+            allowsRefresh: false,
+            showsToolbar: false,
+            controlsNavigationBarVisibility: false,
+            presentationState: .customBrowser(topContentInset: topContentInset),
+            titleVisible: $titleVisible,
+            isAtTop: $isAtTop,
+            onPostLinkTap: onPostLinkTap,
+            viewModel: viewModel,
+            votingViewModel: votingViewModel
+        )
+        .scrollDisabled(scrollDisabled)
+    }
 }

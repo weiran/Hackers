@@ -445,6 +445,52 @@ struct CommentsViewModelTests {
             #expect(sut.visibleComments.count == 2)
         }
 
+        @Test("Toggle uses indexed subtree bounds without hiding following siblings")
+        @MainActor
+        func toggleUsesIndexedSubtreeBounds() async {
+            let parentComment = createTestComment(id: 1, level: 0)
+            let childComment = createTestComment(id: 2, level: 1)
+            let grandchildComment = createTestComment(id: 3, level: 2)
+            let siblingComment = createTestComment(id: 4, level: 0)
+
+            mockPostUseCase.mockPost = createPostWithComments(
+                comments: [parentComment, childComment, grandchildComment, siblingComment]
+            )
+
+            await sut.loadComments()
+
+            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
+            let loadedSibling = sut.comments.first(where: { $0.id == 4 })!
+
+            sut.toggleCommentVisibility(loadedParent)
+
+            #expect(loadedParent.visibility == .compact)
+            #expect(loadedSibling.visibility == .visible)
+            #expect(sut.visibleComments.map(\.id) == [1, 4])
+        }
+
+        @Test("Visible revision advances only when visible signature changes")
+        @MainActor
+        func visibleRevisionTracksSignatureChanges() async {
+            let parentComment = createTestComment(id: 1, level: 0)
+            let childComment = createTestComment(id: 2, level: 1)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [parentComment, childComment])
+
+            await sut.loadComments()
+
+            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
+            let revisionAfterLoad = sut.visibleRevision
+
+            sut.toggleCommentVisibility(loadedParent)
+            let revisionAfterToggle = sut.visibleRevision
+
+            let missingReveal = sut.revealComment(withId: 999)
+
+            #expect(revisionAfterToggle == revisionAfterLoad + 1)
+            #expect(!missingReveal)
+            #expect(sut.visibleRevision == revisionAfterToggle)
+        }
+
         @Test("Hide comment branch collapses entire tree")
         @MainActor
         func hideCommentBranch() async {

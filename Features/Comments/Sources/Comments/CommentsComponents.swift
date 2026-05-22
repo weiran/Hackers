@@ -13,16 +13,27 @@ import Shared
 import SwiftUI
 import UIKit
 
-private enum CommentScrollTarget {
-    static func rowID(for commentID: Int) -> String {
-        "comment-\(commentID)"
+private struct CommentsListFramePreferenceKey: PreferenceKey {
+    static let defaultValue: CGRect? = nil
+
+    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
+        value = nextValue() ?? value
+    }
+}
+
+private struct PendingCommentFramePreferenceKey: PreferenceKey {
+    static let defaultValue: CGRect? = nil
+
+    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
+        value = nextValue() ?? value
     }
 }
 
 struct CommentsContentView: View {
+    @Environment(\.textScaling) private var textScaling
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
-    let toggleCommentVisibility: (Comment, @escaping (Int) -> Void) -> Void
+    let toggleCommentVisibility: (Comment) -> Void
     let hideCommentBranch: (Comment, @escaping (Int) -> Void) -> Void
     let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
@@ -30,10 +41,13 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
-    @Binding var visibleCommentPositions: [Int: CGRect]
     @Binding var pendingCommentID: Int?
     @Binding var listAnimationsEnabled: Bool
     @State private var lastIsAtTop = true
+    @State private var pendingAutoScrollCheckID: Int?
+    @State private var pendingAutoScrollFrame: CGRect?
+    @State private var listFrame: CGRect?
+    @State private var autoScrollSequence = 0
 
     var body: some View {
         Group {
@@ -57,12 +71,12 @@ struct CommentsContentView: View {
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 }, action: { _, newValue in
-                    let shouldShowTitle = newValue > 40
+                    let shouldShowTitle = showTitle ? newValue > 24 : newValue > 56
                     if shouldShowTitle != showTitle {
                         showTitle = shouldShowTitle
                         updateTitleVisibility?(shouldShowTitle)
                     }
-                    let isAtTop = newValue <= 2
+                    let isAtTop = lastIsAtTop ? newValue <= 8 : newValue <= 1
                     if isAtTop != lastIsAtTop {
                         lastIsAtTop = isAtTop
                         updateIsAtTop?(isAtTop)
@@ -73,14 +87,30 @@ struct CommentsContentView: View {
                 .safeAreaInset(edge: .top, spacing: 0) {
                     commentScrollTopSafeAreaInset
                 }
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear.preference(
+                            key: CommentsListFramePreferenceKey.self,
+                            value: geometry.frame(in: .global)
+                        )
+                    }
+                }
                 .transaction { transaction in
                     transaction.disablesAnimations = !listAnimationsEnabled
                 }
                 .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(with: proxy)
                 }
-                .onChange(of: viewModel.visibleComments) { _, _ in
+                .onChange(of: viewModel.visibleRevision) { _, _ in
                     scrollToPendingComment(with: proxy)
+                }
+                .onPreferenceChange(CommentsListFramePreferenceKey.self) { listFrame = $0 }
+                .onPreferenceChange(PendingCommentFramePreferenceKey.self) { pendingAutoScrollFrame = $0 }
+                .task(id: viewModel.visibleRevision) {
+                    CommentTextCache.prewarm(
+                        comments: viewModel.visibleComments.prefix(30),
+                        textScaling: textScaling
+                    )
                 }
             }
         }
@@ -110,12 +140,6 @@ struct CommentsContentView: View {
                 onBookmarkToggle: { await viewModel.toggleBookmark() }
             )
             .id("header")
-            .background(GeometryReader { geometry in
-                Color.clear.preference(
-                    key: ViewOffsetKey.self,
-                    value: geometry.frame(in: .global).minY,
-                )
-            })
             .listRowSeparator(.hidden)
             .if(shouldShowVoteActions(for: post)) { view in
                 view.swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -181,14 +205,21 @@ struct CommentsContentView: View {
             CommentsForEach(
                 post: post,
                 toggleCommentVisibility: { comment in
-                    toggleCommentVisibility(comment) { scrollToComment(withID: $0, proxy: proxy) }
+                    let shouldCheckAutoScroll = comment.visibility == .visible
+                    if shouldCheckAutoScroll {
+                        pendingAutoScrollCheckID = comment.id
+                    }
+                    toggleCommentVisibility(comment)
+                    if shouldCheckAutoScroll {
+                        scheduleAutoScrollCheck(for: comment.id, proxy: proxy)
+                    }
                 },
                 hideCommentBranch: { comment in
                     hideCommentBranch(comment) { scrollToComment(withID: $0, proxy: proxy) }
                 },
                 viewModel: viewModel,
                 votingViewModel: votingViewModel,
-                visibleCommentPositions: $visibleCommentPositions,
+                pendingAutoScrollCheckID: pendingAutoScrollCheckID,
             )
         }
     }
@@ -209,7 +240,7 @@ struct CommentsContentView: View {
         animation: Animation? = nil
     ) {
         let updates = {
-            proxy.scrollTo(CommentScrollTarget.rowID(for: commentID), anchor: .top)
+            proxy.scrollTo(commentID, anchor: .top)
         }
 
         if let animation {
@@ -220,32 +251,69 @@ struct CommentsContentView: View {
             updates()
         }
     }
+
+    private func scheduleAutoScrollCheck(for commentID: Int, proxy: ScrollViewProxy) {
+        autoScrollSequence += 1
+        let sequence = autoScrollSequence
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard autoScrollSequence == sequence,
+                  pendingAutoScrollCheckID == commentID
+            else { return }
+
+            if shouldScrollPendingCommentIntoView() {
+                scrollToComment(withID: commentID, proxy: proxy, animation: .easeInOut(duration: 0.3))
+            }
+
+            pendingAutoScrollCheckID = nil
+            pendingAutoScrollFrame = nil
+        }
+    }
+
+    private func shouldScrollPendingCommentIntoView() -> Bool {
+        guard let pendingAutoScrollFrame, let listFrame else { return true }
+        let visibleFrame = CGRect(
+            x: listFrame.minX,
+            y: listFrame.minY + commentScrollTopInset,
+            width: listFrame.width,
+            height: max(listFrame.height - commentScrollTopInset, 0)
+        )
+        return !visibleFrame.contains(pendingAutoScrollFrame)
+    }
 }
 
 struct CommentsForEach: View {
+    @Environment(\.textScaling) private var textScaling
     let post: Post
     let toggleCommentVisibility: (Comment) -> Void
     let hideCommentBranch: (Comment) -> Void
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
-    @Binding var visibleCommentPositions: [Int: CGRect]
+    let pendingAutoScrollCheckID: Int?
 
     var body: some View {
         ForEach(viewModel.visibleComments, id: \.id) { comment in
             CommentRow(
-                post: post,
-                votingViewModel: votingViewModel,
+                state: rowState(for: comment),
                 onToggle: { toggleCommentVisibility(comment) },
                 onHide: { hideCommentBranch(comment) },
-                comment: comment,
+                onUpvote: { Task { await votingViewModel.upvote(comment: comment, in: post) } },
+                onUnvote: { Task { await votingViewModel.unvote(comment: comment, in: post) } },
+                onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() },
+                onShare: { ContentSharePresenter.shared.shareComment(comment) }
             )
-            .id(CommentScrollTarget.rowID(for: comment.id))
-            .background(GeometryReader { geometry in
-                Color.clear.preference(
-                    key: CommentPositionsPreferenceKey.self,
-                    value: [comment.id: geometry.frame(in: .global)],
-                )
-            })
+            .id(comment.id)
+            .background {
+                if pendingAutoScrollCheckID == comment.id {
+                    GeometryReader { geometry in
+                        Color.clear.preference(
+                            key: PendingCommentFramePreferenceKey.self,
+                            value: geometry.frame(in: .global)
+                        )
+                    }
+                }
+            }
             .listRowSeparator(.visible)
             .accessibilityIdentifier("comments.comment.\(comment.id)")
             .if(shouldShowVoteActions(for: comment)) { view in
@@ -279,11 +347,23 @@ struct CommentsForEach: View {
                 }
             }
         }
-        .onPreferenceChange(CommentPositionsPreferenceKey.self) { positions in
-            if visibleCommentPositions != positions {
-                visibleCommentPositions = positions
-            }
-        }
+    }
+
+    private func rowState(for comment: Comment) -> CommentRowState {
+        CommentRowState(
+            id: comment.id,
+            author: comment.by,
+            age: comment.age,
+            visualLevel: min(comment.level, 6),
+            visibility: comment.visibility,
+            isPostAuthor: comment.by == post.by,
+            isUpvoted: comment.upvoted,
+            canVote: comment.voteLinks?.upvote != nil,
+            canUnvote: comment.voteLinks?.unvote != nil,
+            styledText: comment.visibility == .visible
+                ? CommentTextCache.styledText(for: comment, textScaling: textScaling)
+                : nil
+        )
     }
 
     private func shouldShowVoteActions(for comment: Comment) -> Bool {

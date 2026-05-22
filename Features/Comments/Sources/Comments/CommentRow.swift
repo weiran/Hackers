@@ -7,63 +7,63 @@
 
 import DesignSystem
 import Domain
-import Observation
-import Shared
 import SwiftUI
 import UIKit
 
+struct CommentRowState: Equatable, Identifiable {
+    let id: Int
+    let author: String
+    let age: String
+    let visualLevel: Int
+    let visibility: CommentVisibilityType
+    let isPostAuthor: Bool
+    let isUpvoted: Bool
+    let canVote: Bool
+    let canUnvote: Bool
+    let styledText: AttributedString?
+}
+
 struct CommentRow: View {
-    @Environment(\.textScaling) private var textScaling
-    let post: Post
-    let votingViewModel: VotingViewModel
+    let state: CommentRowState
     let onToggle: () -> Void
     let onHide: () -> Void
-    @Bindable var comment: Comment
-
-    private var baseCommentText: AttributedString {
-        if let cached = comment.parsedText {
-            return cached
-        }
-
-        let parsed = CommentHTMLParser.parseHTMLText(comment.text)
-        comment.parsedText = parsed
-        return parsed
-    }
+    let onUpvote: () -> Void
+    let onUnvote: () -> Void
+    let onCopy: () -> Void
+    let onShare: () -> Void
 
     var body: some View {
         Button(action: onToggle) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(comment.by)
+                    Text(state.author)
                         .scaledFont(.subheadline)
                         .bold()
-                        .foregroundStyle(comment.by == post.by ? AppColors.appTintColor : .primary)
-                    Text(comment.age)
+                        .foregroundStyle(state.isPostAuthor ? AppColors.appTintColor : .primary)
+                    Text(state.age)
                         .scaledFont(.subheadline)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    if comment.upvoted {
+                    if state.isUpvoted {
                         VoteIndicator(
                             votingState: VotingState(
-                                isUpvoted: comment.upvoted,
+                                isUpvoted: state.isUpvoted,
                                 score: nil,
-                                canVote: comment.voteLinks?.upvote != nil,
-                                canUnvote: comment.voteLinks?.unvote != nil,
-                                isVoting: votingViewModel.isVoting,
-                                error: votingViewModel.lastError,
+                                canVote: state.canVote,
+                                canUnvote: state.canUnvote
                             ),
                             style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
                         )
                     }
-                    if comment.visibility == .compact {
+                    if state.visibility == .compact {
                         Image(systemName: "chevron.down")
                             .scaledFont(.caption)
                             .foregroundStyle(.secondary)
                             .accessibilityHidden(true)
                     }
                 }
-                if comment.visibility == .visible {
-                    Text(styledText(for: textScaling))
+                if let styledText = state.styledText {
+                    Text(styledText)
                         .foregroundStyle(.primary)
                 }
             }
@@ -71,36 +71,29 @@ struct CommentRow: View {
         }
         .buttonStyle(.plain)
         .listRowInsets([.top, .bottom, .trailing], 16)
-        .listRowInsets([.leading], CGFloat((comment.level + 1) * 16))
+        .listRowInsets([.leading], CGFloat(16 + state.visualLevel * 14))
         .accessibilityAddTraits(.isButton)
-        .accessibilityHint(comment.visibility == .visible ? "Tap to collapse" : "Tap to expand")
+        .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .contextMenu {
-            VotingContextMenuItems.commentVotingMenuItems(
-                for: comment,
-                onVote: {
-                    Task { await votingViewModel.upvote(comment: comment, in: post) }
-                },
-                onUnvote: {
-                    Task { await votingViewModel.unvote(comment: comment, in: post) }
+            if state.canVote, !state.isUpvoted {
+                Button(action: onUpvote) {
+                    Label("Upvote", systemImage: "arrow.up")
                 }
-            )
-            Button { UIPasteboard.general.string = comment.text.strippingHTML() } label: {
+            }
+            if state.canUnvote, state.isUpvoted {
+                Button(action: onUnvote) {
+                    Label("Unvote", systemImage: "arrow.uturn.down")
+                }
+            }
+            Divider()
+            Button(action: onCopy) {
                 Label("Copy", systemImage: "doc.on.doc")
             }
             Divider()
-            Button { ContentSharePresenter.shared.shareComment(comment) } label: {
+            Button(action: onShare) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
         }
-        .id(String(comment.id) + String(comment.visibility.rawValue))
-    }
-
-    private func styledText(for textScaling: CGFloat) -> AttributedString {
-        StyledCommentTextCache.text(
-            commentID: comment.id,
-            textScaling: textScaling,
-            baseText: baseCommentText
-        )
     }
 }
 
@@ -189,26 +182,39 @@ private struct CommentFontProvider {
 }
 
 @MainActor
-private enum StyledCommentTextCache {
-    private struct CacheKey: Hashable {
+enum CommentTextCache {
+    private struct BaseCacheKey: Hashable {
         let commentID: Int
-        let scale: CGFloat
+        let textHash: Int
     }
 
-    private struct Entry {
-        let base: AttributedString
-        let styled: AttributedString
+    private struct StyledCacheKey: Hashable {
+        let commentID: Int
+        let textHash: Int
+        let scale: Double
     }
 
-    private static var cache: [CacheKey: Entry] = [:]
+    private static var baseCache: [BaseCacheKey: AttributedString] = [:]
+    private static var styledCache: [StyledCacheKey: AttributedString] = [:]
 
-    static func text(commentID: Int, textScaling: CGFloat, baseText: AttributedString) -> AttributedString {
-        let key = CacheKey(commentID: commentID, scale: textScaling)
-        if let cached = cache[key], cached.base == baseText {
-            return cached.styled
+    static func prewarm(comments: ArraySlice<Comment>, textScaling: CGFloat) {
+        for comment in comments where comment.visibility == .visible {
+            _ = styledText(for: comment, textScaling: textScaling)
+        }
+    }
+
+    static func styledText(for comment: Comment, textScaling: CGFloat) -> AttributedString {
+        let textHash = comment.text.hashValue
+        let key = StyledCacheKey(
+            commentID: comment.id,
+            textHash: textHash,
+            scale: Double(textScaling)
+        )
+        if let cached = styledCache[key] {
+            return cached
         }
 
-        var attributed = baseText
+        var attributed = baseText(for: comment, textHash: textHash)
         let fontProvider = CommentFontProvider.cached(textScaling: textScaling)
         let linkColor = AppColors.appTintColor
 
@@ -226,7 +232,18 @@ private enum StyledCommentTextCache {
             attributed[run.range].foregroundColor = linkColor
         }
 
-        cache[key] = Entry(base: baseText, styled: attributed)
+        styledCache[key] = attributed
         return attributed
+    }
+
+    private static func baseText(for comment: Comment, textHash: Int) -> AttributedString {
+        let key = BaseCacheKey(commentID: comment.id, textHash: textHash)
+        if let cached = baseCache[key] {
+            return cached
+        }
+
+        let parsed = CommentHTMLParser.parseHTMLText(comment.text)
+        baseCache[key] = parsed
+        return parsed
     }
 }

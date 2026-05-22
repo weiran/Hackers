@@ -132,6 +132,7 @@ public final class Comment: @unchecked Sendable {
     nonisolated(unsafe) public var upvoted: Bool
     nonisolated(unsafe) public var voteLinks: VoteLinks?
     public var visibility: CommentVisibilityType
+    @ObservationIgnored
     public var parsedText: AttributedString?
 
     public init(

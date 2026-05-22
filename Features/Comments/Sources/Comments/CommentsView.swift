@@ -67,8 +67,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var showTitle = false
-    @State private var hasMeasuredInitialOffset = false
-    @State private var visibleCommentPositions: [Int: CGRect] = [:]
     @State private var pendingCommentID: Int?
     @State private var listAnimationsEnabled = false
 
@@ -95,7 +93,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
-        _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil ? postID : nil))
+        _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
         } else {
@@ -155,7 +153,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,
-                    visibleCommentPositions: $visibleCommentPositions,
                     pendingCommentID: $pendingCommentID,
                     listAnimationsEnabled: $listAnimationsEnabled,
                 )
@@ -295,24 +292,14 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         return true
     }
 
-    private func toggleCommentVisibility(_ comment: Comment, scrollToComment: @escaping (Int) -> Void) {
+    private func toggleCommentVisibility(_ comment: Comment) {
         listAnimationsEnabled = true
-        let wasVisible = comment.visibility == .visible
 
         withAnimation(.easeInOut(duration: 0.3)) {
             viewModel.toggleCommentVisibility(comment)
         }
 
-        if wasVisible, !isCommentVisibleOnScreen(comment) {
-            Task { @MainActor in
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    scrollToComment(comment.id)
-                }
-                listAnimationsEnabled = false
-            }
-        } else {
-            Task { @MainActor in listAnimationsEnabled = false }
-        }
+        Task { @MainActor in listAnimationsEnabled = false }
     }
 
     private func hideCommentBranch(_ comment: Comment, scrollToComment: @escaping (Int) -> Void) {
@@ -331,14 +318,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
     }
 
-    private func isCommentVisibleOnScreen(_ comment: Comment) -> Bool {
-        guard let commentFrame = visibleCommentPositions[comment.id] else { return false }
-        guard let window = PresentationContextProvider.shared.windowScene?.windows.first else { return false }
-        let visibleBounds = window.bounds.inset(
-            by: UIEdgeInsets(top: presentationState.commentScrollTopInset, left: 0, bottom: 0, right: 0)
-        )
-        return visibleBounds.contains(CGPoint(x: commentFrame.midX, y: commentFrame.minY))
-    }
 }
 
 enum CommentsLinkNavigator {
