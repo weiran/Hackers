@@ -247,20 +247,23 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool
     ) -> some View {
         VStack(spacing: 0) {
-            Spacer()
+            Color.clear
                 .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
+                .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
+                .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
             GlassEffectContainer(spacing: 10) {
                 HStack(spacing: 10) {
                     Button {
-                        Task { @MainActor in onDismiss() }
+                        dismissBrowser()
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.title3.weight(.medium))
                             .frame(width: 44, height: 44)
-                            .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
                     .accessibilityLabel("Back")
                     .modifier(GlassCircleBackground())
 
@@ -303,8 +306,6 @@ struct PostCommentsSheet: View {
             .frame(height: Self.expandedToolbarHeight)
             .opacity(showsExpandedToolbar ? 1 : 0)
         }
-        .contentShape(Rectangle())
-        .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .allowsHitTesting(showsExpandedToolbar)
         .background(alignment: .top) {
             if isInteractiveMove {
@@ -410,6 +411,10 @@ struct PostCommentsSheet: View {
             dragStartAllowsSheetDrag = false
             isHandleDragActive = false
         }
+    }
+
+    private func dismissBrowser() {
+        onDismiss()
     }
 }
 

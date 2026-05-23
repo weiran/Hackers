@@ -109,6 +109,8 @@ struct BrowserControlsView: View {
                 .frame(width: 20, height: 20)
                 .padding(10)
         }
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
         .foregroundStyle(.primary)
         .accessibilityLabel("Close")
         .modifier(GlassCircleBackground())

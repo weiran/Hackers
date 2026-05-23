@@ -290,12 +290,18 @@ struct PostLinkBrowserView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .nativeInteractivePopGesture(edgeOnly: true)
+        .systemBackGesturePriorityShield(width: systemBackGestureEdgeWidth)
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.standard) {
                 showingCommentsPane = true
             }
         }
+    }
+
+    private var systemBackGestureEdgeWidth: CGFloat {
+        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
+        return leadingInset + 32
     }
 }
 
@@ -307,6 +313,25 @@ private extension View {
                 .allowsHitTesting(false)
         }
     }
+
+    func systemBackGesturePriorityShield(width: CGFloat) -> some View {
+        overlay(alignment: .leading) {
+            SystemBackGesturePriorityShield()
+                .frame(width: width)
+                .ignoresSafeArea(.container, edges: .leading)
+        }
+    }
+}
+
+private struct SystemBackGesturePriorityShield: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.isUserInteractionEnabled = true
+        return view
+    }
+
+    func updateUIView(_ view: UIView, context: Context) {}
 }
 
 @MainActor
@@ -461,7 +486,11 @@ private struct NativeInteractivePopGestureInstaller: UIViewControllerRepresentab
             _ gestureRecognizer: UIGestureRecognizer,
             shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
         ) -> Bool {
-            isManagedPopGesture(gestureRecognizer) || isManagedPopGesture(otherGestureRecognizer)
+            if isEdgePopGesture(gestureRecognizer) || isEdgePopGesture(otherGestureRecognizer) {
+                return false
+            }
+
+            return isManagedPopGesture(gestureRecognizer) || isManagedPopGesture(otherGestureRecognizer)
         }
 
         private func isManagedPopGesture(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -472,6 +501,22 @@ private struct NativeInteractivePopGestureInstaller: UIViewControllerRepresentab
                gestureRecognizer === contentGesture {
                 return true
             }
+            return false
+        }
+
+        private func isEdgePopGesture(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            if gestureRecognizer === edgeGesture {
+                return true
+            }
+
+            if #available(iOS 26.0, *),
+               edgeOnly,
+               gestureRecognizer === contentGesture,
+               let navigationController {
+                let location = gestureRecognizer.location(in: navigationController.view)
+                return location.x <= systemPopStartMaxX(in: navigationController)
+            }
+
             return false
         }
 
