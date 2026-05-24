@@ -29,6 +29,17 @@ private struct PendingCommentFramePreferenceKey: PreferenceKey {
     }
 }
 
+private struct SystemBackGestureEdgeShield: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.isUserInteractionEnabled = true
+        return view
+    }
+
+    func updateUIView(_ view: UIView, context: Context) {}
+}
+
 struct CommentsContentView: View {
     @Environment(\.textScaling) private var textScaling
     let showsPostHeader: Bool
@@ -59,6 +70,19 @@ struct CommentsContentView: View {
 
     private var commentScrollTopInset: CGFloat {
         presentationState.commentScrollTopInset
+    }
+
+    private var reservesSystemBackGestureEdge: Bool {
+        if case .customBrowser = presentationState {
+            true
+        } else {
+            false
+        }
+    }
+
+    private var systemBackGestureEdgeWidth: CGFloat {
+        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
+        return leadingInset + 56
     }
 
     private func content(for post: Post) -> some View {
@@ -93,6 +117,14 @@ struct CommentsContentView: View {
                             key: CommentsListFramePreferenceKey.self,
                             value: geometry.frame(in: .global)
                         )
+                    }
+                }
+                .overlay(alignment: .leading) {
+                    if reservesSystemBackGestureEdge {
+                        SystemBackGestureEdgeShield()
+                            .frame(width: systemBackGestureEdgeWidth)
+                            .ignoresSafeArea(.container, edges: .leading)
+                            .accessibilityHidden(true)
                     }
                 }
                 .transaction { transaction in

@@ -577,7 +577,7 @@ private extension PostCommentsSheet {
 
     private var systemBackGestureEdgeWidth: CGFloat {
         let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
-        return leadingInset + 32
+        return leadingInset + 56
     }
 
     private func resetDragTracking() {
