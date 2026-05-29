@@ -530,6 +530,8 @@ private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
             .padding(.trailing, 10)
             .frame(height: 44)
             .glassEffect(.regular.interactive(), in: .capsule)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .buttonStyle(.plain)
         .menuIndicator(.hidden)
