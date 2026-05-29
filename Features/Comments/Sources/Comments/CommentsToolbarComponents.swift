@@ -62,23 +62,89 @@ struct ToolbarTitle: View {
     let onTap: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack {
-                ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                    .frame(width: 33, height: 33)
-                    .clipShape(.rect(cornerRadius: 10))
-                Text(post.title)
-                    .scaledFont(.headline)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+        CommentsHeaderTitleButton(
+            post: post,
+            showThumbnails: showThumbnails,
+            isVisible: showTitle,
+            accessibilityHint: "Open link",
+            onTap: onTap
+        )
+    }
+}
+
+public struct CommentsHeaderTitleButton: View {
+    private let post: Post
+    private let showThumbnails: Bool
+    private let isVisible: Bool
+    private let accessibilityHint: String
+    private let onTap: () -> Void
+
+    public init(
+        post: Post,
+        showThumbnails: Bool,
+        isVisible: Bool,
+        accessibilityHint: String,
+        onTap: @escaping () -> Void
+    ) {
+        self.post = post
+        self.showThumbnails = showThumbnails
+        self.isVisible = isVisible
+        self.accessibilityHint = accessibilityHint
+        self.onTap = onTap
+    }
+
+    public var body: some View {
+        ZStack {
+            Color.clear
+                .frame(height: 44)
+
+            if isVisible {
+                Button(action: onTap) {
+                    CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityHint(accessibilityHint)
+                .transition(Self.visibilityTransition)
             }
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint("Open link")
-        .opacity(showTitle ? 1.0 : 0.0)
-        .offset(y: showTitle ? 0 : 20)
-        .animation(.easeInOut(duration: 0.3), value: showTitle)
+        .animation(.easeInOut(duration: 0.3), value: isVisible)
+    }
+
+    private static var visibilityTransition: AnyTransition {
+        .asymmetric(
+            insertion: .opacity.combined(with: .offset(y: 20)),
+            removal: .opacity.combined(with: .offset(y: 20))
+        )
+    }
+}
+
+public struct CommentsHeaderTitlePill: View {
+    private let post: Post
+    private let showThumbnails: Bool
+
+    public init(post: Post, showThumbnails: Bool) {
+        self.post = post
+        self.showThumbnails = showThumbnails
+    }
+
+    public var body: some View {
+        HStack(spacing: 7) {
+            ThumbnailView(url: post.url, isEnabled: showThumbnails)
+                .frame(width: 24, height: 24)
+                .clipShape(.rect(cornerRadius: 7))
+            Text(post.title)
+                .scaledFont(.subheadline)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .padding(.leading, 5)
+        .padding(.trailing, 10)
+        .padding(.vertical, 5)
+        .frame(height: 44)
+        .contentShape(.capsule)
+        .glassEffect(.regular.interactive(), in: .capsule)
     }
 }
 

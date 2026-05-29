@@ -99,8 +99,10 @@ struct CommentsContentView: View {
                 }, action: { _, newValue in
                     let shouldShowTitle = showTitle ? newValue > 24 : newValue > 56
                     if shouldShowTitle != showTitle {
-                        showTitle = shouldShowTitle
-                        updateTitleVisibility?(shouldShowTitle)
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showTitle = shouldShowTitle
+                            updateTitleVisibility?(shouldShowTitle)
+                        }
                     }
                     let isAtTop = lastIsAtTop ? newValue <= 8 : newValue <= 1
                     if isAtTop != lastIsAtTop {

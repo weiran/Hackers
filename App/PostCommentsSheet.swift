@@ -269,22 +269,14 @@ struct PostCommentsSheet: View {
                     .modifier(GlassCircleBackground())
 
                     if let post = viewModel.post {
-                        Button(action: collapseSheet) {
-                            HStack(spacing: 8) {
-                                ThumbnailView(url: post.url, isEnabled: viewModel.showThumbnails)
-                                    .frame(width: 33, height: 33)
-                                    .clipShape(.rect(cornerRadius: 10))
-                                Text(post.title)
-                                    .font(.headline)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .opacity(showsExpandedTitle ? 1.0 : 0.0)
-                        .offset(y: showsExpandedTitle ? 0 : 20)
-                        .animation(.easeInOut(duration: 0.3), value: showsExpandedTitle)
+                        CommentsHeaderTitleButton(
+                            post: post,
+                            showThumbnails: viewModel.showThumbnails,
+                            isVisible: showsExpandedTitle,
+                            accessibilityHint: "Collapse comments",
+                            onTap: collapseSheet
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
                     } else {
                         Spacer()
                     }
