@@ -11,6 +11,7 @@ import Domain
 import MessageUI
 import Shared
 import SwiftUI
+import WhatsNew
 
 public struct SettingsView: View {
     @Environment(ToastPresenter.self) private var toastPresenter
@@ -19,11 +20,12 @@ public struct SettingsView: View {
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
-    let onShowWhatsNew: () -> Void
+    let onWhatsNewDismiss: () -> Void
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showMailView = false
     @State private var showLogin = false
+    @State private var showWhatsNew = false
     @State private var showClearCacheAlert = false
 #if DEBUG
     @AppStorage("devThumbnailProvider") private var devThumbnailProvider = "weiranzhang"
@@ -35,14 +37,14 @@ public struct SettingsView: View {
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onShowWhatsNew: @escaping () -> Void = {}
+        onWhatsNewDismiss: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
         self.currentUsername = currentUsername
         self.onLogin = onLogin
         self.onLogout = onLogout
-        self.onShowWhatsNew = onShowWhatsNew
+        self.onWhatsNewDismiss = onWhatsNewDismiss
     }
 
     public var body: some View {
@@ -88,7 +90,7 @@ public struct SettingsView: View {
                             messageBody: bodyLines.joined(separator: "\n"),
                         )
                     }
-                    Button(action: { onShowWhatsNew() }, label: {
+                    Button(action: { showWhatsNew = true }, label: {
                         Label("Show What's New", systemImage: "sparkles")
                     })
                 }
@@ -250,6 +252,14 @@ public struct SettingsView: View {
                 )
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("settings.close"))
+            .sheet(isPresented: $showWhatsNew) {
+                WhatsNewService.createWhatsNewView {
+                    onWhatsNewDismiss()
+                    showWhatsNew = false
+                }
+                .textScaling(for: viewModel.textSize)
+                .toastOverlay(toastPresenter)
+            }
         }
         .textScaling(for: viewModel.textSize)
     }

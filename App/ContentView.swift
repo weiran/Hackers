@@ -97,8 +97,8 @@ struct MainContentView: View {
                                 onLogout: {
                                     sessionService.unauthenticate()
                                 },
-                                onShowWhatsNew: {
-                                    showWhatsNew = true
+                                onWhatsNewDismiss: {
+                                    whatsNewCoordinator.markWhatsNewShown()
                                 }
                             )
                         }
@@ -135,8 +135,8 @@ struct MainContentView: View {
                 onLogout: {
                     sessionService.unauthenticate()
                 },
-                onShowWhatsNew: {
-                    showWhatsNew = true
+                onWhatsNewDismiss: {
+                    whatsNewCoordinator.markWhatsNewShown()
                 }
             )
             .textScaling(for: settingsViewModel.textSize)
