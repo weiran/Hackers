@@ -35,16 +35,18 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if !viewModel.hasActiveSearch {
+                    ToolbarItem(placement: .principal) {
+                        FeedCategoryToolbarMenu(title: selectedPostType.displayName) {
+                            postTypeTitleMenu
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     settingsButton
                 }
                 ToolbarSpacer(.flexible, placement: .bottomBar)
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
-            }
-            .toolbarTitleMenu {
-                if !viewModel.hasActiveSearch {
-                    postTypeTitleMenu
-                }
             }
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
@@ -500,6 +502,37 @@ private extension FeedView {
     private func shouldShowVoteActions(for post: Domain.Post) -> Bool {
         (post.voteLinks?.upvote != nil && !post.upvoted)
             || (post.voteLinks?.unvote != nil && post.upvoted)
+    }
+}
+
+private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
+    let title: String
+    @ViewBuilder let menuContent: () -> MenuContent
+
+    var body: some View {
+        Menu {
+            menuContent()
+        } label: {
+            HStack(spacing: 8) {
+                Text(title)
+                ZStack {
+                    Circle()
+                        .fill(Color.secondary.opacity(0.16))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(width: 22, height: 22)
+            }
+            .font(.headline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding(.leading, 14)
+            .padding(.trailing, 6)
+            .frame(height: 44)
+            .glassEffect(.regular.interactive(), in: .capsule)
+        }
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
     }
 }
 
