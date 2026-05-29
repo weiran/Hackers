@@ -105,23 +105,6 @@ private extension FeedView {
             && !viewModel.hasActiveSearch
     }
 
-    var selectionBinding: Binding<Int?> {
-        if isSidebar {
-            Binding(
-                get: { selectedPostId },
-                set: { newPostId in
-                    if let postId = newPostId,
-                       let selectedPost = viewModel.posts.first(where: { $0.id == postId }) {
-                        selectedPostId = postId
-                        handlePostTap(post: selectedPost)
-                    }
-                }
-            )
-        } else {
-            .constant(nil)
-        }
-    }
-
     var contentView: some View {
         Group {
             if viewModel.hasActiveSearch {
@@ -182,23 +165,48 @@ private extension FeedView {
         enablePagination: Bool,
         enableSearchPagination: Bool = false
     ) -> some View {
-        List(selection: selectionBinding) {
-            ForEach(posts, id: \.id) { post in
-                postRow(
-                    for: post,
-                    enablePagination: enablePagination,
-                    enableSearchPagination: enableSearchPagination
-                )
-            }
-            if enableSearchPagination {
-                searchPaginationFooter
+        Group {
+            if isSidebar {
+                List {
+                    feedRows(
+                        posts: posts,
+                        enablePagination: enablePagination,
+                        enableSearchPagination: enableSearchPagination
+                    )
+                }
+                .listStyle(.sidebar)
+            } else {
+                List {
+                    feedRows(
+                        posts: posts,
+                        enablePagination: enablePagination,
+                        enableSearchPagination: enableSearchPagination
+                    )
+                }
+                .listStyle(.plain)
             }
         }
-        .if(isSidebar) { view in view.listStyle(.sidebar) }
-        .if(!isSidebar) { view in view.listStyle(.plain) }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .id(selectedPostType)
         .accessibilityIdentifier("feed.list")
+    }
+
+    @ViewBuilder
+    private func feedRows(
+        posts: [Domain.Post],
+        enablePagination: Bool,
+        enableSearchPagination: Bool
+    ) -> some View {
+        ForEach(posts, id: \.id) { post in
+            postRow(
+                for: post,
+                enablePagination: enablePagination,
+                enableSearchPagination: enableSearchPagination
+            )
+        }
+        if enableSearchPagination {
+            searchPaginationFooter
+        }
     }
 
     private func postRow(
@@ -222,7 +230,14 @@ private extension FeedView {
             }
         )
         .if(isSidebar) { view in
-            view.tag(post.id)
+            view
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .listRowBackground(sidebarRowBackground(isSelected: selectedPostId == post.id))
+                .onTapGesture {
+                    selectedPostId = post.id
+                    handlePostTap(post: post)
+                }
         }
         .onAppear {
             if enablePagination, post == viewModel.posts.last {
@@ -245,6 +260,16 @@ private extension FeedView {
         .listRowSeparator(.visible, edges: .bottom)
         .contextMenu { contextMenuContent(for: post) }
         .accessibilityIdentifier("feed.post.\(post.id)")
+    }
+
+    @ViewBuilder
+    private func sidebarRowBackground(isSelected: Bool) -> some View {
+        if isSelected {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(.tertiarySystemFill))
+        } else {
+            Color.clear
+        }
     }
 
     @ViewBuilder
