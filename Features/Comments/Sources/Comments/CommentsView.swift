@@ -61,6 +61,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let showsToolbar: Bool
     private let controlsNavigationBarVisibility: Bool
     private let presentationState: CommentsPresentationState
+    private let postHeaderMatchedGeometryNamespace: Namespace.ID?
+    private let isPostHeaderMatchedGeometrySource: Bool
     private let titleVisible: Binding<Bool>?
     private let isAtTop: Binding<Bool>?
     private let onPostLinkTap: (() -> Void)?
@@ -79,6 +81,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsToolbar: Bool = true,
         controlsNavigationBarVisibility: Bool = true,
         presentationState: CommentsPresentationState = .standard,
+        postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
+        isPostHeaderMatchedGeometrySource: Bool = true,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -90,6 +94,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.showsToolbar = showsToolbar
         self.controlsNavigationBarVisibility = controlsNavigationBarVisibility
         self.presentationState = presentationState
+        self.postHeaderMatchedGeometryNamespace = postHeaderMatchedGeometryNamespace
+        self.isPostHeaderMatchedGeometrySource = isPostHeaderMatchedGeometrySource
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
@@ -116,6 +122,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         showsToolbar: Bool = true,
         controlsNavigationBarVisibility: Bool = true,
         presentationState: CommentsPresentationState = .standard,
+        postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
+        isPostHeaderMatchedGeometrySource: Bool = true,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -131,6 +139,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             showsToolbar: showsToolbar,
             controlsNavigationBarVisibility: controlsNavigationBarVisibility,
             presentationState: presentationState,
+            postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+            isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             titleVisible: titleVisible,
             isAtTop: isAtTop,
             onPostLinkTap: onPostLinkTap,
@@ -150,6 +160,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     updateTitleVisibility: { titleVisible?.wrappedValue = $0 },
                     presentationState: presentationState,
+                    postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+                    isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     showTitle: $showTitle,

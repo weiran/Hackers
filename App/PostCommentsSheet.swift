@@ -32,6 +32,7 @@ struct PostCommentsSheet: View {
     @State private var showsExpandedToolbar = false
     @State private var showsExpandedTitle = false
     @State private var suppressesCollapsedUpvote = false
+    @Namespace private var postHeaderNamespace
 
     init(
         post: Post,
@@ -232,6 +233,8 @@ struct PostCommentsSheet: View {
             scrollDisabled: !isExpanded || dragStartAllowsSheetDrag || isHandleDragActive,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
+            postHeaderMatchedGeometryNamespace: postHeaderNamespace,
+            isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisible: $showsExpandedTitle,
             isAtTop: $isScrollAtTop,
             onPostLinkTap: collapseSheet
@@ -362,7 +365,9 @@ struct PostCommentsSheet: View {
                 onUpvote: { handleCollapsedUpvote(for: post) },
                 onExpand: onExpand,
                 leadingGestureExclusionWidth: systemBackGestureEdgeWidth,
-                disablesUpvote: suppressesCollapsedUpvote
+                disablesUpvote: suppressesCollapsedUpvote,
+                matchedGeometryNamespace: postHeaderNamespace,
+                isMatchedGeometrySource: isCollapsed
             )
         } else {
             CollapsedPostHeaderLoadingView()
@@ -597,6 +602,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let scrollDisabled: Bool
     let viewModel: CommentsViewModel
     let votingViewModel: VotingViewModel
+    let postHeaderMatchedGeometryNamespace: Namespace.ID?
+    let isPostHeaderMatchedGeometrySource: Bool
     @Binding var titleVisible: Bool
     @Binding var isAtTop: Bool
     let onPostLinkTap: () -> Void
@@ -606,6 +613,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             && lhs.topContentInset == rhs.topContentInset
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
+            && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
             && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
             && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
     }
@@ -618,6 +626,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             showsToolbar: false,
             controlsNavigationBarVisibility: false,
             presentationState: .customBrowser(topContentInset: topContentInset),
+            postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+            isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             titleVisible: $titleVisible,
             isAtTop: $isAtTop,
             onPostLinkTap: onPostLinkTap,

@@ -49,6 +49,8 @@ struct CommentsContentView: View {
     let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
     let presentationState: CommentsPresentationState
+    let postHeaderMatchedGeometryNamespace: Namespace.ID?
+    let isPostHeaderMatchedGeometrySource: Bool
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var showTitle: Bool
@@ -165,6 +167,8 @@ struct CommentsContentView: View {
                 votingViewModel: votingViewModel,
                 isLoadingComments: viewModel.isLoading,
                 showThumbnails: viewModel.showThumbnails,
+                matchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+                isMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
                 onLinkTap: { handleLinkTap() },
                 onPostUpdated: { updatedPost in
                     viewModel.post = updatedPost
@@ -409,6 +413,8 @@ struct PostHeader: View {
     let votingViewModel: VotingViewModel
     let isLoadingComments: Bool
     let showThumbnails: Bool
+    let matchedGeometryNamespace: Namespace.ID?
+    let isMatchedGeometrySource: Bool
     let onLinkTap: () -> Void
     let onPostUpdated: @Sendable (Post) -> Void
     let onBookmarkToggle: @Sendable () async -> Bool
@@ -423,7 +429,9 @@ struct PostHeader: View {
                 onThumbnailTap: { onLinkTap() },
                 onUpvoteTap: { await handleUpvote() },
                 onUnvoteTap: { await handleUnvote() },
-                onBookmarkTap: { await onBookmarkToggle() }
+                onBookmarkTap: { await onBookmarkToggle() },
+                matchedGeometryNamespace: matchedGeometryNamespace,
+                isMatchedGeometrySource: isMatchedGeometrySource
             )
             .contentShape(Rectangle())
         }

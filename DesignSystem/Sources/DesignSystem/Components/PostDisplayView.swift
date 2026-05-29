@@ -25,6 +25,8 @@ public struct PostDisplayView: View {
     let onUnvoteTap: (() async -> Bool)?
     let onBookmarkTap: (() async -> Bool)?
     let onCommentsTap: (() -> Void)?
+    let matchedGeometryNamespace: Namespace.ID?
+    let isMatchedGeometrySource: Bool
     @State var isSubmittingUpvote = false
     @State var isSubmittingBookmark = false
     @State var displayedScore: Int
@@ -46,7 +48,9 @@ public struct PostDisplayView: View {
         onUpvoteTap: (() async -> Bool)? = nil,
         onUnvoteTap: (() async -> Bool)? = nil,
         onBookmarkTap: (() async -> Bool)? = nil,
-        onCommentsTap: (() -> Void)? = nil
+        onCommentsTap: (() -> Void)? = nil,
+        matchedGeometryNamespace: Namespace.ID? = nil,
+        isMatchedGeometrySource: Bool = true
     ) {
         self.post = post
         self.votingState = votingState
@@ -62,6 +66,8 @@ public struct PostDisplayView: View {
         self.onUnvoteTap = onUnvoteTap
         self.onBookmarkTap = onBookmarkTap
         self.onCommentsTap = onCommentsTap
+        self.matchedGeometryNamespace = matchedGeometryNamespace
+        self.isMatchedGeometrySource = isMatchedGeometrySource
         _displayedScore = State(initialValue: post.score)
         _displayedUpvoted = State(initialValue: post.upvoted)
         _displayedBookmarked = State(initialValue: post.isBookmarked)
@@ -74,6 +80,11 @@ public struct PostDisplayView: View {
                 // Thumbnail with proper loading
                 Button(action: { onThumbnailTap?() }, label: {
                     ThumbnailView(url: post.url, isEnabled: showThumbnails)
+                        .postHeaderMatchedGeometry(
+                            PostHeaderMatchedGeometryElement.thumbnail(postID: post.id),
+                            namespace: matchedGeometryNamespace,
+                            isSource: isMatchedGeometrySource
+                        )
                         .frame(width: thumbnailSize, height: thumbnailSize)
                         .clipShape(.rect(cornerRadius: min(16, thumbnailSize * 0.3)))
                         .contentShape(Rectangle())
@@ -125,6 +136,11 @@ public struct PostDisplayView: View {
                                 .scaledFont(.caption)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)
+                                .postHeaderMatchedGeometry(
+                                    PostHeaderMatchedGeometryElement.domain(postID: post.id),
+                                    namespace: matchedGeometryNamespace,
+                                    isSource: isMatchedGeometrySource
+                                )
                         }
                     }
 
@@ -141,7 +157,17 @@ public struct PostDisplayView: View {
                     if !compactMode {
                         HStack(spacing: 8) {
                             upvotePill
+                                .postHeaderMatchedGeometry(
+                                    PostHeaderMatchedGeometryElement.upvote(postID: post.id),
+                                    namespace: matchedGeometryNamespace,
+                                    isSource: isMatchedGeometrySource
+                                )
                             commentsPill
+                                .postHeaderMatchedGeometry(
+                                    PostHeaderMatchedGeometryElement.comments(postID: post.id),
+                                    namespace: matchedGeometryNamespace,
+                                    isSource: isMatchedGeometrySource
+                                )
                             Spacer(minLength: 8)
                             if onBookmarkTap != nil {
                                 bookmarkPill
@@ -184,6 +210,39 @@ public struct PostDisplayView: View {
             if let newValue {
                 displayedUpvoted = newValue
             }
+        }
+    }
+}
+
+public enum PostHeaderMatchedGeometryElement {
+    public static func thumbnail(postID: Int) -> String {
+        "post-header-\(postID)-thumbnail"
+    }
+
+    public static func domain(postID: Int) -> String {
+        "post-header-\(postID)-domain"
+    }
+
+    public static func upvote(postID: Int) -> String {
+        "post-header-\(postID)-upvote"
+    }
+
+    public static func comments(postID: Int) -> String {
+        "post-header-\(postID)-comments"
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func postHeaderMatchedGeometry(
+        _ id: String,
+        namespace: Namespace.ID?,
+        isSource: Bool
+    ) -> some View {
+        if let namespace {
+            matchedGeometryEffect(id: id, in: namespace, isSource: isSource)
+        } else {
+            self
         }
     }
 }

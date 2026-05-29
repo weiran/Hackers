@@ -178,6 +178,8 @@ struct CollapsedPostHeaderView: View {
     let onExpand: () -> Void
     let leadingGestureExclusionWidth: CGFloat
     let disablesUpvote: Bool
+    let matchedGeometryNamespace: Namespace.ID?
+    let isMatchedGeometrySource: Bool
     private static let collapsedVerticalPadding: CGFloat = 2
     private static let collapsedHorizontalPadding: CGFloat = 20
     private static let collapsedThumbnailSize: CGFloat = 28
@@ -185,6 +187,11 @@ struct CollapsedPostHeaderView: View {
     var body: some View {
         HStack(spacing: 12) {
             ThumbnailView(url: post.url, isEnabled: true)
+                .postHeaderMatchedGeometry(
+                    PostHeaderMatchedGeometryElement.thumbnail(postID: post.id),
+                    namespace: matchedGeometryNamespace,
+                    isSource: isMatchedGeometrySource
+                )
                 .frame(width: Self.collapsedThumbnailSize, height: Self.collapsedThumbnailSize)
                 .clipShape(.rect(cornerRadius: min(16, Self.collapsedThumbnailSize * 0.3)))
 
@@ -192,12 +199,27 @@ struct CollapsedPostHeaderView: View {
                 .scaledFont(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
+                .postHeaderMatchedGeometry(
+                    PostHeaderMatchedGeometryElement.domain(postID: post.id),
+                    namespace: matchedGeometryNamespace,
+                    isSource: isMatchedGeometrySource
+                )
 
             Spacer(minLength: 8)
 
             HStack(spacing: 8) {
                 upvoteButton
+                    .postHeaderMatchedGeometry(
+                        PostHeaderMatchedGeometryElement.upvote(postID: post.id),
+                        namespace: matchedGeometryNamespace,
+                        isSource: isMatchedGeometrySource
+                    )
                 commentsPill
+                    .postHeaderMatchedGeometry(
+                        PostHeaderMatchedGeometryElement.comments(postID: post.id),
+                        namespace: matchedGeometryNamespace,
+                        isSource: isMatchedGeometrySource
+                    )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -254,6 +276,21 @@ struct CollapsedPostHeaderView: View {
         .disabled(!canInteract || disablesUpvote)
         .opacity(canInteract ? 1 : 0.55)
         .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func postHeaderMatchedGeometry(
+        _ id: String,
+        namespace: Namespace.ID?,
+        isSource: Bool
+    ) -> some View {
+        if let namespace {
+            matchedGeometryEffect(id: id, in: namespace, isSource: isSource)
+        } else {
+            self
+        }
     }
 }
 
