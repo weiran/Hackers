@@ -64,8 +64,10 @@ struct BrowserControlsView: View {
                 controller.goBack()
             }
 
-            controlButton(systemName: "chevron.forward", isEnabled: controller.canGoForward) {
-                controller.goForward()
+            if controller.canGoForward {
+                controlButton(systemName: "chevron.forward") {
+                    controller.goForward()
+                }
             }
 
             controlButton(systemName: controller.isLoading ? "xmark" : "arrow.clockwise") {
