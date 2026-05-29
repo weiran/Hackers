@@ -12,8 +12,11 @@ import SwiftUI
 public struct ThumbnailView: View {
     let url: URL?
     let isEnabled: Bool
+    let showsPlaceholder: Bool
+    let thumbnailSize: CGSize?
 
     @State private var image: Image?
+    @State private var loadCompleted = false
 
 #if DEBUG
     @AppStorage("devThumbnailProvider") private var thumbnailProviderRawValue = "weiranzhang"
@@ -28,28 +31,43 @@ public struct ThumbnailView: View {
     }
 #endif
 
-    public init(url: URL?, isEnabled: Bool = true) {
+    public init(
+        url: URL?,
+        isEnabled: Bool = true,
+        showsPlaceholder: Bool = true,
+        thumbnailSize: CGSize? = nil
+    ) {
         self.url = url
         self.isEnabled = isEnabled
+        self.showsPlaceholder = showsPlaceholder
+        self.thumbnailSize = thumbnailSize
     }
 
     public var body: some View {
         if isEnabled, let url, let thumbnailURL = thumbnailURL(for: url) {
-            ZStack {
+            Group {
                 if let image {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                } else {
+                        .frame(width: thumbnailSize?.width, height: thumbnailSize?.height)
+                } else if showsPlaceholder {
                     placeholderImage
+                        .frame(width: thumbnailSize?.width, height: thumbnailSize?.height)
+                } else if !loadCompleted {
+                    Color.clear
+                        .frame(width: thumbnailSize?.width, height: thumbnailSize?.height)
+                } else {
+                    EmptyView()
                 }
             }
             .task(id: thumbnailURL) {
                 await loadThumbnail(from: thumbnailURL)
             }
             .accessibilityHidden(true)
-        } else {
+        } else if showsPlaceholder {
             placeholderImage
+                .frame(width: thumbnailSize?.width, height: thumbnailSize?.height)
                 .accessibilityHidden(true)
         }
     }
@@ -115,6 +133,7 @@ public struct ThumbnailView: View {
     private func loadThumbnail(from thumbnailURL: URL) async {
         await MainActor.run {
             image = nil
+            loadCompleted = false
         }
 
         var request = URLRequest(url: thumbnailURL)
@@ -125,17 +144,24 @@ public struct ThumbnailView: View {
 
             // Google responds with 404 when it serves its own fallback icon; treat that as missing.
             guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200 else { return }
-
-            guard let cgImage = cgImage(from: data) else { return }
+                  httpResponse.statusCode == 200,
+                  let cgImage = cgImage(from: data) else {
+                await MainActor.run {
+                    image = nil
+                    loadCompleted = true
+                }
+                return
+            }
             let swiftUIImage = Image(decorative: cgImage, scale: 1, orientation: .up)
 
             await MainActor.run {
                 image = swiftUIImage
+                loadCompleted = true
             }
         } catch {
             await MainActor.run {
                 image = nil
+                loadCompleted = true
             }
         }
     }

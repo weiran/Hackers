@@ -173,8 +173,12 @@ private struct CommentsHeaderTitlePillLayout: View {
 
     private func titleContent(font: Font, lineLimit: Int, titleWidth: CGFloat?) -> some View {
         HStack(spacing: 7) {
-            ThumbnailView(url: post.url, isEnabled: showThumbnails)
-                .frame(width: 24, height: 24)
+            ThumbnailView(
+                url: post.url,
+                isEnabled: showThumbnails,
+                showsPlaceholder: false,
+                thumbnailSize: CGSize(width: 24, height: 24)
+            )
                 .clipShape(.rect(cornerRadius: 7))
             Text(post.title)
                 .scaledFont(font)
