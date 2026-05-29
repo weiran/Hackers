@@ -14,6 +14,22 @@ public struct HackerNewsConstants {
     public static let itemPrefix = "item?id="
 
     private init() {}
+
+    public static func isItemURL(_ url: URL) -> Bool {
+        if let urlHost = url.host?.lowercased(), urlHost != host {
+            return false
+        }
+
+        return url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")) == "item"
+    }
+
+    public static func itemID(from url: URL) -> Int? {
+        guard isItemURL(url),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        else { return nil }
+
+        return components.queryItems?.first(where: { $0.name == "id" })?.value.flatMap(Int.init)
+    }
 }
 
 public extension Post {

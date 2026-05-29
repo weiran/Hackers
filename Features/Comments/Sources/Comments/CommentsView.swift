@@ -338,9 +338,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
 
 enum CommentsLinkNavigator {
     static func hackerNewsItemID(from url: URL) -> Int? {
-        guard url.host == HackerNewsConstants.host else { return nil }
-        guard url.path == "/item" else { return nil }
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return nil }
-        return components.queryItems?.first(where: { $0.name == "id" })?.value.flatMap(Int.init)
+        HackerNewsConstants.itemID(from: url)
     }
 }

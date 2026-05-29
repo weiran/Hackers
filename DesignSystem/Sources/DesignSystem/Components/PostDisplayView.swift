@@ -97,7 +97,7 @@ public struct PostDisplayView: View {
                     if compactMode {
                         // Compact mode: URL with inline stats
                         if let host = post.url.host,
-                           !isHackerNewsItemURL(post.url) {
+                           !HackerNewsConstants.isItemURL(post.url) {
                             HStack(spacing: 6) {
                                 Text(truncatedHost(host).uppercased())
                                     .scaledFont(.caption)
@@ -131,7 +131,7 @@ public struct PostDisplayView: View {
                     } else {
                         // Normal mode: URL line
                         if let host = post.url.host,
-                           !isHackerNewsItemURL(post.url) {
+                           !HackerNewsConstants.isItemURL(post.url) {
                             Text(truncatedHost(host).uppercased())
                                 .scaledFont(.caption)
                                 .foregroundStyle(.secondary)
@@ -288,7 +288,7 @@ public struct PostContextMenu: View {
 
             Divider()
 
-            if !isHackerNewsItemURL(post.url) {
+            if !HackerNewsConstants.isItemURL(post.url) {
                 Button {
                     onOpenLink()
                 } label: {
@@ -308,9 +308,4 @@ public struct PostContextMenu: View {
 private func truncatedHost(_ host: String) -> String {
     guard host.hasPrefix("www.") else { return host }
     return String(host.dropFirst(4))
-}
-
-private func isHackerNewsItemURL(_ url: URL) -> Bool {
-    guard let hnHost = url.host else { return false }
-    return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
 }

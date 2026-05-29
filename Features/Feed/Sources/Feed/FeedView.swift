@@ -320,7 +320,7 @@ private extension FeedView {
 
         Divider()
 
-        if !isHackerNewsItemURL(post.url) {
+        if !HackerNewsConstants.isItemURL(post.url) {
             Button { handleLinkTap(post: post) } label: {
                 Label("Open Link", systemImage: "safari")
             }
@@ -472,7 +472,7 @@ private extension FeedView {
     }
 
     private func handleLinkTap(post: Domain.Post) {
-        guard !isHackerNewsItemURL(post.url) else {
+        guard !HackerNewsConstants.isItemURL(post.url) else {
             navigationStore.showPost(post)
             return
         }
@@ -492,11 +492,6 @@ private extension FeedView {
             return
         }
         LinkOpener.openURL(post.url, with: post)
-    }
-
-    private func isHackerNewsItemURL(_ url: URL) -> Bool {
-        guard let hnHost = url.host else { return false }
-        return hnHost == Shared.HackerNewsConstants.host && url.path == "/item"
     }
 
     private func shouldShowVoteActions(for post: Domain.Post) -> Bool {

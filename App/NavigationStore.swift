@@ -60,6 +60,11 @@ class NavigationStore: NavigationStoreProtocol {
     }
 
     func showPostLink(_ post: Domain.Post, presentation: PostLinkPresentation) {
+        guard !HackerNewsConstants.isItemURL(post.url) else {
+            showPost(post)
+            return
+        }
+
         embeddedBrowserURL = nil
         detailPath.removeAll()
         selectedPost = post
