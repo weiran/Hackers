@@ -195,8 +195,7 @@ struct PostCommentsSheet: View {
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
                     expandedTop: expandedTop,
-                    collapsedTop: collapsedTop,
-                    isInteractiveMove: isInteractiveMove
+                    collapsedTop: collapsedTop
                 )
                 .opacity(contentFadeProgress)
                 .allowsHitTesting(contentFadeProgress >= 0.5)
@@ -243,8 +242,7 @@ struct PostCommentsSheet: View {
     private func expandedTopOverlay(
         handleTopInset: CGFloat,
         expandedTop: CGFloat,
-        collapsedTop: CGFloat,
-        isInteractiveMove: Bool
+        collapsedTop: CGFloat
     ) -> some View {
         VStack(spacing: 0) {
             Color.clear
@@ -308,15 +306,11 @@ struct PostCommentsSheet: View {
         }
         .allowsHitTesting(showsExpandedToolbar)
         .background(alignment: .top) {
-            if isInteractiveMove {
-                Color.clear
-            } else {
-                ProgressiveHeaderBlurBackground(
-                    height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
-                    fadeExtension: Self.expandedContentSpacing
-                )
-                .opacity(showsExpandedToolbar ? 1 : 0)
-            }
+            ProgressiveHeaderBlurBackground(
+                height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
+                fadeExtension: Self.expandedContentSpacing
+            )
+            .opacity(showsExpandedToolbar ? 1 : 0)
         }
     }
 
@@ -484,16 +478,12 @@ private extension PostCommentsSheet {
                 let isMostlyVertical = verticalMovement > horizontalMovement * 1.2
 
                 if !isTrackingDrag {
-                    dragStartAllowsSheetDrag = isCollapsed
+                    let startsSheetDrag = isCollapsed
+                        || (isExpanded && isScrollAtTop && isMostlyVertical && value.translation.height > 0)
+                    guard startsSheetDrag else { return }
+                    dragStartAllowsSheetDrag = true
                     isTrackingDrag = true
                     suppressesCollapsedUpvote = true
-                }
-                if isExpanded,
-                   isScrollAtTop,
-                   isMostlyVertical,
-                   value.translation.height > 0,
-                   value.startLocation.x > systemBackGestureEdgeWidth {
-                    dragStartAllowsSheetDrag = true
                 }
                 guard dragStartAllowsSheetDrag else { return }
                 dragTranslation = isExpanded ? max(0, value.translation.height) : value.translation.height
