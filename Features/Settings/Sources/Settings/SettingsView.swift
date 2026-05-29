@@ -190,7 +190,7 @@ public struct SettingsView: View {
                     Picker(selection: $viewModel.linkBrowserMode) {
                         Text("In-App Browser").tag(LinkBrowserMode.inAppBrowser)
                         #if DEBUG
-                        Text("Custom Browser").tag(LinkBrowserMode.customBrowser)
+                        Text("Embedded Browser").tag(LinkBrowserMode.customBrowser)
                         #endif
                         Text("System Browser").tag(LinkBrowserMode.systemBrowser)
                     } label: {
