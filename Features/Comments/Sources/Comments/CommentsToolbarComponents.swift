@@ -165,7 +165,7 @@ private struct CommentsHeaderTitlePillLayout: View {
 
             titleContent(font: .caption, lineLimit: 2, titleWidth: Self.wrappedTitleWidth)
         }
-        .padding(.leading, 5)
+        .padding(.leading, 14)
         .padding(.trailing, 10)
         .padding(.vertical, 5)
         .frame(height: 44)
