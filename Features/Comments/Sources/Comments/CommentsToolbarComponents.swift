@@ -113,8 +113,8 @@ public struct CommentsHeaderTitleButton: View {
         let isVisible = titleVisibility.isVisible
 
         ZStack {
-            Color.clear
-                .frame(height: 44)
+            CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+                .hidden()
 
             if isVisible {
                 Button(action: onTap) {
@@ -123,7 +123,6 @@ public struct CommentsHeaderTitleButton: View {
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint(accessibilityHint)
-                .drawingGroup(opaque: false)
                 .transition(Self.visibilityTransition)
             }
         }
@@ -148,21 +147,31 @@ public struct CommentsHeaderTitlePill: View {
     }
 
     public var body: some View {
+        CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+            .contentShape(.capsule)
+            .glassEffect(.regular.interactive(), in: .capsule)
+    }
+}
+
+private struct CommentsHeaderTitlePillLayout: View {
+    private static let wrappedTitleWidth: CGFloat = 170
+    let post: Post
+    let showThumbnails: Bool
+
+    var body: some View {
         ViewThatFits(in: .horizontal) {
-            titleContent(font: .subheadline, lineLimit: 1)
+            titleContent(font: .subheadline, lineLimit: 1, titleWidth: nil)
                 .fixedSize(horizontal: true, vertical: false)
 
-            titleContent(font: .caption, lineLimit: 2)
+            titleContent(font: .caption, lineLimit: 2, titleWidth: Self.wrappedTitleWidth)
         }
         .padding(.leading, 5)
         .padding(.trailing, 10)
         .padding(.vertical, 5)
         .frame(height: 44)
-        .contentShape(.capsule)
-        .glassEffect(.regular.interactive(), in: .capsule)
     }
 
-    private func titleContent(font: Font, lineLimit: Int) -> some View {
+    private func titleContent(font: Font, lineLimit: Int, titleWidth: CGFloat?) -> some View {
         HStack(spacing: 7) {
             ThumbnailView(url: post.url, isEnabled: showThumbnails)
                 .frame(width: 24, height: 24)
@@ -170,9 +179,11 @@ public struct CommentsHeaderTitlePill: View {
             Text(post.title)
                 .scaledFont(font)
                 .fontWeight(.semibold)
+                .foregroundStyle(.primary)
                 .lineLimit(lineLimit)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.tail)
+                .frame(width: titleWidth, alignment: .leading)
         }
     }
 }
