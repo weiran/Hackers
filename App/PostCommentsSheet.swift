@@ -30,7 +30,7 @@ struct PostCommentsSheet: View {
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @State private var showsExpandedToolbar = false
-    @State private var showsExpandedTitle = false
+    @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var suppressesCollapsedUpvote = false
     @Namespace private var postHeaderNamespace
 
@@ -235,7 +235,7 @@ struct PostCommentsSheet: View {
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
             isPostHeaderMatchedGeometrySource: isExpanded,
-            titleVisible: $showsExpandedTitle,
+            titleVisibility: expandedTitleVisibility,
             isAtTop: $isScrollAtTop,
             onPostLinkTap: collapseSheet
         )
@@ -272,7 +272,7 @@ struct PostCommentsSheet: View {
                         CommentsHeaderTitleButton(
                             post: post,
                             showThumbnails: viewModel.showThumbnails,
-                            isVisible: showsExpandedTitle,
+                            titleVisibility: expandedTitleVisibility,
                             accessibilityHint: "Collapse comments",
                             onTap: collapseSheet
                         )
@@ -436,7 +436,9 @@ private extension PostCommentsSheet {
             }
         } else {
             showsExpandedToolbar = false
-            showsExpandedTitle = false
+            withAnimation(.easeInOut(duration: 0.3)) {
+                expandedTitleVisibility.setVisible(false)
+            }
         }
     }
 
@@ -596,7 +598,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let votingViewModel: VotingViewModel
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
     let isPostHeaderMatchedGeometrySource: Bool
-    @Binding var titleVisible: Bool
+    let titleVisibility: CommentsHeaderTitleVisibility
     @Binding var isAtTop: Bool
     let onPostLinkTap: () -> Void
 
@@ -620,7 +622,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
-            titleVisible: $titleVisible,
+            headerTitleVisibility: titleVisibility,
             isAtTop: $isAtTop,
             onPostLinkTap: onPostLinkTap,
             viewModel: viewModel,

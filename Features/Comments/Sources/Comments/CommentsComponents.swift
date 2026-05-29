@@ -51,9 +51,9 @@ struct CommentsContentView: View {
     let presentationState: CommentsPresentationState
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
     let isPostHeaderMatchedGeometrySource: Bool
+    let titleVisibility: CommentsHeaderTitleVisibility
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
-    @Binding var showTitle: Bool
     @Binding var pendingCommentID: Int?
     @Binding var listAnimationsEnabled: Bool
     @State private var lastIsAtTop = true
@@ -97,10 +97,10 @@ struct CommentsContentView: View {
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 }, action: { _, newValue in
-                    let shouldShowTitle = showTitle ? newValue > 24 : newValue > 56
-                    if shouldShowTitle != showTitle {
+                    let shouldShowTitle = titleVisibility.isVisible ? newValue > 24 : newValue > 56
+                    if shouldShowTitle != titleVisibility.isVisible {
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            showTitle = shouldShowTitle
+                            titleVisibility.setVisible(shouldShowTitle)
                             updateTitleVisibility?(shouldShowTitle)
                         }
                     }

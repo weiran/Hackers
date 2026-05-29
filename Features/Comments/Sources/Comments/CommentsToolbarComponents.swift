@@ -1,9 +1,25 @@
 import DesignSystem
 import Domain
+import Observation
 import ProgressiveBlurHeader
 import Shared
 import SwiftUI
 import VariableBlur
+
+@MainActor
+@Observable
+public final class CommentsHeaderTitleVisibility {
+    public var isVisible: Bool
+
+    public init(isVisible: Bool = false) {
+        self.isVisible = isVisible
+    }
+
+    public func setVisible(_ isVisible: Bool) {
+        guard self.isVisible != isVisible else { return }
+        self.isVisible = isVisible
+    }
+}
 
 public struct ProgressiveHeaderBlurBackground: View {
     private let height: CGFloat
@@ -57,15 +73,15 @@ public struct ProgressiveHeaderBlurBackground: View {
 
 struct ToolbarTitle: View {
     let post: Post
-    let showTitle: Bool
     let showThumbnails: Bool
+    let titleVisibility: CommentsHeaderTitleVisibility
     let onTap: () -> Void
 
     var body: some View {
         CommentsHeaderTitleButton(
             post: post,
             showThumbnails: showThumbnails,
-            isVisible: showTitle,
+            titleVisibility: titleVisibility,
             accessibilityHint: "Open link",
             onTap: onTap
         )
@@ -75,25 +91,27 @@ struct ToolbarTitle: View {
 public struct CommentsHeaderTitleButton: View {
     private let post: Post
     private let showThumbnails: Bool
-    private let isVisible: Bool
+    private let titleVisibility: CommentsHeaderTitleVisibility
     private let accessibilityHint: String
     private let onTap: () -> Void
 
     public init(
         post: Post,
         showThumbnails: Bool,
-        isVisible: Bool,
+        titleVisibility: CommentsHeaderTitleVisibility,
         accessibilityHint: String,
         onTap: @escaping () -> Void
     ) {
         self.post = post
         self.showThumbnails = showThumbnails
-        self.isVisible = isVisible
+        self.titleVisibility = titleVisibility
         self.accessibilityHint = accessibilityHint
         self.onTap = onTap
     }
 
     public var body: some View {
+        let isVisible = titleVisibility.isVisible
+
         ZStack {
             Color.clear
                 .frame(height: 44)
@@ -105,6 +123,7 @@ public struct CommentsHeaderTitleButton: View {
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint(accessibilityHint)
+                .drawingGroup(opaque: false)
                 .transition(Self.visibilityTransition)
             }
         }

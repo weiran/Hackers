@@ -68,7 +68,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let onPostLinkTap: (() -> Void)?
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
-    @State private var showTitle = false
+    @State private var titleVisibility: CommentsHeaderTitleVisibility
     @State private var pendingCommentID: Int?
     @State private var listAnimationsEnabled = false
 
@@ -83,6 +83,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         presentationState: CommentsPresentationState = .standard,
         postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
         isPostHeaderMatchedGeometrySource: Bool = true,
+        headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -99,6 +100,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
+        _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil))
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
@@ -124,6 +126,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         presentationState: CommentsPresentationState = .standard,
         postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
         isPostHeaderMatchedGeometrySource: Bool = true,
+        headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
@@ -141,6 +144,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             presentationState: presentationState,
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
+            headerTitleVisibility: headerTitleVisibility,
             titleVisible: titleVisible,
             isAtTop: isAtTop,
             onPostLinkTap: onPostLinkTap,
@@ -162,9 +166,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     presentationState: presentationState,
                     postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
                     isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
+                    titleVisibility: titleVisibility,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
-                    showTitle: $showTitle,
                     pendingCommentID: $pendingCommentID,
                     listAnimationsEnabled: $listAnimationsEnabled,
                 )
@@ -200,8 +204,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     if let post = viewModel.post {
                         ToolbarTitle(
                             post: post,
-                            showTitle: showTitle,
                             showThumbnails: viewModel.showThumbnails,
+                            titleVisibility: titleVisibility,
                             onTap: handleLinkTap,
                         )
                     }
