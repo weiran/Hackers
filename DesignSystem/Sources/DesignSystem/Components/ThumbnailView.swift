@@ -6,10 +6,12 @@
 //
 
 import CoreGraphics
+import Foundation
 import ImageIO
 import SwiftUI
 
 public struct ThumbnailView: View {
+    private static let imageCache = NSCache<NSURL, CGImage>()
     let url: URL?
     let isEnabled: Bool
     let showsPlaceholder: Bool
@@ -131,6 +133,16 @@ public struct ThumbnailView: View {
 #endif
 
     private func loadThumbnail(from thumbnailURL: URL) async {
+        let cacheKey = thumbnailURL as NSURL
+        if let cachedImage = Self.imageCache.object(forKey: cacheKey) {
+            let swiftUIImage = Image(decorative: cachedImage, scale: 1, orientation: .up)
+            await MainActor.run {
+                image = swiftUIImage
+                loadCompleted = true
+            }
+            return
+        }
+
         await MainActor.run {
             image = nil
             loadCompleted = false
@@ -152,6 +164,7 @@ public struct ThumbnailView: View {
                 }
                 return
             }
+            Self.imageCache.setObject(cgImage, forKey: cacheKey)
             let swiftUIImage = Image(decorative: cgImage, scale: 1, orientation: .up)
 
             await MainActor.run {
