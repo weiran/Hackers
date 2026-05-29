@@ -65,6 +65,8 @@ final class BrowserController: ObservableObject {
 enum WebViewAnimations {
     static let standard = Animation.easeInOut(duration: 0.25)
     static let fast = Animation.easeInOut(duration: 0.2)
+    static let panelDuration: TimeInterval = 0.30
+    static let panel = Animation.timingCurve(0.22, 1.0, 0.36, 1.0, duration: panelDuration)
     static let revealDelay: TimeInterval = 0.15
 }
 
@@ -292,7 +294,7 @@ struct PostLinkBrowserView: View {
         .nativeInteractivePopGesture(edgeOnly: true)
         .task {
             guard !showingCommentsPane else { return }
-            withAnimation(WebViewAnimations.standard) {
+            withAnimation(WebViewAnimations.panel) {
                 showingCommentsPane = true
             }
         }

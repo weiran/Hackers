@@ -14,7 +14,7 @@ struct PostCommentsSheet: View {
     private static let expandedToolbarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
-    private static let sheetAnimationDuration: TimeInterval = 0.25
+    private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
     let fallbackURL: URL
@@ -396,7 +396,7 @@ struct PostCommentsSheet: View {
         }
     }
 
-    private func animateSheet(_ animation: Animation = WebViewAnimations.standard, _ updates: () -> Void) {
+    private func animateSheet(_ animation: Animation = WebViewAnimations.panel, _ updates: () -> Void) {
         withAnimation(animation) {
             updates()
         }
