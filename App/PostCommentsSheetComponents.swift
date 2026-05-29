@@ -157,6 +157,43 @@ struct BrowserControlsView: View {
     }
 }
 
+struct CollapsedBrowserControlsOverlay: View {
+    let isVisible: Bool
+    let fallbackURL: URL
+    let onDismiss: @MainActor () -> Void
+    @ObservedObject var controller: BrowserController
+
+    var body: some View {
+        ZStack {
+            BrowserControlsView(
+                fallbackURL: fallbackURL,
+                onDismiss: onDismiss,
+                controller: controller
+            )
+            .hidden()
+            .accessibilityHidden(true)
+
+            if isVisible {
+                BrowserControlsView(
+                    fallbackURL: fallbackURL,
+                    onDismiss: onDismiss,
+                    controller: controller
+                )
+                .transition(Self.visibilityTransition)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: isVisible)
+        .allowsHitTesting(isVisible)
+    }
+
+    private static var visibilityTransition: AnyTransition {
+        .asymmetric(
+            insertion: .opacity.combined(with: .offset(y: 20)),
+            removal: .opacity.combined(with: .offset(y: 20))
+        )
+    }
+}
+
 struct GlassCapsuleBackground: ViewModifier {
     func body(content: Content) -> some View {
         content.glassEffect(.regular.interactive(), in: .capsule)

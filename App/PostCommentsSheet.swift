@@ -109,23 +109,22 @@ struct PostCommentsSheet: View {
                 )
                 .offset(y: alignedTop)
 
-                if showsCollapsedControls {
-                    BrowserControlsView(
-                        fallbackURL: fallbackURL,
-                        onDismiss: onDismiss,
-                        controller: browserController
-                    )
-                    .frame(width: screenSize.width, alignment: .center)
-                    .offset(y: controlsTop)
-                    .background(
-                        GeometryReader { controlsProxy in
-                            Color.clear.preference(
-                                key: ControlsHeightPreferenceKey.self,
-                                value: controlsProxy.size.height
-                            )
-                        }
-                    )
-                }
+                CollapsedBrowserControlsOverlay(
+                    isVisible: showsCollapsedControls,
+                    fallbackURL: fallbackURL,
+                    onDismiss: onDismiss,
+                    controller: browserController
+                )
+                .frame(width: screenSize.width, alignment: .center)
+                .offset(y: controlsTop)
+                .background(
+                    GeometryReader { controlsProxy in
+                        Color.clear.preference(
+                            key: ControlsHeightPreferenceKey.self,
+                            value: controlsProxy.size.height
+                        )
+                    }
+                )
             }
             .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
             .ignoresSafeArea(.container)
