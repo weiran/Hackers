@@ -19,20 +19,19 @@ public struct WhatsNewData: Sendable {
     public static func currentWhatsNew() -> WhatsNewData {
         let embeddedBrowser = WhatsNewItem(
             title: "Embedded Browser",
-            subtitle: "Open stories inside Hackers with a built-in browser so you stay in the flow.",
+            subtitle: "Open stories inside Hackers and switch back to comments without losing your place.",
             systemImage: "safari",
         )
 
-        let commentsDrawer = WhatsNewItem(
-            title: "Comments Drawer",
-            subtitle: "Swipe up to read comments while the article stays loaded, with quick "
-                + "back, forward, reload, and share controls.",
-            systemImage: "bubble.left.and.bubble.right",
+        let feedShortcuts = WhatsNewItem(
+            title: "Feed Shortcuts",
+            subtitle: "Tap a story's thumbnail to open the link, or tap the row to jump straight to comments.",
+            systemImage: "hand.tap",
         )
 
         return WhatsNewData(
             title: "What's New in Hackers 5.3",
-            items: [embeddedBrowser, commentsDrawer],
+            items: [embeddedBrowser, feedShortcuts],
         )
     }
 }

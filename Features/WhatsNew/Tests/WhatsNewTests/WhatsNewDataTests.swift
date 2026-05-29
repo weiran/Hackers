@@ -16,9 +16,9 @@ struct WhatsNewDataTests {
         #expect(data.title == "What's New in Hackers 5.3")
         #expect(data.items.count == 2)
         #expect(data.items.contains { $0.title == "Embedded Browser" })
-        #expect(data.items.contains { $0.title == "Comments Drawer" })
+        #expect(data.items.contains { $0.title == "Feed Shortcuts" })
         #expect(data.items.contains {
-            $0.subtitle == "Swipe up to read comments while the article stays loaded, with quick back, forward, reload, and share controls."
+            $0.subtitle == "Tap a story's thumbnail to open the link, or tap the row to jump straight to comments."
         })
     }
 
