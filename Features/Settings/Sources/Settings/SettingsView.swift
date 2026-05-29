@@ -266,9 +266,14 @@ public struct SettingsView: View {
 
     private var versionLabel: some View {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        let versionText = [appVersion, buildNumber.map { "(\($0))" }]
+            .compactMap(\.self)
+            .joined(separator: " ")
+
         return HStack {
             Spacer()
-            Text("Version \(appVersion ?? "1.0")")
+            Text("Version \(versionText.isEmpty ? "1.0" : versionText)")
                 .foregroundStyle(.gray)
             Spacer()
         }

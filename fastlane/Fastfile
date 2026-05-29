@@ -42,6 +42,16 @@ def source_build_number
   project_build_setting("CURRENT_PROJECT_VERSION").to_i
 end
 
+def release_tag_parts(tag)
+  match = tag.to_s.match(/\Av(?<version>\d+\.\d+\.\d+)(?:\+(?<build>\d+))?\z/)
+  UI.user_error!("Release tag must be vX.Y.Z or vX.Y.Z+N, got #{tag}") unless match
+
+  {
+    version: match[:version],
+    build_number: match[:build]&.to_i
+  }
+end
+
 def set_build_number(build_number)
   require "xcodeproj"
 
@@ -85,13 +95,20 @@ end
 
 def validate_release_tag!(tag)
   UI.user_error!("Release tag is required") if tag.to_s.empty?
-  UI.user_error!("Release tag must be vX.Y.Z, got #{tag}") unless tag.match?(/\Av\d+\.\d+\.\d+\z/)
 
-  tag_version = tag.delete_prefix("v")
+  tag_version = release_tag_parts(tag)[:version]
   current_version = marketing_version
   return if tag_version == current_version
 
   UI.user_error!("Tag #{tag} does not match MARKETING_VERSION #{current_version}")
+end
+
+def validate_release_tag_build_number!(tag, build_number)
+  tag_build_number = release_tag_parts(tag)[:build_number]
+  return unless tag_build_number
+  return if tag_build_number == build_number
+
+  UI.user_error!("Tag #{tag} build number does not match resolved build number #{build_number}")
 end
 
 def latest_build_number(api_key, version)
@@ -193,6 +210,8 @@ platform :ios do
     version = marketing_version
     latest = latest_build_number(api_key, version)
     next_build = latest.zero? ? [source_build_number, 1].max : latest + 1
+    validate_release_tag_build_number!(tag, next_build)
+
     notes = release_notes
     UI.user_error!("GitHub Release notes are required for TestFlight What to Test") if notes.empty?
 

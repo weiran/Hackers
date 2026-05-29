@@ -68,6 +68,7 @@ gh release edit v5.3.1 --notes-file release-notes.txt
 ## Trigger TestFlight
 
 Tag format must be `vX.Y.Z`, and the tag version must match `MARKETING_VERSION`.
+For an additional TestFlight build on the same marketing version, append the expected build number as SemVer build metadata, for example `v5.3.0+153`.
 
 ```bash
 git tag v5.3.1 master
@@ -80,6 +81,12 @@ Manual dispatch is also supported:
 
 ```bash
 gh workflow run release-testflight.yml -f release_tag=v5.3.1
+```
+
+For a same-version build-number tag:
+
+```bash
+gh workflow run release-testflight.yml -f release_tag=v5.3.0+153
 ```
 
 ## Build Number Handling
