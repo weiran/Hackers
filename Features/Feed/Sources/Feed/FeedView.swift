@@ -519,15 +519,15 @@ private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
                     Circle()
                         .fill(Color.secondary.opacity(0.16))
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 9, weight: .bold))
+                        .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(.secondary)
                 }
-                .frame(width: 22, height: 22)
+                .frame(width: 18, height: 18)
             }
             .font(.headline.weight(.semibold))
             .foregroundStyle(.primary)
             .padding(.leading, 14)
-            .padding(.trailing, 6)
+            .padding(.trailing, 10)
             .frame(height: 44)
             .glassEffect(.regular.interactive(), in: .capsule)
         }
