@@ -29,7 +29,6 @@ struct PostCommentsSheet: View {
     @State private var isHandleDragActive = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
-    @State private var showsExpandedToolbar = false
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var suppressesCollapsedUpvote = false
     @Namespace private var postHeaderNamespace
@@ -56,7 +55,6 @@ struct PostCommentsSheet: View {
         ))
         _browserController = ObservedObject(wrappedValue: controller)
         _sheetState = State(initialValue: initialSheetState)
-        _showsExpandedToolbar = State(initialValue: initialSheetState == .expanded)
         self.onDismiss = onDismiss
         fallbackURL = post.url
     }
@@ -132,7 +130,7 @@ struct PostCommentsSheet: View {
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
             .onChange(of: isExpanded) { _, newValue in
-                updateExpandedToolbarVisibility(isExpanded: newValue)
+                updateExpandedPresentation(isExpanded: newValue)
             }
         }
     }
@@ -194,10 +192,10 @@ struct PostCommentsSheet: View {
 
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
+                    controlsOpacity: contentFadeProgress,
                     expandedTop: expandedTop,
                     collapsedTop: collapsedTop
                 )
-                .opacity(contentFadeProgress)
                 .allowsHitTesting(contentFadeProgress >= 0.5)
             }
 
@@ -243,6 +241,7 @@ struct PostCommentsSheet: View {
 
     private func expandedTopOverlay(
         handleTopInset: CGFloat,
+        controlsOpacity: CGFloat,
         expandedTop: CGFloat,
         collapsedTop: CGFloat
     ) -> some View {
@@ -296,15 +295,14 @@ struct PostCommentsSheet: View {
             }
             .padding(.horizontal, 16)
             .frame(height: Self.expandedToolbarHeight)
-            .opacity(showsExpandedToolbar ? 1 : 0)
+            .opacity(controlsOpacity)
         }
-        .allowsHitTesting(showsExpandedToolbar)
+        .allowsHitTesting(isExpanded)
         .background(alignment: .top) {
             ProgressiveHeaderBlurBackground(
                 height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
                 fadeExtension: Self.expandedContentSpacing
             )
-            .opacity(showsExpandedToolbar ? 1 : 0)
         }
     }
 
@@ -424,17 +422,8 @@ private extension PostCommentsSheet {
         controlsHeight = updated
     }
 
-    private func updateExpandedToolbarVisibility(isExpanded: Bool) {
-        if isExpanded {
-            showsExpandedToolbar = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + WebViewAnimations.revealDelay) {
-                guard self.isExpanded else { return }
-                withAnimation(WebViewAnimations.fast) {
-                    showsExpandedToolbar = true
-                }
-            }
-        } else {
-            showsExpandedToolbar = false
+    private func updateExpandedPresentation(isExpanded: Bool) {
+        if !isExpanded {
             withAnimation(.easeInOut(duration: 0.3)) {
                 expandedTitleVisibility.setVisible(false)
             }
