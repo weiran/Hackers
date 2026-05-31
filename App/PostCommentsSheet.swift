@@ -275,6 +275,13 @@ struct PostCommentsSheet: View {
                             onTap: collapseSheet
                         )
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .contentShape(Rectangle())
+                        .highPriorityGesture(
+                            TapGesture().onEnded {
+                                guard expandedTitleVisibility.isVisible else { return }
+                                collapseSheet()
+                            }
+                        )
                     } else {
                         Spacer()
                     }
