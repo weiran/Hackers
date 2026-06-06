@@ -1,0 +1,22 @@
+project "./Hackers.xcodeproj"
+scheme "Hackers"
+output_directory "./artifacts/screenshots"
+clear_previous_screenshots true
+erase_simulator true
+reinstall_app true
+localize_simulator true
+override_status_bar true
+stop_after_first_error true
+concurrent_simulators false
+skip_open_summary true
+
+languages([
+  "en-US"
+])
+
+devices([
+  "iPhone 17 Pro Max",
+  "iPad Pro 13-inch (M5)"
+])
+
+only_testing "HackersUITests/HackersScreenshotTests"

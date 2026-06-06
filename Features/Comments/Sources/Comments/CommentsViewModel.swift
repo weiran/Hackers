@@ -167,7 +167,7 @@ public final class CommentsViewModel: @unchecked Sendable {
 
             await MainActor.run {
                 self.post = annotatedPost
-                self.post?.commentsCount = commentCountExcludingStoryText
+                self.post?.commentsCount = max(annotatedPost.commentsCount, commentCountExcludingStoryText)
                 self.isPostLoading = false
                 self.onCommentsLoaded?(loadedComments)
             }

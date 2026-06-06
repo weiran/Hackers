@@ -1,6 +1,9 @@
 default_platform(:ios)
 
 require "shellwords"
+require "fileutils"
+require "cgi"
+require "pathname"
 
 REPO_ROOT = File.expand_path("..", __dir__)
 PROJECT = File.join(REPO_ROOT, "Hackers.xcodeproj")
@@ -11,6 +14,8 @@ TEAM_ID = "2KB59GPA9B"
 DESTINATION = "platform=iOS Simulator,name=iPhone 17 Pro"
 RELEASE_DIR = File.join(REPO_ROOT, "artifacts/release")
 LOG_DIR = File.join(REPO_ROOT, "artifacts/logs")
+SNAPSHOT_CACHE_DIR = File.expand_path("~/Library/Caches/tools.fastlane/screenshots")
+SCREENSHOT_OUTPUT_DIR = File.join(REPO_ROOT, "artifacts/screenshots")
 
 def app_store_connect_key
   app_store_connect_api_key(
@@ -32,6 +37,46 @@ def project_build_setting(setting, target_name: "Hackers")
   UI.user_error!("No #{setting} found for #{target_name}") if values.empty?
   UI.user_error!("Mismatched #{setting} values for #{target_name}: #{values.join(', ')}") if values.length > 1
   values.first
+end
+
+def write_screenshot_summary(output_dir)
+  screenshots = Dir[File.join(output_dir, "**", "*.png")].sort
+  screens = Hash.new { |hash, key| hash[key] = [] }
+
+  screenshots.each do |path|
+    relative_path = Pathname.new(path).relative_path_from(Pathname.new(output_dir)).to_s
+    path_parts = relative_path.split(File::SEPARATOR)
+    appearance = path_parts.length >= 3 ? path_parts[-3] : "default"
+    locale = path_parts.length >= 2 ? path_parts[-2] : File.basename(File.dirname(path))
+    file_name = File.basename(path, ".png")
+    match = file_name.match(/\A(.+)-(\d{2}-.+)\z/)
+    device = match ? match[1] : "Unknown Device"
+    screen = match ? match[2] : file_name
+    screens[screen] << {
+      appearance: appearance,
+      device: device,
+      locale: locale,
+      path: relative_path
+    }
+  end
+
+  devices = screens.values.flatten.map { |item| item[:device] }.uniq.sort
+  appearances = screens.values.flatten.map { |item| item[:appearance] }.uniq.sort
+  html = +"<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Hackers Screenshots</title><style>"
+  html << "body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;margin:32px;background:#f7f7f4;color:#1d1d1f}h1{margin:0 0 8px}h2{margin:40px 0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}.shot{background:white;border:1px solid #ddd;border-radius:8px;padding:12px}.shot h3{font-size:14px;margin:0 0 10px;color:#555}.shot img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid #eee}.appearance{text-transform:capitalize;font-weight:700}"
+  html << "</style></head><body><h1>Hackers Screenshots</h1><p>#{screenshots.length} screenshots generated from #{devices.length} devices across #{appearances.length} appearances.</p>"
+  screens.keys.sort.each do |screen|
+    html << "<h2>#{CGI.escapeHTML(screen)}</h2><div class=\"grid\">"
+    screens[screen].sort_by { |item| [item[:appearance], item[:device], item[:locale]] }.each do |item|
+      escaped_path = CGI.escapeHTML(item[:path])
+      label = "#{item[:appearance]} · #{item[:device]} · #{item[:locale]}"
+      html << "<div class=\"shot\"><h3><span class=\"appearance\">#{CGI.escapeHTML(item[:appearance])}</span> · #{CGI.escapeHTML(item[:device])} · #{CGI.escapeHTML(item[:locale])}</h3><a href=\"#{escaped_path}\"><img src=\"#{escaped_path}\" alt=\"#{CGI.escapeHTML(label)} #{CGI.escapeHTML(screen)}\"></a></div>"
+    end
+    html << "</div>"
+  end
+  html << "</body></html>"
+
+  File.write(File.join(output_dir, "screenshots.html"), html)
 end
 
 def marketing_version
@@ -156,6 +201,22 @@ platform :ios do
   desc "Run the full module test suite"
   lane :test do
     sh(File.join(REPO_ROOT, "run_tests.sh").shellescape + " -v")
+  end
+
+  desc "Generate App Store screenshots from deterministic UI-test fixtures"
+  lane :screenshots do
+    FileUtils.rm_rf(SCREENSHOT_OUTPUT_DIR)
+    [
+      { name: "light", dark_mode: false },
+      { name: "dark", dark_mode: true }
+    ].each do |appearance|
+      FileUtils.rm_rf(SNAPSHOT_CACHE_DIR)
+      snapshot(
+        output_directory: File.join(SCREENSHOT_OUTPUT_DIR, appearance[:name]),
+        dark_mode: appearance[:dark_mode]
+      )
+    end
+    write_screenshot_summary(SCREENSHOT_OUTPUT_DIR)
   end
 
   desc "Archive and export a signed App Store build"

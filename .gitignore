@@ -11,6 +11,7 @@
 
 # fastlane specific
 fastlane/report.xml
+fastlane/README.md
 
 # deliver temporary files
 fastlane/Preview.html
@@ -18,6 +19,7 @@ fastlane/Preview.html
 # snapshot generated screenshots
 fastlane/screenshots/**/*.png
 fastlane/screenshots/screenshots.html
+artifacts/screenshots/
 
 # scan temporary files
 fastlane/test_output

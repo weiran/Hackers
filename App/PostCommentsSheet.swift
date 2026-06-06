@@ -11,7 +11,7 @@ struct PostCommentsSheet: View {
     private static let handleThickness: CGFloat = 5
     private static let handleAreaHeight: CGFloat = 22
     private static let handleToolbarSpacing: CGFloat = 8
-    private static let expandedToolbarHeight: CGFloat = 44
+    private static let expandedToolbarTitleHitHeight: CGFloat = 58
     private static let expandedContentSpacing: CGFloat = 8
     private static let controlsSpacing: CGFloat = 12
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
@@ -245,64 +245,69 @@ struct PostCommentsSheet: View {
         expandedTop: CGFloat,
         collapsedTop: CGFloat
     ) -> some View {
-        VStack(spacing: 0) {
-            Color.clear
-                .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
-                .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-                .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+        ZStack(alignment: .top) {
+            VStack(spacing: 0) {
+                Color.clear
+                    .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
+                    .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
+                    .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
-            GlassEffectContainer(spacing: 10) {
-                HStack(spacing: 10) {
-                    Button {
-                        dismissBrowser()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.title3.weight(.medium))
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-                    .accessibilityLabel("Back")
-                    .modifier(GlassCircleBackground())
-
-                    if let post = viewModel.post {
-                        CommentsHeaderTitleButton(
-                            post: post,
-                            showThumbnails: viewModel.showThumbnails,
-                            titleVisibility: expandedTitleVisibility,
-                            accessibilityHint: "Collapse comments",
-                            onTap: collapseSheet
-                        )
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .contentShape(Rectangle())
-                        .highPriorityGesture(
-                            TapGesture().onEnded {
-                                guard expandedTitleVisibility.isVisible else { return }
-                                collapseSheet()
-                            }
-                        )
-                    } else {
-                        Spacer()
-                    }
-
-                    if let post = viewModel.post {
+                GlassEffectContainer(spacing: 10) {
+                    HStack(alignment: .top, spacing: 10) {
                         Button {
-                            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+                            dismissBrowser()
                         } label: {
-                            Image(systemName: "square.and.arrow.up")
+                            Image(systemName: "chevron.left")
+                                .font(.title3.weight(.medium))
                                 .frame(width: 44, height: 44)
-                                .contentShape(Circle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("Share")
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                        .accessibilityLabel("Back")
                         .modifier(GlassCircleBackground())
+
+                        if let post = viewModel.post {
+                            ZStack(alignment: .top) {
+                                CommentsHeaderTitleButton(
+                                    post: post,
+                                    showThumbnails: viewModel.showThumbnails,
+                                    titleVisibility: expandedTitleVisibility,
+                                    accessibilityHint: "Collapse comments",
+                                    hitHeight: Self.expandedToolbarTitleHitHeight,
+                                    fillsAvailableWidth: true,
+                                    usesOffsetTransition: false,
+                                    onTap: collapseSheet
+                                )
+
+                                TransparentTapOverlay(onTap: collapseSheet)
+                                    .allowsHitTesting(expandedTitleVisibility.isVisible)
+                                    .accessibilityHidden(true)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .top)
+                            .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
+                        } else {
+                            Spacer()
+                        }
+
+                        if let post = viewModel.post {
+                            Button {
+                                ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Share")
+                            .modifier(GlassCircleBackground())
+                        }
                     }
                 }
+                .padding(.horizontal, 16)
+                .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
+                .opacity(controlsOpacity)
             }
-            .padding(.horizontal, 16)
-            .frame(height: Self.expandedToolbarHeight)
-            .opacity(controlsOpacity)
         }
         .allowsHitTesting(isExpanded)
         .background(alignment: .top) {
@@ -318,7 +323,7 @@ struct PostCommentsSheet: View {
     }
 
     private func expandedHeaderBlurHeight(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarHeight
+        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarTitleHitHeight
     }
 
     private func sheetHandle(
@@ -582,6 +587,49 @@ private extension PostCommentsSheet {
 enum SheetState {
     case collapsed
     case expanded
+}
+
+private struct TransparentTapOverlay: UIViewRepresentable {
+    let onTap: @MainActor () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onTap: onTap)
+    }
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.isUserInteractionEnabled = true
+        view.isAccessibilityElement = false
+
+        let tapGesture = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap)
+        )
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delaysTouchesBegan = false
+        tapGesture.delaysTouchesEnded = false
+        view.addGestureRecognizer(tapGesture)
+
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.onTap = onTap
+    }
+
+    @MainActor
+    final class Coordinator: NSObject {
+        var onTap: @MainActor () -> Void
+
+        init(onTap: @escaping @MainActor () -> Void) {
+            self.onTap = onTap
+        }
+
+        @objc func handleTap() {
+            onTap()
+        }
+    }
 }
 
 private struct StableCommentsHost: View, @preconcurrency Equatable {

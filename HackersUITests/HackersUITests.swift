@@ -1,6 +1,7 @@
 import XCTest
 
 final class HackersUITests: XCTestCase {
+    private let screenshotPostID = 48_350_598
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -15,8 +16,9 @@ final class HackersUITests: XCTestCase {
         launchApp()
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        XCTAssertTrue(app.staticTexts["ASML's Best Selling Product Isn't What You Think It Is"].exists)
-        XCTAssertTrue(app.staticTexts["GameStop makes $55.5B takeover offer for eBay"].exists)
+        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
+        XCTAssertTrue(app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].exists)
+        XCTAssertTrue(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
 
         app.buttons["settings.button"].tap()
 
@@ -30,26 +32,26 @@ final class HackersUITests: XCTestCase {
     func testSmokeOpenCustomBrowserFromFeed() throws {
         launchApp(linkBrowserMode: "custom")
 
-        let post = app.buttons["feed.post.48007145"]
+        let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["ASML's Best Selling Product Isn't What You Think It Is"].exists)
+        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
     }
 
     func testOpenCommentsFromFeed() throws {
         launchApp(linkBrowserMode: "inApp")
 
-        let post = app.buttons["feed.post.48007145"]
+        let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
         XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["ASML's Best Selling Product Isn't What You Think It Is"].exists)
-        XCTAssertTrue(app.staticTexts["cassianoleal"].exists)
-        XCTAssertTrue(app.staticTexts["The most interesting detail is that service and installed-base work changes the economics."].exists)
+        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
+        XCTAssertTrue(app.staticTexts["manakov_dev"].exists)
+        XCTAssertTrue(app.staticTexts["Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."].exists)
     }
 
     func testSearchUsesMockedAlgoliaResults() throws {
@@ -61,10 +63,10 @@ final class HackersUITests: XCTestCase {
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 5))
         searchField.tap()
-        searchField.typeText("ASML")
+        searchField.typeText("Chuwi")
 
-        XCTAssertTrue(app.staticTexts["ASML's Best Selling Product Isn't What You Think It Is"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["GameStop makes $55.5B takeover offer for eBay"].exists)
+        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
     }
 
     func testCategoryMenuUsesMockedFeeds() throws {
