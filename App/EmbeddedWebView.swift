@@ -5,12 +5,27 @@
 //  Created by Codex on 2025-09-18.
 //
 
+import DesignSystem
 import Domain
 import Foundation
 import Shared
 import SwiftUI
 import UIKit
 import WebKit
+
+enum PageHeaderBlurTint: Equatable {
+    case light
+    case dark
+
+    var color: Color {
+        switch self {
+        case .light:
+            .white
+        case .dark:
+            .black
+        }
+    }
+}
 
 @MainActor
 final class BrowserController: ObservableObject {
@@ -19,8 +34,11 @@ final class BrowserController: ObservableObject {
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
+    @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
     var fallbackURL: URL?
     let page = WebPage()
+    private var headerTintTask: Task<Void, Never>?
+    private var pageHeaderBlurTintURL: URL?
 
     func load(_ target: URL) {
         fallbackURL = target
@@ -31,15 +49,22 @@ final class BrowserController: ObservableObject {
     }
 
     func updateState() {
-        currentURL = page.url ?? currentURL ?? fallbackURL
+        let updatedURL = page.url ?? currentURL ?? fallbackURL
+        if pageHeaderBlurTintURL != updatedURL {
+            pageHeaderBlurTint = nil
+            pageHeaderBlurTintURL = nil
+        }
+        currentURL = updatedURL
         currentTitle = page.title
         let list = page.backForwardList
         canGoBack = !list.backList.isEmpty
         canGoForward = !list.forwardList.isEmpty
         isLoading = page.isLoading
+        scheduleHeaderTintUpdate()
     }
 
     func reload() {
+        resetHeaderBlurTint()
         _ = page.reload()
         updateState()
     }
@@ -51,15 +76,142 @@ final class BrowserController: ObservableObject {
 
     func goBack() {
         guard let item = page.backForwardList.backList.last else { return }
+        resetHeaderBlurTint()
         _ = page.load(item)
         updateState()
     }
 
     func goForward() {
         guard let item = page.backForwardList.forwardList.first else { return }
+        resetHeaderBlurTint()
         _ = page.load(item)
         updateState()
     }
+
+    private func resetHeaderBlurTint() {
+        pageHeaderBlurTint = nil
+        pageHeaderBlurTintURL = nil
+    }
+
+    private func scheduleHeaderTintUpdate() {
+        headerTintTask?.cancel()
+        headerTintTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            await self?.updateHeaderTintFromPage()
+
+            try? await Task.sleep(for: .milliseconds(750))
+            guard !Task.isCancelled else { return }
+            await self?.updateHeaderTintFromPage()
+        }
+    }
+
+    private func updateHeaderTintFromPage() async {
+        do {
+            guard let result = try await page.callJavaScript(Self.headerTintDetectionScript) as? String else {
+                return
+            }
+
+            let updatedTint: PageHeaderBlurTint = result == "dark" ? .dark : .light
+            if pageHeaderBlurTint != updatedTint {
+                pageHeaderBlurTint = updatedTint
+            }
+            pageHeaderBlurTintURL = currentURL
+        } catch {
+            // Cross-origin and in-flight navigations can reject evaluation; keep the last usable tint.
+        }
+    }
+
+    private static let headerTintDetectionScript = """
+    function parseColor(value) {
+        if (!value || value === 'transparent') { return null; }
+        const match = value.match(/rgba?\\(([^)]+)\\)/);
+        if (!match) { return null; }
+
+        const parts = match[1]
+            .replace(/\\//g, ' ')
+            .split(/[ ,]+/)
+            .filter(Boolean);
+
+        if (parts.length < 3) { return null; }
+
+        function component(part) {
+            return part.endsWith('%') ? parseFloat(part) * 2.55 : parseFloat(part);
+        }
+
+        const r = component(parts[0]);
+        const g = component(parts[1]);
+        const b = component(parts[2]);
+        const a = parts.length >= 4 ? parseFloat(parts[3]) : 1;
+
+        if ([r, g, b, a].some((number) => Number.isNaN(number))) { return null; }
+        return { r, g, b, a };
+    }
+
+    function luminance(color) {
+        const channel = (value) => {
+            const normalized = Math.max(0, Math.min(255, value)) / 255;
+            return normalized <= 0.03928
+                ? normalized / 12.92
+                : Math.pow((normalized + 0.055) / 1.055, 2.4);
+        };
+
+        return 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
+    }
+
+    function firstUsefulBackground(element) {
+        var current = element;
+        while (current) {
+            const color = parseColor(getComputedStyle(current).backgroundColor);
+            if (color && color.a > 0.35) { return color; }
+            current = current.parentElement;
+        }
+        return null;
+    }
+
+    const width = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const height = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const points = [
+        [width * 0.25, 1],
+        [width * 0.50, 1],
+        [width * 0.75, 1],
+        [width * 0.25, Math.min(32, height * 0.08)],
+        [width * 0.50, Math.min(32, height * 0.08)],
+        [width * 0.75, Math.min(32, height * 0.08)]
+    ];
+
+    const colors = points
+        .map(([x, y]) => document.elementFromPoint(x, y))
+        .map(firstUsefulBackground)
+        .filter(Boolean);
+
+    if (colors.length === 0 && document.body) {
+        const bodyColor = parseColor(getComputedStyle(document.body).backgroundColor);
+        if (bodyColor && bodyColor.a > 0.35) { colors.push(bodyColor); }
+    }
+
+    if (colors.length === 0) {
+        const rootColor = parseColor(getComputedStyle(document.documentElement).backgroundColor);
+        if (rootColor && rootColor.a > 0.35) { colors.push(rootColor); }
+    }
+
+    if (colors.length === 0) {
+        const themeColor = document.querySelector('meta[name="theme-color"]')?.content;
+        if (themeColor) {
+            const probe = document.createElement('span');
+            probe.style.color = themeColor;
+            document.documentElement.appendChild(probe);
+            const parsedThemeColor = parseColor(getComputedStyle(probe).color);
+            probe.remove();
+            if (parsedThemeColor) { colors.push(parsedThemeColor); }
+        }
+    }
+
+    if (colors.length === 0) { return 'light'; }
+
+    const averageLuminance = colors.reduce((sum, color) => sum + luminance(color), 0) / colors.length;
+    return averageLuminance < 0.45 ? 'dark' : 'light';
+    """
 }
 
 enum WebViewAnimations {
@@ -71,6 +223,8 @@ enum WebViewAnimations {
 }
 
 struct EmbeddedWebView: View {
+    private static let statusBarBlurFadeExtension: CGFloat = 0
+
     let url: URL
     let onDismiss: @MainActor () -> Void
     let showsCloseButton: Bool
@@ -93,6 +247,9 @@ struct EmbeddedWebView: View {
 
     var body: some View {
         content
+            .overlay(alignment: .top) {
+                headerBlur
+            }
             .toolbar {
                 if showsToolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -129,11 +286,29 @@ struct EmbeddedWebView: View {
                     }
                 }
             }
+            .toolbarBackground(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if bottomPanelInsetHeight > 0 {
                     Color.clear.frame(height: bottomPanelInsetHeight)
                 }
             }
+    }
+
+    private var headerBlur: some View {
+        GeometryReader { proxy in
+            if let tint = controller.pageHeaderBlurTint {
+                ProgressiveHeaderBlurBackground(
+                    height: proxy.safeAreaInsets.top,
+                    fadeExtension: Self.statusBarBlurFadeExtension,
+                    tintMiddleLocation: 0.45,
+                    tint: tint.color
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: controller.pageHeaderBlurTint)
+        .allowsHitTesting(false)
     }
 
     @ViewBuilder

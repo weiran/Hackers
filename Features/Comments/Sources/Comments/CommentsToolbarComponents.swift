@@ -1,10 +1,8 @@
 import DesignSystem
 import Domain
 import Observation
-import ProgressiveBlurHeader
 import Shared
 import SwiftUI
-import VariableBlur
 
 @MainActor
 @Observable
@@ -18,56 +16,6 @@ public final class CommentsHeaderTitleVisibility {
     public func setVisible(_ isVisible: Bool) {
         guard self.isVisible != isVisible else { return }
         self.isVisible = isVisible
-    }
-}
-
-public struct ProgressiveHeaderBlurBackground: View {
-    private let height: CGFloat
-    private let fadeExtension: CGFloat
-    private let maxBlurRadius: CGFloat
-    private let tintOpacityTop: Double
-    private let tintOpacityMiddle: Double
-    @Environment(\.colorScheme) private var colorScheme
-
-    public init(
-        height: CGFloat,
-        fadeExtension: CGFloat = 64,
-        maxBlurRadius: CGFloat = 5,
-        tintOpacityTop: Double = 0.7,
-        tintOpacityMiddle: Double = 0.5
-    ) {
-        self.height = height
-        self.fadeExtension = fadeExtension
-        self.maxBlurRadius = maxBlurRadius
-        self.tintOpacityTop = tintOpacityTop
-        self.tintOpacityMiddle = tintOpacityMiddle
-    }
-
-    public var body: some View {
-        let totalHeight = max(height + fadeExtension, 1)
-
-        VariableBlurView(
-            maxBlurRadius: maxBlurRadius,
-            direction: .blurredTopClearBottom
-        )
-        .overlay {
-            LinearGradient(
-                stops: [
-                    .init(color: fadeTint.opacity(tintOpacityTop), location: 0),
-                    .init(color: fadeTint.opacity(tintOpacityMiddle), location: min(90 / totalHeight, 1)),
-                    .init(color: fadeTint.opacity(0), location: 1)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        }
-        .frame(height: totalHeight)
-        .ignoresSafeArea(edges: .top)
-        .allowsHitTesting(false)
-    }
-
-    private var fadeTint: Color {
-        colorScheme == .dark ? .black : .white
     }
 }
 
@@ -93,6 +41,9 @@ public struct CommentsHeaderTitleButton: View {
     private let showThumbnails: Bool
     private let titleVisibility: CommentsHeaderTitleVisibility
     private let accessibilityHint: String
+    private let hitHeight: CGFloat
+    private let fillsAvailableWidth: Bool
+    private let usesOffsetTransition: Bool
     private let onTap: () -> Void
 
     public init(
@@ -100,32 +51,47 @@ public struct CommentsHeaderTitleButton: View {
         showThumbnails: Bool,
         titleVisibility: CommentsHeaderTitleVisibility,
         accessibilityHint: String,
+        hitHeight: CGFloat = 44,
+        fillsAvailableWidth: Bool = false,
+        usesOffsetTransition: Bool = true,
         onTap: @escaping () -> Void
     ) {
         self.post = post
         self.showThumbnails = showThumbnails
         self.titleVisibility = titleVisibility
         self.accessibilityHint = accessibilityHint
+        self.hitHeight = hitHeight
+        self.fillsAvailableWidth = fillsAvailableWidth
+        self.usesOffsetTransition = usesOffsetTransition
         self.onTap = onTap
     }
 
     public var body: some View {
         let isVisible = titleVisibility.isVisible
+        let maxWidth: CGFloat? = fillsAvailableWidth ? .infinity : nil
 
-        ZStack {
-            CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
-                .hidden()
+        Button(action: onTap) {
+            ZStack {
+                CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+                    .hidden()
+                    .accessibilityHidden(true)
 
-            if isVisible {
-                Button(action: onTap) {
+                if isVisible {
                     CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
+                        .transition(usesOffsetTransition ? Self.visibilityTransition : .opacity)
                 }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(.isButton)
-                .accessibilityHint(accessibilityHint)
-                .transition(Self.visibilityTransition)
             }
+            .frame(maxWidth: maxWidth, alignment: .top)
+            .frame(height: hitHeight, alignment: .top)
+            .contentShape(.interaction, Rectangle())
         }
+        .buttonStyle(.plain)
+        .disabled(!isVisible)
+        .allowsHitTesting(isVisible)
+        .accessibilityLabel(post.title)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint(accessibilityHint)
+        .accessibilityHidden(!isVisible)
         .animation(.easeInOut(duration: 0.3), value: isVisible)
     }
 
