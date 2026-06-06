@@ -5,6 +5,8 @@ import Shared
 import SwiftUI
 import UIKit
 
+// swiftlint:disable type_body_length
+
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = 150
     private static let handleWidth: CGFloat = 36

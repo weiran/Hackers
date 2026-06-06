@@ -4,6 +4,8 @@ import Foundation
 import Shared
 import SwiftUI
 
+// swiftlint:disable type_body_length function_body_length
+
 enum UITestingBootstrap {
     private static let argument = "--ui-testing"
     static let postID = 48_350_598
