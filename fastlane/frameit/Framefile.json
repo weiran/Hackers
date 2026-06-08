@@ -1,0 +1,27 @@
+{
+  "default": {
+    "background": "background.png",
+    "padding": "4%x3%",
+    "title_min_height": "18%",
+    "font_scale_factor": 0.085,
+    "stack_title": true,
+    "show_complete_frame": false,
+    "title_below_image": false,
+    "keyword": {
+      "color": "#FFFFFF",
+      "font": "/System/Library/Fonts/SFNS.ttf",
+      "font_weight": "700"
+    },
+    "title": {
+      "color": "#FFFFFF",
+      "font": "/System/Library/Fonts/SFNS.ttf",
+      "font_weight": "700"
+    }
+  },
+  "data": [
+    {
+      "filter": "iPad Pro 13-inch",
+      "force_device_type": "iPad Pro (12.9-inch) (4th generation)"
+    }
+  ]
+}

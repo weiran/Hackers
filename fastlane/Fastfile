@@ -3,6 +3,7 @@ default_platform(:ios)
 require "shellwords"
 require "fileutils"
 require "cgi"
+require "json"
 require "pathname"
 
 REPO_ROOT = File.expand_path("..", __dir__)
@@ -16,6 +17,7 @@ RELEASE_DIR = File.join(REPO_ROOT, "artifacts/release")
 LOG_DIR = File.join(REPO_ROOT, "artifacts/logs")
 SNAPSHOT_CACHE_DIR = File.expand_path("~/Library/Caches/tools.fastlane/screenshots")
 SCREENSHOT_OUTPUT_DIR = File.join(REPO_ROOT, "artifacts/screenshots")
+FRAMEIT_ASSET_DIR = File.join(REPO_ROOT, "fastlane", "frameit")
 
 def app_store_connect_key
   app_store_connect_api_key(
@@ -41,6 +43,8 @@ end
 
 def write_screenshot_summary(output_dir)
   screenshots = Dir[File.join(output_dir, "**", "*.png")].sort
+  framed_screenshots = screenshots.select { |path| File.basename(path, ".png").end_with?("_framed") }
+  screenshots = framed_screenshots unless framed_screenshots.empty?
   screens = Hash.new { |hash, key| hash[key] = [] }
 
   screenshots.each do |path|
@@ -48,7 +52,7 @@ def write_screenshot_summary(output_dir)
     path_parts = relative_path.split(File::SEPARATOR)
     appearance = path_parts.length >= 3 ? path_parts[-3] : "default"
     locale = path_parts.length >= 2 ? path_parts[-2] : File.basename(File.dirname(path))
-    file_name = File.basename(path, ".png")
+    file_name = File.basename(path, ".png").sub(/_framed\z/, "")
     match = file_name.match(/\A(.+)-(\d{2}-.+)\z/)
     device = match ? match[1] : "Unknown Device"
     screen = match ? match[2] : file_name
@@ -77,6 +81,27 @@ def write_screenshot_summary(output_dir)
   html << "</body></html>"
 
   File.write(File.join(output_dir, "screenshots.html"), html)
+end
+
+def prepare_frameit_metadata(output_dir)
+  framefile_path = File.join(FRAMEIT_ASSET_DIR, "Framefile.json")
+  framefile = JSON.parse(File.read(framefile_path))
+  background_path = Pathname.new(File.join(FRAMEIT_ASSET_DIR, "background.png"))
+  output_path = Pathname.new(output_dir)
+  framefile["default"]["background"] = background_path.relative_path_from(output_path).to_s
+  frameit_font_path = Pathname.new("/System/Library/Fonts/SFNS.ttf")
+  frameit_font = frameit_font_path.relative_path_from(output_path).to_s
+  ["keyword", "title"].each do |text_type|
+    framefile["default"][text_type]["font"] = frameit_font
+  end
+
+  File.write(File.join(output_dir, "Framefile.json"), JSON.pretty_generate(framefile))
+
+  locale_dir = File.join(output_dir, "en-US")
+  FileUtils.mkdir_p(locale_dir)
+  ["title.strings", "keyword.strings"].each do |file_name|
+    FileUtils.cp(File.join(FRAMEIT_ASSET_DIR, file_name), File.join(locale_dir, file_name))
+  end
 end
 
 def marketing_version
@@ -210,11 +235,14 @@ platform :ios do
       { name: "light", dark_mode: false },
       { name: "dark", dark_mode: true }
     ].each do |appearance|
+      output_dir = File.join(SCREENSHOT_OUTPUT_DIR, appearance[:name])
       FileUtils.rm_rf(SNAPSHOT_CACHE_DIR)
       snapshot(
-        output_directory: File.join(SCREENSHOT_OUTPUT_DIR, appearance[:name]),
+        output_directory: output_dir,
         dark_mode: appearance[:dark_mode]
       )
+      prepare_frameit_metadata(output_dir)
+      frameit(path: output_dir)
     end
     write_screenshot_summary(SCREENSHOT_OUTPUT_DIR)
   end

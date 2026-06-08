@@ -29,6 +29,7 @@ class NavigationStore: NavigationStoreProtocol {
     var selectedPost: Domain.Post?
     var selectedPostId: Int?
     var selectedPostType: Domain.PostType = .news
+    var selectedPostLinkPresentation: PostLinkPresentation?
     var showingLogin = false
     var showingSettings = false
     var pendingPostId: Int?
@@ -50,6 +51,7 @@ class NavigationStore: NavigationStoreProtocol {
     func showPost(_ post: Domain.Post) {
         embeddedBrowserURL = nil
         detailPath.removeAll()
+        selectedPostLinkPresentation = nil
         selectedPost = post
         selectedPostId = post.id
 
@@ -69,9 +71,15 @@ class NavigationStore: NavigationStoreProtocol {
         detailPath.removeAll()
         selectedPost = post
         selectedPostId = post.id
+        selectedPostLinkPresentation = nil
 
         if UIDevice.current.userInterfaceIdiom != .pad {
             path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
+            return
+        }
+
+        if ProcessInfo.processInfo.environment["HACKERS_SCREENSHOTS"] == "1" {
+            selectedPostLinkPresentation = presentation
             return
         }
 
@@ -85,6 +93,7 @@ class NavigationStore: NavigationStoreProtocol {
     func showPost(withId id: Int) {
         embeddedBrowserURL = nil
         detailPath.removeAll()
+        selectedPostLinkPresentation = nil
         selectedPost = nil
         selectedPostId = id
 
@@ -96,6 +105,7 @@ class NavigationStore: NavigationStoreProtocol {
     func clearSelection() {
         selectedPost = nil
         selectedPostId = nil
+        selectedPostLinkPresentation = nil
         embeddedBrowserURL = nil
         detailPath.removeAll()
     }
@@ -131,6 +141,7 @@ class NavigationStore: NavigationStoreProtocol {
 
         embeddedBrowserURL = url
         detailPath.removeAll()
+        selectedPostLinkPresentation = nil
         return true
     }
 
@@ -150,6 +161,7 @@ class NavigationStore: NavigationStoreProtocol {
                 detailPath.removeLast()
             } else {
                 embeddedBrowserURL = nil
+                selectedPostLinkPresentation = nil
             }
         }
 

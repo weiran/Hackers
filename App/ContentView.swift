@@ -181,7 +181,11 @@ struct AdaptiveSplitView: View {
         } detail: {
             // Detail - CommentsView or empty state
             NavigationStack(path: detailPathBinding) {
-                if let embeddedURL = navigationStore.embeddedBrowserURL {
+                if let selectedPost = navigationStore.selectedPost,
+                   let browserPresentation = navigationStore.selectedPostLinkPresentation {
+                    PostLinkBrowserView(post: selectedPost, presentation: browserPresentation)
+                        .id("browser-\(selectedPost.id)")
+                } else if let embeddedURL = navigationStore.embeddedBrowserURL {
                     EmbeddedWebView(url: embeddedURL,
                                     onDismiss: { navigationStore.dismissEmbeddedBrowser() },
                                     showsCloseButton: true)

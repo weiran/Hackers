@@ -2,7 +2,8 @@ import XCTest
 
 @MainActor
 final class HackersScreenshotTests: XCTestCase {
-    private let screenshotPostTitle = "Chuwi Minibook X"
+    private let screenshotPostID = 48_350_598
+    private let screenshotPostTitle = "Swift 6.2 Released"
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -18,40 +19,19 @@ final class HackersScreenshotTests: XCTestCase {
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts[screenshotPostTitle].waitForExistence(timeout: 5))
-        snapshot("01-top-feed")
+        snapshot("01-feed-built-for-reading")
 
-        tapScreenshotPost()
-        XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["manakov_dev"].waitForExistence(timeout: 5))
-        snapshot("02-comments")
+        relaunch(
+            linkBrowserMode: "custom",
+            usesArticleFixtures: false,
+            initialLinkPostID: screenshotPostID
+        )
+        waitForRealArticleContent()
+        snapshot("02-open-stories-inside-hackers")
 
-        if !isWideLayout {
-            scrollCommentsDownSlightly()
-            snapshot("02-comments-scrolled")
-        }
-
-        if isWideLayout {
-            snapshot("03-article")
-        } else {
-            relaunch(linkBrowserMode: "custom")
-            XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-            tapScreenshotPost()
-            XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-            XCTAssertTrue(
-                app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."]
-                    .waitForExistence(timeout: 5)
-            )
-            snapshot("03-article")
-
-            relaunch(linkBrowserMode: "custom", usesArticleFixtures: false)
-            XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-            tapScreenshotPostThumbnail()
-            XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-            XCTAssertTrue(app.webViews.firstMatch.waitForExistence(timeout: 15))
-            XCTAssertFalse(app.otherElements["browser.mockArticle"].exists)
-            waitForRealArticleContent()
-            snapshot("03-browser-comments-collapsed")
-        }
+        relaunch(linkBrowserMode: "inApp", initialPostID: screenshotPostID)
+        waitForScreenshotComments()
+        snapshot("03-read-comments-alongside-story")
 
         relaunch(linkBrowserMode: "inApp")
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
@@ -60,38 +40,83 @@ final class HackersScreenshotTests: XCTestCase {
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 5))
         searchField.tap()
-        searchField.typeText("Chuwi")
+        searchField.typeText("Swift")
         XCTAssertTrue(app.staticTexts[screenshotPostTitle].waitForExistence(timeout: 5))
-        snapshot("04-search")
+        XCTAssertTrue(app.buttons["search.sort.menu"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["search.date.menu"].waitForExistence(timeout: 5))
+        snapshot("04-search-by-popular-recent-date")
 
-        relaunch(linkBrowserMode: "inApp")
+        relaunch(linkBrowserMode: "inApp", readPostIDs: [48_345_248, 48_347_354, 48_345_840])
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        app.buttons["settings.button"].tap()
-        XCTAssertTrue(app.collectionViews["settings.form"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.switches["settings.showThumbnails"].waitForExistence(timeout: 5))
-        snapshot("05-settings")
+        XCTAssertTrue(app.staticTexts[screenshotPostTitle].waitForExistence(timeout: 5))
+        snapshot("05-dim-read-posts-across-devices")
+
+        relaunch(linkBrowserMode: "inApp", initialPostID: screenshotPostID)
+        waitForScreenshotComments()
+        scrollCommentsDownSlightly()
+        snapshot("06-vote-reply-follow-deep-threads")
     }
 
-    private func launchApp(linkBrowserMode: String, usesArticleFixtures: Bool = true) {
+    private func launchApp(
+        linkBrowserMode: String,
+        usesArticleFixtures: Bool = true,
+        readPostIDs: [Int] = [],
+        initialPostID: Int? = nil,
+        initialLinkPostID: Int? = nil,
+        browserOnly: Bool = false
+    ) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         setupSnapshot(app)
-        configureApp(linkBrowserMode: linkBrowserMode, usesArticleFixtures: usesArticleFixtures)
+        configureApp(
+            linkBrowserMode: linkBrowserMode,
+            usesArticleFixtures: usesArticleFixtures,
+            readPostIDs: readPostIDs,
+            initialPostID: initialPostID,
+            initialLinkPostID: initialLinkPostID,
+            browserOnly: browserOnly
+        )
         app.launch()
     }
 
-    private func relaunch(linkBrowserMode: String, usesArticleFixtures: Bool = true) {
+    private func relaunch(
+        linkBrowserMode: String,
+        usesArticleFixtures: Bool = true,
+        readPostIDs: [Int] = [],
+        initialPostID: Int? = nil,
+        initialLinkPostID: Int? = nil,
+        browserOnly: Bool = false
+    ) {
         app.terminate()
-        configureApp(linkBrowserMode: linkBrowserMode, usesArticleFixtures: usesArticleFixtures)
+        configureApp(
+            linkBrowserMode: linkBrowserMode,
+            usesArticleFixtures: usesArticleFixtures,
+            readPostIDs: readPostIDs,
+            initialPostID: initialPostID,
+            initialLinkPostID: initialLinkPostID,
+            browserOnly: browserOnly
+        )
         app.launch()
     }
 
-    private func configureApp(linkBrowserMode: String, usesArticleFixtures: Bool) {
+    private func configureApp(
+        linkBrowserMode: String,
+        usesArticleFixtures: Bool,
+        readPostIDs: [Int],
+        initialPostID: Int?,
+        initialLinkPostID: Int?,
+        browserOnly: Bool
+    ) {
         appendLaunchArgument("--ui-testing")
         appendLaunchArgument("--screenshots")
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
         app.launchEnvironment["HACKERS_SCREENSHOTS"] = "1"
         app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
         app.launchEnvironment["HACKERS_UI_ARTICLE_FIXTURES"] = usesArticleFixtures ? "1" : "0"
+        app.launchEnvironment["HACKERS_UI_DIM_READ_POSTS"] = readPostIDs.isEmpty ? "0" : "1"
+        app.launchEnvironment["HACKERS_UI_READ_POST_IDS"] = readPostIDs.map(String.init).joined(separator: ",")
+        app.launchEnvironment["HACKERS_UI_INITIAL_POST_ID"] = initialPostID.map(String.init) ?? ""
+        app.launchEnvironment["HACKERS_UI_INITIAL_LINK_POST_ID"] = initialLinkPostID.map(String.init) ?? ""
+        app.launchEnvironment["HACKERS_UI_BROWSER_ONLY"] = browserOnly ? "1" : "0"
     }
 
     private func appendLaunchArgument(_ argument: String) {
@@ -101,37 +126,36 @@ final class HackersScreenshotTests: XCTestCase {
     }
 
     private func tapScreenshotPost() {
-        let title = app.staticTexts[screenshotPostTitle]
-        XCTAssertTrue(title.waitForExistence(timeout: 5))
-        title.tap()
-    }
-
-    private func tapScreenshotPostThumbnail() {
-        let title = app.staticTexts[screenshotPostTitle]
-        XCTAssertTrue(title.waitForExistence(timeout: 5))
-
-        let thumbnailCoordinate = app.coordinate(
-            withNormalizedOffset: CGVector(dx: 0, dy: 0)
-        ).withOffset(CGVector(dx: max(title.frame.minX - 70, 30), dy: title.frame.midY))
-        thumbnailCoordinate.tap()
+        let post = app.buttons.matching(identifier: "feed.post.\(screenshotPostID)").firstMatch
+        XCTAssertTrue(post.waitForExistence(timeout: 5))
+        post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
     private func scrollCommentsDownSlightly() {
         let commentsList = app.collectionViews["comments.list"]
-        XCTAssertTrue(commentsList.waitForExistence(timeout: 5))
+        guard commentsList.waitForExistence(timeout: 2) else {
+            app.swipeUp()
+            return
+        }
 
         let start = commentsList.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62))
         let end = commentsList.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55))
         start.press(forDuration: 0.05, thenDragTo: end)
     }
 
+    private func waitForScreenshotComments() {
+        XCTAssertTrue(app.staticTexts["manakov_dev"].waitForExistence(timeout: 10))
+    }
+
     private func waitForRealArticleContent() {
-        let titlePredicate = NSPredicate { [self, screenshotPostTitle] _, _ in
-            self.app.webViews.staticTexts[screenshotPostTitle].exists
-                || self.app.staticTexts[screenshotPostTitle].exists
+        let loadedPredicate = NSPredicate { [self] _, _ in
+            self.app.webViews.firstMatch.exists
+                || self.app.otherElements["browser.view"].exists
         }
-        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: titlePredicate, object: app)], timeout: 20)
+        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: loadedPredicate, object: app)], timeout: 20)
         XCTAssertEqual(result, .completed)
+        RunLoop.current.run(until: Date().addingTimeInterval(3))
+        waitForScreenshotComments()
     }
 
     private var isWideLayout: Bool {

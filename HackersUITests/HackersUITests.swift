@@ -16,7 +16,7 @@ final class HackersUITests: XCTestCase {
         launchApp()
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
+        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
         XCTAssertTrue(app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].exists)
         XCTAssertTrue(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
 
@@ -38,7 +38,7 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
+        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
     }
 
     func testOpenCommentsFromFeed() throws {
@@ -49,7 +49,7 @@ final class HackersUITests: XCTestCase {
         tapPost(post)
 
         XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].exists)
+        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
         XCTAssertTrue(app.staticTexts["manakov_dev"].exists)
         XCTAssertTrue(app.staticTexts["Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."].exists)
     }
@@ -63,9 +63,9 @@ final class HackersUITests: XCTestCase {
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 5))
         searchField.tap()
-        searchField.typeText("Chuwi")
+        searchField.typeText("Swift")
 
-        XCTAssertTrue(app.staticTexts["Chuwi Minibook X"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
     }
 

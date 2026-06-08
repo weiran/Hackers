@@ -93,11 +93,11 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             ),
             makePost(
                 id: UITestingBootstrap.postID,
-                url: "https://tylercipriani.com/blog/2026/05/28/chuwi-minibook-x/",
-                title: "Chuwi Minibook X",
+                url: "https://www.swift.org/blog/swift-6.2-released/",
+                title: "Swift 6.2 Released",
                 age: "10 hours ago",
                 commentsCount: 202,
-                by: "thcipriani",
+                by: "swiftlang",
                 score: 279
             ),
             makePost(
@@ -771,11 +771,13 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
     var compactFeedDesign = false
-    var dimReadPosts = !UITestingBootstrap.isScreenshotMode
+    var dimReadPosts: Bool
 
     init() {
         let mode = ProcessInfo.processInfo.environment["HACKERS_UI_LINK_BROWSER_MODE"]
         linkBrowserMode = mode == "inApp" ? .inAppBrowser : .customBrowser
+        let dimReadSetting = ProcessInfo.processInfo.environment["HACKERS_UI_DIM_READ_POSTS"]
+        dimReadPosts = dimReadSetting == "1" || (!UITestingBootstrap.isScreenshotMode && dimReadSetting != "0")
     }
 
     func clearCache() {}
@@ -811,7 +813,14 @@ final class UITestBookmarksUseCase: BookmarksUseCase, @unchecked Sendable {
 
 final class UITestReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
     private let lock = NSLock()
-    private var readIDs: Set<Int> = []
+    private var readIDs: Set<Int>
+
+    init() {
+        let ids = ProcessInfo.processInfo.environment["HACKERS_UI_READ_POST_IDS"]?
+            .split(separator: ",")
+            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) } ?? []
+        readIDs = Set(ids)
+    }
 
     func readPostIDs() async -> Set<Int> {
         lock.withLock { readIDs }
@@ -944,9 +953,9 @@ enum UITestArticleFixtures {
             )
         }
 
-        if url.host?.contains("tylercipriani.com") == true {
+        if url.host?.contains("swift.org") == true {
             return UITestArticleContent(
-                title: "Chuwi Minibook X",
+                title: "Swift 6.2 Released",
                 body: "Fixture article loaded from the UI-test Hacker News Active snapshot."
             )
         }

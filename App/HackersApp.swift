@@ -13,6 +13,7 @@ struct HackersApp: App {
     @State private var navigationStore: NavigationStore
     @State private var sessionService: SessionService
     @State private var toastPresenter: ToastPresenter
+    @State private var handledInitialUITestingRoute = false
 
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -34,6 +35,7 @@ struct HackersApp: App {
                 .environment(toastPresenter)
                 .onAppear {
                     setupAppearance()
+                    handleInitialUITestingRouteIfNeeded()
                 }
                 .onOpenURL { url in
                     handleOpenURL(url)
@@ -50,5 +52,28 @@ struct HackersApp: App {
 
     private func handleOpenURL(_ url: URL) {
         navigationStore.handleOpenURL(url)
+    }
+
+    private func handleInitialUITestingRouteIfNeeded() {
+        guard !handledInitialUITestingRoute else { return }
+        guard ProcessInfo.processInfo.environment["HACKERS_SCREENSHOTS"] == "1" else { return }
+
+        if let linkPostID = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_LINK_POST_ID"].flatMap(Int.init) {
+            handledInitialUITestingRoute = true
+            Task {
+                guard let post = try? await DependencyContainer.shared.getPostUseCase().getPost(id: linkPostID) else {
+                    return
+                }
+                await MainActor.run {
+                    navigationStore.showPostLink(post, presentation: .collapsedBrowser)
+                }
+            }
+            return
+        }
+
+        if let postID = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_POST_ID"].flatMap(Int.init) {
+            handledInitialUITestingRoute = true
+            navigationStore.showPost(withId: postID)
+        }
     }
 }
