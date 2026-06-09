@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Release tag to promote manually later, for example v5.3.0"
+        description: "Release tag to submit, for example v5.3.1"
         required: true
+        type: string
+      build_number:
+        description: "Optional processed App Store Connect build number to submit"
+        required: false
         type: string
 
 permissions:
@@ -16,16 +20,55 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  protected-placeholder:
-    name: appstore protected placeholder
+  submit:
+    name: submit app review
     runs-on: macos-26
-    environment: appstore
+    timeout-minutes: 30
+    environment: testflight
     steps:
-      - name: Record promotion guardrail
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.release_tag }}
+
+      - name: Install Bundler dependencies
+        run: |
+          bundle config set path vendor/bundle
+          bundle install
+
+      - name: Resolve release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          mkdir -p artifacts/release
+          gh release view "$RELEASE_TAG" --json body -q .body > artifacts/release/app-store-release-notes.txt
+          if [ ! -s artifacts/release/app-store-release-notes.txt ]; then
+            echo "GitHub Release body is required for App Store release notes" >&2
+            exit 1
+          fi
+
+      - name: Submit for App Review
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+          BUILD_NUMBER: ${{ github.event.inputs.build_number }}
+          WHAT_TO_TEST_FILE: artifacts/release/app-store-release-notes.txt
+        run: bundle exec fastlane ios submit_app_review release_tag:"$RELEASE_TAG" build_number:"$BUILD_NUMBER"
+
+      - name: App Store summary
+        if: always()
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+          BUILD_NUMBER: ${{ github.event.inputs.build_number }}
         run: |
           {
-            echo "## App Store Promotion"
+            echo "## App Store Submission"
             echo
-            echo "Automatic App Review submission is intentionally disabled."
-            echo "Promote tag ${{ github.event.inputs.release_tag }} manually from App Store Connect after TestFlight validation."
+            echo "- Tag: ${RELEASE_TAG}"
+            if [ -n "${BUILD_NUMBER}" ]; then
+              echo "- Requested build: ${BUILD_NUMBER}"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

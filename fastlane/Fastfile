@@ -321,4 +321,45 @@ platform :ios do
     File.write("#{RELEASE_DIR}/build-number.txt", "#{next_build}\n")
     UI.success("Uploaded Hackers #{version} (#{next_build}) to TestFlight")
   end
+
+  desc "Submit a processed App Store Connect build for App Review"
+  lane :submit_app_review do |options|
+    tag = options[:release_tag] || ENV["RELEASE_TAG"]
+    validate_release_tag!(tag)
+
+    api_key = app_store_connect_key
+    version = marketing_version
+    notes = release_notes
+    UI.user_error!("Release notes are required for App Store submission") if notes.empty?
+
+    build_number = options[:build_number] || ENV["BUILD_NUMBER"]
+    build_number = nil if build_number.to_s.strip.empty?
+    build_number ||= latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      version: version,
+      initial_build_number: 0
+    ).to_s
+    UI.user_error!("No TestFlight build found for #{version}") if build_number.to_i <= 0
+
+    upload_to_app_store(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      app_version: version,
+      build_number: build_number,
+      release_notes: notes,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false
+      }
+    )
+
+    UI.success("Submitted Hackers #{version} (#{build_number}) for App Review")
+  end
 end
