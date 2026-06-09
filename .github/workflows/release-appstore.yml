@@ -60,7 +60,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
           BUILD_NUMBER: ${{ github.event.inputs.build_number }}
-          SKIP_APP_VERSION_UPDATE: ${{ github.event.inputs.skip_app_version_update && '1' || '0' }}
+          SKIP_APP_VERSION_UPDATE: ${{ github.event.inputs.skip_app_version_update == 'true' && '1' || '0' }}
           WHAT_TO_TEST_FILE: artifacts/release/app-store-release-notes.txt
         run: bundle exec fastlane ios submit_app_review release_tag:"$RELEASE_TAG" build_number:"$BUILD_NUMBER"
 

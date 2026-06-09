@@ -205,7 +205,7 @@ def latest_build_number(api_key, version)
 end
 
 def log_app_store_versions(api_key)
-  Spaceship::ConnectAPI.token = api_key
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**api_key)
   app = Spaceship::ConnectAPI::App.find(APP_IDENTIFIER)
   UI.user_error!("App Store Connect app not found: #{APP_IDENTIFIER}") unless app
 
