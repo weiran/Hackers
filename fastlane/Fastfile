@@ -405,7 +405,7 @@ platform :ios do
       app_identifier: APP_IDENTIFIER,
       app_version: version,
       build_number: build_number,
-      release_notes: { "en-US" => notes },
+      release_notes: { "en-GB" => notes },
       submit_for_review: true,
       automatic_release: false,
       skip_app_version_update: ENV["SKIP_APP_VERSION_UPDATE"] == "1",
