@@ -231,6 +231,34 @@ def log_app_store_versions(api_key)
   end
 end
 
+def cancel_pending_app_store_release!(api_key, version_string)
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**api_key)
+  app = Spaceship::ConnectAPI::App.find(APP_IDENTIFIER)
+  UI.user_error!("App Store Connect app not found: #{APP_IDENTIFIER}") unless app
+
+  pending_version = app.get_pending_release_app_store_version(
+    platform: Spaceship::ConnectAPI::Platform::IOS,
+    includes: "appStoreVersionSubmission,build"
+  )
+
+  if pending_version.nil?
+    UI.message("No pending App Store release found to cancel")
+    return
+  end
+
+  UI.message(
+    "Pending App Store release: #{pending_version.version_string} " \
+    "(#{pending_version.app_store_state})"
+  )
+  UI.user_error!(
+    "Pending release is #{pending_version.version_string}, expected #{version_string}"
+  ) unless pending_version.version_string == version_string
+
+  UI.user_error!("Pending release #{version_string} cannot be rejected") unless pending_version.can_reject?
+  pending_version.reject!
+  UI.success("Canceled pending App Store release #{version_string}")
+end
+
 def release_notes
   path = ENV["WHAT_TO_TEST_FILE"]
   path = File.expand_path(path, REPO_ROOT) if path && !path.start_with?("/")
@@ -356,6 +384,7 @@ platform :ios do
 
     api_key = app_store_connect_key
     log_app_store_versions(api_key)
+    cancel_pending_app_store_release!(api_key, ENV["CANCEL_PENDING_VERSION"]) if ENV["CANCEL_PENDING_VERSION"].to_s != ""
 
     version = marketing_version
     notes = release_notes
