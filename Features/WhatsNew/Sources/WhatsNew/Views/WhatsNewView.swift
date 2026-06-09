@@ -79,9 +79,7 @@ public struct WhatsNewView: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            #if DEBUG
             enableEmbeddedBrowserButton
-            #endif
             continueButton
         }
     }
