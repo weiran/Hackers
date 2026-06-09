@@ -347,7 +347,7 @@ platform :ios do
       app_identifier: APP_IDENTIFIER,
       app_version: version,
       build_number: build_number,
-      release_notes: notes,
+      release_notes: { "en-US" => notes },
       submit_for_review: true,
       automatic_release: false,
       force: true,
