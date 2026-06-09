@@ -11,6 +11,11 @@ on:
         description: "Optional processed App Store Connect build number to submit"
         required: false
         type: string
+      skip_app_version_update:
+        description: "Skip creating/updating the App Store version"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,7 +34,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.release_tag }}
+          ref: master
 
       - name: Install Bundler dependencies
         run: |
@@ -55,6 +60,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
           BUILD_NUMBER: ${{ github.event.inputs.build_number }}
+          SKIP_APP_VERSION_UPDATE: ${{ github.event.inputs.skip_app_version_update && '1' || '0' }}
           WHAT_TO_TEST_FILE: artifacts/release/app-store-release-notes.txt
         run: bundle exec fastlane ios submit_app_review release_tag:"$RELEASE_TAG" build_number:"$BUILD_NUMBER"
 

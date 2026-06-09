@@ -204,6 +204,33 @@ def latest_build_number(api_key, version)
   [testflight, app_store].max
 end
 
+def log_app_store_versions(api_key)
+  Spaceship::ConnectAPI.token = api_key
+  app = Spaceship::ConnectAPI::App.find(APP_IDENTIFIER)
+  UI.user_error!("App Store Connect app not found: #{APP_IDENTIFIER}") unless app
+
+  versions = app.get_app_store_versions(
+    filter: { platform: Spaceship::ConnectAPI::Platform::IOS },
+    includes: "build,appStoreVersionSubmission"
+  )
+  versions.sort_by { |version| Gem::Version.new(version.version_string) }.each do |version|
+    build = version.respond_to?(:build) && version.build ? version.build.version : "none"
+    UI.message(
+      "App Store version #{version.version_string}: " \
+      "appStoreState=#{version.app_store_state}, " \
+      "appVersionState=#{version.app_version_state}, " \
+      "build=#{build}, id=#{version.id}"
+    )
+  end
+
+  edit_version = app.get_edit_app_store_version(platform: Spaceship::ConnectAPI::Platform::IOS)
+  if edit_version
+    UI.message("Editable App Store version: #{edit_version.version_string} (#{edit_version.app_store_state})")
+  else
+    UI.message("Editable App Store version: none")
+  end
+end
+
 def release_notes
   path = ENV["WHAT_TO_TEST_FILE"]
   path = File.expand_path(path, REPO_ROOT) if path && !path.start_with?("/")
@@ -328,6 +355,8 @@ platform :ios do
     validate_release_tag!(tag)
 
     api_key = app_store_connect_key
+    log_app_store_versions(api_key)
+
     version = marketing_version
     notes = release_notes
     UI.user_error!("Release notes are required for App Store submission") if notes.empty?
@@ -350,6 +379,7 @@ platform :ios do
       release_notes: { "en-US" => notes },
       submit_for_review: true,
       automatic_release: false,
+      skip_app_version_update: ENV["SKIP_APP_VERSION_UPDATE"] == "1",
       force: true,
       skip_binary_upload: true,
       skip_screenshots: true,
