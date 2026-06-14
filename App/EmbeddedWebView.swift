@@ -36,9 +36,16 @@ final class BrowserController: ObservableObject {
     @Published var isLoading = false
     @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
     var fallbackURL: URL?
-    let page = WebPage()
+    let page: WebPage
     private var headerTintTask: Task<Void, Never>?
     private var pageHeaderBlurTintURL: URL?
+
+    init() {
+        var configuration = WebPage.Configuration()
+        // Some app-shell sites gate rendering on Safari UA tokens; keep WebPage identified as Mobile Safari.
+        configuration.applicationNameForUserAgent = Self.safariApplicationNameForUserAgent
+        page = WebPage(configuration: configuration)
+    }
 
     func load(_ target: URL) {
         fallbackURL = target
@@ -120,6 +127,10 @@ final class BrowserController: ObservableObject {
         } catch {
             // Cross-origin and in-flight navigations can reject evaluation; keep the last usable tint.
         }
+    }
+
+    private static var safariApplicationNameForUserAgent: String {
+        "Version/\(UIDevice.current.systemVersion) Mobile/15E148 Safari/604.1"
     }
 
     private static let headerTintDetectionScript = """
