@@ -240,6 +240,8 @@ struct EmbeddedWebView: View {
     let onDismiss: @MainActor () -> Void
     let showsCloseButton: Bool
     let showsToolbar: Bool
+    let bottomWebViewInset: CGFloat
+    let bottomScrollContentInset: CGFloat
     @StateObject private var controller: BrowserController
 
     init(
@@ -247,62 +249,69 @@ struct EmbeddedWebView: View {
         onDismiss: @MainActor @escaping () -> Void,
         showsCloseButton: Bool,
         showsToolbar: Bool = true,
+        bottomWebViewInset: CGFloat = 0,
+        bottomScrollContentInset: CGFloat = 0,
         controller: BrowserController? = nil
     ) {
         self.url = url
         self.onDismiss = onDismiss
         self.showsCloseButton = showsCloseButton
         self.showsToolbar = showsToolbar
+        self.bottomWebViewInset = bottomWebViewInset
+        self.bottomScrollContentInset = bottomScrollContentInset
         _controller = StateObject(wrappedValue: controller ?? BrowserController())
     }
 
     var body: some View {
-        content
-            .overlay(alignment: .top) {
-                headerBlur
-            }
-            .toolbar {
-                if showsToolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        shareButton
+        GeometryReader { proxy in
+            content
+                .frame(
+                    width: proxy.size.width,
+                    height: max(proxy.size.height - bottomPanelInsetHeight, 0),
+                    alignment: .top
+                )
+                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+                .overlay(alignment: .top) {
+                    headerBlur
+                }
+        }
+        .toolbar {
+            if showsToolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    shareButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    openInSafariButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if showsCloseButton {
+                        closeButton
                     }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        openInSafariButton
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        if showsCloseButton {
-                            closeButton
+                }
+                if isPadLayout {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button {
+                            controller.goBack()
+                        } label: {
+                            Image(systemName: "chevron.backward")
                         }
-                    }
-                    if isPadLayout {
-                        ToolbarItemGroup(placement: .bottomBar) {
-                            Button {
-                                controller.goBack()
-                            } label: {
-                                Image(systemName: "chevron.backward")
-                            }
-                            .accessibilityLabel("Back")
-                            .disabled(!controller.canGoBack)
+                        .accessibilityLabel("Back")
+                        .disabled(!controller.canGoBack)
 
-                            Button {
-                                controller.goForward()
-                            } label: {
-                                Image(systemName: "chevron.forward")
-                            }
-                            .accessibilityLabel("Forward")
-                            .disabled(!controller.canGoForward)
-
-                            reloadButton
+                        Button {
+                            controller.goForward()
+                        } label: {
+                            Image(systemName: "chevron.forward")
                         }
+                        .accessibilityLabel("Forward")
+                        .disabled(!controller.canGoForward)
+
+                        reloadButton
                     }
                 }
             }
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                if bottomPanelInsetHeight > 0 {
-                    Color.clear.frame(height: bottomPanelInsetHeight)
-                }
-            }
+        }
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     private var headerBlur: some View {
@@ -338,6 +347,7 @@ struct EmbeddedWebView: View {
 
     private var webView: some View {
         WebView(controller.page)
+            .background(WebViewScrollInsetApplicator(bottomInset: bottomScrollContentInset))
             .task(id: url) { await load(url) }
             .task { await monitorNavigations() }
     }
@@ -352,7 +362,7 @@ struct EmbeddedWebView: View {
 
     private var bottomPanelInsetHeight: CGFloat {
         guard !showsToolbar else { return 0 }
-        return PostCommentsSheet.initialCollapsedHeight
+        return bottomWebViewInset
     }
 
     private var shareButton: some View {
@@ -419,6 +429,143 @@ struct EmbeddedWebView: View {
     }
 }
 
+private struct WebViewScrollInsetApplicator: UIViewRepresentable {
+    let bottomInset: CGFloat
+
+    func makeUIView(context: Context) -> WebViewScrollInsetView {
+        let view = WebViewScrollInsetView()
+        view.bottomInset = bottomInset
+        return view
+    }
+
+    func updateUIView(_ uiView: WebViewScrollInsetView, context: Context) {
+        uiView.bottomInset = bottomInset
+    }
+}
+
+private final class WebViewScrollInsetView: UIView {
+    var bottomInset: CGFloat = 0 {
+        didSet {
+            guard abs(bottomInset - oldValue) > 0.5 else { return }
+            applyInsetsWhenReady()
+        }
+    }
+
+    private weak var webView: WKWebView?
+    private var isApplyScheduled = false
+    private var applyAttempts = 0
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isUserInteractionEnabled = false
+        backgroundColor = .clear
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        nil
+    }
+
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        applyInsetsWhenReady()
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        applyInsetsWhenReady()
+    }
+
+    private func applyInsetsWhenReady() {
+        guard !isApplyScheduled else { return }
+        isApplyScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            self?.isApplyScheduled = false
+            self?.applyInsets()
+        }
+    }
+
+    private func applyInsets() {
+        guard let webView = resolvedWebView() else {
+            retryApplyInsets()
+            return
+        }
+
+        applyAttempts = 0
+        let scrollView = webView.scrollView
+        let automaticBottomInset = max(
+            scrollView.adjustedContentInset.bottom - scrollView.contentInset.bottom,
+            0
+        )
+        let inset = max(bottomInset - automaticBottomInset, 0)
+
+        if abs(scrollView.contentInset.bottom - inset) > 0.5 {
+            var contentInset = scrollView.contentInset
+            contentInset.bottom = inset
+            scrollView.contentInset = contentInset
+        }
+
+        if abs(scrollView.verticalScrollIndicatorInsets.bottom - inset) > 0.5 {
+            var indicatorInsets = scrollView.verticalScrollIndicatorInsets
+            indicatorInsets.bottom = inset
+            scrollView.verticalScrollIndicatorInsets = indicatorInsets
+        }
+    }
+
+    private func retryApplyInsets() {
+        guard window != nil, applyAttempts < 8 else { return }
+        applyAttempts += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.applyInsetsWhenReady()
+        }
+    }
+
+    private func resolvedWebView() -> WKWebView? {
+        if let webView, webView.window != nil, isInCurrentHierarchy(webView) {
+            return webView
+        }
+
+        var candidateSuperview = superview
+        while let candidate = candidateSuperview, !(candidate is UIWindow) {
+            if let resolved = candidate.firstDescendant(ofType: WKWebView.self, excluding: self) {
+                webView = resolved
+                return resolved
+            }
+            candidateSuperview = candidate.superview
+        }
+
+        return nil
+    }
+
+    private func isInCurrentHierarchy(_ view: UIView) -> Bool {
+        var candidateSuperview = superview
+        while let candidate = candidateSuperview, !(candidate is UIWindow) {
+            if view.isDescendant(of: candidate) {
+                return true
+            }
+            candidateSuperview = candidate.superview
+        }
+
+        return false
+    }
+}
+
+private extension UIView {
+    func firstDescendant<T: UIView>(ofType type: T.Type, excluding excludedView: UIView) -> T? {
+        for subview in subviews where subview !== excludedView {
+            if let typedSubview = subview as? T {
+                return typedSubview
+            }
+
+            if let descendant = subview.firstDescendant(ofType: type, excluding: excludedView) {
+                return descendant
+            }
+        }
+
+        return nil
+    }
+}
+
 #if DEBUG
 private struct UITestArticleView: View {
     let article: UITestArticleContent
@@ -444,6 +591,8 @@ struct PostLinkBrowserView: View {
     let post: Post
     let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
+    @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
+    @State private var browserScrollContentInset = PostCommentsSheet.defaultCollapsedBrowserScrollContentInset
     @StateObject private var browserController = BrowserController()
 
     init(post: Post, presentation: PostLinkPresentation) {
@@ -459,6 +608,8 @@ struct PostLinkBrowserView: View {
                 onDismiss: { dismiss() },
                 showsCloseButton: false,
                 showsToolbar: false,
+                bottomWebViewInset: browserBottomInset,
+                bottomScrollContentInset: browserScrollContentInset,
                 controller: browserController
             )
 
@@ -467,7 +618,9 @@ struct PostLinkBrowserView: View {
                     post: post,
                     controller: browserController,
                     initialPresentation: presentation,
-                    onDismiss: { dismiss() }
+                    onDismiss: { dismiss() },
+                    onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
+                    onBrowserScrollContentInsetChange: { browserScrollContentInset = $0 }
                 )
                 .transition(.move(edge: .bottom))
             }
@@ -484,6 +637,10 @@ struct PostLinkBrowserView: View {
                 showingCommentsPane = true
             }
         }
+    }
+
+    private var browserBottomInset: CGFloat {
+        max(collapsedCommentsHeight - PostCommentsSheet.collapsedTopCornerRadius, 0)
     }
 }
 

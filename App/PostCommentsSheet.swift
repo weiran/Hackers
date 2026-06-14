@@ -9,16 +9,27 @@ import UIKit
 
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = 150
+    static let collapsedTopCornerRadius: CGFloat = 24
+    static let collapsedBrowserControlsHeight: CGFloat = 44
+    static let collapsedBrowserControlsSpacing: CGFloat = 12
+    static let collapsedBrowserControlsMargin: CGFloat = 24
+    static var defaultCollapsedBrowserScrollContentInset: CGFloat {
+        collapsedBrowserControlsHeight
+            + collapsedBrowserControlsSpacing
+            + collapsedBrowserControlsMargin
+    }
+
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
     private static let handleAreaHeight: CGFloat = 22
     private static let handleToolbarSpacing: CGFloat = 8
     private static let expandedToolbarTitleHitHeight: CGFloat = 58
     private static let expandedContentSpacing: CGFloat = 8
-    private static let controlsSpacing: CGFloat = 12
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
+    let onCollapsedHeightChange: @MainActor (CGFloat) -> Void
+    let onBrowserScrollContentInsetChange: @MainActor (CGFloat) -> Void
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
     @State private var viewModel: CommentsViewModel
@@ -39,7 +50,9 @@ struct PostCommentsSheet: View {
         post: Post,
         controller: BrowserController,
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
-        onDismiss: @MainActor @escaping () -> Void
+        onDismiss: @MainActor @escaping () -> Void,
+        onCollapsedHeightChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
+        onBrowserScrollContentInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in }
     ) {
         let initialSheetState: SheetState = switch initialPresentation {
         case .collapsedBrowser:
@@ -58,6 +71,8 @@ struct PostCommentsSheet: View {
         _browserController = ObservedObject(wrappedValue: controller)
         _sheetState = State(initialValue: initialSheetState)
         self.onDismiss = onDismiss
+        self.onCollapsedHeightChange = onCollapsedHeightChange
+        self.onBrowserScrollContentInsetChange = onBrowserScrollContentInsetChange
         fallbackURL = post.url
     }
 
@@ -71,7 +86,8 @@ struct PostCommentsSheet: View {
             let proposedTop = baseTop + dragTranslation
             let clampedTop = min(max(proposedTop, expandedTop), collapsedTop)
             let alignedTop = clampedTop
-            let controlsOffset = max(controlsHeight, 44.0) + Self.controlsSpacing
+            let controlsOffset = max(controlsHeight, Self.collapsedBrowserControlsHeight)
+                + Self.collapsedBrowserControlsSpacing
             let controlsTop = alignedTop - controlsOffset
             let showsExpandedPresentation = viewModel.post != nil
             let showsCollapsedControls = sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
@@ -129,8 +145,15 @@ struct PostCommentsSheet: View {
             .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
             .ignoresSafeArea(.container)
             .animation(WebViewAnimations.fast, value: collapsedHeight)
+            .onAppear {
+                onCollapsedHeightChange(collapsedHeight)
+                updateBrowserScrollContentInset()
+            }
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
+            .onChange(of: controlsHeight) { _, _ in
+                updateBrowserScrollContentInset()
+            }
             .onChange(of: isExpanded) { _, newValue in
                 updateExpandedPresentation(isExpanded: newValue)
             }
@@ -151,10 +174,10 @@ struct PostCommentsSheet: View {
 
     private var sheetShape: UnevenRoundedRectangle {
         UnevenRoundedRectangle(
-            topLeadingRadius: 24,
+            topLeadingRadius: Self.collapsedTopCornerRadius,
             bottomLeadingRadius: 0,
             bottomTrailingRadius: 0,
-            topTrailingRadius: 24
+            topTrailingRadius: Self.collapsedTopCornerRadius
         )
     }
 
@@ -427,6 +450,7 @@ private extension PostCommentsSheet {
         let totalHeight = updated + handleAreaHeight
         guard abs(totalHeight - collapsedHeight) > 0.5 else { return }
         collapsedHeight = totalHeight
+        onCollapsedHeightChange(totalHeight)
     }
 
     private func updateControlsHeight(_ newValue: CGFloat) {
@@ -434,6 +458,13 @@ private extension PostCommentsSheet {
         guard updated.isFinite, updated > 0 else { return }
         guard abs(updated - controlsHeight) > 0.5 else { return }
         controlsHeight = updated
+    }
+
+    private func updateBrowserScrollContentInset() {
+        let updated = max(controlsHeight, Self.collapsedBrowserControlsHeight)
+            + Self.collapsedBrowserControlsSpacing
+            + Self.collapsedBrowserControlsMargin
+        onBrowserScrollContentInsetChange(updated)
     }
 
     private func updateExpandedPresentation(isExpanded: Bool) {
