@@ -35,7 +35,7 @@ final class HackersScreenshotTests: XCTestCase {
 
         relaunch(linkBrowserMode: "inApp")
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        app.buttons["Search"].tap()
+        tapBottomBarSearchButton()
 
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 5))
@@ -129,6 +129,17 @@ final class HackersScreenshotTests: XCTestCase {
         let post = app.buttons.matching(identifier: "feed.post.\(screenshotPostID)").firstMatch
         XCTAssertTrue(post.waitForExistence(timeout: 5))
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func tapBottomBarSearchButton() {
+        let searchButton = app.buttons["Search"]
+        if searchButton.waitForExistence(timeout: 2), searchButton.isHittable {
+            searchButton.tap()
+            return
+        }
+
+        let coordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.88, dy: 0.92))
+        coordinate.tap()
     }
 
     private func scrollCommentsDownSlightly() {
