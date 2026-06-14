@@ -70,7 +70,8 @@ public struct LoginView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: dismiss.callAsFunction) {
-                    Image(systemName: "xmark")
+                    Label("Close", systemImage: "xmark")
+                        .labelStyle(.iconOnly)
                 }
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("login.close")
@@ -244,7 +245,8 @@ public struct LoginView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: dismiss.callAsFunction) {
-                    Image(systemName: "xmark")
+                    Label("Close", systemImage: "xmark")
+                        .labelStyle(.iconOnly)
                 }
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("login.close")

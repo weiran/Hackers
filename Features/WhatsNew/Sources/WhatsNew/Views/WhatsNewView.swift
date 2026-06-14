@@ -50,7 +50,8 @@ public struct WhatsNewView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: onDismiss) {
-                        Image(systemName: "xmark")
+                        Label("Close", systemImage: "xmark")
+                            .labelStyle(.iconOnly)
                             .font(.headline)
                     }
                     .foregroundStyle(AppColors.appTintColor)

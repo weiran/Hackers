@@ -384,7 +384,8 @@ private extension FeedView {
         Button {
             navigationStore.showSettings()
         } label: {
-            Image(systemName: "gearshape")
+            Label("Settings", systemImage: "gearshape")
+                .labelStyle(.iconOnly)
                 .font(.headline)
                 .foregroundStyle(.primary)
         }

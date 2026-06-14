@@ -165,8 +165,8 @@ struct ShareMenu: View {
         Button {
             ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
         } label: {
-            Image(systemName: "square.and.arrow.up")
-                .accessibilityLabel("Share")
+            Label("Share", systemImage: "square.and.arrow.up")
+                .labelStyle(.iconOnly)
         }
     }
 }
