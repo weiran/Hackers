@@ -498,6 +498,8 @@ private extension FeedView {
     }
 
     private func handleLinkTap(post: Domain.Post) {
+        viewModel.markPostRead(post)
+
         guard !HackerNewsConstants.isItemURL(post.url) else {
             navigationStore.showPost(post)
             return
