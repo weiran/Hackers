@@ -302,6 +302,7 @@ struct PostCommentsSheet: View {
                                     hitHeight: Self.expandedToolbarTitleHitHeight,
                                     fillsAvailableWidth: true,
                                     usesOffsetTransition: false,
+                                    visualHitAlignmentOffset: 0,
                                     onTap: collapseSheet
                                 )
 
