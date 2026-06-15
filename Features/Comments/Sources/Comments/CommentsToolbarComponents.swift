@@ -163,7 +163,7 @@ struct ShareMenu: View {
 
     var body: some View {
         Button {
-            ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+            ContentSharePresenter.shared.shareHackerNewsPost(post)
         } label: {
             Label("Share", systemImage: "square.and.arrow.up")
                 .labelStyle(.iconOnly)

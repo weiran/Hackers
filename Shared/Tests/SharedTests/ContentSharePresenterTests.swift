@@ -134,6 +134,53 @@ struct ContentSharePresenterTests {
         ) == "")
     }
 
+    @Test("Hacker News post share can include Open in Safari activity")
+    func hackerNewsPostShareCanIncludeOpenInSafariActivity() throws {
+        let post = createTestPost()
+        let activities = ContentSharePresenter.hackerNewsPostActivities(for: post.hackerNewsURL)
+        let activity = try #require(activities.first as? OpenInSafariActivity)
+
+        #expect(activities.count == 2)
+        #expect(activity.activityTitle == "Open in Safari")
+        #expect(activity.activityType?.rawValue == "com.weiranzhang.Hackers.openInSafari")
+        #expect(type(of: activity).activityCategory == .action)
+        #expect(activity.canPerform(withActivityItems: ContentSharePresenter.items(for: post.hackerNewsURL)))
+    }
+
+    @Test("Open in Safari activity opens configured URL")
+    func openInSafariActivityOpensConfiguredURL() {
+        let url = URL(string: "https://news.ycombinator.com/item?id=123")!
+        var openedURL: URL?
+        let activity = OpenInSafariActivity(url: url) { openedURL = $0 }
+
+        activity.perform()
+
+        #expect(openedURL == url)
+    }
+
+    @Test("Hacker News post share includes Copy Link after Open in Safari")
+    func hackerNewsPostShareIncludesCopyLinkAfterOpenInSafari() throws {
+        let post = createTestPost()
+        let activities = ContentSharePresenter.hackerNewsPostActivities(for: post.hackerNewsURL)
+        let activity = try #require(activities[safe: 1] as? CopyLinkActivity)
+
+        #expect(activity.activityTitle == "Copy Link")
+        #expect(activity.activityType?.rawValue == "com.weiranzhang.Hackers.copyLink")
+        #expect(type(of: activity).activityCategory == .action)
+        #expect(activity.canPerform(withActivityItems: ContentSharePresenter.items(for: post.hackerNewsURL)))
+    }
+
+    @Test("Copy Link activity copies configured URL")
+    func copyLinkActivityCopiesConfiguredURL() {
+        let url = URL(string: "https://news.ycombinator.com/item?id=123")!
+        var copiedURL: URL?
+        let activity = CopyLinkActivity(url: url) { copiedURL = $0 }
+
+        activity.perform()
+
+        #expect(copiedURL == url)
+    }
+
     @Test("Comment share still uses stripped text")
     func commentShareItemsUseStrippedText() {
         let items = ContentSharePresenter.items(for: createTestComment())

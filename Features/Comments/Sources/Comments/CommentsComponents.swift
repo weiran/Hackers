@@ -448,7 +448,7 @@ struct PostHeader: View {
             Button { onLinkTap() } label: {
                 Label("Open Link", systemImage: "safari")
             }
-            Button { ContentSharePresenter.shared.shareURL(post.url, title: post.title) } label: {
+            Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
         }

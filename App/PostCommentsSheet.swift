@@ -317,7 +317,7 @@ struct PostCommentsSheet: View {
 
                         if let post = viewModel.post {
                             Button {
-                                ContentSharePresenter.shared.shareURL(post.hackerNewsURL, title: post.title)
+                                ContentSharePresenter.shared.shareHackerNewsPost(post)
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
                                     .frame(width: 44, height: 44)

@@ -26,13 +26,28 @@ public final class ContentSharePresenter: @unchecked Sendable {
     }
 
     @MainActor
+    public func shareHackerNewsPost(_ post: Post) {
+        let url = post.hackerNewsURL
+        showShareSheet(
+            items: Self.items(for: url, title: post.title),
+            applicationActivities: Self.hackerNewsPostActivities(for: url),
+            excludedActivityTypes: [.copyToPasteboard]
+        )
+    }
+
+    @MainActor
     public func shareComment(_ comment: Comment) {
         showShareSheet(items: Self.items(for: comment))
     }
 
     @MainActor
-    private func showShareSheet(items: [Any]) {
-        let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
+    private func showShareSheet(
+        items: [Any],
+        applicationActivities: [UIActivity]? = nil,
+        excludedActivityTypes: [UIActivity.ActivityType]? = nil
+    ) {
+        let activityVC = UIActivityViewController(activityItems: items, applicationActivities: applicationActivities)
+        activityVC.excludedActivityTypes = excludedActivityTypes
 
         if let rootViewController = PresentationContextProvider.shared.rootViewController {
             // For iPad
@@ -60,6 +75,85 @@ extension ContentSharePresenter {
 
     static func items(for comment: Comment) -> [Any] {
         [comment.text.strippingHTML()]
+    }
+
+    static func hackerNewsPostActivities(for url: URL) -> [UIActivity] {
+        [
+            OpenInSafariActivity(url: url) { UIApplication.shared.open($0) },
+            CopyLinkActivity(url: url) { UIPasteboard.general.string = $0.absoluteString }
+        ]
+    }
+}
+
+final class OpenInSafariActivity: UIActivity {
+    private let url: URL
+    private let opener: (URL) -> Void
+
+    init(url: URL, opener: @escaping (URL) -> Void) {
+        self.url = url
+        self.opener = opener
+        super.init()
+    }
+
+    override var activityType: UIActivity.ActivityType? {
+        UIActivity.ActivityType("com.weiranzhang.Hackers.openInSafari")
+    }
+
+    override var activityTitle: String? {
+        "Open in Safari"
+    }
+
+    override var activityImage: UIImage? {
+        UIImage(systemName: "safari")
+    }
+
+    override class var activityCategory: UIActivity.Category {
+        .action
+    }
+
+    override func canPerform(withActivityItems _: [Any]) -> Bool {
+        url.scheme == "http" || url.scheme == "https"
+    }
+
+    override func perform() {
+        opener(url)
+        activityDidFinish(true)
+    }
+}
+
+final class CopyLinkActivity: UIActivity {
+    private let url: URL
+    private let copier: (URL) -> Void
+
+    init(url: URL, copier: @escaping (URL) -> Void) {
+        self.url = url
+        self.copier = copier
+        super.init()
+    }
+
+    override var activityType: UIActivity.ActivityType? {
+        UIActivity.ActivityType("com.weiranzhang.Hackers.copyLink")
+    }
+
+    override var activityTitle: String? {
+        "Copy Link"
+    }
+
+    override var activityImage: UIImage? {
+        UIImage(systemName: "doc.on.doc")
+    }
+
+    override class var activityCategory: UIActivity.Category {
+        .action
+    }
+
+    override func canPerform(withActivityItems _: [Any]) -> Bool {
+        url.scheme == "http" || url.scheme == "https"
+    }
+
+    override func perform() {
+        copier(url)
+        activityDidFinish(true)
     }
 }
 
