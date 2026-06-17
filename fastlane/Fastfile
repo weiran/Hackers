@@ -385,6 +385,35 @@ platform :ios do
     UI.success("Uploaded Hackers #{version} (#{next_build}) to TestFlight")
   end
 
+  desc "Distribute an existing TestFlight build to external testers"
+  lane :distribute_existing_testflight do |options|
+    tag = options[:release_tag] || ENV["RELEASE_TAG"]
+    validate_release_tag!(tag)
+    require_release_tag_build_number!(tag)
+    parts = release_tag_parts(tag)
+
+    notes = release_notes
+    UI.user_error!("GitHub Release notes are required for TestFlight What to Test") if notes.empty?
+
+    distribute_options = {
+      api_key: app_store_connect_key,
+      app_identifier: APP_IDENTIFIER,
+      app_version: parts[:version],
+      build_number: parts[:build_number].to_s,
+      changelog: notes,
+      distribute_external: true,
+      distribute_only: true,
+      skip_waiting_for_build_processing: true
+    }
+
+    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
+    distribute_options[:groups] = groups unless groups.empty?
+
+    upload_to_testflight(**distribute_options)
+
+    UI.success("Distributed Hackers #{parts[:version]} (#{parts[:build_number]}) to external TestFlight testers")
+  end
+
   desc "Submit a processed App Store Connect build for App Review"
   lane :submit_app_review do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]

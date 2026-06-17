@@ -10,6 +10,15 @@ on:
         description: "Release tag to upload, for example v5.3.0+153"
         required: true
         type: string
+      distribute_existing:
+        description: "Distribute an existing TestFlight build externally without uploading a new build"
+        required: false
+        type: boolean
+        default: false
+      external_groups:
+        description: "Optional comma-separated external TestFlight groups"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -34,7 +43,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.release_tag || github.ref }}
+          ref: ${{ github.event.inputs.distribute_existing == 'true' && 'master' || github.event.inputs.release_tag || github.ref }}
 
       - name: Prepare Xcode
         run: scripts/ci/setup-xcode-simulator.sh --xcode-only
@@ -88,6 +97,7 @@ jobs:
           fi
 
       - name: Upload to TestFlight
+        if: ${{ github.event.inputs.distribute_existing != 'true' }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -98,6 +108,17 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
         run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
+
+      - name: Distribute Existing TestFlight Build
+        if: ${{ github.event.inputs.distribute_existing == 'true' }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
+          TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+        run: bundle exec fastlane ios distribute_existing_testflight release_tag:"$RELEASE_TAG"
 
       - name: Release summary
         if: always()
