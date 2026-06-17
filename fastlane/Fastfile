@@ -122,6 +122,11 @@ def release_tag_parts(tag)
   }
 end
 
+def require_release_tag_build_number!(tag)
+  tag_parts = release_tag_parts(tag)
+  UI.user_error!("Release tag must be vX.Y.Z+N for build-tracked releases, got #{tag}") unless tag_parts[:build_number]
+end
+
 def set_build_number(build_number)
   require "xcodeproj"
 
@@ -349,11 +354,14 @@ platform :ios do
   lane :beta do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
     validate_release_tag!(tag)
+    require_release_tag_build_number!(tag)
 
     api_key = app_store_connect_key
     version = marketing_version
+    source_build = source_build_number
     latest = latest_build_number(api_key, version)
-    next_build = latest.zero? ? [source_build_number, 1].max : latest + 1
+    UI.user_error!("CURRENT_PROJECT_VERSION (#{source_build}) must be greater than latest available build (#{latest}) for #{version}") if source_build <= latest
+    next_build = source_build
     validate_release_tag_build_number!(tag, next_build)
 
     notes = release_notes
@@ -381,6 +389,8 @@ platform :ios do
   lane :submit_app_review do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
     validate_release_tag!(tag)
+    require_release_tag_build_number!(tag)
+    tag_build_number = release_tag_parts(tag)[:build_number]
 
     api_key = app_store_connect_key
     log_app_store_versions(api_key)
@@ -392,12 +402,14 @@ platform :ios do
 
     build_number = options[:build_number] || ENV["BUILD_NUMBER"]
     build_number = nil if build_number.to_s.strip.empty?
-    build_number ||= latest_testflight_build_number(
-      api_key: api_key,
-      app_identifier: APP_IDENTIFIER,
-      version: version,
-      initial_build_number: 0
-    ).to_s
+    if build_number
+      build_number = build_number.to_i
+      if build_number != tag_build_number
+        UI.user_error!("Tag #{tag} includes build #{tag_build_number}, but requested build #{build_number} was provided")
+      end
+    else
+      build_number = tag_build_number
+    end
     UI.user_error!("No TestFlight build found for #{version}") if build_number.to_i <= 0
 
     upload_to_app_store(

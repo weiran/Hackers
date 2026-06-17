@@ -3,8 +3,8 @@ name: Release App Store
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: "Release tag to submit, for example v5.3.1"
+    release_tag:
+        description: "Build-number release tag to submit, for example v5.3.1+154"
         required: true
         type: string
       build_number:
@@ -22,7 +22,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: release-appstore-${{ github.event.inputs.release_tag }}
@@ -51,7 +51,30 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag }}
         run: |
           mkdir -p artifacts/release
-          gh release view "$RELEASE_TAG" --json body -q .body > artifacts/release/app-store-release-notes.txt
+          RELEASE_NOTES=artifacts/release/app-store-release-notes.txt
+          PREVIOUS_RELEASE_TAG=$(gh release list --json tagName,isDraft,publishedAt --limit 200 \
+            | jq -r --arg TAG "$RELEASE_TAG" '[.[] | select(.isDraft == false and .tagName != $TAG)] | .[0].tagName')
+          if [ "$PREVIOUS_RELEASE_TAG" = "null" ]; then
+            PREVIOUS_RELEASE_TAG=""
+          fi
+
+          if [ -n "$PREVIOUS_RELEASE_TAG" ]; then
+            gh api repos/${GITHUB_REPOSITORY}/releases/generate-notes \
+              --field tag_name="$RELEASE_TAG" \
+              --field previous_tag_name="$PREVIOUS_RELEASE_TAG" \
+              -q .body > "$RELEASE_NOTES"
+          else
+            gh api repos/${GITHUB_REPOSITORY}/releases/generate-notes \
+              --field tag_name="$RELEASE_TAG" \
+              -q .body > "$RELEASE_NOTES"
+          fi
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES"
+          else
+            gh release create "$RELEASE_TAG" --target "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES"
+          fi
+
           if [ ! -s artifacts/release/app-store-release-notes.txt ]; then
             echo "GitHub Release body is required for App Store release notes" >&2
             exit 1
