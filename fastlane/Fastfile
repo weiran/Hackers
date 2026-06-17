@@ -434,4 +434,13 @@ platform :ios do
 
     UI.success("Submitted Hackers #{version} (#{build_number}) for App Review")
   end
+
+  desc "Cancel a pending App Store review submission"
+  lane :cancel_app_review do |options|
+    version = options[:version] || ENV["CANCEL_PENDING_VERSION"]
+    UI.user_error!("Version is required to cancel App Review") if version.to_s.strip.empty?
+
+    api_key = app_store_connect_key
+    cancel_pending_app_store_release!(api_key, version)
+  end
 end

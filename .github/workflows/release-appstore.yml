@@ -20,6 +20,11 @@ on:
         description: "Optional pending App Store version to cancel before submission"
         required: false
         type: string
+      cancel_only:
+        description: "Only cancel the pending App Store version; do not submit a build"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -87,7 +92,17 @@ jobs:
             exit 1
           fi
 
+      - name: Cancel App Review
+        if: ${{ github.event.inputs.cancel_only == 'true' }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          CANCEL_PENDING_VERSION: ${{ github.event.inputs.cancel_pending_version }}
+        run: bundle exec fastlane ios cancel_app_review version:"$CANCEL_PENDING_VERSION"
+
       - name: Submit for App Review
+        if: ${{ github.event.inputs.cancel_only != 'true' }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
