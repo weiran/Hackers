@@ -94,7 +94,7 @@ struct BrowserControlsView: View {
 
             controlButton(systemName: "safari") {
                 let targetURL = controller.currentURL ?? fallbackURL
-                LinkOpener.openURL(targetURL)
+                LinkOpener.openInSystemBrowser(targetURL)
             }
         }
         .padding(.horizontal, 6)

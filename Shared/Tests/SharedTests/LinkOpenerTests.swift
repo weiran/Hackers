@@ -34,6 +34,27 @@ struct LinkOpenerTests {
     }
 
     @MainActor
+    @Test("Explicit system browser open ignores in-app browser preference")
+    func explicitSystemBrowserOpenBypassesPreference() {
+        let settings = StubSettingsUseCase(linkBrowserMode: .inAppBrowser)
+        var openedURLs: [URL] = []
+
+        LinkOpener.setEnvironmentForTesting(
+            settings: { settings },
+            openURL: { url in openedURLs.append(url) },
+            presenter: { StubPresenter() },
+            presentSafari: { _, _ in Issue.record("Should not present Safari for explicit system browser open") }
+        )
+
+        defer { LinkOpener.resetEnvironment() }
+
+        let url = URL(string: "https://example.com")!
+        LinkOpener.openInSystemBrowser(url)
+
+        #expect(openedURLs == [url])
+    }
+
+    @MainActor
     @Test("In-app browser presents Safari with reader mode setting")
     func presentsSafariViewController() {
         let settings = StubSettingsUseCase(safariReaderMode: true, linkBrowserMode: .inAppBrowser)

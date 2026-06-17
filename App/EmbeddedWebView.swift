@@ -381,7 +381,7 @@ struct EmbeddedWebView: View {
         Button {
             Task { @MainActor in
                 let targetURL = controller.currentURL ?? url
-                LinkOpener.openURL(targetURL)
+                LinkOpener.openInSystemBrowser(targetURL)
             }
         } label: {
             Image(systemName: "safari")

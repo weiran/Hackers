@@ -57,6 +57,10 @@ public enum LinkOpener {
         }
     }
 
+    public static func openInSystemBrowser(_ url: URL) {
+        systemOpener(url)
+    }
+
     private static func isWebURL(_ url: URL) -> Bool {
         // Web URLs are HTTP/HTTPS
         url.scheme == "http" || url.scheme == "https"
