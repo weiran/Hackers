@@ -416,7 +416,7 @@ platform :ios do
       api_key: api_key,
       app_identifier: APP_IDENTIFIER,
       app_version: version,
-      build_number: build_number,
+      build_number: build_number.to_s,
       release_notes: { "en-GB" => notes },
       submit_for_review: true,
       automatic_release: false,
