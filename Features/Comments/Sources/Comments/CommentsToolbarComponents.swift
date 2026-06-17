@@ -86,9 +86,9 @@ public struct CommentsHeaderTitleButton: View {
                     .offset(y: visualHitAlignmentOffset)
             }
 
-            // Keep tap handling above the interactive glass pill, and align the
-            // visible glass with the toolbar's real hit frame. Otherwise the top
-            // pixels can visually react without delivering the tap action.
+            // Work around current interactive glass hit testing in toolbar items:
+            // the pill can visually react above the toolbar's real hit frame
+            // without delivering the tap action. Re-test on future OS releases.
             CommentsHeaderTitleTapOverlay(onTap: onTap)
                 .allowsHitTesting(isVisible)
                 .accessibilityHidden(true)
