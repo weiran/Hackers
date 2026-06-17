@@ -3,7 +3,7 @@ name: Release TestFlight
 on:
   push:
     tags:
-      - "v*+*"
+      - "v*"
   workflow_dispatch:
     inputs:
       release_tag:
