@@ -1,17 +1,20 @@
 # Release Process
 
-This document describes the Hackers iOS TestFlight release workflow. App Store submission is intentionally manual and protected; the automated release path stops after a validated TestFlight build is uploaded and distributed to internal testers.
+This document describes the Hackers iOS release workflow. App Store promotion remains manual; automation stops after a validated TestFlight build is uploaded and distributed to internal testers.
 
 ## Release Model
 
 Releases are source-controlled and tag-driven:
 
-* A release-prep change updates the app version and any user-facing release content.
-* A GitHub Release stores the TestFlight "What to Test" notes.
-* The `vX.Y.Z` tag triggers the protected TestFlight workflow.
-* Fastlane resolves the next valid App Store Connect build number, signs the app and action extension with match, archives, uploads, waits for processing, applies the changelog, and distributes to internal testers.
-
-The release workflow is `.github/workflows/release-testflight.yml`.
+* A release-prep change updates app-facing metadata and code as needed.
+* Every TestFlight build is tagged with a full semver-with-build tag: `v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`.
+  * Example: `v5.3.2+159`
+* The markdown title/body of the GitHub Release is used as TestFlight "What to Test."
+* A release tag exists first, then the protected TestFlight workflow runs and uploads that exact version/build.
+* Published vs Draft status on GitHub Releases is the only release-state differentiator:
+  * draft = built and available internally, not yet marked for App Store
+  * published = selected for App Store release candidacy
+* The release workflow is `.github/workflows/release-testflight.yml`.
 
 ## Prerequisites
 
@@ -33,77 +36,136 @@ Before starting a release, confirm:
 
 ## Prepare A Release
 
-1. Decide the next marketing version, for example `5.3.1`.
-2. Update `MARKETING_VERSION` in `Hackers.xcodeproj` for both targets:
+1. Decide whether this build is a new marketing version (`5.3.2`) or another build for the current marketing version.
+2. Update `MARKETING_VERSION` in `Hackers.xcodeproj` for both targets when needed:
    * `Hackers`
    * `HackersActionExtension`
-3. Update any app-facing "What's New" content if the release includes visible user changes.
-4. Run validation locally when practical:
+3. Bump `CURRENT_PROJECT_VERSION` for the build you want to create on both targets:
+   * this value is the `+N` build-part of the tag
+   * this must increase over the previous build for the chosen marketing version
+   * example tag values from this point forward:
+     * `v5.3.1+158` (last released build)
+     * `v5.3.2+158`
+     * `v5.3.2+159`
+4. Update any app-facing "What's New" content if the build includes visible user changes.
+5. Run validation locally when practical:
 
 ```bash
 ./run_tests.sh
 ```
 
-5. Commit and push the release-prep change to `master` after required checks pass.
+6. Commit and push the release-prep change to `master` after required checks pass.
 
 ## Create Release Notes
 
 Create or update the GitHub Release before triggering TestFlight. The release body becomes the TestFlight "What to Test" text.
 
+Note rules:
+
+* draft releases: generate notes from the previous tag (single-build delta)
+* published releases: generate notes from the previous **published** release (cumulative release changelog)
+
 Use concise, user-facing bullets. Example:
 
 ```bash
-gh release create v5.3.1 \
+tag=v5.3.2+158
+
+gh release create "$tag" \
   --target master \
-  --title "5.3.1" \
-  --notes-file release-notes.txt
+  --title "$tag" \
+  --notes-file release-notes.txt \
+  --draft
 ```
 
 If the release already exists:
 
 ```bash
-gh release edit v5.3.1 --notes-file release-notes.txt
+gh release edit "$tag" --notes-file release-notes.txt
+```
+
+For an App Store-released candidate, publish the same release once its notes are complete:
+
+```bash
+gh release edit "$tag" --draft=false
+```
+
+For App Store releases, release notes should be cumulative since the last **published** release. When the previous published tag is known, you can generate a cumulative body:
+
+```bash
+gh release create "$tag" \
+  --target master \
+  --title "$tag" \
+  --generate-notes \
+  --notes-start-tag v5.3.1+158 \
+  --draft
+```
+
+To correct existing draft releases created with the older logic (post-`5.3.1`), you can regenerate notes directly with the same rules:
+
+```bash
+GITHUB_REPOSITORY=weiran/Hackers
+
+for tag in $(gh release list --json tagName,isDraft --limit 200 --jq '.[] | select(.isDraft == true).tagName'); do
+  case "$tag" in
+    v5.3.1*|v5.3.2*) ;;
+    *)
+      continue
+      ;;
+  esac
+
+  previous_tag=$(git tag --sort=-creatordate --list 'v*' |
+    awk -v TAG="$tag" 'BEGIN {seen=0} $0==TAG {seen=1; next} seen {print; exit}')
+
+  if [ -z "$previous_tag" ]; then
+    payload=$(jq -nc --arg t "$tag" '{tag_name:$t}')
+  else
+    payload=$(jq -nc --arg t "$tag" --arg p "$previous_tag" '{tag_name:$t, previous_tag_name:$p}')
+  fi
+
+  notes_file=$(mktemp)
+  printf '%s' "$payload" |
+    gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$notes_file"
+
+  gh release edit "$tag" --title "${tag#v}" --notes-file "$notes_file"
+  rm "$notes_file"
+done
 ```
 
 ## Trigger TestFlight
 
-Tag format must be `vX.Y.Z`, and the tag version must match `MARKETING_VERSION`.
-For an additional TestFlight build on the same marketing version, append the expected build number as SemVer build metadata, for example `v5.3.0+153`.
+Tag format must be `v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`.
+The build part is required for every build tag.
+
+
+When you need another build for the same marketing version, bump `CURRENT_PROJECT_VERSION`, create a new release-prep commit, and tag it with the new value.
+
+When a tag push starts `Release TestFlight`, approve the protected `testflight` deployment in GitHub Actions.
 
 ```bash
-git tag v5.3.1 master
-git push origin refs/tags/v5.3.1
-```
+tag=v5.3.2+158
 
-The tag push starts `Release TestFlight`. Approve the protected `testflight` deployment in GitHub Actions.
+git tag "$tag" master
+git push origin "refs/tags/$tag"
+```
 
 Manual dispatch is also supported:
 
 ```bash
-gh workflow run release-testflight.yml -f release_tag=v5.3.1
-```
-
-For a same-version build-number tag:
-
-```bash
-gh workflow run release-testflight.yml -f release_tag=v5.3.0+153
+gh workflow run release-testflight.yml -f release_tag=v5.3.2+158
 ```
 
 ## Build Number Handling
 
-Do not manually bump `CURRENT_PROJECT_VERSION` just to release.
+`CURRENT_PROJECT_VERSION` is now explicit in the tag and must match what is built:
 
-The `ios beta` fastlane lane queries App Store Connect for the current `MARKETING_VERSION`:
+* `MARKETING_VERSION` controls the release family (`5.3.2`)
+* `CURRENT_PROJECT_VERSION` controls the build build (`158`)
 
-* latest TestFlight build number
-* latest App Store build number
+The release lane expects this exact build value in the tag:
 
-It then uses:
-
-* `latest + 1` when a previous build exists for that marketing version
-* otherwise `max(source-controlled CURRENT_PROJECT_VERSION, 1)`
-
-The resolved build number is applied to both `Hackers` and `HackersActionExtension` before archive.
+* workflow input `release_tag` should include `+N` and `N` must be greater than the prior build for that `MARKETING_VERSION`
+* both `Hackers` and `HackersActionExtension` must use that build value before archive
+* build numbers are monotonic; do not create tags in descending build order
 
 ## Monitor Release
 
@@ -152,8 +214,10 @@ If the release fails:
 5. Move the release tag to the fixed commit only if the failed tag did not produce a usable TestFlight build:
 
 ```bash
-git tag -f v5.3.1 HEAD
-git push --force origin refs/tags/v5.3.1
+tag=v5.3.2+159
+
+git tag -f "$tag" HEAD
+git push --force origin "refs/tags/$tag"
 ```
 
 6. Approve the new protected TestFlight deployment and monitor it to completion.

@@ -3,7 +3,7 @@ name: Release App Store
 on:
   workflow_dispatch:
     inputs:
-    release_tag:
+      release_tag:
         description: "Build-number release tag to submit, for example v5.3.1+154"
         required: true
         type: string
@@ -54,19 +54,26 @@ jobs:
           RELEASE_NOTES=artifacts/release/app-store-release-notes.txt
           PREVIOUS_RELEASE_TAG=$(gh release list --json tagName,isDraft,publishedAt --limit 200 \
             | jq -r --arg TAG "$RELEASE_TAG" '[.[] | select(.isDraft == false and .tagName != $TAG)] | .[0].tagName')
-          if [ "$PREVIOUS_RELEASE_TAG" = "null" ]; then
-            PREVIOUS_RELEASE_TAG=""
+          PREVIOUS_TAG=$(git tag --sort=-creatordate --list 'v*' \
+            | awk -v TAG="$RELEASE_TAG" 'BEGIN { found=0 } \
+              { if ($0 == TAG) { found=1; next } if (found) { print; exit } }')
+
+          RELEASE_IS_DRAFT=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft 2>/dev/null || echo true)
+
+          if [ "$RELEASE_IS_DRAFT" = "true" ] && [ -n "$PREVIOUS_TAG" ]; then
+            NOTE_START_TAG="$PREVIOUS_TAG"
+          elif [ "$PREVIOUS_RELEASE_TAG" != "null" ] && [ -n "$PREVIOUS_RELEASE_TAG" ]; then
+            NOTE_START_TAG="$PREVIOUS_RELEASE_TAG"
+          else
+            NOTE_START_TAG=""
           fi
 
-          if [ -n "$PREVIOUS_RELEASE_TAG" ]; then
-            gh api repos/${GITHUB_REPOSITORY}/releases/generate-notes \
-              --field tag_name="$RELEASE_TAG" \
-              --field previous_tag_name="$PREVIOUS_RELEASE_TAG" \
-              -q .body > "$RELEASE_NOTES"
+          if [ -n "$NOTE_START_TAG" ]; then
+            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" --arg prev "$NOTE_START_TAG" '{tag_name:$tag, previous_tag_name:$prev}')
+            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
           else
-            gh api repos/${GITHUB_REPOSITORY}/releases/generate-notes \
-              --field tag_name="$RELEASE_TAG" \
-              -q .body > "$RELEASE_NOTES"
+            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" '{tag_name:$tag}')
+            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
           fi
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
