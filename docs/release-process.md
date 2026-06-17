@@ -1,6 +1,6 @@
 # Release Process
 
-This document describes the Hackers iOS release workflow. App Store promotion remains manual; automation stops after a validated TestFlight build is uploaded and distributed to internal testers.
+This document describes the Hackers iOS release workflow. App Store promotion remains manual; automation stops after a validated TestFlight build is uploaded and distributed to TestFlight external testers, including TestFlight beta review when Apple requires it.
 
 ## Release Model
 
@@ -11,6 +11,7 @@ Releases are source-controlled and tag-driven:
   * Example: `v5.3.2+159`
 * The markdown title/body of the GitHub Release is used as TestFlight "What to Test."
 * A release tag exists first, then the protected TestFlight workflow runs and uploads that exact version/build.
+* Every TestFlight build is distributed to external testers. If Apple requires beta review for that build, the TestFlight workflow should put it through beta review as part of external distribution.
 * Published vs Draft status on GitHub Releases is the only release-state differentiator:
   * draft = built and available internally, not yet marked for App Store
   * published = selected for App Store release candidacy
@@ -29,7 +30,7 @@ Before starting a release, confirm:
   * `MATCH_GIT_URL`
   * `MATCH_PASSWORD`
   * `MATCH_GIT_BASIC_AUTHORIZATION` or equivalent match repo access
-* The App Store Connect API key has enough access to read builds, upload builds, update TestFlight metadata, and distribute to testers.
+* The App Store Connect API key has enough access to read builds, upload builds, update TestFlight metadata, submit for TestFlight beta review when required, and distribute to external testers.
 * The match repository contains App Store signing assets for both bundle IDs:
   * `com.weiranzhang.Hackers`
   * `com.weiranzhang.Hackers.ActionExtension`
@@ -183,7 +184,7 @@ Expected successful log milestones:
 * `Successfully uploaded package to App Store Connect`
 * `Successfully finished processing the build`
 * `Successfully set the changelog for build`
-* `Successfully distributed build to Internal testers`
+* `Successfully distributed build to External testers`
 * `Uploaded Hackers X.Y.Z (N) to TestFlight`
 
 The workflow uploads release artifacts for 90 days:

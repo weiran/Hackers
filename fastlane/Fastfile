@@ -376,7 +376,7 @@ platform :ios do
       app_identifier: APP_IDENTIFIER,
       ipa: "#{RELEASE_DIR}/Hackers.ipa",
       changelog: notes,
-      distribute_external: false,
+      distribute_external: true,
       skip_waiting_for_build_processing: false
     )
 
