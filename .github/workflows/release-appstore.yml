@@ -29,6 +29,11 @@ on:
         required: false
         type: boolean
         default: false
+      release_notes_only:
+        description: "Only update App Store release notes for the current version"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -89,7 +94,7 @@ jobs:
         run: bundle exec fastlane ios cancel_app_review version:"$CANCEL_PENDING_VERSION"
 
       - name: Submit for App Review
-        if: ${{ github.event.inputs.cancel_only != 'true' }}
+        if: ${{ github.event.inputs.cancel_only != 'true' && github.event.inputs.release_notes_only != 'true' }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -100,6 +105,16 @@ jobs:
           CANCEL_PENDING_VERSION: ${{ github.event.inputs.cancel_pending_version }}
           WHAT_TO_TEST_FILE: artifacts/release/app-store-release-notes.txt
         run: bundle exec fastlane ios submit_app_review release_tag:"$RELEASE_TAG" build_number:"$BUILD_NUMBER"
+
+      - name: Update App Store Release Notes
+        if: ${{ github.event.inputs.release_notes_only == 'true' }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+          WHAT_TO_TEST_FILE: artifacts/release/app-store-release-notes.txt
+        run: bundle exec fastlane ios update_app_store_release_notes release_tag:"$RELEASE_TAG"
 
       - name: App Store summary
         if: always()
