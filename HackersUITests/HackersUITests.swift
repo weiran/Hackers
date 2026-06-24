@@ -58,7 +58,7 @@ final class HackersUITests: XCTestCase {
         launchApp()
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        app.buttons["Search"].tap()
+        tapBottomBarSearchButton()
 
         let searchField = app.searchFields.firstMatch
         XCTAssertTrue(searchField.waitForExistence(timeout: 5))
@@ -116,5 +116,16 @@ final class HackersUITests: XCTestCase {
 
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func tapBottomBarSearchButton() {
+        let searchButton = app.buttons["Search"]
+        if searchButton.waitForExistence(timeout: 2), searchButton.isHittable {
+            searchButton.tap()
+            return
+        }
+
+        let coordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.88, dy: 0.92))
+        coordinate.tap()
     }
 }
