@@ -10,6 +10,15 @@ This folder contains the canonical project documentation. It is intentionally sm
 | [Development](./development.md) | Local setup, build/test commands, coding standards, CI, and troubleshooting. |
 | [Release Process](./release-process.md) | TestFlight release workflow, signing, build numbers, artifacts, and failure recovery. |
 
+## Source-Of-Truth Hierarchy
+
+* `README.md`: public project overview, build/test basics, and links into maintained docs.
+* `docs/README.md`: documentation map and documentation maintenance rules.
+* `docs/project-overview.md`: current architecture and durable implementation conventions.
+* `docs/development.md`: local setup, validation, CI, dependency updates, and troubleshooting.
+* `docs/release-process.md`: TestFlight and App Store release runbook.
+* `AGENTS.md`: short agent operating contract that points back to the canonical docs.
+
 ## Quick Start
 
 From the repository root:

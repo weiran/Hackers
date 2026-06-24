@@ -72,6 +72,30 @@ Specific modules:
 
 Do not use `swift test` as the project validation command. Packages target iOS and use iOS-only APIs, so tests must run through Xcode with an iOS Simulator destination.
 
+## UI Tests And Screenshots
+
+PR validation includes a small UI smoke suite:
+
+```bash
+./run_ui_tests.sh smoke
+```
+
+Nightly validation runs the full UI test suite:
+
+```bash
+./run_ui_tests.sh full
+```
+
+UI tests write result bundles under `artifacts/xcresults` by default. Use UI tests when validating app launch, top-level navigation, browser presentation, screenshot fixtures, or behavior that cannot be covered reliably through package tests.
+
+App Store screenshots are generated through fastlane:
+
+```bash
+bundle exec fastlane ios screenshots
+```
+
+The screenshot lane uses deterministic UI-test fixtures, generates light and dark screenshots, frames them, and writes a browsable summary under `artifacts/screenshots`.
+
 ## Test Layout
 
 Tests live beside their package:
@@ -131,13 +155,13 @@ Primary workflows:
 
 * `.github/workflows/pr.yml`
   * Runs on PRs and pushes to `master`.
-  * Required jobs: `lint`, `build`, `test`.
+  * Required jobs: `lint`, `build`, `test`, and `ui smoke`.
 * `.github/workflows/nightly.yml`
-  * Scheduled clean validation to catch Xcode/simulator/runtime drift.
+  * Scheduled clean validation to catch Xcode/simulator/runtime drift, including full UI tests.
 * `.github/workflows/release-testflight.yml`
   * Protected TestFlight release workflow.
 * `.github/workflows/release-appstore.yml`
-  * Protected placeholder only; App Store submission remains manual.
+  * Protected App Store submission workflow. Human review and environment approval remain required.
 
 Actions are pinned by commit SHA and the repository requires SHA pinning for Actions.
 
@@ -147,9 +171,9 @@ Dependabot is configured for:
 
 * GitHub Actions
 * Bundler/fastlane
-* Swift packages
+* Swift packages in each package directory
 
-Review dependency updates normally through PR checks. Be careful with release tooling updates because fastlane, Bundler, Xcode, and App Store Connect behavior are tightly coupled.
+Review dependency updates through PR checks. GitHub Actions updates must preserve SHA pinning. Bundler and fastlane updates deserve release-flow scrutiny because fastlane, Xcode, signing, and App Store Connect behavior are tightly coupled. Swift package updates should run the affected package tests, and parser/networking dependency updates should run the full test runner because Hacker News markup and HTTP behavior are high-risk integration points.
 
 ## Troubleshooting
 
