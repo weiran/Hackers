@@ -88,13 +88,27 @@ Nightly validation runs the full UI test suite:
 
 UI tests write result bundles under `artifacts/xcresults` by default. Use UI tests when validating app launch, top-level navigation, browser presentation, screenshot fixtures, or behavior that cannot be covered reliably through package tests.
 
+UI tests should use the deterministic fixture layer in `App/UITesting/UITestingBootstrap.swift`, not live Hacker News or Algolia. Launch with `--ui-testing` or `HACKERS_UI_TESTING=1` so the app installs dependency overrides for posts, comments, search, settings, authentication, bookmarks, read state, voting, and article content.
+
+Common UI-test launch controls:
+
+* `HACKERS_UI_LINK_BROWSER_MODE`: `custom`, `inApp`, or `system`.
+* `HACKERS_UI_ARTICLE_FIXTURES`: set to `0` to allow real article loading in screenshot flows.
+* `HACKERS_UI_DIM_READ_POSTS`: set to `1` or `0` for read-state visual coverage.
+* `HACKERS_UI_READ_POST_IDS`: comma-separated post IDs to pre-mark as read.
+* `HACKERS_UI_INITIAL_POST_ID`: open comments for a fixture post at launch.
+* `HACKERS_UI_INITIAL_LINK_POST_ID`: open a fixture story link at launch.
+* `HACKERS_UI_BROWSER_ONLY`: launch directly into browser-focused fixture state.
+
+When adding UI tests, prefer existing accessibility identifiers such as `feed.list`, `feed.post.<id>`, `comments.list`, `settings.form`, `settings.showThumbnails`, `settings.compactFeed`, `search.sort.menu`, `search.date.menu`, `browser.view`, and `login.*`. Add new identifiers with the same stable, domain-specific naming style.
+
 App Store screenshots are generated through fastlane:
 
 ```bash
 bundle exec fastlane ios screenshots
 ```
 
-The screenshot lane uses deterministic UI-test fixtures, generates light and dark screenshots, frames them, and writes a browsable summary under `artifacts/screenshots`.
+The screenshot lane uses deterministic UI-test fixtures, generates light and dark screenshots, frames them, and writes a browsable summary under `artifacts/screenshots`. Screenshot tests should keep fixture content stable, use descriptive snapshot names with numeric ordering, and avoid depending on live network content unless the test explicitly disables article fixtures for that shot.
 
 ## Test Layout
 
