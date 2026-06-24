@@ -79,16 +79,16 @@ jobs:
 
           if [ -n "$NOTE_START_TAG" ]; then
             PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" --arg prev "$NOTE_START_TAG" '{tag_name:$tag, previous_tag_name:$prev}')
-            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
+            printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
           else
             PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" '{tag_name:$tag}')
-            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
+            printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
           fi
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release edit "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES"
           else
-            gh release create "$RELEASE_TAG" --target "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES" --draft
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES" --draft
           fi
 
           if [ ! -s artifacts/release/what-to-test.txt ]; then
