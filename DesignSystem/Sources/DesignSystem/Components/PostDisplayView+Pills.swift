@@ -57,14 +57,22 @@ public struct PostPillView: View {
                 Text(text)
                     .scaledFont(.caption)
                     .foregroundStyle(textColor)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .fixedSize(horizontal: true, vertical: false)
                     .contentTransition(.numericText())
                     .animation(.easeInOut(duration: 0.2), value: numericValue)
             } else {
                 Text(text)
                     .scaledFont(.caption)
                     .foregroundStyle(textColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .fixedSize(horizontal: true, vertical: false)
             }
         }
+        .fixedSize(horizontal: true, vertical: false)
         .padding(.vertical, 6)
         .padding(.horizontal, 10)
         .background(Capsule().fill(backgroundColor))
@@ -100,9 +108,14 @@ extension PostDisplayView {
             Text("\(score)")
                 .scaledFont(.caption)
                 .foregroundStyle(color)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .fixedSize(horizontal: true, vertical: false)
                 .contentTransition(.numericText())
                 .animation(.easeInOut(duration: 0.2), value: score)
         }
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     var inlineCommentsStat: some View {
@@ -113,7 +126,12 @@ extension PostDisplayView {
             Text("\(post.commentsCount)")
                 .scaledFont(.caption)
                 .foregroundStyle(.secondary)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .fixedSize(horizontal: true, vertical: false)
         }
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     var upvotePill: some View {
