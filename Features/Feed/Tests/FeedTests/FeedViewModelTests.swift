@@ -11,7 +11,7 @@ import Foundation
 import Shared
 import Testing
 
-@Suite("FeedViewModel")
+@Suite("FeedViewModel", .serialized)
 struct FeedViewModelTests {
     @MainActor
     @Test("Loading feed populates posts and clears loading state")
