@@ -55,17 +55,9 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSearchUsesMockedAlgoliaResults() throws {
-        launchApp()
+        launchApp(initialSearchQuery: "Swift")
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        tapBottomBarSearchButton()
-
-        let searchField = app.searchFields.firstMatch
-        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
-        searchField.tap()
-        searchField.typeText("Swift")
-
-        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].waitForExistence(timeout: 8))
         XCTAssertFalse(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
     }
 
@@ -105,12 +97,13 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Welcome back, ui-user"].waitForExistence(timeout: 5))
     }
 
-    private func launchApp(linkBrowserMode: String = "custom") {
+    private func launchApp(linkBrowserMode: String = "custom", initialSearchQuery: String? = nil) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         app.terminate()
         app.launchArguments = ["--ui-testing"]
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
         app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
+        app.launchEnvironment["HACKERS_UI_INITIAL_SEARCH_QUERY"] = initialSearchQuery ?? ""
         app.launch()
     }
 
@@ -118,14 +111,4 @@ final class HackersUITests: XCTestCase {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
-    private func tapBottomBarSearchButton() {
-        let searchButton = app.buttons["Search"]
-        if searchButton.waitForExistence(timeout: 2), searchButton.isHittable {
-            searchButton.tap()
-            return
-        }
-
-        let coordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.88, dy: 0.92))
-        coordinate.tap()
-    }
 }

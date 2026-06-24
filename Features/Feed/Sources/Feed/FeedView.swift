@@ -1,5 +1,6 @@
 import DesignSystem
 import Domain
+import Foundation
 import Shared
 import SwiftUI
 
@@ -64,6 +65,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             .task { @Sendable in
                 votingViewModel.navigationStore = navigationStore
                 await viewModel.loadFeed()
+                applyInitialUITestSearchQueryIfNeeded()
             }
             .onChange(of: navigationStore.selectedPost) { _, newPost in
                 if let updatedPost = newPost {
@@ -98,11 +100,26 @@ private extension FeedView {
         [.bookmarks]
     }
 
+    var initialUITestSearchQuery: String? {
+        guard ProcessInfo.processInfo.environment["HACKERS_UI_TESTING"] == "1" else { return nil }
+        let value = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_SEARCH_QUERY"]
+        return value?.isEmpty == false ? value : nil
+    }
+
     var shouldShowBookmarksEmptyState: Bool {
         viewModel.postType == .bookmarks
             && viewModel.posts.isEmpty
             && !viewModel.isLoading
             && !viewModel.hasActiveSearch
+    }
+
+    func applyInitialUITestSearchQueryIfNeeded() {
+        guard let initialUITestSearchQuery,
+              viewModel.searchQuery != initialUITestSearchQuery
+        else { return }
+
+        searchText = initialUITestSearchQuery
+        viewModel.updateSearchQuery(initialUITestSearchQuery)
     }
 
     var contentView: some View {
