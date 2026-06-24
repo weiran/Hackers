@@ -10,6 +10,7 @@ Releases are source-controlled and tag-driven:
 * Every TestFlight build is tagged with a full semver-with-build tag: `v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`.
   * Example: `v5.3.2+159`
 * The markdown title/body of the GitHub Release is used as TestFlight "What to Test."
+* App Store release notes are a separate public-facing artifact. They must be written specifically for App Store customers and must not be copied from GitHub Release notes, TestFlight notes, or generated changelog output.
 * A release tag exists first, then the protected TestFlight workflow runs and uploads that exact version/build.
 * Every TestFlight build is distributed to external testers. If Apple requires beta review for that build, the TestFlight workflow should put it through beta review as part of external distribution.
 * Published vs Draft status on GitHub Releases is the only release-state differentiator:
@@ -49,13 +50,14 @@ Before starting a release, confirm:
      * `v5.3.2+158`
      * `v5.3.2+159`
 4. Update any app-facing "What's New" content if the build includes visible user changes.
-5. Run validation locally when practical:
+5. Draft App Store release notes separately when the build is intended for App Store submission. These notes must be concise customer-facing copy, not GitHub/TestFlight release text.
+6. Run validation locally when practical:
 
 ```bash
 ./run_tests.sh
 ```
 
-6. Commit and push the release-prep change to `master` after required checks pass.
+7. Commit and push the release-prep change to `master` after required checks pass.
 
 ## Create Release Notes
 
@@ -84,13 +86,13 @@ If the release already exists:
 gh release edit "$tag" --notes-file release-notes.txt
 ```
 
-For an App Store-released candidate, publish the same release once its notes are complete:
+For an App Store-released candidate, publish the same GitHub Release once its TestFlight notes are complete:
 
 ```bash
 gh release edit "$tag" --draft=false
 ```
 
-For App Store releases, release notes should be cumulative since the last **published** release. When the previous published tag is known, you can generate a cumulative body:
+GitHub Release notes may be cumulative since the last **published** release. When the previous published tag is known, you can generate a cumulative GitHub/TestFlight body:
 
 ```bash
 gh release create "$tag" \
@@ -131,6 +133,20 @@ for tag in $(gh release list --json tagName,isDraft --limit 200 --jq '.[] | sele
   rm "$notes_file"
 done
 ```
+
+## Write App Store Release Notes
+
+App Store release notes are not the GitHub Release body and are not TestFlight "What to Test" text. Treat them as final public product copy for App Store customers.
+
+Rules:
+
+* Write the App Store notes specifically for the public App Store listing.
+* Summarize user-visible changes in plain language.
+* Keep the notes concise and useful to someone deciding whether to update.
+* Do not include GitHub compare links, `Full Changelog` links, pull request links, issue links, commit hashes, generated changelog sections, markdown headings, or tester instructions.
+* Do not paste the GitHub Release body or TestFlight notes into App Store Connect without rewriting them for this audience.
+
+Before submitting to App Review, pass the exact App Store release notes through the `app_store_release_notes` workflow input, then read the workflow artifact that will be sent to App Store Connect and confirm it contains no GitHub-only or TestFlight-only content.
 
 ## Trigger TestFlight
 
@@ -227,6 +243,6 @@ Only force-move a release tag during an in-progress failed release recovery. Onc
 
 ## App Store Promotion
 
-`.github/workflows/release-appstore.yml` is a protected placeholder. It records the guardrail that automatic App Review submission is disabled.
+`.github/workflows/release-appstore.yml` submits a processed build for App Review through the protected `testflight` environment. The workflow requires custom public release notes through the `app_store_release_notes` input and rejects GitHub changelog links, markdown headings, and TestFlight-only wording.
 
-Promote a validated TestFlight build manually in App Store Connect after human review.
+Promote a validated TestFlight build only after human review of the selected build and the final custom App Store release notes. Do not submit if the notes are copied from GitHub/TestFlight content or contain links back to GitHub.

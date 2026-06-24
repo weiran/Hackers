@@ -11,6 +11,10 @@ on:
         description: "Optional processed App Store Connect build number to submit"
         required: false
         type: string
+      app_store_release_notes:
+        description: "Custom public App Store release notes. Do not paste GitHub/TestFlight notes."
+        required: false
+        type: string
       skip_app_version_update:
         description: "Skip creating/updating the App Store version"
         required: false
@@ -50,45 +54,28 @@ jobs:
           bundle config set path vendor/bundle
           bundle install
 
-      - name: Resolve release notes
+      - name: Resolve App Store release notes
         env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+          APP_STORE_RELEASE_NOTES: ${{ github.event.inputs.app_store_release_notes }}
+          CANCEL_ONLY: ${{ github.event.inputs.cancel_only }}
         run: |
           mkdir -p artifacts/release
           RELEASE_NOTES=artifacts/release/app-store-release-notes.txt
-          PREVIOUS_RELEASE_TAG=$(gh release list --json tagName,isDraft,publishedAt --limit 200 \
-            | jq -r --arg TAG "$RELEASE_TAG" '[.[] | select(.isDraft == false and .tagName != $TAG)] | .[0].tagName')
-          PREVIOUS_TAG=$(git tag --sort=-creatordate --list 'v*' \
-            | awk -v TAG="$RELEASE_TAG" 'BEGIN { found=0 } \
-              { if ($0 == TAG) { found=1; next } if (found) { print; exit } }')
 
-          RELEASE_IS_DRAFT=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft 2>/dev/null || echo true)
-
-          if [ "$RELEASE_IS_DRAFT" = "true" ] && [ -n "$PREVIOUS_TAG" ]; then
-            NOTE_START_TAG="$PREVIOUS_TAG"
-          elif [ "$PREVIOUS_RELEASE_TAG" != "null" ] && [ -n "$PREVIOUS_RELEASE_TAG" ]; then
-            NOTE_START_TAG="$PREVIOUS_RELEASE_TAG"
-          else
-            NOTE_START_TAG=""
+          if [ "$CANCEL_ONLY" = "true" ]; then
+            echo "Cancel-only run; App Store release notes are not required."
+            exit 0
           fi
 
-          if [ -n "$NOTE_START_TAG" ]; then
-            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" --arg prev "$NOTE_START_TAG" '{tag_name:$tag, previous_tag_name:$prev}')
-            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
-          else
-            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" '{tag_name:$tag}')
-            printf '%s' "$PAYLOAD" | gh api --method POST https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes --input - --jq .body > "$RELEASE_NOTES"
-          fi
-
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES"
-          else
-            gh release create "$RELEASE_TAG" --target "$RELEASE_TAG" --title "${RELEASE_TAG#v}" --notes-file "$RELEASE_NOTES"
-          fi
+          printf '%s\n' "$APP_STORE_RELEASE_NOTES" > "$RELEASE_NOTES"
 
           if [ ! -s artifacts/release/app-store-release-notes.txt ]; then
-            echo "GitHub Release body is required for App Store release notes" >&2
+            echo "Custom App Store release notes are required" >&2
+            exit 1
+          fi
+
+          if grep -Eiq 'github\.com|Full Changelog|pull/[0-9]+|issues/[0-9]+|commit/[0-9a-f]+|^#|TestFlight|What to Test' "$RELEASE_NOTES"; then
+            echo "App Store release notes must be custom public copy without GitHub, changelog, markdown heading, or TestFlight content" >&2
             exit 1
           fi
 

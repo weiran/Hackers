@@ -272,6 +272,26 @@ def release_notes
   ENV.fetch("WHAT_TO_TEST", "").strip
 end
 
+def validate_app_store_release_notes!(notes)
+  forbidden_patterns = [
+    /github\.com/i,
+    /Full Changelog/i,
+    %r{pull/\d+}i,
+    %r{issues/\d+}i,
+    %r{commit/[0-9a-f]+}i,
+    /^#/,
+    /TestFlight/i,
+    /What to Test/i
+  ]
+
+  if forbidden_patterns.any? { |pattern| notes.match?(pattern) }
+    UI.user_error!(
+      "App Store release notes must be custom public copy without GitHub, changelog, " \
+      "markdown heading, or TestFlight content"
+    )
+  end
+end
+
 platform :ios do
   desc "Run SwiftLint"
   lane :lint do
@@ -429,6 +449,7 @@ platform :ios do
     version = marketing_version
     notes = release_notes
     UI.user_error!("Release notes are required for App Store submission") if notes.empty?
+    validate_app_store_release_notes!(notes)
 
     build_number = options[:build_number] || ENV["BUILD_NUMBER"]
     build_number = nil if build_number.to_s.strip.empty?
