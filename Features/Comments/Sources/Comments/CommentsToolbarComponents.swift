@@ -56,7 +56,7 @@ public struct CommentsHeaderTitleButton: View {
         hitHeight: CGFloat = 44,
         fillsAvailableWidth: Bool = false,
         usesOffsetTransition: Bool = true,
-        visualHitAlignmentOffset: CGFloat = 4,
+        visualHitAlignmentOffset: CGFloat = 0,
         onTap: @escaping @MainActor @Sendable () -> Void
     ) {
         self.post = post
