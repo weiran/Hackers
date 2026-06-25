@@ -305,6 +305,9 @@ struct PostCommentsSheet: View {
                             )
                             .frame(maxWidth: .infinity, alignment: .top)
                             .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
+                            .simultaneousGesture(
+                                expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop)
+                            )
                         } else {
                             Spacer()
                         }
