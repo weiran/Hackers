@@ -24,6 +24,8 @@ struct PostCommentsSheet: View {
     private static let handleAreaHeight: CGFloat = 22
     private static let handleToolbarSpacing: CGFloat = 8
     private static let expandedToolbarTitleHitHeight: CGFloat = 58
+    private static let expandedToolbarTitleVisualOffset: CGFloat =
+        (collapsedBrowserControlsHeight - expandedToolbarTitleHitHeight) / 2
     private static let expandedContentSpacing: CGFloat = 8
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
@@ -302,7 +304,7 @@ struct PostCommentsSheet: View {
                                     hitHeight: Self.expandedToolbarTitleHitHeight,
                                     fillsAvailableWidth: true,
                                     usesOffsetTransition: false,
-                                    visualHitAlignmentOffset: 0,
+                                    visualHitAlignmentOffset: Self.expandedToolbarTitleVisualOffset,
                                     onTap: collapseSheet
                                 )
 
