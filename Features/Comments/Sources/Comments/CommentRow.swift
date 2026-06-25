@@ -33,47 +33,47 @@ struct CommentRow: View {
     let onShare: () -> Void
 
     var body: some View {
-        Button(action: onToggle) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(state.author)
-                        .scaledFont(.subheadline)
-                        .bold()
-                        .foregroundStyle(state.isPostAuthor ? AppColors.appTintColor : .primary)
-                    Text(state.age)
-                        .scaledFont(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    if state.isUpvoted {
-                        VoteIndicator(
-                            votingState: VotingState(
-                                isUpvoted: state.isUpvoted,
-                                score: nil,
-                                canVote: state.canVote,
-                                canUnvote: state.canUnvote
-                            ),
-                            style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
-                        )
-                    }
-                    if state.visibility == .compact {
-                        Image(systemName: "chevron.down")
-                            .scaledFont(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityHidden(true)
-                    }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(state.author)
+                    .scaledFont(.subheadline)
+                    .bold()
+                    .foregroundStyle(state.isPostAuthor ? AppColors.appTintColor : .primary)
+                Text(state.age)
+                    .scaledFont(.subheadline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if state.isUpvoted {
+                    VoteIndicator(
+                        votingState: VotingState(
+                            isUpvoted: state.isUpvoted,
+                            score: nil,
+                            canVote: state.canVote,
+                            canUnvote: state.canUnvote
+                        ),
+                        style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
+                    )
                 }
-                if let styledText = state.styledText {
-                    Text(styledText)
-                        .foregroundStyle(.primary)
+                if state.visibility == .compact {
+                    Image(systemName: "chevron.down")
+                        .scaledFont(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
-            .contentShape(Rectangle())
+            if let styledText = state.styledText {
+                Text(styledText)
+                    .foregroundStyle(.primary)
+            }
         }
-        .buttonStyle(.plain)
+        .contentShape(.interaction, Rectangle())
+        .onTapGesture(perform: onToggle)
         .listRowInsets([.top, .bottom, .trailing], 16)
         .listRowInsets([.leading], CGFloat(16 + state.visualLevel * 14))
+        .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
+        .accessibilityAction(.default, onToggle)
         .id("\(state.id)-\(state.visibility.rawValue)")
         .contextMenu {
             if state.canVote, !state.isUpvoted {
