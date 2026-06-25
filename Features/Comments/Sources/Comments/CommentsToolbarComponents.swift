@@ -3,7 +3,6 @@ import Domain
 import Observation
 import Shared
 import SwiftUI
-import UIKit
 
 @MainActor
 @Observable
@@ -45,7 +44,6 @@ public struct CommentsHeaderTitleButton: View {
     private let hitHeight: CGFloat
     private let fillsAvailableWidth: Bool
     private let usesOffsetTransition: Bool
-    private let visualHitAlignmentOffset: CGFloat
     private let onTap: @MainActor @Sendable () -> Void
 
     public init(
@@ -56,7 +54,6 @@ public struct CommentsHeaderTitleButton: View {
         hitHeight: CGFloat = 44,
         fillsAvailableWidth: Bool = false,
         usesOffsetTransition: Bool = true,
-        visualHitAlignmentOffset: CGFloat = 0,
         onTap: @escaping @MainActor @Sendable () -> Void
     ) {
         self.post = post
@@ -66,7 +63,6 @@ public struct CommentsHeaderTitleButton: View {
         self.hitHeight = hitHeight
         self.fillsAvailableWidth = fillsAvailableWidth
         self.usesOffsetTransition = usesOffsetTransition
-        self.visualHitAlignmentOffset = visualHitAlignmentOffset
         self.onTap = onTap
     }
 
@@ -74,34 +70,26 @@ public struct CommentsHeaderTitleButton: View {
         let isVisible = titleVisibility.isVisible
         let maxWidth: CGFloat? = fillsAvailableWidth ? .infinity : nil
 
-        ZStack {
-            CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
-                .hidden()
-                .accessibilityHidden(true)
-                .offset(y: visualHitAlignmentOffset)
+        Button(action: onTap) {
+            ZStack {
+                CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+                    .hidden()
+                    .accessibilityHidden(true)
 
-            if isVisible {
-                CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
-                    .transition(usesOffsetTransition ? Self.visibilityTransition : .opacity)
-                    .offset(y: visualHitAlignmentOffset)
+                if isVisible {
+                    CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
+                        .transition(usesOffsetTransition ? Self.visibilityTransition : .opacity)
+                }
             }
-
-            // Work around current interactive glass hit testing in toolbar items:
-            // the pill can visually react above the toolbar's real hit frame
-            // without delivering the tap action. Re-test on future OS releases.
-            CommentsHeaderTitleTapOverlay(onTap: onTap)
-                .allowsHitTesting(isVisible)
-                .accessibilityHidden(true)
+            .frame(maxWidth: maxWidth, alignment: .top)
+            .frame(height: hitHeight, alignment: .top)
         }
-        .frame(maxWidth: maxWidth, alignment: .top)
-        .frame(height: hitHeight, alignment: .top)
-        .contentShape(.interaction, Rectangle())
+        .buttonStyle(.plain)
         .allowsHitTesting(isVisible)
+        .disabled(!isVisible)
         .accessibilityLabel(post.title)
-        .accessibilityAddTraits(.isButton)
         .accessibilityHint(accessibilityHint)
         .accessibilityHidden(!isVisible)
-        .accessibilityAction(.default, onTap)
         .animation(.easeInOut(duration: 0.3), value: isVisible)
     }
 
@@ -164,49 +152,6 @@ private struct CommentsHeaderTitlePillLayout: View {
                 .multilineTextAlignment(.leading)
                 .truncationMode(.tail)
                 .frame(width: titleWidth, alignment: .leading)
-        }
-    }
-}
-
-private struct CommentsHeaderTitleTapOverlay: UIViewRepresentable {
-    let onTap: @MainActor () -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onTap: onTap)
-    }
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.isUserInteractionEnabled = true
-        view.isAccessibilityElement = false
-
-        let tapGesture = UITapGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(Coordinator.handleTap)
-        )
-        tapGesture.cancelsTouchesInView = false
-        tapGesture.delaysTouchesBegan = false
-        tapGesture.delaysTouchesEnded = false
-        view.addGestureRecognizer(tapGesture)
-
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        context.coordinator.onTap = onTap
-    }
-
-    @MainActor
-    final class Coordinator: NSObject {
-        var onTap: @MainActor () -> Void
-
-        init(onTap: @escaping @MainActor () -> Void) {
-            self.onTap = onTap
-        }
-
-        @objc func handleTap() {
-            onTap()
         }
     }
 }

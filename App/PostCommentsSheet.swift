@@ -24,8 +24,6 @@ struct PostCommentsSheet: View {
     private static let handleAreaHeight: CGFloat = 22
     private static let handleToolbarSpacing: CGFloat = 8
     private static let expandedToolbarTitleHitHeight: CGFloat = 58
-    private static let expandedToolbarTitleVisualOffset: CGFloat =
-        (collapsedBrowserControlsHeight - expandedToolbarTitleHitHeight) / 2
     private static let expandedContentSpacing: CGFloat = 8
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
@@ -295,23 +293,16 @@ struct PostCommentsSheet: View {
                         .modifier(GlassCircleBackground())
 
                         if let post = viewModel.post {
-                            ZStack(alignment: .top) {
-                                CommentsHeaderTitleButton(
-                                    post: post,
-                                    showThumbnails: viewModel.showThumbnails,
-                                    titleVisibility: expandedTitleVisibility,
-                                    accessibilityHint: "Collapse comments",
-                                    hitHeight: Self.expandedToolbarTitleHitHeight,
-                                    fillsAvailableWidth: true,
-                                    usesOffsetTransition: false,
-                                    visualHitAlignmentOffset: Self.expandedToolbarTitleVisualOffset,
-                                    onTap: collapseSheet
-                                )
-
-                                TransparentTapOverlay(onTap: collapseSheet)
-                                    .allowsHitTesting(expandedTitleVisibility.isVisible)
-                                    .accessibilityHidden(true)
-                            }
+                            CommentsHeaderTitleButton(
+                                post: post,
+                                showThumbnails: viewModel.showThumbnails,
+                                titleVisibility: expandedTitleVisibility,
+                                accessibilityHint: "Collapse comments",
+                                hitHeight: Self.expandedToolbarTitleHitHeight,
+                                fillsAvailableWidth: true,
+                                usesOffsetTransition: false,
+                                onTap: collapseSheet
+                            )
                             .frame(maxWidth: .infinity, alignment: .top)
                             .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
                         } else {
@@ -627,49 +618,6 @@ private extension PostCommentsSheet {
 enum SheetState {
     case collapsed
     case expanded
-}
-
-private struct TransparentTapOverlay: UIViewRepresentable {
-    let onTap: @MainActor () -> Void
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onTap: onTap)
-    }
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.isUserInteractionEnabled = true
-        view.isAccessibilityElement = false
-
-        let tapGesture = UITapGestureRecognizer(
-            target: context.coordinator,
-            action: #selector(Coordinator.handleTap)
-        )
-        tapGesture.cancelsTouchesInView = false
-        tapGesture.delaysTouchesBegan = false
-        tapGesture.delaysTouchesEnded = false
-        view.addGestureRecognizer(tapGesture)
-
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        context.coordinator.onTap = onTap
-    }
-
-    @MainActor
-    final class Coordinator: NSObject {
-        var onTap: @MainActor () -> Void
-
-        init(onTap: @escaping @MainActor () -> Void) {
-            self.onTap = onTap
-        }
-
-        @objc func handleTap() {
-            onTap()
-        }
-    }
 }
 
 private struct StableCommentsHost: View, @preconcurrency Equatable {
