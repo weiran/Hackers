@@ -507,7 +507,7 @@ private extension FeedView {
     private func handlePostTap(post: Domain.Post) {
         viewModel.markPostRead(post)
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if mode == .customBrowser {
+        if mode == .customBrowser, !isSidebar {
             navigationStore.showPostLink(post, presentation: .expandedComments)
             return
         }
