@@ -41,6 +41,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     private var indexByID: [Int: Int] = [:]
     private var parentIndexByID: [Int: Int] = [:]
     private var subtreeEndIndexByID: [Int: Int] = [:]
+    private var visibleIndexByID: [Int: Int] = [:]
     private var visibleSignature: [VisibleCommentSignature] = []
 
     public var comments: [Comment] { commentsLoader.data }
@@ -274,9 +275,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     public func nextVisibleCommentID(after commentID: Int?) -> Int? {
         guard !visibleComments.isEmpty else { return nil }
-        guard let commentID,
-              let index = visibleComments.firstIndex(where: { $0.id == commentID })
-        else {
+        guard let commentID, let index = visibleIndexByID[commentID] else {
             return visibleComments.first?.id
         }
 
@@ -286,11 +285,14 @@ public final class CommentsViewModel: @unchecked Sendable {
     }
 
     @MainActor
+    public func hasNextVisibleComment(after commentID: Int?) -> Bool {
+        nextVisibleCommentID(after: commentID) != nil
+    }
+
+    @MainActor
     public func nextVisibleThreadID(after commentID: Int?) -> Int? {
         guard !visibleComments.isEmpty else { return nil }
-        guard let commentID,
-              let index = visibleComments.firstIndex(where: { $0.id == commentID })
-        else {
+        guard let commentID, let index = visibleIndexByID[commentID] else {
             return visibleComments.first(where: { $0.level == 0 })?.id
         }
 
@@ -341,6 +343,9 @@ private extension CommentsViewModel {
 
         guard updatedSignature != visibleSignature else { return }
         visibleComments = updatedComments
+        visibleIndexByID = Dictionary(uniqueKeysWithValues: updatedComments.enumerated().map { index, comment in
+            (comment.id, index)
+        })
         visibleSignature = updatedSignature
         visibleRevision += 1
     }

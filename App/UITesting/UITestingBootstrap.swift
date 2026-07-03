@@ -54,6 +54,8 @@ enum UITestingBootstrap {
 }
 
 final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @unchecked Sendable {
+    static let largeCommentsPostID = 48_399_999
+
     private let posts: [Post]
     private let commentsByPostID: [Int: [Comment]]
 
@@ -64,6 +66,15 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 
     private static func makeActivePosts() -> [Post] {
         [
+            makePost(
+                id: largeCommentsPostID,
+                url: "https://example.com/ui-test-large-comments",
+                title: "UI Test: Large Comments Performance Fixture",
+                age: "1 minute ago",
+                commentsCount: 720,
+                by: "perf_fixture",
+                score: 999
+            ),
             makePost(
                 id: 48_345_248,
                 url: "https://simpleflying.com/united-airlines-767-returns-newark-bluetooth-name-alert/",
@@ -397,6 +408,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 
     private static func makeCommentsByPostID() -> [Int: [Comment]] {
         [
+            largeCommentsPostID: makeLargeCommentThread(count: 720),
             48_345_248: [
                 makeComment(
                     id: 48_348_695,
@@ -760,6 +772,36 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                 unvote: nil
             )
         )
+    }
+
+    private static func makeLargeCommentThread(count: Int) -> [Comment] {
+        (0 ..< count).map { index in
+            let level: Int
+            switch index % 10 {
+            case 0, 1, 2, 3:
+                level = 0
+            case 4, 5, 6:
+                level = 1
+            case 7, 8:
+                level = 2
+            default:
+                level = 3
+            }
+
+            return makeComment(
+                id: 49_000_000 + index,
+                by: "large_thread_\(index % 37)",
+                age: "\(max(1, index % 23)) hours ago",
+                text: largeCommentText(index: index),
+                level: level
+            )
+        }
+    }
+
+    private static func largeCommentText(index: Int) -> String {
+        """
+        This deterministic comment row \(index) is part of a large UI-test discussion. It includes enough text to exercise wrapping, attributed text rendering, row measurement, lazy layout, and scrolling without relying on live Hacker News data. The point is to make performance problems visible when the comments panel is expanded inside the custom browser sheet.
+        """
     }
 }
 

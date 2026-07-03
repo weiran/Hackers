@@ -194,9 +194,12 @@ enum CommentTextCache {
     private static var baseCache: [BaseCacheKey: AttributedString] = [:]
     private static var styledCache: [StyledCacheKey: AttributedString] = [:]
 
-    static func prewarm(comments: ArraySlice<Comment>, textScaling: CGFloat) {
-        for comment in comments where comment.visibility == .visible {
+    static func prewarm(comments: ArraySlice<Comment>, textScaling: CGFloat, chunkSize: Int = .max) async {
+        for (index, comment) in comments.enumerated() where comment.visibility == .visible {
             _ = styledText(for: comment, textScaling: textScaling)
+            if index > 0, index.isMultiple(of: chunkSize) {
+                await Task.yield()
+            }
         }
     }
 

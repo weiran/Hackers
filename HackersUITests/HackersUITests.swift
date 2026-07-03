@@ -3,6 +3,7 @@ import XCTest
 final class HackersUITests: XCTestCase {
     private let screenshotPostID = 48_350_598
     private let longCommentsPostID = 48_345_840
+    private let largeCommentsPostID = 48_399_999
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -167,6 +168,27 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
 
+    func testCustomBrowserLargeCommentsRemainResponsive() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(largeCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let firstComment = app.buttons["comments.comment.49000000"]
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+
+        dragCustomBrowserCommentsUp(count: 12)
+        XCTAssertFalse(firstComment.isHittable)
+
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
+
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.frame.intersects(firstComment.frame))
+
+        XCTAssertTrue(app.buttons["UI Test: Large Comments Performance Fixture"].waitForExistence(timeout: 5))
+    }
+
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
         launchApp(linkBrowserMode: "custom")
 
@@ -318,6 +340,14 @@ final class HackersUITests: XCTestCase {
         let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
         let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
         for _ in 0 ..< maxDrags where !element.exists || !app.frame.intersects(element.frame) {
+            start.press(forDuration: 0.05, thenDragTo: end)
+        }
+    }
+
+    private func dragCustomBrowserCommentsUp(count: Int) {
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        for _ in 0 ..< count {
             start.press(forDuration: 0.05, thenDragTo: end)
         }
     }
