@@ -105,12 +105,7 @@ struct PostCommentsSheetPresentation {
         return true
     }
 
-    mutating func updateHandleDrag(
-        startX: CGFloat,
-        translationHeight: CGFloat,
-        systemBackGestureEdgeWidth: CGFloat
-    ) {
-        guard startX > systemBackGestureEdgeWidth else { return }
+    mutating func updateHandleDrag(translationHeight: CGFloat) {
         if !isHandleDragActive {
             suppressesCollapsedUpvote = true
         }
@@ -118,17 +113,8 @@ struct PostCommentsSheetPresentation {
         dragTranslation = translationHeight
     }
 
-    mutating func canEndHandleDrag(
-        startX: CGFloat,
-        systemBackGestureEdgeWidth: CGFloat
-    ) -> Bool {
-        guard isHandleDragActive else { return false }
-        guard startX > systemBackGestureEdgeWidth else {
-            isHandleDragActive = false
-            resetDragTracking()
-            return false
-        }
-        return true
+    mutating func canEndHandleDrag() -> Bool {
+        isHandleDragActive
     }
 
     mutating func settle(

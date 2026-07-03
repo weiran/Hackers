@@ -30,7 +30,7 @@ private struct CommentScrollMetrics: Equatable {
 
 private enum CollapseScrollDecision {
     case none
-    case scrollToY(CGFloat)
+    case scrollToRoot
     case deferUntilLayout
 }
 
@@ -214,7 +214,7 @@ struct CommentsContentView: View {
 
         let currentVisibleRect = visibleContentRect
         if rootFrame.minY < currentVisibleRect.minY || rootFrame.minY >= currentVisibleRect.maxY {
-            return .scrollToY(clampedScrollY(forRootTop: rootFrame.minY, maxOffsetY: maxContentOffsetY))
+            return .scrollToRoot
         }
 
         let removedHeight = estimatedCollapsedHeightDelta(for: comment, rootFrame: rootFrame)
@@ -229,20 +229,12 @@ struct CommentsContentView: View {
             return .none
         }
 
-        return .scrollToY(clampedScrollY(forRootTop: rootFrame.minY, maxOffsetY: predictedMaxOffsetY))
-    }
-
-    private var maxContentOffsetY: CGFloat {
-        maxContentOffsetY(afterRemoving: 0)
+        return .scrollToRoot
     }
 
     private func maxContentOffsetY(afterRemoving removedHeight: CGFloat) -> CGFloat {
         let contentHeight = max(scrollMetrics.contentSize.height - removedHeight, 0)
         return max(contentHeight - scrollMetrics.visibleRect.height, 0)
-    }
-
-    private func clampedScrollY(forRootTop rootTop: CGFloat, maxOffsetY: CGFloat) -> CGFloat {
-        min(max(rootTop - visibleContentTopInset, 0), maxOffsetY)
     }
 
     private func estimatedCollapsedHeightDelta(for comment: Comment, rootFrame: CGRect) -> CGFloat {
@@ -316,12 +308,7 @@ struct CommentsContentView: View {
     }
 
     private func scrollCollapsedRootToTop(commentID: Int) {
-        guard let frame = rowFrames[commentID] else {
-            scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
-            return
-        }
-
-        scrollPosition.scrollTo(y: frame.minY - visibleContentTopInset)
+        scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
     }
 
     private func scrollToPendingComment() {
@@ -382,8 +369,8 @@ struct CommentsContentView: View {
 
         performListAnimation {
             toggleCommentVisibility(comment)
-            if case .scrollToY(let targetY) = collapseScrollDecision {
-                scrollPosition.scrollTo(y: targetY)
+            if case .scrollToRoot = collapseScrollDecision {
+                scrollCollapsedRootToTop(commentID: comment.id)
             }
         }
     }

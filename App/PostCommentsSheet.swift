@@ -7,21 +7,6 @@ import UIKit
 
 // swiftlint:disable type_body_length
 
-private struct LeadingEdgeExcludedRectangle: Shape {
-    let excludedWidth: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let clampedWidth = min(max(excludedWidth, 0), rect.width)
-        let hitRect = CGRect(
-            x: rect.minX + clampedWidth,
-            y: rect.minY,
-            width: rect.width - clampedWidth,
-            height: rect.height
-        )
-        return Path(hitRect)
-    }
-}
-
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
@@ -250,7 +235,7 @@ struct PostCommentsSheet: View {
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            scrollDisabled: !isExpanded || presentation.dragStartAllowsSheetDrag || presentation.isHandleDragActive,
+            scrollDisabled: !isExpanded || presentation.isHandleDragActive,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
@@ -343,14 +328,14 @@ struct PostCommentsSheet: View {
                     .fill(.secondary.opacity(0.35))
                     .frame(width: Self.handleWidth, height: Self.handleThickness)
                     .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
+                    .contentShape(Rectangle())
+                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
-        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
@@ -507,17 +492,10 @@ private extension PostCommentsSheet {
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
-                presentation.updateHandleDrag(
-                    startX: value.startLocation.x,
-                    translationHeight: value.translation.height,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
+                presentation.updateHandleDrag(translationHeight: value.translation.height)
             }
             .onEnded { value in
-                guard presentation.canEndHandleDrag(
-                    startX: value.startLocation.x,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                ) else {
+                guard presentation.canEndHandleDrag() else {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }

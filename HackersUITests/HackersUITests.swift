@@ -89,6 +89,25 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
 
+    func testCustomBrowserCollapsedHandleDragExpandsComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
+        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
+        titlePill.tap()
+        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+
+        let handle = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let expandedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
+        handle.press(forDuration: 0.1, thenDragTo: expandedPosition)
+
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+    }
+
     func testCustomBrowserHandleDragCollapsesExpandedComments() throws {
         launchApp(linkBrowserMode: "custom")
 
@@ -120,6 +139,31 @@ final class HackersUITests: XCTestCase {
         commentsBody.press(forDuration: 0.1, thenDragTo: collapsedPosition)
 
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    func testCustomBrowserCommentsReturnToTopRemainsResponsive() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let firstComment = app.buttons["comments.comment.48346154"]
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+
+        let lowerComment = app.buttons["comments.comment.48348985"]
+        scrollCustomBrowserComments(untilVisible: lowerComment)
+        XCTAssertTrue(app.frame.intersects(lowerComment.frame))
+
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
+
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.frame.intersects(firstComment.frame))
+
+        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
+        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
+        titlePill.tap()
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
 
@@ -267,6 +311,14 @@ final class HackersUITests: XCTestCase {
     private func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {
         for _ in 0 ..< maxSwipes where !element.exists || !container.frame.intersects(element.frame) {
             container.swipeUp()
+        }
+    }
+
+    private func scrollCustomBrowserComments(untilVisible element: XCUIElement, maxDrags: Int = 8) {
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        for _ in 0 ..< maxDrags where !element.exists || !app.frame.intersects(element.frame) {
+            start.press(forDuration: 0.05, thenDragTo: end)
         }
     }
 
