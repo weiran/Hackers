@@ -67,10 +67,26 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["browser.commentsSheet.back"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Reload"].exists)
         XCTAssertFalse(app.buttons["Open in Safari"].exists)
         XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+    }
+
+    func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
+        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
+        titlePill.tap()
+
+        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
 
     func testCustomBrowserHandleDragCollapsesExpandedComments() throws {
@@ -85,6 +101,23 @@ final class HackersUITests: XCTestCase {
         let handle = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
         handle.press(forDuration: 0.1, thenDragTo: collapsedPosition)
+
+        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    func testCustomBrowserCommentsBodyDragAtTopCollapsesExpandedComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+
+        let commentsBody = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
+        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        commentsBody.press(forDuration: 0.1, thenDragTo: collapsedPosition)
 
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))

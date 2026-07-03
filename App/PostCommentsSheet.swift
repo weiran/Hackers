@@ -7,6 +7,21 @@ import UIKit
 
 // swiftlint:disable type_body_length
 
+private struct LeadingEdgeExcludedRectangle: Shape {
+    let excludedWidth: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let clampedWidth = min(max(excludedWidth, 0), rect.width)
+        let hitRect = CGRect(
+            x: rect.minX + clampedWidth,
+            y: rect.minY,
+            width: rect.width - clampedWidth,
+            height: rect.height
+        )
+        return Path(hitRect)
+    }
+}
+
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
@@ -197,6 +212,7 @@ struct PostCommentsSheet: View {
                 }
                 .allowsHitTesting(contentFadeProgress >= 0.5)
                 .accessibilityHidden(contentFadeProgress < 0.5)
+                .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
@@ -234,7 +250,7 @@ struct PostCommentsSheet: View {
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            scrollDisabled: !isExpanded || presentation.isHandleDragActive,
+            scrollDisabled: !isExpanded || presentation.dragStartAllowsSheetDrag || presentation.isHandleDragActive,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
@@ -259,6 +275,20 @@ struct PostCommentsSheet: View {
 
                 GlassEffectContainer(spacing: 10) {
                     HStack(alignment: .top, spacing: 10) {
+                        Button {
+                            onDismiss()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.title3.weight(.medium))
+                                .frame(width: 44, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                        .accessibilityLabel("Back")
+                        .accessibilityIdentifier("browser.commentsSheet.back")
+                        .modifier(GlassCircleBackground())
+
                         if let post = viewModel.post {
                             CommentsHeaderTitleButton(
                                 post: post,
@@ -327,14 +357,14 @@ struct PostCommentsSheet: View {
                     .fill(.secondary.opacity(0.35))
                     .frame(width: Self.handleWidth, height: Self.handleThickness)
                     .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
-                    .contentShape(Rectangle())
-                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
+        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
+        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
@@ -466,18 +496,52 @@ private extension PostCommentsSheet {
         return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
     }
 
-    private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+    private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 6, coordinateSpace: .global)
             .onChanged { value in
-                presentation.updateHandleDrag(translationHeight: value.translation.height)
+                presentation.updateSheetDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
+                    isScrollAtTop: isScrollAtTop
+                )
             }
             .onEnded { value in
-                guard presentation.canEndHandleDrag() else {
+                guard presentation.canEndSheetDrag(
+                    startX: value.startLocation.x,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                ) else {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
             }
+    }
+
+    private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+            .onChanged { value in
+                presentation.updateHandleDrag(
+                    startX: value.startLocation.x,
+                    translationHeight: value.translation.height,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                )
+            }
+            .onEnded { value in
+                guard presentation.canEndHandleDrag(
+                    startX: value.startLocation.x,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                ) else {
+                    scheduleCollapsedUpvoteReenable()
+                    return
+                }
+                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+            }
+    }
+
+    private var systemBackGestureEdgeWidth: CGFloat {
+        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
+        return leadingInset + 56
     }
 
     private func settleSheet(predictedTranslation: CGFloat, _ expandedTop: CGFloat, _ collapsedTop: CGFloat) {

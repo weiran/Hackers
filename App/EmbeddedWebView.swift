@@ -481,6 +481,119 @@ private struct UITestArticleView: View {
 }
 #endif
 
+private struct NavigationBackSwipeRestorer: UIViewControllerRepresentable {
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIViewController(context: Context) -> RestoringViewController {
+        let viewController = RestoringViewController()
+        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
+            coordinator?.attach(to: navigationController)
+        }
+        return viewController
+    }
+
+    func updateUIViewController(_ viewController: RestoringViewController, context: Context) {
+        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
+            coordinator?.attach(to: navigationController)
+        }
+
+        DispatchQueue.main.async {
+            context.coordinator.attach(to: viewController.nearestNavigationController)
+        }
+    }
+
+    static func dismantleUIViewController(_ viewController: RestoringViewController, coordinator: Coordinator) {
+        coordinator.detach()
+        viewController.onNavigationControllerChange = nil
+    }
+
+    final class RestoringViewController: UIViewController {
+        var onNavigationControllerChange: ((UINavigationController?) -> Void)?
+
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            onNavigationControllerChange?(navigationController)
+        }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            onNavigationControllerChange?(nearestNavigationController)
+        }
+
+        var nearestNavigationController: UINavigationController? {
+            if let navigationController {
+                return navigationController
+            }
+
+            return view.window?.rootViewController?.visibleNavigationController
+        }
+    }
+
+    final class Coordinator {
+        private weak var navigationController: UINavigationController?
+        private var previousNavigationBarTintColor: UIColor?
+        private var previousNavigationBarInteractionEnabled: Bool?
+
+        func attach(to navigationController: UINavigationController?) {
+            guard let navigationController,
+                  let gestureRecognizer = navigationController.interactivePopGestureRecognizer
+            else { return }
+
+            if self.navigationController !== navigationController {
+                detach()
+                self.navigationController = navigationController
+                previousNavigationBarTintColor = navigationController.navigationBar.tintColor
+                previousNavigationBarInteractionEnabled = navigationController.navigationBar.isUserInteractionEnabled
+            }
+
+            gestureRecognizer.isEnabled = true
+            navigationController.navigationBar.tintColor = .clear
+            navigationController.navigationBar.isUserInteractionEnabled = false
+        }
+
+        func detach() {
+            if let navigationBar = navigationController?.navigationBar {
+                navigationBar.tintColor = previousNavigationBarTintColor
+                if let previousNavigationBarInteractionEnabled {
+                    navigationBar.isUserInteractionEnabled = previousNavigationBarInteractionEnabled
+                }
+            }
+
+            navigationController = nil
+            previousNavigationBarTintColor = nil
+            previousNavigationBarInteractionEnabled = nil
+        }
+    }
+}
+
+private extension UIViewController {
+    var visibleNavigationController: UINavigationController? {
+        if let navigationController = self as? UINavigationController {
+            return navigationController
+        }
+
+        if let selectedViewController = (self as? UITabBarController)?.selectedViewController,
+           let navigationController = selectedViewController.visibleNavigationController {
+            return navigationController
+        }
+
+        if let presentedViewController,
+           let navigationController = presentedViewController.visibleNavigationController {
+            return navigationController
+        }
+
+        for child in children {
+            if let navigationController = child.visibleNavigationController {
+                return navigationController
+            }
+        }
+
+        return navigationController
+    }
+}
+
 struct PostLinkBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     let post: Post
@@ -524,6 +637,10 @@ struct PostLinkBrowserView: View {
         .accessibilityIdentifier("browser.view")
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
+        .background {
+            NavigationBackSwipeRestorer()
+                .frame(width: 0, height: 0)
+        }
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.panel) {
