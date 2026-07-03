@@ -67,7 +67,7 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["browser.commentsSheet.back"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["browser.commentsSheet.back"].exists)
         XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Reload"].exists)
         XCTAssertFalse(app.buttons["Open in Safari"].exists)

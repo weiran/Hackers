@@ -275,20 +275,6 @@ struct PostCommentsSheet: View {
 
                 GlassEffectContainer(spacing: 10) {
                     HStack(alignment: .top, spacing: 10) {
-                        Button {
-                            onDismiss()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.title3.weight(.medium))
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                        .accessibilityLabel("Back")
-                        .accessibilityIdentifier("browser.commentsSheet.back")
-                        .modifier(GlassCircleBackground())
-
                         if let post = viewModel.post {
                             CommentsHeaderTitleButton(
                                 post: post,
