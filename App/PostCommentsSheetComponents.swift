@@ -3,21 +3,6 @@ import Domain
 import Shared
 import SwiftUI
 
-struct LeadingEdgeExcludedRectangle: Shape {
-    let excludedWidth: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let clampedWidth = min(max(excludedWidth, 0), rect.width)
-        let hitRect = CGRect(
-            x: rect.minX + clampedWidth,
-            y: rect.minY,
-            width: rect.width - clampedWidth,
-            height: rect.height
-        )
-        return Path(hitRect)
-    }
-}
-
 struct BrowserControlsView: View {
     let fallbackURL: URL
     let onDismiss: @MainActor () -> Void
@@ -213,7 +198,6 @@ struct CollapsedPostHeaderView: View {
     let isLoading: Bool
     let onUpvote: () -> Void
     let onExpand: () -> Void
-    let leadingGestureExclusionWidth: CGFloat
     let disablesUpvote: Bool
     let matchedGeometryNamespace: Namespace.ID?
     let isMatchedGeometrySource: Bool
@@ -262,7 +246,7 @@ struct CollapsedPostHeaderView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, Self.collapsedHorizontalPadding)
         .padding(.vertical, Self.collapsedVerticalPadding)
-        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: leadingGestureExclusionWidth))
+        .contentShape(Rectangle())
         .onTapGesture(perform: onExpand)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("browser.commentsSheet.collapsedHeader")

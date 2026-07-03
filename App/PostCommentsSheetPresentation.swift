@@ -13,7 +13,6 @@ enum PostCommentsSheetMetrics {
     static let collapsedBrowserControlsSpacing: CGFloat = 12
     static let collapsedBrowserControlsMargin: CGFloat = 24
     static let handleAreaHeight: CGFloat = 22
-    static let verticalDragBias: CGFloat = 1.2
 
     static var defaultCollapsedBrowserObscuredBottomInset: CGFloat {
         collapsedBrowserControlsHeight
@@ -31,8 +30,6 @@ enum PostCommentsSheetMetrics {
 struct PostCommentsSheetPresentation {
     var sheetState: SheetState
     var dragTranslation: CGFloat = 0
-    var isTrackingDrag = false
-    var dragStartAllowsSheetDrag = false
     var isHandleDragActive = false
     var suppressesCollapsedUpvote = false
 
@@ -45,11 +42,11 @@ struct PostCommentsSheetPresentation {
     }
 
     var isInteractiveMove: Bool {
-        isTrackingDrag || isHandleDragActive
+        isHandleDragActive
     }
 
     var showsCollapsedControls: Bool {
-        sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
+        sheetState == .collapsed && !isHandleDragActive
     }
 
     init(sheetState: SheetState) {
@@ -64,54 +61,10 @@ struct PostCommentsSheetPresentation {
         guard isExpanded else { return }
         sheetState = .collapsed
         dragTranslation = 0
-        isTrackingDrag = false
-        dragStartAllowsSheetDrag = false
         isHandleDragActive = false
     }
 
-    mutating func updateSheetDrag(
-        startX: CGFloat,
-        translation: CGSize,
-        systemBackGestureEdgeWidth: CGFloat,
-        isScrollAtTop: Bool
-    ) {
-        guard !isHandleDragActive else { return }
-        guard startX > systemBackGestureEdgeWidth else { return }
-        let verticalMovement = abs(translation.height)
-        let horizontalMovement = abs(translation.width)
-        let isMostlyVertical = verticalMovement > horizontalMovement * PostCommentsSheetMetrics.verticalDragBias
-
-        if !isTrackingDrag {
-            let startsSheetDrag = isCollapsed
-                || (isExpanded && isScrollAtTop && isMostlyVertical && translation.height > 0)
-            guard startsSheetDrag else { return }
-            dragStartAllowsSheetDrag = true
-            isTrackingDrag = true
-            suppressesCollapsedUpvote = true
-        }
-
-        guard dragStartAllowsSheetDrag else { return }
-        dragTranslation = isExpanded ? max(0, translation.height) : translation.height
-    }
-
-    mutating func canEndSheetDrag(
-        startX: CGFloat,
-        systemBackGestureEdgeWidth: CGFloat
-    ) -> Bool {
-        guard !isHandleDragActive else { return false }
-        guard startX > systemBackGestureEdgeWidth, dragStartAllowsSheetDrag else {
-            resetDragTracking()
-            return false
-        }
-        return true
-    }
-
-    mutating func updateHandleDrag(
-        startX: CGFloat,
-        translationHeight: CGFloat,
-        systemBackGestureEdgeWidth: CGFloat
-    ) {
-        guard startX > systemBackGestureEdgeWidth else { return }
+    mutating func updateHandleDrag(translationHeight: CGFloat) {
         if !isHandleDragActive {
             suppressesCollapsedUpvote = true
         }
@@ -119,46 +72,8 @@ struct PostCommentsSheetPresentation {
         dragTranslation = translationHeight
     }
 
-    mutating func canEndHandleDrag(
-        startX: CGFloat,
-        systemBackGestureEdgeWidth: CGFloat
-    ) -> Bool {
-        guard startX > systemBackGestureEdgeWidth else {
-            isHandleDragActive = false
-            resetDragTracking()
-            return false
-        }
-        return true
-    }
-
-    mutating func updateExpandedToolbarDrag(
-        startX: CGFloat,
-        translation: CGSize,
-        systemBackGestureEdgeWidth: CGFloat
-    ) {
-        guard isExpanded, !isHandleDragActive else { return }
-        guard startX > systemBackGestureEdgeWidth else { return }
-
-        let verticalMovement = abs(translation.height)
-        let horizontalMovement = abs(translation.width)
-        let isDownwardDrag = translation.height > 0
-        let isMostlyVertical = verticalMovement > horizontalMovement * PostCommentsSheetMetrics.verticalDragBias
-
-        guard isDownwardDrag, isMostlyVertical else { return }
-        if !isTrackingDrag {
-            isTrackingDrag = true
-            dragStartAllowsSheetDrag = true
-            suppressesCollapsedUpvote = true
-        }
-        dragTranslation = max(0, translation.height)
-    }
-
-    mutating func canEndExpandedToolbarDrag() -> Bool {
-        guard isTrackingDrag, dragStartAllowsSheetDrag else {
-            resetDragTracking()
-            return false
-        }
-        return true
+    mutating func canEndHandleDrag() -> Bool {
+        isHandleDragActive
     }
 
     mutating func settle(
@@ -171,18 +86,11 @@ struct PostCommentsSheetPresentation {
         let midpoint = (expandedTop + collapsedTop) / 2
         sheetState = predictedTop <= midpoint ? .expanded : .collapsed
         dragTranslation = 0
-        isTrackingDrag = false
-        dragStartAllowsSheetDrag = false
-    }
-
-    mutating func resetDragTracking() {
-        isTrackingDrag = false
-        dragStartAllowsSheetDrag = false
-        dragTranslation = 0
+        isHandleDragActive = false
     }
 
     mutating func finishUpvoteSuppressionIfIdle() {
-        guard !isTrackingDrag, !isHandleDragActive else { return }
+        guard !isHandleDragActive else { return }
         suppressesCollapsedUpvote = false
     }
 }

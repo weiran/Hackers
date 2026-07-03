@@ -197,7 +197,6 @@ struct PostCommentsSheet: View {
                 }
                 .allowsHitTesting(contentFadeProgress >= 0.5)
                 .accessibilityHidden(contentFadeProgress < 0.5)
-                .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
@@ -218,8 +217,6 @@ struct PostCommentsSheet: View {
             .opacity(1 - contentFadeProgress)
             .allowsHitTesting(contentFadeProgress < 0.5)
             .accessibilityHidden(contentFadeProgress >= 0.5)
-            .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-            .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
             sheetHandle(
                 expandedTop: expandedTop,
@@ -237,7 +234,7 @@ struct PostCommentsSheet: View {
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            scrollDisabled: !isExpanded || presentation.dragStartAllowsSheetDrag || presentation.isHandleDragActive,
+            scrollDisabled: !isExpanded || presentation.isHandleDragActive,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
@@ -259,8 +256,6 @@ struct PostCommentsSheet: View {
             VStack(spacing: 0) {
                 Color.clear
                     .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
-                    .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-                    .simultaneousGesture(expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 GlassEffectContainer(spacing: 10) {
                     HStack(alignment: .top, spacing: 10) {
@@ -277,9 +272,6 @@ struct PostCommentsSheet: View {
                             )
                             .frame(maxWidth: .infinity, alignment: .top)
                             .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
-                            .simultaneousGesture(
-                                expandedToolbarDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop)
-                            )
                         } else {
                             Spacer()
                         }
@@ -328,15 +320,21 @@ struct PostCommentsSheet: View {
         handleTopInset: CGFloat
     ) -> some View {
         ZStack(alignment: .bottom) {
-            Capsule()
-                .fill(.secondary.opacity(0.35))
-                .frame(width: Self.handleWidth, height: Self.handleThickness)
-                .padding(.bottom, (Self.handleAreaHeight - Self.handleThickness) / 2)
+            HStack {
+                Spacer()
+
+                Capsule()
+                    .fill(.secondary.opacity(0.35))
+                    .frame(width: Self.handleWidth, height: Self.handleThickness)
+                    .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
+                    .contentShape(Rectangle())
+                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+
+                Spacer()
+            }
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
-        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
@@ -364,7 +362,6 @@ struct PostCommentsSheet: View {
                 isLoading: viewModel.isLoading,
                 onUpvote: { handleCollapsedUpvote(for: post) },
                 onExpand: onExpand,
-                leadingGestureExclusionWidth: systemBackGestureEdgeWidth,
                 disablesUpvote: presentation.suppressesCollapsedUpvote,
                 matchedGeometryNamespace: postHeaderNamespace,
                 isMatchedGeometrySource: isCollapsed
@@ -469,61 +466,13 @@ private extension PostCommentsSheet {
         return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
     }
 
-    private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 6, coordinateSpace: .global)
-            .onChanged { value in
-                presentation.updateSheetDrag(
-                    startX: value.startLocation.x,
-                    translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
-                    isScrollAtTop: isScrollAtTop
-                )
-            }
-            .onEnded { value in
-                guard presentation.canEndSheetDrag(
-                    startX: value.startLocation.x,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                ) else {
-                    scheduleCollapsedUpvoteReenable()
-                    return
-                }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-            }
-    }
-
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
-                presentation.updateHandleDrag(
-                    startX: value.startLocation.x,
-                    translationHeight: value.translation.height,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
+                presentation.updateHandleDrag(translationHeight: value.translation.height)
             }
             .onEnded { value in
-                guard presentation.canEndHandleDrag(
-                    startX: value.startLocation.x,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                ) else {
-                    scheduleCollapsedUpvoteReenable()
-                    return
-                }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-                presentation.isHandleDragActive = false
-            }
-    }
-
-    private func expandedToolbarDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 18, coordinateSpace: .global)
-            .onChanged { value in
-                presentation.updateExpandedToolbarDrag(
-                    startX: value.startLocation.x,
-                    translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
-            }
-            .onEnded { value in
-                guard presentation.canEndExpandedToolbarDrag() else {
+                guard presentation.canEndHandleDrag() else {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
@@ -540,11 +489,6 @@ private extension PostCommentsSheet {
             )
         }
         scheduleCollapsedUpvoteReenable()
-    }
-
-    private var systemBackGestureEdgeWidth: CGFloat {
-        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
-        return leadingInset + 56
     }
 
     private func scheduleCollapsedUpvoteReenable() {
