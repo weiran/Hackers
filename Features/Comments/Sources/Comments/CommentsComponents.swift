@@ -24,7 +24,14 @@ private struct CommentRowFramePreferenceKey: PreferenceKey {
 private struct CommentScrollMetrics: Equatable {
     var contentOffset: CGPoint = .zero
     var contentInsets: EdgeInsets = EdgeInsets()
+    var contentSize: CGSize = .zero
     var visibleRect: CGRect = .zero
+}
+
+private enum CollapseScrollDecision {
+    case none
+    case scrollToY(CGFloat)
+    case deferUntilLayout
 }
 
 private enum CommentScrollIntent {
@@ -126,6 +133,7 @@ struct CommentsContentView: View {
                 CommentScrollMetrics(
                     contentOffset: geometry.contentOffset,
                     contentInsets: geometry.contentInsets,
+                    contentSize: geometry.contentSize,
                     visibleRect: geometry.visibleRect
                 )
             }, action: { _, newValue in
@@ -194,6 +202,81 @@ struct CommentsContentView: View {
 
     private func scrollPreservationIntent(for comment: Comment) -> CommentScrollIntent {
         .preserveCollapsedRoot(commentID: comment.id, afterRevision: viewModel.visibleRevision + 1)
+    }
+
+    private func collapseScrollDecision(for comment: Comment) -> CollapseScrollDecision {
+        guard let rootFrame = rowFrames[comment.id],
+              visibleContentRect.height > 0,
+              scrollMetrics.contentSize.height > 0
+        else {
+            return .deferUntilLayout
+        }
+
+        let currentVisibleRect = visibleContentRect
+        if rootFrame.minY < currentVisibleRect.minY || rootFrame.minY >= currentVisibleRect.maxY {
+            return .scrollToY(clampedScrollY(forRootTop: rootFrame.minY, maxOffsetY: maxContentOffsetY))
+        }
+
+        let removedHeight = estimatedCollapsedHeightDelta(for: comment, rootFrame: rootFrame)
+        let predictedMaxOffsetY = maxContentOffsetY(afterRemoving: removedHeight)
+        let predictedVisibleMinY = min(scrollMetrics.visibleRect.minY, predictedMaxOffsetY)
+        let predictedVisibleTop = predictedVisibleMinY + visibleContentTopInset
+        let predictedVisibleBottom = predictedVisibleMinY
+            + scrollMetrics.visibleRect.height
+            - scrollMetrics.contentInsets.bottom
+
+        if rootFrame.minY >= predictedVisibleTop, rootFrame.minY < predictedVisibleBottom {
+            return .none
+        }
+
+        return .scrollToY(clampedScrollY(forRootTop: rootFrame.minY, maxOffsetY: predictedMaxOffsetY))
+    }
+
+    private var maxContentOffsetY: CGFloat {
+        maxContentOffsetY(afterRemoving: 0)
+    }
+
+    private func maxContentOffsetY(afterRemoving removedHeight: CGFloat) -> CGFloat {
+        let contentHeight = max(scrollMetrics.contentSize.height - removedHeight, 0)
+        return max(contentHeight - scrollMetrics.visibleRect.height, 0)
+    }
+
+    private func clampedScrollY(forRootTop rootTop: CGFloat, maxOffsetY: CGFloat) -> CGFloat {
+        min(max(rootTop - visibleContentTopInset, 0), maxOffsetY)
+    }
+
+    private func estimatedCollapsedHeightDelta(for comment: Comment, rootFrame: CGRect) -> CGFloat {
+        let descendants = visibleDescendants(of: comment)
+        let measuredDescendantIDs = descendants.map(\.id).filter { rowFrames[$0] != nil }
+        let measuredDescendantHeight = measuredDescendantIDs.reduce(CGFloat.zero) { total, id in
+            total + max(rowFrames[id]?.height ?? 0, 0)
+        }
+        let missingDescendantCount = max(descendants.count - measuredDescendantIDs.count, 0)
+        let missingDescendantHeight = CGFloat(missingDescendantCount) * averageVisibleCommentRowHeight
+        let separatorHeight = CGFloat(descendants.count)
+        let rootHeightDelta = max(rootFrame.height - estimatedCompactCommentRowHeight, 0)
+
+        return rootHeightDelta + measuredDescendantHeight + missingDescendantHeight + separatorHeight
+    }
+
+    private func visibleDescendants(of comment: Comment) -> [Comment] {
+        guard let rootIndex = viewModel.visibleComments.firstIndex(where: { $0.id == comment.id }) else {
+            return []
+        }
+
+        return viewModel.visibleComments[viewModel.visibleComments.index(after: rootIndex)...]
+            .prefix { $0.level > comment.level }
+            .map { $0 }
+    }
+
+    private var averageVisibleCommentRowHeight: CGFloat {
+        let visibleCommentFrames = viewModel.visibleComments.compactMap { rowFrames[$0.id]?.height }
+        guard !visibleCommentFrames.isEmpty else { return estimatedCompactCommentRowHeight }
+        return visibleCommentFrames.reduce(0, +) / CGFloat(visibleCommentFrames.count)
+    }
+
+    private var estimatedCompactCommentRowHeight: CGFloat {
+        max(44, ceil(UIFont.preferredFont(forTextStyle: .subheadline).lineHeight * textScaling + 32))
     }
 
     private func resolvePendingScrollIntent(animated: Bool) {
@@ -290,12 +373,18 @@ struct CommentsContentView: View {
 
     private func toggleCommentVisibilityWithScrollPreservation(_ comment: Comment) {
         let shouldPreserveRoot = comment.visibility == .visible
-        if shouldPreserveRoot {
+        let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: comment) : .none
+        if case .deferUntilLayout = collapseScrollDecision {
             pendingScrollIntent = scrollPreservationIntent(for: comment)
+        } else {
+            pendingScrollIntent = nil
         }
 
         performListAnimation {
             toggleCommentVisibility(comment)
+            if case .scrollToY(let targetY) = collapseScrollDecision {
+                scrollPosition.scrollTo(y: targetY)
+            }
         }
     }
 
