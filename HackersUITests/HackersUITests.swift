@@ -58,6 +58,21 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["675"].firstMatch.exists)
     }
 
+    func testCustomBrowserExpandedCommentsChrome() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Reload"].exists)
+        XCTAssertFalse(app.buttons["Open in Safari"].exists)
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+    }
+
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
         launchApp(linkBrowserMode: "custom")
 

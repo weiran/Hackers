@@ -591,7 +591,7 @@ struct PostLinkBrowserView: View {
     let post: Post
     let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
-    @State private var commentsSheetDetent: PresentationDetent
+    @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
     @State private var browserScrollContentInset = PostCommentsSheet.defaultCollapsedBrowserScrollContentInset
     @StateObject private var browserController = BrowserController()
 
@@ -599,9 +599,6 @@ struct PostLinkBrowserView: View {
         self.post = post
         self.presentation = presentation
         _showingCommentsPane = State(initialValue: presentation == .expandedComments)
-        _commentsSheetDetent = State(initialValue: presentation == .expandedComments
-            ? PostCommentsSheet.expandedDetent
-            : PostCommentsSheet.collapsedDetent)
     }
 
     var body: some View {
@@ -611,6 +608,7 @@ struct PostLinkBrowserView: View {
                 onDismiss: { dismiss() },
                 showsCloseButton: false,
                 showsToolbar: false,
+                bottomWebViewInset: browserBottomInset,
                 bottomScrollContentInset: browserScrollContentInset,
                 controller: browserController
             )
@@ -619,15 +617,15 @@ struct PostLinkBrowserView: View {
                 PostCommentsSheet(
                     post: post,
                     controller: browserController,
-                    selectedDetent: $commentsSheetDetent,
+                    initialPresentation: presentation,
                     onDismiss: { dismiss() },
+                    onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
                     onBrowserScrollContentInsetChange: { browserScrollContentInset = $0 }
                 )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.move(edge: .bottom))
             }
         }
         .tint(.accentColor)
-        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("browser.view")
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
@@ -637,5 +635,9 @@ struct PostLinkBrowserView: View {
                 showingCommentsPane = true
             }
         }
+    }
+
+    private var browserBottomInset: CGFloat {
+        max(collapsedCommentsHeight - PostCommentsSheet.collapsedTopCornerRadius, 0)
     }
 }
