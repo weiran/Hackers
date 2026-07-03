@@ -27,7 +27,7 @@ private struct CommentScrollMetrics: Equatable {
 }
 
 private enum CommentScrollIntent {
-    case preserveCollapsedRoot(commentID: Int, anchor: UnitPoint)
+    case preserveCollapsedRoot(commentID: Int)
     case revealComment(commentID: Int)
 }
 
@@ -151,26 +151,23 @@ struct CommentsContentView: View {
     }
 
     private func scrollPreservationIntent(for comment: Comment) -> CommentScrollIntent {
-        let anchor: UnitPoint
-        if let frame = rowFrames[comment.id], scrollMetrics.visibleRect.height > 0 {
-            let viewportHeight = scrollMetrics.visibleRect.height
-            let minimumY = commentScrollTopInset / viewportHeight
-            let currentY = frame.minY / viewportHeight
-            anchor = UnitPoint(x: 0.5, y: min(max(currentY, minimumY), 1))
-        } else {
-            anchor = .commentTop
-        }
-
-        return .preserveCollapsedRoot(commentID: comment.id, anchor: anchor)
+        .preserveCollapsedRoot(commentID: comment.id)
     }
 
     private func resolvePendingScrollIntent() {
         guard let intent = pendingScrollIntent else { return }
 
         switch intent {
-        case .preserveCollapsedRoot(let commentID, let anchor):
-            if rowFrames[commentID] != nil {
-                scrollPosition.scrollTo(id: commentID, anchor: anchor)
+        case .preserveCollapsedRoot(let commentID):
+            guard viewModel.visibleComments.contains(where: { $0.id == commentID }) else {
+                pendingScrollIntent = nil
+                return
+            }
+
+            if let frame = rowFrames[commentID], isCollapsedRootVisible(frame) {
+                pendingScrollIntent = nil
+            } else {
+                scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
                 pendingScrollIntent = nil
             }
         case .revealComment(let commentID):
@@ -180,6 +177,12 @@ struct CommentsContentView: View {
                 pendingCommentID = nil
             }
         }
+    }
+
+    private func isCollapsedRootVisible(_ frame: CGRect) -> Bool {
+        let topBoundary = commentScrollTopInset
+        let bottomBoundary = max(scrollMetrics.visibleRect.height, topBoundary)
+        return frame.minY >= topBoundary && frame.minY < bottomBoundary
     }
 
     private func scrollToPendingComment() {
@@ -200,9 +203,6 @@ struct CommentsContentView: View {
 
         withAnimation(.easeInOut(duration: 0.3)) {
             toggleCommentVisibility(comment)
-            if shouldPreserveRoot {
-                resolvePendingScrollIntent()
-            }
         }
     }
 
@@ -215,7 +215,6 @@ struct CommentsContentView: View {
             if pendingScrollIntent == nil {
                 pendingScrollIntent = .revealComment(commentID: rootID)
             }
-            resolvePendingScrollIntent()
         }
     }
 
