@@ -13,17 +13,47 @@ import SwiftUI
 import UIKit
 import WebKit
 
-enum PageHeaderBlurTint: Equatable {
-    case light
-    case dark
+struct PageHeaderBlurTint: Equatable {
+    let red: Double
+    let green: Double
+    let blue: Double
+    let alpha: Double
 
     var color: Color {
-        switch self {
-        case .light:
-            .white
-        case .dark:
-            .black
+        Color(red: red, green: green, blue: blue, opacity: alpha)
+    }
+
+    init?(_ uiColor: UIColor?) {
+        guard let uiColor else { return nil }
+        let resolvedColor = uiColor.resolvedColor(with: UITraitCollection.current)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        if resolvedColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+            self.init(red: red, green: green, blue: blue, alpha: alpha)
+            return
         }
+
+        var white: CGFloat = 0
+        if resolvedColor.getWhite(&white, alpha: &alpha) {
+            self.init(red: white, green: white, blue: white, alpha: alpha)
+            return
+        }
+
+        return nil
+    }
+
+    private init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        self.red = Self.rounded(red)
+        self.green = Self.rounded(green)
+        self.blue = Self.rounded(blue)
+        self.alpha = Self.rounded(alpha)
+    }
+
+    private static func rounded(_ value: CGFloat) -> Double {
+        (Double(value) * 1000).rounded() / 1000
     }
 }
 
@@ -39,7 +69,6 @@ final class BrowserController: ObservableObject {
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
-    private var headerTintTask: Task<Void, Never>?
     private var pageHeaderBlurTintURL: URL?
 
     init() {
@@ -74,7 +103,6 @@ final class BrowserController: ObservableObject {
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
         isLoading = webView.isLoading
-        scheduleHeaderTintUpdate()
     }
 
     func reload() {
@@ -158,133 +186,24 @@ final class BrowserController: ObservableObject {
             },
             webView.observe(\.isLoading, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
+            },
+            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateHeaderTintFromPageBackground() }
             }
         ]
     }
 
-    private func scheduleHeaderTintUpdate() {
-        headerTintTask?.cancel()
-        headerTintTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(250))
-            guard !Task.isCancelled else { return }
-            await self?.updateHeaderTintFromPage()
-
-            try? await Task.sleep(for: .milliseconds(750))
-            guard !Task.isCancelled else { return }
-            await self?.updateHeaderTintFromPage()
+    func updateHeaderTintFromPageBackground() {
+        guard let updatedTint = PageHeaderBlurTint(webView.underPageBackgroundColor) else { return }
+        if pageHeaderBlurTint != updatedTint {
+            pageHeaderBlurTint = updatedTint
         }
-    }
-
-    private func updateHeaderTintFromPage() async {
-        do {
-            guard let result = try await webView.evaluateJavaScript(Self.headerTintDetectionScript) as? String else {
-                return
-            }
-
-            let updatedTint: PageHeaderBlurTint = result == "dark" ? .dark : .light
-            if pageHeaderBlurTint != updatedTint {
-                pageHeaderBlurTint = updatedTint
-            }
-            pageHeaderBlurTintURL = currentURL
-        } catch {
-            // Cross-origin and in-flight navigations can reject evaluation; keep the last usable tint.
-        }
+        pageHeaderBlurTintURL = currentURL
     }
 
     private static var safariApplicationNameForUserAgent: String {
         "Version/\(UIDevice.current.systemVersion) Mobile/15E148 Safari/604.1"
     }
-
-    private static let headerTintDetectionScript = """
-    function parseColor(value) {
-        if (!value || value === 'transparent') { return null; }
-        const match = value.match(/rgba?\\(([^)]+)\\)/);
-        if (!match) { return null; }
-
-        const parts = match[1]
-            .replace(/\\//g, ' ')
-            .split(/[ ,]+/)
-            .filter(Boolean);
-
-        if (parts.length < 3) { return null; }
-
-        function component(part) {
-            return part.endsWith('%') ? parseFloat(part) * 2.55 : parseFloat(part);
-        }
-
-        const r = component(parts[0]);
-        const g = component(parts[1]);
-        const b = component(parts[2]);
-        const a = parts.length >= 4 ? parseFloat(parts[3]) : 1;
-
-        if ([r, g, b, a].some((number) => Number.isNaN(number))) { return null; }
-        return { r, g, b, a };
-    }
-
-    function luminance(color) {
-        const channel = (value) => {
-            const normalized = Math.max(0, Math.min(255, value)) / 255;
-            return normalized <= 0.03928
-                ? normalized / 12.92
-                : Math.pow((normalized + 0.055) / 1.055, 2.4);
-        };
-
-        return 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
-    }
-
-    function firstUsefulBackground(element) {
-        var current = element;
-        while (current) {
-            const color = parseColor(getComputedStyle(current).backgroundColor);
-            if (color && color.a > 0.35) { return color; }
-            current = current.parentElement;
-        }
-        return null;
-    }
-
-    const width = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    const height = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-    const points = [
-        [width * 0.25, 1],
-        [width * 0.50, 1],
-        [width * 0.75, 1],
-        [width * 0.25, Math.min(32, height * 0.08)],
-        [width * 0.50, Math.min(32, height * 0.08)],
-        [width * 0.75, Math.min(32, height * 0.08)]
-    ];
-
-    const colors = points
-        .map(([x, y]) => document.elementFromPoint(x, y))
-        .map(firstUsefulBackground)
-        .filter(Boolean);
-
-    if (colors.length === 0 && document.body) {
-        const bodyColor = parseColor(getComputedStyle(document.body).backgroundColor);
-        if (bodyColor && bodyColor.a > 0.35) { colors.push(bodyColor); }
-    }
-
-    if (colors.length === 0) {
-        const rootColor = parseColor(getComputedStyle(document.documentElement).backgroundColor);
-        if (rootColor && rootColor.a > 0.35) { colors.push(rootColor); }
-    }
-
-    if (colors.length === 0) {
-        const themeColor = document.querySelector('meta[name="theme-color"]')?.content;
-        if (themeColor) {
-            const probe = document.createElement('span');
-            probe.style.color = themeColor;
-            document.documentElement.appendChild(probe);
-            const parsedThemeColor = parseColor(getComputedStyle(probe).color);
-            probe.remove();
-            if (parsedThemeColor) { colors.push(parsedThemeColor); }
-        }
-    }
-
-    if (colors.length === 0) { return 'light'; }
-
-    const averageLuminance = colors.reduce((sum, color) => sum + luminance(color), 0) / colors.length;
-    return averageLuminance < 0.45 ? 'dark' : 'light';
-    """
 }
 
 private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
@@ -303,7 +222,7 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateState()
+        updateState(refreshesHeaderTint: true)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -318,9 +237,12 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
         updateState()
     }
 
-    private func updateState() {
+    private func updateState(refreshesHeaderTint: Bool = false) {
         Task { @MainActor [weak controller] in
             controller?.updateState()
+            if refreshesHeaderTint {
+                controller?.updateHeaderTintFromPageBackground()
+            }
         }
     }
 }
@@ -416,16 +338,13 @@ struct EmbeddedWebView: View {
 
     private var headerBlur: some View {
         GeometryReader { proxy in
-            if let tint = controller.pageHeaderBlurTint {
-                ProgressiveHeaderBlurBackground(
-                    height: proxy.safeAreaInsets.top,
-                    fadeExtension: Self.statusBarBlurFadeExtension,
-                    tintMiddleLocation: 0.45,
-                    tint: tint.color
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .transition(.opacity)
-            }
+            ProgressiveHeaderBlurBackground(
+                height: proxy.safeAreaInsets.top,
+                fadeExtension: Self.statusBarBlurFadeExtension,
+                tintMiddleLocation: 0.45,
+                tint: controller.pageHeaderBlurTint?.color
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .animation(.easeInOut(duration: 0.2), value: controller.pageHeaderBlurTint)
         .allowsHitTesting(false)
