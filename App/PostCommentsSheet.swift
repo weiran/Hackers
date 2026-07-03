@@ -264,19 +264,6 @@ struct PostCommentsSheet: View {
 
                 GlassEffectContainer(spacing: 10) {
                     HStack(alignment: .top, spacing: 10) {
-                        Button {
-                            dismissBrowser()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.title3.weight(.medium))
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                        .accessibilityLabel("Back")
-                        .modifier(GlassCircleBackground())
-
                         if let post = viewModel.post {
                             CommentsHeaderTitleButton(
                                 post: post,
@@ -419,10 +406,6 @@ struct PostCommentsSheet: View {
         animateSheet {
             presentation.collapse()
         }
-    }
-
-    private func dismissBrowser() {
-        onDismiss()
     }
 }
 

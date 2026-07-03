@@ -11,7 +11,6 @@ import Foundation
 import Observation
 import Shared
 import SwiftUI
-import UIKit
 
 private struct CommentsListFramePreferenceKey: PreferenceKey {
     static let defaultValue: CGRect? = nil
@@ -27,17 +26,6 @@ private struct PendingCommentFramePreferenceKey: PreferenceKey {
     static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
         value = nextValue() ?? value
     }
-}
-
-private struct SystemBackGestureEdgeShield: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.isUserInteractionEnabled = true
-        return view
-    }
-
-    func updateUIView(_ view: UIView, context: Context) {}
 }
 
 struct CommentsContentView: View {
@@ -74,19 +62,6 @@ struct CommentsContentView: View {
         presentationState.commentScrollTopInset
     }
 
-    private var reservesSystemBackGestureEdge: Bool {
-        if case .customBrowser = presentationState {
-            true
-        } else {
-            false
-        }
-    }
-
-    private var systemBackGestureEdgeWidth: CGFloat {
-        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
-        return leadingInset + 56
-    }
-
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
@@ -121,14 +96,6 @@ struct CommentsContentView: View {
                             key: CommentsListFramePreferenceKey.self,
                             value: geometry.frame(in: .global)
                         )
-                    }
-                }
-                .overlay(alignment: .leading) {
-                    if reservesSystemBackGestureEdge {
-                        SystemBackGestureEdgeShield()
-                            .frame(width: systemBackGestureEdgeWidth)
-                            .ignoresSafeArea(.container, edges: .leading)
-                            .accessibilityHidden(true)
                     }
                 }
                 .transaction { transaction in
