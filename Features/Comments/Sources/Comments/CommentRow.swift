@@ -14,7 +14,6 @@ struct CommentRowState: Equatable, Identifiable {
     let id: Int
     let author: String
     let age: String
-    let visualLevel: Int
     let visibility: CommentVisibilityType
     let isPostAuthor: Bool
     let isUpvoted: Bool
@@ -68,8 +67,6 @@ struct CommentRow: View {
         }
         .contentShape(.interaction, Rectangle())
         .onTapGesture(perform: onToggle)
-        .listRowInsets([.top, .bottom, .trailing], 16)
-        .listRowInsets([.leading], CGFloat(16 + state.visualLevel * 14))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
@@ -85,6 +82,9 @@ struct CommentRow: View {
                 Button(action: onUnvote) {
                     Label("Unvote", systemImage: "arrow.uturn.down")
                 }
+            }
+            Button(action: onHide) {
+                Label("Hide Thread", systemImage: "minus.circle")
             }
             Divider()
             Button(action: onCopy) {

@@ -143,7 +143,7 @@ final class HackersScreenshotTests: XCTestCase {
     }
 
     private func scrollCommentsDownSlightly() {
-        let commentsList = app.collectionViews["comments.list"]
+        let commentsList = app.descendants(matching: .any)["comments.list"]
         guard commentsList.waitForExistence(timeout: 2) else {
             app.swipeUp()
             return

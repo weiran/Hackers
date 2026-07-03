@@ -12,19 +12,39 @@ import Observation
 import Shared
 import SwiftUI
 
-private struct CommentsListFramePreferenceKey: PreferenceKey {
-    static let defaultValue: CGRect? = nil
+private struct CommentRowFramePreferenceKey: PreferenceKey {
+    static let defaultValue: [Int: CGRect] = [:]
 
-    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
-        value = nextValue() ?? value
+    static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
     }
 }
 
-private struct PendingCommentFramePreferenceKey: PreferenceKey {
-    static let defaultValue: CGRect? = nil
+private struct CommentScrollMetrics: Equatable {
+    var contentOffset: CGPoint = .zero
+    var contentInsets: EdgeInsets = EdgeInsets()
+    var visibleRect: CGRect = .zero
+}
 
-    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
-        value = nextValue() ?? value
+private enum CommentScrollIntent {
+    case preserveCollapsedRoot(commentID: Int, anchor: UnitPoint)
+    case revealComment(commentID: Int)
+}
+
+private extension UnitPoint {
+    static let commentTop = UnitPoint(x: 0.5, y: 0)
+}
+
+private extension View {
+    func commentRowFrame(id: Int) -> some View {
+        background {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: CommentRowFramePreferenceKey.self,
+                    value: [id: geometry.frame(in: .scrollView)]
+                )
+            }
+        }
     }
 }
 
@@ -45,10 +65,10 @@ struct CommentsContentView: View {
     @Binding var pendingCommentID: Int?
     @Binding var listAnimationsEnabled: Bool
     @State private var lastIsAtTop = true
-    @State private var pendingAutoScrollCheckID: Int?
-    @State private var pendingAutoScrollFrame: CGRect?
-    @State private var listFrame: CGRect?
-    @State private var autoScrollSequence = 0
+    @State private var scrollPosition = ScrollPosition(idType: Int.self)
+    @State private var rowFrames: [Int: CGRect] = [:]
+    @State private var scrollMetrics = CommentScrollMetrics()
+    @State private var pendingScrollIntent: CommentScrollIntent?
 
     var body: some View {
         Group {
@@ -64,67 +84,216 @@ struct CommentsContentView: View {
 
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScrollViewReader { proxy in
-                List {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
                     postHeaderSection(for: post)
-                    commentsSection(for: post, proxy: proxy)
+                    commentsSection(for: post)
                 }
-                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
-                    geometry.contentOffset.y + geometry.contentInsets.top
-                }, action: { _, newValue in
-                    let shouldShowTitle = titleVisibility.isVisible ? newValue > 24 : newValue > 56
-                    if shouldShowTitle != titleVisibility.isVisible {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            titleVisibility.setVisible(shouldShowTitle)
-                            updateTitleVisibility?(shouldShowTitle)
-                        }
-                    }
-                    let isAtTop = lastIsAtTop ? newValue <= 8 : newValue <= 1
-                    if isAtTop != lastIsAtTop {
-                        lastIsAtTop = isAtTop
-                        updateIsAtTop?(isAtTop)
-                    }
-                })
-                .listStyle(.plain)
-                .accessibilityIdentifier("comments.list")
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    commentScrollTopSafeAreaInset
+                .scrollTargetLayout()
+            }
+            .scrollPosition($scrollPosition)
+            .onScrollGeometryChange(for: CommentScrollMetrics.self, of: { geometry in
+                CommentScrollMetrics(
+                    contentOffset: geometry.contentOffset,
+                    contentInsets: geometry.contentInsets,
+                    visibleRect: geometry.visibleRect
+                )
+            }, action: { _, newValue in
+                scrollMetrics = newValue
+                updateHeaderState(for: newValue)
+            })
+            .onScrollPhaseChange { _, newPhase in
+                if newPhase == .tracking || newPhase == .interacting {
+                    pendingScrollIntent = nil
                 }
-                .background {
-                    GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: CommentsListFramePreferenceKey.self,
-                            value: geometry.frame(in: .global)
-                        )
-                    }
-                }
-                .transaction { transaction in
-                    transaction.disablesAnimations = !listAnimationsEnabled
-                }
-                .onChange(of: pendingCommentID) { _, _ in
-                    scrollToPendingComment(with: proxy)
-                }
-                .onChange(of: viewModel.visibleRevision) { _, _ in
-                    scrollToPendingComment(with: proxy)
-                }
-                .onPreferenceChange(CommentsListFramePreferenceKey.self) { listFrame = $0 }
-                .onPreferenceChange(PendingCommentFramePreferenceKey.self) { pendingAutoScrollFrame = $0 }
-                .task(id: viewModel.visibleRevision) {
-                    CommentTextCache.prewarm(
-                        comments: viewModel.visibleComments.prefix(30),
-                        textScaling: textScaling
-                    )
-                }
+            }
+            .accessibilityIdentifier("comments.list")
+            .safeAreaInset(edge: .top, spacing: 0) {
+                commentScrollTopSafeAreaInset
+            }
+            .transaction { transaction in
+                transaction.disablesAnimations = !listAnimationsEnabled
+            }
+            .onChange(of: pendingCommentID) { _, _ in
+                scrollToPendingComment()
+            }
+            .onChange(of: viewModel.visibleRevision) { _, _ in
+                scrollToPendingComment()
+            }
+            .onPreferenceChange(CommentRowFramePreferenceKey.self) { newFrames in
+                rowFrames = newFrames
+                resolvePendingScrollIntent()
+            }
+            .task(id: viewModel.visibleRevision) {
+                CommentTextCache.prewarm(
+                    comments: viewModel.visibleComments.prefix(30),
+                    textScaling: textScaling
+                )
             }
         }
     }
 
+    private func updateHeaderState(for metrics: CommentScrollMetrics) {
+        let offsetY = metrics.contentOffset.y + metrics.contentInsets.top
+        let shouldShowTitle = titleVisibility.isVisible ? offsetY > 24 : offsetY > 56
+        if shouldShowTitle != titleVisibility.isVisible {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                titleVisibility.setVisible(shouldShowTitle)
+                updateTitleVisibility?(shouldShowTitle)
+            }
+        }
+
+        let isAtTop = lastIsAtTop ? offsetY <= 8 : offsetY <= 1
+        if isAtTop != lastIsAtTop {
+            lastIsAtTop = isAtTop
+            updateIsAtTop?(isAtTop)
+        }
+    }
+
+    private func scrollPreservationIntent(for comment: Comment) -> CommentScrollIntent {
+        let anchor: UnitPoint
+        if let frame = rowFrames[comment.id], scrollMetrics.visibleRect.height > 0 {
+            let viewportHeight = scrollMetrics.visibleRect.height
+            let minimumY = commentScrollTopInset / viewportHeight
+            let currentY = frame.minY / viewportHeight
+            anchor = UnitPoint(x: 0.5, y: min(max(currentY, minimumY), 1))
+        } else {
+            anchor = .commentTop
+        }
+
+        return .preserveCollapsedRoot(commentID: comment.id, anchor: anchor)
+    }
+
+    private func resolvePendingScrollIntent() {
+        guard let intent = pendingScrollIntent else { return }
+
+        switch intent {
+        case .preserveCollapsedRoot(let commentID, let anchor):
+            if rowFrames[commentID] != nil {
+                scrollPosition.scrollTo(id: commentID, anchor: anchor)
+                pendingScrollIntent = nil
+            }
+        case .revealComment(let commentID):
+            if viewModel.visibleComments.contains(where: { $0.id == commentID }) {
+                scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
+                pendingScrollIntent = nil
+                pendingCommentID = nil
+            }
+        }
+    }
+
+    private func scrollToPendingComment() {
+        guard let targetID = pendingCommentID else { return }
+        guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+
+        pendingScrollIntent = .revealComment(commentID: targetID)
+        withAnimation(.easeInOut(duration: 0.3)) {
+            resolvePendingScrollIntent()
+        }
+    }
+
+    private func toggleCommentVisibilityWithScrollPreservation(_ comment: Comment) {
+        let shouldPreserveRoot = comment.visibility == .visible
+        if shouldPreserveRoot {
+            pendingScrollIntent = scrollPreservationIntent(for: comment)
+        }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            toggleCommentVisibility(comment)
+            if shouldPreserveRoot {
+                resolvePendingScrollIntent()
+            }
+        }
+    }
+
+    private func hideCommentBranchWithScrollPreservation(_ comment: Comment) {
+        if let rootComment = visibleRootComment(of: comment) {
+            pendingScrollIntent = scrollPreservationIntent(for: rootComment)
+        }
+
+        hideCommentBranch(comment) { rootID in
+            if pendingScrollIntent == nil {
+                pendingScrollIntent = .revealComment(commentID: rootID)
+            }
+            resolvePendingScrollIntent()
+        }
+    }
+
+    private func visibleRootComment(of comment: Comment) -> Comment? {
+        guard let index = viewModel.comments.firstIndex(where: { $0.id == comment.id }) else {
+            return nil
+        }
+
+        for candidate in viewModel.comments[...index].reversed()
+            where candidate.level == 0 && candidate.visibility != .hidden {
+            return candidate
+        }
+
+        return nil
+    }
+
+    private func commentRow(for comment: Comment, in post: Post) -> some View {
+        CommentRow(
+            state: rowState(for: comment),
+            onToggle: { toggleCommentVisibilityWithScrollPreservation(comment) },
+            onHide: { hideCommentBranchWithScrollPreservation(comment) },
+            onUpvote: { Task { await votingViewModel.upvote(comment: comment, in: post) } },
+            onUnvote: { Task { await votingViewModel.unvote(comment: comment, in: post) } },
+            onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() },
+            onShare: { ContentSharePresenter.shared.shareComment(comment) }
+        )
+        .id(comment.id)
+        .commentRowFrame(id: comment.id)
+        .padding(.leading, CGFloat(16 + min(comment.level, 6) * 14))
+        .padding(.trailing, 16)
+        .padding(.vertical, 16)
+        .accessibilityIdentifier("comments.comment.\(comment.id)")
+    }
+
+    private func rowState(for comment: Comment) -> CommentRowState {
+        CommentRowState(
+            id: comment.id,
+            author: comment.by,
+            age: comment.age,
+            visibility: comment.visibility,
+            isPostAuthor: comment.by == viewModel.post?.by,
+            isUpvoted: comment.upvoted,
+            canVote: comment.voteLinks?.upvote != nil,
+            canUnvote: comment.voteLinks?.unvote != nil,
+            styledText: comment.visibility == .visible
+                ? CommentTextCache.styledText(for: comment, textScaling: textScaling)
+                : nil
+        )
+    }
+
     @ViewBuilder
-    private var commentScrollTopSafeAreaInset: some View {
-        if commentScrollTopInset > 0 {
-            Color.clear
-                .frame(height: commentScrollTopInset)
-                .allowsHitTesting(false)
+    private func commentSeparator(for comment: Comment) -> some View {
+        if comment.id != viewModel.visibleComments.last?.id {
+            Divider()
+                .padding(.leading, CGFloat(16 + min(comment.level, 6) * 14))
+        }
+    }
+
+    @ViewBuilder
+    private func commentsRows(for post: Post) -> some View {
+        ForEach(viewModel.visibleComments, id: \.id) { comment in
+            commentRow(for: comment, in: post)
+            commentSeparator(for: comment)
+        }
+    }
+
+    @ViewBuilder
+    private func commentsSection(for post: Post) -> some View {
+        if viewModel.isLoading {
+            LoadingView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+        } else if viewModel.comments.isEmpty {
+            EmptyCommentsView()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+        } else {
+            commentsRows(for: post)
         }
     }
 
@@ -145,235 +314,19 @@ struct CommentsContentView: View {
                 onBookmarkToggle: { await viewModel.toggleBookmark() }
             )
             .id("header")
-            .listRowSeparator(.hidden)
-            .if(shouldShowVoteActions(for: post)) { view in
-                view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    postHeaderSwipeActions(for: post)
-                }
-            }
-        }
-    }
-
-    private func shouldShowVoteActions(for post: Post) -> Bool {
-        (post.voteLinks?.upvote != nil && !post.upvoted)
-            || (post.voteLinks?.unvote != nil && post.upvoted)
-    }
-
-    @ViewBuilder
-    private func postHeaderSwipeActions(for post: Post) -> some View {
-        if post.upvoted && post.voteLinks?.unvote != nil {
-            Button {
-                guard !viewModel.isLoading else { return }
-                Task {
-                    var mutablePost = post
-                    await votingViewModel.unvote(post: &mutablePost)
-                    await MainActor.run {
-                        viewModel.post = mutablePost
-                    }
-                }
-            } label: {
-                Image(systemName: "arrow.uturn.down")
-            }
-            .tint(.orange)
-            .accessibilityLabel("Unvote")
-            .disabled(viewModel.isLoading)
-        } else {
-            Button {
-                guard !viewModel.isLoading else { return }
-                Task {
-                    var mutablePost = post
-                    await votingViewModel.upvote(post: &mutablePost)
-                    await MainActor.run {
-                        if mutablePost.upvoted {
-                            viewModel.post = mutablePost
-                        }
-                    }
-                }
-            } label: {
-                Image(systemName: "arrow.up")
-            }
-            .tint(AppColors.upvotedColor)
-            .accessibilityLabel("Upvote")
-            .disabled(viewModel.isLoading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            Divider()
         }
     }
 
     @ViewBuilder
-    private func commentsSection(for post: Post, proxy: ScrollViewProxy) -> some View {
-        if viewModel.isLoading {
-            LoadingView()
-                .plainListRow()
-        } else if viewModel.comments.isEmpty {
-            EmptyCommentsView()
-                .plainListRow()
-        } else {
-            CommentsForEach(
-                post: post,
-                toggleCommentVisibility: { comment in
-                    let shouldCheckAutoScroll = comment.visibility == .visible
-                    if shouldCheckAutoScroll {
-                        pendingAutoScrollCheckID = comment.id
-                    }
-                    toggleCommentVisibility(comment)
-                    if shouldCheckAutoScroll {
-                        scheduleAutoScrollCheck(for: comment.id, proxy: proxy)
-                    }
-                },
-                hideCommentBranch: { comment in
-                    hideCommentBranch(comment) { scrollToComment(withID: $0, proxy: proxy) }
-                },
-                viewModel: viewModel,
-                votingViewModel: votingViewModel,
-                pendingAutoScrollCheckID: pendingAutoScrollCheckID,
-            )
+    private var commentScrollTopSafeAreaInset: some View {
+        if commentScrollTopInset > 0 {
+            Color.clear
+                .frame(height: commentScrollTopInset)
+                .allowsHitTesting(false)
         }
-    }
-
-    private func scrollToPendingComment(with proxy: ScrollViewProxy) {
-        guard let targetID = pendingCommentID else { return }
-        guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
-
-        Task { @MainActor in
-            scrollToComment(withID: targetID, proxy: proxy, animation: .easeInOut)
-            pendingCommentID = nil
-        }
-    }
-
-    private func scrollToComment(
-        withID commentID: Int,
-        proxy: ScrollViewProxy,
-        animation: Animation? = nil
-    ) {
-        let updates = {
-            proxy.scrollTo(commentID, anchor: .top)
-        }
-
-        if let animation {
-            withAnimation(animation) {
-                updates()
-            }
-        } else {
-            updates()
-        }
-    }
-
-    private func scheduleAutoScrollCheck(for commentID: Int, proxy: ScrollViewProxy) {
-        autoScrollSequence += 1
-        let sequence = autoScrollSequence
-
-        Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 350_000_000)
-            guard autoScrollSequence == sequence,
-                  pendingAutoScrollCheckID == commentID
-            else { return }
-
-            if shouldScrollPendingCommentIntoView() {
-                scrollToComment(withID: commentID, proxy: proxy, animation: .easeInOut(duration: 0.3))
-            }
-
-            pendingAutoScrollCheckID = nil
-            pendingAutoScrollFrame = nil
-        }
-    }
-
-    private func shouldScrollPendingCommentIntoView() -> Bool {
-        guard let pendingAutoScrollFrame, let listFrame else { return true }
-        let visibleFrame = CGRect(
-            x: listFrame.minX,
-            y: listFrame.minY + commentScrollTopInset,
-            width: listFrame.width,
-            height: max(listFrame.height - commentScrollTopInset, 0)
-        )
-        return !visibleFrame.contains(pendingAutoScrollFrame)
-    }
-}
-
-struct CommentsForEach: View {
-    @Environment(\.textScaling) private var textScaling
-    let post: Post
-    let toggleCommentVisibility: (Comment) -> Void
-    let hideCommentBranch: (Comment) -> Void
-    @State var viewModel: CommentsViewModel
-    @State var votingViewModel: VotingViewModel
-    let pendingAutoScrollCheckID: Int?
-
-    var body: some View {
-        ForEach(viewModel.visibleComments, id: \.id) { comment in
-            CommentRow(
-                state: rowState(for: comment),
-                onToggle: { toggleCommentVisibility(comment) },
-                onHide: { hideCommentBranch(comment) },
-                onUpvote: { Task { await votingViewModel.upvote(comment: comment, in: post) } },
-                onUnvote: { Task { await votingViewModel.unvote(comment: comment, in: post) } },
-                onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() },
-                onShare: { ContentSharePresenter.shared.shareComment(comment) }
-            )
-            .id(comment.id)
-            .background {
-                if pendingAutoScrollCheckID == comment.id {
-                    GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: PendingCommentFramePreferenceKey.self,
-                            value: geometry.frame(in: .global)
-                        )
-                    }
-                }
-            }
-            .listRowSeparator(.visible)
-            .accessibilityIdentifier("comments.comment.\(comment.id)")
-            .if(shouldShowVoteActions(for: comment)) { view in
-                view.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    if comment.upvoted && comment.voteLinks?.unvote != nil {
-                        Button {
-                            Task {
-                                await votingViewModel.unvote(comment: comment, in: post)
-                            }
-                        } label: {
-                            Image(systemName: "arrow.uturn.down")
-                        }
-                        .tint(.orange)
-                        .accessibilityLabel("Unvote")
-                    } else {
-                        Button {
-                            Task {
-                                await votingViewModel.upvote(comment: comment, in: post)
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up")
-                        }
-                        .tint(AppColors.upvotedColor)
-                        .accessibilityLabel("Upvote")
-                    }
-                }
-            }
-            .swipeActions(edge: .trailing) {
-                Button { hideCommentBranch(comment) } label: {
-                    Image(systemName: "minus.circle")
-                }
-            }
-        }
-    }
-
-    private func rowState(for comment: Comment) -> CommentRowState {
-        CommentRowState(
-            id: comment.id,
-            author: comment.by,
-            age: comment.age,
-            visualLevel: min(comment.level, 6),
-            visibility: comment.visibility,
-            isPostAuthor: comment.by == post.by,
-            isUpvoted: comment.upvoted,
-            canVote: comment.voteLinks?.upvote != nil,
-            canUnvote: comment.voteLinks?.unvote != nil,
-            styledText: comment.visibility == .visible
-                ? CommentTextCache.styledText(for: comment, textScaling: textScaling)
-                : nil
-        )
-    }
-
-    private func shouldShowVoteActions(for comment: Comment) -> Bool {
-        (comment.voteLinks?.upvote != nil && !comment.upvoted)
-            || (comment.voteLinks?.unvote != nil && comment.upvoted)
     }
 }
 

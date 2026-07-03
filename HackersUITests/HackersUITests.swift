@@ -127,11 +127,11 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
-        XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
+        XCTAssertTrue(commentsList.waitForExistence(timeout: 5))
         edgeSwipeBack()
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.collectionViews["comments.list"].exists)
+        XCTAssertFalse(commentsList.exists)
     }
 
     func testOpenCommentsFromFeed() throws {
@@ -141,10 +141,34 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
-        XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
+        XCTAssertTrue(commentsList.waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
         XCTAssertTrue(app.staticTexts["manakov_dev"].exists)
         XCTAssertTrue(app.staticTexts["Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."].exists)
+    }
+
+    func testCollapsePreservesRootCommentContext() throws {
+        launchApp(linkBrowserMode: "inApp")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let list = commentsList
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+
+        let rootComment = app.buttons["comments.comment.48348985"]
+        scroll(list, untilVisible: rootComment)
+        XCTAssertTrue(rootComment.waitForExistence(timeout: 2))
+
+        rootComment.tap()
+        XCTAssertTrue(rootComment.waitForExistence(timeout: 2))
+        XCTAssertTrue(list.frame.intersects(rootComment.frame))
+
+        rootComment.press(forDuration: 1)
+        XCTAssertTrue(app.buttons["Hide Thread"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["Copy"].exists)
+        XCTAssertTrue(app.buttons["Share"].exists)
     }
 
     func testSearchUsesMockedAlgoliaResults() throws {
@@ -200,8 +224,18 @@ final class HackersUITests: XCTestCase {
         app.launch()
     }
 
+    private var commentsList: XCUIElement {
+        app.descendants(matching: .any)["comments.list"]
+    }
+
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {
+        for _ in 0 ..< maxSwipes where !element.exists || !container.frame.intersects(element.frame) {
+            container.swipeUp()
+        }
     }
 
     private func edgeSwipeBack() {
