@@ -25,7 +25,6 @@ struct CommentRowState: Equatable, Identifiable {
 struct CommentRow: View {
     let state: CommentRowState
     let onToggle: () -> Void
-    let onHide: () -> Void
     let onUpvote: () -> Void
     let onUnvote: () -> Void
     let onCopy: () -> Void
@@ -82,9 +81,6 @@ struct CommentRow: View {
                 Button(action: onUnvote) {
                     Label("Unvote", systemImage: "arrow.uturn.down")
                 }
-            }
-            Button(action: onHide) {
-                Label("Hide Thread", systemImage: "minus.circle")
             }
             Divider()
             Button(action: onCopy) {

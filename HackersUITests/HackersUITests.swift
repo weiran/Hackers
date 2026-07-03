@@ -166,7 +166,6 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(list.frame.intersects(rootComment.frame))
 
         rootComment.press(forDuration: 1)
-        XCTAssertTrue(app.buttons["Hide Thread"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["Copy"].exists)
         XCTAssertTrue(app.buttons["Share"].exists)
     }

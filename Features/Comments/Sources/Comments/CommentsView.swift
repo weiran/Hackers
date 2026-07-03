@@ -160,7 +160,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     showsPostHeader: showsPostHeader,
                     handleLinkTap: handleLinkTap,
                     toggleCommentVisibility: toggleCommentVisibility,
-                    hideCommentBranch: hideCommentBranch,
                     updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     updateTitleVisibility: { titleVisible?.wrappedValue = $0 },
                     presentationState: presentationState,
@@ -316,22 +315,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
 
         Task { @MainActor in listAnimationsEnabled = false }
-    }
-
-    private func hideCommentBranch(_ comment: Comment, scrollToComment: @escaping (Int) -> Void) {
-        listAnimationsEnabled = true
-        let collapsedRoot = withAnimation(.easeInOut(duration: 0.3)) {
-            viewModel.hideCommentBranch(comment)
-        }
-
-        Task { @MainActor in
-            if let root = collapsedRoot {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    scrollToComment(root.id)
-                }
-            }
-            listAnimationsEnabled = false
-        }
     }
 
 }

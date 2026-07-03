@@ -53,7 +53,6 @@ struct CommentsContentView: View {
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Comment) -> Void
-    let hideCommentBranch: (Comment, @escaping (Int) -> Void) -> Void
     let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
     let presentationState: CommentsPresentationState
@@ -206,36 +205,10 @@ struct CommentsContentView: View {
         }
     }
 
-    private func hideCommentBranchWithScrollPreservation(_ comment: Comment) {
-        if let rootComment = visibleRootComment(of: comment) {
-            pendingScrollIntent = scrollPreservationIntent(for: rootComment)
-        }
-
-        hideCommentBranch(comment) { rootID in
-            if pendingScrollIntent == nil {
-                pendingScrollIntent = .revealComment(commentID: rootID)
-            }
-        }
-    }
-
-    private func visibleRootComment(of comment: Comment) -> Comment? {
-        guard let index = viewModel.comments.firstIndex(where: { $0.id == comment.id }) else {
-            return nil
-        }
-
-        for candidate in viewModel.comments[...index].reversed()
-            where candidate.level == 0 && candidate.visibility != .hidden {
-            return candidate
-        }
-
-        return nil
-    }
-
     private func commentRow(for comment: Comment, in post: Post) -> some View {
         CommentRow(
             state: rowState(for: comment),
             onToggle: { toggleCommentVisibilityWithScrollPreservation(comment) },
-            onHide: { hideCommentBranchWithScrollPreservation(comment) },
             onUpvote: { Task { await votingViewModel.upvote(comment: comment, in: post) } },
             onUnvote: { Task { await votingViewModel.unvote(comment: comment, in: post) } },
             onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() },
