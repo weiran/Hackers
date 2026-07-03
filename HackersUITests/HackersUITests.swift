@@ -2,6 +2,7 @@ import XCTest
 
 final class HackersUITests: XCTestCase {
     private let screenshotPostID = 48_350_598
+    private let longCommentsPostID = 48_345_840
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -39,6 +40,22 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
+    }
+
+    func testCustomBrowserCommentsSheetCollapsedPreview() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+
+        let collapsedHeader = app.staticTexts["HACKTIVIS.ME"].firstMatch
+        XCTAssertTrue(collapsedHeader.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["366"].firstMatch.exists)
+        XCTAssertTrue(app.staticTexts["675"].firstMatch.exists)
     }
 
     func testOpenCommentsFromFeed() throws {

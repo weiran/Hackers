@@ -8,20 +8,18 @@ import UIKit
 // swiftlint:disable type_body_length
 
 struct PostCommentsSheet: View {
-    static let initialCollapsedHeight: CGFloat = 150
-    static let collapsedTopCornerRadius: CGFloat = 24
-    static let collapsedBrowserControlsHeight: CGFloat = 44
-    static let collapsedBrowserControlsSpacing: CGFloat = 12
-    static let collapsedBrowserControlsMargin: CGFloat = 24
+    static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
+    static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
+    static let collapsedBrowserControlsHeight: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsHeight
+    static let collapsedBrowserControlsSpacing: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsSpacing
+    static let collapsedBrowserControlsMargin: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsMargin
     static var defaultCollapsedBrowserScrollContentInset: CGFloat {
-        collapsedBrowserControlsHeight
-            + collapsedBrowserControlsSpacing
-            + collapsedBrowserControlsMargin
+        PostCommentsSheetMetrics.defaultCollapsedBrowserScrollContentInset
     }
 
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
-    private static let handleAreaHeight: CGFloat = 22
+    private static let handleAreaHeight: CGFloat = PostCommentsSheetMetrics.handleAreaHeight
     private static let handleToolbarSpacing: CGFloat = 8
     private static let expandedToolbarTitleHitHeight: CGFloat = 58
     private static let expandedContentSpacing: CGFloat = 8
@@ -34,16 +32,11 @@ struct PostCommentsSheet: View {
     @ObservedObject private var browserController: BrowserController
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
+    @State private var presentation: PostCommentsSheetPresentation
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
-    @State private var sheetState: SheetState = .collapsed
-    @State private var dragTranslation: CGFloat = 0
-    @State private var isTrackingDrag = false
-    @State private var dragStartAllowsSheetDrag = false
-    @State private var isHandleDragActive = false
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
-    @State private var suppressesCollapsedUpvote = false
     @Namespace private var postHeaderNamespace
 
     init(
@@ -69,7 +62,7 @@ struct PostCommentsSheet: View {
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
         _browserController = ObservedObject(wrappedValue: controller)
-        _sheetState = State(initialValue: initialSheetState)
+        _presentation = State(initialValue: PostCommentsSheetPresentation(sheetState: initialSheetState))
         self.onDismiss = onDismiss
         self.onCollapsedHeightChange = onCollapsedHeightChange
         self.onBrowserScrollContentInsetChange = onBrowserScrollContentInsetChange
@@ -80,59 +73,48 @@ struct PostCommentsSheet: View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let screenSize = resolvedScreenSize(for: proxy)
-            let expandedTop: CGFloat = 0
-            let collapsedTop = max(screenSize.height - (collapsedHeight + safeInsets.bottom), expandedTop)
-            let baseTop = isExpanded ? expandedTop : collapsedTop
-            let proposedTop = baseTop + dragTranslation
-            let clampedTop = min(max(proposedTop, expandedTop), collapsedTop)
-            let alignedTop = clampedTop
-            let controlsOffset = max(controlsHeight, Self.collapsedBrowserControlsHeight)
-                + Self.collapsedBrowserControlsSpacing
-            let controlsTop = alignedTop - controlsOffset
+            let layout = PostCommentsSheetLayout(
+                safeInsets: safeInsets,
+                screenSize: screenSize,
+                collapsedHeight: collapsedHeight,
+                controlsHeight: controlsHeight,
+                dragTranslation: presentation.dragTranslation,
+                isExpanded: presentation.isExpanded,
+                expandedTopOverlayHeight: expandedTopOverlayHeight(handleTopInset:)
+            )
             let showsExpandedPresentation = viewModel.post != nil
-            let showsCollapsedControls = sheetState == .collapsed && !isTrackingDrag && !isHandleDragActive
-            let expansionProgress: CGFloat = if collapsedTop > expandedTop {
-                1 - ((alignedTop - expandedTop) / (collapsedTop - expandedTop))
-            } else {
-                isExpanded ? 1 : 0
-            }
-            let handleTopInset = safeInsets.top * min(max(expansionProgress, 0), 1)
-            // Keep the comments list's inset stable while sheet chrome animates.
-            let expandedCommentsTopInset = expandedTopOverlayHeight(handleTopInset: safeInsets.top)
-            let contentFadeProgress = min(max(expansionProgress, 0), 1)
-            let isInteractiveMove = isTrackingDrag || isHandleDragActive
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
 
                 sheetContent(
-                    expandedTop: expandedTop,
-                    collapsedTop: collapsedTop,
-                    handleTopInset: handleTopInset,
-                    commentsTopContentInset: expandedCommentsTopInset,
-                    contentFadeProgress: contentFadeProgress,
-                    isInteractiveMove: isInteractiveMove,
+                    expandedTop: layout.expandedTop,
+                    collapsedTop: layout.collapsedTop,
+                    handleTopInset: layout.handleTopInset,
+                    commentsTopContentInset: layout.expandedCommentsTopInset,
+                    contentFadeProgress: layout.contentFadeProgress,
+                    isInteractiveMove: presentation.isInteractiveMove,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: screenSize.width, height: screenSize.height, alignment: .top)
                 .background(sheetBackground)
                 .clipShape(sheetShape)
                 .shadow(
-                    color: isInteractiveMove ? .clear : .black.opacity(0.12),
-                    radius: isInteractiveMove ? 0 : 10,
+                    color: presentation.isInteractiveMove ? .clear : .black.opacity(0.12),
+                    radius: presentation.isInteractiveMove ? 0 : 10,
                     x: 0,
-                    y: isInteractiveMove ? 0 : -5
+                    y: presentation.isInteractiveMove ? 0 : -5
                 )
-                .offset(y: alignedTop)
+                .offset(y: layout.alignedTop)
 
                 CollapsedBrowserControlsOverlay(
-                    isVisible: showsCollapsedControls,
+                    isVisible: presentation.showsCollapsedControls,
                     fallbackURL: fallbackURL,
                     onDismiss: onDismiss,
                     controller: browserController
                 )
                 .frame(width: screenSize.width, alignment: .center)
-                .offset(y: controlsTop)
+                .offset(y: layout.controlsTop)
                 .background(
                     GeometryReader { controlsProxy in
                         Color.clear.preference(
@@ -157,15 +139,16 @@ struct PostCommentsSheet: View {
             .onChange(of: isExpanded) { _, newValue in
                 updateExpandedPresentation(isExpanded: newValue)
             }
+            .accessibilityIdentifier("browser.commentsSheet")
         }
     }
 
     private var isExpanded: Bool {
-        sheetState == .expanded
+        presentation.isExpanded
     }
 
     private var isCollapsed: Bool {
-        !isExpanded
+        presentation.isCollapsed
     }
 
     private var handleAreaHeight: CGFloat {
@@ -213,6 +196,7 @@ struct PostCommentsSheet: View {
                     }
                 }
                 .allowsHitTesting(contentFadeProgress >= 0.5)
+                .accessibilityHidden(contentFadeProgress < 0.5)
                 .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
@@ -233,6 +217,7 @@ struct PostCommentsSheet: View {
             }
             .opacity(1 - contentFadeProgress)
             .allowsHitTesting(contentFadeProgress < 0.5)
+            .accessibilityHidden(contentFadeProgress >= 0.5)
             .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
             .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
@@ -252,7 +237,7 @@ struct PostCommentsSheet: View {
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            scrollDisabled: !isExpanded || dragStartAllowsSheetDrag || isHandleDragActive,
+            scrollDisabled: !isExpanded || presentation.dragStartAllowsSheetDrag || presentation.isHandleDragActive,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
@@ -332,6 +317,8 @@ struct PostCommentsSheet: View {
             }
         }
         .allowsHitTesting(isExpanded)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("browser.commentsSheet.expandedToolbar")
         .background(alignment: .top) {
             ProgressiveHeaderBlurBackground(
                 height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
@@ -363,12 +350,15 @@ struct PostCommentsSheet: View {
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
         .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
         .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Comments sheet handle")
+        .accessibilityIdentifier("browser.commentsSheet.handle")
     }
 
     private var collapsedHeader: some View {
         collapsedHeaderView(onExpand: {
             animateSheet {
-                sheetState = .expanded
+                presentation.expand()
             }
         })
         .background(
@@ -388,7 +378,7 @@ struct PostCommentsSheet: View {
                 onUpvote: { handleCollapsedUpvote(for: post) },
                 onExpand: onExpand,
                 leadingGestureExclusionWidth: systemBackGestureEdgeWidth,
-                disablesUpvote: suppressesCollapsedUpvote,
+                disablesUpvote: presentation.suppressesCollapsedUpvote,
                 matchedGeometryNamespace: postHeaderNamespace,
                 isMatchedGeometrySource: isCollapsed
             )
@@ -398,7 +388,7 @@ struct PostCommentsSheet: View {
     }
 
     private func handleCollapsedUpvote(for post: Post) {
-        guard !suppressesCollapsedUpvote else { return }
+        guard !presentation.suppressesCollapsedUpvote else { return }
         let state = votingViewModel.votingState(for: post)
         guard !state.isVoting else { return }
         let canUpvote = state.canVote && !state.isUpvoted
@@ -427,11 +417,7 @@ struct PostCommentsSheet: View {
     private func collapseSheet() {
         guard isExpanded else { return }
         animateSheet {
-            sheetState = .collapsed
-            dragTranslation = 0
-            isTrackingDrag = false
-            dragStartAllowsSheetDrag = false
-            isHandleDragActive = false
+            presentation.collapse()
         }
     }
 
@@ -458,10 +444,7 @@ private extension PostCommentsSheet {
     }
 
     private func updateBrowserScrollContentInset() {
-        let updated = max(controlsHeight, Self.collapsedBrowserControlsHeight)
-            + Self.collapsedBrowserControlsSpacing
-            + Self.collapsedBrowserControlsMargin
-        onBrowserScrollContentInsetChange(updated)
+        onBrowserScrollContentInsetChange(PostCommentsSheetMetrics.browserScrollContentInset(controlsHeight: controlsHeight))
     }
 
     private func updateExpandedPresentation(isExpanded: Bool) {
@@ -504,31 +487,19 @@ private extension PostCommentsSheet {
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 6, coordinateSpace: .global)
             .onChanged { value in
-                guard !isHandleDragActive else { return }
-                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
-                let verticalMovement = abs(value.translation.height)
-                let horizontalMovement = abs(value.translation.width)
-                let isMostlyVertical = verticalMovement > horizontalMovement * 1.2
-
-                if !isTrackingDrag {
-                    let startsSheetDrag = isCollapsed
-                        || (isExpanded && isScrollAtTop && isMostlyVertical && value.translation.height > 0)
-                    guard startsSheetDrag else { return }
-                    dragStartAllowsSheetDrag = true
-                    isTrackingDrag = true
-                    suppressesCollapsedUpvote = true
-                }
-                guard dragStartAllowsSheetDrag else { return }
-                dragTranslation = isExpanded ? max(0, value.translation.height) : value.translation.height
+                presentation.updateSheetDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
+                    isScrollAtTop: isScrollAtTop
+                )
             }
             .onEnded { value in
-                guard !isHandleDragActive else { return }
-                guard value.startLocation.x > systemBackGestureEdgeWidth else {
-                    resetDragTracking()
-                    return
-                }
-                guard dragStartAllowsSheetDrag else {
-                    resetDragTracking()
+                guard presentation.canEndSheetDrag(
+                    startX: value.startLocation.x,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                ) else {
+                    scheduleCollapsedUpvoteReenable()
                     return
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
@@ -538,46 +509,37 @@ private extension PostCommentsSheet {
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
-                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
-                if !isHandleDragActive {
-                    suppressesCollapsedUpvote = true
-                }
-                isHandleDragActive = true
-                dragTranslation = value.translation.height
+                presentation.updateHandleDrag(
+                    startX: value.startLocation.x,
+                    translationHeight: value.translation.height,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                )
             }
             .onEnded { value in
-                guard value.startLocation.x > systemBackGestureEdgeWidth else {
-                    isHandleDragActive = false
-                    resetDragTracking()
+                guard presentation.canEndHandleDrag(
+                    startX: value.startLocation.x,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                ) else {
+                    scheduleCollapsedUpvoteReenable()
                     return
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-                isHandleDragActive = false
+                presentation.isHandleDragActive = false
             }
     }
 
     private func expandedToolbarDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 18, coordinateSpace: .global)
             .onChanged { value in
-                guard isExpanded, !isHandleDragActive else { return }
-                guard value.startLocation.x > systemBackGestureEdgeWidth else { return }
-
-                let verticalMovement = abs(value.translation.height)
-                let horizontalMovement = abs(value.translation.width)
-                let isDownwardDrag = value.translation.height > 0
-                let isMostlyVertical = verticalMovement > horizontalMovement * 1.2
-
-                guard isDownwardDrag, isMostlyVertical else { return }
-                if !isTrackingDrag {
-                    isTrackingDrag = true
-                    dragStartAllowsSheetDrag = true
-                    suppressesCollapsedUpvote = true
-                }
-                dragTranslation = max(0, value.translation.height)
+                presentation.updateExpandedToolbarDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                )
             }
             .onEnded { value in
-                guard isTrackingDrag, dragStartAllowsSheetDrag else {
-                    resetDragTracking()
+                guard presentation.canEndExpandedToolbarDrag() else {
+                    scheduleCollapsedUpvoteReenable()
                     return
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
@@ -585,16 +547,13 @@ private extension PostCommentsSheet {
     }
 
     private func settleSheet(predictedTranslation: CGFloat, _ expandedTop: CGFloat, _ collapsedTop: CGFloat) {
-        let baseTop = isExpanded ? expandedTop : collapsedTop
-        let predictedTop = baseTop + predictedTranslation
-        let midpoint = (expandedTop + collapsedTop) / 2
-        let targetState: SheetState = predictedTop <= midpoint ? .expanded : .collapsed
         animateSheet {
-            dragTranslation = 0
-            sheetState = targetState
+            presentation.settle(
+                predictedTranslation: predictedTranslation,
+                expandedTop: expandedTop,
+                collapsedTop: collapsedTop
+            )
         }
-        isTrackingDrag = false
-        dragStartAllowsSheetDrag = false
         scheduleCollapsedUpvoteReenable()
     }
 
@@ -603,24 +562,11 @@ private extension PostCommentsSheet {
         return leadingInset + 56
     }
 
-    private func resetDragTracking() {
-        isTrackingDrag = false
-        dragStartAllowsSheetDrag = false
-        dragTranslation = 0
-        scheduleCollapsedUpvoteReenable()
-    }
-
     private func scheduleCollapsedUpvoteReenable() {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.sheetAnimationDuration) {
-            guard !isTrackingDrag, !isHandleDragActive else { return }
-            suppressesCollapsedUpvote = false
+            presentation.finishUpvoteSuppressionIfIdle()
         }
     }
-}
-
-enum SheetState {
-    case collapsed
-    case expanded
 }
 
 private struct StableCommentsHost: View, @preconcurrency Equatable {

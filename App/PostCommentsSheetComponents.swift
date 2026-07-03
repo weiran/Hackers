@@ -264,6 +264,8 @@ struct CollapsedPostHeaderView: View {
         .padding(.vertical, Self.collapsedVerticalPadding)
         .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: leadingGestureExclusionWidth))
         .onTapGesture(perform: onExpand)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("browser.commentsSheet.collapsedHeader")
     }
 
     private var domainText: String {
