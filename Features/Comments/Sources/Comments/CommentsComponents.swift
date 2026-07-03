@@ -11,6 +11,7 @@ import Foundation
 import Observation
 import Shared
 import SwiftUI
+import UIKit
 
 private struct CommentRowFramePreferenceKey: PreferenceKey {
     static let defaultValue: [Int: CGRect] = [:]
@@ -366,6 +367,7 @@ private struct NextCommentFloatingButton: View {
                         guard isEnabled else { return }
                         switch value {
                         case .first:
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                             onNextThread()
                         case .second:
                             onNextComment()
