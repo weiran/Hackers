@@ -81,6 +81,17 @@ struct CommentsContentView: View {
         presentationState.commentScrollTopInset
     }
 
+    private var topVisibleCommentID: Int? {
+        viewModel.visibleComments.first { comment in
+            guard let frame = rowFrames[comment.id] else { return false }
+            return frame.maxY > commentScrollTopInset
+        }?.id
+    }
+
+    private var hasNextCommentTarget: Bool {
+        viewModel.nextVisibleCommentID(after: topVisibleCommentID) != nil
+    }
+
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollView {
@@ -109,6 +120,17 @@ struct CommentsContentView: View {
             .accessibilityIdentifier("comments.list")
             .safeAreaInset(edge: .top, spacing: 0) {
                 commentScrollTopSafeAreaInset
+            }
+            .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
+                if !viewModel.visibleComments.isEmpty {
+                    NextCommentFloatingButton(
+                        isEnabled: hasNextCommentTarget,
+                        onNextComment: scrollToNextComment,
+                        onNextThread: scrollToNextThread
+                    )
+                    .padding(.trailing, 18)
+                    .padding(.bottom, 16)
+                }
             }
             .transaction { transaction in
                 transaction.disablesAnimations = !listAnimationsEnabled
@@ -188,6 +210,20 @@ struct CommentsContentView: View {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
+        scrollToComment(withID: targetID)
+    }
+
+    private func scrollToNextComment() {
+        guard let targetID = viewModel.nextVisibleCommentID(after: topVisibleCommentID) else { return }
+        scrollToComment(withID: targetID)
+    }
+
+    private func scrollToNextThread() {
+        guard let targetID = viewModel.nextVisibleThreadID(after: topVisibleCommentID) else { return }
+        scrollToComment(withID: targetID)
+    }
+
+    private func scrollToComment(withID targetID: Int) {
         pendingScrollIntent = .revealComment(commentID: targetID)
         withAnimation(.easeInOut(duration: 0.3)) {
             resolvePendingScrollIntent()
@@ -299,6 +335,55 @@ struct CommentsContentView: View {
                 .frame(height: commentScrollTopInset)
                 .allowsHitTesting(false)
         }
+    }
+}
+
+private struct NextCommentFloatingButton: View {
+    let isEnabled: Bool
+    let onNextComment: () -> Void
+    let onNextThread: () -> Void
+
+    var body: some View {
+        Image(systemName: "arrow.down")
+            .font(.system(size: 20, weight: .semibold))
+            .foregroundStyle(isEnabled ? Color.white : Color.secondary)
+            .frame(width: 48, height: 48)
+            .background {
+                Circle()
+                    .fill(isEnabled ? AppColors.appTintColor : Color(.secondarySystemFill))
+            }
+            .overlay {
+                Circle()
+                    .stroke(.white.opacity(isEnabled ? 0.28 : 0), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(isEnabled ? 0.22 : 0), radius: 14, y: 6)
+            .opacity(isEnabled ? 1 : 0.55)
+            .contentShape(Circle())
+            .gesture(
+                LongPressGesture(minimumDuration: 0.45)
+                    .exclusively(before: TapGesture())
+                    .onEnded { value in
+                        guard isEnabled else { return }
+                        switch value {
+                        case .first:
+                            onNextThread()
+                        case .second:
+                            onNextComment()
+                        }
+                    }
+            )
+            .accessibilityLabel("Next comment")
+            .accessibilityHint("Long press for next thread")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(.default) {
+                guard isEnabled else { return }
+                onNextComment()
+            }
+            .accessibilityAction(named: Text("Next thread")) {
+                guard isEnabled else { return }
+                onNextThread()
+            }
+            .accessibilityIdentifier("comments.nextCommentButton")
     }
 }
 

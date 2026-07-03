@@ -554,6 +554,38 @@ struct CommentsViewModelTests {
             #expect(loadedGrandchild.visibility == .visible)
             #expect(sut.visibleComments.contains(where: { $0.id == 3 }))
         }
+
+        @Test("Next visible comment advances through visible projection")
+        @MainActor
+        func nextVisibleCommentID() async {
+            let firstRoot = createTestComment(id: 1, level: 0)
+            let child = createTestComment(id: 2, level: 1)
+            let secondRoot = createTestComment(id: 3, level: 0)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [firstRoot, child, secondRoot])
+
+            await sut.loadComments()
+
+            #expect(sut.nextVisibleCommentID(after: nil) == 1)
+            #expect(sut.nextVisibleCommentID(after: 1) == 2)
+            #expect(sut.nextVisibleCommentID(after: 2) == 3)
+            #expect(sut.nextVisibleCommentID(after: 3) == nil)
+        }
+
+        @Test("Next visible thread skips descendants")
+        @MainActor
+        func nextVisibleThreadID() async {
+            let firstRoot = createTestComment(id: 1, level: 0)
+            let child = createTestComment(id: 2, level: 1)
+            let secondRoot = createTestComment(id: 3, level: 0)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [firstRoot, child, secondRoot])
+
+            await sut.loadComments()
+
+            #expect(sut.nextVisibleThreadID(after: nil) == 1)
+            #expect(sut.nextVisibleThreadID(after: 1) == 3)
+            #expect(sut.nextVisibleThreadID(after: 2) == 3)
+            #expect(sut.nextVisibleThreadID(after: 3) == nil)
+        }
     }
 
     // MARK: - Helper Methods

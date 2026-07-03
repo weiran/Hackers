@@ -270,6 +270,34 @@ public final class CommentsViewModel: @unchecked Sendable {
         toggleCommentVisibility(rootComment)
         return rootComment
     }
+
+    @MainActor
+    public func nextVisibleCommentID(after commentID: Int?) -> Int? {
+        guard !visibleComments.isEmpty else { return nil }
+        guard let commentID,
+              let index = visibleComments.firstIndex(where: { $0.id == commentID })
+        else {
+            return visibleComments.first?.id
+        }
+
+        let nextIndex = visibleComments.index(after: index)
+        guard nextIndex < visibleComments.endIndex else { return nil }
+        return visibleComments[nextIndex].id
+    }
+
+    @MainActor
+    public func nextVisibleThreadID(after commentID: Int?) -> Int? {
+        guard !visibleComments.isEmpty else { return nil }
+        guard let commentID,
+              let index = visibleComments.firstIndex(where: { $0.id == commentID })
+        else {
+            return visibleComments.first(where: { $0.level == 0 })?.id
+        }
+
+        let nextIndex = visibleComments.index(after: index)
+        guard nextIndex < visibleComments.endIndex else { return nil }
+        return visibleComments[nextIndex...].first(where: { $0.level == 0 })?.id
+    }
 }
 
 private extension CommentsViewModel {
