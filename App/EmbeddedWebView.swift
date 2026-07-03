@@ -36,68 +36,104 @@ final class BrowserController: ObservableObject {
     @Published var isLoading = false
     @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
     var fallbackURL: URL?
-    let page: WebPage
+    let webView: WKWebView
+    private var navigationDelegate: BrowserNavigationDelegate?
+    private var observations: [NSKeyValueObservation] = []
     private var headerTintTask: Task<Void, Never>?
     private var pageHeaderBlurTintURL: URL?
 
     init() {
-        var configuration = WebPage.Configuration()
-        // Some app-shell sites gate rendering on Safari UA tokens; keep WebPage identified as Mobile Safari.
+        let configuration = WKWebViewConfiguration()
+        // Some app-shell sites gate rendering on Safari UA tokens; keep the browser identified as Mobile Safari.
         configuration.applicationNameForUserAgent = Self.safariApplicationNameForUserAgent
-        page = WebPage(configuration: configuration)
+        webView = WKWebView(frame: .zero, configuration: configuration)
+
+        let navigationDelegate = BrowserNavigationDelegate(controller: self)
+        self.navigationDelegate = navigationDelegate
+        webView.navigationDelegate = navigationDelegate
+        installStateObservers()
+        updateState()
     }
 
     func load(_ target: URL) {
         fallbackURL = target
         guard currentURL != target else { return }
         currentURL = target
-        _ = page.load(target)
+        webView.load(URLRequest(url: target))
         updateState()
     }
 
     func updateState() {
-        let updatedURL = page.url ?? currentURL ?? fallbackURL
+        let updatedURL = webView.url ?? currentURL ?? fallbackURL
         if pageHeaderBlurTintURL != updatedURL {
             pageHeaderBlurTint = nil
             pageHeaderBlurTintURL = nil
         }
         currentURL = updatedURL
-        currentTitle = page.title
-        let list = page.backForwardList
-        canGoBack = !list.backList.isEmpty
-        canGoForward = !list.forwardList.isEmpty
-        isLoading = page.isLoading
+        currentTitle = webView.title
+        canGoBack = webView.canGoBack
+        canGoForward = webView.canGoForward
+        isLoading = webView.isLoading
         scheduleHeaderTintUpdate()
     }
 
     func reload() {
         resetHeaderBlurTint()
-        _ = page.reload()
+        webView.reload()
         updateState()
     }
 
     func stopLoading() {
-        page.stopLoading()
+        webView.stopLoading()
         updateState()
     }
 
     func goBack() {
-        guard let item = page.backForwardList.backList.last else { return }
+        guard webView.canGoBack else { return }
         resetHeaderBlurTint()
-        _ = page.load(item)
+        webView.goBack()
         updateState()
     }
 
     func goForward() {
-        guard let item = page.backForwardList.forwardList.first else { return }
+        guard webView.canGoForward else { return }
         resetHeaderBlurTint()
-        _ = page.load(item)
+        webView.goForward()
         updateState()
+    }
+
+    func applyObscuredBottomInset(_ bottomInset: CGFloat) {
+        let inset = max(bottomInset, 0)
+        guard abs(webView.obscuredContentInsets.bottom - inset) > 0.5 else { return }
+
+        var obscuredContentInsets = webView.obscuredContentInsets
+        obscuredContentInsets.bottom = inset
+        webView.obscuredContentInsets = obscuredContentInsets
     }
 
     private func resetHeaderBlurTint() {
         pageHeaderBlurTint = nil
         pageHeaderBlurTintURL = nil
+    }
+
+    private func installStateObservers() {
+        observations = [
+            webView.observe(\.url, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateState() }
+            },
+            webView.observe(\.title, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateState() }
+            },
+            webView.observe(\.canGoBack, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateState() }
+            },
+            webView.observe(\.canGoForward, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateState() }
+            },
+            webView.observe(\.isLoading, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.updateState() }
+            }
+        ]
     }
 
     private func scheduleHeaderTintUpdate() {
@@ -115,7 +151,7 @@ final class BrowserController: ObservableObject {
 
     private func updateHeaderTintFromPage() async {
         do {
-            guard let result = try await page.callJavaScript(Self.headerTintDetectionScript) as? String else {
+            guard let result = try await webView.evaluateJavaScript(Self.headerTintDetectionScript) as? String else {
                 return
             }
 
@@ -225,6 +261,44 @@ final class BrowserController: ObservableObject {
     """
 }
 
+private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
+    weak var controller: BrowserController?
+
+    init(controller: BrowserController) {
+        self.controller = controller
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        updateState()
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        updateState()
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        updateState()
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        updateState()
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        didFailProvisionalNavigation navigation: WKNavigation!,
+        withError error: Error
+    ) {
+        updateState()
+    }
+
+    private func updateState() {
+        Task { @MainActor [weak controller] in
+            controller?.updateState()
+        }
+    }
+}
+
 enum WebViewAnimations {
     static let standard = Animation.easeInOut(duration: 0.25)
     static let fast = Animation.easeInOut(duration: 0.2)
@@ -241,7 +315,7 @@ struct EmbeddedWebView: View {
     let showsCloseButton: Bool
     let showsToolbar: Bool
     let bottomWebViewInset: CGFloat
-    let bottomScrollContentInset: CGFloat
+    let obscuredBottomInset: CGFloat
     @StateObject private var controller: BrowserController
 
     init(
@@ -250,7 +324,7 @@ struct EmbeddedWebView: View {
         showsCloseButton: Bool,
         showsToolbar: Bool = true,
         bottomWebViewInset: CGFloat = 0,
-        bottomScrollContentInset: CGFloat = 0,
+        obscuredBottomInset: CGFloat = 0,
         controller: BrowserController? = nil
     ) {
         self.url = url
@@ -258,7 +332,7 @@ struct EmbeddedWebView: View {
         self.showsCloseButton = showsCloseButton
         self.showsToolbar = showsToolbar
         self.bottomWebViewInset = bottomWebViewInset
-        self.bottomScrollContentInset = bottomScrollContentInset
+        self.obscuredBottomInset = obscuredBottomInset
         _controller = StateObject(wrappedValue: controller ?? BrowserController())
     }
 
@@ -346,10 +420,11 @@ struct EmbeddedWebView: View {
     }
 
     private var webView: some View {
-        WebView(controller.page)
-            .background(WebViewScrollInsetApplicator(bottomInset: bottomScrollContentInset))
-            .task(id: url) { await load(url) }
-            .task { await monitorNavigations() }
+        BrowserWebView(
+            controller: controller,
+            url: url,
+            obscuredBottomInset: obscuredBottomInset
+        )
     }
 
     private var isPadLayout: Bool {
@@ -411,158 +486,33 @@ struct EmbeddedWebView: View {
         .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
-    @MainActor
-    private func load(_ target: URL) async {
-        controller.load(target)
-    }
-
-    @MainActor
-    private func monitorNavigations() async {
-        controller.updateState()
-        do {
-            for try await _ in controller.page.navigations {
-                controller.updateState()
-            }
-        } catch {
-            // Ignore navigation stream errors; state updates happen on successful events.
-        }
-    }
 }
 
-private struct WebViewScrollInsetApplicator: UIViewRepresentable {
-    let bottomInset: CGFloat
+private struct BrowserWebView: UIViewRepresentable {
+    let controller: BrowserController
+    let url: URL
+    let obscuredBottomInset: CGFloat
 
-    func makeUIView(context: Context) -> WebViewScrollInsetView {
-        let view = WebViewScrollInsetView()
-        view.bottomInset = bottomInset
-        return view
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
     }
 
-    func updateUIView(_ uiView: WebViewScrollInsetView, context: Context) {
-        uiView.bottomInset = bottomInset
-    }
-}
-
-private final class WebViewScrollInsetView: UIView {
-    var bottomInset: CGFloat = 0 {
-        didSet {
-            guard abs(bottomInset - oldValue) > 0.5 else { return }
-            applyInsetsWhenReady()
-        }
+    func makeUIView(context: Context) -> WKWebView {
+        context.coordinator.requestedURL = url
+        controller.applyObscuredBottomInset(obscuredBottomInset)
+        controller.load(url)
+        return controller.webView
     }
 
-    private weak var webView: WKWebView?
-    private var isApplyScheduled = false
-    private var applyAttempts = 0
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        isUserInteractionEnabled = false
-        backgroundColor = .clear
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        controller.applyObscuredBottomInset(obscuredBottomInset)
+        guard context.coordinator.requestedURL != url else { return }
+        context.coordinator.requestedURL = url
+        controller.load(url)
     }
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        nil
-    }
-
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        applyInsetsWhenReady()
-    }
-
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-        applyInsetsWhenReady()
-    }
-
-    private func applyInsetsWhenReady() {
-        guard !isApplyScheduled else { return }
-        isApplyScheduled = true
-        DispatchQueue.main.async { [weak self] in
-            self?.isApplyScheduled = false
-            self?.applyInsets()
-        }
-    }
-
-    private func applyInsets() {
-        guard let webView = resolvedWebView() else {
-            retryApplyInsets()
-            return
-        }
-
-        applyAttempts = 0
-        let scrollView = webView.scrollView
-        let automaticBottomInset = max(
-            scrollView.adjustedContentInset.bottom - scrollView.contentInset.bottom,
-            0
-        )
-        let inset = max(bottomInset - automaticBottomInset, 0)
-
-        if abs(scrollView.contentInset.bottom - inset) > 0.5 {
-            var contentInset = scrollView.contentInset
-            contentInset.bottom = inset
-            scrollView.contentInset = contentInset
-        }
-
-        if abs(scrollView.verticalScrollIndicatorInsets.bottom - inset) > 0.5 {
-            var indicatorInsets = scrollView.verticalScrollIndicatorInsets
-            indicatorInsets.bottom = inset
-            scrollView.verticalScrollIndicatorInsets = indicatorInsets
-        }
-    }
-
-    private func retryApplyInsets() {
-        guard window != nil, applyAttempts < 8 else { return }
-        applyAttempts += 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-            self?.applyInsetsWhenReady()
-        }
-    }
-
-    private func resolvedWebView() -> WKWebView? {
-        if let webView, webView.window != nil, isInCurrentHierarchy(webView) {
-            return webView
-        }
-
-        var candidateSuperview = superview
-        while let candidate = candidateSuperview, !(candidate is UIWindow) {
-            if let resolved = candidate.firstDescendant(ofType: WKWebView.self, excluding: self) {
-                webView = resolved
-                return resolved
-            }
-            candidateSuperview = candidate.superview
-        }
-
-        return nil
-    }
-
-    private func isInCurrentHierarchy(_ view: UIView) -> Bool {
-        var candidateSuperview = superview
-        while let candidate = candidateSuperview, !(candidate is UIWindow) {
-            if view.isDescendant(of: candidate) {
-                return true
-            }
-            candidateSuperview = candidate.superview
-        }
-
-        return false
-    }
-}
-
-private extension UIView {
-    func firstDescendant<T: UIView>(ofType type: T.Type, excluding excludedView: UIView) -> T? {
-        for subview in subviews where subview !== excludedView {
-            if let typedSubview = subview as? T {
-                return typedSubview
-            }
-
-            if let descendant = subview.firstDescendant(ofType: type, excluding: excludedView) {
-                return descendant
-            }
-        }
-
-        return nil
+    final class Coordinator {
+        var requestedURL: URL?
     }
 }
 
@@ -592,7 +542,7 @@ struct PostLinkBrowserView: View {
     let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
     @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
-    @State private var browserScrollContentInset = PostCommentsSheet.defaultCollapsedBrowserScrollContentInset
+    @State private var browserObscuredBottomInset = PostCommentsSheet.defaultCollapsedBrowserObscuredBottomInset
     @StateObject private var browserController = BrowserController()
 
     init(post: Post, presentation: PostLinkPresentation) {
@@ -609,7 +559,7 @@ struct PostLinkBrowserView: View {
                 showsCloseButton: false,
                 showsToolbar: false,
                 bottomWebViewInset: browserBottomInset,
-                bottomScrollContentInset: browserScrollContentInset,
+                obscuredBottomInset: browserObscuredBottomInset,
                 controller: browserController
             )
 
@@ -620,7 +570,7 @@ struct PostLinkBrowserView: View {
                     initialPresentation: presentation,
                     onDismiss: { dismiss() },
                     onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
-                    onBrowserScrollContentInsetChange: { browserScrollContentInset = $0 }
+                    onBrowserObscuredBottomInsetChange: { browserObscuredBottomInset = $0 }
                 )
                 .transition(.move(edge: .bottom))
             }

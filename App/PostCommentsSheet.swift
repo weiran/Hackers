@@ -13,8 +13,8 @@ struct PostCommentsSheet: View {
     static let collapsedBrowserControlsHeight: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsHeight
     static let collapsedBrowserControlsSpacing: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsSpacing
     static let collapsedBrowserControlsMargin: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsMargin
-    static var defaultCollapsedBrowserScrollContentInset: CGFloat {
-        PostCommentsSheetMetrics.defaultCollapsedBrowserScrollContentInset
+    static var defaultCollapsedBrowserObscuredBottomInset: CGFloat {
+        PostCommentsSheetMetrics.defaultCollapsedBrowserObscuredBottomInset
     }
 
     private static let handleWidth: CGFloat = 36
@@ -27,7 +27,7 @@ struct PostCommentsSheet: View {
 
     let onDismiss: @MainActor () -> Void
     let onCollapsedHeightChange: @MainActor (CGFloat) -> Void
-    let onBrowserScrollContentInsetChange: @MainActor (CGFloat) -> Void
+    let onBrowserObscuredBottomInsetChange: @MainActor (CGFloat) -> Void
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
     @State private var viewModel: CommentsViewModel
@@ -45,7 +45,7 @@ struct PostCommentsSheet: View {
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
         onDismiss: @MainActor @escaping () -> Void,
         onCollapsedHeightChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
-        onBrowserScrollContentInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in }
+        onBrowserObscuredBottomInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in }
     ) {
         let initialSheetState: SheetState = switch initialPresentation {
         case .collapsedBrowser:
@@ -65,7 +65,7 @@ struct PostCommentsSheet: View {
         _presentation = State(initialValue: PostCommentsSheetPresentation(sheetState: initialSheetState))
         self.onDismiss = onDismiss
         self.onCollapsedHeightChange = onCollapsedHeightChange
-        self.onBrowserScrollContentInsetChange = onBrowserScrollContentInsetChange
+        self.onBrowserObscuredBottomInsetChange = onBrowserObscuredBottomInsetChange
         fallbackURL = post.url
     }
 
@@ -129,12 +129,12 @@ struct PostCommentsSheet: View {
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
                 onCollapsedHeightChange(collapsedHeight)
-                updateBrowserScrollContentInset()
+                updateBrowserObscuredBottomInset()
             }
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
             .onChange(of: controlsHeight) { _, _ in
-                updateBrowserScrollContentInset()
+                updateBrowserObscuredBottomInset()
             }
             .onChange(of: isExpanded) { _, newValue in
                 updateExpandedPresentation(isExpanded: newValue)
@@ -443,8 +443,10 @@ private extension PostCommentsSheet {
         controlsHeight = updated
     }
 
-    private func updateBrowserScrollContentInset() {
-        onBrowserScrollContentInsetChange(PostCommentsSheetMetrics.browserScrollContentInset(controlsHeight: controlsHeight))
+    private func updateBrowserObscuredBottomInset() {
+        onBrowserObscuredBottomInsetChange(
+            PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
+        )
     }
 
     private func updateExpandedPresentation(isExpanded: Bool) {
