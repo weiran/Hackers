@@ -58,6 +58,50 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["675"].firstMatch.exists)
     }
 
+    func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(screenshotPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
+        edgeSwipeBack()
+
+        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.otherElements["browser.view"].exists)
+    }
+
+    func testSystemBackSwipeFromCustomBrowserExpandedComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+
+        edgeSwipeBack()
+
+        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.otherElements["browser.view"].exists)
+    }
+
+    func testSystemBackSwipeFromComments() throws {
+        launchApp(linkBrowserMode: "inApp")
+
+        let post = app.buttons["feed.post.\(screenshotPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.collectionViews["comments.list"].waitForExistence(timeout: 5))
+        edgeSwipeBack()
+
+        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.collectionViews["comments.list"].exists)
+    }
+
     func testOpenCommentsFromFeed() throws {
         launchApp(linkBrowserMode: "inApp")
 
@@ -126,6 +170,12 @@ final class HackersUITests: XCTestCase {
 
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func edgeSwipeBack() {
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: 0.5))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: end)
     }
 
 }

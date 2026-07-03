@@ -3,21 +3,6 @@ import Domain
 import Shared
 import SwiftUI
 
-struct LeadingEdgeExcludedRectangle: Shape {
-    let excludedWidth: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let clampedWidth = min(max(excludedWidth, 0), rect.width)
-        let hitRect = CGRect(
-            x: rect.minX + clampedWidth,
-            y: rect.minY,
-            width: rect.width - clampedWidth,
-            height: rect.height
-        )
-        return Path(hitRect)
-    }
-}
-
 struct BrowserControlsView: View {
     let fallbackURL: URL
     let onDismiss: @MainActor () -> Void
@@ -213,8 +198,6 @@ struct CollapsedPostHeaderView: View {
     let isLoading: Bool
     let onUpvote: () -> Void
     let onExpand: () -> Void
-    let leadingGestureExclusionWidth: CGFloat
-    let disablesUpvote: Bool
     let matchedGeometryNamespace: Namespace.ID?
     let isMatchedGeometrySource: Bool
     private static let collapsedVerticalPadding: CGFloat = 2
@@ -251,7 +234,7 @@ struct CollapsedPostHeaderView: View {
                         namespace: matchedGeometryNamespace,
                         isSource: isMatchedGeometrySource
                     )
-                commentsPill
+                expandCommentsButton
                     .postHeaderMatchedGeometry(
                         PostHeaderMatchedGeometryElement.comments(postID: post.id),
                         namespace: matchedGeometryNamespace,
@@ -262,7 +245,7 @@ struct CollapsedPostHeaderView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, Self.collapsedHorizontalPadding)
         .padding(.vertical, Self.collapsedVerticalPadding)
-        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: leadingGestureExclusionWidth))
+        .contentShape(Rectangle())
         .onTapGesture(perform: onExpand)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("browser.commentsSheet.collapsedHeader")
@@ -274,19 +257,24 @@ struct CollapsedPostHeaderView: View {
         return trimmed.uppercased()
     }
 
-    private var commentsPill: some View {
+    private var expandCommentsButton: some View {
         let style = AppColors.PillStyle.comments
         let textColor = AppColors.pillForeground(for: style, colorScheme: colorScheme)
         let backgroundColor = AppColors.pillBackground(for: style, colorScheme: colorScheme)
 
-        return PostPillView(
-            iconName: "message",
-            text: "\(post.commentsCount)",
-            textColor: textColor,
-            backgroundColor: backgroundColor,
-            numericValue: post.commentsCount
-        )
-        .accessibilityLabel("\(post.commentsCount) comments")
+        return Button(action: onExpand) {
+            PostPillView(
+                iconName: "message",
+                text: "\(post.commentsCount)",
+                textColor: textColor,
+                backgroundColor: backgroundColor,
+                numericValue: post.commentsCount
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Show comments")
+        .accessibilityValue("\(post.commentsCount)")
+        .accessibilityIdentifier("browser.commentsSheet.expand")
     }
 
     private var upvoteButton: some View {
@@ -312,7 +300,7 @@ struct CollapsedPostHeaderView: View {
             )
         }
         .buttonStyle(.plain)
-        .disabled(!canInteract || disablesUpvote)
+        .disabled(!canInteract)
         .opacity(canInteract ? 1 : 0.55)
         .accessibilityLabel(isUpvoted ? "Upvoted" : "Upvote")
     }

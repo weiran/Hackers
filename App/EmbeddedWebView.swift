@@ -591,7 +591,7 @@ struct PostLinkBrowserView: View {
     let post: Post
     let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
-    @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
+    @State private var commentsSheetDetent: PresentationDetent
     @State private var browserScrollContentInset = PostCommentsSheet.defaultCollapsedBrowserScrollContentInset
     @StateObject private var browserController = BrowserController()
 
@@ -599,6 +599,9 @@ struct PostLinkBrowserView: View {
         self.post = post
         self.presentation = presentation
         _showingCommentsPane = State(initialValue: presentation == .expandedComments)
+        _commentsSheetDetent = State(initialValue: presentation == .expandedComments
+            ? PostCommentsSheet.expandedDetent
+            : PostCommentsSheet.collapsedDetent)
     }
 
     var body: some View {
@@ -608,7 +611,6 @@ struct PostLinkBrowserView: View {
                 onDismiss: { dismiss() },
                 showsCloseButton: false,
                 showsToolbar: false,
-                bottomWebViewInset: browserBottomInset,
                 bottomScrollContentInset: browserScrollContentInset,
                 controller: browserController
             )
@@ -617,232 +619,23 @@ struct PostLinkBrowserView: View {
                 PostCommentsSheet(
                     post: post,
                     controller: browserController,
-                    initialPresentation: presentation,
+                    selectedDetent: $commentsSheetDetent,
                     onDismiss: { dismiss() },
-                    onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
                     onBrowserScrollContentInsetChange: { browserScrollContentInset = $0 }
                 )
-                .transition(.move(edge: .bottom))
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .tint(.accentColor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("browser.view")
-        .navigationBarBackButtonHidden(true)
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
-        .nativeInteractivePopGesture(edgeOnly: true)
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.panel) {
                 showingCommentsPane = true
             }
         }
-    }
-
-    private var browserBottomInset: CGFloat {
-        max(collapsedCommentsHeight - PostCommentsSheet.collapsedTopCornerRadius, 0)
-    }
-}
-
-private extension View {
-    func nativeInteractivePopGesture(edgeOnly: Bool) -> some View {
-        background {
-            NativeInteractivePopGestureInstaller(edgeOnly: edgeOnly)
-                .frame(width: 0, height: 0)
-                .allowsHitTesting(false)
-        }
-    }
-}
-
-@MainActor
-private struct NativeInteractivePopGestureInstaller: UIViewControllerRepresentable {
-    var edgeOnly: Bool
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(edgeOnly: edgeOnly)
-    }
-
-    func makeUIViewController(context: Context) -> ProbeViewController {
-        let controller = ProbeViewController()
-        controller.view.backgroundColor = .clear
-        controller.view.isUserInteractionEnabled = false
-        controller.onLifecycle = { [weak coordinator = context.coordinator] controller in
-            coordinator?.installIfPossible(from: controller)
-        }
-        return controller
-    }
-
-    func updateUIViewController(_ controller: ProbeViewController, context: Context) {
-        context.coordinator.edgeOnly = edgeOnly
-        controller.onLifecycle = { [weak coordinator = context.coordinator] controller in
-            coordinator?.installIfPossible(from: controller)
-        }
-        context.coordinator.installIfPossible(from: controller)
-
-        let coordinator = context.coordinator
-        Task { @MainActor [weak controller, weak coordinator] in
-            guard let controller else { return }
-            coordinator?.installIfPossible(from: controller)
-        }
-    }
-
-    static func dismantleUIViewController(_ controller: ProbeViewController, coordinator: Coordinator) {
-        coordinator.restore()
-        controller.onLifecycle = nil
-    }
-
-    final class ProbeViewController: UIViewController {
-        var onLifecycle: ((ProbeViewController) -> Void)?
-
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
-            onLifecycle?(self)
-        }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            onLifecycle?(self)
-        }
-
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            onLifecycle?(self)
-        }
-    }
-
-    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        var edgeOnly: Bool
-
-        private weak var navigationController: UINavigationController?
-        private weak var edgeGesture: UIGestureRecognizer?
-        private weak var contentGesture: UIGestureRecognizer?
-        private weak var originalEdgeDelegate: UIGestureRecognizerDelegate?
-        private weak var originalContentDelegate: UIGestureRecognizerDelegate?
-
-        init(edgeOnly: Bool) {
-            self.edgeOnly = edgeOnly
-        }
-
-        func installIfPossible(from controller: UIViewController) {
-            guard let navigationController = controller.nearestNavigationController else { return }
-            install(on: navigationController)
-        }
-
-        private func install(on navigationController: UINavigationController) {
-            self.navigationController = navigationController
-
-            if let gesture = navigationController.interactivePopGestureRecognizer {
-                if edgeGesture !== gesture {
-                    edgeGesture = gesture
-                    originalEdgeDelegate = gesture.delegate
-                } else if gesture.delegate !== self {
-                    originalEdgeDelegate = gesture.delegate
-                }
-                gesture.isEnabled = true
-                gesture.delegate = self
-            }
-
-            if #available(iOS 26.0, *),
-               let gesture = navigationController.interactiveContentPopGestureRecognizer {
-                if contentGesture !== gesture {
-                    contentGesture = gesture
-                    originalContentDelegate = gesture.delegate
-                } else if gesture.delegate !== self {
-                    originalContentDelegate = gesture.delegate
-                }
-                gesture.isEnabled = true
-                gesture.delegate = self
-            }
-        }
-
-        func restore() {
-            if edgeGesture?.delegate === self {
-                edgeGesture?.delegate = originalEdgeDelegate
-            }
-            if #available(iOS 26.0, *),
-               contentGesture?.delegate === self {
-                contentGesture?.delegate = originalContentDelegate
-            }
-            edgeGesture = nil
-            contentGesture = nil
-            navigationController = nil
-        }
-
-        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            guard isManagedPopGesture(gestureRecognizer) else {
-                return true
-            }
-            guard let navigationController else { return false }
-            guard navigationController.viewControllers.count > 1 else { return false }
-            guard navigationController.transitionCoordinator == nil else { return false }
-
-            if #available(iOS 26.0, *),
-               gestureRecognizer === contentGesture,
-               edgeOnly {
-                let location = gestureRecognizer.location(in: navigationController.view)
-                return location.x <= systemPopStartMaxX(in: navigationController)
-            }
-
-            return true
-        }
-
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-            guard isManagedPopGesture(gestureRecognizer) else {
-                return true
-            }
-            guard let navigationController else { return false }
-
-            if #available(iOS 26.0, *),
-               gestureRecognizer === contentGesture,
-               edgeOnly {
-                let location = touch.location(in: navigationController.view)
-                return location.x <= systemPopStartMaxX(in: navigationController)
-            }
-
-            return true
-        }
-
-        func gestureRecognizer(
-            _ gestureRecognizer: UIGestureRecognizer,
-            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-        ) -> Bool {
-            return isManagedPopGesture(gestureRecognizer) || isManagedPopGesture(otherGestureRecognizer)
-        }
-
-        private func isManagedPopGesture(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            if gestureRecognizer === edgeGesture {
-                return true
-            }
-            if #available(iOS 26.0, *),
-               gestureRecognizer === contentGesture {
-                return true
-            }
-            return false
-        }
-
-        private func systemPopStartMaxX(in navigationController: UINavigationController) -> CGFloat {
-            navigationController.view.safeAreaInsets.left + 56
-        }
-    }
-}
-
-private extension UIViewController {
-    var nearestNavigationController: UINavigationController? {
-        if let navigationController {
-            return navigationController
-        }
-
-        var current = parent
-        while let controller = current {
-            if let navigationController = controller as? UINavigationController {
-                return navigationController
-            }
-            if let navigationController = controller.navigationController {
-                return navigationController
-            }
-            current = controller.parent
-        }
-
-        return nil
     }
 }
