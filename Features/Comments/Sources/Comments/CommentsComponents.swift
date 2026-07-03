@@ -129,8 +129,8 @@ struct CommentsContentView: View {
                         onNextComment: scrollToNextComment,
                         onNextThread: scrollToNextThread
                     )
-                    .padding(.trailing, 18)
-                    .padding(.bottom, 16)
+                    .padding(.trailing, 28)
+                    .padding(.bottom, 28)
                 }
             }
             .transaction { transaction in
@@ -144,7 +144,7 @@ struct CommentsContentView: View {
             }
             .onPreferenceChange(CommentRowFramePreferenceKey.self) { newFrames in
                 rowFrames = newFrames
-                resolvePendingScrollIntent()
+                scrollToPendingIntent(animated: true)
             }
             .task(id: viewModel.visibleRevision) {
                 CommentTextCache.prewarm(
@@ -226,9 +226,21 @@ struct CommentsContentView: View {
 
     private func scrollToComment(withID targetID: Int) {
         pendingScrollIntent = .revealComment(commentID: targetID)
+        scrollToPendingIntent(animated: true)
+    }
+
+    private func scrollToPendingIntent(animated: Bool) {
+        guard pendingScrollIntent != nil else { return }
+        guard animated else {
+            resolvePendingScrollIntent()
+            return
+        }
+
+        listAnimationsEnabled = true
         withAnimation(.easeInOut(duration: 0.3)) {
             resolvePendingScrollIntent()
         }
+        Task { @MainActor in listAnimationsEnabled = false }
     }
 
     private func toggleCommentVisibilityWithScrollPreservation(_ comment: Comment) {
@@ -347,17 +359,9 @@ private struct NextCommentFloatingButton: View {
     var body: some View {
         Image(systemName: "arrow.down")
             .font(.system(size: 20, weight: .semibold))
-            .foregroundStyle(isEnabled ? Color.white : Color.secondary)
+            .foregroundStyle(isEnabled ? Color.primary : Color.secondary)
             .frame(width: 48, height: 48)
-            .background {
-                Circle()
-                    .fill(isEnabled ? AppColors.appTintColor : Color(.secondarySystemFill))
-            }
-            .overlay {
-                Circle()
-                    .stroke(.white.opacity(isEnabled ? 0.28 : 0), lineWidth: 1)
-            }
-            .shadow(color: .black.opacity(isEnabled ? 0.22 : 0), radius: 14, y: 6)
+            .glassEffect(.regular.interactive(isEnabled), in: .circle)
             .opacity(isEnabled ? 1 : 0.55)
             .contentShape(Circle())
             .gesture(
