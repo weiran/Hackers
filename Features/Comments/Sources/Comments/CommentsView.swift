@@ -308,13 +308,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     }
 
     private func toggleCommentVisibility(_ comment: Comment) {
-        listAnimationsEnabled = true
-
-        withAnimation(.easeInOut(duration: 0.3)) {
-            viewModel.toggleCommentVisibility(comment)
-        }
-
-        Task { @MainActor in listAnimationsEnabled = false }
+        viewModel.toggleCommentVisibility(comment)
     }
 
 }
