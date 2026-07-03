@@ -102,13 +102,39 @@ final class BrowserController: ObservableObject {
         updateState()
     }
 
-    func applyObscuredBottomInset(_ bottomInset: CGFloat) {
+    func applyBottomChromeInset(_ bottomInset: CGFloat) {
         let inset = max(bottomInset, 0)
+        applyObscuredBottomInset(inset)
+        applyScrollViewBottomInset(inset)
+    }
+
+    private func applyObscuredBottomInset(_ inset: CGFloat) {
         guard abs(webView.obscuredContentInsets.bottom - inset) > 0.5 else { return }
 
         var obscuredContentInsets = webView.obscuredContentInsets
         obscuredContentInsets.bottom = inset
         webView.obscuredContentInsets = obscuredContentInsets
+    }
+
+    private func applyScrollViewBottomInset(_ bottomInset: CGFloat) {
+        let scrollView = webView.scrollView
+        let automaticBottomInset = max(
+            scrollView.adjustedContentInset.bottom - scrollView.contentInset.bottom,
+            0
+        )
+        let inset = max(bottomInset - automaticBottomInset, 0)
+
+        if abs(scrollView.contentInset.bottom - inset) > 0.5 {
+            var contentInset = scrollView.contentInset
+            contentInset.bottom = inset
+            scrollView.contentInset = contentInset
+        }
+
+        if abs(scrollView.verticalScrollIndicatorInsets.bottom - inset) > 0.5 {
+            var indicatorInsets = scrollView.verticalScrollIndicatorInsets
+            indicatorInsets.bottom = inset
+            scrollView.verticalScrollIndicatorInsets = indicatorInsets
+        }
     }
 
     private func resetHeaderBlurTint() {
@@ -499,13 +525,13 @@ private struct BrowserWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
-        controller.applyObscuredBottomInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset)
         controller.load(url)
         return controller.webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        controller.applyObscuredBottomInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
         controller.load(url)
