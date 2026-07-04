@@ -51,6 +51,13 @@ private enum CommentScrollIntent {
     case revealComment(commentID: Int)
 }
 
+private struct CommentRenderRow: Identifiable {
+    let state: CommentRowState
+    let isCollapsing: Bool
+
+    var id: Int { state.id }
+}
+
 enum CollapseScrollVisibility {
     static func isMeasuredRootTopVisible(frame: CGRect?, visibleRect: CGRect) -> Bool? {
         guard let frame else { return nil }
@@ -114,6 +121,7 @@ struct CommentsContentView: View {
     @State private var scrollMetrics = CommentScrollMetrics()
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
+    @State private var collapsingRows: [CommentRowState] = []
     @State private var listAnimationGeneration = 0
 
     var body: some View {
@@ -437,7 +445,7 @@ struct CommentsContentView: View {
         }
     }
 
-    private func performListAnimation(_ updates: () -> Void) {
+    private func performListAnimation(_ updates: () -> Void, completion: (() -> Void)? = nil) {
         listAnimationGeneration += 1
         let generation = listAnimationGeneration
         listAnimationsEnabled = true
@@ -447,7 +455,17 @@ struct CommentsContentView: View {
         } completion: {
             if listAnimationGeneration == generation {
                 listAnimationsEnabled = false
+                completion?()
             }
+        }
+    }
+
+    private func clearCollapsingRows() {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+
+        withTransaction(transaction) {
+            collapsingRows = []
         }
     }
 
@@ -455,6 +473,7 @@ struct CommentsContentView: View {
         guard let state = rowState(forCommentID: commentID) else { return }
 
         let shouldPreserveRoot = state.visibility == .visible
+        let disappearingRows = shouldPreserveRoot ? visibleDescendants(of: state).map(rowState) : []
         let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: state) : .none
         if case .deferUntilLayout = collapseScrollDecision {
             rowFrames = [:]
@@ -462,15 +481,19 @@ struct CommentsContentView: View {
         } else {
             pendingScrollIntent = nil
         }
+        collapsingRows = disappearingRows
 
         performListAnimation {
             guard let toggledComment = toggleCommentVisibility(state.id) else {
                 pendingScrollIntent = nil
+                collapsingRows = []
                 return
             }
             if case .scrollToRoot = collapseScrollDecision {
                 scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
+        } completion: {
+            clearCollapsingRows()
         }
     }
 
@@ -533,23 +556,45 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentRowGroup(for state: CommentRowState, in post: Post, isLast: Bool) -> some View {
+    private func commentRowGroup(for row: CommentRenderRow, in post: Post, isLast: Bool) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            commentRow(for: state, in: post)
+            commentRow(for: row.state, in: post)
             if !isLast {
                 Divider()
-                    .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
+                    .padding(.leading, CGFloat(16 + min(row.state.level, 6) * 14))
             }
         }
-        .id(state.id)
+        .frame(height: row.isCollapsing ? 0 : nil, alignment: .top)
+        .clipped()
+        .opacity(row.isCollapsing ? 0 : 1)
+        .id(row.id)
         .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    private var commentRenderRows: [CommentRenderRow] {
+        let visibleStates = Dictionary(uniqueKeysWithValues: viewModel.visibleComments.map { comment in
+            (comment.id, rowState(for: comment))
+        })
+        let collapsingStates = Dictionary(uniqueKeysWithValues: collapsingRows.map { state in
+            (state.id, state)
+        })
+
+        return viewModel.comments.compactMap { comment in
+            if let visibleState = visibleStates[comment.id] {
+                return CommentRenderRow(state: visibleState, isCollapsing: false)
+            }
+            if let collapsingState = collapsingStates[comment.id] {
+                return CommentRenderRow(state: collapsingState, isCollapsing: true)
+            }
+            return nil
+        }
     }
 
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
-        let rows = viewModel.visibleComments.map(rowState)
-        ForEach(rows) { state in
-            commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
+        let rows = commentRenderRows
+        ForEach(rows) { row in
+            commentRowGroup(for: row, in: post, isLast: row.id == rows.last?.id)
         }
     }
 
