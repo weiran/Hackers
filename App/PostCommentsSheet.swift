@@ -118,10 +118,10 @@ struct PostCommentsSheet: View {
                 .background(sheetBackground)
                 .clipShape(sheetShape)
                 .shadow(
-                    color: presentation.isInteractiveMove ? .clear : .black.opacity(0.12),
-                    radius: presentation.isInteractiveMove ? 0 : 10,
+                    color: .black.opacity(0.12),
+                    radius: 10,
                     x: 0,
-                    y: presentation.isInteractiveMove ? 0 : -5
+                    y: -5
                 )
                 .offset(y: layout.alignedTop)
 
