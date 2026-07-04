@@ -307,8 +307,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         return true
     }
 
-    private func toggleCommentVisibility(_ comment: Comment) {
-        viewModel.toggleCommentVisibility(comment)
+    private func toggleCommentVisibility(withID commentID: Int) -> Comment? {
+        viewModel.toggleCommentVisibility(withID: commentID)
     }
 
 }

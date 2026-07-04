@@ -243,6 +243,13 @@ public final class CommentsViewModel: @unchecked Sendable {
 
     @MainActor
     public func toggleCommentVisibility(_ comment: Comment) {
+        _ = toggleCommentVisibility(withID: comment.id)
+    }
+
+    @MainActor
+    @discardableResult
+    public func toggleCommentVisibility(withID id: Int) -> Comment? {
+        guard let comment = comment(withID: id) else { return nil }
         let visible = comment.visibility == .visible
         comment.visibility = visible ? .compact : .visible
 
@@ -261,6 +268,19 @@ public final class CommentsViewModel: @unchecked Sendable {
         }
 
         updateVisibleComments()
+        return comment
+    }
+
+    @MainActor
+    public func comment(withID id: Int) -> Comment? {
+        guard let index = indexByID[id] else { return nil }
+        return comments[index]
+    }
+
+    @MainActor
+    public func visibleComment(withID id: Int) -> Comment? {
+        guard let index = visibleIndexByID[id] else { return nil }
+        return visibleComments[index]
     }
 
     @MainActor

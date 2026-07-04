@@ -14,6 +14,7 @@ struct CommentRowState: Equatable, Identifiable {
     let id: Int
     let author: String
     let age: String
+    let level: Int
     let visibility: CommentVisibilityType
     let isPostAuthor: Bool
     let isUpvoted: Bool

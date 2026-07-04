@@ -469,6 +469,32 @@ struct CommentsViewModelTests {
             #expect(sut.visibleComments.map(\.id) == [1, 4])
         }
 
+        @Test("Toggle by ID resolves current loaded comment")
+        @MainActor
+        func toggleByIDResolvesCurrentComment() async {
+            let parentComment = createTestComment(id: 1, level: 0)
+            let childComment = createTestComment(id: 2, level: 1)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [parentComment, childComment])
+
+            await sut.loadComments()
+
+            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
+            let staleParent = createTestComment(id: 1, level: 0)
+
+            sut.toggleCommentVisibility(staleParent)
+
+            #expect(loadedParent.visibility == .compact)
+            #expect(staleParent.visibility == .visible)
+            #expect(sut.visibleComments.map(\.id) == [1])
+
+            let toggledParent = sut.toggleCommentVisibility(withID: 1)
+
+            #expect(toggledParent === loadedParent)
+            #expect(loadedParent.visibility == .visible)
+            #expect(sut.visibleComments.map(\.id) == [1, 2])
+            #expect(sut.toggleCommentVisibility(withID: 999) == nil)
+        }
+
         @Test("Visible revision advances only when visible signature changes")
         @MainActor
         func visibleRevisionTracksSignatureChanges() async {

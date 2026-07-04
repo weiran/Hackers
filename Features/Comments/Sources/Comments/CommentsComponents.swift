@@ -95,7 +95,7 @@ struct CommentsContentView: View {
     @Environment(\.textScaling) private var textScaling
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
-    let toggleCommentVisibility: (Comment) -> Void
+    let toggleCommentVisibility: (Int) -> Comment?
     let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
     let presentationState: CommentsPresentationState
@@ -286,16 +286,16 @@ struct CommentsContentView: View {
         )
     }
 
-    private func scrollPreservationIntent(for comment: Comment) -> CommentScrollIntent {
-        .preserveCollapsedRoot(commentID: comment.id, afterRevision: viewModel.visibleRevision + 1)
+    private func scrollPreservationIntent(for commentID: Int) -> CommentScrollIntent {
+        .preserveCollapsedRoot(commentID: commentID, afterRevision: viewModel.visibleRevision + 1)
     }
 
-    private func collapseScrollDecision(for comment: Comment) -> CollapseScrollDecision {
+    private func collapseScrollDecision(for state: CommentRowState) -> CollapseScrollDecision {
         guard !presentationState.usesCustomHeaderBlur || tracksRowFrames else {
             return .deferUntilLayout
         }
 
-        guard let rootFrame = rowFrames[comment.id],
+        guard let rootFrame = rowFrames[state.id],
               visibleContentRect.height > 0,
               scrollMetrics.contentSize.height > 0
         else {
@@ -307,7 +307,7 @@ struct CommentsContentView: View {
             return .scrollToRoot
         }
 
-        let removedHeight = estimatedCollapsedHeightDelta(for: comment, rootFrame: rootFrame)
+        let removedHeight = estimatedCollapsedHeightDelta(for: state, rootFrame: rootFrame)
         let predictedMaxOffsetY = maxContentOffsetY(afterRemoving: removedHeight)
         let predictedVisibleMinY = min(scrollMetrics.visibleRect.minY, predictedMaxOffsetY)
         let predictedVisibleTop = predictedVisibleMinY + visibleContentTopInset
@@ -327,8 +327,8 @@ struct CommentsContentView: View {
         return max(contentHeight - scrollMetrics.visibleRect.height, 0)
     }
 
-    private func estimatedCollapsedHeightDelta(for comment: Comment, rootFrame: CGRect) -> CGFloat {
-        let descendants = visibleDescendants(of: comment)
+    private func estimatedCollapsedHeightDelta(for state: CommentRowState, rootFrame: CGRect) -> CGFloat {
+        let descendants = visibleDescendants(of: state)
         let measuredDescendantIDs = descendants.map(\.id).filter { rowFrames[$0] != nil }
         let measuredDescendantHeight = measuredDescendantIDs.reduce(CGFloat.zero) { total, id in
             total + max(rowFrames[id]?.height ?? 0, 0)
@@ -341,13 +341,13 @@ struct CommentsContentView: View {
         return rootHeightDelta + measuredDescendantHeight + missingDescendantHeight + separatorHeight
     }
 
-    private func visibleDescendants(of comment: Comment) -> [Comment] {
-        guard let rootIndex = viewModel.visibleComments.firstIndex(where: { $0.id == comment.id }) else {
+    private func visibleDescendants(of state: CommentRowState) -> [Comment] {
+        guard let rootIndex = viewModel.visibleComments.firstIndex(where: { $0.id == state.id }) else {
             return []
         }
 
         return viewModel.visibleComments[viewModel.visibleComments.index(after: rootIndex)...]
-            .prefix { $0.level > comment.level }
+            .prefix { $0.level > state.level }
             .map { $0 }
     }
 
@@ -449,39 +449,69 @@ struct CommentsContentView: View {
         }
     }
 
-    private func toggleCommentVisibilityWithScrollPreservation(_ comment: Comment) {
-        let shouldPreserveRoot = comment.visibility == .visible
-        let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: comment) : .none
+    private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
+        guard let state = rowState(forCommentID: commentID) else { return }
+
+        let shouldPreserveRoot = state.visibility == .visible
+        let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: state) : .none
         if case .deferUntilLayout = collapseScrollDecision {
             rowFrames = [:]
-            pendingScrollIntent = scrollPreservationIntent(for: comment)
+            pendingScrollIntent = scrollPreservationIntent(for: state.id)
         } else {
             pendingScrollIntent = nil
         }
 
         performListAnimation {
-            toggleCommentVisibility(comment)
+            guard let toggledComment = toggleCommentVisibility(state.id) else {
+                pendingScrollIntent = nil
+                return
+            }
             if case .scrollToRoot = collapseScrollDecision {
-                scrollCollapsedRootToTop(commentID: comment.id)
+                scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
         }
     }
 
-    private func commentRow(for comment: Comment, in post: Post) -> some View {
+    private func commentRow(for state: CommentRowState, in post: Post) -> some View {
         CommentRow(
-            state: rowState(for: comment),
-            onToggle: { toggleCommentVisibilityWithScrollPreservation(comment) },
-            onUpvote: { Task { await votingViewModel.upvote(comment: comment, in: post) } },
-            onUnvote: { Task { await votingViewModel.unvote(comment: comment, in: post) } },
-            onCopy: { UIPasteboard.general.string = comment.text.strippingHTML() },
-            onShare: { ContentSharePresenter.shared.shareComment(comment) }
+            state: state,
+            onToggle: { toggleCommentVisibilityWithScrollPreservation(commentID: state.id) },
+            onUpvote: { upvoteComment(withID: state.id, in: post) },
+            onUnvote: { unvoteComment(withID: state.id, in: post) },
+            onCopy: { copyComment(withID: state.id) },
+            onShare: { shareComment(withID: state.id) }
         )
-        .id(comment.id)
-        .commentRowFrame(id: comment.id, isEnabled: tracksRowFrames)
-        .padding(.leading, CGFloat(16 + min(comment.level, 6) * 14))
+        .id(state.id)
+        .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
+        .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
         .padding(.trailing, 16)
         .padding(.vertical, 16)
-        .accessibilityIdentifier("comments.comment.\(comment.id)")
+        .accessibilityIdentifier("comments.comment.\(state.id)")
+    }
+
+    private func upvoteComment(withID commentID: Int, in post: Post) {
+        guard let comment = viewModel.comment(withID: commentID) else { return }
+        Task { await votingViewModel.upvote(comment: comment, in: post) }
+    }
+
+    private func unvoteComment(withID commentID: Int, in post: Post) {
+        guard let comment = viewModel.comment(withID: commentID) else { return }
+        Task { await votingViewModel.unvote(comment: comment, in: post) }
+    }
+
+    private func copyComment(withID commentID: Int) {
+        guard let comment = viewModel.comment(withID: commentID) else { return }
+        UIPasteboard.general.string = comment.text.strippingHTML()
+    }
+
+    private func shareComment(withID commentID: Int) {
+        guard let comment = viewModel.comment(withID: commentID) else { return }
+        ContentSharePresenter.shared.shareComment(comment)
+    }
+
+    private func rowState(forCommentID commentID: Int) -> CommentRowState? {
+        guard let comment = viewModel.visibleComment(withID: commentID) else { return nil }
+        return rowState(for: comment)
     }
 
     private func rowState(for comment: Comment) -> CommentRowState {
@@ -489,6 +519,7 @@ struct CommentsContentView: View {
             id: comment.id,
             author: comment.by,
             age: comment.age,
+            level: comment.level,
             visibility: comment.visibility,
             isPostAuthor: comment.by == viewModel.post?.by,
             isUpvoted: comment.upvoted,
@@ -501,18 +532,19 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentSeparator(for comment: Comment) -> some View {
-        if comment.id != viewModel.visibleComments.last?.id {
+    private func commentSeparator(for state: CommentRowState, isLast: Bool) -> some View {
+        if !isLast {
             Divider()
-                .padding(.leading, CGFloat(16 + min(comment.level, 6) * 14))
+                .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
         }
     }
 
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
-        ForEach(viewModel.visibleComments, id: \.id) { comment in
-            commentRow(for: comment, in: post)
-            commentSeparator(for: comment)
+        let rows = viewModel.visibleComments.map(rowState)
+        ForEach(rows) { state in
+            commentRow(for: state, in: post)
+            commentSeparator(for: state, isLast: state.id == rows.last?.id)
         }
     }
 
