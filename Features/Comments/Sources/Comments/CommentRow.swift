@@ -21,6 +21,7 @@ struct CommentRowState: Equatable, Identifiable {
     let canVote: Bool
     let canUnvote: Bool
     let styledText: AttributedString?
+    let compactText: String?
 }
 
 struct CommentRow: View {
@@ -63,6 +64,11 @@ struct CommentRow: View {
             if let styledText = state.styledText {
                 Text(styledText)
                     .foregroundStyle(.primary)
+            } else if let compactText = state.compactText {
+                Text(compactText)
+                    .scaledFont(.body)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
         }
         .contentShape(.interaction, Rectangle())

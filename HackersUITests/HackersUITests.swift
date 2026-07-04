@@ -206,6 +206,31 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.buttons["UI Test: Large Comments Performance Fixture"].waitForExistence(timeout: 5))
     }
 
+    func testCustomBrowserLargeCommentBranchCollapsesAndExpands() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(largeCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let parent = app.buttons["comments.comment.49000003"]
+        let firstChild = app.buttons["comments.comment.49000004"]
+        XCTAssertTrue(firstChild.waitForExistence(timeout: 5))
+        scrollCustomBrowserComments(untilVisible: firstChild)
+        XCTAssertTrue(app.frame.intersects(parent.frame))
+        XCTAssertTrue(app.frame.intersects(firstChild.frame))
+
+        parent.tap()
+
+        waitForNonExistence(firstChild, timeout: 2)
+        XCTAssertTrue(parent.waitForExistence(timeout: 2))
+
+        parent.tap()
+
+        XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.frame.intersects(firstChild.frame))
+    }
+
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
         launchApp(linkBrowserMode: "custom")
 
@@ -367,6 +392,14 @@ final class HackersUITests: XCTestCase {
         for _ in 0 ..< count {
             start.press(forDuration: 0.05, thenDragTo: end)
         }
+    }
+
+    private func waitForNonExistence(_ element: XCUIElement, timeout: TimeInterval) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while element.exists && Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        XCTAssertFalse(element.exists)
     }
 
     private func edgeSwipeBack() {
