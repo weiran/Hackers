@@ -451,6 +451,15 @@ struct CommentsContentView: View {
         }
     }
 
+    private func performListMutation<Result>(_ updates: () -> Result) -> Result {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+
+        return withTransaction(transaction) {
+            updates()
+        }
+    }
+
     private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
         guard let state = rowState(forCommentID: commentID) else { return }
 
@@ -463,12 +472,13 @@ struct CommentsContentView: View {
             pendingScrollIntent = nil
         }
 
-        performListAnimation {
-            guard let toggledComment = toggleCommentVisibility(state.id) else {
-                pendingScrollIntent = nil
-                return
-            }
-            if case .scrollToRoot = collapseScrollDecision {
+        guard let toggledComment = performListMutation({ toggleCommentVisibility(state.id) }) else {
+            pendingScrollIntent = nil
+            return
+        }
+
+        if case .scrollToRoot = collapseScrollDecision {
+            performScrollUpdate(animated: true) {
                 scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
         }
