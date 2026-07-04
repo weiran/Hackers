@@ -51,11 +51,10 @@ private enum CommentScrollIntent {
     case revealComment(commentID: Int)
 }
 
-private struct CommentRenderRow: Identifiable {
-    let state: CommentRowState
-    let isCollapsing: Bool
-
-    var id: Int { state.id }
+private struct CollapsingCommentSubtree {
+    let parentID: Int
+    let rows: [CommentRowState]
+    var height: CGFloat
 }
 
 enum CollapseScrollVisibility {
@@ -121,7 +120,8 @@ struct CommentsContentView: View {
     @State private var scrollMetrics = CommentScrollMetrics()
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
-    @State private var collapsingRows: [CommentRowState] = []
+    @State private var collapsingSubtree: CollapsingCommentSubtree?
+    @State private var collapseAnimationGeneration = 0
     @State private var listAnimationGeneration = 0
 
     var body: some View {
@@ -455,17 +455,17 @@ struct CommentsContentView: View {
         } completion: {
             if listAnimationGeneration == generation {
                 listAnimationsEnabled = false
-                completion?()
             }
+            completion?()
         }
     }
 
-    private func clearCollapsingRows() {
+    private func setCollapsingSubtree(_ subtree: CollapsingCommentSubtree?) {
         var transaction = Transaction()
         transaction.disablesAnimations = true
 
         withTransaction(transaction) {
-            collapsingRows = []
+            collapsingSubtree = subtree
         }
     }
 
@@ -481,19 +481,39 @@ struct CommentsContentView: View {
         } else {
             pendingScrollIntent = nil
         }
-        collapsingRows = disappearingRows
+        collapseAnimationGeneration += 1
+        let collapseGeneration = collapseAnimationGeneration
+
+        if shouldPreserveRoot, !disappearingRows.isEmpty {
+            setCollapsingSubtree(CollapsingCommentSubtree(
+                parentID: state.id,
+                rows: disappearingRows,
+                height: measuredHeight(for: disappearingRows)
+            ))
+        } else {
+            setCollapsingSubtree(nil)
+        }
 
         performListAnimation {
             guard let toggledComment = toggleCommentVisibility(state.id) else {
                 pendingScrollIntent = nil
-                collapsingRows = []
+                setCollapsingSubtree(nil)
                 return
             }
+            collapsingSubtree?.height = 0
             if case .scrollToRoot = collapseScrollDecision {
                 scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
         } completion: {
-            clearCollapsingRows()
+            if collapseAnimationGeneration == collapseGeneration {
+                setCollapsingSubtree(nil)
+            }
+        }
+    }
+
+    private func measuredHeight(for rows: [CommentRowState]) -> CGFloat {
+        rows.reduce(CGFloat.zero) { total, state in
+            total + (rowFrames[state.id]?.height ?? averageVisibleCommentRowHeight) + 1
         }
     }
 
@@ -556,45 +576,40 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentRowGroup(for row: CommentRenderRow, in post: Post, isLast: Bool) -> some View {
+    private func commentRowGroup(for state: CommentRowState, in post: Post, isLast: Bool) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            commentRow(for: row.state, in: post)
+            commentRow(for: state, in: post)
             if !isLast {
                 Divider()
-                    .padding(.leading, CGFloat(16 + min(row.state.level, 6) * 14))
+                    .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
             }
         }
-        .frame(height: row.isCollapsing ? 0 : nil, alignment: .top)
-        .clipped()
-        .opacity(row.isCollapsing ? 0 : 1)
-        .id(row.id)
+        .id(state.id)
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
-    private var commentRenderRows: [CommentRenderRow] {
-        let visibleStates = Dictionary(uniqueKeysWithValues: viewModel.visibleComments.map { comment in
-            (comment.id, rowState(for: comment))
-        })
-        let collapsingStates = Dictionary(uniqueKeysWithValues: collapsingRows.map { state in
-            (state.id, state)
-        })
-
-        return viewModel.comments.compactMap { comment in
-            if let visibleState = visibleStates[comment.id] {
-                return CommentRenderRow(state: visibleState, isCollapsing: false)
+    @ViewBuilder
+    private func collapsingSubtreeBlock(for subtree: CollapsingCommentSubtree, in post: Post) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(subtree.rows) { state in
+                commentRowGroup(for: state, in: post, isLast: state.id == subtree.rows.last?.id)
             }
-            if let collapsingState = collapsingStates[comment.id] {
-                return CommentRenderRow(state: collapsingState, isCollapsing: true)
-            }
-            return nil
         }
+        .frame(height: subtree.height, alignment: .top)
+        .clipped()
+        .opacity(subtree.height > 0 ? 1 : 0)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
-        let rows = commentRenderRows
-        ForEach(rows) { row in
-            commentRowGroup(for: row, in: post, isLast: row.id == rows.last?.id)
+        let rows = viewModel.visibleComments.map(rowState)
+        ForEach(rows) { state in
+            commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
+            if let collapsingSubtree, collapsingSubtree.parentID == state.id {
+                collapsingSubtreeBlock(for: collapsingSubtree, in: post)
+            }
         }
     }
 
