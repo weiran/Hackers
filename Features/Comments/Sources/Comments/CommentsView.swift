@@ -66,6 +66,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let titleVisible: Binding<Bool>?
     private let isAtTop: Binding<Bool>?
     private let onPostLinkTap: (() -> Void)?
+    private let onTitleDragChanged: ((DragGesture.Value) -> Void)?
+    private let onTitleDragEnded: ((DragGesture.Value) -> Void)?
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var titleVisibility: CommentsHeaderTitleVisibility
@@ -87,6 +89,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
+        onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
+        onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -100,6 +104,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.titleVisible = titleVisible
         self.isAtTop = isAtTop
         self.onPostLinkTap = onPostLinkTap
+        self.onTitleDragChanged = onTitleDragChanged
+        self.onTitleDragEnded = onTitleDragEnded
         _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil))
         if let viewModel {
@@ -130,6 +136,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         titleVisible: Binding<Bool>? = nil,
         isAtTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
+        onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
+        onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -148,6 +156,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             titleVisible: titleVisible,
             isAtTop: isAtTop,
             onPostLinkTap: onPostLinkTap,
+            onTitleDragChanged: onTitleDragChanged,
+            onTitleDragEnded: onTitleDragEnded,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -206,6 +216,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                             showThumbnails: viewModel.showThumbnails,
                             titleVisibility: titleVisibility,
                             onTap: handleLinkTap,
+                            onDragChanged: onTitleDragChanged,
+                            onDragEnded: onTitleDragEnded,
                         )
                     }
                 }

@@ -180,7 +180,9 @@ struct PostCommentsSheet: View {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
-                    showsPostHeader: true
+                    showsPostHeader: true,
+                    expandedTop: expandedTop,
+                    collapsedTop: collapsedTop
                 )
                 .overlay {
                     if contentFadeProgress < 0.01 {
@@ -205,6 +207,7 @@ struct PostCommentsSheet: View {
 
                 collapsedHeader
                     .allowsHitTesting(true)
+                    .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
             }
             .opacity(1 - contentFadeProgress)
             .allowsHitTesting(contentFadeProgress < 0.5)
@@ -220,7 +223,9 @@ struct PostCommentsSheet: View {
 
     private func expandedCommentsView(
         topContentInset: CGFloat,
-        showsPostHeader: Bool
+        showsPostHeader: Bool,
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat
     ) -> some View {
         StableCommentsHost(
             postID: viewModel.postID,
@@ -233,8 +238,24 @@ struct PostCommentsSheet: View {
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
             showsToolbar: isExpanded,
+            dragExpandedTop: expandedTop,
+            dragCollapsedTop: collapsedTop,
             isAtTop: $isScrollAtTop,
-            onPostLinkTap: collapseSheet
+            onPostLinkTap: collapseSheet,
+            onTitleDragChanged: { value in
+                presentation.updateExpandedToolbarDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                )
+            },
+            onTitleDragEnded: { value in
+                guard presentation.canEndExpandedToolbarDrag() else {
+                    scheduleCollapsedUpvoteReenable()
+                    return
+                }
+                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+            }
         )
         .equatable()
     }
@@ -465,8 +486,12 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let isPostHeaderMatchedGeometrySource: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
     let showsToolbar: Bool
+    let dragExpandedTop: CGFloat
+    let dragCollapsedTop: CGFloat
     @Binding var isAtTop: Bool
     let onPostLinkTap: () -> Void
+    let onTitleDragChanged: (DragGesture.Value) -> Void
+    let onTitleDragEnded: (DragGesture.Value) -> Void
 
     static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
         lhs.postID == rhs.postID
@@ -475,6 +500,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             && lhs.scrollDisabled == rhs.scrollDisabled
             && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
             && lhs.showsToolbar == rhs.showsToolbar
+            && lhs.dragExpandedTop == rhs.dragExpandedTop
+            && lhs.dragCollapsedTop == rhs.dragCollapsedTop
             && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
             && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
     }
@@ -492,6 +519,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             headerTitleVisibility: titleVisibility,
             isAtTop: $isAtTop,
             onPostLinkTap: onPostLinkTap,
+            onTitleDragChanged: onTitleDragChanged,
+            onTitleDragEnded: onTitleDragEnded,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )

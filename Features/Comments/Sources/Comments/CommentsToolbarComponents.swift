@@ -24,6 +24,8 @@ struct ToolbarTitle: View {
     let showThumbnails: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
     let onTap: @MainActor @Sendable () -> Void
+    let onDragChanged: ((DragGesture.Value) -> Void)?
+    let onDragEnded: ((DragGesture.Value) -> Void)?
 
     var body: some View {
         CommentsHeaderTitleButton(
@@ -33,6 +35,17 @@ struct ToolbarTitle: View {
             accessibilityHint: "Open link",
             onTap: onTap
         )
+        .simultaneousGesture(titleDragGesture)
+    }
+
+    private var titleDragGesture: some Gesture {
+        DragGesture(minimumDistance: 18, coordinateSpace: .global)
+            .onChanged { value in
+                onDragChanged?(value)
+            }
+            .onEnded { value in
+                onDragEnded?(value)
+            }
     }
 }
 

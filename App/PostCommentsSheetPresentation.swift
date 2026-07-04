@@ -83,14 +83,16 @@ struct PostCommentsSheetPresentation {
         let isMostlyVertical = verticalMovement > horizontalMovement * PostCommentsSheetMetrics.verticalDragBias
 
         if !isTrackingDrag {
-            guard isExpanded, isScrollAtTop, isMostlyVertical, translation.height > 0 else { return }
+            let startsSheetDrag = (isCollapsed && isMostlyVertical)
+                || (isExpanded && isScrollAtTop && isMostlyVertical && translation.height > 0)
+            guard startsSheetDrag else { return }
             dragStartAllowsSheetDrag = true
             isTrackingDrag = true
             suppressesCollapsedUpvote = true
         }
 
         guard dragStartAllowsSheetDrag else { return }
-        dragTranslation = max(0, translation.height)
+        dragTranslation = isExpanded ? max(0, translation.height) : translation.height
     }
 
     mutating func canEndSheetDrag(
@@ -115,6 +117,36 @@ struct PostCommentsSheetPresentation {
 
     mutating func canEndHandleDrag() -> Bool {
         isHandleDragActive
+    }
+
+    mutating func updateExpandedToolbarDrag(
+        startX: CGFloat,
+        translation: CGSize,
+        systemBackGestureEdgeWidth: CGFloat
+    ) {
+        guard isExpanded, !isHandleDragActive else { return }
+        guard startX > systemBackGestureEdgeWidth else { return }
+
+        let verticalMovement = abs(translation.height)
+        let horizontalMovement = abs(translation.width)
+        let isDownwardDrag = translation.height > 0
+        let isMostlyVertical = verticalMovement > horizontalMovement * PostCommentsSheetMetrics.verticalDragBias
+
+        guard isDownwardDrag, isMostlyVertical else { return }
+        if !isTrackingDrag {
+            isTrackingDrag = true
+            dragStartAllowsSheetDrag = true
+            suppressesCollapsedUpvote = true
+        }
+        dragTranslation = max(0, translation.height)
+    }
+
+    mutating func canEndExpandedToolbarDrag() -> Bool {
+        guard isTrackingDrag, dragStartAllowsSheetDrag else {
+            resetDragTracking()
+            return false
+        }
+        return true
     }
 
     mutating func settle(
