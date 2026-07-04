@@ -35,7 +35,8 @@ struct PostCommentsSheet: View {
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
     private static let handleAreaHeight: CGFloat = PostCommentsSheetMetrics.handleAreaHeight
-    private static let expandedHandleHitAreaHeight: CGFloat = 44
+    private static let expandedHandleHitTargetHeight: CGFloat = 44
+    private static let expandedHandleHitTargetWidth: CGFloat = 160
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
@@ -285,7 +286,7 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat
     ) -> some View {
-        let handleHitAreaHeight = handleTopInset > 0 ? Self.expandedHandleHitAreaHeight : Self.handleAreaHeight
+        let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
         return ZStack(alignment: .bottom) {
             HStack {
@@ -294,15 +295,25 @@ struct PostCommentsSheet: View {
                 Capsule()
                     .fill(.secondary.opacity(0.35))
                     .frame(width: Self.handleWidth, height: Self.handleThickness)
-                    .frame(width: 88, height: handleHitAreaHeight, alignment: .center)
+                    .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
+                    .allowsHitTesting(false)
+
+                Spacer()
+            }
+
+            HStack {
+                Spacer()
+
+                Color.clear
+                    .frame(width: Self.expandedHandleHitTargetWidth, height: handleHitTargetHeight)
+                    .contentShape(Rectangle())
+                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: handleHitAreaHeight + handleTopInset, alignment: .bottom)
-        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-        .gesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+        .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
