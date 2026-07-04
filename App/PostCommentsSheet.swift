@@ -7,6 +7,21 @@ import UIKit
 
 // swiftlint:disable type_body_length
 
+private struct LeadingEdgeExcludedRectangle: Shape {
+    let excludedWidth: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let clampedWidth = min(max(excludedWidth, 0), rect.width)
+        let hitRect = CGRect(
+            x: rect.minX + clampedWidth,
+            y: rect.minY,
+            width: rect.width - clampedWidth,
+            height: rect.height
+        )
+        return Path(hitRect)
+    }
+}
+
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
@@ -277,14 +292,14 @@ struct PostCommentsSheet: View {
                     .fill(.secondary.opacity(0.35))
                     .frame(width: Self.handleWidth, height: Self.handleThickness)
                     .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
-                    .contentShape(Rectangle())
-                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
+        .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
+        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
