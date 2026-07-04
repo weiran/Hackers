@@ -119,6 +119,11 @@ struct PostCommentsSheetPresentation {
         isHandleDragActive
     }
 
+    mutating func cancelHandleDrag() {
+        dragTranslation = 0
+        isHandleDragActive = false
+    }
+
     mutating func updateExpandedToolbarDrag(
         startX: CGFloat,
         translation: CGSize,
