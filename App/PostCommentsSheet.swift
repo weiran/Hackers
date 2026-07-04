@@ -246,7 +246,7 @@ struct PostCommentsSheet: View {
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
-            scrollDisabled: !isExpanded || presentation.isHandleDragActive,
+            scrollDisabled: !isExpanded || presentation.isInteractiveMove,
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
@@ -299,7 +299,7 @@ struct PostCommentsSheet: View {
         .frame(maxWidth: .infinity)
         .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
         .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
-        .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+        .gesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
