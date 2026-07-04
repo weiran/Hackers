@@ -22,23 +22,6 @@ private struct LeadingEdgeExcludedRectangle: Shape {
     }
 }
 
-private struct HorizontallyInsetRectangle: Shape {
-    let leadingInset: CGFloat
-    let trailingInset: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let leading = min(max(leadingInset, 0), rect.width)
-        let trailing = min(max(trailingInset, 0), max(rect.width - leading, 0))
-        let hitRect = CGRect(
-            x: rect.minX + leading,
-            y: rect.minY,
-            width: max(rect.width - leading - trailing, 0),
-            height: rect.height
-        )
-        return Path(hitRect)
-    }
-}
-
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
@@ -56,7 +39,8 @@ struct PostCommentsSheet: View {
     private static let expandedHandleHitTargetWidth: CGFloat = 160
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
-    private static let expandedTopDragRegionExtraHeight: CGFloat = 190
+    private static let expandedPostTitleDragHeight: CGFloat = 210
+    private static let expandedTopDragTrailingInset: CGFloat = 88
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
@@ -139,17 +123,6 @@ struct PostCommentsSheet: View {
                     x: 0,
                     y: presentation.isInteractiveMove ? 0 : -5
                 )
-                .overlay(alignment: .top) {
-                    if showsExpandedPresentation && layout.contentFadeProgress >= 0.5 {
-                        expandedTopDragOverlay(
-                            expandedTop: layout.expandedTop,
-                            collapsedTop: layout.collapsedTop,
-                            dragRegionHeight: expandedTopDragRegionHeight(
-                                commentsTopContentInset: layout.expandedCommentsTopInset
-                            )
-                        )
-                    }
-                }
                 .offset(y: layout.alignedTop)
 
                 CollapsedBrowserControlsOverlay(
@@ -171,6 +144,29 @@ struct PostCommentsSheet: View {
             }
             .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
             .ignoresSafeArea(.container)
+            .overlay {
+                ExpandedCommentsTopDragRecognizer(
+                    isEnabled: showsExpandedPresentation && presentation.isExpanded,
+                    sheetTop: layout.alignedTop,
+                    dragRegionHeight: expandedToolbarDragRegionHeight(handleTopInset: layout.handleTopInset),
+                    leadingExcludedWidth: systemBackGestureEdgeWidth,
+                    trailingExcludedWidth: Self.expandedTopDragTrailingInset,
+                    onChanged: { _, translation in
+                        presentation.updateHandleDrag(translationHeight: max(0, translation.height))
+                    },
+                    onEnded: { _, translation, predictedTranslationHeight in
+                        presentation.updateHandleDrag(
+                            translationHeight: max(0, translation.height, predictedTranslationHeight)
+                        )
+                        guard presentation.canEndHandleDrag() else {
+                            scheduleCollapsedUpvoteReenable()
+                            return
+                        }
+                        settleSheet(predictedTranslation: predictedTranslationHeight, layout.expandedTop, layout.collapsedTop)
+                    }
+                )
+                .frame(width: 0, height: 0)
+            }
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
                 onCollapsedHeightChange(collapsedHeight)
@@ -310,24 +306,11 @@ struct PostCommentsSheet: View {
         handleTopInset + Self.navigationBarHeight + Self.expandedContentSpacing
     }
 
-    private func expandedTopDragRegionHeight(commentsTopContentInset: CGFloat) -> CGFloat {
-        commentsTopContentInset + Self.expandedTopDragRegionExtraHeight
-    }
-
-    private func expandedTopDragOverlay(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat,
-        dragRegionHeight: CGFloat
-    ) -> some View {
-        Rectangle()
-            .fill(.background.opacity(0.001))
-            .frame(maxWidth: .infinity)
-            .frame(height: dragRegionHeight)
-            .contentShape(HorizontallyInsetRectangle(
-                leadingInset: systemBackGestureEdgeWidth,
-                trailingInset: 88
-            ))
-            .gesture(expandedTopAreaDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+    private func expandedToolbarDragRegionHeight(handleTopInset: CGFloat) -> CGFloat {
+        handleTopInset
+            + Self.navigationBarHeight
+            + Self.expandedContentSpacing
+            + Self.expandedPostTitleDragHeight
     }
 
     private func sheetHandle(
@@ -336,9 +319,6 @@ struct PostCommentsSheet: View {
         handleTopInset: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
-        let handleVerticalInset = handleTopInset > 0
-            ? handleTopInset + Self.navigationBarHeight + Self.expandedContentSpacing
-            : handleTopInset
 
         return ZStack(alignment: .bottom) {
             HStack {
@@ -366,7 +346,7 @@ struct PostCommentsSheet: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Self.handleAreaHeight + handleVerticalInset, alignment: .bottom)
+        .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Comments sheet handle")
         .accessibilityIdentifier("browser.commentsSheet.handle")
@@ -540,33 +520,6 @@ private extension PostCommentsSheet {
             }
     }
 
-    private func expandedTopAreaDragGesture(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat
-    ) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .global)
-            .onChanged { value in
-                presentation.updateExpandedToolbarDrag(
-                    startX: value.startLocation.x,
-                    translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
-            }
-            .onEnded { value in
-                let endTranslation = value.translation.height > 0 ? value.translation : value.predictedEndTranslation
-                presentation.updateExpandedToolbarDrag(
-                    startX: value.startLocation.x,
-                    translation: endTranslation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
-                guard presentation.canEndExpandedToolbarDrag() else {
-                    scheduleCollapsedUpvoteReenable()
-                    return
-                }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-            }
-    }
-
     private var systemBackGestureEdgeWidth: CGFloat {
         let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
         return leadingInset + 56
@@ -587,6 +540,186 @@ private extension PostCommentsSheet {
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.sheetAnimationDuration) {
             presentation.finishUpvoteSuppressionIfIdle()
         }
+    }
+}
+
+private struct ExpandedCommentsTopDragRecognizer: UIViewRepresentable {
+    let isEnabled: Bool
+    let sheetTop: CGFloat
+    let dragRegionHeight: CGFloat
+    let leadingExcludedWidth: CGFloat
+    let trailingExcludedWidth: CGFloat
+    let onChanged: (_ startX: CGFloat, _ translation: CGSize) -> Void
+    let onEnded: (_ startX: CGFloat, _ translation: CGSize, _ predictedTranslationHeight: CGFloat) -> Void
+
+    func makeUIView(context: Context) -> WindowGestureInstallerView {
+        let view = WindowGestureInstallerView()
+        view.isUserInteractionEnabled = false
+        view.onWindowChange = { [weak coordinator = context.coordinator] window in
+            coordinator?.attach(to: window)
+        }
+        return view
+    }
+
+    func updateUIView(_ uiView: WindowGestureInstallerView, context: Context) {
+        context.coordinator.update(self)
+        context.coordinator.attach(to: uiView.window)
+    }
+
+    static func dismantleUIView(_ uiView: WindowGestureInstallerView, coordinator: Coordinator) {
+        coordinator.detach()
+        uiView.onWindowChange = nil
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        private var recognizer: UIPanGestureRecognizer?
+        private weak var installedWindow: UIWindow?
+        private weak var overlayView: WindowTopDragOverlayView?
+        private var configuration: ExpandedCommentsTopDragRecognizer
+        private var startLocation: CGPoint?
+
+        init(_ configuration: ExpandedCommentsTopDragRecognizer) {
+            self.configuration = configuration
+            super.init()
+        }
+
+        func update(_ configuration: ExpandedCommentsTopDragRecognizer) {
+            self.configuration = configuration
+            updateOverlayConfiguration()
+        }
+
+        func attach(to window: UIWindow?) {
+            guard installedWindow !== window else { return }
+            detach()
+            guard let window else { return }
+
+            let overlayView = WindowTopDragOverlayView()
+            overlayView.backgroundColor = .clear
+            overlayView.frame = window.bounds
+            overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+            let recognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+            recognizer.cancelsTouchesInView = false
+            recognizer.delaysTouchesBegan = false
+            recognizer.delaysTouchesEnded = false
+            recognizer.delegate = self
+            overlayView.addGestureRecognizer(recognizer)
+            window.addSubview(overlayView)
+
+            installedWindow = window
+            self.overlayView = overlayView
+            self.recognizer = recognizer
+            updateOverlayConfiguration()
+        }
+
+        func detach() {
+            overlayView?.removeFromSuperview()
+            recognizer = nil
+            installedWindow = nil
+            overlayView = nil
+            startLocation = nil
+        }
+
+        private func updateOverlayConfiguration() {
+            recognizer?.isEnabled = configuration.isEnabled
+            overlayView?.isEnabled = configuration.isEnabled
+            overlayView?.sheetTop = configuration.sheetTop
+            overlayView?.dragRegionHeight = configuration.dragRegionHeight
+            overlayView?.leadingExcludedWidth = configuration.leadingExcludedWidth
+            overlayView?.trailingExcludedWidth = configuration.trailingExcludedWidth
+            if let installedWindow, let overlayView {
+                overlayView.frame = installedWindow.bounds
+                installedWindow.bringSubviewToFront(overlayView)
+            }
+        }
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard configuration.isEnabled,
+                  let pan = gestureRecognizer as? UIPanGestureRecognizer,
+                  let view = gestureRecognizer.view
+            else { return false }
+
+            let velocity = pan.velocity(in: view)
+            let verticalMovement = abs(velocity.y)
+            let horizontalMovement = abs(velocity.x)
+            let isMostlyVertical = verticalMovement > horizontalMovement * PostCommentsSheetMetrics.verticalDragBias
+            return velocity.y > 0 && isMostlyVertical
+        }
+
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            true
+        }
+
+        @objc private func handlePan(_ recognizer: UIPanGestureRecognizer) {
+            guard let view = recognizer.view else { return }
+
+            switch recognizer.state {
+            case .began:
+                let location = recognizer.location(in: view)
+                let translation = recognizer.translation(in: view)
+                let startX = location.x - translation.x
+                startLocation = CGPoint(x: startX, y: location.y - translation.y)
+                configuration.onChanged(startX, .zero)
+
+            case .changed:
+                guard let startLocation else { return }
+                configuration.onChanged(startLocation.x, recognizer.translation(in: view).size)
+
+            case .ended, .cancelled, .failed:
+                guard let startLocation else { return }
+                let translation = recognizer.translation(in: view)
+                let velocity = recognizer.velocity(in: view)
+                let predictedTranslationHeight = translation.y + (velocity.y * 0.2)
+                configuration.onEnded(
+                    startLocation.x,
+                    translation.size,
+                    max(translation.y, predictedTranslationHeight)
+                )
+                self.startLocation = nil
+
+            default:
+                break
+            }
+        }
+    }
+}
+
+private final class WindowGestureInstallerView: UIView {
+    var onWindowChange: ((UIWindow?) -> Void)?
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        onWindowChange?(window)
+    }
+}
+
+private final class WindowTopDragOverlayView: UIView {
+    var isEnabled = false
+    var sheetTop: CGFloat = 0
+    var dragRegionHeight: CGFloat = 0
+    var leadingExcludedWidth: CGFloat = 0
+    var trailingExcludedWidth: CGFloat = 0
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        guard isEnabled else { return false }
+        let trailingStart = bounds.width - trailingExcludedWidth
+        return point.y >= sheetTop
+            && point.y <= sheetTop + dragRegionHeight
+            && point.x > leadingExcludedWidth
+            && point.x < trailingStart
+    }
+}
+
+private extension CGPoint {
+    var size: CGSize {
+        CGSize(width: x, height: y)
     }
 }
 

@@ -126,6 +126,23 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
 
+    func testCustomBrowserExpandedTopAreaDragCollapsesExpandedComments() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+
+        let topTitleArea = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.18))
+        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        topTitleArea.press(forDuration: 0.1, thenDragTo: collapsedPosition)
+
+        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+    }
+
     func testCustomBrowserCommentsBodyDragAtTopCollapsesExpandedComments() throws {
         launchApp(linkBrowserMode: "custom")
 
