@@ -70,7 +70,6 @@ struct CommentRow: View {
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .accessibilityAction(.default, onToggle)
-        .id("\(state.id)-\(state.visibility.rawValue)")
         .contextMenu {
             if state.canVote, !state.isUpvoted {
                 Button(action: onUpvote) {
