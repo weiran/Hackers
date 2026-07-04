@@ -451,15 +451,6 @@ struct CommentsContentView: View {
         }
     }
 
-    private func performListMutation<Result>(_ updates: () -> Result) -> Result {
-        var transaction = Transaction()
-        transaction.disablesAnimations = true
-
-        return withTransaction(transaction) {
-            updates()
-        }
-    }
-
     private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
         guard let state = rowState(forCommentID: commentID) else { return }
 
@@ -472,13 +463,12 @@ struct CommentsContentView: View {
             pendingScrollIntent = nil
         }
 
-        guard let toggledComment = performListMutation({ toggleCommentVisibility(state.id) }) else {
-            pendingScrollIntent = nil
-            return
-        }
-
-        if case .scrollToRoot = collapseScrollDecision {
-            performScrollUpdate(animated: true) {
+        performListAnimation {
+            guard let toggledComment = toggleCommentVisibility(state.id) else {
+                pendingScrollIntent = nil
+                return
+            }
+            if case .scrollToRoot = collapseScrollDecision {
                 scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
         }
@@ -493,7 +483,6 @@ struct CommentsContentView: View {
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) }
         )
-        .id(state.id)
         .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
         .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
         .padding(.trailing, 16)
@@ -544,19 +533,23 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentSeparator(for state: CommentRowState, isLast: Bool) -> some View {
-        if !isLast {
-            Divider()
-                .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
+    private func commentRowGroup(for state: CommentRowState, in post: Post, isLast: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            commentRow(for: state, in: post)
+            if !isLast {
+                Divider()
+                    .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
+            }
         }
+        .id(state.id)
+        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
         let rows = viewModel.visibleComments.map(rowState)
         ForEach(rows) { state in
-            commentRow(for: state, in: post)
-            commentSeparator(for: state, isLast: state.id == rows.last?.id)
+            commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
         }
     }
 
