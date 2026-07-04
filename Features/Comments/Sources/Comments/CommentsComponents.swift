@@ -28,6 +28,18 @@ private struct CommentScrollMetrics: Equatable {
     var visibleRect: CGRect = .zero
 }
 
+@Observable
+private final class VisibleCommentTarget {
+    var topCommentID: Int?
+    var hasNextComment = false
+
+    func update(topCommentID: Int?, hasNextComment: Bool) {
+        guard self.topCommentID != topCommentID || self.hasNextComment != hasNextComment else { return }
+        self.topCommentID = topCommentID
+        self.hasNextComment = hasNextComment
+    }
+}
+
 private enum CollapseScrollDecision {
     case none
     case scrollToRoot
@@ -48,19 +60,26 @@ private extension UnitPoint {
 }
 
 private extension View {
-    func commentRowFrame(id: Int) -> some View {
-        background {
-            GeometryReader { geometry in
-                Color.clear.preference(
-                    key: CommentRowFramePreferenceKey.self,
-                    value: [id: geometry.frame(in: .named(CommentScrollCoordinateSpace.content))]
-                )
+    @ViewBuilder
+    func commentRowFrame(id: Int, isEnabled: Bool) -> some View {
+        if isEnabled {
+            background {
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: CommentRowFramePreferenceKey.self,
+                        value: [id: geometry.frame(in: .named(CommentScrollCoordinateSpace.content))]
+                    )
+                }
             }
+        } else {
+            self
         }
     }
 }
 
 struct CommentsContentView: View {
+    private static let scrollMetricsUpdateDistance: CGFloat = 48
+
     @Environment(\.textScaling) private var textScaling
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
@@ -79,6 +98,7 @@ struct CommentsContentView: View {
     @State private var scrollPosition = ScrollPosition(idType: Int.self)
     @State private var rowFrames: [Int: CGRect] = [:]
     @State private var scrollMetrics = CommentScrollMetrics()
+    @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
     @State private var listAnimationGeneration = 0
 
@@ -98,24 +118,26 @@ struct CommentsContentView: View {
         max(scrollMetrics.contentInsets.top, commentScrollTopInset)
     }
 
+    private var tracksRowFrames: Bool {
+        !presentationState.usesCustomHeaderBlur || pendingScrollIntent != nil
+    }
+
+    private var tracksScrollMetrics: Bool {
+        !presentationState.usesCustomHeaderBlur || pendingScrollIntent != nil
+    }
+
     private var visibleContentRect: CGRect {
-        let rect = scrollMetrics.visibleRect
+        visibleContentRect(for: scrollMetrics)
+    }
+
+    private func visibleContentRect(for metrics: CommentScrollMetrics) -> CGRect {
+        let rect = metrics.visibleRect
         guard rect.height > 0 else { return .zero }
 
-        let minY = rect.minY + visibleContentTopInset
-        let maxY = max(minY, rect.maxY - scrollMetrics.contentInsets.bottom)
+        let topInset = max(metrics.contentInsets.top, commentScrollTopInset)
+        let minY = rect.minY + topInset
+        let maxY = max(minY, rect.maxY - metrics.contentInsets.bottom)
         return CGRect(x: rect.minX, y: minY, width: rect.width, height: maxY - minY)
-    }
-
-    private var topVisibleCommentID: Int? {
-        viewModel.visibleComments.first { comment in
-            guard let frame = rowFrames[comment.id] else { return false }
-            return frame.maxY > visibleContentRect.minY && frame.minY < visibleContentRect.maxY
-        }?.id
-    }
-
-    private var hasNextCommentTarget: Bool {
-        viewModel.nextVisibleCommentID(after: topVisibleCommentID) != nil
     }
 
     private func content(for post: Post) -> some View {
@@ -129,6 +151,9 @@ struct CommentsContentView: View {
                 .coordinateSpace(name: CommentScrollCoordinateSpace.content)
             }
             .scrollPosition($scrollPosition)
+            .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
+                updateVisibleCommentTarget(visibleIDs: visibleIDs)
+            }
             .onScrollGeometryChange(for: CommentScrollMetrics.self, of: { geometry in
                 CommentScrollMetrics(
                     contentOffset: geometry.contentOffset,
@@ -137,9 +162,8 @@ struct CommentsContentView: View {
                     visibleRect: geometry.visibleRect
                 )
             }, action: { _, newValue in
-                scrollMetrics = newValue
                 updateHeaderState(for: newValue)
-                resolvePendingScrollIntent(animated: true)
+                updateStoredScrollMetricsIfNeeded(newValue)
             })
             .onScrollPhaseChange { _, newPhase in
                 if newPhase == .tracking || newPhase == .interacting {
@@ -153,7 +177,7 @@ struct CommentsContentView: View {
             .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
                 if !viewModel.visibleComments.isEmpty {
                     NextCommentFloatingButton(
-                        isEnabled: hasNextCommentTarget,
+                        visibleCommentTarget: visibleCommentTarget,
                         onNextComment: scrollToNextComment,
                         onNextThread: scrollToNextThread
                     )
@@ -171,13 +195,18 @@ struct CommentsContentView: View {
                 scrollToPendingComment()
             }
             .onPreferenceChange(CommentRowFramePreferenceKey.self) { newFrames in
+                guard tracksRowFrames else { return }
+                guard rowFrames != newFrames else { return }
                 rowFrames = newFrames
-                resolvePendingScrollIntent(animated: true)
+                if pendingScrollIntent != nil {
+                    resolvePendingScrollIntent(animated: true)
+                }
             }
             .task(id: viewModel.visibleRevision) {
-                CommentTextCache.prewarm(
+                await CommentTextCache.prewarm(
                     comments: viewModel.visibleComments.prefix(30),
-                    textScaling: textScaling
+                    textScaling: textScaling,
+                    chunkSize: 5
                 )
             }
         }
@@ -200,11 +229,60 @@ struct CommentsContentView: View {
         }
     }
 
+    private func updateStoredScrollMetricsIfNeeded(_ newValue: CommentScrollMetrics) {
+        let shouldUpdateMetrics: Bool
+        if tracksScrollMetrics {
+            shouldUpdateMetrics = shouldStoreScrollMetrics(newValue) || pendingScrollIntent != nil
+        } else {
+            shouldUpdateMetrics = shouldStoreStaticScrollMetrics(newValue)
+        }
+        guard shouldUpdateMetrics else { return }
+
+        scrollMetrics = newValue
+        if pendingScrollIntent != nil {
+            resolvePendingScrollIntent(animated: true)
+        }
+    }
+
+    private func shouldStoreScrollMetrics(_ newValue: CommentScrollMetrics) -> Bool {
+        guard scrollMetrics.visibleRect != .zero else { return true }
+        guard scrollMetrics.contentInsets == newValue.contentInsets,
+              scrollMetrics.contentSize == newValue.contentSize,
+              scrollMetrics.visibleRect.size == newValue.visibleRect.size
+        else {
+            return true
+        }
+
+        let previousOffset = scrollMetrics.contentOffset.y + scrollMetrics.contentInsets.top
+        let newOffset = newValue.contentOffset.y + newValue.contentInsets.top
+        return abs(newOffset - previousOffset) >= Self.scrollMetricsUpdateDistance
+    }
+
+    private func shouldStoreStaticScrollMetrics(_ newValue: CommentScrollMetrics) -> Bool {
+        guard scrollMetrics.visibleRect != .zero else { return true }
+
+        return scrollMetrics.contentInsets != newValue.contentInsets
+            || scrollMetrics.contentSize != newValue.contentSize
+            || scrollMetrics.visibleRect.size != newValue.visibleRect.size
+    }
+
+    private func updateVisibleCommentTarget(visibleIDs: [Int]) {
+        let topID = visibleIDs.first
+        visibleCommentTarget.update(
+            topCommentID: topID,
+            hasNextComment: viewModel.hasNextVisibleComment(after: topID)
+        )
+    }
+
     private func scrollPreservationIntent(for comment: Comment) -> CommentScrollIntent {
         .preserveCollapsedRoot(commentID: comment.id, afterRevision: viewModel.visibleRevision + 1)
     }
 
     private func collapseScrollDecision(for comment: Comment) -> CollapseScrollDecision {
+        guard !presentationState.usesCustomHeaderBlur || tracksRowFrames else {
+            return .deferUntilLayout
+        }
+
         guard let rootFrame = rowFrames[comment.id],
               visibleContentRect.height > 0,
               scrollMetrics.contentSize.height > 0
@@ -319,12 +397,12 @@ struct CommentsContentView: View {
     }
 
     private func scrollToNextComment() {
-        guard let targetID = viewModel.nextVisibleCommentID(after: topVisibleCommentID) else { return }
+        guard let targetID = viewModel.nextVisibleCommentID(after: visibleCommentTarget.topCommentID) else { return }
         scrollToComment(withID: targetID)
     }
 
     private func scrollToNextThread() {
-        guard let targetID = viewModel.nextVisibleThreadID(after: topVisibleCommentID) else { return }
+        guard let targetID = viewModel.nextVisibleThreadID(after: visibleCommentTarget.topCommentID) else { return }
         scrollToComment(withID: targetID)
     }
 
@@ -385,7 +463,7 @@ struct CommentsContentView: View {
             onShare: { ContentSharePresenter.shared.shareComment(comment) }
         )
         .id(comment.id)
-        .commentRowFrame(id: comment.id)
+        .commentRowFrame(id: comment.id, isEnabled: tracksRowFrames)
         .padding(.leading, CGFloat(16 + min(comment.level, 6) * 14))
         .padding(.trailing, 16)
         .padding(.vertical, 16)
@@ -473,9 +551,13 @@ struct CommentsContentView: View {
 }
 
 private struct NextCommentFloatingButton: View {
-    let isEnabled: Bool
+    let visibleCommentTarget: VisibleCommentTarget
     let onNextComment: () -> Void
     let onNextThread: () -> Void
+
+    private var isEnabled: Bool {
+        visibleCommentTarget.hasNextComment
+    }
 
     var body: some View {
         Image(systemName: "arrow.down")

@@ -197,6 +197,7 @@ struct PostCommentsSheet: View {
                 }
                 .allowsHitTesting(contentFadeProgress >= 0.5)
                 .accessibilityHidden(contentFadeProgress < 0.5)
+                .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
 
                 expandedTopOverlay(
                     handleTopInset: handleTopInset,
@@ -466,6 +467,28 @@ private extension PostCommentsSheet {
         return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
     }
 
+    private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 6, coordinateSpace: .global)
+            .onChanged { value in
+                presentation.updateSheetDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
+                    isScrollAtTop: isScrollAtTop
+                )
+            }
+            .onEnded { value in
+                guard presentation.canEndSheetDrag(
+                    startX: value.startLocation.x,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                ) else {
+                    scheduleCollapsedUpvoteReenable()
+                    return
+                }
+                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+            }
+    }
+
     private func handleDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
@@ -478,6 +501,11 @@ private extension PostCommentsSheet {
                 }
                 settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
             }
+    }
+
+    private var systemBackGestureEdgeWidth: CGFloat {
+        let leadingInset = PresentationContextProvider.shared.keyWindow?.safeAreaInsets.left ?? 0
+        return leadingInset + 56
     }
 
     private func settleSheet(predictedTranslation: CGFloat, _ expandedTop: CGFloat, _ collapsedTop: CGFloat) {

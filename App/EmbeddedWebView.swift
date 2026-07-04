@@ -445,7 +445,7 @@ private struct BrowserWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
         controller.applyBottomChromeInset(obscuredBottomInset)
-        controller.load(url)
+        context.coordinator.scheduleLoad(controller: controller, url: url)
         return controller.webView
     }
 
@@ -453,11 +453,26 @@ private struct BrowserWebView: UIViewRepresentable {
         controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
-        controller.load(url)
+        context.coordinator.scheduleLoad(controller: controller, url: url)
     }
 
+    @MainActor
     final class Coordinator {
         var requestedURL: URL?
+        private var loadTask: Task<Void, Never>?
+
+        func scheduleLoad(controller: BrowserController, url: URL) {
+            loadTask?.cancel()
+            loadTask = Task { @MainActor [weak controller] in
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                controller?.load(url)
+            }
+        }
+
+        deinit {
+            loadTask?.cancel()
+        }
     }
 }
 
