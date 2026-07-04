@@ -50,6 +50,7 @@ struct SimpleCommentsTests {
             let visibleRect = CGRect(x: 0, y: 100, width: 320, height: 500)
 
             #expect(CollapseScrollVisibility.isRootTopVisible(frame: frame, visibleRect: visibleRect))
+            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: frame, visibleRect: visibleRect) == true)
         }
 
         @Test("Treats root top above or below visible bounds as outside")
@@ -60,6 +61,14 @@ struct SimpleCommentsTests {
 
             #expect(!CollapseScrollVisibility.isRootTopVisible(frame: aboveFrame, visibleRect: visibleRect))
             #expect(!CollapseScrollVisibility.isRootTopVisible(frame: belowFrame, visibleRect: visibleRect))
+            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: aboveFrame, visibleRect: visibleRect) == false)
+        }
+
+        @Test("Waits for missing collapsed root frame")
+        func missingRootFrameWaitsForLayout() {
+            let visibleRect = CGRect(x: 0, y: 100, width: 320, height: 500)
+
+            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: nil, visibleRect: visibleRect) == nil)
         }
 
         @Test("Allows unresolved layout without forcing a scroll")

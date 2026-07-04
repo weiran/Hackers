@@ -52,6 +52,11 @@ private enum CommentScrollIntent {
 }
 
 enum CollapseScrollVisibility {
+    static func isMeasuredRootTopVisible(frame: CGRect?, visibleRect: CGRect) -> Bool? {
+        guard let frame else { return nil }
+        return isRootTopVisible(frame: frame, visibleRect: visibleRect)
+    }
+
     static func isRootTopVisible(frame: CGRect, visibleRect: CGRect) -> Bool {
         guard visibleRect.height > 0 else { return true }
         return frame.minY >= visibleRect.minY && frame.minY < visibleRect.maxY
@@ -366,9 +371,8 @@ struct CommentsContentView: View {
                 pendingScrollIntent = nil
                 return
             }
-            guard !rowFrames.isEmpty else { return }
-
-            if let frame = rowFrames[commentID], isCollapsedRootVisible(frame) {
+            guard let isRootVisible = collapsedRootVisibility(for: commentID) else { return }
+            if isRootVisible {
                 pendingScrollIntent = nil
             } else {
                 performScrollUpdate(animated: animated) {
@@ -387,8 +391,11 @@ struct CommentsContentView: View {
         }
     }
 
-    private func isCollapsedRootVisible(_ frame: CGRect) -> Bool {
-        CollapseScrollVisibility.isRootTopVisible(frame: frame, visibleRect: visibleContentRect)
+    private func collapsedRootVisibility(for commentID: Int) -> Bool? {
+        CollapseScrollVisibility.isMeasuredRootTopVisible(
+            frame: rowFrames[commentID],
+            visibleRect: visibleContentRect
+        )
     }
 
     private func scrollCollapsedRootToTop(commentID: Int) {
