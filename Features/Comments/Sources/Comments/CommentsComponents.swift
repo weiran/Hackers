@@ -21,6 +21,14 @@ private struct CommentRowFramePreferenceKey: PreferenceKey {
     }
 }
 
+private struct CommentSubtreeHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: [Int: CGFloat] = [:]
+
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
+}
+
 private struct CommentScrollMetrics: Equatable {
     var contentOffset: CGPoint = .zero
     var contentInsets: EdgeInsets = EdgeInsets()
@@ -51,10 +59,17 @@ private enum CommentScrollIntent {
     case revealComment(commentID: Int)
 }
 
-private struct CollapsingCommentSubtree {
+private enum CommentSubtreeTransitionKind {
+    case collapsing
+    case expanding
+}
+
+private struct CommentSubtreeTransition {
+    let kind: CommentSubtreeTransitionKind
     let parentID: Int
     let rows: [CommentRowState]
     var height: CGFloat
+    var targetHeight: CGFloat
 }
 
 enum CollapseScrollVisibility {
@@ -120,8 +135,8 @@ struct CommentsContentView: View {
     @State private var scrollMetrics = CommentScrollMetrics()
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
-    @State private var collapsingSubtree: CollapsingCommentSubtree?
-    @State private var collapseAnimationGeneration = 0
+    @State private var subtreeTransition: CommentSubtreeTransition?
+    @State private var subtreeTransitionGeneration = 0
     @State private var listAnimationGeneration = 0
 
     var body: some View {
@@ -223,6 +238,9 @@ struct CommentsContentView: View {
                 if pendingScrollIntent != nil {
                     resolvePendingScrollIntent(animated: true)
                 }
+            }
+            .onPreferenceChange(CommentSubtreeHeightPreferenceKey.self) { newHeights in
+                updateSubtreeTransitionMeasuredHeights(newHeights)
             }
             .task(id: viewModel.visibleRevision) {
                 await CommentTextCache.prewarm(
@@ -377,6 +395,7 @@ struct CommentsContentView: View {
         switch intent {
         case .preserveCollapsedRoot(let commentID, let afterRevision):
             guard viewModel.visibleRevision >= afterRevision else { return }
+            guard subtreeTransition?.parentID != commentID else { return }
             guard viewModel.visibleComments.contains(where: { $0.id == commentID }) else {
                 pendingScrollIntent = nil
                 return
@@ -460,54 +479,75 @@ struct CommentsContentView: View {
         }
     }
 
-    private func setCollapsingSubtree(_ subtree: CollapsingCommentSubtree?) {
+    private func performWithoutListAnimation(_ updates: () -> Void) {
         var transaction = Transaction()
         transaction.disablesAnimations = true
 
         withTransaction(transaction) {
-            collapsingSubtree = subtree
+            updates()
         }
     }
 
     private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
         guard let state = rowState(forCommentID: commentID) else { return }
 
-        let shouldPreserveRoot = state.visibility == .visible
-        let disappearingRows = shouldPreserveRoot ? visibleDescendants(of: state).map(rowState) : []
-        let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: state) : .none
+        let isCollapsing = state.visibility == .visible
+        let disappearingRows = isCollapsing ? visibleDescendants(of: state).map(rowState) : []
+        let disappearingHeight = measuredHeight(for: disappearingRows)
+        let collapseScrollDecision = isCollapsing ? collapseScrollDecision(for: state) : .none
         if case .deferUntilLayout = collapseScrollDecision {
             rowFrames = [:]
             pendingScrollIntent = scrollPreservationIntent(for: state.id)
         } else {
             pendingScrollIntent = nil
         }
-        collapseAnimationGeneration += 1
-        let collapseGeneration = collapseAnimationGeneration
 
-        if shouldPreserveRoot, !disappearingRows.isEmpty {
-            setCollapsingSubtree(CollapsingCommentSubtree(
-                parentID: state.id,
-                rows: disappearingRows,
-                height: measuredHeight(for: disappearingRows)
-            ))
-        } else {
-            setCollapsingSubtree(nil)
-        }
+        subtreeTransitionGeneration += 1
+        let transitionGeneration = subtreeTransitionGeneration
+        var shouldAnimateSubtreeTransition = false
 
-        performListAnimation {
+        performWithoutListAnimation {
             guard let toggledComment = toggleCommentVisibility(state.id) else {
                 pendingScrollIntent = nil
-                setCollapsingSubtree(nil)
+                subtreeTransition = nil
                 return
             }
-            collapsingSubtree?.height = 0
+
+            if isCollapsing, !disappearingRows.isEmpty {
+                subtreeTransition = CommentSubtreeTransition(
+                    kind: .collapsing,
+                    parentID: state.id,
+                    rows: disappearingRows,
+                    height: disappearingHeight,
+                    targetHeight: 0
+                )
+                shouldAnimateSubtreeTransition = true
+            } else if !isCollapsing {
+                let expandedState = rowState(for: toggledComment)
+                let expandingRows = visibleDescendants(of: expandedState).map(rowState)
+                if !expandingRows.isEmpty {
+                    subtreeTransition = CommentSubtreeTransition(
+                        kind: .expanding,
+                        parentID: state.id,
+                        rows: expandingRows,
+                        height: 0,
+                        targetHeight: measuredHeight(for: expandingRows)
+                    )
+                    shouldAnimateSubtreeTransition = true
+                } else {
+                    subtreeTransition = nil
+                }
+            } else {
+                subtreeTransition = nil
+            }
+
             if case .scrollToRoot = collapseScrollDecision {
                 scrollCollapsedRootToTop(commentID: toggledComment.id)
             }
-        } completion: {
-            if collapseAnimationGeneration == collapseGeneration {
-                setCollapsingSubtree(nil)
-            }
+        }
+
+        if shouldAnimateSubtreeTransition {
+            animateSubtreeTransition(generation: transitionGeneration)
         }
     }
 
@@ -517,7 +557,52 @@ struct CommentsContentView: View {
         }
     }
 
-    private func commentRow(for state: CommentRowState, in post: Post) -> some View {
+    private func animateSubtreeTransition(generation: Int) {
+        Task { @MainActor in
+            await Task.yield()
+            guard subtreeTransitionGeneration == generation,
+                  let transition = subtreeTransition
+            else { return }
+
+            performListAnimation {
+                subtreeTransition?.height = transition.targetHeight
+            } completion: {
+                finishSubtreeTransition(generation: generation)
+            }
+        }
+    }
+
+    private func finishSubtreeTransition(generation: Int) {
+        guard subtreeTransitionGeneration == generation else { return }
+        performWithoutListAnimation {
+            subtreeTransition = nil
+        }
+        if pendingScrollIntent != nil {
+            resolvePendingScrollIntent(animated: true)
+        }
+    }
+
+    private func updateSubtreeTransitionMeasuredHeights(_ heights: [Int: CGFloat]) {
+        guard let transition = subtreeTransition,
+              transition.kind == .expanding,
+              let measuredHeight = heights[transition.parentID],
+              measuredHeight > 0
+        else { return }
+
+        let roundedHeight = ceil(measuredHeight)
+        guard abs(transition.targetHeight - roundedHeight) > 0.5 else { return }
+
+        if transition.height > 0 {
+            performListAnimation {
+                subtreeTransition?.targetHeight = roundedHeight
+                subtreeTransition?.height = roundedHeight
+            }
+        } else {
+            subtreeTransition?.targetHeight = roundedHeight
+        }
+    }
+
+    private func commentRow(for state: CommentRowState, in post: Post, tracksFrame: Bool = true) -> some View {
         CommentRow(
             state: state,
             onToggle: { toggleCommentVisibilityWithScrollPreservation(commentID: state.id) },
@@ -526,7 +611,7 @@ struct CommentsContentView: View {
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) }
         )
-        .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
+        .commentRowFrame(id: state.id, isEnabled: tracksFrame && tracksRowFrames)
         .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
         .padding(.trailing, 16)
         .padding(.vertical, 16)
@@ -576,28 +661,53 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentRowGroup(for state: CommentRowState, in post: Post, isLast: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            commentRow(for: state, in: post)
+    private func commentRowGroup(
+        for state: CommentRowState,
+        in post: Post,
+        isLast: Bool,
+        isScrollTarget: Bool = true,
+        tracksFrame: Bool = true
+    ) -> some View {
+        let group = VStack(alignment: .leading, spacing: 0) {
+            commentRow(for: state, in: post, tracksFrame: tracksFrame)
             if !isLast {
                 Divider()
                     .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
             }
         }
-        .id(state.id)
-        .transition(.opacity.combined(with: .move(edge: .top)))
+
+        if isScrollTarget {
+            group
+                .id(state.id)
+                .transition(.identity)
+        } else {
+            group
+        }
     }
 
     @ViewBuilder
-    private func collapsingSubtreeBlock(for subtree: CollapsingCommentSubtree, in post: Post) -> some View {
+    private func transitionSubtreeBlock(for transition: CommentSubtreeTransition, in post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(subtree.rows) { state in
-                commentRowGroup(for: state, in: post, isLast: state.id == subtree.rows.last?.id)
+            ForEach(transition.rows) { state in
+                commentRowGroup(
+                    for: state,
+                    in: post,
+                    isLast: state.id == transition.rows.last?.id,
+                    isScrollTarget: transition.kind == .expanding,
+                    tracksFrame: false
+                )
             }
         }
-        .frame(height: subtree.height, alignment: .top)
+        .background {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: CommentSubtreeHeightPreferenceKey.self,
+                    value: [transition.parentID: geometry.size.height]
+                )
+            }
+        }
+        .frame(height: transition.height, alignment: .top)
         .clipped()
-        .opacity(subtree.height > 0 ? 1 : 0)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
@@ -605,12 +715,19 @@ struct CommentsContentView: View {
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
         let rows = viewModel.visibleComments.map(rowState)
-        ForEach(rows) { state in
-            commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
-            if let collapsingSubtree, collapsingSubtree.parentID == state.id {
-                collapsingSubtreeBlock(for: collapsingSubtree, in: post)
+        let hiddenTransitionRowIDs = hiddenRowIDs(for: subtreeTransition)
+        let renderedRows = rows.filter { !hiddenTransitionRowIDs.contains($0.id) }
+        ForEach(renderedRows) { state in
+            commentRowGroup(for: state, in: post, isLast: state.id == renderedRows.last?.id)
+            if let subtreeTransition, subtreeTransition.parentID == state.id {
+                transitionSubtreeBlock(for: subtreeTransition, in: post)
             }
         }
+    }
+
+    private func hiddenRowIDs(for transition: CommentSubtreeTransition?) -> Set<Int> {
+        guard let transition, transition.kind == .expanding else { return [] }
+        return Set(transition.rows.map(\.id))
     }
 
     @ViewBuilder
