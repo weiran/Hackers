@@ -536,6 +536,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
+            onPostHeaderDragChanged: onTitleDragChanged,
+            onPostHeaderDragEnded: onTitleDragEnded,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )

@@ -102,6 +102,8 @@ struct CommentsContentView: View {
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
     let isPostHeaderMatchedGeometrySource: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
+    let onPostHeaderDragChanged: ((DragGesture.Value) -> Void)?
+    let onPostHeaderDragEnded: ((DragGesture.Value) -> Void)?
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
@@ -566,24 +568,44 @@ struct CommentsContentView: View {
     @ViewBuilder
     private func postHeaderSection(for post: Post) -> some View {
         if showsPostHeader {
-            PostHeader(
-                post: post,
-                votingViewModel: votingViewModel,
-                isLoadingComments: viewModel.isLoading,
-                showThumbnails: viewModel.showThumbnails,
-                matchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
-                isMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
-                onLinkTap: { handleLinkTap() },
-                onPostUpdated: { updatedPost in
-                    viewModel.post = updatedPost
-                },
-                onBookmarkToggle: { await viewModel.toggleBookmark() }
-            )
-            .id("header")
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            if onPostHeaderDragChanged != nil || onPostHeaderDragEnded != nil {
+                postHeader(for: post)
+                    .simultaneousGesture(postHeaderDragGesture)
+            } else {
+                postHeader(for: post)
+            }
             Divider()
         }
+    }
+
+    private func postHeader(for post: Post) -> some View {
+        PostHeader(
+            post: post,
+            votingViewModel: votingViewModel,
+            isLoadingComments: viewModel.isLoading,
+            showThumbnails: viewModel.showThumbnails,
+            matchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+            isMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
+            onLinkTap: { handleLinkTap() },
+            onPostUpdated: { updatedPost in
+                viewModel.post = updatedPost
+            },
+            onBookmarkToggle: { await viewModel.toggleBookmark() }
+        )
+        .id("header")
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+
+    private var postHeaderDragGesture: some Gesture {
+        DragGesture(minimumDistance: 18, coordinateSpace: .global)
+            .onChanged { value in
+                onPostHeaderDragChanged?(value)
+            }
+            .onEnded { value in
+                onPostHeaderDragEnded?(value)
+            }
     }
 
     @ViewBuilder

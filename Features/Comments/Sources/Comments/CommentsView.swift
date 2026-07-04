@@ -68,6 +68,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let onPostLinkTap: (() -> Void)?
     private let onTitleDragChanged: ((DragGesture.Value) -> Void)?
     private let onTitleDragEnded: ((DragGesture.Value) -> Void)?
+    private let onPostHeaderDragChanged: ((DragGesture.Value) -> Void)?
+    private let onPostHeaderDragEnded: ((DragGesture.Value) -> Void)?
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var titleVisibility: CommentsHeaderTitleVisibility
@@ -91,6 +93,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
+        onPostHeaderDragChanged: ((DragGesture.Value) -> Void)? = nil,
+        onPostHeaderDragEnded: ((DragGesture.Value) -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -106,6 +110,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.onPostLinkTap = onPostLinkTap
         self.onTitleDragChanged = onTitleDragChanged
         self.onTitleDragEnded = onTitleDragEnded
+        self.onPostHeaderDragChanged = onPostHeaderDragChanged
+        self.onPostHeaderDragEnded = onPostHeaderDragEnded
         _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
         _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil))
         if let viewModel {
@@ -138,6 +144,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
+        onPostHeaderDragChanged: ((DragGesture.Value) -> Void)? = nil,
+        onPostHeaderDragEnded: ((DragGesture.Value) -> Void)? = nil,
         viewModel: CommentsViewModel? = nil,
         votingViewModel: VotingViewModel? = nil
     ) {
@@ -158,6 +166,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
+            onPostHeaderDragChanged: onPostHeaderDragChanged,
+            onPostHeaderDragEnded: onPostHeaderDragEnded,
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
@@ -176,6 +186,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
                     isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
                     titleVisibility: titleVisibility,
+                    onPostHeaderDragChanged: onPostHeaderDragChanged,
+                    onPostHeaderDragEnded: onPostHeaderDragEnded,
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     pendingCommentID: $pendingCommentID,
