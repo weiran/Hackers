@@ -35,6 +35,7 @@ struct PostCommentsSheet: View {
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
     private static let handleAreaHeight: CGFloat = PostCommentsSheetMetrics.handleAreaHeight
+    private static let expandedHandleHitAreaHeight: CGFloat = 44
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
@@ -284,20 +285,22 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat
     ) -> some View {
-        ZStack(alignment: .bottom) {
+        let handleHitAreaHeight = handleTopInset > 0 ? Self.expandedHandleHitAreaHeight : Self.handleAreaHeight
+
+        return ZStack(alignment: .bottom) {
             HStack {
                 Spacer()
 
                 Capsule()
                     .fill(.secondary.opacity(0.35))
                     .frame(width: Self.handleWidth, height: Self.handleThickness)
-                    .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
+                    .frame(width: 88, height: handleHitAreaHeight, alignment: .center)
 
                 Spacer()
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
+        .frame(height: handleHitAreaHeight + handleTopInset, alignment: .bottom)
         .contentShape(LeadingEdgeExcludedRectangle(excludedWidth: systemBackGestureEdgeWidth))
         .gesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
         .accessibilityElement(children: .ignore)
