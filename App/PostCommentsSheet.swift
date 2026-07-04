@@ -20,8 +20,7 @@ struct PostCommentsSheet: View {
     private static let handleWidth: CGFloat = 36
     private static let handleThickness: CGFloat = 5
     private static let handleAreaHeight: CGFloat = PostCommentsSheetMetrics.handleAreaHeight
-    private static let handleToolbarSpacing: CGFloat = 8
-    private static let expandedToolbarTitleHitHeight: CGFloat = 58
+    private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
@@ -80,7 +79,7 @@ struct PostCommentsSheet: View {
                 controlsHeight: controlsHeight,
                 dragTranslation: presentation.dragTranslation,
                 isExpanded: presentation.isExpanded,
-                expandedTopOverlayHeight: expandedTopOverlayHeight(handleTopInset:)
+                expandedCommentsTopInset: expandedCommentsTopInset(handleTopInset:)
             )
             let showsExpandedPresentation = viewModel.post != nil
 
@@ -198,14 +197,6 @@ struct PostCommentsSheet: View {
                 .allowsHitTesting(contentFadeProgress >= 0.5)
                 .accessibilityHidden(contentFadeProgress < 0.5)
                 .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-
-                expandedTopOverlay(
-                    handleTopInset: handleTopInset,
-                    controlsOpacity: contentFadeProgress,
-                    expandedTop: expandedTop,
-                    collapsedTop: collapsedTop
-                )
-                .allowsHitTesting(contentFadeProgress >= 0.5)
             }
 
             VStack(spacing: 0) {
@@ -241,78 +232,15 @@ struct PostCommentsSheet: View {
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
+            showsToolbar: isExpanded,
             isAtTop: $isScrollAtTop,
             onPostLinkTap: collapseSheet
         )
         .equatable()
     }
 
-    private func expandedTopOverlay(
-        handleTopInset: CGFloat,
-        controlsOpacity: CGFloat,
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat
-    ) -> some View {
-        ZStack(alignment: .top) {
-            VStack(spacing: 0) {
-                Color.clear
-                    .frame(height: handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing)
-
-                GlassEffectContainer(spacing: 10) {
-                    HStack(alignment: .top, spacing: 10) {
-                        if let post = viewModel.post {
-                            CommentsHeaderTitleButton(
-                                post: post,
-                                showThumbnails: viewModel.showThumbnails,
-                                titleVisibility: expandedTitleVisibility,
-                                accessibilityHint: "Collapse comments",
-                                hitHeight: Self.expandedToolbarTitleHitHeight,
-                                fillsAvailableWidth: true,
-                                usesOffsetTransition: false,
-                                onTap: collapseSheet
-                            )
-                            .frame(maxWidth: .infinity, alignment: .top)
-                            .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
-                        } else {
-                            Spacer()
-                        }
-
-                        if let post = viewModel.post {
-                            Button {
-                                ContentSharePresenter.shared.shareHackerNewsPost(post)
-                            } label: {
-                                Image(systemName: "square.and.arrow.up")
-                                    .frame(width: 44, height: 44)
-                                    .contentShape(Circle())
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Share")
-                            .modifier(GlassCircleBackground())
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                .frame(height: Self.expandedToolbarTitleHitHeight, alignment: .top)
-                .opacity(controlsOpacity)
-            }
-        }
-        .allowsHitTesting(isExpanded)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("browser.commentsSheet.expandedToolbar")
-        .background(alignment: .top) {
-            ProgressiveHeaderBlurBackground(
-                height: expandedHeaderBlurHeight(handleTopInset: handleTopInset),
-                fadeExtension: Self.expandedContentSpacing
-            )
-        }
-    }
-
-    private func expandedTopOverlayHeight(handleTopInset: CGFloat) -> CGFloat {
-        expandedHeaderBlurHeight(handleTopInset: handleTopInset) + Self.expandedContentSpacing
-    }
-
-    private func expandedHeaderBlurHeight(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset + Self.handleAreaHeight + Self.handleToolbarSpacing + Self.expandedToolbarTitleHitHeight
+    private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
+        handleTopInset + Self.navigationBarHeight + Self.expandedContentSpacing
     }
 
     private func sheetHandle(
@@ -536,6 +464,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
     let isPostHeaderMatchedGeometrySource: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
+    let showsToolbar: Bool
     @Binding var isAtTop: Bool
     let onPostLinkTap: () -> Void
 
@@ -545,6 +474,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
             && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
+            && lhs.showsToolbar == rhs.showsToolbar
             && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
             && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
     }
@@ -554,8 +484,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             postID: postID,
             showsPostHeader: showsPostHeader,
             allowsRefresh: false,
-            showsToolbar: false,
-            controlsNavigationBarVisibility: false,
+            showsToolbar: showsToolbar,
+            controlsNavigationBarVisibility: showsToolbar,
             presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,

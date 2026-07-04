@@ -28,8 +28,8 @@ public enum CommentsPresentationState: Equatable, Sendable {
         switch self {
         case .standard:
             0
-        case let .customBrowser(topContentInset):
-            max(topContentInset, 0)
+        case .customBrowser:
+            0
         }
     }
 

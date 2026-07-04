@@ -161,7 +161,7 @@ struct PostCommentsSheetLayout {
         controlsHeight: CGFloat,
         dragTranslation: CGFloat,
         isExpanded: Bool,
-        expandedTopOverlayHeight: (CGFloat) -> CGFloat
+        expandedCommentsTopInset: (CGFloat) -> CGFloat
     ) {
         expandedTop = 0
         collapsedTop = max(screenSize.height - (collapsedHeight + safeInsets.bottom), expandedTop)
@@ -181,7 +181,7 @@ struct PostCommentsSheetLayout {
         }
 
         handleTopInset = safeInsets.top * min(max(expansionProgress, 0), 1)
-        expandedCommentsTopInset = expandedTopOverlayHeight(safeInsets.top)
+        self.expandedCommentsTopInset = expandedCommentsTopInset(safeInsets.top)
         contentFadeProgress = min(max(expansionProgress, 0), 1)
     }
 }
