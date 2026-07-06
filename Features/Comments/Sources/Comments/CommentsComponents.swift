@@ -51,6 +51,14 @@ private enum CommentScrollIntent {
     case revealComment(commentID: Int)
 }
 
+private struct CollapsingCommentBranch {
+    let rootID: Int
+    let rows: [CommentRowState]
+    let rowIDs: Set<Int>
+    let isLast: Bool
+    var height: CGFloat
+}
+
 enum CollapseScrollVisibility {
     static func isMeasuredRootTopVisible(frame: CGRect?, visibleRect: CGRect) -> Bool? {
         guard let frame else { return nil }
@@ -114,6 +122,8 @@ struct CommentsContentView: View {
     @State private var scrollMetrics = CommentScrollMetrics()
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
+    @State private var collapsingBranch: CollapsingCommentBranch?
+    @State private var collapsingBranchGeneration = 0
     @State private var listAnimationGeneration = 0
 
     var body: some View {
@@ -133,7 +143,7 @@ struct CommentsContentView: View {
     }
 
     private var tracksRowFrames: Bool {
-        !presentationState.usesCustomHeaderBlur || pendingScrollIntent != nil
+        !presentationState.usesCustomHeaderBlur || pendingScrollIntent != nil || collapsingBranch != nil
     }
 
     private var tracksScrollMetrics: Bool {
@@ -337,10 +347,11 @@ struct CommentsContentView: View {
         }
         let missingDescendantCount = max(descendants.count - measuredDescendantIDs.count, 0)
         let missingDescendantHeight = CGFloat(missingDescendantCount) * averageVisibleCommentRowHeight
-        let separatorHeight = CGFloat(descendants.count)
-        let rootHeightDelta = max(rootFrame.height - estimatedCompactCommentRowHeight, 0)
+        let isBranchLast = descendants.last?.id == viewModel.visibleComments.last?.id
+        let compactHeight = compactRowGroupHeight(isLast: isBranchLast)
+        let expandedHeight = rootFrame.height + measuredDescendantHeight + missingDescendantHeight
 
-        return rootHeightDelta + measuredDescendantHeight + missingDescendantHeight + separatorHeight
+        return max(expandedHeight - compactHeight, 0)
     }
 
     private func visibleDescendants(of state: CommentRowState) -> [Comment] {
@@ -452,11 +463,28 @@ struct CommentsContentView: View {
         }
     }
 
+    private func performWithoutListAnimation(_ updates: () -> Void) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+
+        withTransaction(transaction) {
+            updates()
+        }
+    }
+
     private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
         guard let state = rowState(forCommentID: commentID) else { return }
+        guard collapsingBranch == nil else { return }
 
-        let shouldPreserveRoot = state.visibility == .visible
-        let collapseScrollDecision = shouldPreserveRoot ? collapseScrollDecision(for: state) : .none
+        if state.visibility == .visible {
+            collapseCommentBranch(from: state)
+        } else {
+            expandCommentBranch(from: state)
+        }
+    }
+
+    private func collapseCommentBranch(from state: CommentRowState) {
+        let collapseScrollDecision = collapseScrollDecision(for: state)
         if case .deferUntilLayout = collapseScrollDecision {
             rowFrames = [:]
             pendingScrollIntent = scrollPreservationIntent(for: state.id)
@@ -464,24 +492,81 @@ struct CommentsContentView: View {
             pendingScrollIntent = nil
         }
 
-        var toggledCommentID: Int?
+        let visibleRows = viewModel.visibleComments.map(rowState)
+        let branchRows = [state] + visibleDescendants(of: state).map(rowState)
+        let isBranchLast = branchRows.last?.id == visibleRows.last?.id
+        let branch = CollapsingCommentBranch(
+            rootID: state.id,
+            rows: branchRows,
+            rowIDs: Set(branchRows.map(\.id)),
+            isLast: isBranchLast,
+            height: measuredBranchHeight(for: branchRows)
+        )
+        let targetHeight = compactRowGroupHeight(isLast: isBranchLast)
+
+        performWithoutListAnimation {
+            collapsingBranch = branch
+        }
+
+        collapsingBranchGeneration += 1
+        let generation = collapsingBranchGeneration
+
+        Task { @MainActor in
+            await Task.yield()
+            guard collapsingBranchGeneration == generation,
+                  collapsingBranch?.rootID == state.id
+            else { return }
+
+            var toggledCommentID: Int?
+            performListAnimation {
+                guard let toggledComment = toggleCommentVisibility(state.id) else {
+                    pendingScrollIntent = nil
+                    collapsingBranch = nil
+                    return
+                }
+                toggledCommentID = toggledComment.id
+                collapsingBranch?.height = targetHeight
+            } completion: {
+                guard collapsingBranchGeneration == generation else { return }
+                collapsingBranch = nil
+
+                guard case .scrollToRoot = collapseScrollDecision,
+                      let toggledCommentID
+                else {
+                    return
+                }
+
+                performScrollUpdate(animated: true) {
+                    scrollCollapsedRootToTop(commentID: toggledCommentID)
+                }
+            }
+        }
+    }
+
+    private func expandCommentBranch(from state: CommentRowState) {
+        pendingScrollIntent = nil
+
         performListAnimation {
             guard let toggledComment = toggleCommentVisibility(state.id) else {
                 pendingScrollIntent = nil
                 return
             }
-            toggledCommentID = toggledComment.id
-        } completion: {
-            guard case .scrollToRoot = collapseScrollDecision,
-                  let toggledCommentID
-            else {
-                return
-            }
-
-            performScrollUpdate(animated: true) {
-                scrollCollapsedRootToTop(commentID: toggledCommentID)
-            }
+            rowFrames[toggledComment.id] = nil
         }
+    }
+
+    private func measuredBranchHeight(for branchRows: [CommentRowState]) -> CGFloat {
+        branchRows.reduce(CGFloat.zero) { total, state in
+            total + measuredRowGroupHeight(for: state)
+        }
+    }
+
+    private func measuredRowGroupHeight(for state: CommentRowState) -> CGFloat {
+        rowFrames[state.id]?.height ?? averageVisibleCommentRowHeight
+    }
+
+    private func compactRowGroupHeight(isLast: Bool) -> CGFloat {
+        estimatedCompactCommentRowHeight + (isLast ? 0 : 1)
     }
 
     private func commentRow(for state: CommentRowState, in post: Post) -> some View {
@@ -493,7 +578,6 @@ struct CommentsContentView: View {
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) }
         )
-        .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
         .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
         .padding(.trailing, 16)
         .padding(.vertical, 16)
@@ -562,15 +646,35 @@ struct CommentsContentView: View {
             commentRow(for: state, in: post)
             commentSeparator(for: state, isLast: isLast)
         }
+        .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
         .id(state.id)
         .transition(commentRowTransition(for: state))
+    }
+
+    @ViewBuilder
+    private func collapsingCommentBranchView(_ branch: CollapsingCommentBranch, in post: Post) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(branch.rows) { state in
+                commentRow(for: state, in: post)
+                commentSeparator(for: state, isLast: state.id == branch.rows.last?.id && branch.isLast)
+            }
+        }
+        .commentRowFrame(id: branch.rootID, isEnabled: tracksRowFrames)
+        .frame(height: max(branch.height, 0), alignment: .top)
+        .clipped()
+        .id(branch.rootID)
+        .allowsHitTesting(false)
     }
 
     @ViewBuilder
     private func commentsRows(for post: Post) -> some View {
         let rows = viewModel.visibleComments.map(rowState)
         ForEach(rows) { state in
-            commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
+            if let collapsingBranch, collapsingBranch.rootID == state.id {
+                collapsingCommentBranchView(collapsingBranch, in: post)
+            } else if collapsingBranch?.rowIDs.contains(state.id) != true {
+                commentRowGroup(for: state, in: post, isLast: state.id == rows.last?.id)
+            }
         }
     }
 
