@@ -32,38 +32,54 @@ struct CommentRow: View {
     let onShare: () -> Void
 
     var body: some View {
-        Button(action: onToggle) {
-            rowContent
-                .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
-                .padding(.trailing, 16)
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .contentShape(Rectangle())
-        .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
-        .contextMenu {
-            if state.canVote, !state.isUpvoted {
-                Button(action: onUpvote) {
-                    Label("Upvote", systemImage: "arrow.up")
+        rowDisplay
+            .overlay {
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .onTapGesture(perform: onToggle)
+                    .accessibilityHidden(true)
+            }
+            .overlay(alignment: .topLeading) {
+                rowControls
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
+            .accessibilityAction(.default, onToggle)
+            .contextMenu {
+                if state.canVote, !state.isUpvoted {
+                    Button(action: onUpvote) {
+                        Label("Upvote", systemImage: "arrow.up")
+                    }
+                }
+                if state.canUnvote, state.isUpvoted {
+                    Button(action: onUnvote) {
+                        Label("Unvote", systemImage: "arrow.uturn.down")
+                    }
+                }
+                Divider()
+                Button(action: onCopy) {
+                    Label("Copy", systemImage: "doc.on.doc")
+                }
+                Divider()
+                Button(action: onShare) {
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
             }
-            if state.canUnvote, state.isUpvoted {
-                Button(action: onUnvote) {
-                    Label("Unvote", systemImage: "arrow.uturn.down")
-                }
-            }
-            Divider()
-            Button(action: onCopy) {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-            Divider()
-            Button(action: onShare) {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
-        }
+    }
+
+    private var rowDisplay: some View {
+        rowContent
+            .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
+            .padding(.trailing, 16)
+            .padding(.vertical, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var rowControls: some View {
+        EmptyView()
     }
 
     private var rowContent: some View {
