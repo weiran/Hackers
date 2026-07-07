@@ -220,12 +220,12 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.frame.intersects(parent.frame))
         XCTAssertTrue(app.frame.intersects(firstChild.frame))
 
-        parent.tap()
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
 
         waitForNonExistence(firstChild, timeout: 2)
         XCTAssertTrue(parent.waitForExistence(timeout: 2))
 
-        parent.tap()
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
         XCTAssertTrue(app.frame.intersects(firstChild.frame))

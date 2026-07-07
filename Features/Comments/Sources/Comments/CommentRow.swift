@@ -66,7 +66,7 @@ struct CommentRow: View {
             }
         }
         .contentShape(.interaction, Rectangle())
-        .onTapGesture(perform: onToggle)
+        .highPriorityGesture(TapGesture().onEnded(onToggle))
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
