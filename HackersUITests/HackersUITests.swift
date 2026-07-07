@@ -220,7 +220,7 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.frame.intersects(parent.frame))
         XCTAssertTrue(app.frame.intersects(firstChild.frame))
 
-        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
 
         waitForNonExistence(firstChild, timeout: 2)
         XCTAssertTrue(parent.waitForExistence(timeout: 2))
@@ -229,6 +229,11 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
         XCTAssertTrue(app.frame.intersects(firstChild.frame))
+
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
+
+        waitForNonExistence(firstChild, timeout: 2)
+        XCTAssertTrue(parent.waitForExistence(timeout: 2))
     }
 
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {

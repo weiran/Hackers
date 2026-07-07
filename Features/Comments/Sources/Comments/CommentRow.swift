@@ -32,6 +32,39 @@ struct CommentRow: View {
     let onShare: () -> Void
 
     var body: some View {
+        Button(action: onToggle) {
+            rowContent
+                .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
+                .padding(.trailing, 16)
+                .padding(.vertical, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
+        .contextMenu {
+            if state.canVote, !state.isUpvoted {
+                Button(action: onUpvote) {
+                    Label("Upvote", systemImage: "arrow.up")
+                }
+            }
+            if state.canUnvote, state.isUpvoted {
+                Button(action: onUnvote) {
+                    Label("Unvote", systemImage: "arrow.uturn.down")
+                }
+            }
+            Divider()
+            Button(action: onCopy) {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            Divider()
+            Button(action: onShare) {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+        }
+    }
+
+    private var rowContent: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(state.author)
@@ -63,32 +96,6 @@ struct CommentRow: View {
             if let styledText = state.styledText {
                 Text(styledText)
                     .foregroundStyle(.primary)
-            }
-        }
-        .contentShape(.interaction, Rectangle())
-        .highPriorityGesture(TapGesture().onEnded(onToggle))
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
-        .accessibilityAction(.default, onToggle)
-        .contextMenu {
-            if state.canVote, !state.isUpvoted {
-                Button(action: onUpvote) {
-                    Label("Upvote", systemImage: "arrow.up")
-                }
-            }
-            if state.canUnvote, state.isUpvoted {
-                Button(action: onUnvote) {
-                    Label("Unvote", systemImage: "arrow.uturn.down")
-                }
-            }
-            Divider()
-            Button(action: onCopy) {
-                Label("Copy", systemImage: "doc.on.doc")
-            }
-            Divider()
-            Button(action: onShare) {
-                Label("Share", systemImage: "square.and.arrow.up")
             }
         }
     }

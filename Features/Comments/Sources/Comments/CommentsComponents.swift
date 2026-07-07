@@ -578,9 +578,6 @@ struct CommentsContentView: View {
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) }
         )
-        .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
-        .padding(.trailing, 16)
-        .padding(.vertical, 16)
         .accessibilityIdentifier("comments.comment.\(state.id)")
     }
 
