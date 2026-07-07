@@ -220,7 +220,7 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.frame.intersects(parent.frame))
         XCTAssertTrue(app.frame.intersects(firstChild.frame))
 
-        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
+        tapAbsolutePoint(x: parent.frame.minX + 8, y: parent.frame.minY + 8)
 
         waitForNonExistence(firstChild, timeout: 2)
         XCTAssertTrue(parent.waitForExistence(timeout: 2))
@@ -231,6 +231,14 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.frame.intersects(firstChild.frame))
 
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
+
+        waitForNonExistence(firstChild, timeout: 2)
+        XCTAssertTrue(parent.waitForExistence(timeout: 2))
+
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
+
+        tapAbsolutePoint(x: parent.frame.maxX - 8, y: parent.frame.minY + 8)
 
         waitForNonExistence(firstChild, timeout: 2)
         XCTAssertTrue(parent.waitForExistence(timeout: 2))
@@ -375,6 +383,15 @@ final class HackersUITests: XCTestCase {
 
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func tapAbsolutePoint(x: CGFloat, y: CGFloat) {
+        app.coordinate(
+            withNormalizedOffset: CGVector(
+                dx: x / app.frame.width,
+                dy: y / app.frame.height
+            )
+        ).tap()
     }
 
     private func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {

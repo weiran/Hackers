@@ -41,6 +41,8 @@ struct CommentRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
         .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
         .contextMenu {
             if state.canVote, !state.isUpvoted {
