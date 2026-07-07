@@ -663,8 +663,10 @@ private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent
     var body: some View {
         ZStack(alignment: .topLeading) {
             compactContent()
+                .frame(height: branch.compactHeight, alignment: .top)
                 .opacity(isCollapsed ? 1 : 0)
             expandedContent()
+                .frame(height: branch.expandedHeight, alignment: .top)
                 .opacity(isCollapsed ? 0 : 1)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
