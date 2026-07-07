@@ -40,9 +40,9 @@ public final class CommentsViewModel: @unchecked Sendable {
     private var bookmarksObservation: AnyCancellable?
     private var indexByID: [Int: Int] = [:]
     private var parentIndexByID: [Int: Int] = [:]
-    private var subtreeEndIndexByID: [Int: Int] = [:]
     private var visibleIndexByID: [Int: Int] = [:]
     private var visibleSignature: [VisibleCommentSignature] = []
+    private var collapsedCommentIDs: Set<Int> = []
 
     public var comments: [Comment] { commentsLoader.data }
     public var isLoading: Bool { commentsLoader.isLoading }
@@ -231,6 +231,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     public func revealComment(withId id: Int) -> Bool {
         guard let index = indexByID[id] else { return false }
         let targetComment = comments[index]
+        collapsedCommentIDs.remove(targetComment.id)
         targetComment.visibility = .visible
 
         if targetComment.level > 0 {
@@ -250,21 +251,12 @@ public final class CommentsViewModel: @unchecked Sendable {
     @discardableResult
     public func toggleCommentVisibility(withID id: Int) -> Comment? {
         guard let comment = comment(withID: id) else { return nil }
-        let visible = comment.visibility == .visible
-        comment.visibility = visible ? .compact : .visible
-
-        if let commentIndex = indexByID[comment.id] {
-            let subtreeEndIndex = subtreeEndIndexByID[comment.id] ?? (commentIndex + 1)
-
-            if commentIndex + 1 < subtreeEndIndex {
-                for childIndex in (commentIndex + 1) ..< subtreeEndIndex {
-                    let currentComment = comments[childIndex]
-                    if visible, currentComment.visibility == .hidden {
-                        continue
-                    }
-                    currentComment.visibility = visible ? .hidden : .visible
-                }
-            }
+        if collapsedCommentIDs.contains(comment.id) {
+            collapsedCommentIDs.remove(comment.id)
+            comment.visibility = .visible
+        } else {
+            collapsedCommentIDs.insert(comment.id)
+            comment.visibility = .compact
         }
 
         updateVisibleComments()
@@ -281,6 +273,11 @@ public final class CommentsViewModel: @unchecked Sendable {
     public func visibleComment(withID id: Int) -> Comment? {
         guard let index = visibleIndexByID[id] else { return nil }
         return visibleComments[index]
+    }
+
+    @MainActor
+    public func isCommentCollapsed(withID id: Int) -> Bool {
+        collapsedCommentIDs.contains(id)
     }
 
     @MainActor
@@ -331,15 +328,20 @@ private extension CommentsViewModel {
     func rebuildCommentIndexes() {
         indexByID = [:]
         parentIndexByID = [:]
-        subtreeEndIndexByID = [:]
 
+        var validCommentIDs = Set<Int>()
         var stack: [(index: Int, id: Int, level: Int)] = []
         for index in comments.indices {
             let comment = comments[index]
+            validCommentIDs.insert(comment.id)
             indexByID[comment.id] = index
+            if comment.visibility == .compact {
+                collapsedCommentIDs.insert(comment.id)
+            } else if comment.visibility == .hidden {
+                comment.visibility = .visible
+            }
 
             while let last = stack.last, comment.level <= last.level {
-                subtreeEndIndexByID[last.id] = index
                 stack.removeLast()
             }
 
@@ -350,15 +352,31 @@ private extension CommentsViewModel {
             stack.append((index: index, id: comment.id, level: comment.level))
         }
 
-        for item in stack {
-            subtreeEndIndexByID[item.id] = comments.endIndex
-        }
+        collapsedCommentIDs.formIntersection(validCommentIDs)
     }
 
     func updateVisibleComments() {
-        let updatedComments = comments.filter { $0.visibility != .hidden }
-        let updatedSignature = updatedComments.map {
-            VisibleCommentSignature(id: $0.id, visibility: $0.visibility)
+        var updatedComments: [Comment] = []
+        var hiddenUntilLevel: Int?
+
+        for comment in comments {
+            if let hiddenLevel = hiddenUntilLevel {
+                guard comment.level <= hiddenLevel else { continue }
+                hiddenUntilLevel = nil
+            }
+
+            updatedComments.append(comment)
+
+            if collapsedCommentIDs.contains(comment.id) {
+                hiddenUntilLevel = comment.level
+            }
+        }
+
+        let updatedSignature = updatedComments.map { comment in
+            VisibleCommentSignature(
+                id: comment.id,
+                visibility: collapsedCommentIDs.contains(comment.id) ? .compact : .visible
+            )
         }
 
         guard updatedSignature != visibleSignature else { return }
@@ -374,7 +392,7 @@ private extension CommentsViewModel {
         guard let commentIndex = indexByID[comment.id] else { return nil }
 
         for index in (0 ... commentIndex).reversed()
-            where comments[index].level == 0 && comments[index].visibility != .hidden {
+            where comments[index].level == 0 {
             return comments[index]
         }
 
@@ -384,6 +402,7 @@ private extension CommentsViewModel {
     func ensureAncestorVisibility(forCommentAt index: Int) {
         var currentCommentID = comments[index].id
         while let parentIndex = parentIndexByID[currentCommentID] {
+            collapsedCommentIDs.remove(comments[parentIndex].id)
             comments[parentIndex].visibility = .visible
             currentCommentID = comments[parentIndex].id
         }

@@ -413,7 +413,9 @@ struct CommentsViewModelTests {
 
             // Then
             #expect(loadedParent.visibility == Domain.CommentVisibilityType.compact)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.hidden)
+            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
+            #expect(sut.isCommentCollapsed(withID: loadedParent.id))
+            #expect(!sut.isCommentCollapsed(withID: loadedChild.id))
             #expect(sut.visibleComments.count == 1)
         }
 
@@ -442,6 +444,7 @@ struct CommentsViewModelTests {
             // Then
             #expect(loadedParent.visibility == Domain.CommentVisibilityType.visible)
             #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
+            #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
             #expect(sut.visibleComments.count == 2)
         }
 
@@ -466,6 +469,7 @@ struct CommentsViewModelTests {
 
             #expect(loadedParent.visibility == .compact)
             #expect(loadedSibling.visibility == .visible)
+            #expect(!sut.isCommentCollapsed(withID: loadedSibling.id))
             #expect(sut.visibleComments.map(\.id) == [1, 4])
         }
 
@@ -485,12 +489,14 @@ struct CommentsViewModelTests {
 
             #expect(loadedParent.visibility == .compact)
             #expect(staleParent.visibility == .visible)
+            #expect(sut.isCommentCollapsed(withID: loadedParent.id))
             #expect(sut.visibleComments.map(\.id) == [1])
 
             let toggledParent = sut.toggleCommentVisibility(withID: 1)
 
             #expect(toggledParent === loadedParent)
             #expect(loadedParent.visibility == .visible)
+            #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
             #expect(sut.visibleComments.map(\.id) == [1, 2])
             #expect(sut.toggleCommentVisibility(withID: 999) == nil)
         }
@@ -544,8 +550,9 @@ struct CommentsViewModelTests {
 
             #expect(collapsedRoot === loadedRoot)
             #expect(loadedRoot.visibility == Domain.CommentVisibilityType.compact)
-            #expect(loadedChild1.visibility == Domain.CommentVisibilityType.hidden)
-            #expect(loadedChild2.visibility == Domain.CommentVisibilityType.hidden)
+            #expect(loadedChild1.visibility == Domain.CommentVisibilityType.visible)
+            #expect(loadedChild2.visibility == Domain.CommentVisibilityType.visible)
+            #expect(sut.isCommentCollapsed(withID: loadedRoot.id))
             #expect(sut.visibleComments.count == 1)
         }
 
@@ -578,7 +585,33 @@ struct CommentsViewModelTests {
             #expect(loadedRoot.visibility == .visible)
             #expect(loadedChild.visibility == .visible)
             #expect(loadedGrandchild.visibility == .visible)
+            #expect(!sut.isCommentCollapsed(withID: loadedRoot.id))
             #expect(sut.visibleComments.contains(where: { $0.id == 3 }))
+        }
+
+        @Test("Nested collapsed child stays collapsed after parent collapse and expand")
+        @MainActor
+        func nestedCollapsedChildPersistsThroughParentToggle() async {
+            let rootComment = createTestComment(id: 1, level: 0)
+            let childComment = createTestComment(id: 2, level: 1)
+            let grandchildComment = createTestComment(id: 3, level: 2)
+
+            mockPostUseCase.mockPost = createPostWithComments(comments: [rootComment, childComment, grandchildComment])
+
+            await sut.loadComments()
+
+            let loadedRoot = sut.comments.first(where: { $0.id == 1 })!
+            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
+
+            sut.toggleCommentVisibility(loadedChild)
+            #expect(sut.visibleComments.map(\.id) == [1, 2])
+
+            sut.toggleCommentVisibility(loadedRoot)
+            #expect(sut.visibleComments.map(\.id) == [1])
+
+            sut.toggleCommentVisibility(loadedRoot)
+            #expect(sut.visibleComments.map(\.id) == [1, 2])
+            #expect(sut.isCommentCollapsed(withID: 2))
         }
 
         @Test("Next visible comment advances through visible projection")

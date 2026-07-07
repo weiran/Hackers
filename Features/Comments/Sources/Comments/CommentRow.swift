@@ -33,13 +33,8 @@ struct CommentRow: View {
 
     var body: some View {
         rowDisplay
-            .overlay {
-                Rectangle()
-                    .fill(.clear)
-                    .contentShape(Rectangle())
-                    .onTapGesture(perform: onToggle)
-                    .accessibilityHidden(true)
-            }
+            .contentShape(.interaction, Rectangle())
+            .onTapGesture(perform: onToggle)
             .overlay(alignment: .topLeading) {
                 rowControls
             }
@@ -114,8 +109,10 @@ struct CommentRow: View {
             if let styledText = state.styledText {
                 Text(styledText)
                     .foregroundStyle(.primary)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+        .clipped()
     }
 }
 

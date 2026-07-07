@@ -74,7 +74,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var votingViewModel: VotingViewModel
     @State private var titleVisibility: CommentsHeaderTitleVisibility
     @State private var pendingCommentID: Int?
-    @State private var listAnimationsEnabled = false
 
     public init(
         postID: Int,
@@ -191,7 +190,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     pendingCommentID: $pendingCommentID,
-                    listAnimationsEnabled: $listAnimationsEnabled,
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")
