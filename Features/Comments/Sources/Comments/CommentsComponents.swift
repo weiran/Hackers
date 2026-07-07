@@ -659,6 +659,7 @@ struct CommentsContentView: View {
                 commentSeparator(for: state, isLast: state.id == branch.rows.last?.id && branch.isLast)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .commentRowFrame(id: branch.rootID, isEnabled: tracksRowFrames)
         .frame(height: max(branch.height, 0), alignment: .top)
         .clipped()
