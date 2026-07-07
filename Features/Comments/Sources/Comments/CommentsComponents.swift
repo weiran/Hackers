@@ -666,6 +666,7 @@ private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent
                 .frame(height: branch.compactHeight, alignment: .top)
                 .opacity(isCollapsed ? 1 : 0)
             expandedContent()
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(height: branch.expandedHeight, alignment: .top)
                 .opacity(isCollapsed ? 0 : 1)
         }
