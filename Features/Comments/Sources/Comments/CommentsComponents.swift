@@ -357,42 +357,6 @@ struct CommentsContentView: View {
         }
     }
 
-    private func maxContentOffsetY(afterRemoving removedHeight: CGFloat, metrics: CommentScrollMetrics) -> CGFloat {
-        let contentHeight = max(metrics.contentSize.height - removedHeight, 0)
-        return max(contentHeight - metrics.visibleRect.height, 0)
-    }
-
-    private func clampedScrollY(forRootTop rootTop: CGFloat, maxOffsetY: CGFloat, metrics: CommentScrollMetrics) -> CGFloat {
-        min(max(rootTop - visibleContentTopInset(for: metrics), 0), maxOffsetY)
-    }
-
-    private func coordinatedCollapseScrollTarget(
-        for branch: CollapsingCommentBranch,
-        expandedHeight: CGFloat,
-        compactHeight: CGFloat
-    ) -> CGFloat? {
-        let metrics = latestScrollMetrics.latest
-        let visibleRect = visibleContentRect(for: metrics)
-        guard let rootFrame = rowFrames[branch.rootID],
-              visibleRect.height > 0,
-              metrics.contentSize.height > 0,
-              metrics.visibleRect.height > 0
-        else { return nil }
-
-        guard rootFrame.minY < visibleRect.minY || rootFrame.minY >= visibleRect.maxY else {
-            return nil
-        }
-
-        let removedHeight = max(expandedHeight - compactHeight, 0)
-        let targetY = clampedScrollY(
-            forRootTop: rootFrame.minY,
-            maxOffsetY: maxContentOffsetY(afterRemoving: removedHeight, metrics: metrics),
-            metrics: metrics
-        )
-        guard abs(targetY - metrics.visibleRect.minY) > 0.5 else { return nil }
-        return targetY
-    }
-
     private func scrollToPendingComment() {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
@@ -426,7 +390,7 @@ struct CommentsContentView: View {
         }
     }
 
-    private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
+    private func toggleCommentVisibilityWithCollapseAnimation(commentID: Int) {
         guard collapsingBranch == nil else { return }
         guard let state = rowState(forCommentID: commentID) else { return }
         if state.visibility == .visible {
@@ -559,7 +523,7 @@ struct CommentsContentView: View {
     private func commentRow(for state: CommentRowState, in post: Post) -> some View {
         CommentRow(
             state: state,
-            onToggle: { toggleCommentVisibilityWithScrollPreservation(commentID: state.id) },
+            onToggle: { toggleCommentVisibilityWithCollapseAnimation(commentID: state.id) },
             onUpvote: { upvoteComment(withID: state.id, in: post) },
             onUnvote: { unvoteComment(withID: state.id, in: post) },
             onCopy: { copyComment(withID: state.id) },
@@ -617,7 +581,7 @@ struct CommentsContentView: View {
         }
     }
 
-    private func commentRowTransition(for state: CommentRowState) -> AnyTransition {
+    private var commentRowTransition: AnyTransition {
         .opacity
     }
 
@@ -634,7 +598,7 @@ struct CommentsContentView: View {
         }
         .commentRowFrame(id: state.id, isEnabled: tracksFrame && tracksRowFrames)
         .id(state.id)
-        .transition(commentRowTransition(for: state))
+        .transition(commentRowTransition)
     }
 
     @ViewBuilder
@@ -642,17 +606,6 @@ struct CommentsContentView: View {
         CollapsingCommentBranchView(
             branch: branch,
             animation: Self.commentCollapseAnimation,
-            onAnimationStarted: { expandedHeight, compactHeight in
-                guard let targetY = coordinatedCollapseScrollTarget(
-                    for: branch,
-                    expandedHeight: expandedHeight,
-                    compactHeight: compactHeight
-                ) else { return }
-
-                withAnimation(Self.commentCollapseAnimation) {
-                    scrollPosition.scrollTo(y: targetY)
-                }
-            },
             onFinished: {
                 if collapsingBranch?.rootID == branch.rootID {
                     var transaction = Transaction()
@@ -793,7 +746,6 @@ struct CommentsContentView: View {
 private struct CollapsingCommentBranchView<SnapshotContent: View, CompactContent: View>: View {
     let branch: CollapsingCommentBranch
     let animation: Animation
-    let onAnimationStarted: (CGFloat, CGFloat) -> Void
     let onFinished: () -> Void
     @ViewBuilder let snapshotContent: () -> SnapshotContent
     @ViewBuilder let compactContent: () -> CompactContent
@@ -847,7 +799,6 @@ private struct CollapsingCommentBranchView<SnapshotContent: View, CompactContent
             hasStartedCollapse = true
             let expandedHeight = max(branch.expandedHeight, compactHeight)
             animatedHeight = expandedHeight
-            onAnimationStarted(expandedHeight, compactHeight)
             withAnimation(animation, completionCriteria: .logicallyComplete) {
                 animatedHeight = compactHeight
             } completion: {
