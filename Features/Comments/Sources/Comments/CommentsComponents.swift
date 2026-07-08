@@ -49,6 +49,7 @@ private enum CommentScrollIntent {
 }
 
 private struct CollapsingCommentBranch {
+    let transitionID: UUID
     let rootID: Int
     let expandedRows: [CommentRowState]
     let compactRoot: CommentRowState
@@ -439,6 +440,7 @@ struct CommentsContentView: View {
         let isLast = allRows.last?.id == viewModel.visibleComments.last?.id
 
         return CollapsingCommentBranch(
+            transitionID: UUID(),
             rootID: state.id,
             expandedRows: allRows,
             compactRoot: compactState(from: state),
@@ -534,8 +536,8 @@ struct CommentsContentView: View {
         }
     }
 
-    private func commentRowTransition(for _: CommentRowState) -> AnyTransition {
-        .commentTopReveal
+    private func commentRowTransition(for state: CommentRowState) -> AnyTransition {
+        state.level == 0 ? .opacity : .commentTopReveal
     }
 
     @ViewBuilder
@@ -592,7 +594,7 @@ struct CommentsContentView: View {
             }
         )
         .commentRowFrame(id: branch.rootID, isEnabled: tracksRowFrames)
-        .id(branch.rootID)
+        .id(branch.transitionID)
     }
 
     @ViewBuilder
