@@ -51,48 +51,14 @@ public struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(footer: versionLabel) {
-                    NavigationLink {
-                        SupportView()
-                    } label: {
-                        Label("Support the App", systemImage: "heart.circle.fill")
-                    }
-                    Button(action: {
-                        if let url = URL(string: "https://github.com/weiran/hackers") {
-                            UIApplication.shared.open(url)
-                        }
-                    }, label: {
-                        Label("Hackers on GitHub", systemImage: "link")
-                    })
-                    Button(action: {
-                        showMailView.toggle()
-                    }, label: {
-                        Label("Send Feedback", systemImage: "paperplane")
-                    })
-                    .disabled(!MFMailComposeViewController.canSendMail())
-                    .sheet(isPresented: $showMailView) {
-                        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-                        let deviceIdentifier = UIDevice.current.modelIdentifier
-                        let systemVersion = UIDevice.current.systemVersion
-                        let bodyLines = [
-                            "",
-                            "",
-                            "",
-                            "---",
-                            "App Version: \(version)",
-                            "Device Model: \(deviceIdentifier)",
-                            "iOS Version: \(systemVersion)"
-                        ]
-
-                        MailView(
-                            result: $mailResult,
-                            recipients: ["weiran@zhang.me.uk"],
-                            subject: "Hackers App Feedback",
-                            messageBody: bodyLines.joined(separator: "\n"),
-                        )
-                    }
-                    Button(action: { showWhatsNew = true }, label: {
-                        Label("Show What's New", systemImage: "sparkles")
-                    })
+                    SettingsHeroSection(
+                        canSendFeedback: MFMailComposeViewController.canSendMail(),
+                        openGitHub: openGitHub,
+                        sendFeedback: { showMailView = true },
+                        showWhatsNew: { showWhatsNew = true }
+                    )
+                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
+                    .listRowSeparator(.hidden)
                 }
 
                 Section(header: Text("Account")) {
@@ -250,6 +216,9 @@ public struct SettingsView: View {
                 )
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("settings.close"))
+            .sheet(isPresented: $showMailView) {
+                feedbackMailView
+            }
             .sheet(isPresented: $showWhatsNew) {
                 WhatsNewService.createWhatsNewView {
                     onWhatsNewDismiss()
@@ -260,6 +229,34 @@ public struct SettingsView: View {
             }
         }
         .textScaling(for: viewModel.textSize)
+    }
+
+    private func openGitHub() {
+        if let url = URL(string: "https://github.com/weiran/hackers") {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private var feedbackMailView: some View {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let deviceIdentifier = UIDevice.current.modelIdentifier
+        let systemVersion = UIDevice.current.systemVersion
+        let bodyLines = [
+            "",
+            "",
+            "",
+            "---",
+            "App Version: \(version)",
+            "Device Model: \(deviceIdentifier)",
+            "iOS Version: \(systemVersion)"
+        ]
+
+        return MailView(
+            result: $mailResult,
+            recipients: ["weiran@zhang.me.uk"],
+            subject: "Hackers App Feedback",
+            messageBody: bodyLines.joined(separator: "\n"),
+        )
     }
 
     private var versionLabel: some View {
@@ -277,6 +274,174 @@ public struct SettingsView: View {
         }
     }
 
+}
+
+private struct SettingsHeroSection: View {
+    let canSendFeedback: Bool
+    let openGitHub: () -> Void
+    let sendFeedback: () -> Void
+    let showWhatsNew: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .center, spacing: 14) {
+                AppIconView()
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Hackers")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.primary)
+
+                    Text("A focused Hacker News reader")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Divider()
+
+            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
+                GridRow {
+                    NavigationLink {
+                        SupportView()
+                    } label: {
+                        SettingsHeroAction(
+                            title: "Donate",
+                            systemImage: "heart.fill",
+                            style: .primary
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    SettingsHeroButton(
+                        title: "GitHub",
+                        systemImage: "link",
+                        action: openGitHub
+                    )
+                }
+
+                GridRow {
+                    SettingsHeroButton(
+                        title: "Feedback",
+                        systemImage: "paperplane",
+                        isEnabled: canSendFeedback,
+                        action: sendFeedback
+                    )
+
+                    SettingsHeroButton(
+                        title: "What's New",
+                        systemImage: "sparkles",
+                        action: showWhatsNew
+                    )
+                }
+            }
+        }
+        .padding(18)
+        .background(AppColors.background, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(.quaternary, lineWidth: 1)
+        }
+    }
+}
+
+private struct AppIconView: View {
+    var body: some View {
+        Group {
+            if let icon = Bundle.main.icon {
+                Image(uiImage: icon)
+                    .resizable()
+            } else {
+                Image(systemName: "h.square.fill")
+                    .resizable()
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(AppColors.appTintColor, AppColors.background)
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .frame(width: 64, height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .stroke(.white.opacity(0.55), lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct SettingsHeroButton: View {
+    let title: String
+    let systemImage: String
+    var isEnabled = true
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            SettingsHeroAction(title: title, systemImage: systemImage, style: .secondary)
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.45)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        switch title {
+        case "GitHub": "Hackers on GitHub"
+        case "Feedback": "Send Feedback"
+        case "What's New": "Show What's New"
+        default: title
+        }
+    }
+}
+
+private struct SettingsHeroAction: View {
+    enum Style {
+        case primary
+        case secondary
+    }
+
+    let title: String
+    let systemImage: String
+    let style: Style
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.headline.weight(.semibold))
+                .frame(width: 22)
+                .accessibilityHidden(true)
+
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .allowsTightening(true)
+
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(foregroundStyle)
+        .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+        .padding(.horizontal, 14)
+        .background(backgroundStyle, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var foregroundStyle: Color {
+        switch style {
+        case .primary: .white
+        case .secondary: AppColors.appTintColor
+        }
+    }
+
+    private var backgroundStyle: Color {
+        switch style {
+        case .primary: AppColors.appTintColor
+        case .secondary: AppColors.appTintColor.opacity(0.1)
+        }
+    }
 }
 
 private extension UIDevice {
