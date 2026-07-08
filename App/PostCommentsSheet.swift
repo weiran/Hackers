@@ -7,21 +7,6 @@ import UIKit
 
 // swiftlint:disable type_body_length
 
-private struct LeadingEdgeExcludedRectangle: Shape {
-    let excludedWidth: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let clampedWidth = min(max(excludedWidth, 0), rect.width)
-        let hitRect = CGRect(
-            x: rect.minX + clampedWidth,
-            y: rect.minY,
-            width: rect.width - clampedWidth,
-            height: rect.height
-        )
-        return Path(hitRect)
-    }
-}
-
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius

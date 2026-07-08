@@ -14,16 +14,4 @@ public extension String {
             .replacingOccurrences(of: "\t", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
-
-    subscript(value: PartialRangeUpTo<Int>) -> Substring {
-        self[..<index(startIndex, offsetBy: value.upperBound)]
-    }
-
-    subscript(value: PartialRangeThrough<Int>) -> Substring {
-        self[...index(startIndex, offsetBy: value.upperBound)]
-    }
-
-    subscript(value: PartialRangeFrom<Int>) -> Substring {
-        self[index(startIndex, offsetBy: value.lowerBound)...]
-    }
 }
