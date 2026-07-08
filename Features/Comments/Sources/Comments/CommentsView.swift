@@ -219,16 +219,18 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
         .toolbar {
             if controlsNavigationBarVisibility && showsToolbar {
-                ToolbarItem(placement: .principal) {
-                    if let post = viewModel.post {
-                        ToolbarTitle(
-                            post: post,
-                            showThumbnails: viewModel.showThumbnails,
-                            titleVisibility: titleVisibility,
-                            onTap: handleLinkTap,
-                            onDragChanged: onTitleDragChanged,
-                            onDragEnded: onTitleDragEnded,
-                        )
+                if !presentationState.usesCustomHeaderBlur {
+                    ToolbarItem(placement: .principal) {
+                        if let post = viewModel.post {
+                            ToolbarTitle(
+                                post: post,
+                                showThumbnails: viewModel.showThumbnails,
+                                titleVisibility: titleVisibility,
+                                onTap: handleLinkTap,
+                                onDragChanged: onTitleDragChanged,
+                                onDragEnded: onTitleDragEnded,
+                            )
+                        }
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {

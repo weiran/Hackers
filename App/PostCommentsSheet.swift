@@ -248,7 +248,8 @@ struct PostCommentsSheet: View {
             sheetHandle(
                 expandedTop: expandedTop,
                 collapsedTop: collapsedTop,
-                handleTopInset: handleTopInset
+                handleTopInset: handleTopInset,
+                titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
             )
         }
     }
@@ -305,22 +306,25 @@ struct PostCommentsSheet: View {
     private func sheetHandle(
         expandedTop: CGFloat,
         collapsedTop: CGFloat,
-        handleTopInset: CGFloat
+        handleTopInset: CGFloat,
+        titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
         return ZStack(alignment: .bottom) {
-            HStack {
-                Spacer()
-
-                Capsule()
-                    .fill(.secondary.opacity(0.35))
-                    .frame(width: Self.handleWidth, height: Self.handleThickness)
-                    .frame(width: 88, height: Self.handleAreaHeight, alignment: .center)
-                    .allowsHitTesting(false)
-
-                Spacer()
-            }
+            CommentsSheetTopChrome(
+                post: viewModel.post,
+                showThumbnails: viewModel.showThumbnails,
+                titleProgress: titleProgress,
+                handleTopInset: handleTopInset,
+                handleWidth: Self.handleWidth,
+                handleThickness: Self.handleThickness,
+                handleAreaHeight: Self.handleAreaHeight,
+                navigationBarHeight: Self.navigationBarHeight,
+                onTitleTap: collapseSheet
+            )
+            .simultaneousGesture(titlePillDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+            .allowsHitTesting(titleProgress > 0.5)
 
             HStack {
                 Spacer()
@@ -330,15 +334,23 @@ struct PostCommentsSheet: View {
                     .frame(width: Self.expandedHandleHitTargetWidth, height: handleHitTargetHeight)
                     .contentShape(Rectangle())
                     .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                    .allowsHitTesting(titleProgress <= 0.5)
+                    .accessibilityElement()
+                    .accessibilityLabel("Comments sheet handle")
+                    .accessibilityHidden(titleProgress > 0.5)
 
                 Spacer()
             }
+            .padding(.top, handleTopInset)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Self.handleAreaHeight + handleTopInset, alignment: .bottom)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Comments sheet handle")
+        .frame(height: Self.navigationBarHeight + handleTopInset, alignment: .top)
         .accessibilityIdentifier("browser.commentsSheet.handle")
+    }
+
+    private func titleChromeProgress(contentFadeProgress: CGFloat) -> CGFloat {
+        guard expandedTitleVisibility.isVisible else { return 0 }
+        return min(max(contentFadeProgress, 0), 1)
     }
 
     private var collapsedHeader: some View {
@@ -502,6 +514,24 @@ private extension PostCommentsSheet {
                     presentation.updateHandleDrag(translationHeight: endTranslation)
                 }
                 guard presentation.canEndHandleDrag() else {
+                    scheduleCollapsedUpvoteReenable()
+                    return
+                }
+                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+            }
+    }
+
+    private func titlePillDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 18, coordinateSpace: .global)
+            .onChanged { value in
+                presentation.updateExpandedToolbarDrag(
+                    startX: value.startLocation.x,
+                    translation: value.translation,
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                )
+            }
+            .onEnded { value in
+                guard presentation.canEndExpandedToolbarDrag() else {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
@@ -713,6 +743,88 @@ private final class WindowTopDragHitAreaView: UIView {
 private extension CGPoint {
     var size: CGSize {
         CGSize(width: x, height: y)
+    }
+}
+
+private struct CommentsSheetTopChrome: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let post: Post?
+    let showThumbnails: Bool
+    let titleProgress: CGFloat
+    let handleTopInset: CGFloat
+    let handleWidth: CGFloat
+    let handleThickness: CGFloat
+    let handleAreaHeight: CGFloat
+    let navigationBarHeight: CGFloat
+    let onTitleTap: () -> Void
+
+    private var progress: CGFloat {
+        min(max(titleProgress, 0), 1)
+    }
+
+    private var easedProgress: CGFloat {
+        progress * progress * (3 - (2 * progress))
+    }
+
+    private var handleOpacity: CGFloat {
+        1 - easedProgress
+    }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            handle
+                .padding(.top, handleTopInset)
+
+            if let post {
+                titleButton(for: post)
+                    .padding(.top, handleTopInset)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: navigationBarHeight + handleTopInset, alignment: .top)
+        .animation(chromeAnimation, value: progress)
+    }
+
+    private var handle: some View {
+        HStack {
+            Spacer()
+
+            Capsule()
+                .fill(.secondary.opacity(0.35))
+                .frame(
+                    width: handleWidth + (reduceMotion ? 0 : 18 * easedProgress),
+                    height: handleThickness
+                )
+                .frame(width: 88, height: handleAreaHeight, alignment: .center)
+                .opacity(handleOpacity)
+                .offset(y: reduceMotion ? 0 : -4 * easedProgress)
+                .allowsHitTesting(false)
+
+            Spacer()
+        }
+        .accessibilityHidden(progress > 0.5)
+    }
+
+    private func titleButton(for post: Post) -> some View {
+        Button(action: onTitleTap) {
+            CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
+                .scaleEffect(reduceMotion ? 1 : 0.92 + (0.08 * easedProgress))
+                .offset(y: reduceMotion ? 0 : 7 * (1 - easedProgress))
+                .opacity(easedProgress)
+        }
+        .buttonStyle(.plain)
+        .disabled(progress <= 0.5)
+        .accessibilityLabel(post.title)
+        .accessibilityHint("Collapse comments")
+        .accessibilityHidden(progress <= 0.5)
+    }
+
+    private var chromeAnimation: Animation {
+        if reduceMotion {
+            .easeInOut(duration: 0.2)
+        } else {
+            .spring(response: 0.32, dampingFraction: 0.84, blendDuration: 0.05)
+        }
     }
 }
 
