@@ -129,12 +129,9 @@ struct CommentRow: View {
             commentText
                 .transaction { transaction in
                     transaction.disablesAnimations = true
-            }
+                }
         }
         .clipped()
-        .transaction { transaction in
-            transaction.disablesAnimations = true
-        }
     }
 
     @ViewBuilder
