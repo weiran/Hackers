@@ -26,12 +26,12 @@ struct CommentRowState: Equatable, Identifiable {
 struct CommentRow: View {
     private enum Metrics {
         static let horizontalPadding: CGFloat = 16
-        static let verticalPadding: CGFloat = 14
-        static let nestedTopPadding: CGFloat = 10
+        static let verticalPadding: CGFloat = 16
+        static let nestedTopPadding: CGFloat = 12
         static let railWidth: CGFloat = 2
-        static let railSpacing: CGFloat = 10
-        static let railContentSpacing: CGFloat = 12
-        static let maxVisibleDepth = 6
+        static let railSpacing: CGFloat = 42
+        static let railContentSpacing: CGFloat = 36
+        static let maxVisibleGuides = 3
     }
 
     let state: CommentRowState
@@ -85,7 +85,6 @@ struct CommentRow: View {
             .overlay(alignment: .leading) {
                 threadRails
                     .padding(.leading, Metrics.horizontalPadding)
-                    .padding(.vertical, 6)
             }
     }
 
@@ -94,23 +93,19 @@ struct CommentRow: View {
         EmptyView()
     }
 
-    private var visibleDepth: Int {
-        min(max(state.level, 0), Metrics.maxVisibleDepth)
-    }
-
-    private var railStride: CGFloat {
-        Metrics.railWidth + Metrics.railSpacing
+    private var visibleGuideCount: Int {
+        min(max(state.level + 1, 1), Metrics.maxVisibleGuides)
     }
 
     private var contentLeadingPadding: CGFloat {
-        let railWidth = CGFloat(visibleDepth) * railStride
-        let nestedSpacing = visibleDepth == 0 ? 0 : Metrics.railContentSpacing
-        return Metrics.horizontalPadding + railWidth + nestedSpacing
+        let railWidth = CGFloat(visibleGuideCount) * Metrics.railWidth
+        let railSpacing = CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing
+        return Metrics.horizontalPadding + railWidth + railSpacing + Metrics.railContentSpacing
     }
 
     private var rowContent: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
+            HStack(spacing: 10) {
                 Text(state.author)
                     .scaledFont(.subheadline)
                     .bold()
@@ -118,19 +113,12 @@ struct CommentRow: View {
                 Text(state.age)
                     .scaledFont(.subheadline)
                     .foregroundStyle(.secondary)
-                Spacer()
-                if state.isUpvoted {
-                    VoteIndicator(
-                        votingState: VotingState(
-                            isUpvoted: state.isUpvoted,
-                            score: nil,
-                            canVote: state.canVote,
-                            canUnvote: state.canUnvote
-                        ),
-                        style: VoteIndicatorStyle(showScore: false, iconFont: .body, iconScale: 1.0),
-                    )
+                metadataSeparator
+                if showsVoteControl {
+                    inlineVoteControl
                 }
                 if state.visibility == .compact {
+                    metadataSeparator
                     Image(systemName: "chevron.down")
                         .scaledFont(.caption)
                         .foregroundStyle(.secondary)
@@ -144,27 +132,56 @@ struct CommentRow: View {
 
     @ViewBuilder
     private var threadRails: some View {
-        if visibleDepth > 0 {
+        if visibleGuideCount > 0 {
             HStack(spacing: Metrics.railSpacing) {
-                ForEach(0..<visibleDepth, id: \.self) { depth in
+                ForEach(0..<visibleGuideCount, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: Metrics.railWidth / 2)
-                        .fill(threadRailColor(for: depth))
+                        .fill(Color.secondary.opacity(0.16))
                         .frame(width: Metrics.railWidth)
                         .frame(maxHeight: .infinity)
                 }
             }
-            .frame(width: CGFloat(visibleDepth) * railStride - Metrics.railSpacing)
+            .frame(width: CGFloat(visibleGuideCount) * Metrics.railWidth
+                + CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing)
             .frame(maxHeight: .infinity)
             .accessibilityHidden(true)
         }
     }
 
-    private func threadRailColor(for depth: Int) -> Color {
-        if depth == visibleDepth - 1 {
-            AppColors.appTintColor.opacity(state.visibility == .compact ? 0.35 : 0.5)
+    private var metadataSeparator: some View {
+        Text("•")
+            .scaledFont(.subheadline)
+            .foregroundStyle(.secondary)
+    }
+
+    private var showsVoteControl: Bool {
+        state.canVote || state.canUnvote || state.isUpvoted
+    }
+
+    @ViewBuilder
+    private var inlineVoteControl: some View {
+        if state.canUnvote, state.isUpvoted {
+            Button(action: onUnvote) {
+                voteLabel
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Unvote")
+        } else if state.canVote, !state.isUpvoted {
+            Button(action: onUpvote) {
+                voteLabel
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Upvote")
         } else {
-            Color.secondary.opacity(0.18)
+            voteLabel
         }
+    }
+
+    private var voteLabel: some View {
+        Image(systemName: state.isUpvoted ? "arrow.up.circle.fill" : "arrow.up")
+            .scaledFont(.subheadline)
+            .foregroundStyle(AppColors.upvotedColor)
+            .accessibilityHidden(true)
     }
 
     private var commentText: some View {
