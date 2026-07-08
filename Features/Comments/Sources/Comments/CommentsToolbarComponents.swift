@@ -153,7 +153,7 @@ private struct CommentsHeaderTitlePillLayout: View {
             ThumbnailView(
                 url: post.url,
                 isEnabled: showThumbnails,
-                showsPlaceholder: false,
+                showsPlaceholder: showThumbnails,
                 thumbnailSize: CGSize(width: 24, height: 24)
             )
                 .clipShape(.rect(cornerRadius: 7))
