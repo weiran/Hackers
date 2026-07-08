@@ -168,7 +168,7 @@ struct CommentsContentView: View {
         switch intent {
         case .revealComment(let commentID):
             if viewModel.visibleComments.contains(where: { $0.id == commentID }) {
-                performScrollUpdate(animated: animated) {
+                performScrollUpdate {
                     scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
                     pendingScrollIntent = nil
                     pendingCommentID = nil
@@ -199,12 +199,7 @@ struct CommentsContentView: View {
         resolvePendingScrollIntent(animated: true)
     }
 
-    private func performScrollUpdate(animated: Bool, _ updates: () -> Void) {
-        guard animated else {
-            updates()
-            return
-        }
-
+    private func performScrollUpdate(_ updates: () -> Void) {
         withAnimation(.easeInOut(duration: 0.3)) {
             updates()
         }
@@ -248,11 +243,6 @@ struct CommentsContentView: View {
         ContentSharePresenter.shared.shareComment(comment)
     }
 
-    private func rowState(forCommentID commentID: Int) -> CommentRowState? {
-        guard let comment = viewModel.visibleComment(withID: commentID) else { return nil }
-        return rowState(for: comment)
-    }
-
     private func rowState(for comment: Comment) -> CommentRowState {
         let isCollapsed = viewModel.isCommentCollapsed(withID: comment.id)
         return CommentRowState(
@@ -278,10 +268,6 @@ struct CommentsContentView: View {
         }
     }
 
-    private var commentRowTransition: AnyTransition {
-        .opacity
-    }
-
     @ViewBuilder
     private func commentRowGroup(
         for state: CommentRowState,
@@ -293,7 +279,7 @@ struct CommentsContentView: View {
             commentSeparator(isVisible: showsSeparator)
         }
         .id(state.id)
-        .transition(commentRowTransition)
+        .transition(.opacity)
     }
 
     @ViewBuilder

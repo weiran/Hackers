@@ -46,9 +46,6 @@ struct CommentRow: View {
         rowDisplay
             .contentShape(.interaction, Rectangle())
             .onTapGesture(perform: onToggle)
-            .overlay(alignment: .topLeading) {
-                rowControls
-            }
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("comments.comment.\(state.id)")
             .accessibilityAddTraits(.isButton)
@@ -87,11 +84,6 @@ struct CommentRow: View {
                 threadRails
                     .padding(.leading, Metrics.horizontalPadding)
             }
-    }
-
-    @ViewBuilder
-    private var rowControls: some View {
-        EmptyView()
     }
 
     private var visibleGuideCount: Int {
