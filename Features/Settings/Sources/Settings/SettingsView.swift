@@ -59,7 +59,7 @@ public struct SettingsView: View {
                         sendFeedback: { showMailView = true },
                         showWhatsNew: { showWhatsNew = true }
                     )
-                    .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+                    .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
                 }
 
@@ -341,7 +341,8 @@ private struct SettingsHeroSection: View {
                 }
             }
         }
-        .padding(14)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 }
 
