@@ -121,20 +121,18 @@ struct CommentRow: View {
                     .scaledFont(.subheadline)
                     .bold()
                     .foregroundStyle(state.isPostAuthor ? AppColors.appTintColor : .primary)
-                Text(state.age)
-                    .scaledFont(.subheadline)
-                    .foregroundStyle(.secondary)
-                metadataSeparator
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                 if showsVoteControl {
+                    metadataSeparator
                     inlineVoteControl
                 }
-                if state.visibility == .compact {
-                    metadataSeparator
-                    Image(systemName: "chevron.down")
-                        .scaledFont(.caption)
-                        .foregroundStyle(.secondary)
-                        .accessibilityHidden(true)
-                }
+                Spacer(minLength: 12)
+                Text(shortAge)
+                    .scaledFont(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .accessibilityLabel(state.age)
             }
             commentText
                 .transaction { transaction in
@@ -164,6 +162,24 @@ struct CommentRow: View {
 
     private var showsVoteControl: Bool {
         state.canVote || state.canUnvote || state.isUpvoted
+    }
+
+    private var shortAge: String {
+        let parts = state.age.split(separator: " ")
+        guard
+            parts.count >= 2,
+            let value = Int(parts[0])
+        else {
+            return state.age
+        }
+
+        let unit = parts[1].lowercased()
+        if unit.hasPrefix("minute") { return "\(value)m" }
+        if unit.hasPrefix("hour") { return "\(value)h" }
+        if unit.hasPrefix("day") { return "\(value)d" }
+        if unit.hasPrefix("month") { return "\(value)mo" }
+        if unit.hasPrefix("year") { return "\(value)y" }
+        return state.age
     }
 
     @ViewBuilder
