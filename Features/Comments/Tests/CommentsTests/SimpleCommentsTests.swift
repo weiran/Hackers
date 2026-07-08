@@ -6,7 +6,6 @@
 //
 
 @testable import Comments
-import CoreGraphics
 import Foundation
 import Testing
 
@@ -42,40 +41,4 @@ struct SimpleCommentsTests {
         }
     }
 
-    @Suite("Collapse Scroll Visibility")
-    struct CollapseScrollVisibilityTests {
-        @Test("Treats root top inside visible bounds as visible")
-        func rootTopInsideVisibleBounds() {
-            let frame = CGRect(x: 0, y: 140, width: 320, height: 52)
-            let visibleRect = CGRect(x: 0, y: 100, width: 320, height: 500)
-
-            #expect(CollapseScrollVisibility.isRootTopVisible(frame: frame, visibleRect: visibleRect))
-            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: frame, visibleRect: visibleRect) == true)
-        }
-
-        @Test("Treats root top above or below visible bounds as outside")
-        func rootTopOutsideVisibleBounds() {
-            let visibleRect = CGRect(x: 0, y: 100, width: 320, height: 500)
-            let aboveFrame = CGRect(x: 0, y: 80, width: 320, height: 52)
-            let belowFrame = CGRect(x: 0, y: 600, width: 320, height: 52)
-
-            #expect(!CollapseScrollVisibility.isRootTopVisible(frame: aboveFrame, visibleRect: visibleRect))
-            #expect(!CollapseScrollVisibility.isRootTopVisible(frame: belowFrame, visibleRect: visibleRect))
-            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: aboveFrame, visibleRect: visibleRect) == false)
-        }
-
-        @Test("Waits for missing collapsed root frame")
-        func missingRootFrameWaitsForLayout() {
-            let visibleRect = CGRect(x: 0, y: 100, width: 320, height: 500)
-
-            #expect(CollapseScrollVisibility.isMeasuredRootTopVisible(frame: nil, visibleRect: visibleRect) == nil)
-        }
-
-        @Test("Allows unresolved layout without forcing a scroll")
-        func unresolvedLayoutIsVisible() {
-            let frame = CGRect(x: 0, y: 120, width: 320, height: 52)
-
-            #expect(CollapseScrollVisibility.isRootTopVisible(frame: frame, visibleRect: .zero))
-        }
-    }
 }
