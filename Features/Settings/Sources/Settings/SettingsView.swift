@@ -59,7 +59,7 @@ public struct SettingsView: View {
                         sendFeedback: { showMailView = true },
                         showWhatsNew: { showWhatsNew = true }
                     )
-                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                     .listRowSeparator(.hidden)
                 }
 
@@ -341,7 +341,7 @@ private struct SettingsHeroSection: View {
                 }
             }
         }
-        .padding(18)
+        .padding(14)
     }
 }
 
@@ -361,10 +361,6 @@ private struct AppIconView: View {
         .aspectRatio(1, contentMode: .fit)
         .frame(width: 72, height: 72)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.55), lineWidth: 1)
-        }
         .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
         .accessibilityHidden(true)
     }
