@@ -51,25 +51,17 @@ private enum CommentScrollIntent {
 private struct CollapsingCommentBranch {
     let transitionID: UUID
     let rootID: Int
-    let expandedRows: [CommentRowState]
     let compactRoot: CommentRowState
     let rowIDs: Set<Int>
+    let expandedHeight: CGFloat
     let showsSeparatorAfter: Bool
 }
 
-private enum CollapsingBranchContentKind: Hashable {
-    case expanded
-    case compact
-}
+private struct CollapsingBranchCompactHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
 
-private struct CollapsingBranchHeightPreferenceKey: PreferenceKey {
-    static let defaultValue: [CollapsingBranchContentKind: CGFloat] = [:]
-
-    static func reduce(
-        value: inout [CollapsingBranchContentKind: CGFloat],
-        nextValue: () -> [CollapsingBranchContentKind: CGFloat]
-    ) {
-        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 
@@ -110,12 +102,12 @@ private extension View {
         }
     }
 
-    func collapsingBranchContentHeight(_ kind: CollapsingBranchContentKind) -> some View {
+    func collapsingBranchCompactHeight() -> some View {
         background {
             GeometryReader { geometry in
                 Color.clear.preference(
-                    key: CollapsingBranchHeightPreferenceKey.self,
-                    value: [kind: geometry.size.height]
+                    key: CollapsingBranchCompactHeightPreferenceKey.self,
+                    value: geometry.size.height
                 )
             }
         }
@@ -418,6 +410,10 @@ struct CommentsContentView: View {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) {
+                guard toggleCommentVisibility(state.id) != nil else {
+                    pendingScrollIntent = nil
+                    return
+                }
                 collapsingBranch = branch
             }
         } else {
@@ -435,18 +431,30 @@ struct CommentsContentView: View {
 
     private func collapsingBranch(from state: CommentRowState) -> CollapsingCommentBranch {
         let descendants = visibleDescendants(of: state)
-        let allRows = [state] + descendants.map { rowState(for: $0) }
-        let rowIDs = Set(allRows.map(\.id))
-        let showsSeparatorAfter = allRows.last.map { showsRootSeparator(afterCommentID: $0.id) } ?? false
+        let rowIDs = Set([state.id] + descendants.map(\.id))
+        let allIDs = [state.id] + descendants.map(\.id)
+        let expandedHeight = measuredThreadHeight(forCommentIDs: allIDs, rootID: state.id)
+        let lastID = allIDs.last ?? state.id
+        let showsSeparatorAfter = showsRootSeparator(afterCommentID: lastID)
 
         return CollapsingCommentBranch(
             transitionID: UUID(),
             rootID: state.id,
-            expandedRows: allRows,
             compactRoot: compactState(from: state),
             rowIDs: rowIDs,
+            expandedHeight: expandedHeight,
             showsSeparatorAfter: showsSeparatorAfter
         )
+    }
+
+    private func measuredThreadHeight(forCommentIDs commentIDs: [Int], rootID: Int) -> CGFloat {
+        guard let rootFrame = rowFrames[rootID] else { return 0 }
+
+        let measuredFrames = commentIDs.compactMap { rowFrames[$0] }
+        guard !measuredFrames.isEmpty else { return rootFrame.height }
+
+        let maxY = measuredFrames.map(\.maxY).max() ?? rootFrame.maxY
+        return max(rootFrame.height, maxY - rootFrame.minY)
     }
 
     private func visibleDescendants(of state: CommentRowState) -> [Comment] {
@@ -571,22 +579,7 @@ struct CommentsContentView: View {
                     var transaction = Transaction()
                     transaction.disablesAnimations = true
                     withTransaction(transaction) {
-                        guard toggleCommentVisibility(branch.rootID) != nil else {
-                            pendingScrollIntent = nil
-                            collapsingBranch = nil
-                            return
-                        }
                         collapsingBranch = nil
-                    }
-                }
-            },
-            expandedContent: {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(branch.expandedRows) { state in
-                        commentRow(for: state, in: post)
-                        commentSeparator(
-                            isVisible: state.id == branch.expandedRows.last?.id && branch.showsSeparatorAfter
-                        )
                     }
                 }
             },
@@ -699,47 +692,34 @@ struct CommentsContentView: View {
     }
 }
 
-private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent: View>: View {
+private struct CollapsingCommentBranchView<CompactContent: View>: View {
     let branch: CollapsingCommentBranch
     let animation: Animation
     let onAnimationStarted: (CGFloat, CGFloat) -> Void
     let onFinished: () -> Void
-    @ViewBuilder let expandedContent: () -> ExpandedContent
     @ViewBuilder let compactContent: () -> CompactContent
 
-    @State private var showsCompactContent = false
     @State private var hasStartedCollapse = false
     @State private var hasScheduledCollapse = false
     @State private var hasFinishedCollapse = false
-    @State private var expandedHeight: CGFloat?
     @State private var compactHeight: CGFloat?
     @State private var animatedHeight: CGFloat?
 
     private var currentHeight: CGFloat? {
-        animatedHeight ?? expandedHeight
+        animatedHeight ?? max(branch.expandedHeight, compactHeight ?? 0)
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            compactContent()
-                .fixedSize(horizontal: false, vertical: true)
-                .collapsingBranchContentHeight(.compact)
-                .opacity(showsCompactContent ? 1 : 0)
-            expandedContent()
-                .fixedSize(horizontal: false, vertical: true)
-                .collapsingBranchContentHeight(.expanded)
-                .opacity(showsCompactContent ? 0 : 1)
-        }
+        compactContent()
+            .fixedSize(horizontal: false, vertical: true)
+            .collapsingBranchCompactHeight()
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: currentHeight, alignment: .top)
         .clipped()
         .allowsHitTesting(false)
-        .onPreferenceChange(CollapsingBranchHeightPreferenceKey.self) { heights in
-            if let expanded = heights[.expanded], expanded > 0 {
-                expandedHeight = expanded
-            }
-            if let compact = heights[.compact], compact > 0 {
-                compactHeight = compact
+        .onPreferenceChange(CollapsingBranchCompactHeightPreferenceKey.self) { height in
+            if height > 0 {
+                compactHeight = height
             }
             startCollapseWhenMeasured()
         }
@@ -750,22 +730,22 @@ private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent
 
     private func startCollapseWhenMeasured() {
         guard !hasStartedCollapse, !hasScheduledCollapse else { return }
-        guard expandedHeight != nil, compactHeight != nil else { return }
+        guard compactHeight != nil else { return }
 
         hasScheduledCollapse = true
         Task { @MainActor in
             guard !hasStartedCollapse else { return }
-            guard let expandedHeight, let compactHeight else {
+            guard let compactHeight else {
                 hasScheduledCollapse = false
                 return
             }
 
             hasStartedCollapse = true
+            let expandedHeight = max(branch.expandedHeight, compactHeight)
             animatedHeight = expandedHeight
             onAnimationStarted(expandedHeight, compactHeight)
             withAnimation(animation, completionCriteria: .logicallyComplete) {
                 animatedHeight = compactHeight
-                showsCompactContent = true
             } completion: {
                 finishCollapseIfNeeded()
             }
