@@ -227,18 +227,14 @@ private struct ThreadRailStack: View {
     let lineWidth: CGFloat
 
     var body: some View {
-        Canvas { context, size in
-            let style = StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
-            let color = Color(uiColor: .separator)
-
-            for index in 0..<count {
-                let x = (lineWidth / 2) + CGFloat(index) * (lineWidth + spacing)
-                var path = Path()
-                path.move(to: CGPoint(x: x, y: 0))
-                path.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(path, with: .color(color), style: style)
+        HStack(spacing: spacing) {
+            ForEach(0..<count, id: \.self) { _ in
+                Divider()
+                    .frame(width: lineWidth)
+                    .frame(maxHeight: .infinity)
             }
         }
+        .frame(width: CGFloat(count) * lineWidth + CGFloat(max(count - 1, 0)) * spacing)
         .frame(maxHeight: .infinity)
         .accessibilityHidden(true)
     }
