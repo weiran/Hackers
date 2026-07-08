@@ -300,10 +300,7 @@ private struct SettingsHeroSection: View {
                         .font(.title2.weight(.bold))
                         .foregroundStyle(.primary)
 
-                    Text("A focused Hacker News reader")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    authorLine
                 }
             }
 
@@ -343,6 +340,23 @@ private struct SettingsHeroSection: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
+    }
+
+    private var authorLine: some View {
+        HStack(spacing: 0) {
+            Text("By ")
+                .foregroundStyle(.secondary)
+
+            if let url = URL(string: "https://weiranzhang.com") {
+                Link("Weiran Zhang", destination: url)
+                    .foregroundStyle(AppColors.appTintColor)
+            } else {
+                Text("Weiran Zhang")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.subheadline)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
