@@ -12,6 +12,9 @@ import SwiftUI
 
 public struct ThumbnailView: View {
     private static let imageCache = NSCache<NSURL, CGImage>()
+    private static let defaultPlaceholderIconSize: CGFloat = 22
+    private static let minimumPlaceholderIconSize: CGFloat = 6
+    private static let placeholderIconScale: CGFloat = 0.55
     let url: URL?
     let isEnabled: Bool
     let showsPlaceholder: Bool
@@ -76,10 +79,23 @@ public struct ThumbnailView: View {
 
     private var placeholderImage: some View {
         Image(systemName: "safari")
-            .font(.title2)
+            .font(placeholderIconFont)
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.secondary.opacity(0.1))
+    }
+
+    private var placeholderIconFont: Font {
+        guard let thumbnailSize else { return .title2 }
+
+        let iconSize = min(
+            Self.defaultPlaceholderIconSize,
+            max(
+                Self.minimumPlaceholderIconSize,
+                min(thumbnailSize.width, thumbnailSize.height) * Self.placeholderIconScale
+            )
+        )
+        return .system(size: iconSize)
     }
 
     private func thumbnailURL(for url: URL) -> URL? {
