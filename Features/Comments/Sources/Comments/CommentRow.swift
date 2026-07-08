@@ -30,7 +30,7 @@ struct CommentRow: View {
         static let nestedTopPadding: CGFloat = 12
         static let railSpacing: CGFloat = 24
         static let railContentSpacing: CGFloat = 24
-        static let maxVisibleGuides = 3
+        static let maxVisibleGuides = 5
     }
 
     @Environment(\.displayScale) private var displayScale
