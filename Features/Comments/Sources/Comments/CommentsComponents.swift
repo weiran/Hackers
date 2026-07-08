@@ -51,11 +51,18 @@ private enum CommentScrollIntent {
 private struct CollapsingCommentBranch {
     let transitionID: UUID
     let rootID: Int
-    let expandedRows: [CommentRowState]
+    let snapshotRows: [CollapsingCommentBranchSnapshotRow]
     let compactRoot: CommentRowState
     let rowIDs: Set<Int>
     let contentWidth: CGFloat?
     let expandedHeight: CGFloat
+    let showsSeparatorAfter: Bool
+}
+
+private struct CollapsingCommentBranchSnapshotRow: Identifiable {
+    let id: Int
+    let state: CommentRowState
+    let yOffset: CGFloat
     let showsSeparatorAfter: Bool
 }
 
@@ -257,12 +264,29 @@ struct CommentsContentView: View {
     }
 
     private func updateHeaderState(for metrics: CommentScrollMetrics) {
+        guard collapsingBranch == nil else { return }
+        updateHeaderState(for: metrics, animatesTitleChange: true)
+    }
+
+    private func updateHeaderState(for metrics: CommentScrollMetrics, animatesTitleChange: Bool) {
         let offsetY = metrics.contentOffset.y + metrics.contentInsets.top
         let shouldShowTitle = titleVisibility.isVisible ? offsetY > 24 : offsetY > 56
         if shouldShowTitle != titleVisibility.isVisible {
-            withAnimation(.easeInOut(duration: 0.3)) {
+            let updateTitle = {
                 titleVisibility.setVisible(shouldShowTitle)
                 updateTitleVisibility?(shouldShowTitle)
+            }
+
+            if animatesTitleChange {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    updateTitle()
+                }
+            } else {
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    updateTitle()
+                }
             }
         }
 
@@ -429,24 +453,72 @@ struct CommentsContentView: View {
 
     private func collapsingBranch(from state: CommentRowState) -> CollapsingCommentBranch {
         let descendants = visibleDescendants(of: state)
-        let expandedRows = [state] + descendants.map { rowState(for: $0) }
-        let rowIDs = Set(expandedRows.map(\.id))
-        let allIDs = expandedRows.map(\.id)
-        let contentWidth = rowFrames[state.id]?.width
+        let allIDs = [state.id] + descendants.map(\.id)
+        let rowIDs = Set(allIDs)
+        let rootFrame = rowFrames[state.id]
+        let contentWidth = rootFrame?.width
         let expandedHeight = measuredThreadHeight(forCommentIDs: allIDs, rootID: state.id)
         let lastID = allIDs.last ?? state.id
         let showsSeparatorAfter = showsRootSeparator(afterCommentID: lastID)
+        let snapshotRows = collapsingBranchSnapshotRows(
+            rootState: state,
+            descendants: descendants,
+            lastID: lastID,
+            rootFrame: rootFrame,
+            showsSeparatorAfter: showsSeparatorAfter
+        )
 
         return CollapsingCommentBranch(
             transitionID: UUID(),
             rootID: state.id,
-            expandedRows: expandedRows,
+            snapshotRows: snapshotRows,
             compactRoot: compactState(from: state),
             rowIDs: rowIDs,
             contentWidth: contentWidth,
             expandedHeight: expandedHeight,
             showsSeparatorAfter: showsSeparatorAfter
         )
+    }
+
+    private func collapsingBranchSnapshotRows(
+        rootState: CommentRowState,
+        descendants: [Comment],
+        lastID: Int,
+        rootFrame: CGRect?,
+        showsSeparatorAfter: Bool
+    ) -> [CollapsingCommentBranchSnapshotRow] {
+        guard let rootFrame else { return [] }
+
+        let visibleRect = visibleContentRect(for: latestScrollMetrics.latest)
+        let captureRect = visibleRect == .zero
+            ? rootFrame
+            : visibleRect.insetBy(dx: 0, dy: -96)
+        var snapshotRows: [CollapsingCommentBranchSnapshotRow] = []
+
+        func appendSnapshotRow(id: Int, state: CommentRowState) {
+            guard let frame = rowFrames[id],
+                  frame.intersects(captureRect)
+            else { return }
+
+            snapshotRows.append(
+                CollapsingCommentBranchSnapshotRow(
+                    id: id,
+                    state: state,
+                    yOffset: frame.minY - rootFrame.minY,
+                    showsSeparatorAfter: id == lastID && showsSeparatorAfter
+                )
+            )
+        }
+
+        appendSnapshotRow(id: rootState.id, state: rootState)
+        for comment in descendants {
+            guard let frame = rowFrames[comment.id],
+                  frame.intersects(captureRect)
+            else { continue }
+            appendSnapshotRow(id: comment.id, state: rowState(for: comment))
+        }
+
+        return snapshotRows
     }
 
     private func measuredThreadHeight(forCommentIDs commentIDs: [Int], rootID: Int) -> CGFloat {
@@ -550,12 +622,17 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentRowGroup(for state: CommentRowState, in post: Post, showsSeparator: Bool) -> some View {
+    private func commentRowGroup(
+        for state: CommentRowState,
+        in post: Post,
+        showsSeparator: Bool,
+        tracksFrame: Bool = true
+    ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             commentRow(for: state, in: post)
             commentSeparator(isVisible: showsSeparator)
         }
-        .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
+        .commentRowFrame(id: state.id, isEnabled: tracksFrame && tracksRowFrames)
         .id(state.id)
         .transition(commentRowTransition(for: state))
     }
@@ -588,23 +665,27 @@ struct CommentsContentView: View {
                         }
                         collapsingBranch = nil
                     }
+                    updateHeaderState(for: latestScrollMetrics.latest, animatesTitleChange: false)
                 }
             },
-            expandedContent: {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(branch.expandedRows) { state in
-                        commentRow(for: state, in: post)
-                        commentSeparator(
-                            isVisible: state.id == branch.expandedRows.last?.id && branch.showsSeparatorAfter
-                        )
+            snapshotContent: {
+                ZStack(alignment: .topLeading) {
+                    ForEach(branch.snapshotRows) { snapshotRow in
+                        VStack(alignment: .leading, spacing: 0) {
+                            commentRow(for: snapshotRow.state, in: post)
+                            commentSeparator(isVisible: snapshotRow.showsSeparatorAfter)
+                        }
+                        .offset(y: snapshotRow.yOffset)
                     }
                 }
+                .frame(height: branch.expandedHeight, alignment: .top)
             },
             compactContent: {
                 commentRowGroup(
                     for: branch.compactRoot,
                     in: post,
-                    showsSeparator: branch.showsSeparatorAfter
+                    showsSeparator: branch.showsSeparatorAfter,
+                    tracksFrame: false
                 )
             }
         )
@@ -709,12 +790,12 @@ struct CommentsContentView: View {
     }
 }
 
-private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent: View>: View {
+private struct CollapsingCommentBranchView<SnapshotContent: View, CompactContent: View>: View {
     let branch: CollapsingCommentBranch
     let animation: Animation
     let onAnimationStarted: (CGFloat, CGFloat) -> Void
     let onFinished: () -> Void
-    @ViewBuilder let expandedContent: () -> ExpandedContent
+    @ViewBuilder let snapshotContent: () -> SnapshotContent
     @ViewBuilder let compactContent: () -> CompactContent
 
     @State private var hasStartedCollapse = false
@@ -729,8 +810,7 @@ private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            expandedContent()
-                .fixedSize(horizontal: false, vertical: true)
+            snapshotContent()
             compactContent()
                 .fixedSize(horizontal: false, vertical: true)
                 .collapsingBranchCompactHeight()
