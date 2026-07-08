@@ -773,6 +773,10 @@ private struct CommentsSheetTopChrome: View {
         1 - titleContentProgress
     }
 
+    private var glassSurfaceOpacity: CGFloat {
+        min(max(easedProgress / 0.18, 0), 1)
+    }
+
     private var titleContentProgress: CGFloat {
         min(max((easedProgress - 0.24) / 0.52, 0), 1)
     }
@@ -814,11 +818,17 @@ private struct CommentsSheetTopChrome: View {
     private var morphingChrome: some View {
         Button(action: onTitleTap) {
             ZStack {
-                if let post {
-                    CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .opacity(titleContentProgress)
+                ZStack {
+                    if let post {
+                        CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .opacity(titleContentProgress)
+                    }
                 }
+                .frame(width: morphWidth, height: morphHeight)
+                .clipShape(.capsule)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .opacity(glassSurfaceOpacity)
 
                 Capsule()
                     .fill(.secondary.opacity(0.52))
@@ -827,9 +837,7 @@ private struct CommentsSheetTopChrome: View {
                     .allowsHitTesting(false)
             }
             .frame(width: morphWidth, height: morphHeight)
-            .clipShape(.capsule)
             .contentShape(.capsule)
-            .glassEffect(.regular.interactive(), in: .capsule)
         }
         .buttonStyle(.plain)
         .disabled(progress <= 0.5)
