@@ -44,9 +44,6 @@ struct CommentRow: View {
 
     var body: some View {
         rowDisplay
-            .transaction { transaction in
-                transaction.disablesAnimations = true
-            }
             .contentShape(.interaction, Rectangle())
             .onTapGesture(perform: onToggle)
             .accessibilityElement(children: .combine)
@@ -132,9 +129,12 @@ struct CommentRow: View {
             commentText
                 .transaction { transaction in
                     transaction.disablesAnimations = true
-                }
+            }
         }
         .clipped()
+        .transaction { transaction in
+            transaction.disablesAnimations = true
+        }
     }
 
     @ViewBuilder
