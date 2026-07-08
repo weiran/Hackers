@@ -406,29 +406,28 @@ private struct SettingsHeroAction: View {
     let style: Style
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Image(systemName: systemImage)
                 .font(.headline.weight(.semibold))
-                .frame(width: 22)
+                .frame(width: 20)
                 .accessibilityHidden(true)
 
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.78)
                 .allowsTightening(true)
                 .layoutPriority(1)
 
-            Spacer(minLength: 4)
+            Spacer(minLength: 3)
 
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.bold))
-                .frame(width: 8)
+                .frame(width: 7)
                 .accessibilityHidden(true)
         }
         .foregroundStyle(foregroundStyle)
         .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 12)
         .background(backgroundStyle, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
