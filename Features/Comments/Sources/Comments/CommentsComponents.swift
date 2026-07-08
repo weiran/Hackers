@@ -260,21 +260,9 @@ struct CommentsContentView: View {
             commentRowGroup(
                 for: state,
                 in: post,
-                showsSeparator: showsRootSeparator(afterCommentID: state.id)
+                showsSeparator: viewModel.showsRootSeparator(afterCommentID: state.id)
             )
         }
-    }
-
-    private func showsRootSeparator(afterCommentID commentID: Int) -> Bool {
-        guard
-            let index = viewModel.visibleComments.firstIndex(where: { $0.id == commentID }),
-            index < viewModel.visibleComments.index(before: viewModel.visibleComments.endIndex)
-        else {
-            return false
-        }
-
-        let nextIndex = viewModel.visibleComments.index(after: index)
-        return viewModel.visibleComments[nextIndex].level == 0
     }
 
     @ViewBuilder

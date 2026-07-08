@@ -645,6 +645,28 @@ struct CommentsViewModelTests {
             #expect(sut.nextVisibleThreadID(after: 2) == 3)
             #expect(sut.nextVisibleThreadID(after: 3) == nil)
         }
+
+        @Test("Root separator follows visible adjacency")
+        @MainActor
+        func rootSeparatorFollowsVisibleAdjacency() async {
+            let firstRoot = createTestComment(id: 1, level: 0)
+            let child = createTestComment(id: 2, level: 1)
+            let secondRoot = createTestComment(id: 3, level: 0)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [firstRoot, child, secondRoot])
+
+            await sut.loadComments()
+
+            #expect(!sut.showsRootSeparator(afterCommentID: 1))
+            #expect(sut.showsRootSeparator(afterCommentID: 2))
+            #expect(!sut.showsRootSeparator(afterCommentID: 3))
+            #expect(!sut.showsRootSeparator(afterCommentID: 999))
+
+            sut.toggleCommentVisibility(withID: 1)
+
+            #expect(sut.visibleComments.map(\.id) == [1, 3])
+            #expect(sut.showsRootSeparator(afterCommentID: 1))
+            #expect(!sut.showsRootSeparator(afterCommentID: 3))
+        }
     }
 
     // MARK: - Helper Methods

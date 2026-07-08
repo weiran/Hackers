@@ -307,6 +307,16 @@ public final class CommentsViewModel: @unchecked Sendable {
     }
 
     @MainActor
+    public func showsRootSeparator(afterCommentID commentID: Int) -> Bool {
+        guard let index = visibleIndexByID[commentID] else { return false }
+
+        let nextIndex = visibleComments.index(after: index)
+        guard nextIndex < visibleComments.endIndex else { return false }
+
+        return visibleComments[nextIndex].level == 0
+    }
+
+    @MainActor
     public func nextVisibleThreadID(after commentID: Int?) -> Int? {
         guard !visibleComments.isEmpty else { return nil }
         guard let commentID, let index = visibleIndexByID[commentID] else {
