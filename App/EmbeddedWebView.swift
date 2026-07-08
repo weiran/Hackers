@@ -5,57 +5,12 @@
 //  Created by Codex on 2025-09-18.
 //
 
-import DesignSystem
 import Domain
 import Foundation
 import Shared
 import SwiftUI
 import UIKit
 import WebKit
-
-struct PageHeaderBlurTint: Equatable {
-    let red: Double
-    let green: Double
-    let blue: Double
-    let alpha: Double
-
-    var color: Color {
-        Color(red: red, green: green, blue: blue, opacity: alpha)
-    }
-
-    init?(_ uiColor: UIColor?) {
-        guard let uiColor else { return nil }
-        let resolvedColor = uiColor.resolvedColor(with: UITraitCollection.current)
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        if resolvedColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
-            self.init(red: red, green: green, blue: blue, alpha: alpha)
-            return
-        }
-
-        var white: CGFloat = 0
-        if resolvedColor.getWhite(&white, alpha: &alpha) {
-            self.init(red: white, green: white, blue: white, alpha: alpha)
-            return
-        }
-
-        return nil
-    }
-
-    private init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-        self.red = Self.rounded(red)
-        self.green = Self.rounded(green)
-        self.blue = Self.rounded(blue)
-        self.alpha = Self.rounded(alpha)
-    }
-
-    private static func rounded(_ value: CGFloat) -> Double {
-        (Double(value) * 1000).rounded() / 1000
-    }
-}
 
 @MainActor
 final class BrowserController: ObservableObject {
@@ -64,12 +19,10 @@ final class BrowserController: ObservableObject {
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
-    @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
     var fallbackURL: URL?
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
-    private var pageHeaderBlurTintURL: URL?
 
     init() {
         let configuration = WKWebViewConfiguration()
@@ -94,10 +47,6 @@ final class BrowserController: ObservableObject {
 
     func updateState() {
         let updatedURL = webView.url ?? currentURL ?? fallbackURL
-        if pageHeaderBlurTintURL != updatedURL {
-            pageHeaderBlurTint = nil
-            pageHeaderBlurTintURL = nil
-        }
         currentURL = updatedURL
         currentTitle = webView.title
         canGoBack = webView.canGoBack
@@ -106,7 +55,6 @@ final class BrowserController: ObservableObject {
     }
 
     func reload() {
-        resetHeaderBlurTint()
         webView.reload()
         updateState()
     }
@@ -118,14 +66,12 @@ final class BrowserController: ObservableObject {
 
     func goBack() {
         guard webView.canGoBack else { return }
-        resetHeaderBlurTint()
         webView.goBack()
         updateState()
     }
 
     func goForward() {
         guard webView.canGoForward else { return }
-        resetHeaderBlurTint()
         webView.goForward()
         updateState()
     }
@@ -165,11 +111,6 @@ final class BrowserController: ObservableObject {
         }
     }
 
-    private func resetHeaderBlurTint() {
-        pageHeaderBlurTint = nil
-        pageHeaderBlurTintURL = nil
-    }
-
     private func installStateObservers() {
         observations = [
             webView.observe(\.url, options: [.new]) { [weak self] _, _ in
@@ -186,19 +127,8 @@ final class BrowserController: ObservableObject {
             },
             webView.observe(\.isLoading, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
-            },
-            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
-                Task { @MainActor [weak self] in self?.updateHeaderTintFromPageBackground() }
             }
         ]
-    }
-
-    func updateHeaderTintFromPageBackground() {
-        guard let updatedTint = PageHeaderBlurTint(webView.underPageBackgroundColor) else { return }
-        if pageHeaderBlurTint != updatedTint {
-            pageHeaderBlurTint = updatedTint
-        }
-        pageHeaderBlurTintURL = currentURL
     }
 
     private static var safariApplicationNameForUserAgent: String {
@@ -222,7 +152,7 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateState(refreshesHeaderTint: true)
+        updateState()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -237,12 +167,9 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
         updateState()
     }
 
-    private func updateState(refreshesHeaderTint: Bool = false) {
+    private func updateState() {
         Task { @MainActor [weak controller] in
             controller?.updateState()
-            if refreshesHeaderTint {
-                controller?.updateHeaderTintFromPageBackground()
-            }
         }
     }
 }
@@ -256,8 +183,6 @@ enum WebViewAnimations {
 }
 
 struct EmbeddedWebView: View {
-    private static let statusBarBlurFadeExtension: CGFloat = 0
-
     let url: URL
     let onDismiss: @MainActor () -> Void
     let showsCloseButton: Bool
@@ -293,9 +218,6 @@ struct EmbeddedWebView: View {
                     alignment: .top
                 )
                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
-                .overlay(alignment: .top) {
-                    headerBlur
-                }
         }
         .toolbar {
             if showsToolbar {
@@ -333,21 +255,7 @@ struct EmbeddedWebView: View {
                 }
             }
         }
-        .toolbarBackground(.hidden, for: .navigationBar)
-    }
-
-    private var headerBlur: some View {
-        GeometryReader { proxy in
-            ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top,
-                fadeExtension: Self.statusBarBlurFadeExtension,
-                tintMiddleLocation: 0.45,
-                tint: controller.pageHeaderBlurTint?.color
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .animation(.easeInOut(duration: 0.2), value: controller.pageHeaderBlurTint)
-        .allowsHitTesting(false)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     @ViewBuilder
@@ -537,7 +445,7 @@ struct PostLinkBrowserView: View {
         }
         .tint(.accentColor)
         .accessibilityIdentifier("browser.view")
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             guard !showingCommentsPane else { return }
