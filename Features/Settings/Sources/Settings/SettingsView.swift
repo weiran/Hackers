@@ -417,8 +417,14 @@ private struct SettingsHeroAction: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
                 .allowsTightening(true)
+                .layoutPriority(1)
 
-            Spacer(minLength: 0)
+            Spacer(minLength: 4)
+
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.bold))
+                .frame(width: 8)
+                .accessibilityHidden(true)
         }
         .foregroundStyle(foregroundStyle)
         .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
