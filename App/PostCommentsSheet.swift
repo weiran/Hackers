@@ -311,7 +311,7 @@ struct PostCommentsSheet: View {
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
-        return ZStack(alignment: .bottom) {
+        return ZStack(alignment: .top) {
             CommentsSheetTopChrome(
                 post: viewModel.post,
                 showThumbnails: viewModel.showThumbnails,
@@ -337,6 +337,7 @@ struct PostCommentsSheet: View {
                     .allowsHitTesting(titleProgress <= 0.5)
                     .accessibilityElement()
                     .accessibilityLabel("Comments sheet handle")
+                    .accessibilityIdentifier("browser.commentsSheet.handle")
                     .accessibilityHidden(titleProgress > 0.5)
 
                 Spacer()
@@ -345,7 +346,6 @@ struct PostCommentsSheet: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.navigationBarHeight + handleTopInset, alignment: .top)
-        .accessibilityIdentifier("browser.commentsSheet.handle")
     }
 
     private func titleChromeProgress(contentFadeProgress: CGFloat) -> CGFloat {
