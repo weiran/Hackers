@@ -376,7 +376,7 @@ private struct AppIconView: View {
         .aspectRatio(1, contentMode: .fit)
         .frame(width: 72, height: 72)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
+        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         .accessibilityHidden(true)
     }
 }
