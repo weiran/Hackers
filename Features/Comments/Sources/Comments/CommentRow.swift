@@ -28,9 +28,9 @@ struct CommentRow: View {
         static let horizontalPadding: CGFloat = 16
         static let verticalPadding: CGFloat = 16
         static let nestedTopPadding: CGFloat = 12
-        static let railWidth: CGFloat = 2
-        static let railSpacing: CGFloat = 42
-        static let railContentSpacing: CGFloat = 36
+        static let railWidth: CGFloat = 0.5
+        static let railSpacing: CGFloat = 24
+        static let railContentSpacing: CGFloat = 24
         static let maxVisibleGuides = 3
     }
 
@@ -94,10 +94,11 @@ struct CommentRow: View {
     }
 
     private var visibleGuideCount: Int {
-        min(max(state.level + 1, 1), Metrics.maxVisibleGuides)
+        min(max(state.level, 0), Metrics.maxVisibleGuides)
     }
 
     private var contentLeadingPadding: CGFloat {
+        guard visibleGuideCount > 0 else { return Metrics.horizontalPadding }
         let railWidth = CGFloat(visibleGuideCount) * Metrics.railWidth
         let railSpacing = CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing
         return Metrics.horizontalPadding + railWidth + railSpacing + Metrics.railContentSpacing
