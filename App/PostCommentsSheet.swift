@@ -777,14 +777,6 @@ private struct CommentsSheetTopChrome: View {
         min(max((easedProgress - 0.24) / 0.52, 0), 1)
     }
 
-    private var collapsedHandleWidth: CGFloat {
-        max(handleWidth + 20, 56)
-    }
-
-    private var collapsedHandleHeight: CGFloat {
-        max(handleThickness + 9, 14)
-    }
-
     private var resolvedTitleSize: CGSize {
         guard measuredTitleSize.width > 0, measuredTitleSize.height > 0 else {
             return CGSize(width: 220, height: navigationBarHeight)
@@ -793,15 +785,15 @@ private struct CommentsSheetTopChrome: View {
     }
 
     private var morphWidth: CGFloat {
-        interpolate(from: collapsedHandleWidth, to: resolvedTitleSize.width, progress: easedProgress)
+        interpolate(from: handleWidth, to: resolvedTitleSize.width, progress: easedProgress)
     }
 
     private var morphHeight: CGFloat {
-        interpolate(from: collapsedHandleHeight, to: resolvedTitleSize.height, progress: easedProgress)
+        interpolate(from: handleThickness, to: resolvedTitleSize.height, progress: easedProgress)
     }
 
     private var morphVerticalOffset: CGFloat {
-        interpolate(from: (handleAreaHeight - collapsedHandleHeight) / 2, to: 0, progress: easedProgress)
+        interpolate(from: (handleAreaHeight - handleThickness) / 2, to: 0, progress: easedProgress)
     }
 
     var body: some View {
