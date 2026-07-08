@@ -13,13 +13,6 @@ import Shared
 import SwiftUI
 import UIKit
 
-private struct CommentScrollMetrics: Equatable {
-    var contentOffset: CGPoint = .zero
-    var contentInsets: EdgeInsets = EdgeInsets()
-    var contentSize: CGSize = .zero
-    var visibleRect: CGRect = .zero
-}
-
 @Observable
 private final class VisibleCommentTarget {
     var topCommentID: Int?
@@ -41,7 +34,6 @@ private extension UnitPoint {
 }
 
 struct CommentsContentView: View {
-    private static let scrollMetricsUpdateDistance: CGFloat = 48
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
     @Environment(\.textScaling) private var textScaling
@@ -61,7 +53,6 @@ struct CommentsContentView: View {
     @Binding var pendingCommentID: Int?
     @State private var lastIsAtTop = true
     @State private var scrollPosition = ScrollPosition(idType: Int.self)
-    @State private var scrollMetrics = CommentScrollMetrics()
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
 
@@ -77,10 +68,6 @@ struct CommentsContentView: View {
         presentationState.commentScrollTopInset
     }
 
-    private var tracksScrollMetrics: Bool {
-        !presentationState.usesCustomHeaderBlur || pendingScrollIntent != nil
-    }
-
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollView {
@@ -94,16 +81,10 @@ struct CommentsContentView: View {
             .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
                 updateVisibleCommentTarget(visibleIDs: visibleIDs)
             }
-            .onScrollGeometryChange(for: CommentScrollMetrics.self, of: { geometry in
-                CommentScrollMetrics(
-                    contentOffset: geometry.contentOffset,
-                    contentInsets: geometry.contentInsets,
-                    contentSize: geometry.contentSize,
-                    visibleRect: geometry.visibleRect
-                )
-            }, action: { _, newValue in
-                updateHeaderState(for: newValue)
-                updateStoredScrollMetricsIfNeeded(newValue)
+            .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top
+            }, action: { _, offsetY in
+                updateHeaderState(offsetY: offsetY)
             })
             .onScrollPhaseChange { _, newPhase in
                 if newPhase == .tracking || newPhase == .interacting {
@@ -141,12 +122,11 @@ struct CommentsContentView: View {
         }
     }
 
-    private func updateHeaderState(for metrics: CommentScrollMetrics) {
-        updateHeaderState(for: metrics, animatesTitleChange: true)
+    private func updateHeaderState(offsetY: CGFloat) {
+        updateHeaderState(offsetY: offsetY, animatesTitleChange: true)
     }
 
-    private func updateHeaderState(for metrics: CommentScrollMetrics, animatesTitleChange: Bool) {
-        let offsetY = metrics.contentOffset.y + metrics.contentInsets.top
+    private func updateHeaderState(offsetY: CGFloat, animatesTitleChange: Bool) {
         let shouldShowTitle = titleVisibility.isVisible ? offsetY > 24 : offsetY > 56
         if shouldShowTitle != titleVisibility.isVisible {
             let updateTitle = {
@@ -172,43 +152,6 @@ struct CommentsContentView: View {
             lastIsAtTop = isAtTop
             updateIsAtTop?(isAtTop)
         }
-    }
-
-    private func updateStoredScrollMetricsIfNeeded(_ newValue: CommentScrollMetrics) {
-        let shouldUpdateMetrics: Bool
-        if tracksScrollMetrics {
-            shouldUpdateMetrics = shouldStoreScrollMetrics(newValue) || pendingScrollIntent != nil
-        } else {
-            shouldUpdateMetrics = shouldStoreStaticScrollMetrics(newValue)
-        }
-        guard shouldUpdateMetrics else { return }
-
-        scrollMetrics = newValue
-        if pendingScrollIntent != nil {
-            resolvePendingScrollIntent(animated: true)
-        }
-    }
-
-    private func shouldStoreScrollMetrics(_ newValue: CommentScrollMetrics) -> Bool {
-        guard scrollMetrics.visibleRect != .zero else { return true }
-        guard scrollMetrics.contentInsets == newValue.contentInsets,
-              scrollMetrics.contentSize == newValue.contentSize,
-              scrollMetrics.visibleRect.size == newValue.visibleRect.size
-        else {
-            return true
-        }
-
-        let previousOffset = scrollMetrics.contentOffset.y + scrollMetrics.contentInsets.top
-        let newOffset = newValue.contentOffset.y + newValue.contentInsets.top
-        return abs(newOffset - previousOffset) >= Self.scrollMetricsUpdateDistance
-    }
-
-    private func shouldStoreStaticScrollMetrics(_ newValue: CommentScrollMetrics) -> Bool {
-        guard scrollMetrics.visibleRect != .zero else { return true }
-
-        return scrollMetrics.contentInsets != newValue.contentInsets
-            || scrollMetrics.contentSize != newValue.contentSize
-            || scrollMetrics.visibleRect.size != newValue.visibleRect.size
     }
 
     private func updateVisibleCommentTarget(visibleIDs: [Int]) {
