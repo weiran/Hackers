@@ -107,6 +107,7 @@ struct MainContentView: View {
             }
         }
         .textScaling(for: settingsViewModel.textSize)
+        .buttonStyle(AppDefaultButtonStyle())
         .accentColor(.accentColor)
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
         .sheet(isPresented: showingLoginBinding) {

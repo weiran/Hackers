@@ -103,6 +103,36 @@ public enum AppColors {
     }
 }
 
+public struct AppDefaultButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        AppDefaultButtonStyleBody(configuration: configuration)
+    }
+}
+
+private struct AppDefaultButtonStyleBody: View {
+    let configuration: AppDefaultButtonStyle.Configuration
+    @Environment(\.isEnabled) private var isEnabled
+
+    var body: some View {
+        configuration.label
+            .foregroundStyle(foregroundColor)
+            .opacity(configuration.isPressed ? 0.65 : 1)
+    }
+
+    private var foregroundColor: Color {
+        guard isEnabled else { return .secondary }
+
+        switch configuration.role {
+        case .destructive:
+            return AppColors.danger
+        default:
+            return .primary
+        }
+    }
+}
+
 public enum AppGradients {
     public static func brandSymbol() -> LinearGradient {
         LinearGradient(
