@@ -749,6 +749,7 @@ private extension CGPoint {
 
 private struct CommentsSheetTopChrome: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var measuredTitleSize: CGSize = .zero
     let post: Post?
     let showThumbnails: Bool
     let titleProgress: CGFloat
@@ -769,54 +770,70 @@ private struct CommentsSheetTopChrome: View {
     }
 
     private var handleOpacity: CGFloat {
-        1 - easedProgress
+        1 - titleContentProgress
+    }
+
+    private var titleContentProgress: CGFloat {
+        min(max((easedProgress - 0.24) / 0.52, 0), 1)
+    }
+
+    private var resolvedTitleSize: CGSize {
+        guard measuredTitleSize.width > 0, measuredTitleSize.height > 0 else {
+            return CGSize(width: 220, height: navigationBarHeight)
+        }
+        return measuredTitleSize
+    }
+
+    private var morphWidth: CGFloat {
+        interpolate(from: handleWidth, to: resolvedTitleSize.width, progress: easedProgress)
+    }
+
+    private var morphHeight: CGFloat {
+        interpolate(from: handleThickness, to: resolvedTitleSize.height, progress: easedProgress)
+    }
+
+    private var morphVerticalOffset: CGFloat {
+        interpolate(from: (handleAreaHeight - handleThickness) / 2, to: 0, progress: easedProgress)
     }
 
     var body: some View {
         ZStack(alignment: .top) {
-            handle
-                .padding(.top, handleTopInset)
-
             if let post {
-                titleButton(for: post)
-                    .padding(.top, handleTopInset)
+                measuredTitleContent(for: post)
             }
+
+            morphingChrome
+                .padding(.top, handleTopInset)
+                .offset(y: morphVerticalOffset)
         }
         .frame(maxWidth: .infinity)
         .frame(height: navigationBarHeight + handleTopInset, alignment: .top)
         .animation(isInteractiveMove ? nil : chromeAnimation, value: progress)
     }
 
-    private var handle: some View {
-        HStack {
-            Spacer()
-
-            Capsule()
-                .fill(.secondary.opacity(0.35))
-                .frame(
-                    width: handleWidth + (reduceMotion ? 0 : 18 * easedProgress),
-                    height: handleThickness
-                )
-                .frame(width: 88, height: handleAreaHeight, alignment: .center)
-                .opacity(handleOpacity)
-                .offset(y: reduceMotion ? 0 : -4 * easedProgress)
-                .allowsHitTesting(false)
-
-            Spacer()
-        }
-        .accessibilityHidden(progress > 0.5)
-    }
-
-    private func titleButton(for post: Post) -> some View {
+    private var morphingChrome: some View {
         Button(action: onTitleTap) {
-            CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
-                .scaleEffect(reduceMotion ? 1 : 0.92 + (0.08 * easedProgress))
-                .offset(y: reduceMotion ? 0 : 7 * (1 - easedProgress))
-                .opacity(easedProgress)
+            ZStack {
+                if let post {
+                    CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .opacity(titleContentProgress)
+                }
+
+                Capsule()
+                    .fill(.secondary.opacity(0.35))
+                    .frame(width: handleWidth, height: handleThickness)
+                    .opacity(handleOpacity)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: morphWidth, height: morphHeight)
+            .clipShape(.capsule)
+            .contentShape(.capsule)
+            .glassEffect(.regular.interactive(), in: .capsule)
         }
         .buttonStyle(.plain)
         .disabled(progress <= 0.5)
-        .accessibilityLabel(post.title)
+        .accessibilityLabel(post?.title ?? "Comments sheet handle")
         .accessibilityHint("Collapse comments")
         .accessibilityHidden(progress <= 0.5)
     }
@@ -826,6 +843,38 @@ private struct CommentsSheetTopChrome: View {
             .easeInOut(duration: 0.2)
         } else {
             .spring(response: 0.32, dampingFraction: 0.84, blendDuration: 0.05)
+        }
+    }
+
+    private func measuredTitleContent(for post: Post) -> some View {
+        CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
+            .fixedSize(horizontal: true, vertical: false)
+            .hidden()
+            .background(
+                GeometryReader { proxy in
+                    Color.clear.preference(key: TitlePillSizePreferenceKey.self, value: proxy.size)
+                }
+            )
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .onPreferenceChange(TitlePillSizePreferenceKey.self) { newValue in
+                guard newValue.width > 0, newValue.height > 0 else { return }
+                measuredTitleSize = newValue
+            }
+    }
+
+    private func interpolate(from start: CGFloat, to end: CGFloat, progress: CGFloat) -> CGFloat {
+        start + ((end - start) * progress)
+    }
+}
+
+private struct TitlePillSizePreferenceKey: PreferenceKey {
+    static let defaultValue: CGSize = .zero
+
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        let next = nextValue()
+        if next.width > 0, next.height > 0 {
+            value = next
         }
     }
 }

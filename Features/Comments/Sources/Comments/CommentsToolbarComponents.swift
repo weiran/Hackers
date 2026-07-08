@@ -85,7 +85,7 @@ public struct CommentsHeaderTitleButton: View {
 
         Button(action: onTap) {
             ZStack {
-                CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+                CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
                     .hidden()
                     .accessibilityHidden(true)
 
@@ -124,18 +124,24 @@ public struct CommentsHeaderTitlePill: View {
     }
 
     public var body: some View {
-        CommentsHeaderTitlePillLayout(post: post, showThumbnails: showThumbnails)
+        CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
             .contentShape(.capsule)
             .glassEffect(.regular.interactive(), in: .capsule)
     }
 }
 
-private struct CommentsHeaderTitlePillLayout: View {
+public struct CommentsHeaderTitlePillContent: View {
     private static let wrappedTitleWidth: CGFloat = 170
-    let post: Post
-    let showThumbnails: Bool
 
-    var body: some View {
+    private let post: Post
+    private let showThumbnails: Bool
+
+    public init(post: Post, showThumbnails: Bool) {
+        self.post = post
+        self.showThumbnails = showThumbnails
+    }
+
+    public var body: some View {
         ViewThatFits(in: .horizontal) {
             titleContent(font: .subheadline, lineLimit: 1, titleWidth: nil)
                 .fixedSize(horizontal: true, vertical: false)
