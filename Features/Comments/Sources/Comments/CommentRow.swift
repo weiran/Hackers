@@ -213,7 +213,7 @@ private struct ThreadRailStack: View {
     var body: some View {
         Canvas { context, size in
             let style = StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
-            let color = Color(uiColor: .separator).opacity(0.85)
+            let color = Color(uiColor: .separator)
 
             for index in 0..<count {
                 let x = (lineWidth / 2) + CGFloat(index) * (lineWidth + spacing)
