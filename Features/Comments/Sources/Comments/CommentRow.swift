@@ -28,11 +28,12 @@ struct CommentRow: View {
         static let horizontalPadding: CGFloat = 16
         static let verticalPadding: CGFloat = 16
         static let nestedTopPadding: CGFloat = 12
-        static let railWidth: CGFloat = 0.5
         static let railSpacing: CGFloat = 24
         static let railContentSpacing: CGFloat = 24
         static let maxVisibleGuides = 3
     }
+
+    @Environment(\.displayScale) private var displayScale
 
     let state: CommentRowState
     let onToggle: () -> Void
@@ -99,9 +100,18 @@ struct CommentRow: View {
 
     private var contentLeadingPadding: CGFloat {
         guard visibleGuideCount > 0 else { return Metrics.horizontalPadding }
-        let railWidth = CGFloat(visibleGuideCount) * Metrics.railWidth
+        let railWidth = CGFloat(visibleGuideCount) * railHairlineWidth
         let railSpacing = CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing
         return Metrics.horizontalPadding + railWidth + railSpacing + Metrics.railContentSpacing
+    }
+
+    private var railHairlineWidth: CGFloat {
+        1 / max(displayScale, 1)
+    }
+
+    private var threadRailsWidth: CGFloat {
+        CGFloat(visibleGuideCount) * railHairlineWidth
+            + CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing
     }
 
     private var rowContent: some View {
@@ -134,18 +144,12 @@ struct CommentRow: View {
     @ViewBuilder
     private var threadRails: some View {
         if visibleGuideCount > 0 {
-            HStack(spacing: Metrics.railSpacing) {
-                ForEach(0..<visibleGuideCount, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: Metrics.railWidth / 2)
-                        .fill(Color.secondary.opacity(0.16))
-                        .frame(width: Metrics.railWidth)
-                        .frame(maxHeight: .infinity)
-                }
-            }
-            .frame(width: CGFloat(visibleGuideCount) * Metrics.railWidth
-                + CGFloat(max(visibleGuideCount - 1, 0)) * Metrics.railSpacing)
-            .frame(maxHeight: .infinity)
-            .accessibilityHidden(true)
+            ThreadRailStack(
+                count: visibleGuideCount,
+                spacing: Metrics.railSpacing,
+                lineWidth: railHairlineWidth
+            )
+            .frame(width: threadRailsWidth)
         }
     }
 
@@ -196,6 +200,29 @@ struct CommentRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .clipped()
+    }
+}
+
+private struct ThreadRailStack: View {
+    let count: Int
+    let spacing: CGFloat
+    let lineWidth: CGFloat
+
+    var body: some View {
+        Canvas { context, size in
+            let style = StrokeStyle(lineWidth: lineWidth, lineCap: .butt)
+            let color = Color(uiColor: .separator).opacity(0.85)
+
+            for index in 0..<count {
+                let x = (lineWidth / 2) + CGFloat(index) * (lineWidth + spacing)
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x, y: size.height))
+                context.stroke(path, with: .color(color), style: style)
+            }
+        }
+        .frame(maxHeight: .infinity)
+        .accessibilityHidden(true)
     }
 }
 
