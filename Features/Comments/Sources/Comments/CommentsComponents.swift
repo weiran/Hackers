@@ -25,10 +25,6 @@ private final class VisibleCommentTarget {
     }
 }
 
-private enum CommentScrollIntent {
-    case revealComment(commentID: Int)
-}
-
 private extension UnitPoint {
     static let commentTop = UnitPoint(x: 0.5, y: 0)
 }
@@ -54,7 +50,6 @@ struct CommentsContentView: View {
     @State private var lastIsAtTop = true
     @State private var scrollPosition = ScrollPosition(idType: Int.self)
     @State private var visibleCommentTarget = VisibleCommentTarget()
-    @State private var pendingScrollIntent: CommentScrollIntent?
 
     var body: some View {
         Group {
@@ -86,11 +81,6 @@ struct CommentsContentView: View {
             }, action: { _, offsetY in
                 updateHeaderState(offsetY: offsetY)
             })
-            .onScrollPhaseChange { _, newPhase in
-                if newPhase == .tracking || newPhase == .interacting {
-                    pendingScrollIntent = nil
-                }
-            }
             .accessibilityIdentifier("comments.list")
             .safeAreaInset(edge: .top, spacing: 0) {
                 commentScrollTopSafeAreaInset
@@ -162,21 +152,6 @@ struct CommentsContentView: View {
         )
     }
 
-    private func resolvePendingScrollIntent(animated: Bool) {
-        guard let intent = pendingScrollIntent else { return }
-
-        switch intent {
-        case .revealComment(let commentID):
-            if viewModel.visibleComments.contains(where: { $0.id == commentID }) {
-                performScrollUpdate {
-                    scrollPosition.scrollTo(id: commentID, anchor: .commentTop)
-                    pendingScrollIntent = nil
-                    pendingCommentID = nil
-                }
-            }
-        }
-    }
-
     private func scrollToPendingComment() {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
@@ -195,18 +170,13 @@ struct CommentsContentView: View {
     }
 
     private func scrollToComment(withID targetID: Int) {
-        pendingScrollIntent = .revealComment(commentID: targetID)
-        resolvePendingScrollIntent(animated: true)
-    }
-
-    private func performScrollUpdate(_ updates: () -> Void) {
         withAnimation(.easeInOut(duration: 0.3)) {
-            updates()
+            scrollPosition.scrollTo(id: targetID, anchor: .commentTop)
         }
+        pendingCommentID = nil
     }
 
     private func toggleCommentVisibilityWithNativeAnimation(commentID: Int) {
-        pendingScrollIntent = nil
         withAnimation(Self.commentCollapseAnimation) {
             _ = toggleCommentVisibility(commentID)
         }
