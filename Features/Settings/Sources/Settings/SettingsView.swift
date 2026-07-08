@@ -23,6 +23,7 @@ public struct SettingsView: View {
     let onWhatsNewDismiss: () -> Void
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
+    @State private var showSupport = false
     @State private var showMailView = false
     @State private var showLogin = false
     @State private var showWhatsNew = false
@@ -53,6 +54,7 @@ public struct SettingsView: View {
                 Section(footer: versionLabel) {
                     SettingsHeroSection(
                         canSendFeedback: MFMailComposeViewController.canSendMail(),
+                        donate: { showSupport = true },
                         openGitHub: openGitHub,
                         sendFeedback: { showMailView = true },
                         showWhatsNew: { showWhatsNew = true }
@@ -216,6 +218,9 @@ public struct SettingsView: View {
                 )
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("settings.close"))
+            .navigationDestination(isPresented: $showSupport) {
+                SupportView()
+            }
             .sheet(isPresented: $showMailView) {
                 feedbackMailView
             }
@@ -237,11 +242,11 @@ public struct SettingsView: View {
         }
     }
 
-    private var feedbackMailView: some View {
+    private var feedbackBodyLines: [String] {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
         let deviceIdentifier = UIDevice.current.modelIdentifier
         let systemVersion = UIDevice.current.systemVersion
-        let bodyLines = [
+        return [
             "",
             "",
             "",
@@ -250,12 +255,14 @@ public struct SettingsView: View {
             "Device Model: \(deviceIdentifier)",
             "iOS Version: \(systemVersion)"
         ]
+    }
 
+    private var feedbackMailView: some View {
         return MailView(
             result: $mailResult,
             recipients: ["weiran@zhang.me.uk"],
             subject: "Hackers App Feedback",
-            messageBody: bodyLines.joined(separator: "\n"),
+            messageBody: feedbackBodyLines.joined(separator: "\n"),
         )
     }
 
@@ -278,6 +285,7 @@ public struct SettingsView: View {
 
 private struct SettingsHeroSection: View {
     let canSendFeedback: Bool
+    let donate: () -> Void
     let openGitHub: () -> Void
     let sendFeedback: () -> Void
     let showWhatsNew: () -> Void
@@ -303,16 +311,12 @@ private struct SettingsHeroSection: View {
 
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    NavigationLink {
-                        SupportView()
-                    } label: {
-                        SettingsHeroAction(
-                            title: "Donate",
-                            systemImage: "heart.fill",
-                            style: .primary
-                        )
-                    }
-                    .buttonStyle(.plain)
+                    SettingsHeroButton(
+                        title: "Donate",
+                        systemImage: "heart",
+                        style: .primary,
+                        action: donate
+                    )
 
                     SettingsHeroButton(
                         title: "GitHub",
@@ -338,11 +342,6 @@ private struct SettingsHeroSection: View {
             }
         }
         .padding(18)
-        .background(AppColors.background, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(.quaternary, lineWidth: 1)
-        }
     }
 }
 
@@ -360,10 +359,10 @@ private struct AppIconView: View {
             }
         }
         .aspectRatio(1, contentMode: .fit)
-        .frame(width: 64, height: 64)
-        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .frame(width: 72, height: 72)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.white.opacity(0.55), lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
@@ -374,12 +373,13 @@ private struct AppIconView: View {
 private struct SettingsHeroButton: View {
     let title: String
     let systemImage: String
+    var style: SettingsHeroAction.Style = .secondary
     var isEnabled = true
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            SettingsHeroAction(title: title, systemImage: systemImage, style: .secondary)
+            SettingsHeroAction(title: title, systemImage: systemImage, style: style)
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
@@ -389,6 +389,7 @@ private struct SettingsHeroButton: View {
 
     private var accessibilityLabel: String {
         switch title {
+        case "Donate": "Donate"
         case "GitHub": "Hackers on GitHub"
         case "Feedback": "Send Feedback"
         case "What's New": "Show What's New"
