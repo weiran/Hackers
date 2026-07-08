@@ -54,6 +54,7 @@ private struct CollapsingCommentBranch {
     let expandedRows: [CommentRowState]
     let compactRoot: CommentRowState
     let rowIDs: Set<Int>
+    let contentWidth: CGFloat?
     let expandedHeight: CGFloat
     let showsSeparatorAfter: Bool
 }
@@ -431,6 +432,7 @@ struct CommentsContentView: View {
         let expandedRows = [state] + descendants.map { rowState(for: $0) }
         let rowIDs = Set(expandedRows.map(\.id))
         let allIDs = expandedRows.map(\.id)
+        let contentWidth = rowFrames[state.id]?.width
         let expandedHeight = measuredThreadHeight(forCommentIDs: allIDs, rootID: state.id)
         let lastID = allIDs.last ?? state.id
         let showsSeparatorAfter = showsRootSeparator(afterCommentID: lastID)
@@ -441,6 +443,7 @@ struct CommentsContentView: View {
             expandedRows: expandedRows,
             compactRoot: compactState(from: state),
             rowIDs: rowIDs,
+            contentWidth: contentWidth,
             expandedHeight: expandedHeight,
             showsSeparatorAfter: showsSeparatorAfter
         )
@@ -733,6 +736,7 @@ private struct CollapsingCommentBranchView<ExpandedContent: View, CompactContent
                 .collapsingBranchCompactHeight()
                 .opacity(0)
         }
+        .frame(width: branch.contentWidth, alignment: .topLeading)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: currentHeight, alignment: .top)
         .clipped()
