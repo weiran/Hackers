@@ -316,6 +316,7 @@ struct PostCommentsSheet: View {
                 post: viewModel.post,
                 showThumbnails: viewModel.showThumbnails,
                 titleProgress: titleProgress,
+                isInteractiveMove: presentation.isInteractiveMove,
                 handleTopInset: handleTopInset,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
@@ -751,6 +752,7 @@ private struct CommentsSheetTopChrome: View {
     let post: Post?
     let showThumbnails: Bool
     let titleProgress: CGFloat
+    let isInteractiveMove: Bool
     let handleTopInset: CGFloat
     let handleWidth: CGFloat
     let handleThickness: CGFloat
@@ -782,7 +784,7 @@ private struct CommentsSheetTopChrome: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: navigationBarHeight + handleTopInset, alignment: .top)
-        .animation(chromeAnimation, value: progress)
+        .animation(isInteractiveMove ? nil : chromeAnimation, value: progress)
     }
 
     private var handle: some View {
