@@ -137,6 +137,9 @@ struct CommentRow: View {
                 }
             }
             commentText
+                .transaction { transaction in
+                    transaction.disablesAnimations = true
+                }
         }
         .clipped()
     }
@@ -195,7 +198,6 @@ struct CommentRow: View {
                 Text(styledText)
                     .foregroundStyle(.primary)
                     .padding(.top, 8)
-                    .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
