@@ -255,6 +255,7 @@ struct EmbeddedWebView: View {
                 }
             }
         }
+        .browserToolbarMaterial(isVisible: showsToolbar)
     }
 
     @ViewBuilder
@@ -338,6 +339,21 @@ struct EmbeddedWebView: View {
         .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
+}
+
+private extension View {
+    @ViewBuilder
+    func browserToolbarMaterial(isVisible: Bool) -> some View {
+        if isVisible {
+            self
+                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.ultraThinMaterial, for: .bottomBar)
+                .toolbarBackground(.visible, for: .bottomBar)
+        } else {
+            self
+        }
+    }
 }
 
 private struct BrowserWebView: UIViewRepresentable {
