@@ -44,6 +44,9 @@ struct CommentRow: View {
 
     var body: some View {
         rowDisplay
+            .transaction { transaction in
+                transaction.disablesAnimations = true
+            }
             .contentShape(.interaction, Rectangle())
             .onTapGesture(perform: onToggle)
             .accessibilityElement(children: .combine)
