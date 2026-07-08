@@ -148,7 +148,6 @@ struct CommentsContentView: View {
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var pendingScrollIntent: CommentScrollIntent?
     @State private var collapsingBranch: CollapsingCommentBranch?
-    @State private var activeCommentVisibilityTransitionID: Int?
 
     var body: some View {
         Group {
@@ -258,9 +257,6 @@ struct CommentsContentView: View {
                     textScaling: textScaling,
                     chunkSize: 5
                 )
-            }
-            .onDisappear {
-                activeCommentVisibilityTransitionID = nil
             }
         }
     }
@@ -411,22 +407,9 @@ struct CommentsContentView: View {
         }
     }
 
-    private func beginCommentVisibilityTransition(for commentID: Int) -> Bool {
-        guard activeCommentVisibilityTransitionID == nil else { return false }
-        activeCommentVisibilityTransitionID = commentID
-        return true
-    }
-
-    private func finishCommentVisibilityTransition(for commentID: Int) {
-        guard activeCommentVisibilityTransitionID == commentID else { return }
-        activeCommentVisibilityTransitionID = nil
-    }
-
     private func toggleCommentVisibilityWithScrollPreservation(commentID: Int) {
         guard collapsingBranch == nil else { return }
         guard let state = rowState(forCommentID: commentID) else { return }
-        guard beginCommentVisibilityTransition(for: state.id) else { return }
-
         if state.visibility == .visible {
             pendingScrollIntent = nil
             let branch = collapsingBranch(from: state)
@@ -440,19 +423,11 @@ struct CommentsContentView: View {
             pendingScrollIntent = nil
             rowFrames[state.id] = nil
 
-            var didToggle = false
-            withAnimation(Self.commentCollapseAnimation, completionCriteria: .logicallyComplete) {
+            withAnimation(Self.commentCollapseAnimation) {
                 guard toggleCommentVisibility(state.id) != nil else {
                     pendingScrollIntent = nil
                     return
                 }
-                didToggle = true
-            } completion: {
-                finishCommentVisibilityTransition(for: state.id)
-            }
-
-            if !didToggle {
-                finishCommentVisibilityTransition(for: state.id)
             }
         }
     }
@@ -603,7 +578,6 @@ struct CommentsContentView: View {
                         collapsingBranch = nil
                     }
                 }
-                finishCommentVisibilityTransition(for: branch.rootID)
             },
             expandedContent: {
                 VStack(alignment: .leading, spacing: 0) {
