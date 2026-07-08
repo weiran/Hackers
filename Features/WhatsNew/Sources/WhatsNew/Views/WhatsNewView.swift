@@ -123,7 +123,7 @@ public struct WhatsNewView: View {
         let isPrimary = style == .primary
         let label = Text(title)
             .scaledFont(.headline)
-            .foregroundStyle(isPrimary ? .white : .primary)
+            .foregroundStyle(labelForegroundStyle(isPrimary: isPrimary, isEnabled: isEnabled))
             .frame(maxWidth: .infinity)
             .frame(height: 50)
 
@@ -134,7 +134,6 @@ public struct WhatsNewView: View {
             .buttonStyle(.glassProminent)
             .tint(AppColors.appTintColor)
             .disabled(!isEnabled)
-            .opacity(isEnabled ? 1 : 0.7)
         } else {
             Button(action: action) {
                 label
@@ -142,7 +141,14 @@ public struct WhatsNewView: View {
             .buttonStyle(.glass)
             .tint(.secondary)
             .disabled(!isEnabled)
-            .opacity(isEnabled ? 1 : 0.7)
         }
+    }
+
+    private func labelForegroundStyle(isPrimary: Bool, isEnabled: Bool) -> Color {
+        if isPrimary {
+            return isEnabled ? .white : .secondary
+        }
+
+        return .primary
     }
 }
