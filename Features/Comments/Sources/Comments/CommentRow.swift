@@ -202,9 +202,9 @@ struct CommentRow: View {
     }
 
     private var voteLabel: some View {
-        Image(systemName: state.isUpvoted ? "arrow.up.circle.fill" : "arrow.up")
+        Image(systemName: state.isUpvoted ? "arrow.up.circle.fill" : "arrow.up.circle")
             .scaledFont(.subheadline)
-            .foregroundStyle(AppColors.upvotedColor)
+            .foregroundStyle(state.isUpvoted ? AppColors.upvotedColor : .secondary)
             .accessibilityHidden(true)
     }
 
