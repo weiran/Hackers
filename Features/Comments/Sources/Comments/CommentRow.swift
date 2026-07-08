@@ -24,6 +24,16 @@ struct CommentRowState: Equatable, Identifiable {
 }
 
 struct CommentRow: View {
+    private enum Metrics {
+        static let horizontalPadding: CGFloat = 16
+        static let verticalPadding: CGFloat = 14
+        static let nestedTopPadding: CGFloat = 10
+        static let railWidth: CGFloat = 2
+        static let railSpacing: CGFloat = 10
+        static let railContentSpacing: CGFloat = 12
+        static let maxVisibleDepth = 6
+    }
+
     let state: CommentRowState
     let onToggle: () -> Void
     let onUpvote: () -> Void
@@ -67,15 +77,35 @@ struct CommentRow: View {
 
     private var rowDisplay: some View {
         rowContent
-            .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
-            .padding(.trailing, 16)
-            .padding(.vertical, 16)
+            .padding(.leading, contentLeadingPadding)
+            .padding(.trailing, Metrics.horizontalPadding)
+            .padding(.top, state.level == 0 ? Metrics.verticalPadding : Metrics.nestedTopPadding)
+            .padding(.bottom, Metrics.verticalPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .leading) {
+                threadRails
+                    .padding(.leading, Metrics.horizontalPadding)
+                    .padding(.vertical, 6)
+            }
     }
 
     @ViewBuilder
     private var rowControls: some View {
         EmptyView()
+    }
+
+    private var visibleDepth: Int {
+        min(max(state.level, 0), Metrics.maxVisibleDepth)
+    }
+
+    private var railStride: CGFloat {
+        Metrics.railWidth + Metrics.railSpacing
+    }
+
+    private var contentLeadingPadding: CGFloat {
+        let railWidth = CGFloat(visibleDepth) * railStride
+        let nestedSpacing = visibleDepth == 0 ? 0 : Metrics.railContentSpacing
+        return Metrics.horizontalPadding + railWidth + nestedSpacing
     }
 
     private var rowContent: some View {
@@ -110,6 +140,31 @@ struct CommentRow: View {
             commentText
         }
         .clipped()
+    }
+
+    @ViewBuilder
+    private var threadRails: some View {
+        if visibleDepth > 0 {
+            HStack(spacing: Metrics.railSpacing) {
+                ForEach(0..<visibleDepth, id: \.self) { depth in
+                    RoundedRectangle(cornerRadius: Metrics.railWidth / 2)
+                        .fill(threadRailColor(for: depth))
+                        .frame(width: Metrics.railWidth)
+                        .frame(maxHeight: .infinity)
+                }
+            }
+            .frame(width: CGFloat(visibleDepth) * railStride - Metrics.railSpacing)
+            .frame(maxHeight: .infinity)
+            .accessibilityHidden(true)
+        }
+    }
+
+    private func threadRailColor(for depth: Int) -> Color {
+        if depth == visibleDepth - 1 {
+            AppColors.appTintColor.opacity(state.visibility == .compact ? 0.35 : 0.5)
+        } else {
+            Color.secondary.opacity(0.18)
+        }
     }
 
     private var commentText: some View {

@@ -530,10 +530,7 @@ struct CommentsContentView: View {
 
     @ViewBuilder
     private func commentSeparator(for state: CommentRowState, isLast: Bool) -> some View {
-        if !isLast {
-            Divider()
-                .padding(.leading, CGFloat(16 + min(state.level, 6) * 14))
-        }
+        EmptyView()
     }
 
     private func commentRowTransition(for state: CommentRowState) -> AnyTransition {
