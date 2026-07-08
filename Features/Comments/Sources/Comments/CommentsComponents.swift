@@ -495,7 +495,7 @@ struct CommentsContentView: View {
 
     private func copyComment(withID commentID: Int) {
         guard let comment = viewModel.comment(withID: commentID) else { return }
-        UIPasteboard.general.string = comment.text.strippingHTML()
+        UIPasteboard.general.string = CommentHTMLParser.plainText(fromHTML: comment.text)
     }
 
     private func shareComment(withID commentID: Int) {

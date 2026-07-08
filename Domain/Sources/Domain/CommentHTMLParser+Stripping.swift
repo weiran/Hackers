@@ -8,6 +8,13 @@
 import Foundation
 
 extension CommentHTMLParser {
+    /// Converts Hacker News comment HTML to plain text for copy/share surfaces.
+    public static func plainText(fromHTML html: String) -> String {
+        let decodedHTML = decodeHTMLEntities(html)
+        return stripHTMLTags(decodedHTML)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     /// Strips HTML tags using pre-compiled regex for better performance
     static func stripHTMLTags(_ text: String) -> String {
         let range = NSRange(location: 0, length: text.utf16.count)

@@ -12,7 +12,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class SessionService: AuthenticationServiceProtocol {
+public final class SessionService {
     private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
     nonisolated(unsafe) private var logoutObserver: NSObjectProtocol?
@@ -49,16 +49,6 @@ public final class SessionService: AuthenticationServiceProtocol {
 
     public var username: String? {
         user?.username
-    }
-
-    // MARK: - AuthenticationServiceProtocol
-
-    public var isAuthenticated: Bool {
-        authenticationState == .authenticated
-    }
-
-    public func showLogin() {
-        // NavigationStore handles presentation in the view layer.
     }
 
     public func authenticate(username: String, password: String) async throws -> AuthenticationState {

@@ -618,28 +618,28 @@ struct CommentHTMLParserTests {
         #expect(!resultString.contains("123;\n\nText"), "Should not have double newlines after code block")
     }
 
-    // MARK: - String Extension Tests
+    // MARK: - Plain Text Tests
 
-    @Test("String extension strippingHTML removes HTML and decodes entities")
-    func stringExtensionStrippingHTML() {
+    @Test("plainText removes HTML and decodes entities")
+    func plainTextRemovesHTMLAndDecodesEntities() {
         let input = "<p>Hello &amp; <a href=\"https://example.com\">world</a>!</p>"
-        let result = input.strippingHTML()
+        let result = CommentHTMLParser.plainText(fromHTML: input)
         let expected = "Hello & world!"
-        #expect(result == expected, "String extension should strip HTML and decode entities")
+        #expect(result == expected, "Plain text conversion should strip HTML and decode entities")
     }
 
-    @Test("String extension strippingHTML trims whitespace correctly")
-    func stringExtensionStrippingHTMLWithWhitespace() {
+    @Test("plainText trims whitespace correctly")
+    func plainTextTrimsWhitespace() {
         let input = "  <p>  Content  </p>  "
-        let result = input.strippingHTML()
-        #expect(result == "Content", "String extension should trim whitespace")
+        let result = CommentHTMLParser.plainText(fromHTML: input)
+        #expect(result == "Content", "Plain text conversion should trim whitespace")
     }
 
-    @Test("String extension strippingHTML removes formatting tags")
-    func stringExtensionStrippingHTMLWithFormatting() {
+    @Test("plainText removes formatting tags")
+    func plainTextRemovesFormattingTags() {
         let input = "<p>Text with <b>bold</b> and <i>italic</i> formatting.</p>"
-        let result = input.strippingHTML()
+        let result = CommentHTMLParser.plainText(fromHTML: input)
         let expected = "Text with bold and italic formatting."
-        #expect(result == expected, "String extension should strip formatting tags while preserving text")
+        #expect(result == expected, "Plain text conversion should strip formatting tags while preserving text")
     }
 }
