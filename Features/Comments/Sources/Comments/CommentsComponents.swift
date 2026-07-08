@@ -54,7 +54,7 @@ private struct CollapsingCommentBranch {
     let expandedRows: [CommentRowState]
     let compactRoot: CommentRowState
     let rowIDs: Set<Int>
-    let isLast: Bool
+    let showsSeparatorAfter: Bool
 }
 
 private enum CollapsingBranchContentKind: Hashable {
@@ -437,7 +437,7 @@ struct CommentsContentView: View {
         let descendants = visibleDescendants(of: state)
         let allRows = [state] + descendants.map { rowState(for: $0) }
         let rowIDs = Set(allRows.map(\.id))
-        let isLast = allRows.last?.id == viewModel.visibleComments.last?.id
+        let showsSeparatorAfter = allRows.last.map { showsRootSeparator(afterCommentID: $0.id) } ?? false
 
         return CollapsingCommentBranch(
             transitionID: UUID(),
@@ -445,7 +445,7 @@ struct CommentsContentView: View {
             expandedRows: allRows,
             compactRoot: compactState(from: state),
             rowIDs: rowIDs,
-            isLast: isLast
+            showsSeparatorAfter: showsSeparatorAfter
         )
     }
 
@@ -529,8 +529,10 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentSeparator(for state: CommentRowState, isLast: Bool) -> some View {
-        EmptyView()
+    private func commentSeparator(isVisible: Bool) -> some View {
+        if isVisible {
+            Divider()
+        }
     }
 
     private func commentRowTransition(for state: CommentRowState) -> AnyTransition {
@@ -538,10 +540,10 @@ struct CommentsContentView: View {
     }
 
     @ViewBuilder
-    private func commentRowGroup(for state: CommentRowState, in post: Post, isLast: Bool) -> some View {
+    private func commentRowGroup(for state: CommentRowState, in post: Post, showsSeparator: Bool) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             commentRow(for: state, in: post)
-            commentSeparator(for: state, isLast: isLast)
+            commentSeparator(isVisible: showsSeparator)
         }
         .commentRowFrame(id: state.id, isEnabled: tracksRowFrames)
         .id(state.id)
@@ -582,12 +584,18 @@ struct CommentsContentView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(branch.expandedRows) { state in
                         commentRow(for: state, in: post)
-                        commentSeparator(for: state, isLast: state.id == branch.expandedRows.last?.id && branch.isLast)
+                        commentSeparator(
+                            isVisible: state.id == branch.expandedRows.last?.id && branch.showsSeparatorAfter
+                        )
                     }
                 }
             },
             compactContent: {
-                commentRowGroup(for: branch.compactRoot, in: post, isLast: branch.isLast)
+                commentRowGroup(
+                    for: branch.compactRoot,
+                    in: post,
+                    showsSeparator: branch.showsSeparatorAfter
+                )
             }
         )
         .commentRowFrame(id: branch.rootID, isEnabled: tracksRowFrames)
@@ -602,9 +610,25 @@ struct CommentsContentView: View {
             if let collapsingBranch, collapsingBranch.rootID == state.id {
                 collapsingCommentBranchView(collapsingBranch, in: post)
             } else if collapsingBranch?.rowIDs.contains(state.id) != true {
-                commentRowGroup(for: state, in: post, isLast: state.id == visibleComments.last?.id)
+                commentRowGroup(
+                    for: state,
+                    in: post,
+                    showsSeparator: showsRootSeparator(afterCommentID: state.id)
+                )
             }
         }
+    }
+
+    private func showsRootSeparator(afterCommentID commentID: Int) -> Bool {
+        guard
+            let index = viewModel.visibleComments.firstIndex(where: { $0.id == commentID }),
+            index < viewModel.visibleComments.index(before: viewModel.visibleComments.endIndex)
+        else {
+            return false
+        }
+
+        let nextIndex = viewModel.visibleComments.index(after: index)
+        return viewModel.visibleComments[nextIndex].level == 0
     }
 
     @ViewBuilder
