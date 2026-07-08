@@ -618,7 +618,7 @@ struct CommentsContentView: View {
     }
 
     private func commentRowTransition(for state: CommentRowState) -> AnyTransition {
-        state.level == 0 ? .opacity : .commentTopReveal
+        .opacity
     }
 
     @ViewBuilder
