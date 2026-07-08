@@ -39,7 +39,6 @@ struct PostCommentsSheet: View {
     private static let expandedHandleHitTargetWidth: CGFloat = 160
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
-    private static let expandedPostHeaderDragHeight: CGFloat = 210
     private static let expandedTopDragTrailingPassthroughWidth: CGFloat = 88
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
@@ -316,7 +315,6 @@ struct PostCommentsSheet: View {
         handleTopInset
             + Self.navigationBarHeight
             + Self.expandedContentSpacing
-            + Self.expandedPostHeaderDragHeight
     }
 
     private func sheetHandle(

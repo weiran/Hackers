@@ -39,6 +39,7 @@ struct CommentRow: View {
                 rowControls
             }
             .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("comments.comment.\(state.id)")
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
             .accessibilityAction(.default, onToggle)
@@ -78,7 +79,7 @@ struct CommentRow: View {
     }
 
     private var rowContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(state.author)
                     .scaledFont(.subheadline)
@@ -106,13 +107,52 @@ struct CommentRow: View {
                         .accessibilityHidden(true)
                 }
             }
+            commentText
+        }
+        .clipped()
+    }
+
+    private var commentText: some View {
+        VStack(alignment: .leading, spacing: 0) {
             if let styledText = state.styledText {
                 Text(styledText)
                     .foregroundStyle(.primary)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .padding(.top, 8)
+                    .transition(.opacity)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .clipped()
+    }
+}
+
+private struct CommentTopRevealModifier: ViewModifier {
+    var progress: CGFloat
+
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(progress)
+            .mask(alignment: .top) {
+                GeometryReader { geometry in
+                    Rectangle()
+                        .frame(height: max(0, geometry.size.height * progress))
+                        .frame(maxWidth: .infinity, alignment: .top)
+                }
+            }
+    }
+}
+
+extension AnyTransition {
+    static var commentTopReveal: AnyTransition {
+        .modifier(
+            active: CommentTopRevealModifier(progress: 0),
+            identity: CommentTopRevealModifier(progress: 1)
+        )
     }
 }
 
