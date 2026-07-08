@@ -51,14 +51,48 @@ public struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(footer: versionLabel) {
-                    SettingsTopActionsSection(
-                        canSendFeedback: MFMailComposeViewController.canSendMail(),
-                        openGitHub: openGitHub,
-                        sendFeedback: { showMailView = true },
-                        showWhatsNew: { showWhatsNew = true }
-                    )
-                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
-                    .listRowSeparator(.hidden)
+                    NavigationLink {
+                        SupportView()
+                    } label: {
+                        Label("Support the App", systemImage: "heart.circle.fill")
+                    }
+                    Button(action: {
+                        if let url = URL(string: "https://github.com/weiran/hackers") {
+                            UIApplication.shared.open(url)
+                        }
+                    }, label: {
+                        Label("Hackers on GitHub", systemImage: "link")
+                    })
+                    Button(action: {
+                        showMailView.toggle()
+                    }, label: {
+                        Label("Send Feedback", systemImage: "paperplane")
+                    })
+                    .disabled(!MFMailComposeViewController.canSendMail())
+                    .sheet(isPresented: $showMailView) {
+                        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+                        let deviceIdentifier = UIDevice.current.modelIdentifier
+                        let systemVersion = UIDevice.current.systemVersion
+                        let bodyLines = [
+                            "",
+                            "",
+                            "",
+                            "---",
+                            "App Version: \(version)",
+                            "Device Model: \(deviceIdentifier)",
+                            "iOS Version: \(systemVersion)"
+                        ]
+
+                        MailView(
+                            result: $mailResult,
+                            recipients: ["weiran@zhang.me.uk"],
+                            subject: "Hackers App Feedback",
+                            messageBody: bodyLines.joined(separator: "\n"),
+                        )
+                    }
+                    Button(action: { showWhatsNew = true }, label: {
+                        Label("Show What's New", systemImage: "sparkles")
+                    })
                 }
 
                 Section(header: Text("Account")) {
@@ -216,9 +250,6 @@ public struct SettingsView: View {
                 )
                 .accessibilityLabel("Close")
                 .accessibilityIdentifier("settings.close"))
-            .sheet(isPresented: $showMailView) {
-                feedbackMailView
-            }
             .sheet(isPresented: $showWhatsNew) {
                 WhatsNewService.createWhatsNewView {
                     onWhatsNewDismiss()
@@ -229,34 +260,6 @@ public struct SettingsView: View {
             }
         }
         .textScaling(for: viewModel.textSize)
-    }
-
-    private func openGitHub() {
-        if let url = URL(string: "https://github.com/weiran/hackers") {
-            UIApplication.shared.open(url)
-        }
-    }
-
-    private var feedbackMailView: some View {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-        let deviceIdentifier = UIDevice.current.modelIdentifier
-        let systemVersion = UIDevice.current.systemVersion
-        let bodyLines = [
-            "",
-            "",
-            "",
-            "---",
-            "App Version: \(version)",
-            "Device Model: \(deviceIdentifier)",
-            "iOS Version: \(systemVersion)"
-        ]
-
-        return MailView(
-            result: $mailResult,
-            recipients: ["weiran@zhang.me.uk"],
-            subject: "Hackers App Feedback",
-            messageBody: bodyLines.joined(separator: "\n"),
-        )
     }
 
     private var versionLabel: some View {
@@ -274,129 +277,6 @@ public struct SettingsView: View {
         }
     }
 
-}
-
-private struct SettingsTopActionsSection: View {
-    let canSendFeedback: Bool
-    let openGitHub: () -> Void
-    let sendFeedback: () -> Void
-    let showWhatsNew: () -> Void
-
-    var body: some View {
-        VStack(spacing: 12) {
-            NavigationLink {
-                SupportView()
-            } label: {
-                SettingsSupportActionLabel()
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 10) {
-                SettingsActionTile(
-                    title: "GitHub",
-                    systemImage: "link",
-                    action: openGitHub
-                )
-                .accessibilityLabel("Hackers on GitHub")
-
-                SettingsActionTile(
-                    title: "Feedback",
-                    systemImage: "paperplane",
-                    action: sendFeedback
-                )
-                .disabled(!canSendFeedback)
-                .opacity(canSendFeedback ? 1 : 0.45)
-                .accessibilityLabel("Send Feedback")
-
-                SettingsActionTile(
-                    title: "What's New",
-                    systemImage: "sparkles",
-                    action: showWhatsNew
-                )
-                .accessibilityLabel("Show What's New")
-            }
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-private struct SettingsSupportActionLabel: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "heart.fill")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: 44, height: 44)
-                .background(AppColors.appTintColor, in: Circle())
-                .accessibilityHidden(true)
-
-            Text("Support the App")
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-            Spacer(minLength: 8)
-
-            Image(systemName: "chevron.right")
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
-        }
-        .padding(16)
-        .frame(minHeight: 76)
-        .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(AppColors.appTintColor.opacity(colorScheme == .dark ? 0.2 : 0.12))
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(AppColors.appTintColor.opacity(colorScheme == .dark ? 0.28 : 0.16), lineWidth: 1)
-        }
-        .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-    }
-}
-
-private struct SettingsActionTile: View {
-    @Environment(\.colorScheme) private var colorScheme
-    let title: String
-    let systemImage: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: systemImage)
-                    .font(.title2.weight(.medium))
-                    .frame(height: 28)
-                    .accessibilityHidden(true)
-
-                Text(title)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.74)
-                    .allowsTightening(true)
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .foregroundStyle(AppColors.appTintColor)
-            .frame(maxWidth: .infinity, minHeight: 112)
-            .padding(.horizontal, 8)
-            .background(AppColors.background, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(AppColors.separator(for: colorScheme), lineWidth: 1)
-            }
-            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        }
-        .buttonStyle(.plain)
-    }
 }
 
 private extension UIDevice {
