@@ -66,14 +66,22 @@ struct CommentsContentView: View {
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             GeometryReader { proxy in
+                let horizontalInsets = presentationState.horizontalSafeAreaInsets
+                let contentWidth = max(
+                    proxy.size.width - horizontalInsets.leading - horizontalInsets.trailing,
+                    0
+                )
+
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         postHeaderSection(for: post)
                         commentsSection(for: post)
                     }
-                    .frame(width: max(proxy.size.width, 0), alignment: .leading)
+                    .frame(width: contentWidth, alignment: .leading)
                     .scrollTargetLayout()
                 }
+                .padding(.leading, horizontalInsets.leading)
+                .padding(.trailing, horizontalInsets.trailing)
                 .scrollPosition($scrollPosition)
                 .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
                     updateVisibleCommentTarget(visibleIDs: visibleIDs)
