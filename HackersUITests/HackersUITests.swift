@@ -60,11 +60,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {
-        launchApp(linkBrowserMode: "custom")
-
-        let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
-        tapPost(post)
+        openExpandedCustomBrowserComments()
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"].waitForExistence(timeout: 5))
@@ -72,7 +68,25 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Reload"].exists)
         XCTAssertFalse(app.buttons["Open in Safari"].exists)
+        let headerTitle = app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].firstMatch
+        let firstComment = app.buttons["comments.comment.48346154"]
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertElementIsHorizontallyContained(headerTitle)
+        assertElementIsHorizontallyContained(firstComment)
+    }
+
+    func testCustomBrowserExpandedCommentsLayoutAcrossOrientations() throws {
+        XCUIDevice.shared.orientation = .portrait
+        openExpandedCustomBrowserComments()
+        assertExpandedCommentsLayoutIsContained()
+
+        XCUIDevice.shared.orientation = .landscapeLeft
         XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+        assertExpandedCommentsLayoutIsContained()
+
+        XCUIDevice.shared.orientation = .portrait
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+        assertExpandedCommentsLayoutIsContained()
     }
 
     func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {
@@ -383,6 +397,33 @@ final class HackersUITests: XCTestCase {
 
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func openExpandedCustomBrowserComments() {
+        launchApp(linkBrowserMode: "custom")
+
+        let postTitle = app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].firstMatch
+        XCTAssertTrue(postTitle.waitForExistence(timeout: 8))
+        tapPost(postTitle)
+    }
+
+    private func assertExpandedCommentsLayoutIsContained() {
+        let headerTitle = app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].firstMatch
+        let firstComment = app.buttons["comments.comment.48346154"]
+        XCTAssertTrue(headerTitle.waitForExistence(timeout: 5))
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertElementIsHorizontallyContained(headerTitle)
+        assertElementIsHorizontallyContained(firstComment)
+    }
+
+    private func assertElementIsHorizontallyContained(
+        _ element: XCUIElement,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(element.exists, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(element.frame.minX, app.frame.minX, file: file, line: line)
+        XCTAssertLessThanOrEqual(element.frame.maxX, app.frame.maxX, file: file, line: line)
     }
 
     private func tapAbsolutePoint(x: CGFloat, y: CGFloat) {

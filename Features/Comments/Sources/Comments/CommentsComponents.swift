@@ -70,6 +70,7 @@ struct CommentsContentView: View {
                     postHeaderSection(for: post)
                     commentsSection(for: post)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .scrollTargetLayout()
             }
             .scrollPosition($scrollPosition)

@@ -469,15 +469,10 @@ private extension PostCommentsSheet {
 
     private func resolvedScreenSize(for proxy: GeometryProxy) -> CGSize {
         let size = proxy.size
-        let insets = proxy.safeAreaInsets
-        let fullSize = CGSize(
-            width: size.width + insets.leading + insets.trailing,
-            height: size.height + insets.top + insets.bottom
-        )
-        if fullSize.width > 0, fullSize.height > 0 {
-            return fullSize
+        if size.width > 0, size.height > 0 {
+            return size
         }
-        return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
+        return PresentationContextProvider.shared.keyWindow?.bounds.size ?? size
     }
 
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
