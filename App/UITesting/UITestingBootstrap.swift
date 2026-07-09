@@ -428,12 +428,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     id: 48_346_154,
                     by: "denysvitali",
                     age: "17 hours ago",
-                    text: """
-                    <p>kudos to Louis Rossmann for doing a ton of work on Right to repair, and the website called Consumer Rights Wiki to document anti-consumer practices.</p>
-                    <p><a href="https://consumerrights.wiki/w/Main_Page">https://consumerrights.wiki/w/Main_Page</a></p>
-                    <p>He is involved with FULU Foundation which has a bounty for running without Amazon's servers.</p>
-                    <p><a href="https://bounties.fulu.org/bounties/ring-video-doorbells">https://bounties.fulu.org/bounties/ring-video-doorbells</a></p>
-                    """
+                    text: "Bot detection based on browser fingerprints keeps expanding, and WebGL gives services a surprisingly specific signal."
                 ),
                 makeComment(
                     id: 48_354_612,

@@ -65,52 +65,50 @@ struct CommentsContentView: View {
 
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            GeometryReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        postHeaderSection(for: post)
-                        commentsSection(for: post)
-                    }
-                    .frame(width: proxy.size.width, alignment: .leading)
-                    .scrollTargetLayout()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    postHeaderSection(for: post)
+                    commentsSection(for: post)
                 }
-                .scrollPosition($scrollPosition)
-                .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
-                    updateVisibleCommentTarget(visibleIDs: visibleIDs)
-                }
-                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
-                    geometry.contentOffset.y + geometry.contentInsets.top
-                }, action: { _, offsetY in
-                    updateHeaderState(offsetY: offsetY)
-                })
-                .accessibilityIdentifier("comments.list")
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    commentScrollTopSafeAreaInset
-                }
-                .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                    if !viewModel.visibleComments.isEmpty {
-                        NextCommentFloatingButton(
-                            visibleCommentTarget: visibleCommentTarget,
-                            onNextComment: scrollToNextComment,
-                            onNextThread: scrollToNextThread
-                        )
-                        .padding(.trailing, 28)
-                        .padding(.bottom, 28)
-                    }
-                }
-                .onChange(of: pendingCommentID) { _, _ in
-                    scrollToPendingComment()
-                }
-                .onChange(of: viewModel.visibleRevision) { _, _ in
-                    scrollToPendingComment()
-                }
-                .task(id: viewModel.visibleRevision) {
-                    await CommentTextCache.prewarm(
-                        comments: viewModel.visibleComments.prefix(30),
-                        textScaling: textScaling,
-                        chunkSize: 5
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .scrollTargetLayout()
+            }
+            .scrollPosition($scrollPosition)
+            .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
+                updateVisibleCommentTarget(visibleIDs: visibleIDs)
+            }
+            .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top
+            }, action: { _, offsetY in
+                updateHeaderState(offsetY: offsetY)
+            })
+            .accessibilityIdentifier("comments.list")
+            .safeAreaInset(edge: .top, spacing: 0) {
+                commentScrollTopSafeAreaInset
+            }
+            .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
+                if !viewModel.visibleComments.isEmpty {
+                    NextCommentFloatingButton(
+                        visibleCommentTarget: visibleCommentTarget,
+                        onNextComment: scrollToNextComment,
+                        onNextThread: scrollToNextThread
                     )
+                    .padding(.trailing, 28)
+                    .padding(.bottom, 28)
                 }
+            }
+            .onChange(of: pendingCommentID) { _, _ in
+                scrollToPendingComment()
+            }
+            .onChange(of: viewModel.visibleRevision) { _, _ in
+                scrollToPendingComment()
+            }
+            .task(id: viewModel.visibleRevision) {
+                await CommentTextCache.prewarm(
+                    comments: viewModel.visibleComments.prefix(30),
+                    textScaling: textScaling,
+                    chunkSize: 5
+                )
             }
         }
     }
