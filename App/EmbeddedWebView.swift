@@ -476,7 +476,7 @@ struct PostLinkBrowserView: View {
         .tint(.accentColor)
         .accessibilityIdentifier("browser.view")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+        .toolbarRole(.browser)
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.panel) {
