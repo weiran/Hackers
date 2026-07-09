@@ -43,6 +43,16 @@ For UI smoke coverage, use:
 ./run_ui_tests.sh smoke
 ```
 
+## Visual Regression Verification
+
+For user-reported visual bugs, screenshots are the source of truth.
+
+* Reproduce the same screen, state, device class, and presentation path before changing code when feasible.
+* For a visual fix, verify with a post-fix screenshot of the same flow. UI tests and accessibility frame checks are supplemental; they do not prove a visual bug is fixed by themselves.
+* Match verification scope to the claim: one matching viewport is enough for a narrow visual fix; check orientations, iPad, or multiple sizes only when requested or when the change touches adaptive layout.
+* If the visual state cannot be reproduced, say so clearly and do not claim the issue is fixed.
+* If new visual evidence contradicts the working hypothesis, stop changing code and reassess before stacking more commits.
+
 ## Release Process
 
 Follow `docs/release-process.md` as the source of truth.
