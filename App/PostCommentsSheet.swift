@@ -196,7 +196,7 @@ struct PostCommentsSheet: View {
     }
 
     private var sheetBackground: some View {
-        sheetShape.fill(.background)
+        sheetShape.fill(Color(uiColor: .systemBackground))
     }
 
     private func sheetContent(
@@ -208,7 +208,7 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool,
         showsExpandedPresentation: Bool
     ) -> some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .topLeading) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
@@ -291,6 +291,8 @@ struct PostCommentsSheet: View {
             }
         )
         .equatable()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(Color(uiColor: .systemBackground))
     }
 
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
