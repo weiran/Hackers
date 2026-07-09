@@ -221,15 +221,17 @@ struct EmbeddedWebView: View {
         }
         .toolbar {
             if showsToolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     shareButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     openInSafariButton
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     if showsCloseButton {
                         closeButton
                     }
                 }
-                .sharedBackgroundVisibility(.visible)
-
                 if isPadLayout {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Button {
@@ -250,11 +252,10 @@ struct EmbeddedWebView: View {
 
                         reloadButton
                     }
-                    .sharedBackgroundVisibility(.visible)
                 }
             }
         }
-        .browserToolbarGlass(isVisible: showsToolbar)
+        .browserToolbarMaterial(isVisible: showsToolbar)
     }
 
     @ViewBuilder
@@ -342,11 +343,13 @@ struct EmbeddedWebView: View {
 
 private extension View {
     @ViewBuilder
-    func browserToolbarGlass(isVisible: Bool) -> some View {
+    func browserToolbarMaterial(isVisible: Bool) -> some View {
         if isVisible {
             self
-                .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
-                .toolbarBackgroundVisibility(.hidden, for: .bottomBar)
+                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.ultraThinMaterial, for: .bottomBar)
+                .toolbarBackground(.visible, for: .bottomBar)
         } else {
             self
         }
