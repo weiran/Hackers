@@ -13,27 +13,14 @@ import SwiftUI
 
 public enum CommentsPresentationState: Equatable, Sendable {
     case standard
-    case customBrowser(
-        topContentInset: CGFloat,
-        horizontalSafeAreaLeading: CGFloat,
-        horizontalSafeAreaTrailing: CGFloat
-    )
+    case customBrowser(topContentInset: CGFloat)
 
     var commentScrollTopInset: CGFloat {
         switch self {
         case .standard:
             0
-        case let .customBrowser(topContentInset, _, _):
+        case let .customBrowser(topContentInset):
             max(topContentInset, 0)
-        }
-    }
-
-    var horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat) {
-        switch self {
-        case .standard:
-            (0, 0)
-        case let .customBrowser(_, leading, trailing):
-            (max(leading, 0), max(trailing, 0))
         }
     }
 
