@@ -65,7 +65,12 @@ struct HackersApp: App {
                     return
                 }
                 await MainActor.run {
-                    navigationStore.showPostLink(post, presentation: .collapsedBrowser)
+                    let initialLinkPresentation = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_LINK_PRESENTATION"]
+                    let presentation: PostLinkPresentation =
+                        initialLinkPresentation == "expandedComments"
+                        ? .expandedComments
+                        : .collapsedBrowser
+                    navigationStore.showPostLink(post, presentation: presentation)
                 }
             }
             return

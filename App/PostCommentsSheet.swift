@@ -96,7 +96,6 @@ struct PostCommentsSheet: View {
                     commentsTopContentInset: layout.expandedCommentsTopInset,
                     contentFadeProgress: layout.contentFadeProgress,
                     isInteractiveMove: presentation.isInteractiveMove,
-                    horizontalSafeAreaInsets: (safeInsets.left, safeInsets.right),
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
@@ -207,10 +206,11 @@ struct PostCommentsSheet: View {
         commentsTopContentInset: CGFloat,
         contentFadeProgress: CGFloat,
         isInteractiveMove: Bool,
-        horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsExpandedPresentation: Bool
     ) -> some View {
-        ZStack(alignment: .topLeading) {
+        let horizontalSafeAreaInsets = resolvedHorizontalSafeAreaInsets()
+
+        return ZStack(alignment: .topLeading) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
@@ -271,6 +271,7 @@ struct PostCommentsSheet: View {
         StableCommentsHost(
             postID: viewModel.postID,
             topContentInset: topContentInset,
+            horizontalSafeAreaInsets: horizontalSafeAreaInsets,
             showsPostHeader: showsPostHeader,
             scrollDisabled: !isExpanded || presentation.isInteractiveMove,
             viewModel: viewModel,
@@ -299,8 +300,6 @@ struct PostCommentsSheet: View {
             }
         )
         .equatable()
-        .padding(.leading, horizontalSafeAreaInsets.leading)
-        .padding(.trailing, horizontalSafeAreaInsets.trailing)
     }
 
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
@@ -478,6 +477,12 @@ private extension PostCommentsSheet {
     }
 
     private func resolvedScreenSize(for proxy: GeometryProxy) -> CGSize {
+        if let windowSize = PresentationContextProvider.shared.keyWindow?.bounds.size,
+           windowSize.width > 0,
+           windowSize.height > 0 {
+            return windowSize
+        }
+
         let size = proxy.size
         let insets = proxy.safeAreaInsets
         let fullSize = CGSize(
@@ -488,6 +493,13 @@ private extension PostCommentsSheet {
             return fullSize
         }
         return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
+    }
+
+    private func resolvedHorizontalSafeAreaInsets() -> (leading: CGFloat, trailing: CGFloat) {
+        if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
+            return (insets.left, insets.right)
+        }
+        return (0, 0)
     }
 
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
@@ -900,6 +912,7 @@ private struct TitlePillSizePreferenceKey: PreferenceKey {
 private struct StableCommentsHost: View, @preconcurrency Equatable {
     let postID: Int
     let topContentInset: CGFloat
+    let horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat)
     let showsPostHeader: Bool
     let scrollDisabled: Bool
     let viewModel: CommentsViewModel
@@ -918,6 +931,8 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
         lhs.postID == rhs.postID
             && lhs.topContentInset == rhs.topContentInset
+            && lhs.horizontalSafeAreaInsets.leading == rhs.horizontalSafeAreaInsets.leading
+            && lhs.horizontalSafeAreaInsets.trailing == rhs.horizontalSafeAreaInsets.trailing
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
             && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
@@ -935,7 +950,11 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             allowsRefresh: false,
             showsToolbar: showsToolbar,
             controlsNavigationBarVisibility: showsToolbar,
-            presentationState: .customBrowser(topContentInset: topContentInset),
+            presentationState: .customBrowser(
+                topContentInset: topContentInset,
+                horizontalSafeAreaLeading: horizontalSafeAreaInsets.leading,
+                horizontalSafeAreaTrailing: horizontalSafeAreaInsets.trailing
+            ),
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
