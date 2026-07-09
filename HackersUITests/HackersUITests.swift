@@ -83,20 +83,6 @@ final class HackersUITests: XCTestCase {
         assertExpandedCommentsAreContained()
     }
 
-    func testCustomBrowserExpandedCommentsChromeLandscape() throws {
-        XCUIDevice.shared.orientation = .landscapeLeft
-        defer { XCUIDevice.shared.orientation = .portrait }
-
-        launchApp(
-            linkBrowserMode: "custom",
-            initialLinkPostID: longCommentsPostID,
-            initialLinkPresentation: "expandedComments"
-        )
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 8))
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-        assertExpandedCommentsAreContained()
-    }
-
     private func openExpandedCustomBrowserComments() {
         launchApp(linkBrowserMode: "custom")
 
@@ -416,20 +402,16 @@ final class HackersUITests: XCTestCase {
     private func launchApp(
         linkBrowserMode: String = "custom",
         initialSearchQuery: String? = nil,
-        initialPostID: Int? = nil,
-        initialLinkPostID: Int? = nil,
-        initialLinkPresentation: String? = nil
+        initialPostID: Int? = nil
     ) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         app.terminate()
         app.launchArguments = ["--ui-testing"]
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
-        app.launchEnvironment["HACKERS_SCREENSHOTS"] = initialPostID == nil && initialLinkPostID == nil ? "0" : "1"
+        app.launchEnvironment["HACKERS_SCREENSHOTS"] = initialPostID == nil ? "0" : "1"
         app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
         app.launchEnvironment["HACKERS_UI_INITIAL_SEARCH_QUERY"] = initialSearchQuery ?? ""
         app.launchEnvironment["HACKERS_UI_INITIAL_POST_ID"] = initialPostID.map(String.init) ?? ""
-        app.launchEnvironment["HACKERS_UI_INITIAL_LINK_POST_ID"] = initialLinkPostID.map(String.init) ?? ""
-        app.launchEnvironment["HACKERS_UI_INITIAL_LINK_PRESENTATION"] = initialLinkPresentation ?? ""
         app.launch()
     }
 

@@ -208,13 +208,10 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool,
         showsExpandedPresentation: Bool
     ) -> some View {
-        let horizontalSafeAreaInsets = resolvedHorizontalSafeAreaInsets()
-
-        return ZStack(alignment: .topLeading) {
+        ZStack(alignment: .topLeading) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
-                    horizontalSafeAreaInsets: horizontalSafeAreaInsets,
                     showsPostHeader: true,
                     expandedTop: expandedTop,
                     collapsedTop: collapsedTop
@@ -263,7 +260,6 @@ struct PostCommentsSheet: View {
 
     private func expandedCommentsView(
         topContentInset: CGFloat,
-        horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsPostHeader: Bool,
         expandedTop: CGFloat,
         collapsedTop: CGFloat
@@ -271,7 +267,6 @@ struct PostCommentsSheet: View {
         StableCommentsHost(
             postID: viewModel.postID,
             topContentInset: topContentInset,
-            horizontalSafeAreaInsets: horizontalSafeAreaInsets,
             showsPostHeader: showsPostHeader,
             scrollDisabled: !isExpanded || presentation.isInteractiveMove,
             viewModel: viewModel,
@@ -477,12 +472,6 @@ private extension PostCommentsSheet {
     }
 
     private func resolvedScreenSize(for proxy: GeometryProxy) -> CGSize {
-        if let windowSize = PresentationContextProvider.shared.keyWindow?.bounds.size,
-           windowSize.width > 0,
-           windowSize.height > 0 {
-            return windowSize
-        }
-
         let size = proxy.size
         let insets = proxy.safeAreaInsets
         let fullSize = CGSize(
@@ -493,13 +482,6 @@ private extension PostCommentsSheet {
             return fullSize
         }
         return PresentationContextProvider.shared.keyWindow?.bounds.size ?? fullSize
-    }
-
-    private func resolvedHorizontalSafeAreaInsets() -> (leading: CGFloat, trailing: CGFloat) {
-        if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
-            return (insets.left, insets.right)
-        }
-        return (0, 0)
     }
 
     private func sheetDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
@@ -912,7 +894,6 @@ private struct TitlePillSizePreferenceKey: PreferenceKey {
 private struct StableCommentsHost: View, @preconcurrency Equatable {
     let postID: Int
     let topContentInset: CGFloat
-    let horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat)
     let showsPostHeader: Bool
     let scrollDisabled: Bool
     let viewModel: CommentsViewModel
@@ -931,8 +912,6 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
         lhs.postID == rhs.postID
             && lhs.topContentInset == rhs.topContentInset
-            && lhs.horizontalSafeAreaInsets.leading == rhs.horizontalSafeAreaInsets.leading
-            && lhs.horizontalSafeAreaInsets.trailing == rhs.horizontalSafeAreaInsets.trailing
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
             && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
@@ -950,11 +929,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             allowsRefresh: false,
             showsToolbar: showsToolbar,
             controlsNavigationBarVisibility: showsToolbar,
-            presentationState: .customBrowser(
-                topContentInset: topContentInset,
-                horizontalSafeAreaLeading: horizontalSafeAreaInsets.leading,
-                horizontalSafeAreaTrailing: horizontalSafeAreaInsets.trailing
-            ),
+            presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
