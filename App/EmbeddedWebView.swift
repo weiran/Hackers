@@ -476,18 +476,6 @@ struct PostLinkBrowserView: View {
         .tint(.accentColor)
         .accessibilityIdentifier("browser.view")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                }
-                .accessibilityLabel("Back")
-                .buttonStyle(.glass)
-            }
-        }
         .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
         .task {
             guard !showingCommentsPane else { return }
