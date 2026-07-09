@@ -75,6 +75,10 @@ struct PostCommentsSheet: View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let screenSize = resolvedScreenSize(for: proxy)
+            let expandedHandleAreaHeight = max(
+                proxy.safeAreaInsets.top - safeInsets.top,
+                Self.navigationBarHeight
+            )
             let layout = PostCommentsSheetLayout(
                 safeInsets: safeInsets,
                 screenSize: screenSize,
@@ -84,6 +88,9 @@ struct PostCommentsSheet: View {
                 isExpanded: presentation.isExpanded,
                 expandedCommentsTopInset: expandedCommentsTopInset(handleTopInset:)
             )
+            let currentHandleAreaHeight = Self.handleAreaHeight
+                + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
+            let restingHandleVerticalOffset = (currentHandleAreaHeight - Self.handleThickness) / 2
             let showsExpandedPresentation = viewModel.post != nil
 
             ZStack(alignment: .topLeading) {
@@ -96,6 +103,7 @@ struct PostCommentsSheet: View {
                     commentsTopContentInset: layout.expandedCommentsTopInset,
                     contentFadeProgress: layout.contentFadeProgress,
                     isInteractiveMove: presentation.isInteractiveMove,
+                    restingHandleVerticalOffset: restingHandleVerticalOffset,
                     horizontalSafeAreaInsets: (
                         proxy.safeAreaInsets.leading,
                         proxy.safeAreaInsets.trailing
@@ -210,6 +218,7 @@ struct PostCommentsSheet: View {
         commentsTopContentInset: CGFloat,
         contentFadeProgress: CGFloat,
         isInteractiveMove: Bool,
+        restingHandleVerticalOffset: CGFloat,
         horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsExpandedPresentation: Bool
     ) -> some View {
@@ -255,6 +264,7 @@ struct PostCommentsSheet: View {
                 expandedTop: expandedTop,
                 collapsedTop: collapsedTop,
                 handleTopInset: handleTopInset,
+                restingHandleVerticalOffset: restingHandleVerticalOffset,
                 titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
             )
         }
@@ -316,6 +326,7 @@ struct PostCommentsSheet: View {
         expandedTop: CGFloat,
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
+        restingHandleVerticalOffset: CGFloat,
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -327,6 +338,7 @@ struct PostCommentsSheet: View {
                 titleProgress: titleProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
                 handleTopInset: handleTopInset,
+                restingHandleVerticalOffset: restingHandleVerticalOffset,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
                 handleAreaHeight: Self.handleAreaHeight,
@@ -764,6 +776,7 @@ private struct CommentsSheetTopChrome: View {
     let titleProgress: CGFloat
     let isInteractiveMove: Bool
     let handleTopInset: CGFloat
+    let restingHandleVerticalOffset: CGFloat
     let handleWidth: CGFloat
     let handleThickness: CGFloat
     let handleAreaHeight: CGFloat
@@ -806,7 +819,7 @@ private struct CommentsSheetTopChrome: View {
     }
 
     private var morphVerticalOffset: CGFloat {
-        interpolate(from: (handleAreaHeight - handleThickness) / 2, to: 0, progress: easedProgress)
+        interpolate(from: restingHandleVerticalOffset, to: 0, progress: easedProgress)
     }
 
     var body: some View {
