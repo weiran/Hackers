@@ -255,6 +255,7 @@ struct EmbeddedWebView: View {
                 }
             }
         }
+        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     @ViewBuilder
@@ -444,6 +445,7 @@ struct PostLinkBrowserView: View {
         }
         .tint(.accentColor)
         .accessibilityIdentifier("browser.view")
+        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             guard !showingCommentsPane else { return }
