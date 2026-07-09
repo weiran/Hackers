@@ -88,9 +88,8 @@ struct PostCommentsSheet: View {
                 isExpanded: presentation.isExpanded,
                 expandedCommentsTopInset: expandedCommentsTopInset(handleTopInset:)
             )
-            let currentHandleAreaHeight = Self.handleAreaHeight
+            let currentChromeAreaHeight = Self.handleAreaHeight
                 + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
-            let restingHandleVerticalOffset = (currentHandleAreaHeight - Self.handleThickness) / 2
             let showsExpandedPresentation = viewModel.post != nil
 
             ZStack(alignment: .topLeading) {
@@ -103,7 +102,7 @@ struct PostCommentsSheet: View {
                     commentsTopContentInset: layout.expandedCommentsTopInset,
                     contentFadeProgress: layout.contentFadeProgress,
                     isInteractiveMove: presentation.isInteractiveMove,
-                    restingHandleVerticalOffset: restingHandleVerticalOffset,
+                    chromeAreaHeight: currentChromeAreaHeight,
                     horizontalSafeAreaInsets: (
                         proxy.safeAreaInsets.leading,
                         proxy.safeAreaInsets.trailing
@@ -218,7 +217,7 @@ struct PostCommentsSheet: View {
         commentsTopContentInset: CGFloat,
         contentFadeProgress: CGFloat,
         isInteractiveMove: Bool,
-        restingHandleVerticalOffset: CGFloat,
+        chromeAreaHeight: CGFloat,
         horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsExpandedPresentation: Bool
     ) -> some View {
@@ -264,7 +263,7 @@ struct PostCommentsSheet: View {
                 expandedTop: expandedTop,
                 collapsedTop: collapsedTop,
                 handleTopInset: handleTopInset,
-                restingHandleVerticalOffset: restingHandleVerticalOffset,
+                chromeAreaHeight: chromeAreaHeight,
                 titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
             )
         }
@@ -326,7 +325,7 @@ struct PostCommentsSheet: View {
         expandedTop: CGFloat,
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
-        restingHandleVerticalOffset: CGFloat,
+        chromeAreaHeight: CGFloat,
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -338,10 +337,9 @@ struct PostCommentsSheet: View {
                 titleProgress: titleProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
                 handleTopInset: handleTopInset,
-                restingHandleVerticalOffset: restingHandleVerticalOffset,
+                chromeAreaHeight: chromeAreaHeight,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
-                handleAreaHeight: Self.handleAreaHeight,
                 navigationBarHeight: Self.navigationBarHeight,
                 onTitleTap: collapseSheet
             )
@@ -776,10 +774,9 @@ private struct CommentsSheetTopChrome: View {
     let titleProgress: CGFloat
     let isInteractiveMove: Bool
     let handleTopInset: CGFloat
-    let restingHandleVerticalOffset: CGFloat
+    let chromeAreaHeight: CGFloat
     let handleWidth: CGFloat
     let handleThickness: CGFloat
-    let handleAreaHeight: CGFloat
     let navigationBarHeight: CGFloat
     let onTitleTap: () -> Void
 
@@ -819,7 +816,9 @@ private struct CommentsSheetTopChrome: View {
     }
 
     private var morphVerticalOffset: CGFloat {
-        interpolate(from: restingHandleVerticalOffset, to: 0, progress: easedProgress)
+        let handleOffset = (chromeAreaHeight - handleThickness) / 2
+        let titleOffset = max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
+        return interpolate(from: handleOffset, to: titleOffset, progress: easedProgress)
     }
 
     var body: some View {
