@@ -80,13 +80,11 @@ final class HackersUITests: XCTestCase {
         openExpandedCustomBrowserComments()
         assertExpandedCommentsLayoutIsContained()
 
-        XCUIDevice.shared.orientation = .landscapeLeft
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-        assertExpandedCommentsLayoutIsContained()
-
-        XCUIDevice.shared.orientation = .portrait
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-        assertExpandedCommentsLayoutIsContained()
+        for orientation in [UIDeviceOrientation.landscapeLeft, .landscapeRight, .portrait] {
+            XCUIDevice.shared.orientation = orientation
+            XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+            assertExpandedCommentsLayoutIsContained()
+        }
     }
 
     func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {
