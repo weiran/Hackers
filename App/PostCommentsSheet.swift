@@ -96,7 +96,10 @@ struct PostCommentsSheet: View {
                     commentsTopContentInset: layout.expandedCommentsTopInset,
                     contentFadeProgress: layout.contentFadeProgress,
                     isInteractiveMove: presentation.isInteractiveMove,
-                    horizontalSafeAreaInsets: (safeInsets.left, safeInsets.right),
+                    horizontalSafeAreaInsets: (
+                        proxy.safeAreaInsets.leading,
+                        proxy.safeAreaInsets.trailing
+                    ),
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: screenSize.width, height: screenSize.height, alignment: .top)
@@ -458,6 +461,9 @@ private extension PostCommentsSheet {
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
+        if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
+            return insets
+        }
         let insets = proxy.safeAreaInsets
         if insets.top != 0 || insets.leading != 0 || insets.bottom != 0 || insets.trailing != 0 {
             return UIEdgeInsets(
@@ -466,9 +472,6 @@ private extension PostCommentsSheet {
                 bottom: insets.bottom,
                 right: insets.trailing
             )
-        }
-        if let insets = PresentationContextProvider.shared.keyWindow?.safeAreaInsets {
-            return insets
         }
         return .zero
     }
