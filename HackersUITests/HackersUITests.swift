@@ -60,6 +60,30 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {
+        XCUIDevice.shared.orientation = .portrait
+
+        openExpandedCustomBrowserComments()
+        assertExpandedCommentsAreContained()
+    }
+
+    func testExpandedCommentsLayoutIsContainedInPortrait() throws {
+        XCUIDevice.shared.orientation = .portrait
+
+        launchApp(linkBrowserMode: "custom", initialPostID: longCommentsPostID)
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 8))
+        assertExpandedCommentsAreContained()
+    }
+
+    func testExpandedCommentsLayoutIsContainedInLandscape() throws {
+        XCUIDevice.shared.orientation = .landscapeLeft
+        defer { XCUIDevice.shared.orientation = .portrait }
+
+        launchApp(linkBrowserMode: "custom", initialPostID: longCommentsPostID)
+        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 8))
+        assertExpandedCommentsAreContained()
+    }
+
+    private func openExpandedCustomBrowserComments() {
         launchApp(linkBrowserMode: "custom")
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
@@ -73,6 +97,14 @@ final class HackersUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Reload"].exists)
         XCTAssertFalse(app.buttons["Open in Safari"].exists)
         XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+    }
+
+    private func assertExpandedCommentsAreContained() {
+        let windowFrame = app.windows.firstMatch.frame
+        let firstComment = app.buttons["comments.comment.48346154"]
+
+        XCTAssertGreaterThanOrEqual(firstComment.frame.minX, windowFrame.minX)
+        XCTAssertLessThanOrEqual(firstComment.frame.maxX, windowFrame.maxX)
     }
 
     func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {
@@ -367,13 +399,19 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Welcome back, ui-user"].waitForExistence(timeout: 5))
     }
 
-    private func launchApp(linkBrowserMode: String = "custom", initialSearchQuery: String? = nil) {
+    private func launchApp(
+        linkBrowserMode: String = "custom",
+        initialSearchQuery: String? = nil,
+        initialPostID: Int? = nil
+    ) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         app.terminate()
         app.launchArguments = ["--ui-testing"]
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
+        app.launchEnvironment["HACKERS_SCREENSHOTS"] = initialPostID == nil ? "0" : "1"
         app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
         app.launchEnvironment["HACKERS_UI_INITIAL_SEARCH_QUERY"] = initialSearchQuery ?? ""
+        app.launchEnvironment["HACKERS_UI_INITIAL_POST_ID"] = initialPostID.map(String.init) ?? ""
         app.launch()
     }
 

@@ -98,7 +98,7 @@ struct PostCommentsSheet: View {
                     isInteractiveMove: presentation.isInteractiveMove,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
-                .frame(width: screenSize.width, height: screenSize.height, alignment: .top)
+                .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
                 .background(sheetBackground)
                 .clipShape(sheetShape)
                 .shadow(
@@ -208,7 +208,7 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool,
         showsExpandedPresentation: Bool
     ) -> some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .topLeading) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
@@ -231,6 +231,7 @@ struct PostCommentsSheet: View {
                 .allowsHitTesting(contentFadeProgress >= 0.5)
                 .accessibilityHidden(contentFadeProgress < 0.5)
                 .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
 
             VStack(spacing: 0) {
@@ -244,6 +245,7 @@ struct PostCommentsSheet: View {
             .opacity(1 - contentFadeProgress)
             .allowsHitTesting(contentFadeProgress < 0.5)
             .accessibilityHidden(contentFadeProgress >= 0.5)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
             sheetHandle(
                 expandedTop: expandedTop,
@@ -251,7 +253,9 @@ struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset,
                 titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
             )
+            .frame(maxWidth: .infinity, alignment: .top)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func expandedCommentsView(
