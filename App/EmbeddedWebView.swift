@@ -23,6 +23,7 @@ final class BrowserController: ObservableObject {
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
+    private var underlapsTopBar = false
 
     init() {
         let configuration = WKWebViewConfiguration()
@@ -34,6 +35,7 @@ final class BrowserController: ObservableObject {
         self.navigationDelegate = navigationDelegate
         webView.navigationDelegate = navigationDelegate
         installStateObservers()
+        applyTopBarUnderlap(false)
         updateState()
     }
 
@@ -80,6 +82,13 @@ final class BrowserController: ObservableObject {
         let inset = max(bottomInset, 0)
         applyObscuredBottomInset(inset)
         applyScrollViewBottomInset(inset)
+    }
+
+    func applyTopBarUnderlap(_ underlapsTopBar: Bool) {
+        guard self.underlapsTopBar != underlapsTopBar else { return }
+
+        self.underlapsTopBar = underlapsTopBar
+        webView.scrollView.contentInsetAdjustmentBehavior = underlapsTopBar ? .never : .automatic
     }
 
     private func applyObscuredBottomInset(_ inset: CGFloat) {
@@ -189,6 +198,7 @@ struct EmbeddedWebView: View {
     let showsToolbar: Bool
     let bottomWebViewInset: CGFloat
     let obscuredBottomInset: CGFloat
+    let underlapsTopBar: Bool
     @StateObject private var controller: BrowserController
 
     init(
@@ -198,6 +208,7 @@ struct EmbeddedWebView: View {
         showsToolbar: Bool = true,
         bottomWebViewInset: CGFloat = 0,
         obscuredBottomInset: CGFloat = 0,
+        underlapsTopBar: Bool = false,
         controller: BrowserController? = nil
     ) {
         self.url = url
@@ -206,6 +217,7 @@ struct EmbeddedWebView: View {
         self.showsToolbar = showsToolbar
         self.bottomWebViewInset = bottomWebViewInset
         self.obscuredBottomInset = obscuredBottomInset
+        self.underlapsTopBar = underlapsTopBar
         _controller = StateObject(wrappedValue: controller ?? BrowserController())
     }
 
@@ -275,7 +287,8 @@ struct EmbeddedWebView: View {
         BrowserWebView(
             controller: controller,
             url: url,
-            obscuredBottomInset: obscuredBottomInset
+            obscuredBottomInset: obscuredBottomInset,
+            underlapsTopBar: underlapsTopBar
         )
     }
 
@@ -357,6 +370,7 @@ private struct BrowserWebView: UIViewRepresentable {
     let controller: BrowserController
     let url: URL
     let obscuredBottomInset: CGFloat
+    let underlapsTopBar: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -364,12 +378,14 @@ private struct BrowserWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
+        controller.applyTopBarUnderlap(underlapsTopBar)
         controller.applyBottomChromeInset(obscuredBottomInset)
         context.coordinator.scheduleLoad(controller: controller, url: url)
         return controller.webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        controller.applyTopBarUnderlap(underlapsTopBar)
         controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
@@ -440,8 +456,10 @@ struct PostLinkBrowserView: View {
                 showsToolbar: false,
                 bottomWebViewInset: browserBottomInset,
                 obscuredBottomInset: browserObscuredBottomInset,
+                underlapsTopBar: true,
                 controller: browserController
             )
+            .ignoresSafeArea(.container, edges: .top)
 
             if showingCommentsPane {
                 PostCommentsSheet(
@@ -458,6 +476,7 @@ struct PostLinkBrowserView: View {
         .tint(.accentColor)
         .accessibilityIdentifier("browser.view")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.panel) {
