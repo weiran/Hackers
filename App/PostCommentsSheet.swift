@@ -264,7 +264,6 @@ struct PostCommentsSheet: View {
                 collapsedTop: collapsedTop,
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
-                horizontalSafeAreaInsets: horizontalSafeAreaInsets,
                 titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
             )
         }
@@ -327,7 +326,6 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
         chromeAreaHeight: CGFloat,
-        horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -345,8 +343,6 @@ struct PostCommentsSheet: View {
                 navigationBarHeight: Self.navigationBarHeight,
                 onTitleTap: collapseSheet
             )
-            .padding(.leading, horizontalSafeAreaInsets.leading)
-            .padding(.trailing, horizontalSafeAreaInsets.trailing)
             .simultaneousGesture(titlePillDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
             .allowsHitTesting(titleProgress > 0.5)
 
@@ -366,8 +362,6 @@ struct PostCommentsSheet: View {
 
                 Spacer()
             }
-            .padding(.leading, horizontalSafeAreaInsets.leading)
-            .padding(.trailing, horizontalSafeAreaInsets.trailing)
             .padding(.top, handleTopInset)
         }
         .frame(maxWidth: .infinity)
@@ -773,8 +767,6 @@ private extension CGPoint {
 }
 
 private struct CommentsSheetTopChrome: View {
-    private static let toolbarSideClearance: CGFloat = 64
-
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var measuredTitleSize: CGSize = .zero
     let post: Post?
@@ -850,6 +842,7 @@ private struct CommentsSheetTopChrome: View {
                 ZStack {
                     if let post {
                         CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
+                            .fixedSize(horizontal: true, vertical: false)
                             .opacity(titleContentProgress)
                     }
                 }
@@ -884,14 +877,13 @@ private struct CommentsSheetTopChrome: View {
 
     private func measuredTitleContent(for post: Post) -> some View {
         CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
+            .fixedSize(horizontal: true, vertical: false)
             .hidden()
             .background(
                 GeometryReader { proxy in
                     Color.clear.preference(key: TitlePillSizePreferenceKey.self, value: proxy.size)
                 }
             )
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, Self.toolbarSideClearance)
             .allowsHitTesting(false)
             .accessibilityHidden(true)
             .onPreferenceChange(TitlePillSizePreferenceKey.self) { newValue in
