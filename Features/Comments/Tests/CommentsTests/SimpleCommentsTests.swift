@@ -7,10 +7,74 @@
 
 @testable import Comments
 import Foundation
+import SwiftUI
 import Testing
 
 @Suite("Comments Module Tests")
 struct SimpleCommentsTests {
+    @Suite("Scroll drag start eligibility")
+    struct ScrollDragStartEligibilityTests {
+        @Test("Allows a new drag from an idle scroll settled at the top")
+        func allowsSettledTopDrag() {
+            let isEligible = CommentsScrollDragStartEligibility.updatedValue(
+                currentValue: false,
+                oldPhase: .idle,
+                newPhase: .tracking,
+                isAtTop: true
+            )
+
+            #expect(isEligible)
+        }
+
+        @Test("Rejects a new drag while away from the top")
+        func rejectsDragAwayFromTop() {
+            let isEligible = CommentsScrollDragStartEligibility.updatedValue(
+                currentValue: false,
+                oldPhase: .idle,
+                newPhase: .tracking,
+                isAtTop: false
+            )
+
+            #expect(!isEligible)
+        }
+
+        @Test("Rejects a drag that interrupts deceleration at the top")
+        func rejectsDragDuringDeceleration() {
+            let isEligible = CommentsScrollDragStartEligibility.updatedValue(
+                currentValue: false,
+                oldPhase: .decelerating,
+                newPhase: .tracking,
+                isAtTop: true
+            )
+
+            #expect(!isEligible)
+        }
+
+        @Test("Keeps an eligible drag latched while the scroll is interacting")
+        func keepsEligibilityDuringInteraction() {
+            let isEligible = CommentsScrollDragStartEligibility.updatedValue(
+                currentValue: true,
+                oldPhase: .tracking,
+                newPhase: .interacting,
+                isAtTop: true
+            )
+
+            #expect(isEligible)
+        }
+
+        @Test("Clears eligibility when scrolling settles")
+        func clearsEligibilityWhenIdle() {
+            let isEligible = CommentsScrollDragStartEligibility.updatedValue(
+                currentValue: true,
+                oldPhase: .interacting,
+                newPhase: .idle,
+                isAtTop: true
+            )
+
+            #expect(!isEligible)
+        }
+    }
+
     @Suite("Comments Link Navigator")
     struct LinkNavigatorTests {
         @Test("Extracts Hacker News item id from valid URL")

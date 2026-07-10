@@ -73,7 +73,7 @@ struct PostCommentsSheetPresentation {
         startX: CGFloat,
         translation: CGSize,
         systemBackGestureEdgeWidth: CGFloat,
-        isScrollAtTop: Bool
+        canStartExpandedSheetDrag: Bool
     ) {
         guard !isHandleDragActive else { return }
         guard startX > systemBackGestureEdgeWidth else { return }
@@ -84,7 +84,7 @@ struct PostCommentsSheetPresentation {
 
         if !isTrackingDrag {
             let startsSheetDrag = (isCollapsed && isMostlyVertical)
-                || (isExpanded && isScrollAtTop && isMostlyVertical && translation.height > 0)
+                || (isExpanded && canStartExpandedSheetDrag && isMostlyVertical && translation.height > 0)
             guard startsSheetDrag else { return }
             dragStartAllowsSheetDrag = true
             isTrackingDrag = true

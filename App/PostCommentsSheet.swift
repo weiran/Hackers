@@ -38,6 +38,7 @@ struct PostCommentsSheet: View {
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
     @State private var isScrollAtTop = true
+    @State private var scrollDragStartsFromSettledTop = false
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @Namespace private var postHeaderNamespace
 
@@ -290,6 +291,7 @@ struct PostCommentsSheet: View {
             dragExpandedTop: expandedTop,
             dragCollapsedTop: collapsedTop,
             isAtTop: $isScrollAtTop,
+            scrollDragStartsFromSettledTop: $scrollDragStartsFromSettledTop,
             onPostLinkTap: collapseSheet,
             onTitleDragChanged: { value in
                 presentation.updateExpandedToolbarDrag(
@@ -506,7 +508,7 @@ private extension PostCommentsSheet {
                     startX: value.startLocation.x,
                     translation: value.translation,
                     systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
-                    isScrollAtTop: isScrollAtTop
+                    canStartExpandedSheetDrag: isScrollAtTop && scrollDragStartsFromSettledTop
                 )
             }
             .onEnded { value in
@@ -922,6 +924,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let dragExpandedTop: CGFloat
     let dragCollapsedTop: CGFloat
     @Binding var isAtTop: Bool
+    @Binding var scrollDragStartsFromSettledTop: Bool
     let onPostLinkTap: () -> Void
     let onTitleDragChanged: (DragGesture.Value) -> Void
     let onTitleDragEnded: (DragGesture.Value) -> Void
@@ -951,6 +954,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
             isAtTop: $isAtTop,
+            scrollDragStartsFromSettledTop: $scrollDragStartsFromSettledTop,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
