@@ -73,14 +73,18 @@ struct PostCommentsSheet: View {
     var body: some View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
-            let screenSize = resolvedScreenSize(for: proxy)
+            let containerSize = resolvedContainerSize(for: proxy)
             let expandedHandleAreaHeight = max(
                 proxy.safeAreaInsets.top - safeInsets.top,
                 Self.navigationBarHeight
             )
             let layout = PostCommentsSheetLayout(
                 safeInsets: safeInsets,
-                screenSize: screenSize,
+                containerSize: containerSize,
+                commentsHorizontalInsets: (
+                    proxy.safeAreaInsets.leading,
+                    proxy.safeAreaInsets.trailing
+                ),
                 collapsedHeight: collapsedHeight,
                 controlsHeight: controlsHeight,
                 dragTranslation: presentation.dragTranslation,
@@ -95,21 +99,12 @@ struct PostCommentsSheet: View {
                 Color.clear.allowsHitTesting(false)
 
                 sheetContent(
-                    expandedTop: layout.expandedTop,
-                    collapsedTop: layout.collapsedTop,
-                    handleTopInset: layout.handleTopInset,
-                    commentsTopContentInset: layout.expandedCommentsTopInset,
-                    contentFadeProgress: layout.contentFadeProgress,
+                    layout: layout,
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
-                    viewportSize: screenSize,
-                    horizontalSafeAreaInsets: (
-                        proxy.safeAreaInsets.leading,
-                        proxy.safeAreaInsets.trailing
-                    ),
                     showsExpandedPresentation: showsExpandedPresentation
                 )
-                .frame(width: screenSize.width, height: screenSize.height, alignment: .top)
+                .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
                 .background(sheetBackground)
                 .clipShape(sheetShape)
                 .shadow(
@@ -126,7 +121,7 @@ struct PostCommentsSheet: View {
                     onDismiss: onDismiss,
                     controller: browserController
                 )
-                .frame(width: screenSize.width, alignment: .center)
+                .frame(width: layout.containerSize.width, alignment: .center)
                 .offset(y: layout.controlsTop)
                 .background(
                     GeometryReader { controlsProxy in
@@ -137,7 +132,7 @@ struct PostCommentsSheet: View {
                     }
                 )
             }
-            .frame(width: screenSize.width, height: screenSize.height, alignment: .topLeading)
+            .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .topLeading)
             .ignoresSafeArea(.container)
             .overlay {
                 ExpandedCommentsTopDragHitArea(
@@ -211,82 +206,69 @@ struct PostCommentsSheet: View {
     }
 
     private func sheetContent(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat,
-        handleTopInset: CGFloat,
-        commentsTopContentInset: CGFloat,
-        contentFadeProgress: CGFloat,
+        layout: PostCommentsSheetLayout,
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
-        viewportSize: CGSize,
-        horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsExpandedPresentation: Bool
     ) -> some View {
         ZStack(alignment: .top) {
             if showsExpandedPresentation {
                 expandedCommentsView(
-                    topContentInset: commentsTopContentInset,
-                    viewportSize: viewportSize,
-                    horizontalSafeAreaInsets: horizontalSafeAreaInsets,
-                    showsPostHeader: true,
-                    expandedTop: expandedTop,
-                    collapsedTop: collapsedTop
+                    layout: layout,
+                    showsPostHeader: true
                 )
                 .overlay {
-                    if contentFadeProgress < 0.01 {
+                    if layout.contentFadeProgress < 0.01 {
                         Rectangle()
                             .fill(.background)
                             .allowsHitTesting(false)
-                    } else if !isInteractiveMove, contentFadeProgress < 1 {
+                    } else if !isInteractiveMove, layout.contentFadeProgress < 1 {
                         Rectangle()
                             .fill(.background)
-                            .opacity(1 - contentFadeProgress)
+                            .opacity(1 - layout.contentFadeProgress)
                             .allowsHitTesting(false)
                     }
                 }
-                .allowsHitTesting(contentFadeProgress >= 0.5)
-                .accessibilityHidden(contentFadeProgress < 0.5)
-                .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                .allowsHitTesting(layout.contentFadeProgress >= 0.5)
+                .accessibilityHidden(layout.contentFadeProgress < 0.5)
+                .simultaneousGesture(
+                    sheetDragGesture(expandedTop: layout.expandedTop, collapsedTop: layout.collapsedTop)
+                )
             }
 
             VStack(spacing: 0) {
                 Color.clear
-                    .frame(height: Self.handleAreaHeight + handleTopInset)
+                    .frame(height: Self.handleAreaHeight + layout.handleTopInset)
 
                 collapsedHeader
                     .allowsHitTesting(true)
-                    .simultaneousGesture(sheetDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                    .simultaneousGesture(
+                        sheetDragGesture(expandedTop: layout.expandedTop, collapsedTop: layout.collapsedTop)
+                    )
             }
-            .opacity(1 - contentFadeProgress)
-            .allowsHitTesting(contentFadeProgress < 0.5)
-            .accessibilityHidden(contentFadeProgress >= 0.5)
+            .opacity(1 - layout.contentFadeProgress)
+            .allowsHitTesting(layout.contentFadeProgress < 0.5)
+            .accessibilityHidden(layout.contentFadeProgress >= 0.5)
 
             sheetHandle(
-                expandedTop: expandedTop,
-                collapsedTop: collapsedTop,
-                handleTopInset: handleTopInset,
+                expandedTop: layout.expandedTop,
+                collapsedTop: layout.collapsedTop,
+                handleTopInset: layout.handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
-                titleProgress: titleChromeProgress(contentFadeProgress: contentFadeProgress)
+                titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
             )
         }
     }
 
     private func expandedCommentsView(
-        topContentInset: CGFloat,
-        viewportSize: CGSize,
-        horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
-        showsPostHeader: Bool,
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat
+        layout: PostCommentsSheetLayout,
+        showsPostHeader: Bool
     ) -> some View {
-        let contentWidth = max(
-            viewportSize.width - horizontalSafeAreaInsets.leading - horizontalSafeAreaInsets.trailing,
-            0
-        )
+        let viewport = layout.commentsViewport
 
         return StableCommentsHost(
             postID: viewModel.postID,
-            topContentInset: topContentInset,
+            topContentInset: layout.expandedCommentsTopInset,
             showsPostHeader: showsPostHeader,
             scrollDisabled: !isExpanded || presentation.isInteractiveMove,
             viewModel: viewModel,
@@ -295,8 +277,8 @@ struct PostCommentsSheet: View {
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
             showsToolbar: isExpanded,
-            dragExpandedTop: expandedTop,
-            dragCollapsedTop: collapsedTop,
+            dragExpandedTop: layout.expandedTop,
+            dragCollapsedTop: layout.collapsedTop,
             onPostLinkTap: collapseSheet,
             onTitleDragChanged: { value in
                 presentation.updateExpandedToolbarDrag(
@@ -310,11 +292,15 @@ struct PostCommentsSheet: View {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+                settleSheet(
+                    predictedTranslation: value.predictedEndTranslation.height,
+                    layout.expandedTop,
+                    layout.collapsedTop
+                )
             }
         )
         .equatable()
-        .frame(width: contentWidth, height: viewportSize.height, alignment: .topLeading)
+        .frame(width: viewport.width, height: viewport.height, alignment: .topLeading)
         .onScrollPhaseChange { oldPhase, newPhase, context in
             let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
             presentation.updateScrollDragEligibility(
@@ -323,8 +309,12 @@ struct PostCommentsSheet: View {
                 isAtRestingTop: abs(offsetY) <= 1
             )
         }
-        .padding(.leading, horizontalSafeAreaInsets.leading)
-        .padding(.trailing, horizontalSafeAreaInsets.trailing)
+        .offset(x: viewport.minX, y: viewport.minY)
+        .frame(
+            width: layout.containerSize.width,
+            height: layout.containerSize.height,
+            alignment: .topLeading
+        )
     }
 
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
@@ -502,7 +492,7 @@ private extension PostCommentsSheet {
         return .zero
     }
 
-    private func resolvedScreenSize(for proxy: GeometryProxy) -> CGSize {
+    private func resolvedContainerSize(for proxy: GeometryProxy) -> CGSize {
         let size = proxy.size
         let insets = proxy.safeAreaInsets
         let fullSize = CGSize(

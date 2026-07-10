@@ -200,6 +200,8 @@ struct PostCommentsSheetPresentation {
 }
 
 struct PostCommentsSheetLayout {
+    let containerSize: CGSize
+    let commentsViewport: CGRect
     let expandedTop: CGFloat
     let collapsedTop: CGFloat
     let alignedTop: CGFloat
@@ -211,15 +213,26 @@ struct PostCommentsSheetLayout {
 
     init(
         safeInsets: UIEdgeInsets,
-        screenSize: CGSize,
+        containerSize: CGSize,
+        commentsHorizontalInsets: (leading: CGFloat, trailing: CGFloat),
         collapsedHeight: CGFloat,
         controlsHeight: CGFloat,
         dragTranslation: CGFloat,
         isExpanded: Bool,
         expandedCommentsTopInset: (CGFloat) -> CGFloat
     ) {
+        self.containerSize = containerSize
+        commentsViewport = CGRect(
+            x: commentsHorizontalInsets.leading,
+            y: 0,
+            width: max(
+                containerSize.width - commentsHorizontalInsets.leading - commentsHorizontalInsets.trailing,
+                0
+            ),
+            height: containerSize.height
+        )
         expandedTop = 0
-        collapsedTop = max(screenSize.height - (collapsedHeight + safeInsets.bottom), expandedTop)
+        collapsedTop = max(containerSize.height - (collapsedHeight + safeInsets.bottom), expandedTop)
 
         let baseTop = isExpanded ? expandedTop : collapsedTop
         let proposedTop = baseTop + dragTranslation
