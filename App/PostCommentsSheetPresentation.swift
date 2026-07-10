@@ -75,11 +75,11 @@ struct PostCommentsSheetPresentation {
     mutating func updateScrollDragEligibility(
         oldPhase: ScrollPhase,
         newPhase: ScrollPhase,
-        isAtTop: Bool
+        isAtRestingTop: Bool
     ) {
         switch (oldPhase, newPhase) {
         case (.idle, .tracking), (.idle, .interacting):
-            scrollDragStartedFromSettledTop = isAtTop
+            scrollDragStartedFromSettledTop = isAtRestingTop
         case (_, .interacting):
             break
         default:

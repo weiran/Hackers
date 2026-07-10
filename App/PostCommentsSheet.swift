@@ -310,7 +310,7 @@ struct PostCommentsSheet: View {
             presentation.updateScrollDragEligibility(
                 oldPhase: oldPhase,
                 newPhase: newPhase,
-                isAtTop: offsetY <= 1
+                isAtRestingTop: abs(offsetY) <= 1
             )
         }
         .padding(.leading, horizontalSafeAreaInsets.leading)
