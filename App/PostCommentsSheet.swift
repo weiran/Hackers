@@ -102,6 +102,7 @@ struct PostCommentsSheet: View {
                     contentFadeProgress: layout.contentFadeProgress,
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
+                    viewportSize: screenSize,
                     horizontalSafeAreaInsets: (
                         proxy.safeAreaInsets.leading,
                         proxy.safeAreaInsets.trailing
@@ -217,6 +218,7 @@ struct PostCommentsSheet: View {
         contentFadeProgress: CGFloat,
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
+        viewportSize: CGSize,
         horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsExpandedPresentation: Bool
     ) -> some View {
@@ -224,6 +226,7 @@ struct PostCommentsSheet: View {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     topContentInset: commentsTopContentInset,
+                    viewportSize: viewportSize,
                     horizontalSafeAreaInsets: horizontalSafeAreaInsets,
                     showsPostHeader: true,
                     expandedTop: expandedTop,
@@ -270,12 +273,18 @@ struct PostCommentsSheet: View {
 
     private func expandedCommentsView(
         topContentInset: CGFloat,
+        viewportSize: CGSize,
         horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat),
         showsPostHeader: Bool,
         expandedTop: CGFloat,
         collapsedTop: CGFloat
     ) -> some View {
-        StableCommentsHost(
+        let contentWidth = max(
+            viewportSize.width - horizontalSafeAreaInsets.leading - horizontalSafeAreaInsets.trailing,
+            0
+        )
+
+        return StableCommentsHost(
             postID: viewModel.postID,
             topContentInset: topContentInset,
             showsPostHeader: showsPostHeader,
@@ -305,6 +314,7 @@ struct PostCommentsSheet: View {
             }
         )
         .equatable()
+        .frame(width: contentWidth, height: viewportSize.height, alignment: .topLeading)
         .onScrollPhaseChange { oldPhase, newPhase, context in
             let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
             presentation.updateScrollDragEligibility(

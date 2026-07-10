@@ -60,6 +60,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {
+        XCUIDevice.shared.orientation = .portrait
         launchApp(linkBrowserMode: "custom")
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
@@ -72,7 +73,10 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Reload"].exists)
         XCTAssertFalse(app.buttons["Open in Safari"].exists)
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+        let firstComment = app.buttons["comments.comment.48346154"]
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        XCTAssertEqual(firstComment.frame.minX, 0, accuracy: 1)
+        XCTAssertEqual(firstComment.frame.width, app.frame.width, accuracy: 1)
     }
 
     func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {

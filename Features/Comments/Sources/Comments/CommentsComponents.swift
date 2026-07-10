@@ -62,13 +62,12 @@ struct CommentsContentView: View {
     }
 
     private func content(for post: Post) -> some View {
-        GeometryReader { proxy in
+        VStack(alignment: .leading, spacing: 0) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     postHeaderSection(for: post)
                     commentsSection(for: post)
                 }
-                .frame(width: proxy.size.width, alignment: .leading)
                 .scrollTargetLayout()
             }
             .scrollPosition($scrollPosition)
@@ -109,7 +108,6 @@ struct CommentsContentView: View {
                 )
             }
         }
-        .safeAreaPadding(.horizontal)
     }
 
     private func updateHeaderState(offsetY: CGFloat) {
