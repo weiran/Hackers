@@ -36,7 +36,6 @@ struct CommentsContentView: View {
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Int) -> Comment?
-    let updateIsAtTop: ((Bool) -> Void)?
     let updateTitleVisibility: ((Bool) -> Void)?
     let presentationState: CommentsPresentationState
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
@@ -47,7 +46,6 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
-    @State private var lastIsAtTop = true
     @State private var scrollPosition = ScrollPosition(idType: Int.self)
     @State private var visibleCommentTarget = VisibleCommentTarget()
 
@@ -135,12 +133,6 @@ struct CommentsContentView: View {
                     updateTitle()
                 }
             }
-        }
-
-        let isAtTop = lastIsAtTop ? offsetY <= 8 : offsetY <= 1
-        if isAtTop != lastIsAtTop {
-            lastIsAtTop = isAtTop
-            updateIsAtTop?(isAtTop)
         }
     }
 

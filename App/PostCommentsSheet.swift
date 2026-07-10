@@ -37,8 +37,6 @@ struct PostCommentsSheet: View {
     @State private var presentation: PostCommentsSheetPresentation
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
-    @State private var isScrollAtTop = true
-    @State private var scrollDragStartsFromSettledTop = false
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @Namespace private var postHeaderNamespace
 
@@ -290,8 +288,6 @@ struct PostCommentsSheet: View {
             showsToolbar: isExpanded,
             dragExpandedTop: expandedTop,
             dragCollapsedTop: collapsedTop,
-            isAtTop: $isScrollAtTop,
-            scrollDragStartsFromSettledTop: $scrollDragStartsFromSettledTop,
             onPostLinkTap: collapseSheet,
             onTitleDragChanged: { value in
                 presentation.updateExpandedToolbarDrag(
@@ -309,6 +305,14 @@ struct PostCommentsSheet: View {
             }
         )
         .equatable()
+        .onScrollPhaseChange { oldPhase, newPhase, context in
+            let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
+            presentation.updateScrollDragEligibility(
+                oldPhase: oldPhase,
+                newPhase: newPhase,
+                isAtTop: offsetY <= 1
+            )
+        }
         .padding(.leading, horizontalSafeAreaInsets.leading)
         .padding(.trailing, horizontalSafeAreaInsets.trailing)
     }
@@ -507,8 +511,7 @@ private extension PostCommentsSheet {
                 presentation.updateSheetDrag(
                     startX: value.startLocation.x,
                     translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth,
-                    canStartExpandedSheetDrag: isScrollAtTop && scrollDragStartsFromSettledTop
+                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
                 )
             }
             .onEnded { value in
@@ -923,8 +926,6 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let showsToolbar: Bool
     let dragExpandedTop: CGFloat
     let dragCollapsedTop: CGFloat
-    @Binding var isAtTop: Bool
-    @Binding var scrollDragStartsFromSettledTop: Bool
     let onPostLinkTap: () -> Void
     let onTitleDragChanged: (DragGesture.Value) -> Void
     let onTitleDragEnded: (DragGesture.Value) -> Void
@@ -953,8 +954,6 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
-            isAtTop: $isAtTop,
-            scrollDragStartsFromSettledTop: $scrollDragStartsFromSettledTop,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,

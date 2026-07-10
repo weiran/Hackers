@@ -52,26 +52,6 @@ public enum CommentsPresentationState: Equatable, Sendable {
     }
 }
 
-enum CommentsScrollDragStartEligibility {
-    static func updatedValue(
-        currentValue: Bool,
-        oldPhase: ScrollPhase,
-        newPhase: ScrollPhase,
-        isAtTop: Bool
-    ) -> Bool {
-        if oldPhase == .idle, newPhase == .tracking || newPhase == .interacting {
-            return isAtTop
-        }
-
-        switch newPhase {
-        case .interacting:
-            return currentValue
-        case .idle, .tracking, .decelerating, .animating:
-            return false
-        }
-    }
-}
-
 public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     @Environment(\.dismiss) private var dismiss
@@ -84,8 +64,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let postHeaderMatchedGeometryNamespace: Namespace.ID?
     private let isPostHeaderMatchedGeometrySource: Bool
     private let titleVisible: Binding<Bool>?
-    private let isAtTop: Binding<Bool>?
-    private let scrollDragStartsFromSettledTop: Binding<Bool>?
     private let onPostLinkTap: (() -> Void)?
     private let onTitleDragChanged: ((DragGesture.Value) -> Void)?
     private let onTitleDragEnded: ((DragGesture.Value) -> Void)?
@@ -109,8 +87,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         isPostHeaderMatchedGeometrySource: Bool = true,
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         titleVisible: Binding<Bool>? = nil,
-        isAtTop: Binding<Bool>? = nil,
-        scrollDragStartsFromSettledTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
@@ -127,8 +103,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.postHeaderMatchedGeometryNamespace = postHeaderMatchedGeometryNamespace
         self.isPostHeaderMatchedGeometrySource = isPostHeaderMatchedGeometrySource
         self.titleVisible = titleVisible
-        self.isAtTop = isAtTop
-        self.scrollDragStartsFromSettledTop = scrollDragStartsFromSettledTop
         self.onPostLinkTap = onPostLinkTap
         self.onTitleDragChanged = onTitleDragChanged
         self.onTitleDragEnded = onTitleDragEnded
@@ -162,8 +136,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         isPostHeaderMatchedGeometrySource: Bool = true,
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         titleVisible: Binding<Bool>? = nil,
-        isAtTop: Binding<Bool>? = nil,
-        scrollDragStartsFromSettledTop: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
@@ -185,8 +157,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: headerTitleVisibility,
             titleVisible: titleVisible,
-            isAtTop: isAtTop,
-            scrollDragStartsFromSettledTop: scrollDragStartsFromSettledTop,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
@@ -204,7 +174,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     showsPostHeader: showsPostHeader,
                     handleLinkTap: handleLinkTap,
                     toggleCommentVisibility: toggleCommentVisibility,
-                    updateIsAtTop: { isAtTop?.wrappedValue = $0 },
                     updateTitleVisibility: { titleVisible?.wrappedValue = $0 },
                     presentationState: presentationState,
                     postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
@@ -216,16 +185,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     votingViewModel: votingViewModel,
                     pendingCommentID: $pendingCommentID,
                 )
-                .onScrollPhaseChange { oldPhase, newPhase, context in
-                    guard let scrollDragStartsFromSettledTop else { return }
-                    let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
-                    scrollDragStartsFromSettledTop.wrappedValue = CommentsScrollDragStartEligibility.updatedValue(
-                        currentValue: scrollDragStartsFromSettledTop.wrappedValue,
-                        oldPhase: oldPhase,
-                        newPhase: newPhase,
-                        isAtTop: offsetY <= 1
-                    )
-                }
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")
             } else if let error = viewModel.error {

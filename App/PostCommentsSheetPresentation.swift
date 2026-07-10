@@ -1,4 +1,5 @@
 import CoreGraphics
+import SwiftUI
 import UIKit
 
 enum SheetState {
@@ -33,6 +34,7 @@ struct PostCommentsSheetPresentation {
     var dragTranslation: CGFloat = 0
     var isTrackingDrag = false
     var dragStartAllowsSheetDrag = false
+    var scrollDragStartedFromSettledTop = false
     var isHandleDragActive = false
     var suppressesCollapsedUpvote = false
 
@@ -66,14 +68,29 @@ struct PostCommentsSheetPresentation {
         dragTranslation = 0
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
+        scrollDragStartedFromSettledTop = false
         isHandleDragActive = false
+    }
+
+    mutating func updateScrollDragEligibility(
+        oldPhase: ScrollPhase,
+        newPhase: ScrollPhase,
+        isAtTop: Bool
+    ) {
+        switch (oldPhase, newPhase) {
+        case (.idle, .tracking), (.idle, .interacting):
+            scrollDragStartedFromSettledTop = isAtTop
+        case (_, .interacting):
+            break
+        default:
+            scrollDragStartedFromSettledTop = false
+        }
     }
 
     mutating func updateSheetDrag(
         startX: CGFloat,
         translation: CGSize,
-        systemBackGestureEdgeWidth: CGFloat,
-        canStartExpandedSheetDrag: Bool
+        systemBackGestureEdgeWidth: CGFloat
     ) {
         guard !isHandleDragActive else { return }
         guard startX > systemBackGestureEdgeWidth else { return }
@@ -84,7 +101,7 @@ struct PostCommentsSheetPresentation {
 
         if !isTrackingDrag {
             let startsSheetDrag = (isCollapsed && isMostlyVertical)
-                || (isExpanded && canStartExpandedSheetDrag && isMostlyVertical && translation.height > 0)
+                || (isExpanded && scrollDragStartedFromSettledTop && isMostlyVertical && translation.height > 0)
             guard startsSheetDrag else { return }
             dragStartAllowsSheetDrag = true
             isTrackingDrag = true
@@ -166,6 +183,7 @@ struct PostCommentsSheetPresentation {
         dragTranslation = 0
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
+        scrollDragStartedFromSettledTop = false
         isHandleDragActive = false
     }
 
