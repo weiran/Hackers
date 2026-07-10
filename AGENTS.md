@@ -23,6 +23,8 @@ Keep this file focused on agent operating rules. Prefer updating the canonical d
 
 Always run `xcodebuild` commands from the project directory.
 
+Reuse stable DerivedData and build incrementally by default. Clean only when diagnosing build-cache problems; use fresh DerivedData only if cleaning fails or a clean release/CI build is required.
+
 ```bash
 xcodebuild -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 ```
