@@ -64,7 +64,6 @@ public final class VotingViewModel {
 
             await handleUnauthenticatedIfNeeded(error)
         }
-
     }
 
     public func unvote(post: inout Post) async {
@@ -99,7 +98,6 @@ public final class VotingViewModel {
 
             await handleUnauthenticatedIfNeeded(error)
         }
-
     }
 
     // MARK: - Comment Voting
@@ -130,7 +128,6 @@ public final class VotingViewModel {
             // Check if error is unauthenticated and show login
             await handleUnauthenticatedIfNeeded(error)
         }
-
     }
 
     public func unvote(comment: Comment, in post: Post) async {
@@ -155,7 +152,6 @@ public final class VotingViewModel {
             // Check if error is unauthenticated and show login
             await handleUnauthenticatedIfNeeded(error)
         }
-
     }
 
     // MARK: - State Helpers

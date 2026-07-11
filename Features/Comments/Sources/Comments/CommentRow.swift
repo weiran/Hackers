@@ -58,11 +58,13 @@ struct CommentRow: View {
                     Button(action: onUpvote) {
                         Label("Upvote", systemImage: "arrow.up")
                     }
+                    .disabled(state.isVoting)
                 }
                 if state.isAuthenticated, state.canUnvote, state.isUpvoted {
                     Button(action: onUnvote) {
                         Label("Unvote", systemImage: "arrow.uturn.down")
                     }
+                    .disabled(state.isVoting)
                 }
                 Divider()
                 Button(action: onCopy) {

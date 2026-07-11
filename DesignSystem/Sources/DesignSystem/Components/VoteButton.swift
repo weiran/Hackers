@@ -44,7 +44,7 @@ public struct VoteButton: View {
                 }
             }
         }
-        .disabled((!votingState.canVote && !votingState.canUnvote) || votingState.isVoting)
+        .disabled(!canPerformAction || votingState.isVoting)
         .scaleEffect(votingState.isVoting ? 0.95 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: votingState.isVoting)
         .accessibilityLabel(accessibilityLabelText)
@@ -61,6 +61,10 @@ public struct VoteButton: View {
         } else {
             style.defaultIconName
         }
+    }
+
+    private var canPerformAction: Bool {
+        votingState.isUpvoted ? votingState.canUnvote : votingState.canVote
     }
 
     private var accessibilityLabelText: String {

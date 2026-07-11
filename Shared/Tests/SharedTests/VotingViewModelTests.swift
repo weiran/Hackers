@@ -60,6 +60,50 @@ struct VotingViewModelTests {
         func unvoteComment(_: Domain.Comment, for _: Post) async throws {}
     }
 
+    final class BlockingCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuations: [Int: CheckedContinuation<Void, Never>] = [:]
+        private var startedItemIDs: Set<Int> = []
+        private var startWaiters: [Int: [CheckedContinuation<Void, Never>]] = [:]
+
+        func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
+            await withCheckedContinuation { continuation in
+                let waiters = lock.withLock {
+                    continuations[comment.id] = continuation
+                    startedItemIDs.insert(comment.id)
+                    return startWaiters.removeValue(forKey: comment.id) ?? []
+                }
+                waiters.forEach { $0.resume() }
+            }
+        }
+
+        func unvoteComment(_: Domain.Comment, for _: Post) async throws {}
+
+        func waitUntilStarted(itemID: Int) async {
+            if lock.withLock({ startedItemIDs.contains(itemID) }) {
+                return
+            }
+
+            await withCheckedContinuation { continuation in
+                let alreadyStarted = lock.withLock {
+                    if startedItemIDs.contains(itemID) {
+                        return true
+                    }
+                    startWaiters[itemID, default: []].append(continuation)
+                    return false
+                }
+                if alreadyStarted {
+                    continuation.resume()
+                }
+            }
+        }
+
+        func finish(itemID: Int) {
+            let continuation = lock.withLock { continuations.removeValue(forKey: itemID) }
+            continuation?.resume()
+        }
+    }
+
     final class MockAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
         var logoutCalled = false
         func authenticate(username _: String, password _: String) async throws {}
@@ -178,6 +222,49 @@ struct VotingViewModelTests {
 
     // MARK: - Comment Voting Tests
 
+    @Test("Comment loading state is scoped per item")
+    @MainActor
+    func commentLoadingStateIsScopedPerItem() async throws {
+        let provider = BlockingCommentVotingStateProvider()
+        let viewModel = VotingViewModel(
+            votingStateProvider: mockVotingStateProvider,
+            commentVotingStateProvider: provider,
+            authenticationUseCase: MockAuthenticationUseCase()
+        )
+        let firstComment = makeComment(id: 101)
+        let secondComment = makeComment(id: 102)
+        let post = Post(
+            id: 200,
+            url: URL(string: "https://example.com")!,
+            title: "Test Post",
+            age: "1h",
+            commentsCount: 2,
+            by: "author",
+            score: 10,
+            postType: .news,
+            upvoted: false
+        )
+
+        let firstTask = Task { await viewModel.upvote(comment: firstComment, in: post) }
+        await waitUntilStarted(itemID: firstComment.id, provider: provider)
+
+        #expect(viewModel.votingState(for: firstComment).isVoting)
+        #expect(!viewModel.votingState(for: secondComment).isVoting)
+
+        let secondTask = Task { await viewModel.upvote(comment: secondComment, in: post) }
+        await waitUntilStarted(itemID: secondComment.id, provider: provider)
+
+        provider.finish(itemID: firstComment.id)
+        await firstTask.value
+        #expect(!viewModel.votingState(for: firstComment).isVoting)
+        #expect(viewModel.votingState(for: secondComment).isVoting)
+        #expect(viewModel.isVoting)
+
+        provider.finish(itemID: secondComment.id)
+        await secondTask.value
+        #expect(!viewModel.isVoting)
+    }
+
     @Test("Comment voting with MainActor")
     @MainActor
     func commentVotingWithMainActor() async throws {
@@ -211,6 +298,25 @@ struct VotingViewModelTests {
         // Then
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
+    }
+
+    private func makeComment(id: Int) -> Domain.Comment {
+        Domain.Comment(
+            id: id,
+            age: "1h",
+            text: "Test comment",
+            by: "user",
+            level: 0,
+            upvoted: false,
+            voteLinks: VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
+        )
+    }
+
+    private func waitUntilStarted(
+        itemID: Int,
+        provider: BlockingCommentVotingStateProvider
+    ) async {
+        await provider.waitUntilStarted(itemID: itemID)
     }
 
     @Test("Comment upvote synthesizes unvote URL when missing")
