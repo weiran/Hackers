@@ -64,6 +64,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let postHeaderMatchedGeometryNamespace: Namespace.ID?
     private let isPostHeaderMatchedGeometrySource: Bool
     private let titleVisible: Binding<Bool>?
+    private let toolbarGeometry: CommentsToolbarGeometry?
     private let onPostLinkTap: (() -> Void)?
     private let onTitleDragChanged: ((DragGesture.Value) -> Void)?
     private let onTitleDragEnded: ((DragGesture.Value) -> Void)?
@@ -86,6 +87,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
         isPostHeaderMatchedGeometrySource: Bool = true,
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
+        toolbarGeometry: CommentsToolbarGeometry? = nil,
         titleVisible: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
@@ -103,6 +105,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.postHeaderMatchedGeometryNamespace = postHeaderMatchedGeometryNamespace
         self.isPostHeaderMatchedGeometrySource = isPostHeaderMatchedGeometrySource
         self.titleVisible = titleVisible
+        self.toolbarGeometry = toolbarGeometry
         self.onPostLinkTap = onPostLinkTap
         self.onTitleDragChanged = onTitleDragChanged
         self.onTitleDragEnded = onTitleDragEnded
@@ -135,6 +138,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         postHeaderMatchedGeometryNamespace: Namespace.ID? = nil,
         isPostHeaderMatchedGeometrySource: Bool = true,
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
+        toolbarGeometry: CommentsToolbarGeometry? = nil,
         titleVisible: Binding<Bool>? = nil,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
@@ -156,6 +160,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: headerTitleVisibility,
+            toolbarGeometry: toolbarGeometry,
             titleVisible: titleVisible,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
@@ -225,6 +230,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                                 onDragEnded: onTitleDragEnded,
                             )
                         }
+                    }
+                } else if let toolbarGeometry {
+                    ToolbarItem(placement: .principal) {
+                        ToolbarPrincipalAlignmentReader(geometry: toolbarGeometry)
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {

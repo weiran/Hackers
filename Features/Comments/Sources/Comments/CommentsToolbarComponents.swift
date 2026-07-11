@@ -19,6 +19,19 @@ public final class CommentsHeaderTitleVisibility {
     }
 }
 
+@MainActor
+@Observable
+public final class CommentsToolbarGeometry {
+    public var principalCenterY: CGFloat?
+
+    public init() {}
+
+    public func updatePrincipalCenterY(_ centerY: CGFloat) {
+        guard principalCenterY != centerY else { return }
+        principalCenterY = centerY
+    }
+}
+
 struct ToolbarTitle: View {
     let post: Post
     let showThumbnails: Bool
@@ -46,6 +59,21 @@ struct ToolbarTitle: View {
             .onEnded { value in
                 onDragEnded?(value)
             }
+    }
+}
+
+struct ToolbarPrincipalAlignmentReader: View {
+    let geometry: CommentsToolbarGeometry
+
+    var body: some View {
+        Color.clear
+            .frame(width: 1, height: 1)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .global).midY
+            } action: { centerY in
+                geometry.updatePrincipalCenterY(centerY)
+            }
+            .accessibilityHidden(true)
     }
 }
 

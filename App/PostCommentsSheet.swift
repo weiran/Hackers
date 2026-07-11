@@ -39,6 +39,7 @@ struct PostCommentsSheet: View {
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
+    @State private var toolbarGeometry = CommentsToolbarGeometry()
     @Namespace private var postHeaderNamespace
 
     init(
@@ -102,6 +103,9 @@ struct PostCommentsSheet: View {
                     - (Self.toolbarControlExclusionWidth * 2),
                 0
             )
+            let toolbarPrincipalCenterY = toolbarGeometry.principalCenterY.map {
+                $0 - proxy.frame(in: .global).minY - layout.alignedTop
+            }
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -111,6 +115,7 @@ struct PostCommentsSheet: View {
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
                     titleMaximumWidth: titleMaximumWidth,
+                    toolbarPrincipalCenterY: toolbarPrincipalCenterY,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
@@ -219,6 +224,7 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
         titleMaximumWidth: CGFloat,
+        toolbarPrincipalCenterY: CGFloat?,
         showsExpandedPresentation: Bool
     ) -> some View {
         ZStack(alignment: .top) {
@@ -266,6 +272,7 @@ struct PostCommentsSheet: View {
                 handleTopInset: layout.handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
                 titleMaximumWidth: titleMaximumWidth,
+                toolbarPrincipalCenterY: toolbarPrincipalCenterY,
                 titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
             )
         }
@@ -287,6 +294,7 @@ struct PostCommentsSheet: View {
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
+            toolbarGeometry: toolbarGeometry,
             showsToolbar: isExpanded,
             dragExpandedTop: layout.expandedTop,
             dragCollapsedTop: layout.collapsedTop,
@@ -344,6 +352,7 @@ struct PostCommentsSheet: View {
         handleTopInset: CGFloat,
         chromeAreaHeight: CGFloat,
         titleMaximumWidth: CGFloat,
+        toolbarPrincipalCenterY: CGFloat?,
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -357,6 +366,7 @@ struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
                 titleMaximumWidth: titleMaximumWidth,
+                toolbarPrincipalCenterY: toolbarPrincipalCenterY,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
                 navigationBarHeight: Self.navigationBarHeight,
@@ -794,6 +804,7 @@ private struct CommentsSheetTopChrome: View {
     let handleTopInset: CGFloat
     let chromeAreaHeight: CGFloat
     let titleMaximumWidth: CGFloat
+    let toolbarPrincipalCenterY: CGFloat?
     let handleWidth: CGFloat
     let handleThickness: CGFloat
     let navigationBarHeight: CGFloat
@@ -836,7 +847,9 @@ private struct CommentsSheetTopChrome: View {
 
     private var morphVerticalOffset: CGFloat {
         let handleOffset = (chromeAreaHeight - handleThickness) / 2
-        let titleOffset = max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
+        let titleOffset = toolbarPrincipalCenterY.map {
+            max($0 - handleTopInset - (resolvedTitleSize.height / 2), 0)
+        } ?? max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
         return interpolate(from: handleOffset, to: titleOffset, progress: easedProgress)
     }
 
@@ -943,6 +956,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
     let isPostHeaderMatchedGeometrySource: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
+    let toolbarGeometry: CommentsToolbarGeometry
     let showsToolbar: Bool
     let dragExpandedTop: CGFloat
     let dragCollapsedTop: CGFloat
@@ -961,6 +975,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             && lhs.dragCollapsedTop == rhs.dragCollapsedTop
             && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
             && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
+            && ObjectIdentifier(lhs.toolbarGeometry) == ObjectIdentifier(rhs.toolbarGeometry)
     }
 
     var body: some View {
@@ -974,6 +989,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
+            toolbarGeometry: toolbarGeometry,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
