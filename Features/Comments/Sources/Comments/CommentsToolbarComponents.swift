@@ -166,6 +166,7 @@ public struct CommentsHeaderTitlePillContent: View {
         .padding(.vertical, 5)
         .frame(maxWidth: maximumWidth)
         .frame(height: 44)
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private func titleContent(font: Font, lineLimit: Int) -> some View {

@@ -40,7 +40,9 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
+        let titlePill = app.buttons["Swift 6.2 Released"]
+        XCTAssertTrue(titlePill.exists)
+        XCTAssertLessThan(titlePill.frame.width, app.frame.width - 176)
     }
 
     func testCustomBrowserCommentsSheetCollapsedPreview() throws {
