@@ -131,30 +131,31 @@ public struct CommentsHeaderTitlePill: View {
 }
 
 public struct CommentsHeaderTitlePillContent: View {
-    private static let wrappedTitleWidth: CGFloat = 170
-
     private let post: Post
     private let showThumbnails: Bool
+    private let maximumWidth: CGFloat?
 
-    public init(post: Post, showThumbnails: Bool) {
+    public init(post: Post, showThumbnails: Bool, maximumWidth: CGFloat? = nil) {
         self.post = post
         self.showThumbnails = showThumbnails
+        self.maximumWidth = maximumWidth
     }
 
     public var body: some View {
         ViewThatFits(in: .horizontal) {
-            titleContent(font: .subheadline, lineLimit: 1, titleWidth: nil)
+            titleContent(font: .subheadline, lineLimit: 1)
                 .fixedSize(horizontal: true, vertical: false)
 
-            titleContent(font: .caption, lineLimit: 2, titleWidth: Self.wrappedTitleWidth)
+            titleContent(font: .caption, lineLimit: 2)
         }
         .padding(.leading, 14)
         .padding(.trailing, 10)
         .padding(.vertical, 5)
+        .frame(maxWidth: maximumWidth)
         .frame(height: 44)
     }
 
-    private func titleContent(font: Font, lineLimit: Int, titleWidth: CGFloat?) -> some View {
+    private func titleContent(font: Font, lineLimit: Int) -> some View {
         HStack(spacing: 7) {
             ThumbnailView(
                 url: post.url,
@@ -170,7 +171,6 @@ public struct CommentsHeaderTitlePillContent: View {
                 .lineLimit(lineLimit)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.tail)
-                .frame(width: titleWidth, alignment: .leading)
         }
     }
 }

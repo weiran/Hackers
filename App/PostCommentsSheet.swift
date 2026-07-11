@@ -25,6 +25,7 @@ struct PostCommentsSheet: View {
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let expandedTopDragTrailingPassthroughWidth: CGFloat = 88
+    private static let toolbarControlExclusionWidth: CGFloat = 88
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
@@ -94,6 +95,13 @@ struct PostCommentsSheet: View {
             let currentChromeAreaHeight = Self.handleAreaHeight
                 + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
             let showsExpandedPresentation = viewModel.post != nil
+            let titleMaximumWidth = max(
+                containerSize.width
+                    - proxy.safeAreaInsets.leading
+                    - proxy.safeAreaInsets.trailing
+                    - (Self.toolbarControlExclusionWidth * 2),
+                0
+            )
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -102,6 +110,7 @@ struct PostCommentsSheet: View {
                     layout: layout,
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
+                    titleMaximumWidth: titleMaximumWidth,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
@@ -209,6 +218,7 @@ struct PostCommentsSheet: View {
         layout: PostCommentsSheetLayout,
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
+        titleMaximumWidth: CGFloat,
         showsExpandedPresentation: Bool
     ) -> some View {
         ZStack(alignment: .top) {
@@ -255,6 +265,7 @@ struct PostCommentsSheet: View {
                 collapsedTop: layout.collapsedTop,
                 handleTopInset: layout.handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
+                titleMaximumWidth: titleMaximumWidth,
                 titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
             )
         }
@@ -332,6 +343,7 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
         chromeAreaHeight: CGFloat,
+        titleMaximumWidth: CGFloat,
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -344,6 +356,7 @@ struct PostCommentsSheet: View {
                 isInteractiveMove: presentation.isInteractiveMove,
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
+                titleMaximumWidth: titleMaximumWidth,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
                 navigationBarHeight: Self.navigationBarHeight,
@@ -780,6 +793,7 @@ private struct CommentsSheetTopChrome: View {
     let isInteractiveMove: Bool
     let handleTopInset: CGFloat
     let chromeAreaHeight: CGFloat
+    let titleMaximumWidth: CGFloat
     let handleWidth: CGFloat
     let handleThickness: CGFloat
     let navigationBarHeight: CGFloat
@@ -846,8 +860,11 @@ private struct CommentsSheetTopChrome: View {
             ZStack {
                 ZStack {
                     if let post {
-                        CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
-                            .fixedSize(horizontal: true, vertical: false)
+                        CommentsHeaderTitlePillContent(
+                            post: post,
+                            showThumbnails: showThumbnails,
+                            maximumWidth: titleMaximumWidth
+                        )
                             .opacity(titleContentProgress)
                     }
                 }
@@ -881,8 +898,11 @@ private struct CommentsSheetTopChrome: View {
     }
 
     private func measuredTitleContent(for post: Post) -> some View {
-        CommentsHeaderTitlePillContent(post: post, showThumbnails: showThumbnails)
-            .fixedSize(horizontal: true, vertical: false)
+        CommentsHeaderTitlePillContent(
+            post: post,
+            showThumbnails: showThumbnails,
+            maximumWidth: titleMaximumWidth
+        )
             .hidden()
             .background(
                 GeometryReader { proxy in
