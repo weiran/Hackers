@@ -181,8 +181,8 @@ struct CommentRow: View {
         VoteButton(
             votingState: VotingState(
                 isUpvoted: state.isUpvoted,
-                canVote: state.canVote,
-                canUnvote: state.canUnvote,
+                canVote: !state.isUpvoted && state.canVote,
+                canUnvote: state.isUpvoted && state.canUnvote,
                 isVoting: state.isVoting
             ),
             style: .commentInline,

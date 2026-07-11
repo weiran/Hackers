@@ -18,7 +18,8 @@ public final class VotingViewModel {
     private let authenticationUseCase: any AuthenticationUseCase
     public var navigationStore: NavigationStoreProtocol?
 
-    public var isVoting = false
+    private var votingItemIDs: Set<Int> = []
+    public var isVoting: Bool { !votingItemIDs.isEmpty }
     public var lastError: Error?
 
     public init(
@@ -34,7 +35,8 @@ public final class VotingViewModel {
     // MARK: - Post Voting (Upvote only)
 
     public func upvote(post: inout Post) async {
-        guard !post.upvoted else { return }
+        guard !post.upvoted, beginVoting(itemID: post.id) else { return }
+        defer { endVoting(itemID: post.id) }
 
         let originalScore = post.score
         let originalVoteLinks = post.voteLinks
@@ -49,7 +51,6 @@ public final class VotingViewModel {
         post.score += 1
         post.voteLinks = ensureUnvoteLinkIfPossible(from: originalVoteLinks)
 
-        isVoting = true
         lastError = nil
 
         do {
@@ -64,11 +65,11 @@ public final class VotingViewModel {
             await handleUnauthenticatedIfNeeded(error)
         }
 
-        isVoting = false
     }
 
     public func unvote(post: inout Post) async {
-        guard post.upvoted else { return }
+        guard post.upvoted, beginVoting(itemID: post.id) else { return }
+        defer { endVoting(itemID: post.id) }
 
         let originalScore = post.score
 
@@ -86,7 +87,6 @@ public final class VotingViewModel {
             post.voteLinks = VoteLinks(upvote: existingLinks.upvote, unvote: nil)
         }
 
-        isVoting = true
         lastError = nil
 
         do {
@@ -100,14 +100,14 @@ public final class VotingViewModel {
             await handleUnauthenticatedIfNeeded(error)
         }
 
-        isVoting = false
     }
 
     // MARK: - Comment Voting
 
     // Comment toggle removed
     public func upvote(comment: Comment, in post: Post) async {
-        guard !comment.upvoted else { return }
+        guard !comment.upvoted, beginVoting(itemID: comment.id) else { return }
+        defer { endVoting(itemID: comment.id) }
 
         // Create a copy of the comment with the original state for the voting provider
         var commentForVoting = comment
@@ -118,7 +118,6 @@ public final class VotingViewModel {
         comment.upvoted = true
         comment.voteLinks = ensureUnvoteLinkIfPossible(from: originalVoteLinks)
 
-        isVoting = true
         lastError = nil
 
         do {
@@ -132,11 +131,11 @@ public final class VotingViewModel {
             await handleUnauthenticatedIfNeeded(error)
         }
 
-        isVoting = false
     }
 
     public func unvote(comment: Comment, in post: Post) async {
-        guard comment.upvoted else { return }
+        guard comment.upvoted, beginVoting(itemID: comment.id) else { return }
+        defer { endVoting(itemID: comment.id) }
 
         // Create a copy of the comment with the original state for the voting provider
         var commentForVoting = comment
@@ -145,7 +144,6 @@ public final class VotingViewModel {
         // Optimistic UI update
         comment.upvoted = false
 
-        isVoting = true
         lastError = nil
 
         do {
@@ -158,7 +156,6 @@ public final class VotingViewModel {
             await handleUnauthenticatedIfNeeded(error)
         }
 
-        isVoting = false
     }
 
     // MARK: - State Helpers
@@ -170,9 +167,17 @@ public final class VotingViewModel {
             score: baseState.score,
             canVote: baseState.canVote,
             canUnvote: baseState.canUnvote,
-            isVoting: isVoting,
+            isVoting: votingItemIDs.contains(item.id),
             error: lastError
         )
+    }
+
+    private func beginVoting(itemID: Int) -> Bool {
+        votingItemIDs.insert(itemID).inserted
+    }
+
+    private func endVoting(itemID: Int) {
+        votingItemIDs.remove(itemID)
     }
 
     public func canVote(item: any Votable) -> Bool {

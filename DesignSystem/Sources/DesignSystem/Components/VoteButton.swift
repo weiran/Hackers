@@ -10,13 +10,13 @@ import SwiftUI
 
 public struct VoteButton: View {
     private let votingState: VotingState
-    private let action: @Sendable () -> Void
+    private let action: () -> Void
     private let style: VoteButtonStyle
 
     public init(
         votingState: VotingState,
         style: VoteButtonStyle = .default,
-        action: @escaping @Sendable () -> Void,
+        action: @escaping () -> Void,
     ) {
         self.votingState = votingState
         self.style = style
@@ -64,6 +64,9 @@ public struct VoteButton: View {
     }
 
     private var accessibilityLabelText: String {
+        if votingState.isVoting {
+            return "Submitting vote"
+        }
         if votingState.isUpvoted {
             return votingState.canUnvote ? "Unvote" : "Upvoted"
         }
@@ -71,6 +74,9 @@ public struct VoteButton: View {
     }
 
     private var accessibilityHintText: String {
+        if votingState.isVoting {
+            return "Please wait"
+        }
         if votingState.isUpvoted {
             return votingState.canUnvote ? "Double-tap to unvote" : "Already upvoted"
         }
@@ -115,10 +121,10 @@ public struct VoteButtonStyle: Sendable {
     }
 
     public func foregroundColor(for state: VotingState) -> Color {
-        if !state.canVote {
-            disabledColor
-        } else if state.isUpvoted {
+        if state.isUpvoted {
             upvotedColor
+        } else if !state.canVote {
+            disabledColor
         } else {
             defaultColor
         }
