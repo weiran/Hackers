@@ -33,6 +33,7 @@ struct CommentsContentView: View {
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
     @Environment(\.textScaling) private var textScaling
+    @Environment(SessionService.self) private var sessionService
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
     let toggleCommentVisibility: (Int) -> Comment?
@@ -215,6 +216,8 @@ struct CommentsContentView: View {
             visibility: isCollapsed ? .compact : .visible,
             isPostAuthor: comment.by == viewModel.post?.by,
             isUpvoted: comment.upvoted,
+            isVoting: votingViewModel.votingState(for: comment).isVoting,
+            isAuthenticated: sessionService.authenticationState == .authenticated,
             canVote: comment.voteLinks?.upvote != nil,
             canUnvote: comment.voteLinks?.unvote != nil,
             styledText: isCollapsed

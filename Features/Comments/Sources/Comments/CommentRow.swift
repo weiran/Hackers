@@ -18,6 +18,8 @@ struct CommentRowState: Equatable, Identifiable {
     let visibility: CommentVisibilityType
     let isPostAuthor: Bool
     let isUpvoted: Bool
+    let isVoting: Bool
+    let isAuthenticated: Bool
     let canVote: Bool
     let canUnvote: Bool
     let styledText: AttributedString?
@@ -52,12 +54,12 @@ struct CommentRow: View {
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
             .accessibilityAction(.default, onToggle)
             .contextMenu {
-                if state.canVote, !state.isUpvoted {
+                if state.isAuthenticated, state.canVote, !state.isUpvoted {
                     Button(action: onUpvote) {
                         Label("Upvote", systemImage: "arrow.up")
                     }
                 }
-                if state.canUnvote, state.isUpvoted {
+                if state.isAuthenticated, state.canUnvote, state.isUpvoted {
                     Button(action: onUnvote) {
                         Label("Unvote", systemImage: "arrow.uturn.down")
                     }
@@ -153,7 +155,7 @@ struct CommentRow: View {
     }
 
     private var showsVoteControl: Bool {
-        state.canVote || state.canUnvote || state.isUpvoted
+        state.isAuthenticated && (state.canVote || state.canUnvote || state.isUpvoted)
     }
 
     private var shortAge: String {
@@ -176,28 +178,18 @@ struct CommentRow: View {
 
     @ViewBuilder
     private var inlineVoteControl: some View {
-        if state.canUnvote, state.isUpvoted {
-            Button(action: onUnvote) {
-                voteLabel
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Unvote")
-        } else if state.canVote, !state.isUpvoted {
-            Button(action: onUpvote) {
-                voteLabel
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Upvote")
-        } else {
-            voteLabel
-        }
-    }
-
-    private var voteLabel: some View {
-        Image(systemName: state.isUpvoted ? "arrow.up.circle.fill" : "arrow.up.circle")
-            .scaledFont(.subheadline)
-            .foregroundStyle(state.isUpvoted ? AppColors.upvotedColor : .secondary)
-            .accessibilityHidden(true)
+        VoteButton(
+            votingState: VotingState(
+                isUpvoted: state.isUpvoted,
+                canVote: state.canVote,
+                canUnvote: state.canUnvote,
+                isVoting: state.isVoting
+            ),
+            style: .commentInline,
+            action: state.isUpvoted ? onUnvote : onUpvote
+        )
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("comments.vote.\(state.id)")
     }
 
     private var commentText: some View {
@@ -211,6 +203,17 @@ struct CommentRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .clipped()
     }
+}
+
+private extension VoteButtonStyle {
+    static let commentInline = VoteButtonStyle(
+        showScore: false,
+        iconFont: .subheadline,
+        spacing: 0,
+        defaultIconName: "arrow.up.circle",
+        upvotedIconName: "arrow.up.circle.fill",
+        defaultColor: .secondary
+    )
 }
 
 private struct ThreadRailStack: View {
