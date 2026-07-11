@@ -104,7 +104,7 @@ struct PostCommentsSheet: View {
                 0
             )
             let toolbarControlCenterY = toolbarGeometry.controlCenterY.map {
-                $0 - proxy.frame(in: .global).minY - layout.alignedTop
+                $0 - layout.alignedTop
             }
 
             ZStack(alignment: .topLeading) {
