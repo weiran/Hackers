@@ -231,14 +231,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                             )
                         }
                     }
-                } else if let toolbarGeometry {
-                    ToolbarItem(placement: .principal) {
-                        ToolbarPrincipalAlignmentReader(geometry: toolbarGeometry)
-                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if let post = viewModel.post {
-                        ShareMenu(post: post)
+                        ShareMenu(post: post, toolbarGeometry: toolbarGeometry)
                     }
                 }
             }

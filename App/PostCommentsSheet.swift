@@ -103,7 +103,7 @@ struct PostCommentsSheet: View {
                     - (Self.toolbarControlExclusionWidth * 2),
                 0
             )
-            let toolbarPrincipalCenterY = toolbarGeometry.principalCenterY.map {
+            let toolbarControlCenterY = toolbarGeometry.controlCenterY.map {
                 $0 - proxy.frame(in: .global).minY - layout.alignedTop
             }
 
@@ -115,7 +115,7 @@ struct PostCommentsSheet: View {
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
                     titleMaximumWidth: titleMaximumWidth,
-                    toolbarPrincipalCenterY: toolbarPrincipalCenterY,
+                    toolbarControlCenterY: toolbarControlCenterY,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
                 .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
@@ -224,7 +224,7 @@ struct PostCommentsSheet: View {
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
         titleMaximumWidth: CGFloat,
-        toolbarPrincipalCenterY: CGFloat?,
+        toolbarControlCenterY: CGFloat?,
         showsExpandedPresentation: Bool
     ) -> some View {
         ZStack(alignment: .top) {
@@ -272,7 +272,7 @@ struct PostCommentsSheet: View {
                 handleTopInset: layout.handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
                 titleMaximumWidth: titleMaximumWidth,
-                toolbarPrincipalCenterY: toolbarPrincipalCenterY,
+                toolbarControlCenterY: toolbarControlCenterY,
                 titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
             )
         }
@@ -352,7 +352,7 @@ struct PostCommentsSheet: View {
         handleTopInset: CGFloat,
         chromeAreaHeight: CGFloat,
         titleMaximumWidth: CGFloat,
-        toolbarPrincipalCenterY: CGFloat?,
+        toolbarControlCenterY: CGFloat?,
         titleProgress: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
@@ -366,7 +366,7 @@ struct PostCommentsSheet: View {
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
                 titleMaximumWidth: titleMaximumWidth,
-                toolbarPrincipalCenterY: toolbarPrincipalCenterY,
+                toolbarControlCenterY: toolbarControlCenterY,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
                 navigationBarHeight: Self.navigationBarHeight,
@@ -804,7 +804,7 @@ private struct CommentsSheetTopChrome: View {
     let handleTopInset: CGFloat
     let chromeAreaHeight: CGFloat
     let titleMaximumWidth: CGFloat
-    let toolbarPrincipalCenterY: CGFloat?
+    let toolbarControlCenterY: CGFloat?
     let handleWidth: CGFloat
     let handleThickness: CGFloat
     let navigationBarHeight: CGFloat
@@ -847,7 +847,7 @@ private struct CommentsSheetTopChrome: View {
 
     private var morphVerticalOffset: CGFloat {
         let handleOffset = (chromeAreaHeight - handleThickness) / 2
-        let titleOffset = toolbarPrincipalCenterY.map {
+        let titleOffset = toolbarControlCenterY.map {
             max($0 - handleTopInset - (resolvedTitleSize.height / 2), 0)
         } ?? max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
         return interpolate(from: handleOffset, to: titleOffset, progress: easedProgress)

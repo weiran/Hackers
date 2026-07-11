@@ -22,13 +22,13 @@ public final class CommentsHeaderTitleVisibility {
 @MainActor
 @Observable
 public final class CommentsToolbarGeometry {
-    public var principalCenterY: CGFloat?
+    public var controlCenterY: CGFloat?
 
     public init() {}
 
-    public func updatePrincipalCenterY(_ centerY: CGFloat) {
-        guard principalCenterY != centerY else { return }
-        principalCenterY = centerY
+    public func updateControlCenterY(_ centerY: CGFloat) {
+        guard controlCenterY != centerY else { return }
+        controlCenterY = centerY
     }
 }
 
@@ -59,21 +59,6 @@ struct ToolbarTitle: View {
             .onEnded { value in
                 onDragEnded?(value)
             }
-    }
-}
-
-struct ToolbarPrincipalAlignmentReader: View {
-    let geometry: CommentsToolbarGeometry
-
-    var body: some View {
-        Color.clear
-            .frame(width: 1, height: 1)
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.frame(in: .global).midY
-            } action: { centerY in
-                geometry.updatePrincipalCenterY(centerY)
-            }
-            .accessibilityHidden(true)
     }
 }
 
@@ -205,6 +190,7 @@ public struct CommentsHeaderTitlePillContent: View {
 
 struct ShareMenu: View {
     let post: Post
+    var toolbarGeometry: CommentsToolbarGeometry?
 
     var body: some View {
         Button {
@@ -212,6 +198,11 @@ struct ShareMenu: View {
         } label: {
             Label("Share", systemImage: "square.and.arrow.up")
                 .labelStyle(.iconOnly)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.frame(in: .global).midY
+                } action: { centerY in
+                    toolbarGeometry?.updateControlCenterY(centerY)
+                }
         }
     }
 }
