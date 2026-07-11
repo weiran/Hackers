@@ -159,7 +159,7 @@ public struct CommentsHeaderTitlePillContent: View {
             titleContent(font: .subheadline, lineLimit: 1)
                 .fixedSize(horizontal: true, vertical: false)
 
-            titleContent(font: .caption, lineLimit: 2)
+            titleContent(font: .subheadline, lineLimit: 2)
         }
         .padding(.leading, 14)
         .padding(.trailing, 10)
