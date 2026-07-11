@@ -9,15 +9,6 @@
         "revision" : "6c7915e16f729857aec3e99068c361e58a00ed68",
         "version" : "2.13.4"
       }
-    },
-    {
-      "identity" : "variableblur",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nikstar/VariableBlur",
-      "state" : {
-        "branch" : "main",
-        "revision" : "5073a0d9080e488a2d317e04859c001a57fbb3e8"
-      }
     }
   ],
   "version" : 3
