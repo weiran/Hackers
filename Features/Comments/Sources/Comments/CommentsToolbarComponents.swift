@@ -155,16 +155,21 @@ public struct CommentsHeaderTitlePillContent: View {
     }
 
     public var body: some View {
-        titleContent
-            .padding(.leading, 14)
-            .padding(.trailing, 10)
-            .padding(.vertical, 5)
-            .frame(maxWidth: maximumWidth)
-            .frame(height: 44)
-            .fixedSize(horizontal: true, vertical: false)
+        ViewThatFits(in: .horizontal) {
+            titleContent(lineLimit: 1)
+                .fixedSize(horizontal: true, vertical: false)
+
+            titleContent(lineLimit: 2)
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, 10)
+        .padding(.vertical, 5)
+        .frame(maxWidth: maximumWidth)
+        .frame(height: 44)
+        .fixedSize(horizontal: true, vertical: false)
     }
 
-    private var titleContent: some View {
+    private func titleContent(lineLimit: Int) -> some View {
         HStack(spacing: 7) {
             ThumbnailView(
                 url: post.url,
@@ -177,7 +182,7 @@ public struct CommentsHeaderTitlePillContent: View {
                 .scaledFont(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
-                .lineLimit(2)
+                .lineLimit(lineLimit)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.tail)
         }
