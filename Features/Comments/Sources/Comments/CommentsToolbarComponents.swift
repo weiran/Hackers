@@ -155,21 +155,16 @@ public struct CommentsHeaderTitlePillContent: View {
     }
 
     public var body: some View {
-        ViewThatFits(in: .horizontal) {
-            titleContent(lineLimit: 1)
-                .fixedSize(horizontal: true, vertical: false)
-
-            titleContent(lineLimit: 2)
+        WidthCappedLayout(maximumWidth: maximumWidth) {
+            titleContent
+                .padding(.leading, 14)
+                .padding(.trailing, 10)
+                .padding(.vertical, 5)
         }
-        .padding(.leading, 14)
-        .padding(.trailing, 10)
-        .padding(.vertical, 5)
-        .frame(maxWidth: maximumWidth)
         .frame(height: 44)
-        .fixedSize(horizontal: true, vertical: false)
     }
 
-    private func titleContent(lineLimit: Int) -> some View {
+    private var titleContent: some View {
         HStack(spacing: 7) {
             ThumbnailView(
                 url: post.url,
@@ -182,10 +177,42 @@ public struct CommentsHeaderTitlePillContent: View {
                 .scaledFont(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
-                .lineLimit(lineLimit)
+                .lineLimit(2)
                 .multilineTextAlignment(.leading)
                 .truncationMode(.tail)
         }
+    }
+}
+
+private struct WidthCappedLayout: Layout {
+    let maximumWidth: CGFloat?
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        guard let subview = subviews.first else { return .zero }
+
+        let idealSize = subview.sizeThatFits(.unspecified)
+        let proposedWidth = proposal.width ?? .greatestFiniteMagnitude
+        let cappedWidth = min(proposedWidth, maximumWidth ?? .greatestFiniteMagnitude)
+        let width = min(idealSize.width, cappedWidth)
+        let fittedSize = subview.sizeThatFits(.init(width: width, height: proposal.height))
+        return CGSize(width: width, height: fittedSize.height)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        subviews.first?.place(
+            at: bounds.origin,
+            anchor: .topLeading,
+            proposal: .init(width: bounds.width, height: bounds.height)
+        )
     }
 }
 
