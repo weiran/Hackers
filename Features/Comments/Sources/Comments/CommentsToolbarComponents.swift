@@ -156,10 +156,10 @@ public struct CommentsHeaderTitlePillContent: View {
 
     public var body: some View {
         ViewThatFits(in: .horizontal) {
-            titleContent(font: .subheadline, lineLimit: 1)
+            titleContent(font: .caption, lineLimit: 1)
                 .fixedSize(horizontal: true, vertical: false)
 
-            titleContent(font: .subheadline, lineLimit: 2)
+            titleContent(font: .caption, lineLimit: 2)
         }
         .padding(.leading, 14)
         .padding(.trailing, 10)
