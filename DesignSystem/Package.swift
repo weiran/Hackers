@@ -21,14 +21,16 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Domain"),
-        .package(path: "../Shared")
+        .package(path: "../Shared"),
+        .package(url: "https://github.com/nikstar/VariableBlur", branch: "main")
     ],
     targets: [
         .target(
             name: "DesignSystem",
             dependencies: [
                 "Domain",
-                "Shared"
+                "Shared",
+                .product(name: "VariableBlur", package: "VariableBlur")
             ],
         ),
         .testTarget(
