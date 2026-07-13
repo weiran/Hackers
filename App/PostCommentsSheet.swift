@@ -188,7 +188,6 @@ struct PostCommentsSheet: View {
             .onChange(of: controlsHeight) { _, _ in
                 updateBrowserObscuredBottomInset()
             }
-            .accessibilityIdentifier("browser.commentsSheet")
         }
     }
 
@@ -901,6 +900,7 @@ private struct CommentsSheetTopChrome: View {
         }
         .buttonStyle(.plain)
         .disabled(progress <= 0.5)
+        .accessibilityIdentifier("browser.commentsSheet.expandedTitle")
         .accessibilityLabel(post?.title ?? "Comments sheet handle")
         .accessibilityHint("Collapse comments")
         .accessibilityHidden(progress <= 0.5)

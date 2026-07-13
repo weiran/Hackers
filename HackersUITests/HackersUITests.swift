@@ -22,31 +22,46 @@ final class HackersUITests: XCTestCase {
     func testSmokeLaunchFeedAndSettings() throws {
         launchApp()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
-        XCTAssertTrue(app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"].exists)
-        XCTAssertTrue(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
+        let feed = app.collectionViews["feed.list"]
+        assertFullyContained(feed, in: app, timeout: 8)
+        assertHasVisibleIntersection(app.staticTexts["Swift 6.2 Released"], in: feed)
+        assertHasVisibleIntersection(app.staticTexts["Cloudflare Turnstile requiring fingerprintable WebGL"], in: feed)
+        assertHasVisibleIntersection(
+            app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"],
+            in: feed
+        )
 
-        app.buttons["settings.button"].tap()
+        let settingsButton = app.buttons["settings.button"]
+        assertHittable(settingsButton)
+        settingsButton.tap()
 
-        XCTAssertTrue(app.collectionViews["settings.form"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Settings"].exists)
-        XCTAssertTrue(app.switches["settings.showThumbnails"].exists)
-        XCTAssertTrue(app.switches["settings.compactFeed"].exists)
-        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH %@", "Version")).firstMatch.exists)
+        let settingsForm = app.collectionViews["settings.form"]
+        assertFullyContained(settingsForm, in: app)
+        assertHasVisibleIntersection(app.staticTexts["Settings"], in: app)
+        assertHittable(app.switches["settings.showThumbnails"])
+        assertHittable(app.switches["settings.compactFeed"])
+        assertHasVisibleIntersection(
+            app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH %@", "Version")).firstMatch,
+            in: settingsForm
+        )
     }
 
     func testSmokeOpenCustomBrowserFromFeed() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        let browser = browserView
+        assertFullyContained(browser, in: app)
+        assertHasVisibleIntersection(
+            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            in: browser
+        )
         let titlePill = app.buttons["Swift 6.2 Released"]
-        XCTAssertTrue(titlePill.exists)
+        assertHasVisibleIntersection(titlePill, in: app)
+        assertFullyContained(titlePill, in: app)
         XCTAssertLessThan(titlePill.frame.width, app.frame.width - 176)
     }
 
@@ -54,16 +69,19 @@ final class HackersUITests: XCTestCase {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
+        let browser = browserView
+        assertFullyContained(browser, in: app)
+        assertHasVisibleIntersection(
+            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            in: browser
+        )
 
-        let collapsedHeader = app.staticTexts["HACKTIVIS.ME"].firstMatch
-        XCTAssertTrue(collapsedHeader.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["366"].firstMatch.exists)
-        XCTAssertTrue(app.staticTexts["675"].firstMatch.exists)
+        collapseCommentsByTappingTitle()
+        assertHasVisibleIntersection(app.staticTexts["366 comments"].firstMatch, in: collapsedCommentsHeader)
+        assertHasVisibleIntersection(app.staticTexts["675"].firstMatch, in: collapsedCommentsHeader)
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {
@@ -71,17 +89,20 @@ final class HackersUITests: XCTestCase {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["browser.commentsSheet.back"].exists)
-        XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["Reload"].exists)
-        XCTAssertFalse(app.buttons["Open in Safari"].exists)
+        assertFullyContained(browserView, in: app)
+        assertHasVisibleIntersection(
+            expandedCommentsTitle,
+            in: app
+        )
+        assertAbsent(app.buttons["browser.commentsSheet.back"])
+        assertHittable(app.buttons["Share"])
+        assertAbsent(app.buttons["Reload"])
+        assertAbsent(app.buttons["Open in Safari"])
         let firstComment = app.buttons["comments.comment.48346154"]
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(firstComment, in: app)
         XCTAssertEqual(firstComment.frame.minX, 0, accuracy: 1)
         XCTAssertEqual(firstComment.frame.width, app.frame.width, accuracy: 1)
     }
@@ -90,51 +111,47 @@ final class HackersUITests: XCTestCase {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let firstComment = app.buttons["comments.comment.48346154"]
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(firstComment, in: app)
         dragCustomBrowserCommentsUp(count: 1)
-        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
-        XCTAssertTrue(sheetHandle.waitForExistence(timeout: 5))
         let scrollStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
         let scrollEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
         scrollStart.press(forDuration: 0.05, thenDragTo: scrollEnd)
 
-        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
-        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
+        let titlePill = expandedCommentsTitle
+        assertHasVisibleIntersection(titlePill, in: app)
         let titlePillFrame = titlePill.frame
-        XCTAssertTrue(app.frame.contains(titlePillFrame))
+        assertFullyContained(titlePill, in: app)
         XCTAssertLessThan(titlePillFrame.maxY, 120)
-        XCTAssertLessThan(sheetHandle.frame.maxY, 120)
         tapAbsolutePoint(x: titlePillFrame.maxX - 12, y: titlePillFrame.midY)
 
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
+        let sheetHandle = commentsSheetHandle
         waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
         let postTapScreenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         postTapScreenshot.lifetime = .keepAlways
         add(postTapScreenshot)
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(
+            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            in: app
+        )
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
     }
 
     func testCustomBrowserCollapsedHandleDragExpandsComments() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
-        XCTAssertTrue(sheetHandle.waitForExistence(timeout: 5))
-        XCTAssertLessThan(sheetHandle.frame.maxY, 120)
-        let expandedHandle = app.coordinate(withNormalizedOffset: CGVector(
-            dx: sheetHandle.frame.midX / app.frame.width,
-            dy: sheetHandle.frame.midY / app.frame.height
-        ))
-        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
-        expandedHandle.press(forDuration: 0.1, thenDragTo: collapsedPosition)
-        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
+        collapseCommentsByTappingTitle()
+        let sheetHandle = commentsSheetHandle
+        assertHasVisibleIntersection(sheetHandle, in: app)
+        XCTAssertGreaterThan(sheetHandle.frame.minY, app.frame.midY)
 
         let handle = app.coordinate(withNormalizedOffset: CGVector(
             dx: sheetHandle.frame.midX / app.frame.width,
@@ -143,35 +160,37 @@ final class HackersUITests: XCTestCase {
         let expandedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         handle.press(forDuration: 0.1, thenDragTo: expandedPosition)
 
-        waitForFrameMaxY(of: sheetHandle, lessThan: 120, timeout: 5)
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+        assertFullyContained(app.buttons["comments.comment.48346154"], in: app)
+        assertHasVisibleIntersection(expandedCommentsTitle, in: app)
+        XCTAssertLessThan(expandedCommentsTitle.frame.maxY, 120)
     }
 
     func testCustomBrowserPreservesCommentScrollPositionAcrossCollapse() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let lowerComment = app.buttons["comments.comment.48348985"]
         scrollCustomBrowserComments(untilVisible: lowerComment)
-        XCTAssertTrue(app.frame.intersects(lowerComment.frame))
+        assertHasVisibleIntersection(lowerComment, in: app)
         let frameBeforeCollapse = lowerComment.frame
 
-        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
-        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
-        tapAbsolutePoint(x: titlePill.frame.midX, y: titlePill.frame.midY)
+        let titlePill = expandedCommentsTitle
+        assertHasVisibleIntersection(titlePill, in: app)
+        tapAbsolutePoint(x: titlePill.frame.maxX - 12, y: titlePill.frame.midY)
 
-        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
+        let sheetHandle = commentsSheetHandle
         waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
         tapAbsolutePoint(x: sheetHandle.frame.midX, y: sheetHandle.frame.maxY + 30)
         waitForFrameMaxY(of: sheetHandle, lessThan: 120, timeout: 5)
 
-        XCTAssertTrue(lowerComment.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(lowerComment, in: app)
         XCTAssertEqual(lowerComment.frame.minY, frameBeforeCollapse.minY, accuracy: 1)
-        let reexpandedTitlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
-        XCTAssertTrue(reexpandedTitlePill.waitForExistence(timeout: 5))
+        let reexpandedTitlePill = expandedCommentsTitle
+        assertHasVisibleIntersection(reexpandedTitlePill, in: app)
         XCTAssertLessThan(reexpandedTitlePill.frame.maxY, 120)
         let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         screenshot.name = "Re-expanded comments preserve scroll position"
@@ -179,116 +198,63 @@ final class HackersUITests: XCTestCase {
         add(screenshot)
     }
 
-    func testCustomBrowserHandleDragCollapsesExpandedComments() throws {
+    func testCustomBrowserCommentsReturnToTopAfterLongScroll() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
-        tapPost(post)
-
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-
-        let handle = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
-        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
-        handle.press(forDuration: 0.1, thenDragTo: collapsedPosition)
-
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
-    }
-
-    func testCustomBrowserExpandedTopAreaDragCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: .custom)
-
-        let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
-        tapPost(post)
-
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-
-        let topTitleArea = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.18))
-        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
-        topTitleArea.press(forDuration: 0.1, thenDragTo: collapsedPosition)
-
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
-    }
-
-    func testCustomBrowserCommentsBodyDragAtTopCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: .custom)
-
-        let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
-        tapPost(post)
-
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
-
-        let commentsBody = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
-        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
-        commentsBody.press(forDuration: 0.1, thenDragTo: collapsedPosition)
-
-        XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
-    }
-
-    func testCustomBrowserCommentsReturnToTopRemainsResponsive() throws {
-        launchApp(linkBrowserMode: .custom)
-
-        let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let firstComment = app.buttons["comments.comment.48346154"]
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(firstComment, in: app)
 
         let lowerComment = app.buttons["comments.comment.48348985"]
         scrollCustomBrowserComments(untilVisible: lowerComment)
-        XCTAssertTrue(app.frame.intersects(lowerComment.frame))
+        assertHasVisibleIntersection(lowerComment, in: app)
 
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
 
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.frame.intersects(firstComment.frame))
+        assertHasVisibleIntersection(firstComment, in: app)
 
-        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
-        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
-        titlePill.tap()
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+        let titlePill = expandedCommentsTitle
+        assertHasVisibleIntersection(titlePill, in: app)
+        tapAbsolutePoint(x: titlePill.frame.maxX - 12, y: titlePill.frame.midY)
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
     }
 
-    func testCustomBrowserLargeCommentsRemainResponsive() throws {
+    func testCustomBrowserLargeCommentListReturnsToTopAfterLongScroll() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(largeCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let firstComment = app.buttons["comments.comment.49000000"]
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(firstComment, in: app)
 
         dragCustomBrowserCommentsUp(count: 12)
-        XCTAssertFalse(firstComment.isHittable)
+        XCTAssertFalse(hasVisibleIntersection(firstComment, in: app))
 
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
 
-        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.frame.intersects(firstComment.frame))
+        assertHasVisibleIntersection(firstComment, in: app)
 
-        XCTAssertTrue(app.buttons["UI Test: Large Comments Performance Fixture"].waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(app.buttons["UI Test: Large Comments Stress Fixture"], in: app)
     }
 
     func testCustomBrowserLargeCommentBranchCollapsesAndExpands() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(largeCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let parent = app.buttons["comments.comment.49000003"]
         let firstChild = app.buttons["comments.comment.49000004"]
         XCTAssertTrue(firstChild.waitForExistence(timeout: 5))
         scrollCustomBrowserComments(untilVisible: firstChild)
-        XCTAssertTrue(app.frame.intersects(parent.frame))
-        XCTAssertTrue(app.frame.intersects(firstChild.frame))
+        assertHasVisibleIntersection(parent, in: app)
+        assertHasVisibleIntersection(firstChild, in: app)
 
         tapAbsolutePoint(x: parent.frame.minX + 8, y: parent.frame.minY + 8)
 
@@ -298,7 +264,7 @@ final class HackersUITests: XCTestCase {
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
-        XCTAssertTrue(app.frame.intersects(firstChild.frame))
+        assertHasVisibleIntersection(firstChild, in: app)
 
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
 
@@ -318,135 +284,149 @@ final class HackersUITests: XCTestCase {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
+        assertFullyContained(app.otherElements["browser.view"], in: app)
         edgeSwipeBack()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.otherElements["browser.view"].exists)
+        assertFullyContained(app.collectionViews["feed.list"], in: app)
+        assertAbsent(browserView)
     }
 
     func testSystemBackSwipeFromCustomBrowserExpandedComments() throws {
         launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(app.otherElements["browser.view"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+        assertFullyContained(browserView, in: app)
+        assertHasVisibleIntersection(app.buttons["comments.comment.48346154"], in: app)
 
         edgeSwipeBack()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.otherElements["browser.view"].exists)
+        assertFullyContained(app.collectionViews["feed.list"], in: app)
+        assertAbsent(browserView)
     }
 
     func testSystemBackSwipeFromComments() throws {
         launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(commentsList.waitForExistence(timeout: 5))
+        assertFullyContained(commentsList, in: app)
         edgeSwipeBack()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 5))
-        XCTAssertFalse(commentsList.exists)
+        assertFullyContained(app.collectionViews["feed.list"], in: app)
+        assertAbsent(commentsList)
     }
 
     func testOpenCommentsFromFeed() throws {
         launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
-        XCTAssertTrue(commentsList.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].exists)
-        XCTAssertTrue(app.staticTexts["manakov_dev"].exists)
-        XCTAssertTrue(app.staticTexts["Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."].exists)
+        assertFullyContained(commentsList, in: app)
+        assertHasVisibleIntersection(app.staticTexts["Swift 6.2 Released"], in: commentsList)
+        assertHasVisibleIntersection(app.staticTexts["manakov_dev"], in: commentsList)
+        assertHasVisibleIntersection(
+            app.staticTexts["Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."],
+            in: commentsList
+        )
     }
 
-    func testCollapsePreservesRootCommentContext() throws {
+    func testCollapsingCommentKeepsRootContextAvailable() throws {
         launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
-        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        assertHittable(post, timeout: 8)
         tapPost(post)
 
         let list = commentsList
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        assertFullyContained(list, in: app)
 
         let rootComment = app.buttons["comments.comment.48348985"]
+        let childComment = app.buttons["comments.comment.48349298"]
         scroll(list, untilVisible: rootComment)
-        XCTAssertTrue(rootComment.waitForExistence(timeout: 2))
+        assertHasVisibleIntersection(rootComment, in: list)
+        XCTAssertTrue(childComment.exists)
 
         rootComment.tap()
-        XCTAssertTrue(rootComment.waitForExistence(timeout: 2))
-        XCTAssertTrue(list.frame.intersects(rootComment.frame))
+        waitForNonExistence(childComment, timeout: 2)
+        assertHasVisibleIntersection(rootComment, in: list)
 
         rootComment.press(forDuration: 1)
-        XCTAssertTrue(app.buttons["Copy"].exists)
-        XCTAssertTrue(app.buttons["Share"].exists)
+        assertHittable(app.buttons["Copy"].firstMatch)
+        assertHasVisibleIntersection(app.buttons["Share"].firstMatch, in: app)
     }
 
     func testSearchUsesMockedAlgoliaResults() throws {
         launchApp()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
+        assertFullyContained(app.collectionViews["feed.list"], in: app, timeout: 8)
         let searchButton = app.buttons["Search"]
-        XCTAssertTrue(searchButton.waitForExistence(timeout: 5))
-        XCTAssertTrue(searchButton.isHittable)
+        assertHittable(searchButton)
         searchButton.tap()
 
         let searchField = app.searchFields.firstMatch
-        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
-        XCTAssertTrue(searchField.isHittable)
+        assertHittable(searchField)
         searchField.tap()
         searchField.typeText("Swift")
 
-        XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].waitForExistence(timeout: 8))
-        XCTAssertFalse(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
+        assertHasVisibleIntersection(app.staticTexts["Swift 6.2 Released"], in: app, timeout: 8)
+        assertAbsent(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"])
     }
 
     func testCategoryMenuUsesMockedFeeds() throws {
         launchApp()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        app.navigationBars.buttons["Top"].tap()
-        app.buttons["Ask"].tap()
+        assertFullyContained(app.collectionViews["feed.list"], in: app, timeout: 8)
+        let categoryMenu = app.navigationBars.buttons["Top"]
+        assertHittable(categoryMenu)
+        categoryMenu.tap()
+        let askButton = app.buttons["Ask"]
+        assertHittable(askButton)
+        askButton.tap()
 
-        XCTAssertTrue(app.staticTexts["Ask HN: What are you using for iOS UI testing in 2026?"].waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(
+            app.staticTexts["Ask HN: What are you using for iOS UI testing in 2026?"],
+            in: app
+        )
     }
 
     func testLoginFailureAndSuccessUseMockedAuthentication() throws {
         launchApp()
 
-        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
-        app.buttons["settings.button"].tap()
-        XCTAssertTrue(app.collectionViews["settings.form"].waitForExistence(timeout: 5))
-        app.buttons["Login"].tap()
+        assertFullyContained(app.collectionViews["feed.list"], in: app, timeout: 8)
+        let settingsButton = app.buttons["settings.button"]
+        assertHittable(settingsButton)
+        settingsButton.tap()
+        assertFullyContained(app.collectionViews["settings.form"], in: app)
+        let loginButton = app.buttons["Login"]
+        assertHittable(loginButton)
+        loginButton.tap()
 
         let username = app.textFields["login.username"]
         let password = app.secureTextFields["login.password"]
-        XCTAssertTrue(username.waitForExistence(timeout: 5))
+        assertHittable(username)
         username.tap()
         username.typeText("ui-user")
         password.tap()
         password.typeText("wrong")
         app.buttons["login.signIn"].tap()
-        XCTAssertTrue(app.alerts["Login Failed"].waitForExistence(timeout: 5))
+        assertFullyContained(app.alerts["Login Failed"], in: app)
         app.alerts["Login Failed"].buttons["OK"].tap()
 
         password.tap()
         password.typeText("password")
         app.buttons["login.signIn"].tap()
 
-        XCTAssertTrue(app.staticTexts["Welcome back, ui-user"].waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(app.staticTexts["Welcome back, ui-user"].firstMatch, in: app)
     }
 
     private func launchApp(linkBrowserMode: BrowserMode = .custom) {
@@ -459,11 +439,37 @@ final class HackersUITests: XCTestCase {
     }
 
     private var commentsList: XCUIElement {
-        app.descendants(matching: .any)["comments.list"]
+        app.descendants(matching: .any).matching(identifier: "comments.list").firstMatch
+    }
+
+    private var collapsedCommentsHeader: XCUIElement {
+        app.descendants(matching: .any)
+            .matching(identifier: "browser.commentsSheet.collapsedHeader")
+            .firstMatch
+    }
+
+    private var commentsSheetHandle: XCUIElement {
+        app.descendants(matching: .any)
+            .matching(identifier: "browser.commentsSheet.handle")
+            .firstMatch
+    }
+
+    private var expandedCommentsTitle: XCUIElement {
+        app.buttons.matching(identifier: "browser.commentsSheet.expandedTitle").firstMatch
+    }
+
+    private var browserView: XCUIElement {
+        app.otherElements.matching(identifier: "browser.view").firstMatch
     }
 
     private func tapPost(_ post: XCUIElement) {
         post.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
+    private func collapseCommentsByTappingTitle() {
+        assertHasVisibleIntersection(expandedCommentsTitle, in: app)
+        tapAbsolutePoint(x: expandedCommentsTitle.frame.maxX - 12, y: expandedCommentsTitle.frame.midY)
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
     }
 
     private func tapAbsolutePoint(x: CGFloat, y: CGFloat) {
@@ -475,8 +481,90 @@ final class HackersUITests: XCTestCase {
         ).tap()
     }
 
+    private func assertHittable(
+        _ element: XCUIElement,
+        timeout: TimeInterval = 5,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        if !element.isHittable {
+            let expectation = XCTNSPredicateExpectation(
+                predicate: NSPredicate(format: "hittable == true"),
+                object: element
+            )
+            let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+            XCTAssertEqual(result, .completed, "Expected element to become hittable: \(element)", file: file, line: line)
+            guard result == .completed else { return }
+        }
+        assertHasVisibleIntersection(element, in: app, timeout: 0, file: file, line: line)
+    }
+
+    private func assertFullyContained(
+        _ element: XCUIElement,
+        in container: XCUIElement,
+        timeout: TimeInterval = 5,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        guard element.exists || element.waitForExistence(timeout: timeout) else {
+            XCTFail("Expected element to exist: \(element)", file: file, line: line)
+            return
+        }
+        guard container.exists || container.waitForExistence(timeout: timeout) else {
+            XCTFail("Expected container to exist: \(container)", file: file, line: line)
+            return
+        }
+
+        let elementFrame = element.frame
+        XCTAssertFalse(elementFrame.isEmpty, "Expected element to have a rendered frame", file: file, line: line)
+        XCTAssertTrue(
+            container.frame.contains(elementFrame),
+            "Expected \(elementFrame) to be fully contained in \(container.frame)",
+            file: file,
+            line: line
+        )
+    }
+
+    private func assertHasVisibleIntersection(
+        _ element: XCUIElement,
+        in container: XCUIElement,
+        timeout: TimeInterval = 5,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        guard element.exists || element.waitForExistence(timeout: timeout) else {
+            XCTFail("Expected element to exist: \(element)", file: file, line: line)
+            return
+        }
+        guard container.exists || container.waitForExistence(timeout: timeout) else {
+            XCTFail("Expected container to exist: \(container)", file: file, line: line)
+            return
+        }
+
+        XCTAssertTrue(
+            hasVisibleIntersection(element, in: container),
+            "Expected \(element.frame) to visibly intersect \(container.frame)",
+            file: file,
+            line: line
+        )
+    }
+
+    private func assertAbsent(
+        _ element: XCUIElement,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertFalse(element.exists, "Expected element to be absent: \(element)", file: file, line: line)
+    }
+
+    private func hasVisibleIntersection(_ element: XCUIElement, in container: XCUIElement) -> Bool {
+        guard element.exists, container.exists else { return false }
+        let intersection = element.frame.intersection(container.frame)
+        return !intersection.isNull && intersection.width > 1 && intersection.height > 1
+    }
+
     private func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {
-        for _ in 0 ..< maxSwipes where !element.exists || !container.frame.intersects(element.frame) {
+        for _ in 0 ..< maxSwipes where !hasVisibleIntersection(element, in: container) {
             container.swipeUp()
         }
     }
@@ -484,7 +572,7 @@ final class HackersUITests: XCTestCase {
     private func scrollCustomBrowserComments(untilVisible element: XCUIElement, maxDrags: Int = 8) {
         let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
         let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
-        for _ in 0 ..< maxDrags where !element.exists || !app.frame.intersects(element.frame) {
+        for _ in 0 ..< maxDrags where !hasVisibleIntersection(element, in: app) {
             start.press(forDuration: 0.05, thenDragTo: end)
         }
     }

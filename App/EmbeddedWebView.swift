@@ -536,6 +536,7 @@ struct PostLinkBrowserView: View {
             }
         }
         .tint(.accentColor)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("browser.view")
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)

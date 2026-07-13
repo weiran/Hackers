@@ -71,7 +71,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             makePost(
                 id: largeCommentsPostID,
                 url: "https://example.com/ui-test-large-comments",
-                title: "UI Test: Large Comments Performance Fixture",
+                title: "UI Test: Large Comments Stress Fixture",
                 age: "1 minute ago",
                 commentsCount: 720,
                 by: "perf_fixture",
