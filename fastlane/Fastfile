@@ -18,6 +18,14 @@ LOG_DIR = File.join(REPO_ROOT, "artifacts/logs")
 SNAPSHOT_CACHE_DIR = File.expand_path("~/Library/Caches/tools.fastlane/screenshots")
 SCREENSHOT_OUTPUT_DIR = File.join(REPO_ROOT, "artifacts/screenshots")
 FRAMEIT_ASSET_DIR = File.join(REPO_ROOT, "fastlane", "frameit")
+SCREENSHOT_NAMES = [
+  "01-feed-built-for-reading",
+  "02-open-stories-inside-hackers",
+  "03-read-comments-alongside-story",
+  "04-search-by-popular-recent-date",
+  "05-dim-read-posts-across-devices",
+  "06-vote-reply-follow-deep-threads"
+].freeze
 
 def app_store_connect_key
   app_store_connect_api_key(
@@ -81,6 +89,14 @@ def write_screenshot_summary(output_dir)
   html << "</body></html>"
 
   File.write(File.join(output_dir, "screenshots.html"), html)
+end
+
+def validate_raw_screenshots!(output_dir)
+  SCREENSHOT_NAMES.each do |name|
+    matches = Dir[File.join(output_dir, "**", "*-#{name}.png")]
+      .reject { |path| File.basename(path, ".png").end_with?("_framed") }
+    UI.user_error!("Expected 2 screenshots for #{name}, found #{matches.length}") unless matches.length == 2
+  end
 end
 
 def prepare_frameit_metadata(output_dir)
@@ -321,6 +337,7 @@ platform :ios do
         output_directory: output_dir,
         dark_mode: appearance[:dark_mode]
       )
+      validate_raw_screenshots!(output_dir)
       prepare_frameit_metadata(output_dir)
       frameit(path: output_dir)
     end

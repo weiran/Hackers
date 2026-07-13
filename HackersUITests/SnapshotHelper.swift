@@ -26,7 +26,10 @@ private enum SnapshotHelper {
         NSLog("snapshot: \(name)")
         sleep(1)
 
-        guard let screenshotsDirectory else { return }
+        guard let screenshotsDirectory else {
+            XCTFail("Screenshot output directory is unavailable")
+            return
+        }
 
         do {
             try FileManager.default.createDirectory(
@@ -37,9 +40,13 @@ private enum SnapshotHelper {
             let image = normalizedImage(screenshot.image)
             let simulatorName = normalizedSimulatorName()
             let url = screenshotsDirectory.appendingPathComponent("\(simulatorName)-\(name).png")
-            try image.pngData()?.write(to: url, options: .atomic)
+            guard let data = image.pngData() else {
+                XCTFail("Could not encode screenshot \(name) as PNG")
+                return
+            }
+            try data.write(to: url, options: .atomic)
         } catch {
-            NSLog("Problem writing screenshot \(name): \(error.localizedDescription)")
+            XCTFail("Could not write screenshot \(name): \(error.localizedDescription)")
         }
     }
 

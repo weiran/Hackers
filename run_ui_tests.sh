@@ -4,14 +4,23 @@ set -euo pipefail
 DESTINATION="${DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro}"
 MODE="${1:-smoke}"
 
-ONLY_TESTING=(
-  "-only-testing:HackersUITests/HackersUITests/testSmokeLaunchFeedAndSettings"
-  "-only-testing:HackersUITests/HackersUITests/testSmokeOpenCustomBrowserFromFeed"
-)
-
-if [[ "$MODE" == "full" || "$MODE" == "--full" ]]; then
-  ONLY_TESTING=()
-fi
+case "$MODE" in
+  smoke)
+    TEST_SELECTION=(
+      "-only-testing:HackersUITests/HackersUITests/testSmokeLaunchFeedAndSettings"
+      "-only-testing:HackersUITests/HackersUITests/testSmokeOpenCustomBrowserFromFeed"
+    )
+    ;;
+  full|--full)
+    TEST_SELECTION=(
+      "-skip-testing:HackersUITests/HackersScreenshotTests"
+    )
+    ;;
+  *)
+    echo "Unknown UI test mode: $MODE (expected smoke or full)" >&2
+    exit 2
+    ;;
+esac
 
 RESULT_BUNDLE_PATH="${RESULT_BUNDLE_PATH:-artifacts/xcresults/Hackers-UITests.xcresult}"
 rm -rf "$RESULT_BUNDLE_PATH"
@@ -25,8 +34,6 @@ COMMAND=(
   -resultBundlePath "$RESULT_BUNDLE_PATH"
 )
 
-if [[ ${#ONLY_TESTING[@]} -gt 0 ]]; then
-  COMMAND+=("${ONLY_TESTING[@]}")
-fi
+COMMAND+=("${TEST_SELECTION[@]}")
 
 "${COMMAND[@]}"

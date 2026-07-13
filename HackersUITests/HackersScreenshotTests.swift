@@ -159,13 +159,9 @@ final class HackersScreenshotTests: XCTestCase {
     }
 
     private func waitForRealArticleContent() {
-        let loadedPredicate = NSPredicate { [self] _, _ in
-            self.app.webViews.firstMatch.exists
-                || self.app.otherElements["browser.view"].exists
-        }
-        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: loadedPredicate, object: app)], timeout: 20)
-        XCTAssertEqual(result, .completed)
-        RunLoop.current.run(until: Date().addingTimeInterval(3))
+        let webView = app.webViews.firstMatch
+        XCTAssertTrue(webView.waitForExistence(timeout: 20))
+        XCTAssertTrue(webView.staticTexts[screenshotPostTitle].waitForExistence(timeout: 20))
         waitForScreenshotComments()
     }
 
