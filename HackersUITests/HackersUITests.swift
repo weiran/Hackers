@@ -91,12 +91,17 @@ final class HackersUITests: XCTestCase {
         let firstComment = app.buttons["comments.comment.48346154"]
         XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
         dragCustomBrowserCommentsUp(count: 1)
+        waitForNonExistence(app.otherElements["browser.commentsSheet.handle"], timeout: 5)
+        let scrollStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+        let scrollEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+        scrollStart.press(forDuration: 0.05, thenDragTo: scrollEnd)
 
         let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
         XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
         let titlePillFrame = titlePill.frame
         XCTAssertTrue(app.frame.contains(titlePillFrame))
-        tapAbsolutePoint(x: titlePillFrame.midX, y: titlePillFrame.midY)
+        XCTAssertLessThan(titlePillFrame.maxY, 120)
+        tapAbsolutePoint(x: titlePillFrame.maxX - 12, y: titlePillFrame.midY)
 
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
