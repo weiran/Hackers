@@ -188,9 +188,6 @@ struct PostCommentsSheet: View {
             .onChange(of: controlsHeight) { _, _ in
                 updateBrowserObscuredBottomInset()
             }
-            .onChange(of: isExpanded) { _, newValue in
-                updateExpandedPresentation(isExpanded: newValue)
-            }
             .accessibilityIdentifier("browser.commentsSheet")
         }
     }
@@ -490,14 +487,6 @@ private extension PostCommentsSheet {
         onBrowserObscuredBottomInsetChange(
             PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
         )
-    }
-
-    private func updateExpandedPresentation(isExpanded: Bool) {
-        if !isExpanded {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                expandedTitleVisibility.setVisible(false)
-            }
-        }
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {

@@ -165,6 +165,9 @@ final class HackersUITests: XCTestCase {
 
         XCTAssertTrue(lowerComment.waitForExistence(timeout: 5))
         XCTAssertEqual(lowerComment.frame.minY, frameBeforeCollapse.minY, accuracy: 1)
+        let reexpandedTitlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
+        XCTAssertTrue(reexpandedTitlePill.waitForExistence(timeout: 5))
+        XCTAssertLessThan(reexpandedTitlePill.frame.maxY, 120)
         let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         screenshot.name = "Re-expanded comments preserve scroll position"
         screenshot.lifetime = .keepAlways
