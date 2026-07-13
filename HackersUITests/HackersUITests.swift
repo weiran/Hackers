@@ -120,16 +120,55 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
-        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
-        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
-        titlePill.tap()
-        XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
+        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
+        XCTAssertTrue(sheetHandle.waitForExistence(timeout: 5))
+        XCTAssertLessThan(sheetHandle.frame.maxY, 120)
+        let expandedHandle = app.coordinate(withNormalizedOffset: CGVector(
+            dx: sheetHandle.frame.midX / app.frame.width,
+            dy: sheetHandle.frame.midY / app.frame.height
+        ))
+        let collapsedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        expandedHandle.press(forDuration: 0.1, thenDragTo: collapsedPosition)
+        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
 
-        let handle = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let handle = app.coordinate(withNormalizedOffset: CGVector(
+            dx: sheetHandle.frame.midX / app.frame.width,
+            dy: sheetHandle.frame.midY / app.frame.height
+        ))
         let expandedPosition = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08))
         handle.press(forDuration: 0.1, thenDragTo: expandedPosition)
 
+        waitForFrameMaxY(of: sheetHandle, lessThan: 120, timeout: 5)
         XCTAssertTrue(app.buttons["comments.comment.48346154"].waitForExistence(timeout: 5))
+    }
+
+    func testCustomBrowserPreservesCommentScrollPositionAcrossCollapse() throws {
+        launchApp(linkBrowserMode: "custom")
+
+        let post = app.buttons["feed.post.\(longCommentsPostID)"]
+        XCTAssertTrue(post.waitForExistence(timeout: 8))
+        tapPost(post)
+
+        let lowerComment = app.buttons["comments.comment.48348985"]
+        scrollCustomBrowserComments(untilVisible: lowerComment)
+        XCTAssertTrue(app.frame.intersects(lowerComment.frame))
+        let frameBeforeCollapse = lowerComment.frame
+
+        let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
+        XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
+        tapAbsolutePoint(x: titlePill.frame.midX, y: titlePill.frame.midY)
+
+        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
+        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
+        tapAbsolutePoint(x: sheetHandle.frame.midX, y: sheetHandle.frame.maxY + 30)
+        waitForFrameMaxY(of: sheetHandle, lessThan: 120, timeout: 5)
+
+        XCTAssertTrue(lowerComment.waitForExistence(timeout: 5))
+        XCTAssertEqual(lowerComment.frame.minY, frameBeforeCollapse.minY, accuracy: 1)
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Re-expanded comments preserve scroll position"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     func testCustomBrowserHandleDragCollapsesExpandedComments() throws {
@@ -454,6 +493,15 @@ final class HackersUITests: XCTestCase {
         }
         XCTAssertTrue(element.exists)
         XCTAssertGreaterThan(element.frame.minY, threshold)
+    }
+
+    private func waitForFrameMaxY(of element: XCUIElement, lessThan threshold: CGFloat, timeout: TimeInterval) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while element.exists, element.frame.maxY >= threshold, Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        XCTAssertTrue(element.exists)
+        XCTAssertLessThan(element.frame.maxY, threshold)
     }
 
     private func edgeSwipeBack() {

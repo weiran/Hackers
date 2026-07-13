@@ -999,7 +999,7 @@ private struct StableCommentsHost: View, @preconcurrency Equatable {
             showsPostHeader: showsPostHeader,
             allowsRefresh: false,
             showsToolbar: showsToolbar,
-            controlsNavigationBarVisibility: showsToolbar,
+            controlsNavigationBarVisibility: true,
             presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
