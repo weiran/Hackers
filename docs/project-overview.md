@@ -167,11 +167,11 @@ Search requests use `tags=story`, page/hits-per-page parameters, and optional `c
 
 ## UI Test Fixtures
 
-UI tests do not hit live Hacker News by default. `App/UITesting/UITestingBootstrap.swift` installs dependency overrides when `--ui-testing` is present or `HACKERS_UI_TESTING=1` is set.
+UI tests do not hit live Hacker News by default. `App/UITesting/UITestingBootstrap.swift` installs dependency overrides only when `HACKERS_UI_TESTING=1` is set.
 
-The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. UI tests depend on accessibility identifiers such as `feed.list`, `feed.post.<id>`, `comments.list`, `settings.form`, `settings.showThumbnails`, `search.sort.menu`, `search.date.menu`, `browser.view`, and `login.*`.
+The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. A typed launch configuration validates the browser mode, initial route, post ID, story presentation, article source, read-state options, and thumbnail option. Invalid or incompatible settings fail at launch.
 
-Screenshot mode adds `--screenshots` or `HACKERS_SCREENSHOTS=1`. Screenshot tests can seed browser mode, article fixtures, initially read post IDs, initial comments/story selection, and browser-only state through `HACKERS_UI_*` environment variables.
+Functional UI tests use stable, state-specific accessibility identifiers, but assert hittability and rendered geometry rather than treating hierarchy existence as visibility. The `HackersScreenshotTests` class is separate manual capture orchestration, excluded from automatic smoke and full runs, and shares the same typed `HACKERS_UI_*` launch contract.
 
 ## What Not To Reintroduce
 
