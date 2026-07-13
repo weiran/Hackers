@@ -7,22 +7,24 @@ import SwiftUI
 // swiftlint:disable type_body_length function_body_length
 
 enum UITestingBootstrap {
-    private static let argument = "--ui-testing"
     static let postID = 48_350_598
+    static let configuration: UITestLaunchConfiguration? = {
+        do {
+            return try UITestLaunchConfiguration.parse(
+                environment: ProcessInfo.processInfo.environment
+            )
+        } catch {
+            preconditionFailure("Invalid UI-test launch configuration: \(error)")
+        }
+    }()
 
     static var isEnabled: Bool {
-        ProcessInfo.processInfo.arguments.contains(argument)
-            || ProcessInfo.processInfo.environment["HACKERS_UI_TESTING"] == "1"
-    }
-
-    static var isScreenshotMode: Bool {
-        ProcessInfo.processInfo.arguments.contains("--screenshots")
-            || ProcessInfo.processInfo.environment["HACKERS_SCREENSHOTS"] == "1"
+        configuration != nil
     }
 
     @MainActor
     static func configureIfNeeded() {
-        guard isEnabled else { return }
+        guard configuration != nil else { return }
 
         let settingsUseCase = UITestSettingsUseCase()
         let authenticationUseCase = UITestAuthenticationUseCase()
@@ -808,7 +810,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var safariReaderMode = false
     var linkBrowserMode: LinkBrowserMode
-    var showThumbnails = UITestingBootstrap.isScreenshotMode
+    var showThumbnails: Bool
     var rememberFeedCategory = false
     var lastFeedCategory: PostType?
     var textSize: TextSize = .medium
@@ -816,10 +818,12 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool
 
     init() {
-        let mode = ProcessInfo.processInfo.environment["HACKERS_UI_LINK_BROWSER_MODE"]
-        linkBrowserMode = mode == "inApp" ? .inAppBrowser : .customBrowser
-        let dimReadSetting = ProcessInfo.processInfo.environment["HACKERS_UI_DIM_READ_POSTS"]
-        dimReadPosts = dimReadSetting == "1" || (!UITestingBootstrap.isScreenshotMode && dimReadSetting != "0")
+        guard let configuration = UITestingBootstrap.configuration else {
+            preconditionFailure("UI-test settings require an active launch configuration")
+        }
+        linkBrowserMode = configuration.browserMode
+        showThumbnails = configuration.showThumbnails
+        dimReadPosts = configuration.dimReadPosts
     }
 
     func clearCache() {}
@@ -858,10 +862,7 @@ final class UITestReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
     private var readIDs: Set<Int>
 
     init() {
-        let ids = ProcessInfo.processInfo.environment["HACKERS_UI_READ_POST_IDS"]?
-            .split(separator: ",")
-            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) } ?? []
-        readIDs = Set(ids)
+        readIDs = UITestingBootstrap.configuration?.readPostIDs ?? []
     }
 
     func readPostIDs() async -> Set<Int> {
@@ -983,8 +984,7 @@ struct UITestArticleContent: Equatable {
 
 enum UITestArticleFixtures {
     static func article(for url: URL) -> UITestArticleContent? {
-        guard UITestingBootstrap.isEnabled else { return nil }
-        guard ProcessInfo.processInfo.environment["HACKERS_UI_ARTICLE_FIXTURES"] != "0" else {
+        guard UITestingBootstrap.configuration?.articleSource == .fixture else {
             return nil
         }
 

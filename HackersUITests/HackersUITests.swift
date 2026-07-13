@@ -1,6 +1,11 @@
 import XCTest
 
 final class HackersUITests: XCTestCase {
+    private enum BrowserMode: String {
+        case custom
+        case inApp
+    }
+
     private let screenshotPostID = 48_350_598
     private let longCommentsPostID = 48_345_840
     private let largeCommentsPostID = 48_399_999
@@ -32,7 +37,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSmokeOpenCustomBrowserFromFeed() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -46,7 +51,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserCommentsSheetCollapsedPreview() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -63,7 +68,7 @@ final class HackersUITests: XCTestCase {
 
     func testCustomBrowserExpandedCommentsChrome() throws {
         XCUIDevice.shared.orientation = .portrait
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -82,7 +87,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserTitlePillTapCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -114,7 +119,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserCollapsedHandleDragExpandsComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -143,7 +148,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserPreservesCommentScrollPositionAcrossCollapse() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -175,7 +180,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserHandleDragCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -192,7 +197,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserExpandedTopAreaDragCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -209,7 +214,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserCommentsBodyDragAtTopCollapsesExpandedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -226,7 +231,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserCommentsReturnToTopRemainsResponsive() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -251,7 +256,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserLargeCommentsRemainResponsive() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(largeCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -272,7 +277,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCustomBrowserLargeCommentBranchCollapsesAndExpands() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(largeCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -310,7 +315,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -324,7 +329,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSystemBackSwipeFromCustomBrowserExpandedComments() throws {
-        launchApp(linkBrowserMode: "custom")
+        launchApp(linkBrowserMode: .custom)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -340,7 +345,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSystemBackSwipeFromComments() throws {
-        launchApp(linkBrowserMode: "inApp")
+        launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -354,7 +359,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testOpenCommentsFromFeed() throws {
-        launchApp(linkBrowserMode: "inApp")
+        launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(screenshotPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -367,7 +372,7 @@ final class HackersUITests: XCTestCase {
     }
 
     func testCollapsePreservesRootCommentContext() throws {
-        launchApp(linkBrowserMode: "inApp")
+        launchApp(linkBrowserMode: .inApp)
 
         let post = app.buttons["feed.post.\(longCommentsPostID)"]
         XCTAssertTrue(post.waitForExistence(timeout: 8))
@@ -390,7 +395,19 @@ final class HackersUITests: XCTestCase {
     }
 
     func testSearchUsesMockedAlgoliaResults() throws {
-        launchApp(initialSearchQuery: "Swift")
+        launchApp()
+
+        XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
+        let searchButton = app.buttons["Search"]
+        XCTAssertTrue(searchButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(searchButton.isHittable)
+        searchButton.tap()
+
+        let searchField = app.searchFields.firstMatch
+        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
+        XCTAssertTrue(searchField.isHittable)
+        searchField.tap()
+        searchField.typeText("Swift")
 
         XCTAssertTrue(app.staticTexts["Swift 6.2 Released"].waitForExistence(timeout: 8))
         XCTAssertFalse(app.staticTexts["United Airlines 767 returns to Newark after Bluetooth name sparks alert"].exists)
@@ -432,13 +449,12 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Welcome back, ui-user"].waitForExistence(timeout: 5))
     }
 
-    private func launchApp(linkBrowserMode: String = "custom", initialSearchQuery: String? = nil) {
+    private func launchApp(linkBrowserMode: BrowserMode = .custom) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         app.terminate()
-        app.launchArguments = ["--ui-testing"]
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
-        app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
-        app.launchEnvironment["HACKERS_UI_INITIAL_SEARCH_QUERY"] = initialSearchQuery ?? ""
+        app.launchEnvironment["HACKERS_UI_BROWSER_MODE"] = linkBrowserMode.rawValue
+        app.launchEnvironment["HACKERS_UI_ROUTE"] = "feed"
         app.launch()
     }
 

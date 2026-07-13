@@ -2,6 +2,29 @@ import XCTest
 
 @MainActor
 final class HackersScreenshotTests: XCTestCase {
+    private enum BrowserMode: String {
+        case custom
+        case inApp
+    }
+
+    private enum ArticleSource: String {
+        case fixture
+        case live
+    }
+
+    private enum Route {
+        case feed
+        case comments(postID: Int)
+        case story(postID: Int)
+    }
+
+    private struct LaunchConfiguration {
+        let browserMode: BrowserMode
+        var articleSource: ArticleSource = .fixture
+        var route: Route = .feed
+        var readPostIDs: [Int] = []
+    }
+
     private let screenshotPostID = 48_350_598
     private let screenshotPostTitle = "Swift 6.2 Released"
     private var app: XCUIApplication!
@@ -15,25 +38,28 @@ final class HackersScreenshotTests: XCTestCase {
     }
 
     func testAppStoreScreenshots() throws {
-        launchApp(linkBrowserMode: "inApp")
+        launchApp(configuration: LaunchConfiguration(browserMode: .inApp))
 
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts[screenshotPostTitle].waitForExistence(timeout: 5))
         snapshot("01-feed-built-for-reading")
 
-        relaunch(
-            linkBrowserMode: "custom",
-            usesArticleFixtures: false,
-            initialLinkPostID: screenshotPostID
-        )
+        relaunch(configuration: LaunchConfiguration(
+            browserMode: .custom,
+            articleSource: .live,
+            route: .story(postID: screenshotPostID)
+        ))
         waitForRealArticleContent()
         snapshot("02-open-stories-inside-hackers")
 
-        relaunch(linkBrowserMode: "inApp", initialPostID: screenshotPostID)
+        relaunch(configuration: LaunchConfiguration(
+            browserMode: .inApp,
+            route: .comments(postID: screenshotPostID)
+        ))
         waitForScreenshotComments()
         snapshot("03-read-comments-alongside-story")
 
-        relaunch(linkBrowserMode: "inApp")
+        relaunch(configuration: LaunchConfiguration(browserMode: .inApp))
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
         tapBottomBarSearchButton()
 
@@ -46,82 +72,56 @@ final class HackersScreenshotTests: XCTestCase {
         XCTAssertTrue(app.buttons["search.date.menu"].waitForExistence(timeout: 5))
         snapshot("04-search-by-popular-recent-date")
 
-        relaunch(linkBrowserMode: "inApp", readPostIDs: [48_345_248, 48_347_354, 48_345_840])
+        relaunch(configuration: LaunchConfiguration(
+            browserMode: .inApp,
+            readPostIDs: [48_345_248, 48_347_354, 48_345_840]
+        ))
         XCTAssertTrue(app.collectionViews["feed.list"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts[screenshotPostTitle].waitForExistence(timeout: 5))
         snapshot("05-dim-read-posts-across-devices")
 
-        relaunch(linkBrowserMode: "inApp", initialPostID: screenshotPostID)
+        relaunch(configuration: LaunchConfiguration(
+            browserMode: .inApp,
+            route: .comments(postID: screenshotPostID)
+        ))
         waitForScreenshotComments()
         scrollCommentsDownSlightly()
         snapshot("06-vote-reply-follow-deep-threads")
     }
 
-    private func launchApp(
-        linkBrowserMode: String,
-        usesArticleFixtures: Bool = true,
-        readPostIDs: [Int] = [],
-        initialPostID: Int? = nil,
-        initialLinkPostID: Int? = nil,
-        browserOnly: Bool = false
-    ) {
+    private func launchApp(configuration: LaunchConfiguration) {
         app = XCUIApplication(bundleIdentifier: "com.weiranzhang.Hackers")
         setupSnapshot(app)
-        configureApp(
-            linkBrowserMode: linkBrowserMode,
-            usesArticleFixtures: usesArticleFixtures,
-            readPostIDs: readPostIDs,
-            initialPostID: initialPostID,
-            initialLinkPostID: initialLinkPostID,
-            browserOnly: browserOnly
-        )
+        configureApp(configuration)
         app.launch()
     }
 
-    private func relaunch(
-        linkBrowserMode: String,
-        usesArticleFixtures: Bool = true,
-        readPostIDs: [Int] = [],
-        initialPostID: Int? = nil,
-        initialLinkPostID: Int? = nil,
-        browserOnly: Bool = false
-    ) {
+    private func relaunch(configuration: LaunchConfiguration) {
         app.terminate()
-        configureApp(
-            linkBrowserMode: linkBrowserMode,
-            usesArticleFixtures: usesArticleFixtures,
-            readPostIDs: readPostIDs,
-            initialPostID: initialPostID,
-            initialLinkPostID: initialLinkPostID,
-            browserOnly: browserOnly
-        )
+        configureApp(configuration)
         app.launch()
     }
 
-    private func configureApp(
-        linkBrowserMode: String,
-        usesArticleFixtures: Bool,
-        readPostIDs: [Int],
-        initialPostID: Int?,
-        initialLinkPostID: Int?,
-        browserOnly: Bool
-    ) {
-        appendLaunchArgument("--ui-testing")
-        appendLaunchArgument("--screenshots")
+    private func configureApp(_ configuration: LaunchConfiguration) {
         app.launchEnvironment["HACKERS_UI_TESTING"] = "1"
-        app.launchEnvironment["HACKERS_SCREENSHOTS"] = "1"
-        app.launchEnvironment["HACKERS_UI_LINK_BROWSER_MODE"] = linkBrowserMode
-        app.launchEnvironment["HACKERS_UI_ARTICLE_FIXTURES"] = usesArticleFixtures ? "1" : "0"
-        app.launchEnvironment["HACKERS_UI_DIM_READ_POSTS"] = readPostIDs.isEmpty ? "0" : "1"
-        app.launchEnvironment["HACKERS_UI_READ_POST_IDS"] = readPostIDs.map(String.init).joined(separator: ",")
-        app.launchEnvironment["HACKERS_UI_INITIAL_POST_ID"] = initialPostID.map(String.init) ?? ""
-        app.launchEnvironment["HACKERS_UI_INITIAL_LINK_POST_ID"] = initialLinkPostID.map(String.init) ?? ""
-        app.launchEnvironment["HACKERS_UI_BROWSER_ONLY"] = browserOnly ? "1" : "0"
-    }
+        app.launchEnvironment["HACKERS_UI_BROWSER_MODE"] = configuration.browserMode.rawValue
+        app.launchEnvironment["HACKERS_UI_ARTICLE_SOURCE"] = configuration.articleSource.rawValue
+        app.launchEnvironment["HACKERS_UI_READ_POST_IDS"] = configuration.readPostIDs.map(String.init).joined(separator: ",")
+        app.launchEnvironment["HACKERS_UI_DIM_READ_POSTS"] = configuration.readPostIDs.isEmpty ? "0" : "1"
+        app.launchEnvironment["HACKERS_UI_SHOW_THUMBNAILS"] = "1"
+        app.launchEnvironment.removeValue(forKey: "HACKERS_UI_POST_ID")
+        app.launchEnvironment.removeValue(forKey: "HACKERS_UI_STORY_PRESENTATION")
 
-    private func appendLaunchArgument(_ argument: String) {
-        if !app.launchArguments.contains(argument) {
-            app.launchArguments.append(argument)
+        switch configuration.route {
+        case .feed:
+            app.launchEnvironment["HACKERS_UI_ROUTE"] = "feed"
+        case let .comments(postID):
+            app.launchEnvironment["HACKERS_UI_ROUTE"] = "comments"
+            app.launchEnvironment["HACKERS_UI_POST_ID"] = String(postID)
+        case let .story(postID):
+            app.launchEnvironment["HACKERS_UI_ROUTE"] = "story"
+            app.launchEnvironment["HACKERS_UI_POST_ID"] = String(postID)
+            app.launchEnvironment["HACKERS_UI_STORY_PRESENTATION"] = "collapsedBrowser"
         }
     }
 

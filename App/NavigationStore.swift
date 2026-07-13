@@ -78,10 +78,12 @@ class NavigationStore: NavigationStoreProtocol {
             return
         }
 
-        if ProcessInfo.processInfo.environment["HACKERS_SCREENSHOTS"] == "1" {
+        #if DEBUG
+        if case .story = UITestingBootstrap.configuration?.route {
             selectedPostLinkPresentation = presentation
             return
         }
+        #endif
 
         if openURLInPrimaryContext(post.url) {
             return

@@ -56,24 +56,26 @@ struct HackersApp: App {
 
     private func handleInitialUITestingRouteIfNeeded() {
         guard !handledInitialUITestingRoute else { return }
-        guard ProcessInfo.processInfo.environment["HACKERS_SCREENSHOTS"] == "1" else { return }
+        #if DEBUG
+        guard let route = UITestingBootstrap.configuration?.route else { return }
 
-        if let linkPostID = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_LINK_POST_ID"].flatMap(Int.init) {
+        switch route {
+        case .feed:
+            handledInitialUITestingRoute = true
+        case let .story(postID, presentation):
             handledInitialUITestingRoute = true
             Task {
-                guard let post = try? await DependencyContainer.shared.getPostUseCase().getPost(id: linkPostID) else {
+                guard let post = try? await DependencyContainer.shared.getPostUseCase().getPost(id: postID) else {
                     return
                 }
                 await MainActor.run {
-                    navigationStore.showPostLink(post, presentation: .collapsedBrowser)
+                    navigationStore.showPostLink(post, presentation: presentation)
                 }
             }
-            return
-        }
-
-        if let postID = ProcessInfo.processInfo.environment["HACKERS_UI_INITIAL_POST_ID"].flatMap(Int.init) {
+        case let .comments(postID):
             handledInitialUITestingRoute = true
             navigationStore.showPost(withId: postID)
         }
+        #endif
     }
 }
