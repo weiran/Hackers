@@ -88,9 +88,15 @@ final class HackersUITests: XCTestCase {
         XCTAssertTrue(post.waitForExistence(timeout: 8))
         tapPost(post)
 
+        let firstComment = app.buttons["comments.comment.48346154"]
+        XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
+        dragCustomBrowserCommentsUp(count: 1)
+
         let titlePill = app.buttons["Cloudflare Turnstile requiring fingerprintable WebGL"]
         XCTAssertTrue(titlePill.waitForExistence(timeout: 5))
-        titlePill.tap()
+        let titlePillFrame = titlePill.frame
+        XCTAssertTrue(app.frame.contains(titlePillFrame))
+        tapAbsolutePoint(x: titlePillFrame.midX, y: titlePillFrame.midY)
 
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
