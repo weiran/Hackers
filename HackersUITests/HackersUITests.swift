@@ -91,7 +91,8 @@ final class HackersUITests: XCTestCase {
         let firstComment = app.buttons["comments.comment.48346154"]
         XCTAssertTrue(firstComment.waitForExistence(timeout: 5))
         dragCustomBrowserCommentsUp(count: 1)
-        waitForNonExistence(app.otherElements["browser.commentsSheet.handle"], timeout: 5)
+        let sheetHandle = app.otherElements["Comments sheet handle"].firstMatch
+        XCTAssertTrue(sheetHandle.waitForExistence(timeout: 5))
         let scrollStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
         let scrollEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
         scrollStart.press(forDuration: 0.05, thenDragTo: scrollEnd)
@@ -101,8 +102,13 @@ final class HackersUITests: XCTestCase {
         let titlePillFrame = titlePill.frame
         XCTAssertTrue(app.frame.contains(titlePillFrame))
         XCTAssertLessThan(titlePillFrame.maxY, 120)
+        XCTAssertLessThan(sheetHandle.frame.maxY, 120)
         tapAbsolutePoint(x: titlePillFrame.maxX - 12, y: titlePillFrame.midY)
 
+        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
+        let postTapScreenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        postTapScreenshot.lifetime = .keepAlways
+        add(postTapScreenshot)
         XCTAssertTrue(app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["HACKTIVIS.ME"].firstMatch.waitForExistence(timeout: 5))
     }
@@ -439,6 +445,15 @@ final class HackersUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         }
         XCTAssertFalse(element.exists)
+    }
+
+    private func waitForFrameMinY(of element: XCUIElement, greaterThan threshold: CGFloat, timeout: TimeInterval) {
+        let deadline = Date().addingTimeInterval(timeout)
+        while element.exists, element.frame.minY <= threshold, Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+        XCTAssertTrue(element.exists)
+        XCTAssertGreaterThan(element.frame.minY, threshold)
     }
 
     private func edgeSwipeBack() {

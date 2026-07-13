@@ -155,6 +155,7 @@ struct PostCommentsSheet: View {
                     hitAreaHeight: expandedTopDragHitAreaHeight(handleTopInset: layout.handleTopInset),
                     leadingPassthroughWidth: systemBackGestureEdgeWidth,
                     trailingPassthroughWidth: Self.expandedTopDragTrailingPassthroughWidth,
+                    onTap: collapseSheet,
                     onDragChanged: { translation in
                         presentation.updateHandleDrag(translationHeight: max(0, translation.height))
                     },
@@ -611,13 +612,15 @@ private extension PostCommentsSheet {
 }
 
 // SwiftUI toolbar items can sit above the sheet content, so this installs a
-// transparent window hit area that leaves toolbar button zones tappable.
+// transparent window hit area that handles the title zone while leaving the
+// leading and trailing toolbar button zones tappable.
 private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
     let isEnabled: Bool
     let hitAreaTop: CGFloat
     let hitAreaHeight: CGFloat
     let leadingPassthroughWidth: CGFloat
     let trailingPassthroughWidth: CGFloat
+    let onTap: () -> Void
     let onDragChanged: (_ translation: CGSize) -> Void
     let onDragEnded: (_ translation: CGSize, _ predictedTranslationHeight: CGFloat) -> Void
     let onDragCancelled: () -> Void
@@ -647,6 +650,7 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
 
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         private var recognizer: UIPanGestureRecognizer?
+        private var tapRecognizer: UITapGestureRecognizer?
         private weak var installedWindow: UIWindow?
         private weak var hitAreaView: WindowTopDragHitAreaView?
         private var configuration: ExpandedCommentsTopDragHitArea
@@ -678,17 +682,23 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
             recognizer.delaysTouchesEnded = false
             recognizer.delegate = self
             hitAreaView.addGestureRecognizer(recognizer)
+
+            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+            tapRecognizer.cancelsTouchesInView = false
+            hitAreaView.addGestureRecognizer(tapRecognizer)
             window.addSubview(hitAreaView)
 
             installedWindow = window
             self.hitAreaView = hitAreaView
             self.recognizer = recognizer
+            self.tapRecognizer = tapRecognizer
             updateHitAreaConfiguration()
         }
 
         func detach() {
             hitAreaView?.removeFromSuperview()
             recognizer = nil
+            tapRecognizer = nil
             installedWindow = nil
             hitAreaView = nil
             hasActiveDrag = false
@@ -696,6 +706,7 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
 
         private func updateHitAreaConfiguration() {
             recognizer?.isEnabled = configuration.isEnabled
+            tapRecognizer?.isEnabled = configuration.isEnabled
             hitAreaView?.isDragHitTestingEnabled = configuration.isEnabled
             hitAreaView?.hitAreaTop = configuration.hitAreaTop
             hitAreaView?.hitAreaHeight = configuration.hitAreaHeight
@@ -758,6 +769,10 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
             default:
                 break
             }
+        }
+
+        @objc private func handleTap() {
+            configuration.onTap()
         }
     }
 }
