@@ -1,5 +1,6 @@
 import XCTest
 
+@MainActor
 final class HackersUITests: XCTestCase {
     private enum BrowserMode: String {
         case custom
@@ -13,10 +14,6 @@ final class HackersUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-    }
-
-    override func tearDownWithError() throws {
-        app = nil
     }
 
     func testSmokeLaunchFeedAndSettings() throws {

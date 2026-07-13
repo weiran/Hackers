@@ -33,10 +33,6 @@ final class HackersScreenshotTests: XCTestCase {
         continueAfterFailure = false
     }
 
-    override func tearDownWithError() throws {
-        app = nil
-    }
-
     func testAppStoreScreenshots() throws {
         launchApp(configuration: LaunchConfiguration(browserMode: .inApp))
 
@@ -162,7 +158,11 @@ final class HackersScreenshotTests: XCTestCase {
         let webView = app.webViews.firstMatch
         XCTAssertTrue(webView.waitForExistence(timeout: 20))
         XCTAssertTrue(webView.staticTexts[screenshotPostTitle].waitForExistence(timeout: 20))
-        waitForScreenshotComments()
+        let collapsedHeader = app.descendants(matching: .any)
+            .matching(identifier: "browser.commentsSheet.collapsedHeader")
+            .firstMatch
+        XCTAssertTrue(collapsedHeader.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.frame.intersects(collapsedHeader.frame))
     }
 
     private var isWideLayout: Bool {
