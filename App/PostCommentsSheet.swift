@@ -874,21 +874,23 @@ private struct CommentsSheetTopChrome: View {
     private var morphingChrome: some View {
         Button(action: onTitleTap) {
             ZStack {
-                ZStack {
-                    if let post {
-                        CommentsHeaderTitlePillContent(
-                            post: post,
-                            showThumbnails: showThumbnails,
-                            maximumWidth: titleMaximumWidth
-                        )
-                            .opacity(titleContentProgress)
+                if glassSurfaceOpacity > 0 {
+                    ZStack {
+                        if let post {
+                            CommentsHeaderTitlePillContent(
+                                post: post,
+                                showThumbnails: showThumbnails,
+                                maximumWidth: titleMaximumWidth
+                            )
+                                .opacity(titleContentProgress)
+                        }
                     }
+                    .frame(width: morphWidth, height: morphHeight)
+                    .clipShape(.capsule)
+                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .glassEffectTransition(.identity)
+                    .opacity(glassSurfaceOpacity)
                 }
-                .frame(width: morphWidth, height: morphHeight)
-                .clipShape(.capsule)
-                .glassEffect(.regular.interactive(), in: .capsule)
-                .opacity(glassSurfaceOpacity)
-
                 Capsule()
                     .fill(.secondary.opacity(0.52))
                     .frame(width: handleWidth, height: handleThickness)
