@@ -328,7 +328,7 @@ final class HackersUITests: XCTestCase {
         tapAbsolutePoint(x: parent.frame.minX + 8, y: parent.frame.minY + 8)
 
         waitForNonExistence(firstChild, timeout: 2)
-        XCTAssertTrue(parent.waitForExistence(timeout: 2))
+        assertHasVisibleIntersection(parent, in: app, timeout: 2)
 
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
@@ -338,15 +338,16 @@ final class HackersUITests: XCTestCase {
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)).tap()
 
         waitForNonExistence(firstChild, timeout: 2)
-        XCTAssertTrue(parent.waitForExistence(timeout: 2))
+        assertHasVisibleIntersection(parent, in: app, timeout: 2)
 
         parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(firstChild.waitForExistence(timeout: 2))
+        assertHasVisibleIntersection(parent, in: app, timeout: 2)
 
         tapAbsolutePoint(x: parent.frame.maxX - 8, y: parent.frame.minY + 8)
 
         waitForNonExistence(firstChild, timeout: 2)
-        XCTAssertTrue(parent.waitForExistence(timeout: 2))
+        assertHasVisibleIntersection(parent, in: app, timeout: 2)
     }
 
     func testSystemBackSwipeFromCustomBrowserCollapsedComments() throws {
@@ -605,7 +606,16 @@ final class HackersUITests: XCTestCase {
     }
 
     private func tapPost(_ post: XCUIElement) {
-        let frame = post.frame
+        guard let visiblePost = waitForStableRenderedCandidate(
+            matching: post,
+            in: app,
+            timeout: 2,
+            requiresHittable: true
+        ) else {
+            XCTFail("Expected a visible post candidate before tapping: \(post)")
+            return
+        }
+        let frame = visiblePost.frame
         tapAbsolutePoint(x: frame.midX, y: frame.midY)
     }
 
@@ -630,8 +640,8 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        guard waitForStableRenderedFrame(
-            of: element,
+        guard waitForStableRenderedCandidate(
+            matching: element,
             in: app,
             timeout: timeout,
             requiresHittable: true
@@ -648,8 +658,8 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        guard waitForStableRenderedFrame(
-            of: element,
+        guard waitForStableRenderedCandidate(
+            matching: element,
             in: container,
             timeout: timeout,
             requiresFullContainment: true
@@ -670,7 +680,11 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        guard waitForStableRenderedFrame(of: element, in: container, timeout: timeout) != nil else {
+        guard waitForStableRenderedCandidate(
+            matching: element,
+            in: container,
+            timeout: timeout
+        ) != nil else {
             XCTFail(
                 "Expected element to become meaningfully visible in \(container): \(element)",
                 file: file,
@@ -768,22 +782,60 @@ final class HackersUITests: XCTestCase {
         _ = waitForStableFrame(of: element, timeout: timeout) { _ in true }
     }
 
-    private func waitForStableRenderedFrame(
-        of element: XCUIElement,
+    private func waitForStableRenderedCandidate(
+        matching element: XCUIElement,
         in container: XCUIElement,
         timeout: TimeInterval,
         requiresHittable: Bool = false,
         requiresFullContainment: Bool = false
-    ) -> CGRect? {
-        waitForStableFrame(of: element, timeout: timeout) { frame in
-            guard container.exists else { return false }
-            if requiresHittable, !element.isHittable { return false }
-            let containerFrame = container.frame
-            if requiresFullContainment {
-                return containerFrame.insetBy(dx: -1, dy: -1).contains(frame)
+    ) -> XCUIElement? {
+        let deadline = Date().addingTimeInterval(timeout)
+        var previousFrame: CGRect?
+        var stableSampleCount = 0
+
+        repeat {
+            let candidates: [XCUIElement]
+            if element.exists, !element.identifier.isEmpty {
+                let matches = app.descendants(matching: .any)
+                    .matching(identifier: element.identifier)
+                    .allElementsBoundByIndex
+                candidates = matches.isEmpty ? [element] : matches
+            } else {
+                candidates = [element]
             }
-            return isMeaningfullyVisible(frame, in: containerFrame)
-        }
+
+            if container.exists,
+               let candidate = candidates.first(where: { candidate in
+                   guard candidate.exists else { return false }
+                   if requiresHittable, !candidate.isHittable { return false }
+                   let frame = candidate.frame
+                   guard !frame.isEmpty, !frame.isNull else { return false }
+                   let containerFrame = container.frame
+                   if requiresFullContainment {
+                       return containerFrame.insetBy(dx: -1, dy: -1).contains(frame)
+                   }
+                   return isMeaningfullyVisible(frame, in: containerFrame)
+               }) {
+                let frame = candidate.frame
+                if let previousFrame, framesAreStable(previousFrame, frame) {
+                    stableSampleCount += 1
+                } else {
+                    stableSampleCount = 1
+                }
+                previousFrame = frame
+                if stableSampleCount >= 3 {
+                    return candidate
+                }
+            } else {
+                previousFrame = nil
+                stableSampleCount = 0
+            }
+
+            guard Date() < deadline else { break }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        } while true
+
+        return nil
     }
 
     private func waitForStableFrame(

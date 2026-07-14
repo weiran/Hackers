@@ -95,7 +95,10 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         ]
 
         if !readPostIDs.isEmpty {
-            environment[EnvironmentKey.readPostIDs.rawValue] = readPostIDs.sorted().map(String.init).joined(separator: ",")
+            environment[EnvironmentKey.readPostIDs.rawValue] = readPostIDs
+                .sorted()
+                .map(String.init)
+                .joined(separator: ",")
         }
 
         switch route {
@@ -114,104 +117,23 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     }
 
     public static func parse(environment: [String: String]) throws -> UITestLaunchConfiguration? {
-        let testingKey = EnvironmentKey.testing.rawValue
-        guard let testingValue = environment[testingKey] else { return nil }
-        switch testingValue {
-        case "0": return nil
-        case "1": break
-        default: throw ParseError.invalidValue(key: testingKey, value: testingValue)
-        }
+        guard try isTestingEnabled(in: environment) else { return nil }
+        try validateKnownKeys(in: environment)
 
-        let supportedKeys = Set(EnvironmentKey.allCases.map(\.rawValue))
-        if let unknownKey = environment.keys
-            .filter({ $0.hasPrefix("HACKERS_UI_") && !supportedKeys.contains($0) })
-            .sorted()
-            .first {
-            throw ParseError.unknownKey(unknownKey)
-        }
+        let route = try parseRoute(in: environment)
+        let browserMode = try parseBrowserMode(in: environment)
+        try validate(route: route, browserMode: browserMode)
 
-        let routeKey = EnvironmentKey.route.rawValue
-        let postIDKey = EnvironmentKey.postID.rawValue
-        let presentationKey = EnvironmentKey.storyPresentation.rawValue
-        let routeName = environment[routeKey] ?? "feed"
-        let postID = try optionalPositiveInteger(environment[postIDKey], key: postIDKey)
-        let presentationValue = environment[presentationKey]
-
-        let route: Route
-        switch routeName {
-        case "feed":
-            if postID != nil {
-                throw ParseError.unexpectedValue(key: postIDKey, route: routeName)
-            }
-            if presentationValue != nil {
-                throw ParseError.unexpectedValue(key: presentationKey, route: routeName)
-            }
-            route = .feed
-        case "comments":
-            guard let postID else {
-                throw ParseError.missingValue(key: postIDKey, route: routeName)
-            }
-            if presentationValue != nil {
-                throw ParseError.unexpectedValue(key: presentationKey, route: routeName)
-            }
-            route = .comments(postID: postID)
-        case "story":
-            guard let postID else {
-                throw ParseError.missingValue(key: postIDKey, route: routeName)
-            }
-            let presentation: PostLinkPresentation
-            switch presentationValue ?? "collapsedBrowser" {
-            case "collapsedBrowser": presentation = .collapsedBrowser
-            case "expandedComments": presentation = .expandedComments
-            case let value:
-                throw ParseError.invalidValue(key: presentationKey, value: value)
-            }
-            route = .story(postID: postID, presentation: presentation)
-        case let value:
-            throw ParseError.invalidValue(key: routeKey, value: value)
-        }
-
-        let browserModeKey = EnvironmentKey.browserMode.rawValue
-        let browserMode: LinkBrowserMode
-        switch environment[browserModeKey] ?? "custom" {
-        case "custom": browserMode = .customBrowser
-        case "inApp": browserMode = .inAppBrowser
-        case "system":
-            throw ParseError.unsupportedBrowserMode("system")
-        case let value:
-            throw ParseError.invalidValue(key: browserModeKey, value: value)
-        }
-
-        if case .story = route, browserMode != .customBrowser {
-            throw ParseError.incompatibleValues(
-                key: routeKey,
-                value: routeName,
-                otherKey: browserModeKey,
-                otherValue: browserMode.environmentValue
-            )
-        }
-
-        let articleSourceKey = EnvironmentKey.articleSource.rawValue
-        let articleSource: ArticleSource
-        if let value = environment[articleSourceKey] {
-            guard let parsedValue = ArticleSource(rawValue: value) else {
-                throw ParseError.invalidValue(key: articleSourceKey, value: value)
-            }
-            articleSource = parsedValue
-        } else {
-            articleSource = .fixture
-        }
-
-        let fixtureProfileKey = EnvironmentKey.fixtureProfile.rawValue
-        let fixtureProfile: FixtureProfile
-        if let value = environment[fixtureProfileKey] {
-            guard let parsedValue = FixtureProfile(rawValue: value) else {
-                throw ParseError.invalidValue(key: fixtureProfileKey, value: value)
-            }
-            fixtureProfile = parsedValue
-        } else {
-            fixtureProfile = .functional
-        }
+        let articleSource = try enumValue(
+            environment[EnvironmentKey.articleSource.rawValue],
+            key: .articleSource,
+            default: ArticleSource.fixture
+        )
+        let fixtureProfile = try enumValue(
+            environment[EnvironmentKey.fixtureProfile.rawValue],
+            key: .fixtureProfile,
+            default: FixtureProfile.functional
+        )
 
         let readPostIDsKey = EnvironmentKey.readPostIDs.rawValue
         let dimReadPostsKey = EnvironmentKey.dimReadPosts.rawValue
@@ -229,6 +151,104 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             dimReadPosts: dimReadPosts,
             showThumbnails: showThumbnails
         )
+    }
+
+    private static func isTestingEnabled(in environment: [String: String]) throws -> Bool {
+        let key = EnvironmentKey.testing.rawValue
+        guard let value = environment[key] else { return false }
+        switch value {
+        case "0": return false
+        case "1": return true
+        default: throw ParseError.invalidValue(key: key, value: value)
+        }
+    }
+
+    private static func validateKnownKeys(in environment: [String: String]) throws {
+        let supportedKeys = Set(EnvironmentKey.allCases.map(\.rawValue))
+        if let unknownKey = environment.keys
+            .filter({ $0.hasPrefix("HACKERS_UI_") && !supportedKeys.contains($0) })
+            .sorted()
+            .first {
+            throw ParseError.unknownKey(unknownKey)
+        }
+    }
+
+    private static func parseRoute(in environment: [String: String]) throws -> Route {
+        let routeKey = EnvironmentKey.route.rawValue
+        let postIDKey = EnvironmentKey.postID.rawValue
+        let presentationKey = EnvironmentKey.storyPresentation.rawValue
+        let routeName = environment[routeKey] ?? "feed"
+        let postID = try optionalPositiveInteger(environment[postIDKey], key: postIDKey)
+        let presentationValue = environment[presentationKey]
+
+        switch routeName {
+        case "feed":
+            try reject(postID.map(String.init), key: postIDKey, route: routeName)
+            try reject(presentationValue, key: presentationKey, route: routeName)
+            return .feed
+        case "comments":
+            guard let postID else {
+                throw ParseError.missingValue(key: postIDKey, route: routeName)
+            }
+            try reject(presentationValue, key: presentationKey, route: routeName)
+            return .comments(postID: postID)
+        case "story":
+            guard let postID else {
+                throw ParseError.missingValue(key: postIDKey, route: routeName)
+            }
+            return .story(
+                postID: postID,
+                presentation: try parsePresentation(presentationValue, key: presentationKey)
+            )
+        case let value:
+            throw ParseError.invalidValue(key: routeKey, value: value)
+        }
+    }
+
+    private static func parsePresentation(_ value: String?, key: String) throws -> PostLinkPresentation {
+        switch value ?? "collapsedBrowser" {
+        case "collapsedBrowser": return .collapsedBrowser
+        case "expandedComments": return .expandedComments
+        case let value: throw ParseError.invalidValue(key: key, value: value)
+        }
+    }
+
+    private static func parseBrowserMode(in environment: [String: String]) throws -> LinkBrowserMode {
+        let key = EnvironmentKey.browserMode.rawValue
+        switch environment[key] ?? "custom" {
+        case "custom": return .customBrowser
+        case "inApp": return .inAppBrowser
+        case "system": throw ParseError.unsupportedBrowserMode("system")
+        case let value: throw ParseError.invalidValue(key: key, value: value)
+        }
+    }
+
+    private static func validate(route: Route, browserMode: LinkBrowserMode) throws {
+        guard case .story = route, browserMode != .customBrowser else { return }
+        throw ParseError.incompatibleValues(
+            key: EnvironmentKey.route.rawValue,
+            value: "story",
+            otherKey: EnvironmentKey.browserMode.rawValue,
+            otherValue: browserMode.environmentValue
+        )
+    }
+
+    private static func reject(_ value: String?, key: String, route: String) throws {
+        guard value == nil else {
+            throw ParseError.unexpectedValue(key: key, route: route)
+        }
+    }
+
+    private static func enumValue<Value: RawRepresentable>(
+        _ value: String?,
+        key: EnvironmentKey,
+        default defaultValue: Value
+    ) throws -> Value where Value.RawValue == String {
+        guard let value else { return defaultValue }
+        guard let parsedValue = Value(rawValue: value) else {
+            throw ParseError.invalidValue(key: key.rawValue, value: value)
+        }
+        return parsedValue
     }
 
     private static func optionalPositiveInteger(_ value: String?, key: String) throws -> Int? {

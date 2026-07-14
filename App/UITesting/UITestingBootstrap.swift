@@ -4,8 +4,6 @@ import Foundation
 import Shared
 import SwiftUI
 
-// swiftlint:disable type_body_length function_body_length
-
 enum UITestingBootstrap {
     static let postID = 48_350_598
     static let configuration: UITestLaunchConfiguration? = {
@@ -65,6 +63,7 @@ enum UITestingBootstrap {
     }
 }
 
+// swiftlint:disable:next type_body_length
 final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @unchecked Sendable {
     static let largeCommentsPostID = 48_399_999
     static let searchOnlyPostID = 48_400_101
@@ -86,6 +85,16 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         }
     }
 
+    private struct PostFixture {
+        let id: Int
+        let url: String
+        let title: String
+        let age: String
+        let commentsCount: Int
+        let by: String
+        let score: Int
+    }
+
     private let posts: [Post]
     private let searchPosts: [Post]
     private let commentsByPostID: [Int: [Comment]]
@@ -104,207 +113,36 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         searchPosts = [Self.makeSearchOnlyPost()] + posts
     }
 
+    // Fixture rows intentionally stay compact so the test bootstrap remains navigable.
+    // swiftlint:disable line_length
+    private static let activePostFixtures: [PostFixture] = [
+        PostFixture(id: 48_345_248, url: "https://simpleflying.com/united-airlines-767-returns-newark-bluetooth-name-alert/", title: "United Airlines 767 returns to Newark after Bluetooth name sparks alert", age: "21 hours ago", commentsCount: 689, by: "Eridanus2", score: 355),
+        PostFixture(id: 48_347_354, url: "https://techcrunch.com/2026/05/27/meta-officially-launches-instagram-facebook-and-whatsapp-subscriptions-with-more-to-come-including-ai-plans/", title: "Meta launches Instagram, Facebook, and WhatsApp subscriptions", age: "16 hours ago", commentsCount: 354, by: "tambourine_man", score: 224),
+        PostFixture(id: 48_345_840, url: "https://hacktivis.me/articles/cloudflare-turnstile-webgl-fingerprinting", title: "Cloudflare Turnstile requiring fingerprintable WebGL", age: "19 hours ago", commentsCount: 366, by: "HypnoticOcelot", score: 675),
+        PostFixture(id: UITestingBootstrap.postID, url: "https://www.swift.org/blog/swift-6.2-released/", title: "Swift 6.2 Released", age: "10 hours ago", commentsCount: 202, by: "swiftlang", score: 279),
+        PostFixture(id: 48_349_527, url: "https://arstechnica.com/health/2026/05/us-healthcare-still-stupidly-expensive-with-pathetic-outcomes-study-finds/", title: "US healthcare still stupidly expensive, with pathetic outcomes, study finds", age: "13 hours ago", commentsCount: 161, by: "rbanffy", score: 142),
+        PostFixture(id: 48_353_497, url: "https://apnews.com/article/malaysia-social-media-ban-16-bfaa7b01163b61b5d53c4ecfa870d133", title: "Malaysia enforces ban on social media accounts for children younger than 16", age: "2 hours ago", commentsCount: 104, by: "01-_-", score: 118),
+        PostFixture(id: 48_346_257, url: "https://prismml.com/news/bonsai-image-4b", title: "1-Bit Bonsai Image 4B Image Generation for Local Devices", age: "18 hours ago", commentsCount: 153, by: "modinfo", score: 388),
+        PostFixture(id: 48_348_864, url: "https://variety.com/2026/film/box-office/backrooms-box-office-record-opening-weekend-obsession-jumps-star-wars-crumbles-1236763355/", title: "'Backrooms' Stuns with $81M Debut", age: "14 hours ago", commentsCount: 125, by: "mindcrime", score: 198),
+        PostFixture(id: 48_350_149, url: "https://mail.cyberneticforests.com/its-not-just-data-its-post-training/", title: "It's Not Just X. It's Y", age: "12 hours ago", commentsCount: 128, by: "mooreds", score: 158),
+        PostFixture(id: 48_345_896, url: "https://thoughts.hmmz.org/2026-05-31.html", title: "The solution might be cancelling my AI subscription", age: "19 hours ago", commentsCount: 229, by: "dmw_ng", score: 360),
+        PostFixture(id: 48_345_282, url: "https://paulgraham.com/boss.html", title: "You weren't meant to have a boss (2008)", age: "21 hours ago", commentsCount: 155, by: "downbad_", score: 133),
+        PostFixture(id: 48_344_961, url: "https://jbkempf.com/blog/2026/dav2d/", title: "Dav2d", age: "22 hours ago", commentsCount: 173, by: "captain_bender", score: 487),
+        PostFixture(id: 48_349_487, url: "https://www.promptarmor.com/resources/gpt-for-google-sheets-data-exfiltration", title: "ChatGPT for Google Sheets exfiltrates workbooks", age: "13 hours ago", commentsCount: 75, by: "hackerBanana", score: 216),
+        PostFixture(id: 48_345_694, url: "https://blog.tymscar.com/posts/v100localllm/", title: "I put a datacenter GPU in my gaming PC", age: "20 hours ago", commentsCount: 171, by: "birdculture", score: 305),
+        PostFixture(id: 48_352_939, url: "https://www.nvidia.com/en-us/products/rtx-spark/", title: "Nvidia RTX Spark", age: "4 hours ago", commentsCount: 65, by: "shenli3514", score: 72),
+        PostFixture(id: 48_350_131, url: "https://peninsulaforeveryone.org/blog/atherton-spent-145k-to-delay-caltrain-electrification-the-rest-of-us-paid-400-million-and-waited-3-extra-years/", title: "Atherton spent $145K to delay train electrification. The rest of us paid $400M", age: "12 hours ago", commentsCount: 91, by: "mslate", score: 194),
+        PostFixture(id: 48_347_153, url: "https://darylcecile.net/notes/speed-of-prototyping-age-of-ai", title: "The Speed of Prototyping in the Age of AI", age: "17 hours ago", commentsCount: 83, by: "mooreds", score: 163),
+        PostFixture(id: 48_340_411, url: "https://www.brethorsting.com/blog/2026/05/domain-expertise-has-always-been-the-real-moat/", title: "Domain expertise has always been the real moat", age: "1 day ago", commentsCount: 526, by: "aaronbrethorst", score: 834),
+        PostFixture(id: 48_352_627, url: "https://blogs.windows.com/devices/2026/05/31/introducing-surface-laptop-ultra-made-for-world-makers/", title: "Surface Laptop Ultra: Made for World Makers", age: "5 hours ago", commentsCount: 56, by: "berlianta", score: 30),
+        PostFixture(id: 48_343_683, url: "https://specification.website/", title: "The Website Specification", age: "1 day ago", commentsCount: 200, by: "k1m", score: 501),
+        PostFixture(id: 48_346_693, url: "https://github.com/pewdiepie-archdaemon/odysseus", title: "Odysseus - self-hosted AI workspace", age: "18 hours ago", commentsCount: 82, by: "Dzheky", score: 175),
+        PostFixture(id: 48_345_090, url: "https://www.lucasfcosta.com/blog/backpressure-is-all-you-need", title: "Backpressure is all you need", age: "21 hours ago", commentsCount: 103, by: "lucasfcosta", score: 190)
+    ]
+    // swiftlint:enable line_length
+
     private static func makeActivePosts() -> [Post] {
-        [
-            makePost(
-                id: 48_345_248,
-                url: "https://simpleflying.com/united-airlines-767-returns-newark-bluetooth-name-alert/",
-                title: "United Airlines 767 returns to Newark after Bluetooth name sparks alert",
-                age: "21 hours ago",
-                commentsCount: 689,
-                by: "Eridanus2",
-                score: 355
-            ),
-            makePost(
-                id: 48_347_354,
-                url: "https://techcrunch.com/2026/05/27/meta-officially-launches-instagram-facebook-and-whatsapp-subscriptions-with-more-to-come-including-ai-plans/",
-                title: "Meta launches Instagram, Facebook, and WhatsApp subscriptions",
-                age: "16 hours ago",
-                commentsCount: 354,
-                by: "tambourine_man",
-                score: 224
-            ),
-            makePost(
-                id: 48_345_840,
-                url: "https://hacktivis.me/articles/cloudflare-turnstile-webgl-fingerprinting",
-                title: "Cloudflare Turnstile requiring fingerprintable WebGL",
-                age: "19 hours ago",
-                commentsCount: 366,
-                by: "HypnoticOcelot",
-                score: 675
-            ),
-            makePost(
-                id: UITestingBootstrap.postID,
-                url: "https://www.swift.org/blog/swift-6.2-released/",
-                title: "Swift 6.2 Released",
-                age: "10 hours ago",
-                commentsCount: 202,
-                by: "swiftlang",
-                score: 279
-            ),
-            makePost(
-                id: 48_349_527,
-                url: "https://arstechnica.com/health/2026/05/us-healthcare-still-stupidly-expensive-with-pathetic-outcomes-study-finds/",
-                title: "US healthcare still stupidly expensive, with pathetic outcomes, study finds",
-                age: "13 hours ago",
-                commentsCount: 161,
-                by: "rbanffy",
-                score: 142
-            ),
-            makePost(
-                id: 48_353_497,
-                url: "https://apnews.com/article/malaysia-social-media-ban-16-bfaa7b01163b61b5d53c4ecfa870d133",
-                title: "Malaysia enforces ban on social media accounts for children younger than 16",
-                age: "2 hours ago",
-                commentsCount: 104,
-                by: "01-_-",
-                score: 118
-            ),
-            makePost(
-                id: 48_346_257,
-                url: "https://prismml.com/news/bonsai-image-4b",
-                title: "1-Bit Bonsai Image 4B Image Generation for Local Devices",
-                age: "18 hours ago",
-                commentsCount: 153,
-                by: "modinfo",
-                score: 388
-            ),
-            makePost(
-                id: 48_348_864,
-                url: "https://variety.com/2026/film/box-office/backrooms-box-office-record-opening-weekend-obsession-jumps-star-wars-crumbles-1236763355/",
-                title: "'Backrooms' Stuns with $81M Debut",
-                age: "14 hours ago",
-                commentsCount: 125,
-                by: "mindcrime",
-                score: 198
-            ),
-            makePost(
-                id: 48_350_149,
-                url: "https://mail.cyberneticforests.com/its-not-just-data-its-post-training/",
-                title: "It's Not Just X. It's Y",
-                age: "12 hours ago",
-                commentsCount: 128,
-                by: "mooreds",
-                score: 158
-            ),
-            makePost(
-                id: 48_345_896,
-                url: "https://thoughts.hmmz.org/2026-05-31.html",
-                title: "The solution might be cancelling my AI subscription",
-                age: "19 hours ago",
-                commentsCount: 229,
-                by: "dmw_ng",
-                score: 360
-            ),
-            makePost(
-                id: 48_345_282,
-                url: "https://paulgraham.com/boss.html",
-                title: "You weren't meant to have a boss (2008)",
-                age: "21 hours ago",
-                commentsCount: 155,
-                by: "downbad_",
-                score: 133
-            ),
-            makePost(
-                id: 48_344_961,
-                url: "https://jbkempf.com/blog/2026/dav2d/",
-                title: "Dav2d",
-                age: "22 hours ago",
-                commentsCount: 173,
-                by: "captain_bender",
-                score: 487
-            ),
-            makePost(
-                id: 48_349_487,
-                url: "https://www.promptarmor.com/resources/gpt-for-google-sheets-data-exfiltration",
-                title: "ChatGPT for Google Sheets exfiltrates workbooks",
-                age: "13 hours ago",
-                commentsCount: 75,
-                by: "hackerBanana",
-                score: 216
-            ),
-            makePost(
-                id: 48_345_694,
-                url: "https://blog.tymscar.com/posts/v100localllm/",
-                title: "I put a datacenter GPU in my gaming PC",
-                age: "20 hours ago",
-                commentsCount: 171,
-                by: "birdculture",
-                score: 305
-            ),
-            makePost(
-                id: 48_352_939,
-                url: "https://www.nvidia.com/en-us/products/rtx-spark/",
-                title: "Nvidia RTX Spark",
-                age: "4 hours ago",
-                commentsCount: 65,
-                by: "shenli3514",
-                score: 72
-            ),
-            makePost(
-                id: 48_350_131,
-                url: "https://peninsulaforeveryone.org/blog/atherton-spent-145k-to-delay-caltrain-electrification-the-rest-of-us-paid-400-million-and-waited-3-extra-years/",
-                title: "Atherton spent $145K to delay train electrification. The rest of us paid $400M",
-                age: "12 hours ago",
-                commentsCount: 91,
-                by: "mslate",
-                score: 194
-            ),
-            makePost(
-                id: 48_347_153,
-                url: "https://darylcecile.net/notes/speed-of-prototyping-age-of-ai",
-                title: "The Speed of Prototyping in the Age of AI",
-                age: "17 hours ago",
-                commentsCount: 83,
-                by: "mooreds",
-                score: 163
-            ),
-            makePost(
-                id: 48_340_411,
-                url: "https://www.brethorsting.com/blog/2026/05/domain-expertise-has-always-been-the-real-moat/",
-                title: "Domain expertise has always been the real moat",
-                age: "1 day ago",
-                commentsCount: 526,
-                by: "aaronbrethorst",
-                score: 834
-            ),
-            makePost(
-                id: 48_352_627,
-                url: "https://blogs.windows.com/devices/2026/05/31/introducing-surface-laptop-ultra-made-for-world-makers/",
-                title: "Surface Laptop Ultra: Made for World Makers",
-                age: "5 hours ago",
-                commentsCount: 56,
-                by: "berlianta",
-                score: 30
-            ),
-            makePost(
-                id: 48_343_683,
-                url: "https://specification.website/",
-                title: "The Website Specification",
-                age: "1 day ago",
-                commentsCount: 200,
-                by: "k1m",
-                score: 501
-            ),
-            makePost(
-                id: 48_346_693,
-                url: "https://github.com/pewdiepie-archdaemon/odysseus",
-                title: "Odysseus - self-hosted AI workspace",
-                age: "18 hours ago",
-                commentsCount: 82,
-                by: "Dzheky",
-                score: 175
-            ),
-            makePost(
-                id: 48_345_090,
-                url: "https://www.lucasfcosta.com/blog/backpressure-is-all-you-need",
-                title: "Backpressure is all you need",
-                age: "21 hours ago",
-                commentsCount: 103,
-                by: "lucasfcosta",
-                score: 190
-            )
-        ]
+        activePostFixtures.map(makePost)
     }
 
     private static func makeMarketingPosts(from posts: [Post]) -> [Post] {
@@ -323,7 +161,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     }
 
     private static func makeLargeCommentsPost() -> Post {
-        makePost(
+        makePost(PostFixture(
             id: largeCommentsPostID,
             url: "https://example.com/ui-test-large-comments",
             title: "UI Test: Large Comments Stress Fixture",
@@ -331,11 +169,11 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             commentsCount: 720,
             by: "perf_fixture",
             score: 999
-        )
+        ))
     }
 
     private static func makeSearchOnlyPost() -> Post {
-        makePost(
+        makePost(PostFixture(
             id: searchOnlyPostID,
             url: "https://www.swift.org/documentation/migration-guide/",
             title: "Swift 6.2 Migration Guide",
@@ -343,30 +181,22 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             commentsCount: 42,
             by: "swiftlang",
             score: 188
-        )
+        ))
     }
 
-    private static func makePost(
-        id: Int,
-        url: String,
-        title: String,
-        age: String,
-        commentsCount: Int,
-        by: String,
-        score: Int
-    ) -> Post {
+    private static func makePost(_ fixture: PostFixture) -> Post {
         Post(
-            id: id,
-            url: URL(string: url)!,
-            title: title,
-            age: age,
-            commentsCount: commentsCount,
-            by: by,
-            score: score,
+            id: fixture.id,
+            url: URL(string: fixture.url)!,
+            title: fixture.title,
+            age: fixture.age,
+            commentsCount: fixture.commentsCount,
+            by: fixture.by,
+            score: fixture.score,
             postType: .news,
             upvoted: false,
             voteLinks: VoteLinks(
-                upvote: URL(string: "https://news.ycombinator.com/vote?id=\(id)&how=up&goto=news"),
+                upvote: URL(string: "https://news.ycombinator.com/vote?id=\(fixture.id)&how=up&goto=news"),
                 unvote: nil
             )
         )
@@ -391,7 +221,9 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     }
 
     func getPost(id: Int) async throws -> Post {
-        guard var post = posts.first(where: { $0.id == id }) ?? [askPost, showPost, jobPost].first(where: { $0.id == id }) else {
+        let categoryPosts = [askPost, showPost, jobPost]
+        guard var post = posts.first(where: { $0.id == id })
+            ?? categoryPosts.first(where: { $0.id == id }) else {
             throw HackersKitError.scraperError
         }
         post.comments = commentsByPostID[id] ?? []
@@ -501,6 +333,9 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         )
     }
 
+    // Comment copy mirrors wrapped UI content, so keeping each fixture together is easier to audit.
+    // swiftlint:disable line_length
+    // swiftlint:disable:next function_body_length
     private static func makeCommentsByPostID() -> [Int: [Comment]] {
         [
             largeCommentsPostID: makeLargeCommentThread(count: 720),
@@ -853,6 +688,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             ]
         ]
     }
+    // swiftlint:enable line_length
 
     private static func makeComment(id: Int, by: String, age: String, text: String, level: Int = 0) -> Comment {
         Comment(
@@ -863,7 +699,10 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             level: level,
             upvoted: false,
             voteLinks: VoteLinks(
-                upvote: URL(string: "https://news.ycombinator.com/vote?id=\(id)&how=up&goto=item%3Fid%3D\(UITestingBootstrap.postID)"),
+                upvote: URL(
+                    string: "https://news.ycombinator.com/vote?id=\(id)&how=up"
+                        + "&goto=item%3Fid%3D\(UITestingBootstrap.postID)"
+                ),
                 unvote: nil
             )
         )
@@ -894,9 +733,13 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     }
 
     private static func largeCommentText(index: Int) -> String {
-        """
-        This deterministic comment row \(index) is part of a large UI-test discussion. It includes enough text to exercise wrapping, attributed text rendering, row measurement, lazy layout, and scrolling without relying on live Hacker News data. The point is to make performance problems visible when the comments panel is expanded inside the custom browser sheet.
-        """
+        [
+            "This deterministic comment row \(index) is part of a large UI-test discussion.",
+            "It includes enough text to exercise wrapping, attributed text rendering, row measurement,",
+            "lazy layout, and scrolling without relying on live Hacker News data.",
+            "The point is to make performance problems visible when the comments panel is expanded",
+            "inside the custom browser sheet."
+        ].joined(separator: " ")
     }
 }
 
@@ -964,7 +807,7 @@ final class UITestReadStatusUseCase: ReadStatusUseCase, @unchecked Sendable {
 
     func markPostRead(id: Int) async {
         lock.withLock {
-            readIDs.insert(id)
+            _ = readIDs.insert(id)
         }
     }
 }
@@ -995,7 +838,10 @@ final class UITestAuthenticationUseCase: AuthenticationUseCase, @unchecked Senda
     }
 }
 
-final class UITestVotingStateProvider: VoteUseCase, VotingStateProvider, CommentVotingStateProvider, @unchecked Sendable {
+final class UITestVotingStateProvider: VoteUseCase,
+    VotingStateProvider,
+    CommentVotingStateProvider,
+    @unchecked Sendable {
     private let lock = NSLock()
     private var upvotedIDs: Set<Int> = []
 
@@ -1012,27 +858,27 @@ final class UITestVotingStateProvider: VoteUseCase, VotingStateProvider, Comment
     }
 
     func upvote(post: Post) async throws {
-        lock.withLock { upvotedIDs.insert(post.id) }
+        lock.withLock { _ = upvotedIDs.insert(post.id) }
     }
 
     func upvote(comment: Comment, for post: Post) async throws {
-        lock.withLock { upvotedIDs.insert(comment.id) }
+        lock.withLock { _ = upvotedIDs.insert(comment.id) }
     }
 
     func unvote(post: Post) async throws {
-        lock.withLock { upvotedIDs.remove(post.id) }
+        lock.withLock { _ = upvotedIDs.remove(post.id) }
     }
 
     func unvote(comment: Comment, for post: Post) async throws {
-        lock.withLock { upvotedIDs.remove(comment.id) }
+        lock.withLock { _ = upvotedIDs.remove(comment.id) }
     }
 
     func upvote(item: any Votable) async throws {
-        lock.withLock { upvotedIDs.insert(item.id) }
+        lock.withLock { _ = upvotedIDs.insert(item.id) }
     }
 
     func unvote(item: any Votable) async throws {
-        lock.withLock { upvotedIDs.remove(item.id) }
+        lock.withLock { _ = upvotedIDs.remove(item.id) }
     }
 
     func upvoteComment(_ comment: Comment, for post: Post) async throws {
