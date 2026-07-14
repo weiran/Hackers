@@ -496,6 +496,57 @@ private struct UITestArticleView: View {
 }
 #endif
 
+@MainActor
+private struct NavigationBackSwipeRestorer: UIViewControllerRepresentable {
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIViewController(context: Context) -> RestoringViewController {
+        let viewController = RestoringViewController()
+        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
+            coordinator?.enableBackSwipe(on: navigationController)
+        }
+        return viewController
+    }
+
+    func updateUIViewController(_ viewController: RestoringViewController, context: Context) {
+        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
+            coordinator?.enableBackSwipe(on: navigationController)
+        }
+
+        DispatchQueue.main.async {
+            context.coordinator.enableBackSwipe(on: viewController.navigationController)
+        }
+    }
+
+    static func dismantleUIViewController(_ viewController: RestoringViewController, coordinator _: Coordinator) {
+        viewController.onNavigationControllerChange = nil
+    }
+
+    final class RestoringViewController: UIViewController {
+        var onNavigationControllerChange: ((UINavigationController?) -> Void)?
+
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            onNavigationControllerChange?(navigationController)
+        }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            onNavigationControllerChange?(navigationController)
+        }
+    }
+
+    @MainActor
+    final class Coordinator {
+        func enableBackSwipe(on navigationController: UINavigationController?) {
+            guard navigationController?.viewControllers.count ?? 0 > 1 else { return }
+            navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        }
+    }
+}
+
 struct PostLinkBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     let post: Post
@@ -540,6 +591,10 @@ struct PostLinkBrowserView: View {
         .accessibilityIdentifier("browser.view")
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
+        .background {
+            NavigationBackSwipeRestorer()
+                .frame(width: 0, height: 0)
+        }
         .task {
             guard !showingCommentsPane else { return }
             withAnimation(WebViewAnimations.panel) {
