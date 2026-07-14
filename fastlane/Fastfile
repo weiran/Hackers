@@ -3,6 +3,7 @@ default_platform(:ios)
 require "shellwords"
 require "fileutils"
 require "cgi"
+require "digest"
 require "json"
 require "pathname"
 
@@ -26,6 +27,14 @@ SCREENSHOT_NAMES = [
   "05-dim-read-posts-across-devices",
   "06-vote-reply-follow-deep-threads"
 ].freeze
+SCREENSHOT_DEVICES = [
+  "iPhone 17 Pro Max",
+  "iPad Pro 13-inch (M5)"
+].freeze
+SCREENSHOT_RAW_DIMENSIONS = {
+  "iPhone 17 Pro Max" => [1320, 2868],
+  "iPad Pro 13-inch (M5)" => [2064, 2752]
+}.freeze
 
 def app_store_connect_key
   app_store_connect_api_key(
@@ -52,7 +61,8 @@ end
 def write_screenshot_summary(output_dir)
   screenshots = Dir[File.join(output_dir, "**", "*.png")].sort
   framed_screenshots = screenshots.select { |path| File.basename(path, ".png").end_with?("_framed") }
-  screenshots = framed_screenshots unless framed_screenshots.empty?
+  UI.user_error!("No framed screenshots were generated") if framed_screenshots.empty?
+  screenshots = framed_screenshots
   screens = Hash.new { |hash, key| hash[key] = [] }
 
   screenshots.each do |path|
@@ -91,11 +101,59 @@ def write_screenshot_summary(output_dir)
   File.write(File.join(output_dir, "screenshots.html"), html)
 end
 
-def validate_raw_screenshots!(output_dir)
+def png_dimensions(path)
+  File.open(path, "rb") do |file|
+    signature = file.read(8)
+    UI.user_error!("Invalid PNG signature: #{path}") unless signature == "\x89PNG\r\n\x1A\n".b
+    file.seek(16)
+    dimensions = file.read(8)
+    UI.user_error!("Missing PNG dimensions: #{path}") unless dimensions&.bytesize == 8
+    dimensions.unpack("NN")
+  end
+end
+
+def validate_screenshots!(output_dir, framed:)
+  suffix = framed ? "_framed" : ""
+  selected_paths = []
+
   SCREENSHOT_NAMES.each do |name|
-    matches = Dir[File.join(output_dir, "**", "*-#{name}.png")]
-      .reject { |path| File.basename(path, ".png").end_with?("_framed") }
-    UI.user_error!("Expected 2 screenshots for #{name}, found #{matches.length}") unless matches.length == 2
+    SCREENSHOT_DEVICES.each do |device|
+      expected_basename = "#{device}-#{name}#{suffix}.png"
+      matches = Dir[File.join(output_dir, "**", expected_basename)]
+      UI.user_error!("Expected one #{expected_basename}, found #{matches.length}") unless matches.length == 1
+      width, height = png_dimensions(matches.first)
+      if framed
+        UI.user_error!("Expected a portrait screenshot, got #{width}x#{height}: #{matches.first}") unless height > width
+      else
+        expected_dimensions = SCREENSHOT_RAW_DIMENSIONS.fetch(device)
+        unless [width, height] == expected_dimensions
+          UI.user_error!("Expected #{device} screenshot dimensions #{expected_dimensions.join("x")}, got #{width}x#{height}: #{matches.first}")
+        end
+      end
+      selected_paths << matches.first
+    end
+  end
+
+  duplicates = selected_paths.group_by { |path| Digest::SHA256.file(path).hexdigest }
+    .values
+    .select { |paths| paths.length > 1 }
+  unless duplicates.empty?
+    duplicate_names = duplicates.flatten.map { |path| File.basename(path) }.join(", ")
+    UI.user_error!("Unexpected identical screenshots: #{duplicate_names}")
+  end
+end
+
+def validate_appearance_differences!(output_dir)
+  SCREENSHOT_NAMES.each do |name|
+    SCREENSHOT_DEVICES.each do |device|
+      paths = %w[light dark].map do |appearance|
+        File.join(output_dir, appearance, "en-US", "#{device}-#{name}.png")
+      end
+      paths.each { |path| UI.user_error!("Missing appearance screenshot: #{path}") unless File.exist?(path) }
+      next unless Digest::SHA256.file(paths[0]).hexdigest == Digest::SHA256.file(paths[1]).hexdigest
+
+      UI.user_error!("Light and dark screenshots are identical for #{device} #{name}")
+    end
   end
 end
 
@@ -337,10 +395,12 @@ platform :ios do
         output_directory: output_dir,
         dark_mode: appearance[:dark_mode]
       )
-      validate_raw_screenshots!(output_dir)
+      validate_screenshots!(output_dir, framed: false)
       prepare_frameit_metadata(output_dir)
       frameit(path: output_dir)
+      validate_screenshots!(output_dir, framed: true)
     end
+    validate_appearance_differences!(SCREENSHOT_OUTPUT_DIR)
     write_screenshot_summary(SCREENSHOT_OUTPUT_DIR)
   end
 

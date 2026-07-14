@@ -6,6 +6,7 @@ erase_simulator true
 reinstall_app true
 localize_simulator true
 override_status_bar true
+disable_slide_to_type true
 stop_after_first_error true
 concurrent_simulators false
 skip_open_summary true

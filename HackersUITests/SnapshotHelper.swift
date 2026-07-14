@@ -15,7 +15,7 @@ private enum SnapshotHelper {
         cacheDirectory = makeCacheDirectory()
         configureLanguage(for: app)
         configureLocale(for: app)
-        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES"]
+        configureLaunchArguments(for: app)
     }
 
     static func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval) {
@@ -68,6 +68,23 @@ private enum SnapshotHelper {
         app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
     }
 
+    private static func configureLaunchArguments(for app: XCUIApplication) {
+        app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
+        guard let rawArguments = readCacheValue("snapshot-launch_arguments.txt"), !rawArguments.isEmpty else {
+            return
+        }
+
+        do {
+            let expression = try NSRegularExpression(pattern: #"(".+?"|\S+)"#)
+            let range = NSRange(rawArguments.startIndex..., in: rawArguments)
+            app.launchArguments += expression.matches(in: rawArguments, range: range).compactMap { match in
+                Range(match.range, in: rawArguments).map { String(rawArguments[$0]) }
+            }
+        } catch {
+            XCTFail("Could not parse Fastlane snapshot launch arguments: \(error.localizedDescription)")
+        }
+    }
+
     private static func readCacheValue(_ fileName: String) -> String? {
         guard let cacheDirectory else { return nil }
         let url = cacheDirectory.appendingPathComponent(fileName)
@@ -79,12 +96,15 @@ private enum SnapshotHelper {
         guard let app else { return }
         let spinner = app.activityIndicators.firstMatch
         if spinner.exists {
-            _ = spinner.waitForNonExistence(timeout: timeout)
+            XCTAssertTrue(
+                spinner.waitForNonExistence(timeout: timeout),
+                "Timed out waiting for the screenshot loading indicator to disappear"
+            )
         }
     }
 
     private static func normalizedImage(_ image: UIImage) -> UIImage {
-        guard UIDevice.current.orientation.isLandscape else { return image }
+        guard XCUIDevice.shared.orientation.isLandscape else { return image }
 
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
@@ -114,4 +134,5 @@ func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
     SnapshotHelper.snapshot(name, timeWaitingForIdle: timeout)
 }
 
+// HackersSnapshotHelperVersion [1.0, based on Fastlane SnapshotHelper 1.30]
 // SnapshotHelperVersion [1.30]
