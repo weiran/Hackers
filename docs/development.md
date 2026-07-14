@@ -86,12 +86,13 @@ Nightly validation runs every functional UI test, explicitly excluding screensho
 ./run_ui_tests.sh full
 ```
 
-UI tests write result bundles under `artifacts/xcresults` by default. Use functional UI tests when validating app launch, top-level navigation, browser presentation, or behavior that cannot be covered reliably through package tests.
+UI tests write result bundles under `artifacts/xcresults` by default, then verify that the bundle contains exactly the requested smoke tests or only functional tests for a full run. The runner uses `DESTINATION` when set, otherwise a CI simulator selected by `CI_DEVICE_UDID` or `CI_DESTINATION`, and finally the local `iPhone 17 Pro` default. Use functional UI tests when validating app launch, top-level navigation, browser presentation, or behavior that cannot be covered reliably through package tests.
 
 UI tests should use the deterministic fixture layer in `App/UITesting/UITestingBootstrap.swift`, not live Hacker News or Algolia. `HACKERS_UI_TESTING=1` is the sole opt-in and installs dependency overrides for posts, comments, search, settings, authentication, bookmarks, read state, voting, and article content. Invalid values and incompatible route options fail at launch rather than silently falling back.
 
 The typed launch contract is:
 
+* `HACKERS_UI_FIXTURE_PROFILE`: `functional`, `marketing`, or `stress`; defaults to `functional`.
 * `HACKERS_UI_BROWSER_MODE`: `custom` or `inApp`; system-browser automation is unsupported.
 * `HACKERS_UI_ROUTE`: `feed`, `comments`, or `story`.
 * `HACKERS_UI_POST_ID`: required for `comments` and `story`; rejected for `feed`.
@@ -101,15 +102,17 @@ The typed launch contract is:
 * `HACKERS_UI_READ_POST_IDS`: comma-separated post IDs to pre-mark as read.
 * `HACKERS_UI_SHOW_THUMBNAILS`: set to `1` or `0`.
 
-When adding UI tests, prefer existing accessibility identifiers such as `feed.list`, `feed.post.<id>`, `comments.list`, `settings.form`, `settings.showThumbnails`, `settings.compactFeed`, `search.sort.menu`, `search.date.menu`, `browser.view`, and `login.*`. Add new identifiers with the same stable, domain-specific naming style. An element's presence in the accessibility hierarchy is not proof that it is visible: require hittability for interactive controls, and verify a non-empty frame plus containment or visible intersection for rendered content. Use state-specific identifiers when multiple presentations remain in the hierarchy.
+Only keys defined by the shared launch contract are accepted once UI testing is enabled. Functional tests use the `functional` profile, screenshot staging uses `marketing`, and oversized/scroll coverage opts into `stress`. Direct routes must refer to a post in the selected profile. A story route cannot use the in-app browser, and fixture article mode fails closed if the selected post has no local article.
+
+When adding UI tests, prefer existing accessibility identifiers such as `feed.list`, `feed.post.<id>`, `comments.list`, `settings.form`, `settings.showThumbnails`, `settings.compactFeed`, `search.results`, `search.sort.menu`, `search.date.menu`, `browser.view`, and `login.*`. Add new identifiers with the same stable, domain-specific naming style. An element's presence in the accessibility hierarchy is not proof that it is visible: require hittability for interactive controls, and verify stable, meaningful intersection with the app viewport for rendered content. Use state-specific identifiers when multiple presentations remain in the hierarchy. These checks prove functional presentation and interaction, not pixel-level appearance; for a visual claim, reproduce and inspect a screenshot of the same state.
 
 App Store screenshots are generated through fastlane:
 
 ```bash
-bundle exec fastlane ios screenshots
+fastlane ios screenshots
 ```
 
-The screenshot class is a manual generation workflow and is excluded from both `smoke` and `full`. Its assertions only stage each intended screen before capture; it is not a functional or visual-regression suite. The lane generates iPhone and iPad captures in light and dark appearances, validates that every expected raw image was produced, frames them, and writes a browsable summary under `artifacts/screenshots`. Keep fixture content stable, use descriptive snapshot names with numeric ordering, and use live article content only for a shot that explicitly requests it.
+The screenshot class is a manual generation workflow and is excluded from both `smoke` and `full`. Its assertions only stage each intended screen before capture; it is not a functional or visual-regression suite. The lane uses the deterministic `marketing` profile, including locally rendered article HTML, then generates iPhone and iPad captures in light and dark appearances. It validates the exact raw and framed image matrix, PNG dimensions and portrait orientation, rejects duplicate captures within an appearance, confirms light and dark output differ, and writes a browsable summary under `artifacts/screenshots`. Keep fixture content stable and use descriptive snapshot names with numeric ordering.
 
 ## Test Layout
 

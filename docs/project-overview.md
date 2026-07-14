@@ -169,9 +169,9 @@ Search requests use `tags=story`, page/hits-per-page parameters, and optional `c
 
 UI tests do not hit live Hacker News by default. `App/UITesting/UITestingBootstrap.swift` installs dependency overrides only when `HACKERS_UI_TESTING=1` is set.
 
-The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. A typed launch configuration validates the browser mode, initial route, post ID, story presentation, article source, read-state options, and thumbnail option. Invalid or incompatible settings fail at launch.
+The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. A typed launch configuration shared by the app and UI-test targets validates the fixture profile, browser mode, initial route, post ID, story presentation, article source, read-state options, and thumbnail option. Unknown keys, invalid values, unavailable fixture posts/articles, and incompatible route options fail at launch.
 
-Functional UI tests use stable, state-specific accessibility identifiers, but assert hittability and rendered geometry rather than treating hierarchy existence as visibility. The `HackersScreenshotTests` class is separate manual capture orchestration, excluded from automatic smoke and full runs, and shares the same typed `HACKERS_UI_*` launch contract.
+Functional UI tests use stable, state-specific accessibility identifiers, but assert hittability and stable, meaningful viewport intersection rather than treating hierarchy existence as visibility. This proves functional presentation, while screenshots remain the source of truth for visual claims. The `HackersScreenshotTests` class is separate manual capture orchestration, excluded from automatic smoke and full runs, and uses the deterministic `marketing` fixture profile through the same typed `HACKERS_UI_*` launch contract.
 
 ## What Not To Reintroduce
 
