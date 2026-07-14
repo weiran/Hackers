@@ -445,6 +445,35 @@ final class HackersUITests: XCTestCase {
         assertHasVisibleIntersection(app.buttons["comments.comment.48346154"], in: app)
     }
 
+    func testNextCommentButtonStartsAtFirstCommentThenAdvances() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: longCommentsPostID, presentation: .expandedComments)
+        ))
+
+        let nextCommentButton = app.buttons["comments.nextCommentButton"]
+        let firstComment = app.buttons["comments.comment.48346154"]
+        let secondComment = app.buttons["comments.comment.48354612"]
+        assertHittable(nextCommentButton, timeout: 8)
+        assertHasVisibleIntersection(firstComment, in: app)
+        assertHasVisibleIntersection(secondComment, in: app)
+
+        let initialFirstMinY = firstComment.frame.minY
+        tapAbsolutePoint(x: nextCommentButton.frame.midX, y: nextCommentButton.frame.midY)
+        let firstTargetFrame = waitForStableFrame(of: firstComment, timeout: 5) {
+            $0.minY < initialFirstMinY - 40
+        }
+        XCTAssertNotNil(firstTargetFrame, "The first press should align the first comment")
+        assertFullyContained(firstComment, in: app)
+
+        let initialSecondMinY = secondComment.frame.minY
+        tapAbsolutePoint(x: nextCommentButton.frame.midX, y: nextCommentButton.frame.midY)
+        let secondTargetFrame = waitForStableFrame(of: secondComment, timeout: 5) {
+            $0.minY < initialSecondMinY - 40
+        }
+        XCTAssertNotNil(secondTargetFrame, "The next press should advance to the second comment")
+    }
+
     func testCollapsingCommentKeepsRootContextAvailable() throws {
         launchApp(linkBrowserMode: .inAppBrowser)
 

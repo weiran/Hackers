@@ -29,6 +29,16 @@ private extension UnitPoint {
     static let commentTop = UnitPoint(x: 0.5, y: 0)
 }
 
+private enum CommentsScrollTarget: Hashable {
+    case header
+    case comment(Int)
+
+    var commentID: Int? {
+        guard case let .comment(id) = self else { return nil }
+        return id
+    }
+}
+
 struct CommentsContentView: View {
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
@@ -47,7 +57,7 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
-    @State private var scrollPosition = ScrollPosition(idType: Int.self)
+    @State private var scrollPosition = ScrollPosition(idType: CommentsScrollTarget.self)
     @State private var visibleCommentTarget = VisibleCommentTarget()
 
     var body: some View {
@@ -73,8 +83,8 @@ struct CommentsContentView: View {
                     .scrollTargetLayout()
                 }
                 .scrollPosition($scrollPosition)
-                .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
-                    updateVisibleCommentTarget(visibleIDs: visibleIDs)
+                .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
+                    updateVisibleCommentTarget(visibleTargets: visibleTargets)
                 }
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
@@ -139,8 +149,8 @@ struct CommentsContentView: View {
         }
     }
 
-    private func updateVisibleCommentTarget(visibleIDs: [Int]) {
-        let topID = visibleIDs.first
+    private func updateVisibleCommentTarget(visibleTargets: [CommentsScrollTarget]) {
+        let topID = visibleTargets.first?.commentID
         visibleCommentTarget.update(
             topCommentID: topID,
             hasNextComment: viewModel.hasNextVisibleComment(after: topID)
@@ -166,7 +176,7 @@ struct CommentsContentView: View {
 
     private func scrollToComment(withID targetID: Int, using proxy: ScrollViewProxy) {
         withAnimation(.easeInOut(duration: 0.3)) {
-            proxy.scrollTo(targetID, anchor: .commentTop)
+            proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
         }
         pendingCommentID = nil
     }
@@ -245,7 +255,7 @@ struct CommentsContentView: View {
             commentRow(for: state, in: post)
             commentSeparator(isVisible: showsSeparator)
         }
-        .id(state.id)
+        .id(CommentsScrollTarget.comment(state.id))
         .transition(.opacity)
     }
 
@@ -304,7 +314,7 @@ struct CommentsContentView: View {
             },
             onBookmarkToggle: { await viewModel.toggleBookmark() }
         )
-        .id("header")
+        .id(CommentsScrollTarget.header)
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .contentShape(Rectangle())
