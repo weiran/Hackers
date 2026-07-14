@@ -189,7 +189,7 @@ private extension FeedView {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .id(selectedPostType)
-        .accessibilityIdentifier("feed.list")
+        .accessibilityIdentifier(enableSearchPagination ? "search.results" : "feed.list")
     }
 
     @ViewBuilder
@@ -261,6 +261,7 @@ private extension FeedView {
         .listRowSeparator(.visible, edges: .bottom)
         .contextMenu { contextMenuContent(for: post) }
         .accessibilityIdentifier("feed.post.\(post.id)")
+        .accessibilityValue(post.isRead ? (viewModel.dimReadPosts ? "read, dimmed" : "read") : "unread")
     }
 
     @ViewBuilder

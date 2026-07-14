@@ -322,7 +322,7 @@ struct PostCommentsSheet: View {
             presentation.updateScrollDragEligibility(
                 oldPhase: oldPhase,
                 newPhase: newPhase,
-                isAtRestingTop: abs(offsetY) <= 1
+                isAtRestingTop: offsetY <= 1
             )
         }
         .offset(x: viewport.minX, y: viewport.minY)
