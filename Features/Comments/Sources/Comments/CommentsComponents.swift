@@ -64,49 +64,51 @@ struct CommentsContentView: View {
 
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    postHeaderSection(for: post)
-                    commentsSection(for: post)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        postHeaderSection(for: post)
+                        commentsSection(for: post)
+                    }
+                    .scrollTargetLayout()
                 }
-                .scrollTargetLayout()
-            }
-            .scrollPosition($scrollPosition)
-            .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
-                updateVisibleCommentTarget(visibleIDs: visibleIDs)
-            }
-            .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
-                geometry.contentOffset.y + geometry.contentInsets.top
-            }, action: { _, offsetY in
-                updateHeaderState(offsetY: offsetY)
-            })
-            .accessibilityIdentifier("comments.list")
-            .safeAreaInset(edge: .top, spacing: 0) {
-                commentScrollTopSafeAreaInset
-            }
-            .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                if !viewModel.visibleComments.isEmpty {
-                    NextCommentFloatingButton(
-                        visibleCommentTarget: visibleCommentTarget,
-                        onNextComment: scrollToNextComment,
-                        onNextThread: scrollToNextThread
+                .scrollPosition($scrollPosition)
+                .onScrollTargetVisibilityChange(idType: Int.self, threshold: 0.1) { visibleIDs in
+                    updateVisibleCommentTarget(visibleIDs: visibleIDs)
+                }
+                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                    geometry.contentOffset.y + geometry.contentInsets.top
+                }, action: { _, offsetY in
+                    updateHeaderState(offsetY: offsetY)
+                })
+                .accessibilityIdentifier("comments.list")
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    commentScrollTopSafeAreaInset
+                }
+                .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
+                    if !viewModel.visibleComments.isEmpty {
+                        NextCommentFloatingButton(
+                            isEnabled: visibleCommentTarget.hasNextComment,
+                            onNextComment: { scrollToNextComment(using: proxy) },
+                            onNextThread: { scrollToNextThread(using: proxy) }
+                        )
+                        .padding(.trailing, 28)
+                        .padding(.bottom, 28)
+                    }
+                }
+                .onChange(of: pendingCommentID) { _, _ in
+                    scrollToPendingComment(using: proxy)
+                }
+                .onChange(of: viewModel.visibleRevision) { _, _ in
+                    scrollToPendingComment(using: proxy)
+                }
+                .task(id: viewModel.visibleRevision) {
+                    await CommentTextCache.prewarm(
+                        comments: viewModel.visibleComments.prefix(30),
+                        textScaling: textScaling,
+                        chunkSize: 5
                     )
-                    .padding(.trailing, 28)
-                    .padding(.bottom, 28)
                 }
-            }
-            .onChange(of: pendingCommentID) { _, _ in
-                scrollToPendingComment()
-            }
-            .onChange(of: viewModel.visibleRevision) { _, _ in
-                scrollToPendingComment()
-            }
-            .task(id: viewModel.visibleRevision) {
-                await CommentTextCache.prewarm(
-                    comments: viewModel.visibleComments.prefix(30),
-                    textScaling: textScaling,
-                    chunkSize: 5
-                )
             }
         }
     }
@@ -145,26 +147,26 @@ struct CommentsContentView: View {
         )
     }
 
-    private func scrollToPendingComment() {
+    private func scrollToPendingComment(using proxy: ScrollViewProxy) {
         guard let targetID = pendingCommentID else { return }
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
-        scrollToComment(withID: targetID)
+        scrollToComment(withID: targetID, using: proxy)
     }
 
-    private func scrollToNextComment() {
+    private func scrollToNextComment(using proxy: ScrollViewProxy) {
         guard let targetID = viewModel.nextVisibleCommentID(after: visibleCommentTarget.topCommentID) else { return }
-        scrollToComment(withID: targetID)
+        scrollToComment(withID: targetID, using: proxy)
     }
 
-    private func scrollToNextThread() {
+    private func scrollToNextThread(using proxy: ScrollViewProxy) {
         guard let targetID = viewModel.nextVisibleThreadID(after: visibleCommentTarget.topCommentID) else { return }
-        scrollToComment(withID: targetID)
+        scrollToComment(withID: targetID, using: proxy)
     }
 
-    private func scrollToComment(withID targetID: Int) {
+    private func scrollToComment(withID targetID: Int, using proxy: ScrollViewProxy) {
         withAnimation(.easeInOut(duration: 0.3)) {
-            scrollPosition.scrollTo(id: targetID, anchor: .commentTop)
+            proxy.scrollTo(targetID, anchor: .commentTop)
         }
         pendingCommentID = nil
     }
@@ -329,48 +331,45 @@ struct CommentsContentView: View {
 }
 
 private struct NextCommentFloatingButton: View {
-    let visibleCommentTarget: VisibleCommentTarget
+    let isEnabled: Bool
     let onNextComment: () -> Void
     let onNextThread: () -> Void
-
-    private var isEnabled: Bool {
-        visibleCommentTarget.hasNextComment
-    }
+    @State private var performedLongPress = false
 
     var body: some View {
-        Image(systemName: "arrow.down")
-            .font(.system(size: 20, weight: .semibold))
-            .foregroundStyle(isEnabled ? Color.primary : Color.secondary)
-            .frame(width: 48, height: 48)
-            .glassEffect(.regular.interactive(isEnabled), in: .circle)
-            .opacity(isEnabled ? 1 : 0.55)
-            .contentShape(Circle())
-            .gesture(
-                LongPressGesture(minimumDuration: 0.45)
-                    .exclusively(before: TapGesture())
-                    .onEnded { value in
-                        guard isEnabled else { return }
-                        switch value {
-                        case .first:
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            onNextThread()
-                        case .second:
-                            onNextComment()
-                        }
-                    }
-            )
-            .accessibilityLabel("Next comment")
-            .accessibilityHint("Long press for next thread")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction(.default) {
-                guard isEnabled else { return }
-                onNextComment()
+        Button {
+            guard !performedLongPress else {
+                performedLongPress = false
+                return
             }
-            .accessibilityAction(named: Text("Next thread")) {
-                guard isEnabled else { return }
-                onNextThread()
-            }
-            .accessibilityIdentifier("comments.nextCommentButton")
+            onNextComment()
+        } label: {
+            Image(systemName: "arrow.down")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(isEnabled ? Color.primary : Color.secondary)
+                .frame(width: 48, height: 48)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(isEnabled), in: .circle)
+        .opacity(isEnabled ? 1 : 0.55)
+        .disabled(!isEnabled)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.45)
+                .onEnded { _ in
+                    guard isEnabled else { return }
+                    performedLongPress = true
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onNextThread()
+                }
+        )
+        .accessibilityLabel("Next comment")
+        .accessibilityHint("Long press for next thread")
+        .accessibilityAction(named: Text("Next thread")) {
+            guard isEnabled else { return }
+            onNextThread()
+        }
+        .accessibilityIdentifier("comments.nextCommentButton")
     }
 }
 
