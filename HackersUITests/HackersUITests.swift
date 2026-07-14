@@ -285,6 +285,8 @@ final class HackersUITests: XCTestCase {
         tapPost(post)
 
         assertFullyContained(app.otherElements["browser.view"], in: app)
+        collapseCommentsByTappingTitle()
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
         edgeSwipeBack()
 
         assertFullyContained(app.collectionViews["feed.list"], in: app)

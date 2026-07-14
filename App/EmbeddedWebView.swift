@@ -502,48 +502,173 @@ private struct NavigationBackSwipeRestorer: UIViewControllerRepresentable {
         Coordinator()
     }
 
-    func makeUIViewController(context: Context) -> RestoringViewController {
-        let viewController = RestoringViewController()
-        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
-            coordinator?.enableBackSwipe(on: navigationController)
+    func makeUIViewController(context: Context) -> ProbeViewController {
+        let viewController = ProbeViewController()
+        viewController.view.backgroundColor = .clear
+        viewController.view.isUserInteractionEnabled = false
+        viewController.onLifecycle = { [weak coordinator = context.coordinator] viewController in
+            coordinator?.installIfPossible(from: viewController)
         }
         return viewController
     }
 
-    func updateUIViewController(_ viewController: RestoringViewController, context: Context) {
-        viewController.onNavigationControllerChange = { [weak coordinator = context.coordinator] navigationController in
-            coordinator?.enableBackSwipe(on: navigationController)
+    func updateUIViewController(_ viewController: ProbeViewController, context: Context) {
+        viewController.onLifecycle = { [weak coordinator = context.coordinator] viewController in
+            coordinator?.installIfPossible(from: viewController)
         }
+        context.coordinator.installIfPossible(from: viewController)
 
-        DispatchQueue.main.async {
-            context.coordinator.enableBackSwipe(on: viewController.navigationController)
+        let coordinator = context.coordinator
+        Task { @MainActor [weak viewController, weak coordinator] in
+            guard let viewController else { return }
+            coordinator?.installIfPossible(from: viewController)
         }
     }
 
-    static func dismantleUIViewController(_ viewController: RestoringViewController, coordinator _: Coordinator) {
-        viewController.onNavigationControllerChange = nil
+    static func dismantleUIViewController(_ viewController: ProbeViewController, coordinator: Coordinator) {
+        coordinator.restore()
+        viewController.onLifecycle = nil
     }
 
-    final class RestoringViewController: UIViewController {
-        var onNavigationControllerChange: ((UINavigationController?) -> Void)?
+    final class ProbeViewController: UIViewController {
+        var onLifecycle: ((ProbeViewController) -> Void)?
 
         override func didMove(toParent parent: UIViewController?) {
             super.didMove(toParent: parent)
-            onNavigationControllerChange?(navigationController)
+            onLifecycle?(self)
+        }
+
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            onLifecycle?(self)
         }
 
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
-            onNavigationControllerChange?(navigationController)
+            onLifecycle?(self)
         }
     }
 
     @MainActor
-    final class Coordinator {
-        func enableBackSwipe(on navigationController: UINavigationController?) {
-            guard navigationController?.viewControllers.count ?? 0 > 1 else { return }
-            navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        private weak var navigationController: UINavigationController?
+        private weak var edgeGesture: UIGestureRecognizer?
+        private weak var contentGesture: UIGestureRecognizer?
+        private weak var originalEdgeDelegate: UIGestureRecognizerDelegate?
+        private weak var originalContentDelegate: UIGestureRecognizerDelegate?
+
+        func installIfPossible(from viewController: UIViewController) {
+            guard let navigationController = viewController.nearestNavigationController else { return }
+            install(on: navigationController)
         }
+
+        private func install(on navigationController: UINavigationController) {
+            self.navigationController = navigationController
+
+            if let gesture = navigationController.interactivePopGestureRecognizer {
+                if edgeGesture !== gesture {
+                    edgeGesture = gesture
+                    originalEdgeDelegate = gesture.delegate
+                } else if gesture.delegate !== self {
+                    originalEdgeDelegate = gesture.delegate
+                }
+                gesture.isEnabled = true
+                gesture.delegate = self
+            }
+
+            if #available(iOS 26.0, *),
+               let gesture = navigationController.interactiveContentPopGestureRecognizer {
+                if contentGesture !== gesture {
+                    contentGesture = gesture
+                    originalContentDelegate = gesture.delegate
+                } else if gesture.delegate !== self {
+                    originalContentDelegate = gesture.delegate
+                }
+                gesture.isEnabled = true
+                gesture.delegate = self
+            }
+        }
+
+        func restore() {
+            if edgeGesture?.delegate === self {
+                edgeGesture?.delegate = originalEdgeDelegate
+            }
+            if #available(iOS 26.0, *),
+               contentGesture?.delegate === self {
+                contentGesture?.delegate = originalContentDelegate
+            }
+            edgeGesture = nil
+            contentGesture = nil
+            navigationController = nil
+        }
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard isManagedPopGesture(gestureRecognizer) else { return true }
+            guard let navigationController else { return false }
+            guard navigationController.viewControllers.count > 1 else { return false }
+            guard navigationController.transitionCoordinator == nil else { return false }
+
+            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
+                let location = gestureRecognizer.location(in: navigationController.view)
+                return location.x <= systemPopStartMaxX(in: navigationController)
+            }
+
+            return true
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            guard isManagedPopGesture(gestureRecognizer) else { return true }
+            guard let navigationController else { return false }
+
+            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
+                let location = touch.location(in: navigationController.view)
+                return location.x <= systemPopStartMaxX(in: navigationController)
+            }
+
+            return true
+        }
+
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            isManagedPopGesture(gestureRecognizer) || isManagedPopGesture(otherGestureRecognizer)
+        }
+
+        private func isManagedPopGesture(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            if gestureRecognizer === edgeGesture {
+                return true
+            }
+            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
+                return true
+            }
+            return false
+        }
+
+        private func systemPopStartMaxX(in navigationController: UINavigationController) -> CGFloat {
+            navigationController.view.safeAreaInsets.left + 32
+        }
+    }
+}
+
+private extension UIViewController {
+    var nearestNavigationController: UINavigationController? {
+        if let navigationController {
+            return navigationController
+        }
+
+        var current = parent
+        while let viewController = current {
+            if let navigationController = viewController as? UINavigationController {
+                return navigationController
+            }
+            if let navigationController = viewController.navigationController {
+                return navigationController
+            }
+            current = viewController.parent
+        }
+
+        return nil
     }
 }
 
