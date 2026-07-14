@@ -10,6 +10,7 @@
 		0753D902ECB640FABD16B31F /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0F18D1F4D44676A1E7253F /* HackersUITests.swift */; };
 		243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00032E8B000100000001 /* HackersScreenshotTests.swift */; };
 		243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00042E8B000100000001 /* SnapshotHelper.swift */; };
+		243C00102E8B000100000001 /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 243C00122E8B000100000001 /* Shared */; };
 		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
 		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
@@ -97,6 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				243C00102E8B000100000001 /* Shared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,6 +191,9 @@
 				584323FBE2EE4A7A97803F05 /* PBXTargetDependency */,
 			);
 			name = HackersUITests;
+			packageProductDependencies = (
+				243C00122E8B000100000001 /* Shared */,
+			);
 			productName = HackersUITests;
 			productReference = 17AFE2AC4DD34C2F82AF632D /* HackersUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -288,6 +293,7 @@
 				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */,
 				248256F62E59D2460068E91E /* XCLocalSwiftPackageReference "Domain" */,
 				248256F92E59D2540068E91E /* XCLocalSwiftPackageReference "Networking" */,
+				243C00112E8B000100000001 /* XCLocalSwiftPackageReference "Shared" */,
 			);
 			productRefGroup = 24F39F8618AFB1150055F8DC /* Products */;
 			projectDirPath = "";
@@ -709,6 +715,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		243C00112E8B000100000001 /* XCLocalSwiftPackageReference "Shared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Shared;
+		};
 		241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Data;
@@ -743,6 +753,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		243C00122E8B000100000001 /* Shared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 243C00112E8B000100000001 /* XCLocalSwiftPackageReference "Shared" */;
+			productName = Shared;
+		};
 		2406B38628AD083500CB396B /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;

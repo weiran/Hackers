@@ -353,9 +353,13 @@ struct EmbeddedWebView: View {
     @ViewBuilder
     private var content: some View {
         #if DEBUG
-        if let article = UITestArticleFixtures.article(for: url) {
-            UITestArticleView(article: article)
-                .accessibilityIdentifier("browser.mockArticle")
+        if let configuration = UITestingBootstrap.configuration,
+           configuration.articleSource == .fixture {
+            if let article = UITestArticleFixtures.article(for: url) {
+                UITestArticleView(article: article)
+            } else {
+                UITestMissingArticleView(url: url)
+            }
         } else {
             webView
         }
@@ -477,21 +481,95 @@ private struct BrowserWebView: UIViewRepresentable {
 }
 
 #if DEBUG
-private struct UITestArticleView: View {
+private struct UITestArticleView: UIViewRepresentable {
     let article: UITestArticleContent
 
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(article.title)
-                    .font(.title2)
-                    .bold()
-                Text(article.body)
-                    .font(.body)
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        webView.accessibilityIdentifier = "browser.fixtureArticle"
+        loadArticle(in: webView, coordinator: context.coordinator)
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        guard context.coordinator.loadedArticle != article else { return }
+        loadArticle(in: webView, coordinator: context.coordinator)
+    }
+
+    private func loadArticle(in webView: WKWebView, coordinator: Coordinator) {
+        coordinator.loadedArticle = article
+        webView.loadHTMLString(html, baseURL: nil)
+    }
+
+    private var html: String {
+        """
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            :root { color-scheme: light dark; }
+            body {
+              box-sizing: border-box;
+              max-width: 760px;
+              margin: 0 auto;
+              padding: 32px 24px 180px;
+              font: -apple-system-body;
+              line-height: 1.55;
+              background: Canvas;
+              color: CanvasText;
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
-        }
+            h1 {
+              margin: 0 0 20px;
+              font: -apple-system-title1;
+              font-weight: 700;
+              line-height: 1.15;
+            }
+            p { margin: 0 0 18px; }
+          </style>
+        </head>
+        <body>
+          <article>
+            <h1>\(escaped(article.title))</h1>
+            <p>\(escaped(article.body))</p>
+          </article>
+        </body>
+        </html>
+        """
+    }
+
+    private func escaped(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+    }
+
+    final class Coordinator {
+        var loadedArticle: UITestArticleContent?
+    }
+}
+
+private struct UITestMissingArticleView: View {
+    let url: URL
+
+    var body: some View {
+        ContentUnavailableView(
+            "Missing UI-Test Article Fixture",
+            systemImage: "exclamationmark.triangle",
+            description: Text(url.absoluteString)
+        )
+        .accessibilityIdentifier("browser.fixtureArticle.missing")
+        .accessibilityLabel("Missing UI-test article fixture")
+        .accessibilityValue(url.absoluteString)
     }
 }
 #endif

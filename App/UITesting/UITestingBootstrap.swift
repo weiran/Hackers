@@ -18,17 +18,27 @@ enum UITestingBootstrap {
         }
     }()
 
+    static let fixtures: UITestFixtures? = {
+        guard let configuration else { return nil }
+        let fixtures = UITestFixtures(profile: configuration.fixtureProfile)
+        do {
+            try fixtures.validate(configuration: configuration)
+        } catch {
+            preconditionFailure("Invalid UI-test fixture route: \(error)")
+        }
+        return fixtures
+    }()
+
     static var isEnabled: Bool {
         configuration != nil
     }
 
     @MainActor
     static func configureIfNeeded() {
-        guard configuration != nil else { return }
+        guard configuration != nil, let fixtures else { return }
 
         let settingsUseCase = UITestSettingsUseCase()
         let authenticationUseCase = UITestAuthenticationUseCase()
-        let fixtures = UITestFixtures()
         let bookmarksUseCase = UITestBookmarksUseCase()
         let readStatusUseCase = UITestReadStatusUseCase()
         let votingStateProvider = UITestVotingStateProvider()
@@ -57,26 +67,45 @@ enum UITestingBootstrap {
 
 final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @unchecked Sendable {
     static let largeCommentsPostID = 48_399_999
+    static let searchOnlyPostID = 48_400_101
+
+    enum ValidationError: Error, CustomStringConvertible {
+        case itemURLCannotOpenAsStory(Int)
+        case missingArticleFixture(Int)
+        case unknownPost(Int)
+
+        var description: String {
+            switch self {
+            case let .itemURLCannotOpenAsStory(postID):
+                "Post \(postID) is a Hacker News item URL and cannot launch as a story"
+            case let .missingArticleFixture(postID):
+                "Post \(postID) has no deterministic article fixture"
+            case let .unknownPost(postID):
+                "Post \(postID) is not available in the active fixture profile"
+            }
+        }
+    }
 
     private let posts: [Post]
+    private let searchPosts: [Post]
     private let commentsByPostID: [Int: [Comment]]
 
-    init() {
+    init(profile: UITestLaunchConfiguration.FixtureProfile) {
         commentsByPostID = Self.makeCommentsByPostID()
-        posts = Self.makeActivePosts()
+        let functionalPosts = Self.makeActivePosts()
+        switch profile {
+        case .functional:
+            posts = functionalPosts
+        case .marketing:
+            posts = Self.makeMarketingPosts(from: functionalPosts)
+        case .stress:
+            posts = [Self.makeLargeCommentsPost()] + functionalPosts
+        }
+        searchPosts = [Self.makeSearchOnlyPost()] + posts
     }
 
     private static func makeActivePosts() -> [Post] {
         [
-            makePost(
-                id: largeCommentsPostID,
-                url: "https://example.com/ui-test-large-comments",
-                title: "UI Test: Large Comments Stress Fixture",
-                age: "1 minute ago",
-                commentsCount: 720,
-                by: "perf_fixture",
-                score: 999
-            ),
             makePost(
                 id: 48_345_248,
                 url: "https://simpleflying.com/united-airlines-767-returns-newark-bluetooth-name-alert/",
@@ -278,6 +307,45 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         ]
     }
 
+    private static func makeMarketingPosts(from posts: [Post]) -> [Post] {
+        let priorityIDs = [
+            UITestingBootstrap.postID,
+            48_345_840,
+            48_345_248,
+            48_347_354,
+            48_349_527
+        ]
+        let prioritySet = Set(priorityIDs)
+        let prioritizedPosts = priorityIDs.compactMap { postID in
+            posts.first { $0.id == postID }
+        }
+        return prioritizedPosts + posts.filter { !prioritySet.contains($0.id) }
+    }
+
+    private static func makeLargeCommentsPost() -> Post {
+        makePost(
+            id: largeCommentsPostID,
+            url: "https://example.com/ui-test-large-comments",
+            title: "UI Test: Large Comments Stress Fixture",
+            age: "1 minute ago",
+            commentsCount: 720,
+            by: "perf_fixture",
+            score: 999
+        )
+    }
+
+    private static func makeSearchOnlyPost() -> Post {
+        makePost(
+            id: searchOnlyPostID,
+            url: "https://www.swift.org/documentation/migration-guide/",
+            title: "Swift 6.2 Migration Guide",
+            age: "3 hours ago",
+            commentsCount: 42,
+            by: "swiftlang",
+            score: 188
+        )
+    }
+
     private static func makePost(
         id: Int,
         url: String,
@@ -333,6 +401,31 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         return post
     }
 
+    func validate(configuration: UITestLaunchConfiguration) throws {
+        let postID: Int
+        switch configuration.route {
+        case .feed:
+            return
+        case let .comments(routePostID):
+            postID = routePostID
+        case let .story(routePostID, _):
+            postID = routePostID
+        }
+
+        guard let post = posts.first(where: { $0.id == postID }) else {
+            throw ValidationError.unknownPost(postID)
+        }
+
+        guard case .story = configuration.route else { return }
+        guard !HackerNewsConstants.isItemURL(post.url) else {
+            throw ValidationError.itemURLCannotOpenAsStory(postID)
+        }
+        if configuration.articleSource == .fixture,
+           UITestArticleFixtures.article(for: post.url) == nil {
+            throw ValidationError.missingArticleFixture(postID)
+        }
+    }
+
     func getComments(for post: Post) async throws -> [Comment] {
         try await getPost(id: post.id).comments ?? []
     }
@@ -348,7 +441,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         guard !normalizedQuery.isEmpty else {
             return SearchResultsPage(posts: [], page: page, totalPages: 0, totalResults: 0, hasMore: false)
         }
-        let matches = posts.filter { post in
+        let matches = searchPosts.filter { post in
             post.title.lowercased().contains(normalizedQuery)
                 || post.by.lowercased().contains(normalizedQuery)
                 || post.url.host?.lowercased().contains(normalizedQuery) == true
@@ -984,10 +1077,6 @@ struct UITestArticleContent: Equatable {
 
 enum UITestArticleFixtures {
     static func article(for url: URL) -> UITestArticleContent? {
-        guard UITestingBootstrap.configuration?.articleSource == .fixture else {
-            return nil
-        }
-
         if url.host?.contains("hacktivis.me") == true {
             return UITestArticleContent(
                 title: "Cloudflare Turnstile requiring fingerprintable WebGL",
@@ -1006,6 +1095,13 @@ enum UITestArticleFixtures {
             return UITestArticleContent(
                 title: "United Airlines 767 returns to Newark",
                 body: "Fixture article for a current Active thread with a lively comment discussion."
+            )
+        }
+
+        if url.absoluteString == "https://example.com/ui-test-large-comments" {
+            return UITestArticleContent(
+                title: "Large comments stress fixture",
+                body: "Deterministic local article content for the large comments UI-test discussion."
             )
         }
 

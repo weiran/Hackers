@@ -62,6 +62,20 @@ class NavigationStore: NavigationStoreProtocol {
     }
 
     func showPostLink(_ post: Domain.Post, presentation: PostLinkPresentation) {
+        showPostLink(post, presentation: presentation, forceCustomBrowser: false)
+    }
+
+    #if DEBUG
+    func showPostLinkForUITesting(_ post: Domain.Post, presentation: PostLinkPresentation) {
+        showPostLink(post, presentation: presentation, forceCustomBrowser: true)
+    }
+    #endif
+
+    private func showPostLink(
+        _ post: Domain.Post,
+        presentation: PostLinkPresentation,
+        forceCustomBrowser: Bool
+    ) {
         guard !HackerNewsConstants.isItemURL(post.url) else {
             showPost(post)
             return
@@ -73,17 +87,19 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPostId = post.id
         selectedPostLinkPresentation = nil
 
+        if forceCustomBrowser {
+            if UIDevice.current.userInterfaceIdiom == .pad || isRunningOnMac {
+                selectedPostLinkPresentation = presentation
+            } else {
+                path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
+            }
+            return
+        }
+
         if UIDevice.current.userInterfaceIdiom != .pad {
             path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
             return
         }
-
-        #if DEBUG
-        if case .story = UITestingBootstrap.configuration?.route {
-            selectedPostLinkPresentation = presentation
-            return
-        }
-        #endif
 
         if openURLInPrimaryContext(post.url) {
             return

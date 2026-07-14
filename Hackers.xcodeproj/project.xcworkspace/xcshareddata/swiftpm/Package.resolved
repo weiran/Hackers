@@ -1,15 +1,6 @@
 {
-  "originHash" : "98f4ae6451d863c10e91ef8c5ed868340f75ff7e8a195de3c7aa8835a0b56659",
+  "originHash" : "7129b0f5593382388e93bc0c66d7ee3a398c1527b320da18b4af45e4e44bd4f4",
   "pins" : [
-    {
-      "identity" : "progressiveblurheader",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dominikmartn/ProgressiveBlurHeader",
-      "state" : {
-        "branch" : "main",
-        "revision" : "0e8c29bc90d52e592fd63e034ca15b59095855f3"
-      }
-    },
     {
       "identity" : "swiftsoup",
       "kind" : "remoteSourceControl",

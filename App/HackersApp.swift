@@ -14,6 +14,7 @@ struct HackersApp: App {
     @State private var sessionService: SessionService
     @State private var toastPresenter: ToastPresenter
     @State private var handledInitialUITestingRoute = false
+    @State private var handlingInitialUITestingRoute = false
 
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -55,7 +56,7 @@ struct HackersApp: App {
     }
 
     private func handleInitialUITestingRouteIfNeeded() {
-        guard !handledInitialUITestingRoute else { return }
+        guard !handledInitialUITestingRoute, !handlingInitialUITestingRoute else { return }
         #if DEBUG
         guard let route = UITestingBootstrap.configuration?.route else { return }
 
@@ -63,18 +64,22 @@ struct HackersApp: App {
         case .feed:
             handledInitialUITestingRoute = true
         case let .story(postID, presentation):
-            handledInitialUITestingRoute = true
+            handlingInitialUITestingRoute = true
             Task {
-                guard let post = try? await DependencyContainer.shared.getPostUseCase().getPost(id: postID) else {
-                    return
-                }
-                await MainActor.run {
-                    navigationStore.showPostLink(post, presentation: presentation)
+                do {
+                    let post = try await DependencyContainer.shared.getPostUseCase().getPost(id: postID)
+                    await MainActor.run {
+                        navigationStore.showPostLinkForUITesting(post, presentation: presentation)
+                        handledInitialUITestingRoute = true
+                        handlingInitialUITestingRoute = false
+                    }
+                } catch {
+                    preconditionFailure("Validated UI-test story route failed to load post \(postID): \(error)")
                 }
             }
         case let .comments(postID):
-            handledInitialUITestingRoute = true
             navigationStore.showPost(withId: postID)
+            handledInitialUITestingRoute = true
         }
         #endif
     }
