@@ -850,21 +850,21 @@ final class HackersUITests: XCTestCase {
         var stableSampleCount = 0
 
         repeat {
-            let matchingCandidates = candidates(matching: element, in: container)
+            let isCandidate: (XCUIElement) -> Bool = { candidate in
+                guard candidate.exists else { return false }
+                if requiresHittable, !candidate.isHittable { return false }
+                let frame = candidate.frame
+                guard !frame.isEmpty, !frame.isNull else { return false }
+                let containerFrame = container.frame
+                if requiresFullContainment {
+                    return containerFrame.insetBy(dx: -1, dy: -1).contains(frame)
+                }
+                return self.isMeaningfullyVisible(frame, in: containerFrame)
+            }
+            let matchingCandidates = candidates(matching: element, in: container, preferring: isCandidate)
 
             if container.exists,
-               let match = matchingCandidates.enumerated().first(where: { match in
-                   let candidate = match.element
-                   guard candidate.exists else { return false }
-                   if requiresHittable, !candidate.isHittable { return false }
-                   let frame = candidate.frame
-                   guard !frame.isEmpty, !frame.isNull else { return false }
-                   let containerFrame = container.frame
-                   if requiresFullContainment {
-                       return containerFrame.insetBy(dx: -1, dy: -1).contains(frame)
-                   }
-                   return isMeaningfullyVisible(frame, in: containerFrame)
-               }) {
+               let match = matchingCandidates.enumerated().first(where: { isCandidate($0.element) }) {
                 let candidateIndex = match.offset
                 let candidate = match.element
                 let frame = candidate.frame
@@ -893,7 +893,12 @@ final class HackersUITests: XCTestCase {
         return nil
     }
 
-    private func candidates(matching element: XCUIElement, in container: XCUIElement) -> [XCUIElement] {
+    private func candidates(
+        matching element: XCUIElement,
+        in container: XCUIElement,
+        preferring preferredCandidate: ((XCUIElement) -> Bool)? = nil
+    ) -> [XCUIElement] {
+        if preferredCandidate?(element) == true { return [element] }
         guard element.exists else { return [element] }
         let identifier = element.identifier
         guard !identifier.isEmpty else { return [element] }
@@ -914,7 +919,7 @@ final class HackersUITests: XCTestCase {
     private func waitForStableFrame(
         of element: XCUIElement,
         timeout: TimeInterval,
-        condition: (CGRect) -> Bool
+        condition: @escaping (CGRect) -> Bool
     ) -> CGRect? {
         let deadline = Date().addingTimeInterval(timeout)
         var previousFrame: CGRect?
@@ -922,13 +927,13 @@ final class HackersUITests: XCTestCase {
         var stableSampleCount = 0
 
         repeat {
-            let matchingCandidates = candidates(matching: element, in: app)
-            if let match = matchingCandidates.enumerated().first(where: { match in
-                let candidate = match.element
+            let isCandidate: (XCUIElement) -> Bool = { candidate in
                 guard candidate.exists else { return false }
                 let frame = candidate.frame
                 return !frame.isEmpty && !frame.isNull && condition(frame)
-            }) {
+            }
+            let matchingCandidates = candidates(matching: element, in: app, preferring: isCandidate)
+            if let match = matchingCandidates.enumerated().first(where: { isCandidate($0.element) }) {
                 let frame = match.element.frame
                 if previousCandidateIndex == match.offset,
                    let previousFrame,
