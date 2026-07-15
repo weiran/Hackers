@@ -70,6 +70,7 @@ final class BrowserController: ObservableObject {
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
     private var pageHeaderBlurTintURL: URL?
+    private var reloadOverride: (() -> Void)?
 
     init() {
         let configuration = WKWebViewConfiguration()
@@ -85,6 +86,7 @@ final class BrowserController: ObservableObject {
     }
 
     func load(_ target: URL) {
+        reloadOverride = nil
         fallbackURL = target
         guard currentURL != target else { return }
         currentURL = target
@@ -107,8 +109,16 @@ final class BrowserController: ObservableObject {
 
     func reload() {
         resetHeaderBlurTint()
-        webView.reload()
+        if let reloadOverride {
+            reloadOverride()
+        } else {
+            webView.reload()
+        }
         updateState()
+    }
+
+    func setReloadOverride(_ action: (() -> Void)?) {
+        reloadOverride = action
     }
 
     func stopLoading() {
@@ -356,7 +366,12 @@ struct EmbeddedWebView: View {
         if let configuration = UITestingBootstrap.configuration,
            configuration.articleSource == .fixture {
             if let article = UITestArticleFixtures.article(for: url) {
-                UITestArticleView(article: article)
+                UITestArticleView(
+                    controller: controller,
+                    url: url,
+                    article: article,
+                    obscuredBottomInset: obscuredBottomInset
+                )
             } else {
                 UITestMissingArticleView(url: url)
             }
@@ -448,12 +463,14 @@ private struct BrowserWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
+        controller.setReloadOverride(nil)
         controller.applyBottomChromeInset(obscuredBottomInset)
         context.coordinator.scheduleLoad(controller: controller, url: url)
         return controller.webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        controller.setReloadOverride(nil)
         controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
@@ -482,14 +499,18 @@ private struct BrowserWebView: UIViewRepresentable {
 
 #if DEBUG
 private struct UITestArticleView: UIViewRepresentable {
+    let controller: BrowserController
+    let url: URL
     let article: UITestArticleContent
+    let obscuredBottomInset: CGFloat
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
 
     func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
+        let webView = controller.webView
+        controller.applyBottomChromeInset(obscuredBottomInset)
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
@@ -499,13 +520,23 @@ private struct UITestArticleView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard context.coordinator.loadedArticle != article else { return }
+        controller.applyBottomChromeInset(obscuredBottomInset)
+        guard context.coordinator.loadedArticle != article
+            || context.coordinator.loadedURL != url else { return }
         loadArticle(in: webView, coordinator: context.coordinator)
     }
 
     private func loadArticle(in webView: WKWebView, coordinator: Coordinator) {
         coordinator.loadedArticle = article
-        webView.loadHTMLString(html, baseURL: nil)
+        coordinator.loadedURL = url
+        controller.fallbackURL = url
+        controller.currentURL = url
+        let html = html
+        controller.setReloadOverride { [weak webView] in
+            webView?.loadHTMLString(html, baseURL: url)
+        }
+        webView.loadHTMLString(html, baseURL: url)
+        controller.updateState()
     }
 
     private var html: String {
@@ -555,6 +586,7 @@ private struct UITestArticleView: UIViewRepresentable {
 
     final class Coordinator {
         var loadedArticle: UITestArticleContent?
+        var loadedURL: URL?
     }
 }
 

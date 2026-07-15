@@ -40,6 +40,10 @@ private enum SnapshotHelper {
             let image = normalizedImage(screenshot.image)
             let simulatorName = normalizedSimulatorName()
             let url = screenshotsDirectory.appendingPathComponent("\(simulatorName)-\(name).png")
+            guard !FileManager.default.fileExists(atPath: url.path) else {
+                XCTFail("Refusing to overwrite duplicate screenshot output: \(url.lastPathComponent)")
+                return
+            }
             guard let data = image.pngData() else {
                 XCTFail("Could not encode screenshot \(name) as PNG")
                 return

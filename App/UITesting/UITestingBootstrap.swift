@@ -99,6 +99,10 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     private let searchPosts: [Post]
     private let commentsByPostID: [Int: [Comment]]
 
+    private var availablePosts: [Post] {
+        searchPosts + [askPost, showPost, jobPost]
+    }
+
     init(profile: UITestLaunchConfiguration.FixtureProfile) {
         commentsByPostID = Self.makeCommentsByPostID()
         let functionalPosts = Self.makeActivePosts()
@@ -221,12 +225,10 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     }
 
     func getPost(id: Int) async throws -> Post {
-        let categoryPosts = [askPost, showPost, jobPost]
-        guard var post = posts.first(where: { $0.id == id })
-            ?? categoryPosts.first(where: { $0.id == id }) else {
+        guard var post = availablePosts.first(where: { $0.id == id }) else {
             throw HackersKitError.scraperError
         }
-        post.comments = commentsByPostID[id] ?? []
+        post.comments = comments(for: id)
         if let commentCount = post.comments?.count, commentCount > 0 {
             post.commentsCount = max(post.commentsCount, commentCount)
         }
@@ -244,7 +246,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             postID = routePostID
         }
 
-        guard let post = posts.first(where: { $0.id == postID }) else {
+        guard let post = availablePosts.first(where: { $0.id == postID }) else {
             throw ValidationError.unknownPost(postID)
         }
 
@@ -260,6 +262,20 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 
     func getComments(for post: Post) async throws -> [Comment] {
         try await getPost(id: post.id).comments ?? []
+    }
+
+    private func comments(for postID: Int) -> [Comment] {
+        (commentsByPostID[postID] ?? []).map { fixture in
+            let comment = fixture
+            comment.voteLinks = VoteLinks(
+                upvote: URL(
+                    string: "https://news.ycombinator.com/vote?id=\(fixture.id)&how=up"
+                        + "&goto=item%3Fid%3D\(postID)"
+                ),
+                unvote: nil
+            )
+            return comment
+        }
     }
 
     func searchPosts(
@@ -552,124 +568,124 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     id: 48_354_262,
                     by: "manakov_dev",
                     age: "1 minute ago",
-                    text: "Tiny machines make sense when travel weight matters more than benchmark numbers, especially for light terminal and browser work."
+                    text: "Swift 6.2 feels focused on making concurrency diagnostics more practical without giving up the safety model."
                 ),
                 makeComment(
                     id: 48_353_305,
                     by: "lexicality",
                     age: "2 hours ago",
-                    text: "Cheap small laptops can be rough around the edges and still hit a strange sweet spot for vacation or couch computing."
+                    text: "Approachable concurrency is the right direction. The language should teach the common path before exposing every isolation detail."
                 ),
                 makeComment(
                     id: 48_353_877,
                     by: "tinythinkpad",
                     age: "2 hours ago",
-                    text: "The appeal is not raw speed. It is being able to throw a real keyboard and a full browser into the smallest corner of a bag.",
+                    text: "The migration story matters as much as the feature list. Existing apps need a path that can be adopted one module at a time.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_353_928,
                     by: "luggable",
                     age: "2 hours ago",
-                    text: "For SSH, notes, and light code review these devices are closer to tools than toys. The moment you expect workstation behavior they get frustrating.",
+                    text: "Default actor isolation removes a lot of annotation noise for UI code, but library authors still need to make their boundaries explicit.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_047,
                     by: "michaelcampbell",
                     age: "1 hour ago",
-                    text: "I wish more reviews spent time on thermals at lap distance. A compact chassis can turn a fine chip into a noisy compromise."
+                    text: "The compiler messages are noticeably more useful when a value crosses an isolation boundary in a large view model."
                 ),
                 makeComment(
                     id: 48_354_083,
                     by: "janalsncm",
                     age: "1 hour ago",
-                    text: "The hinge and keyboard matter more than the CPU here. If either one feels fragile the whole category stops making sense.",
+                    text: "It would help to see more migration examples that start with mixed Swift 5 and Swift 6 targets in one workspace.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_119,
                     by: "summerlight",
                     age: "1 hour ago",
-                    text: "I keep an older MiniBook around as a travel terminal. It is not pleasant for eight hours, but it is fantastic for twenty minutes in an airport."
+                    text: "InlineArray looks small on paper, but fixed-size storage is useful when performance and predictable layout both matter."
                 ),
                 makeComment(
                     id: 48_354_166,
                     by: "pavel_lishin",
                     age: "58 minutes ago",
-                    text: "These machines also make good emergency computers. Leave one charged in a drawer and it is ready for routers, serial consoles, and odd jobs.",
+                    text: "Span should make low-level buffer APIs easier to express without immediately reaching for unsafe pointer arithmetic.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_204,
                     by: "cipherpunks",
                     age: "49 minutes ago",
-                    text: "The weird part is that phones have the performance, but the clamshell form factor still wins when you need to type accurately."
+                    text: "I appreciate releases that improve build diagnostics and tooling alongside headline language features."
                 ),
                 makeComment(
                     id: 48_354_233,
                     by: "rsyncer",
                     age: "45 minutes ago",
-                    text: "A pocketable laptop with Linux support is a surprisingly good fit for homelab maintenance. The screen only has to be good enough.",
+                    text: "Package authors will need clear guidance on which concurrency annotations are source-compatible for older clients.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_281,
                     by: "kspace",
                     age: "38 minutes ago",
-                    text: "Battery life is the deciding detail for me. If the small machine needs its own charger every day, the portability story gets weaker."
+                    text: "The best concurrency improvement may be reducing how often developers have to think about executors in ordinary app code."
                 ),
                 makeComment(
                     id: 48_354_312,
                     by: "subpixel",
                     age: "34 minutes ago",
-                    text: "The high-DPI display is more important than it sounds. Small screens are only tolerable when text rendering is crisp.",
+                    text: "There is still a gap between understanding Sendable in a small sample and untangling it in an established application.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_337,
                     by: "nfriedly",
                     age: "30 minutes ago",
-                    text: "I like that this category still exists. Not every portable computer needs to converge into a tablet plus keyboard cover."
+                    text: "Better interoperability work is easy to overlook, but it expands where Swift can be introduced without rewriting a whole system."
                 ),
                 makeComment(
                     id: 48_354_371,
                     by: "softfalcon",
                     age: "27 minutes ago",
-                    text: "The market seems tiny, but the people who want one really want one. That is exactly the sort of hardware niche worth preserving.",
+                    text: "The language is becoming stricter and easier to use at the same time, which is a difficult balance to maintain.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_415,
                     by: "kerneltoast",
                     age: "21 minutes ago",
-                    text: "Driver support would make or break it for me. Suspend, Wi-Fi, brightness keys, and audio have to work without a weekend project."
+                    text: "I would like Xcode fix-its to distinguish mechanical migration steps from changes that need an architectural decision."
                 ),
                 makeComment(
                     id: 48_354_441,
                     by: "annoyingnoises",
                     age: "18 minutes ago",
-                    text: "Fans on tiny laptops have a way of sounding much worse than their actual decibel number. Pitch matters.",
+                    text: "Concurrency warnings are most useful when they point to the ownership boundary, not only the line where the value was used.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_486,
                     by: "travelrouter",
                     age: "12 minutes ago",
-                    text: "For me the comparison is not with a MacBook Air. It is with carrying no laptop at all and regretting it once per trip."
+                    text: "The WebAssembly work is interesting because it tests assumptions that were previously hidden by Apple platform runtimes."
                 ),
                 makeComment(
                     id: 48_354_520,
                     by: "noisefloor",
                     age: "8 minutes ago",
-                    text: "I would love to see this with a matte screen and repairable storage. Small does not have to mean disposable.",
+                    text: "A release like this benefits from sample projects showing the same feature in app, server, and package contexts.",
                     level: 1
                 ),
                 makeComment(
                     id: 48_354_553,
                     by: "xterm256",
                     age: "4 minutes ago",
-                    text: "The keyboard layout is always the catch. If slash, escape, and arrows are in strange places, terminal work becomes comedy."
+                    text: "My main question is how these defaults behave when an application mixes Observation, delegates, and older Combine pipelines."
                 )
             ],
             48_349_527: [
@@ -698,13 +714,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             by: by,
             level: level,
             upvoted: false,
-            voteLinks: VoteLinks(
-                upvote: URL(
-                    string: "https://news.ycombinator.com/vote?id=\(id)&how=up"
-                        + "&goto=item%3Fid%3D\(UITestingBootstrap.postID)"
-                ),
-                unvote: nil
-            )
+            voteLinks: nil
         )
     }
 
@@ -923,35 +933,35 @@ struct UITestArticleContent: Equatable {
 
 enum UITestArticleFixtures {
     static func article(for url: URL) -> UITestArticleContent? {
-        if url.host?.contains("hacktivis.me") == true {
+        switch url.absoluteString {
+        case "https://hacktivis.me/articles/cloudflare-turnstile-webgl-fingerprinting":
             return UITestArticleContent(
                 title: "Cloudflare Turnstile requiring fingerprintable WebGL",
                 body: "Fixture article loaded from the UI-test Hacker News Active snapshot."
             )
-        }
-
-        if url.host?.contains("swift.org") == true {
+        case "https://www.swift.org/blog/swift-6.2-released/":
             return UITestArticleContent(
                 title: "Swift 6.2 Released",
                 body: "Fixture article loaded from the UI-test Hacker News Active snapshot."
             )
-        }
-
-        if url.host?.contains("simpleflying.com") == true {
+        case "https://www.swift.org/documentation/migration-guide/":
+            return UITestArticleContent(
+                title: "Swift 6.2 Migration Guide",
+                body: "Deterministic local migration guidance for the UI-test search result."
+            )
+        case "https://simpleflying.com/united-airlines-767-returns-newark-bluetooth-name-alert/":
             return UITestArticleContent(
                 title: "United Airlines 767 returns to Newark",
                 body: "Fixture article for a current Active thread with a lively comment discussion."
             )
-        }
-
-        if url.absoluteString == "https://example.com/ui-test-large-comments" {
+        case "https://example.com/ui-test-large-comments":
             return UITestArticleContent(
                 title: "Large comments stress fixture",
                 body: "Deterministic local article content for the large comments UI-test discussion."
             )
+        default:
+            return nil
         }
-
-        return nil
     }
 }
 #endif

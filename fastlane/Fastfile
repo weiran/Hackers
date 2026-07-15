@@ -114,23 +114,35 @@ end
 
 def validate_screenshots!(output_dir, framed:)
   suffix = framed ? "_framed" : ""
-  selected_paths = []
+  expected_paths = SCREENSHOT_NAMES.product(SCREENSHOT_DEVICES).map do |name, device|
+    File.join(output_dir, "en-US", "#{device}-#{name}#{suffix}.png")
+  end.sort
+  selected_paths = Dir[File.join(output_dir, "**", "*.png")].select do |path|
+    is_framed = File.basename(path, ".png").end_with?("_framed")
+    framed == is_framed
+  end.sort
 
-  SCREENSHOT_NAMES.each do |name|
-    SCREENSHOT_DEVICES.each do |device|
-      expected_basename = "#{device}-#{name}#{suffix}.png"
-      matches = Dir[File.join(output_dir, "**", expected_basename)]
-      UI.user_error!("Expected one #{expected_basename}, found #{matches.length}") unless matches.length == 1
-      width, height = png_dimensions(matches.first)
-      if framed
-        UI.user_error!("Expected a portrait screenshot, got #{width}x#{height}: #{matches.first}") unless height > width
-      else
-        expected_dimensions = SCREENSHOT_RAW_DIMENSIONS.fetch(device)
-        unless [width, height] == expected_dimensions
-          UI.user_error!("Expected #{device} screenshot dimensions #{expected_dimensions.join("x")}, got #{width}x#{height}: #{matches.first}")
-        end
+  missing = expected_paths - selected_paths
+  unexpected = selected_paths - expected_paths
+  unless missing.empty? && unexpected.empty?
+    UI.user_error!(
+      "Screenshot matrix mismatch. Missing: #{missing.map { |path| Pathname.new(path).relative_path_from(Pathname.new(output_dir)) }.join(', ')}; " \
+      "unexpected: #{unexpected.map { |path| Pathname.new(path).relative_path_from(Pathname.new(output_dir)) }.join(', ')}"
+    )
+  end
+
+  selected_paths.each do |path|
+    file_name = File.basename(path)
+    device = SCREENSHOT_DEVICES.find { |candidate| file_name.start_with?("#{candidate}-") }
+    UI.user_error!("Unknown screenshot device: #{path}") unless device
+    width, height = png_dimensions(path)
+    if framed
+      UI.user_error!("Expected a portrait screenshot, got #{width}x#{height}: #{path}") unless height > width
+    else
+      expected_dimensions = SCREENSHOT_RAW_DIMENSIONS.fetch(device)
+      unless [width, height] == expected_dimensions
+        UI.user_error!("Expected #{device} screenshot dimensions #{expected_dimensions.join("x")}, got #{width}x#{height}: #{path}")
       end
-      selected_paths << matches.first
     end
   end
 

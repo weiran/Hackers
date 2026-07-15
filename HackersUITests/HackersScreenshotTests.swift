@@ -7,7 +7,7 @@ final class HackersScreenshotTests: XCTestCase {
     private let screenshotPostID = 48_350_598
     private let dimmedPostID = 48_345_840
     private let firstScreenshotCommentID = 48_354_262
-    private let laterScreenshotCommentID = 48_354_553
+    private let laterScreenshotCommentID = 48_354_415
     private let searchOnlyPostID = 48_400_101
     private let screenshotPostTitle = "Swift 6.2 Released"
     private var app: XCUIApplication!
@@ -41,16 +41,15 @@ final class HackersScreenshotTests: XCTestCase {
         waitForVisible(app.collectionViews["feed.list"], in: app, timeout: 8)
         tapBottomBarSearchButton()
 
-        let searchField = app.searchFields.firstMatch
-        waitForHittable(searchField)
+        let searchField = waitForHittable(app.searchFields.firstMatch, timeout: 10)
         searchField.tap()
         searchField.typeText("Swift")
         dismissSearchKeyboard()
         let searchResults = app.collectionViews["search.results"]
         waitForVisible(searchResults, in: app, timeout: 8)
         _ = waitForVisiblePost(id: searchOnlyPostID, in: searchResults)
-        waitForHittable(app.buttons["search.sort.menu"])
-        waitForHittable(app.buttons["search.date.menu"])
+        _ = waitForHittable(app.buttons["search.sort.menu"])
+        _ = waitForHittable(app.buttons["search.date.menu"])
         snapshot("04-search-by-popular-recent-date")
 
         relaunch(configuration: marketingConfiguration(
@@ -117,8 +116,7 @@ final class HackersScreenshotTests: XCTestCase {
         let keyboard = app.keyboards.firstMatch
         guard keyboard.exists else { return }
 
-        let searchKey = keyboard.buttons["Search"]
-        waitForHittable(searchKey, timeout: timeout)
+        let searchKey = waitForHittable(keyboard.buttons["Search"], timeout: timeout)
         searchKey.tap()
 
         let deadline = Date().addingTimeInterval(timeout)
@@ -136,14 +134,17 @@ final class HackersScreenshotTests: XCTestCase {
         let query = app.buttons.matching(predicate)
         let deadline = Date().addingTimeInterval(timeout)
         var previousFrame: CGRect?
+        var previousCandidateIndex: Int?
         var stableSamples = 0
 
         repeat {
-            if let candidate = query.allElementsBoundByIndex.first(where: {
-                isMeaningfullyVisible($0, in: app)
+            if let match = query.allElementsBoundByIndex.enumerated().first(where: {
+                $0.element.isHittable && isMeaningfullyVisible($0.element, in: app)
             }) {
+                let candidate = match.element
                 let frame = candidate.frame
-                if let previousFrame,
+                if previousCandidateIndex == match.offset,
+                   let previousFrame,
                    abs(previousFrame.minX - frame.minX) <= 1,
                    abs(previousFrame.minY - frame.minY) <= 1,
                    abs(previousFrame.width - frame.width) <= 1,
@@ -153,11 +154,13 @@ final class HackersScreenshotTests: XCTestCase {
                     stableSamples = 1
                 }
                 previousFrame = frame
+                previousCandidateIndex = match.offset
                 if stableSamples >= 3 {
                     return candidate
                 }
             } else {
                 previousFrame = nil
+                previousCandidateIndex = nil
                 stableSamples = 0
             }
 
@@ -165,73 +168,133 @@ final class HackersScreenshotTests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         } while true
 
-        XCTFail("Expected screenshot button \(name) to become meaningfully visible")
+        XCTFail("Expected screenshot button \(name) to become visibly hittable")
         return query.firstMatch
     }
 
     private func scrollCommentsToDeepThread() {
-        let commentsList = app.descendants(matching: .any)["comments.list"]
-        waitForVisible(commentsList, in: app, timeout: 10)
+        let commentsList = waitForVisible(
+            app.descendants(matching: .any)["comments.list"],
+            in: app,
+            timeout: 10
+        )
         let firstComment = app.buttons["comments.comment.\(firstScreenshotCommentID)"]
         let laterComment = app.buttons["comments.comment.\(laterScreenshotCommentID)"]
-        waitForVisible(firstComment, in: commentsList)
-
-        for _ in 0 ..< 8 where !isMeaningfullyVisible(laterComment, in: commentsList) {
+        for _ in 0 ..< 8 where !hasCandidate(matching: laterComment, in: commentsList, satisfying: {
+            isFullyContained($0, in: commentsList) && isInCentralCaptureBand($0, in: commentsList)
+        }) {
             commentsList.swipeUp()
         }
 
-        waitForVisible(laterComment, in: commentsList)
-        XCTAssertFalse(
-            isMeaningfullyVisible(firstComment, in: commentsList),
-            "Expected the initial comment to be outside the captured viewport"
+        _ = waitForStableCandidate(
+            matching: laterComment,
+            in: commentsList,
+            timeout: 5,
+            description: "deep-thread comment to settle in the central capture band"
+        ) {
+            self.isFullyContained($0, in: commentsList)
+                && self.isInCentralCaptureBand($0, in: commentsList)
+        }
+        waitForEveryCandidateOutside(
+            firstComment,
+            container: commentsList,
+            timeout: 5
         )
     }
 
     private func waitForScreenshotComments() {
-        let commentsList = app.descendants(matching: .any)["comments.list"]
-        waitForVisible(commentsList, in: app, timeout: 10)
+        let commentsList = waitForVisible(
+            app.descendants(matching: .any)["comments.list"],
+            in: app,
+            timeout: 10
+        )
         let firstComment = app.buttons["comments.comment.\(firstScreenshotCommentID)"]
-        for _ in 0 ..< 8 where !isMeaningfullyVisible(firstComment, in: commentsList) {
+        for _ in 0 ..< 8 where !hasCandidate(
+            matching: firstComment,
+            in: commentsList,
+            satisfying: { self.isFullyContained($0, in: commentsList) }
+        ) {
             commentsList.swipeDown()
         }
-        waitForVisible(firstComment, in: commentsList)
-        waitForVisible(app.staticTexts["manakov_dev"], in: commentsList)
+        _ = waitForFullyContained(firstComment, in: commentsList)
+        _ = waitForFullyContained(app.staticTexts["manakov_dev"], in: commentsList)
     }
 
     private func waitForFixtureArticleContent() {
-        let webView = app.webViews["browser.fixtureArticle"]
-        waitForVisible(webView, in: app, timeout: 20)
-        waitForVisible(webView.staticTexts[screenshotPostTitle], in: webView, timeout: 20)
+        let webView = waitForVisible(app.webViews["browser.fixtureArticle"], in: app, timeout: 20)
+        _ = waitForFullyContained(webView.staticTexts[screenshotPostTitle], in: webView, timeout: 20)
         let collapsedHeader = app.descendants(matching: .any)
             .matching(identifier: "browser.commentsSheet.collapsedHeader")
             .firstMatch
-        waitForVisible(collapsedHeader, in: app, timeout: 10)
+        let visibleHeader = waitForFullyContained(collapsedHeader, in: app, timeout: 10)
+        XCTAssertGreaterThan(
+            visibleHeader.frame.minY,
+            app.frame.midY,
+            "Expected the collapsed comments sheet below the article capture area"
+        )
     }
 
-    private func waitForHittable(_ element: XCUIElement, timeout: TimeInterval = 5) {
-        let deadline = Date().addingTimeInterval(timeout)
-        repeat {
-            if element.exists, element.isHittable, isMeaningfullyVisible(element, in: app) {
-                return
-            }
-            guard Date() < deadline else { break }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
-        } while true
-        XCTFail("Expected screenshot control to become visibly hittable: \(element)")
+    private func waitForHittable(_ element: XCUIElement, timeout: TimeInterval = 5) -> XCUIElement {
+        waitForStableCandidate(
+            matching: element,
+            in: app,
+            timeout: timeout,
+            description: "screenshot control to become visibly hittable"
+        ) {
+            $0.isHittable && self.isMeaningfullyVisible($0, in: self.app)
+        }
     }
 
+    @discardableResult
     private func waitForVisible(
         _ element: XCUIElement,
         in container: XCUIElement,
         timeout: TimeInterval = 5
-    ) {
+    ) -> XCUIElement {
+        waitForStableCandidate(
+            matching: element,
+            in: container,
+            timeout: timeout,
+            description: "screenshot content to become meaningfully visible"
+        ) {
+            self.isMeaningfullyVisible($0, in: container)
+        }
+    }
+
+    private func waitForFullyContained(
+        _ element: XCUIElement,
+        in container: XCUIElement,
+        timeout: TimeInterval = 5
+    ) -> XCUIElement {
+        waitForStableCandidate(
+            matching: element,
+            in: container,
+            timeout: timeout,
+            description: "screenshot content to become fully contained"
+        ) {
+            self.isFullyContained($0, in: container)
+        }
+    }
+
+    private func waitForStableCandidate(
+        matching element: XCUIElement,
+        in container: XCUIElement,
+        timeout: TimeInterval,
+        description: String,
+        satisfying condition: (XCUIElement) -> Bool
+    ) -> XCUIElement {
         let deadline = Date().addingTimeInterval(timeout)
         var previousFrame: CGRect?
+        var previousCandidateIndex: Int?
         var stableSamples = 0
+
         repeat {
-            if isMeaningfullyVisible(element, in: container) {
-                let frame = element.frame
-                if let previousFrame,
+            let matchingCandidates = candidates(matching: element, in: container)
+            if container.exists,
+               let match = matchingCandidates.enumerated().first(where: { condition($0.element) }) {
+                let frame = match.element.frame
+                if previousCandidateIndex == match.offset,
+                   let previousFrame,
                    abs(previousFrame.minX - frame.minX) <= 1,
                    abs(previousFrame.minY - frame.minY) <= 1,
                    abs(previousFrame.width - frame.width) <= 1,
@@ -241,17 +304,21 @@ final class HackersScreenshotTests: XCTestCase {
                     stableSamples = 1
                 }
                 previousFrame = frame
+                previousCandidateIndex = match.offset
                 if stableSamples >= 3 {
-                    return
+                    return match.element
                 }
             } else {
                 previousFrame = nil
+                previousCandidateIndex = nil
                 stableSamples = 0
             }
             guard Date() < deadline else { break }
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         } while true
-        XCTFail("Expected screenshot content to become meaningfully visible: \(element)")
+
+        XCTFail("Expected \(description): \(element)")
+        return element
     }
 
     private func waitForVisiblePost(
@@ -259,40 +326,80 @@ final class HackersScreenshotTests: XCTestCase {
         in container: XCUIElement,
         timeout: TimeInterval = 5
     ) -> XCUIElement {
-        let query = app.descendants(matching: .any).matching(identifier: "feed.post.\(id)")
-        let deadline = Date().addingTimeInterval(timeout)
-        var previousFrame: CGRect?
-        var stableSamples = 0
+        waitForStableCandidate(
+            matching: app.descendants(matching: .any).matching(identifier: "feed.post.\(id)").firstMatch,
+            in: container,
+            timeout: timeout,
+            description: "feed post \(id) to become meaningfully visible"
+        ) {
+            self.isMeaningfullyVisible($0, in: container)
+        }
+    }
 
+    private func candidates(matching element: XCUIElement, in container: XCUIElement) -> [XCUIElement] {
+        guard element.exists else { return [element] }
+        let identifier = element.identifier
+        guard !identifier.isEmpty else { return [element] }
+        var matches = container.descendants(matching: .any)
+            .matching(identifier: identifier)
+            .allElementsBoundByIndex
+        if container.identifier == identifier {
+            matches.insert(container, at: 0)
+        }
+        let elementType = element.elementType
+        let typeMatches = matches.filter { $0.elementType == elementType }
+        if !typeMatches.isEmpty {
+            matches = typeMatches
+        }
+        return matches.isEmpty ? [element] : matches
+    }
+
+    private func hasCandidate(
+        matching element: XCUIElement,
+        in container: XCUIElement,
+        satisfying condition: (XCUIElement) -> Bool
+    ) -> Bool {
+        candidates(matching: element, in: container).contains(where: condition)
+    }
+
+    private func waitForEveryCandidateOutside(
+        _ element: XCUIElement,
+        container: XCUIElement,
+        timeout: TimeInterval
+    ) {
+        let deadline = Date().addingTimeInterval(timeout)
+        var stableSamples = 0
         repeat {
-            if let candidate = query.allElementsBoundByIndex.first(where: {
-                isMeaningfullyVisible($0, in: container)
-            }) {
-                let frame = candidate.frame
-                if let previousFrame,
-                   abs(previousFrame.minX - frame.minX) <= 1,
-                   abs(previousFrame.minY - frame.minY) <= 1,
-                   abs(previousFrame.width - frame.width) <= 1,
-                   abs(previousFrame.height - frame.height) <= 1 {
-                    stableSamples += 1
-                } else {
-                    stableSamples = 1
-                }
-                previousFrame = frame
-                if stableSamples >= 3 {
-                    return candidate
-                }
+            let allOutside = candidates(matching: element, in: container).allSatisfy {
+                !$0.exists || $0.frame.intersection(container.frame).isNull || $0.frame.intersection(container.frame).isEmpty
+            }
+            if allOutside {
+                stableSamples += 1
+                if stableSamples >= 3 { return }
             } else {
-                previousFrame = nil
                 stableSamples = 0
             }
-
             guard Date() < deadline else { break }
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         } while true
+        XCTFail("Expected every initial-comment candidate outside the captured viewport")
+    }
 
-        XCTFail("Expected feed post \(id) to become meaningfully visible")
-        return query.firstMatch
+    private func isFullyContained(_ element: XCUIElement, in container: XCUIElement) -> Bool {
+        guard element.exists, container.exists else { return false }
+        let frame = element.frame
+        let containerFrame = container.frame
+        guard !frame.isEmpty, !frame.isNull, !containerFrame.isEmpty, !containerFrame.isNull else {
+            return false
+        }
+        return containerFrame.insetBy(dx: -1, dy: -1).contains(frame)
+    }
+
+    private func isInCentralCaptureBand(_ element: XCUIElement, in container: XCUIElement) -> Bool {
+        let frame = element.frame
+        let containerFrame = container.frame
+        let band = containerFrame.insetBy(dx: 0, dy: containerFrame.height * 0.25)
+        return band.contains(CGPoint(x: frame.midX, y: frame.midY))
     }
 
     private func isMeaningfullyVisible(_ element: XCUIElement, in container: XCUIElement) -> Bool {
