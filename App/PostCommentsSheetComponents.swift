@@ -1,3 +1,4 @@
+import Comments
 import DesignSystem
 import Domain
 import Shared
@@ -347,5 +348,216 @@ enum CollapsedHeaderHeightPreferenceKey: PreferenceKey {
     static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
+    }
+}
+
+struct CommentsSheetTopChrome: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var measuredTitleSize: CGSize = .zero
+    let post: Post?
+    let showThumbnails: Bool
+    let titleProgress: CGFloat
+    let isInteractiveMove: Bool
+    let handleTopInset: CGFloat
+    let chromeAreaHeight: CGFloat
+    let titleMaximumWidth: CGFloat
+    let toolbarControlCenterY: CGFloat?
+    let handleWidth: CGFloat
+    let handleThickness: CGFloat
+    let navigationBarHeight: CGFloat
+    let onTitleTap: () -> Void
+
+    private var progress: CGFloat {
+        min(max(titleProgress, 0), 1)
+    }
+
+    private var easedProgress: CGFloat {
+        progress * progress * (3 - (2 * progress))
+    }
+
+    private var handleOpacity: CGFloat {
+        1 - titleContentProgress
+    }
+
+    private var glassSurfaceOpacity: CGFloat {
+        min(max(easedProgress / 0.18, 0), 1)
+    }
+
+    private var titleContentProgress: CGFloat {
+        min(max((easedProgress - 0.24) / 0.52, 0), 1)
+    }
+
+    private var resolvedTitleSize: CGSize {
+        guard measuredTitleSize.width > 0, measuredTitleSize.height > 0 else {
+            return CGSize(width: 220, height: navigationBarHeight)
+        }
+        return measuredTitleSize
+    }
+
+    private var morphWidth: CGFloat {
+        interpolate(from: handleWidth, to: resolvedTitleSize.width, progress: easedProgress)
+    }
+
+    private var morphHeight: CGFloat {
+        interpolate(from: handleThickness, to: resolvedTitleSize.height, progress: easedProgress)
+    }
+
+    private var morphVerticalOffset: CGFloat {
+        let handleOffset = (chromeAreaHeight - handleThickness) / 2
+        let titleOffset = toolbarControlCenterY.map {
+            max($0 - handleTopInset - (resolvedTitleSize.height / 2), 0)
+        } ?? max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
+        return interpolate(from: handleOffset, to: titleOffset, progress: easedProgress)
+    }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            if let post {
+                measuredTitleContent(for: post)
+            }
+
+            morphingChrome
+                .padding(.top, handleTopInset)
+                .offset(y: morphVerticalOffset)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: navigationBarHeight + handleTopInset, alignment: .top)
+        .animation(isInteractiveMove ? nil : chromeAnimation, value: progress)
+    }
+
+    private var morphingChrome: some View {
+        Button(action: onTitleTap) {
+            ZStack {
+                if glassSurfaceOpacity > 0 {
+                    ZStack {
+                        if let post {
+                            CommentsHeaderTitlePillContent(
+                                post: post,
+                                showThumbnails: showThumbnails,
+                                maximumWidth: titleMaximumWidth
+                            )
+                                .opacity(titleContentProgress)
+                        }
+                    }
+                    .frame(width: morphWidth, height: morphHeight)
+                    .clipShape(.capsule)
+                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .glassEffectTransition(.identity)
+                    .opacity(glassSurfaceOpacity)
+                }
+                Capsule()
+                    .fill(.secondary.opacity(0.52))
+                    .frame(width: handleWidth, height: handleThickness)
+                    .opacity(handleOpacity)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: morphWidth, height: morphHeight)
+            .contentShape(.capsule)
+        }
+        .buttonStyle(.plain)
+        .disabled(progress <= 0.5)
+        .accessibilityIdentifier("browser.commentsSheet.expandedTitle")
+        .accessibilityLabel(post?.title ?? "Comments sheet handle")
+        .accessibilityHint("Collapse comments")
+        .accessibilityHidden(progress <= 0.5)
+    }
+
+    private var chromeAnimation: Animation {
+        if reduceMotion {
+            .easeInOut(duration: 0.2)
+        } else {
+            .spring(response: 0.32, dampingFraction: 0.84, blendDuration: 0.05)
+        }
+    }
+
+    private func measuredTitleContent(for post: Post) -> some View {
+        CommentsHeaderTitlePillContent(
+            post: post,
+            showThumbnails: showThumbnails,
+            maximumWidth: titleMaximumWidth
+        )
+            .hidden()
+            .background(
+                GeometryReader { proxy in
+                    Color.clear.preference(key: TitlePillSizePreferenceKey.self, value: proxy.size)
+                }
+            )
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .onPreferenceChange(TitlePillSizePreferenceKey.self) { newValue in
+                guard newValue.width > 0, newValue.height > 0 else { return }
+                measuredTitleSize = newValue
+            }
+    }
+
+    private func interpolate(from start: CGFloat, to end: CGFloat, progress: CGFloat) -> CGFloat {
+        start + ((end - start) * progress)
+    }
+}
+
+private struct TitlePillSizePreferenceKey: PreferenceKey {
+    static let defaultValue: CGSize = .zero
+
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        let next = nextValue()
+        if next.width > 0, next.height > 0 {
+            value = next
+        }
+    }
+}
+
+struct StableCommentsHost: View, @preconcurrency Equatable {
+    let postID: Int
+    let topContentInset: CGFloat
+    let showsPostHeader: Bool
+    let scrollDisabled: Bool
+    let viewModel: CommentsViewModel
+    let votingViewModel: VotingViewModel
+    let postHeaderMatchedGeometryNamespace: Namespace.ID?
+    let isPostHeaderMatchedGeometrySource: Bool
+    let titleVisibility: CommentsHeaderTitleVisibility
+    let toolbarGeometry: CommentsToolbarGeometry
+    let showsToolbar: Bool
+    let dragExpandedTop: CGFloat
+    let dragCollapsedTop: CGFloat
+    let onPostLinkTap: () -> Void
+    let onTitleDragChanged: (DragGesture.Value) -> Void
+    let onTitleDragEnded: (DragGesture.Value) -> Void
+
+    static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
+        lhs.postID == rhs.postID
+            && lhs.topContentInset == rhs.topContentInset
+            && lhs.showsPostHeader == rhs.showsPostHeader
+            && lhs.scrollDisabled == rhs.scrollDisabled
+            && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
+            && lhs.showsToolbar == rhs.showsToolbar
+            && lhs.dragExpandedTop == rhs.dragExpandedTop
+            && lhs.dragCollapsedTop == rhs.dragCollapsedTop
+            && ObjectIdentifier(lhs.viewModel) == ObjectIdentifier(rhs.viewModel)
+            && ObjectIdentifier(lhs.votingViewModel) == ObjectIdentifier(rhs.votingViewModel)
+            && ObjectIdentifier(lhs.toolbarGeometry) == ObjectIdentifier(rhs.toolbarGeometry)
+    }
+
+    var body: some View {
+        CommentsView<NavigationStore>(
+            postID: postID,
+            showsPostHeader: showsPostHeader,
+            allowsRefresh: false,
+            showsToolbar: showsToolbar,
+            controlsNavigationBarVisibility: true,
+            presentationState: .customBrowser(topContentInset: topContentInset),
+            postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+            isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
+            headerTitleVisibility: titleVisibility,
+            toolbarGeometry: toolbarGeometry,
+            onPostLinkTap: onPostLinkTap,
+            onTitleDragChanged: onTitleDragChanged,
+            onTitleDragEnded: onTitleDragEnded,
+            onPostHeaderDragChanged: onTitleDragChanged,
+            onPostHeaderDragEnded: onTitleDragEnded,
+            viewModel: viewModel,
+            votingViewModel: votingViewModel
+        )
+        .scrollDisabled(scrollDisabled)
     }
 }
