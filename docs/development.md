@@ -27,7 +27,7 @@ If the simulator is missing or stale, compare your environment with the CI setup
 scripts/ci/setup-xcode-simulator.sh
 ```
 
-That script selects/prints Xcode, runs first launch setup, verifies the iOS simulator platform, and creates/boots the expected simulator when needed.
+That script selects/prints Xcode, runs first launch setup, selects an iOS runtime matching the chosen Xcode simulator SDK, and creates/boots the expected simulator when needed.
 
 ## Build
 

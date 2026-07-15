@@ -83,9 +83,12 @@ run_with_timeout() {
 
 has_available_ios_runtime() {
   xcrun simctl list runtimes -j | ruby -rjson -e '
+    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_SDK_VERSION"))
+    sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     exit(runtimes.any? { |runtime|
       runtime["platform"] == "iOS" && runtime["isAvailable"] != false
+        && (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
     } ? 0 : 1)
   '
 }
@@ -128,14 +131,17 @@ if [[ "$MODE" == "xcode-only" ]]; then
   exit 0
 fi
 
+IOS_SIMULATOR_SDK_VERSION="$(xcrun --sdk iphonesimulator --show-sdk-version)"
+export IOS_SIMULATOR_SDK_VERSION
+
 if has_available_ios_runtime; then
-  echo "An available iOS simulator runtime is already installed."
+  echo "An iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION is already installed."
 else
   if [[ "$DOWNLOAD_IOS_PLATFORM" == "1" ]]; then
-    echo "No available iOS simulator runtime found; downloading iOS platform."
+    echo "No iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION found; downloading iOS platform."
     run_with_timeout 900 xcodebuild -downloadPlatform iOS
   else
-    echo "No available iOS simulator runtime found on this runner image." >&2
+    echo "No iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION found on this runner image." >&2
     echo "Set CI_DOWNLOAD_IOS_PLATFORM=1 or pass --download-ios-platform to allow an on-runner download." >&2
     exit 1
   fi
@@ -143,11 +149,14 @@ fi
 
 RUNTIME_ID="$(
   xcrun simctl list runtimes -j | ruby -rjson -e '
+    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_SDK_VERSION"))
+    sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     ios = runtimes.select { |runtime|
       runtime["platform"] == "iOS" && runtime["isAvailable"] != false
+        && (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
     }
-    abort("No available iOS simulator runtime found") if ios.empty?
+    abort("No iOS simulator runtime compatible with SDK #{sdk_version} found") if ios.empty?
     puts ios.sort_by { |runtime| Gem::Version.new(runtime.fetch("version")) }.last.fetch("identifier")
   '
 )"
