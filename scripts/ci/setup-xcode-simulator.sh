@@ -87,8 +87,9 @@ has_available_ios_runtime() {
     sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     exit(runtimes.any? { |runtime|
-      runtime["platform"] == "iOS" && runtime["isAvailable"] != false
-        && (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+      runtime["platform"] == "iOS" &&
+        runtime["isAvailable"] != false &&
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
     } ? 0 : 1)
   '
 }
@@ -153,8 +154,9 @@ RUNTIME_ID="$(
     sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     ios = runtimes.select { |runtime|
-      runtime["platform"] == "iOS" && runtime["isAvailable"] != false
-        && (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+      runtime["platform"] == "iOS" &&
+        runtime["isAvailable"] != false &&
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
     }
     abort("No iOS simulator runtime compatible with SDK #{sdk_version} found") if ios.empty?
     puts ios.sort_by { |runtime| Gem::Version.new(runtime.fetch("version")) }.last.fetch("identifier")
