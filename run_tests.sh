@@ -58,7 +58,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 BASE_DIR="$(pwd)"
-DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro"
+DESTINATION="${CI_DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro}"
 VERBOSE=false
 
 # All available modules

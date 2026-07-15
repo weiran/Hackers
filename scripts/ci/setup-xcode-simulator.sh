@@ -194,5 +194,5 @@ fi
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
   echo "CI_DEVICE_UDID=$DEVICE_UDID" >> "$GITHUB_ENV"
-  echo "CI_DESTINATION=platform=iOS Simulator,name=$DEVICE_NAME" >> "$GITHUB_ENV"
+  echo "CI_DESTINATION=platform=iOS Simulator,id=$DEVICE_UDID" >> "$GITHUB_ENV"
 fi
