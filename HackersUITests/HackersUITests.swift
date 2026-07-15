@@ -846,7 +846,6 @@ final class HackersUITests: XCTestCase {
     ) -> XCUIElement? {
         let deadline = Date().addingTimeInterval(timeout)
         var previousFrame: CGRect?
-        var previousCandidateIndex: Int?
         var stableSampleCount = 0
 
         repeat {
@@ -865,24 +864,21 @@ final class HackersUITests: XCTestCase {
                    }
                    return isMeaningfullyVisible(frame, in: containerFrame)
                }) {
-                let candidateIndex = match.offset
                 let candidate = match.element
                 let frame = candidate.frame
-                if previousCandidateIndex == candidateIndex,
-                   let previousFrame,
-                   framesAreStable(previousFrame, frame) {
+                // Matching nodes can reorder between accessibility snapshots. Identifier, type,
+                // and stable rendered geometry are the meaningful identity for this assertion.
+                if let previousFrame, framesAreStable(previousFrame, frame) {
                     stableSampleCount += 1
                 } else {
                     stableSampleCount = 1
                 }
                 previousFrame = frame
-                previousCandidateIndex = candidateIndex
                 if stableSampleCount >= 3 {
                     return candidate
                 }
             } else {
                 previousFrame = nil
-                previousCandidateIndex = nil
                 stableSampleCount = 0
             }
 
@@ -918,7 +914,6 @@ final class HackersUITests: XCTestCase {
     ) -> CGRect? {
         let deadline = Date().addingTimeInterval(timeout)
         var previousFrame: CGRect?
-        var previousCandidateIndex: Int?
         var stableSampleCount = 0
 
         repeat {
@@ -930,21 +925,17 @@ final class HackersUITests: XCTestCase {
                 return !frame.isEmpty && !frame.isNull && condition(frame)
             }) {
                 let frame = match.element.frame
-                if previousCandidateIndex == match.offset,
-                   let previousFrame,
-                   framesAreStable(previousFrame, frame) {
+                if let previousFrame, framesAreStable(previousFrame, frame) {
                     stableSampleCount += 1
                 } else {
                     stableSampleCount = 1
                 }
                 previousFrame = frame
-                previousCandidateIndex = match.offset
                 if stableSampleCount >= 3 {
                     return frame
                 }
             } else {
                 previousFrame = nil
-                previousCandidateIndex = nil
                 stableSampleCount = 0
             }
 
