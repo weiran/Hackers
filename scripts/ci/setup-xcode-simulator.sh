@@ -94,10 +94,9 @@ has_available_ios_runtime() {
   '
 }
 
-if [[ -f "$XCODE_VERSION_FILE" ]]; then
+XCODE_VERSION="${CI_XCODE_VERSION:-}"
+if [[ -z "$XCODE_VERSION" && -f "$XCODE_VERSION_FILE" ]]; then
   XCODE_VERSION="$(tr -d '[:space:]' < "$XCODE_VERSION_FILE")"
-else
-  XCODE_VERSION=""
 fi
 
 if [[ -n "$XCODE_VERSION" ]]; then
