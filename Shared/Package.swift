@@ -5,7 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-// swift-tools-version: 6.2
+// swift-tools-version: 6.3
 import PackageDescription
 
 let package = Package(
