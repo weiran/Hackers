@@ -175,7 +175,7 @@ Primary workflows:
   * Runs on PRs and pushes to `master`.
   * Required jobs: `lint`, `build`, `test`, and `ui smoke`.
 * `.github/workflows/nightly.yml`
-  * Scheduled clean validation to catch Xcode/simulator/runtime drift, including full UI tests.
+  * Scheduled nightly validation to catch Xcode/simulator/runtime drift, including full UI tests.
 * `.github/workflows/release-testflight.yml`
   * Protected TestFlight release workflow.
 * `.github/workflows/release-appstore.yml`

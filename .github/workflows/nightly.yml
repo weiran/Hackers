@@ -18,8 +18,8 @@ env:
   XCODE_VERSION_FILE: .github/xcode-version
 
 jobs:
-  clean-validation:
-    name: clean validation
+  nightly-validation:
+    name: nightly validation
     runs-on: macos-26
     timeout-minutes: 120
     steps:
