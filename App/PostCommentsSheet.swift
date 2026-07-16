@@ -383,7 +383,7 @@ struct PostCommentsSheet: View {
                     .allowsHitTesting(titleProgress <= 0.5)
                     .accessibilityElement()
                     .accessibilityLabel("Comments sheet handle")
-                    .accessibilityIdentifier("browser.commentsSheet.handle")
+                    .accessibilityIdentifier(AccessibilityIdentifier.Browser.commentsSheetHandle)
                     .accessibilityHidden(titleProgress > 0.5)
 
                 Spacer()

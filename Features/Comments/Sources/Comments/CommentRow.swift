@@ -7,6 +7,7 @@
 
 import DesignSystem
 import Domain
+import Shared
 import SwiftUI
 import UIKit
 
@@ -49,7 +50,7 @@ struct CommentRow: View {
             .contentShape(.interaction, Rectangle())
             .onTapGesture(perform: onToggle)
             .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("comments.comment.\(state.id)")
+            .accessibilityIdentifier(AccessibilityIdentifier.Comments.comment(state.id))
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
             .accessibilityAction(.default, onToggle)
@@ -191,7 +192,7 @@ struct CommentRow: View {
             action: state.isUpvoted ? onUnvote : onUpvote
         )
         .buttonStyle(.plain)
-        .accessibilityIdentifier("comments.vote.\(state.id)")
+        .accessibilityIdentifier(AccessibilityIdentifier.Comments.vote(state.id))
     }
 
     private var commentText: some View {

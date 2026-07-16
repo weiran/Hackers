@@ -250,7 +250,7 @@ struct CollapsedPostHeaderView: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: onExpand)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("browser.commentsSheet.collapsedHeader")
+        .accessibilityIdentifier(AccessibilityIdentifier.Browser.collapsedCommentsHeader)
     }
 
     private var domainText: String {
@@ -456,7 +456,7 @@ struct CommentsSheetTopChrome: View {
         }
         .buttonStyle(.plain)
         .disabled(progress <= 0.5)
-        .accessibilityIdentifier("browser.commentsSheet.expandedTitle")
+        .accessibilityIdentifier(AccessibilityIdentifier.Browser.expandedCommentsTitle)
         .accessibilityLabel(post?.title ?? "Comments sheet handle")
         .accessibilityHint("Collapse comments")
         .accessibilityHidden(progress <= 0.5)

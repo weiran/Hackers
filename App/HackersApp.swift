@@ -19,6 +19,14 @@ struct HackersApp: App {
     // Keep AppDelegate for legacy services and setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+    private var runtimePolicy: AppRuntimePolicy {
+        #if DEBUG
+        UITestingBootstrap.runtimePolicy
+        #else
+        .standard
+        #endif
+    }
+
     init() {
         #if DEBUG
         UITestingBootstrap.configureIfNeeded()
@@ -34,6 +42,7 @@ struct HackersApp: App {
                 .environment(navigationStore)
                 .environment(sessionService)
                 .environment(toastPresenter)
+                .environment(\.appRuntimePolicy, runtimePolicy)
                 .onAppear {
                     setupAppearance()
                     handleInitialUITestingRouteIfNeeded()

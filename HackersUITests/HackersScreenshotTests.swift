@@ -4,11 +4,11 @@ import XCTest
 
 @MainActor
 final class HackersScreenshotTests: XCTestCase {
-    private let screenshotPostID = 48_350_598
-    private let dimmedPostID = 48_345_840
-    private let firstScreenshotCommentID = 48_354_262
-    private let laterScreenshotCommentID = 48_354_415
-    private let searchOnlyPostID = 48_400_101
+    private let screenshotPostID = UITestFixtureReference.screenshotPostID
+    private let dimmedPostID = UITestFixtureReference.longCommentsPostID
+    private let firstScreenshotCommentID = UITestFixtureReference.firstScreenshotCommentID
+    private let laterScreenshotCommentID = UITestFixtureReference.laterScreenshotCommentID
+    private let searchOnlyPostID = UITestFixtureReference.searchOnlyPostID
     private let screenshotPostTitle = "Swift 6.2 Released"
     private var app: XCUIApplication!
 
@@ -19,7 +19,7 @@ final class HackersScreenshotTests: XCTestCase {
     func testAppStoreScreenshots() throws {
         launchApp(configuration: marketingConfiguration(browserMode: .inAppBrowser))
 
-        waitForVisible(app.collectionViews["feed.list"], in: app, timeout: 8)
+        waitForVisible(app.collectionViews[AccessibilityIdentifier.Feed.list], in: app, timeout: 8)
         _ = waitForVisiblePost(id: screenshotPostID, in: app)
         snapshot("01-feed-built-for-reading")
 
@@ -38,18 +38,18 @@ final class HackersScreenshotTests: XCTestCase {
         snapshot("03-read-comments-alongside-story")
 
         relaunch(configuration: marketingConfiguration(browserMode: .inAppBrowser))
-        waitForVisible(app.collectionViews["feed.list"], in: app, timeout: 8)
+        waitForVisible(app.collectionViews[AccessibilityIdentifier.Feed.list], in: app, timeout: 8)
         tapBottomBarSearchButton()
 
         let searchField = waitForHittable(app.searchFields.firstMatch, timeout: 10)
         searchField.tap()
         searchField.typeText("Swift")
         dismissSearchKeyboard()
-        let searchResults = app.collectionViews["search.results"]
+        let searchResults = app.collectionViews[AccessibilityIdentifier.Feed.searchResults]
         waitForVisible(searchResults, in: app, timeout: 8)
         _ = waitForVisiblePost(id: searchOnlyPostID, in: searchResults)
-        _ = waitForHittable(app.buttons["search.sort.menu"])
-        _ = waitForHittable(app.buttons["search.date.menu"])
+        _ = waitForHittable(app.buttons[AccessibilityIdentifier.Feed.searchSortMenu])
+        _ = waitForHittable(app.buttons[AccessibilityIdentifier.Feed.searchDateMenu])
         snapshot("04-search-by-popular-recent-date")
 
         relaunch(configuration: marketingConfiguration(
@@ -174,12 +174,12 @@ final class HackersScreenshotTests: XCTestCase {
 
     private func scrollCommentsToDeepThread() {
         let commentsList = waitForVisible(
-            app.descendants(matching: .any)["comments.list"],
+            app.descendants(matching: .any)[AccessibilityIdentifier.Comments.list],
             in: app,
             timeout: 10
         )
-        let firstComment = app.buttons["comments.comment.\(firstScreenshotCommentID)"]
-        let laterComment = app.buttons["comments.comment.\(laterScreenshotCommentID)"]
+        let firstComment = app.buttons[AccessibilityIdentifier.Comments.comment(firstScreenshotCommentID)]
+        let laterComment = app.buttons[AccessibilityIdentifier.Comments.comment(laterScreenshotCommentID)]
         for _ in 0 ..< 8 where !hasCandidate(matching: laterComment, in: commentsList, satisfying: {
             isFullyContained($0, in: commentsList) && isInCentralCaptureBand($0, in: commentsList)
         }) {
@@ -204,11 +204,11 @@ final class HackersScreenshotTests: XCTestCase {
 
     private func waitForScreenshotComments() {
         let commentsList = waitForVisible(
-            app.descendants(matching: .any)["comments.list"],
+            app.descendants(matching: .any)[AccessibilityIdentifier.Comments.list],
             in: app,
             timeout: 10
         )
-        let firstComment = app.buttons["comments.comment.\(firstScreenshotCommentID)"]
+        let firstComment = app.buttons[AccessibilityIdentifier.Comments.comment(firstScreenshotCommentID)]
         for _ in 0 ..< 8 where !hasCandidate(
             matching: firstComment,
             in: commentsList,
@@ -221,10 +221,10 @@ final class HackersScreenshotTests: XCTestCase {
     }
 
     private func waitForFixtureArticleContent() {
-        let webView = waitForVisible(app.webViews["browser.fixtureArticle"], in: app, timeout: 20)
+        let webView = waitForVisible(app.webViews[AccessibilityIdentifier.Browser.fixtureArticle], in: app, timeout: 20)
         _ = waitForFullyContained(webView.staticTexts[screenshotPostTitle], in: webView, timeout: 20)
         let collapsedHeader = app.descendants(matching: .any)
-            .matching(identifier: "browser.commentsSheet.collapsedHeader")
+            .matching(identifier: AccessibilityIdentifier.Browser.collapsedCommentsHeader)
             .firstMatch
         let visibleHeader = waitForFullyContained(collapsedHeader, in: app, timeout: 10)
         XCTAssertGreaterThan(
@@ -327,7 +327,9 @@ final class HackersScreenshotTests: XCTestCase {
         timeout: TimeInterval = 5
     ) -> XCUIElement {
         waitForStableCandidate(
-            matching: app.descendants(matching: .any).matching(identifier: "feed.post.\(id)").firstMatch,
+            matching: app.descendants(matching: .any)
+                .matching(identifier: AccessibilityIdentifier.Feed.post(id))
+                .firstMatch,
             in: container,
             timeout: timeout,
             description: "feed post \(id) to become meaningfully visible"

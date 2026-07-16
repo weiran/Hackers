@@ -65,7 +65,7 @@ struct PostRowView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityIdentifier("feed.post.\(post.id)")
+            .accessibilityIdentifier(AccessibilityIdentifier.Feed.post(post.id))
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Open comments")
         } else {
@@ -86,7 +86,7 @@ struct PostRowView: View {
                 onCommentsTap: onCommentsTap
             )
             .contentShape(Rectangle())
-            .accessibilityIdentifier("feed.post.\(post.id)")
+            .accessibilityIdentifier(AccessibilityIdentifier.Feed.post(post.id))
         }
     }
 

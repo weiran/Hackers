@@ -21,7 +21,6 @@ public struct SettingsView: View {
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
     let onWhatsNewDismiss: () -> Void
-    let disablesCredentialAutoFill: Bool
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showSupport = false
@@ -39,8 +38,7 @@ public struct SettingsView: View {
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onWhatsNewDismiss: @escaping () -> Void = {},
-        disablesCredentialAutoFill: Bool = false
+        onWhatsNewDismiss: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
@@ -48,7 +46,6 @@ public struct SettingsView: View {
         self.onLogin = onLogin
         self.onLogout = onLogout
         self.onWhatsNewDismiss = onWhatsNewDismiss
-        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
     public var body: some View {
@@ -91,8 +88,7 @@ public struct SettingsView: View {
                             currentUsername: currentUsername,
                             onLogin: onLogin,
                             onLogout: onLogout,
-                            textSize: viewModel.textSize,
-                            disablesCredentialAutoFill: disablesCredentialAutoFill
+                            textSize: viewModel.textSize
                         )
                         .textScaling(for: viewModel.textSize)
                     }
@@ -136,12 +132,12 @@ public struct SettingsView: View {
                     Toggle(isOn: $viewModel.showThumbnails) {
                         Label("Show Thumbnails", systemImage: "photo.on.rectangle")
                     }
-                    .accessibilityIdentifier("settings.showThumbnails")
+                    .accessibilityIdentifier(AccessibilityIdentifier.Settings.showThumbnails)
 
                     Toggle(isOn: $viewModel.compactFeedDesign) {
                         Label("Compact Feed Design", systemImage: "list.bullet.rectangle")
                     }
-                    .accessibilityIdentifier("settings.compactFeed")
+                    .accessibilityIdentifier(AccessibilityIdentifier.Settings.compactFeed)
                 }
 
 #if DEBUG
@@ -181,7 +177,7 @@ public struct SettingsView: View {
                     Toggle(isOn: $viewModel.dimReadPosts) {
                         Label("Dim Read Posts", systemImage: "circle.lefthalf.filled")
                     }
-                    .accessibilityIdentifier("settings.dimReadPosts")
+                    .accessibilityIdentifier(AccessibilityIdentifier.Settings.dimReadPosts)
                 }
 
                 Section(header: Text("Storage")) {
@@ -209,7 +205,7 @@ public struct SettingsView: View {
                 }
             }
             .listStyle(GroupedListStyle())
-            .accessibilityIdentifier("settings.form")
+            .accessibilityIdentifier(AccessibilityIdentifier.Settings.form)
             .navigationBarTitle(Text("Settings"))
             .navigationBarItems(trailing:
                 Button(
@@ -221,7 +217,7 @@ public struct SettingsView: View {
                     },
                 )
                 .accessibilityLabel("Close")
-                .accessibilityIdentifier("settings.close"))
+                .accessibilityIdentifier(AccessibilityIdentifier.Settings.close))
             .navigationDestination(isPresented: $showSupport) {
                 SupportView()
             }

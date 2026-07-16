@@ -189,7 +189,9 @@ private extension FeedView {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .id(selectedPostType)
-        .accessibilityIdentifier(enableSearchPagination ? "search.results" : "feed.list")
+        .accessibilityIdentifier(
+            enableSearchPagination ? AccessibilityIdentifier.Feed.searchResults : AccessibilityIdentifier.Feed.list
+        )
     }
 
     @ViewBuilder
@@ -391,7 +393,7 @@ private extension FeedView {
                 .foregroundStyle(.primary)
         }
         .accessibilityLabel("Settings")
-        .accessibilityIdentifier("settings.button")
+        .accessibilityIdentifier(AccessibilityIdentifier.Feed.settingsButton)
     }
 
     private var searchSortMenu: some View {
@@ -414,7 +416,7 @@ private extension FeedView {
         }
         .buttonStyle(.bordered)
         .controlSize(.small)
-        .accessibilityIdentifier("search.sort.menu")
+        .accessibilityIdentifier(AccessibilityIdentifier.Feed.searchSortMenu)
     }
 
     private var searchDateRangeMenu: some View {
@@ -437,7 +439,7 @@ private extension FeedView {
         }
         .buttonStyle(.bordered)
         .controlSize(.small)
-        .accessibilityIdentifier("search.date.menu")
+        .accessibilityIdentifier(AccessibilityIdentifier.Feed.searchDateMenu)
     }
 
     private var searchFilterBar: some View {
@@ -485,7 +487,7 @@ private extension FeedView {
                 }
             }
         }
-        .accessibilityIdentifier("feed.category.\(postType.rawValue)")
+        .accessibilityIdentifier(AccessibilityIdentifier.Feed.category(postType.rawValue))
     }
 
     private func handlePostTap(post: Domain.Post) {

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		0753D902ECB640FABD16B31F /* HackersUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D0F18D1F4D44676A1E7253F /* HackersUITests.swift */; };
+		AA2000010000000000000001 /* HackersUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000001 /* HackersUITestCase.swift */; };
+		AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000002 /* BrowserCommentsUITests.swift */; };
+		AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */; };
 		243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00032E8B000100000001 /* HackersScreenshotTests.swift */; };
 		243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00042E8B000100000001 /* SnapshotHelper.swift */; };
 		243C00102E8B000100000001 /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 243C00122E8B000100000001 /* Shared */; };
@@ -65,6 +68,9 @@
 		24F39F8A18AFB1150055F8DC /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		24F39F8C18AFB1150055F8DC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		9D0F18D1F4D44676A1E7253F /* HackersUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersUITests.swift; sourceTree = "<group>"; };
+		AA1000010000000000000001 /* HackersUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersUITestCase.swift; sourceTree = "<group>"; };
+		AA1000010000000000000002 /* BrowserCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserCommentsUITests.swift; sourceTree = "<group>"; };
+		AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationAndCommentsUITests.swift; sourceTree = "<group>"; };
 		243C00032E8B000100000001 /* HackersScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersScreenshotTests.swift; sourceTree = "<group>"; };
 		243C00042E8B000100000001 /* SnapshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
 		17AFE2AC4DD34C2F82AF632D /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +154,9 @@
 			isa = PBXGroup;
 			children = (
 				9D0F18D1F4D44676A1E7253F /* HackersUITests.swift */,
+				AA1000010000000000000001 /* HackersUITestCase.swift */,
+				AA1000010000000000000002 /* BrowserCommentsUITests.swift */,
+				AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */,
 				243C00032E8B000100000001 /* HackersScreenshotTests.swift */,
 				243C00042E8B000100000001 /* SnapshotHelper.swift */,
 			);
@@ -353,6 +362,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0753D902ECB640FABD16B31F /* HackersUITests.swift in Sources */,
+				AA2000010000000000000001 /* HackersUITestCase.swift in Sources */,
+				AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */,
+				AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */,
 				243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */,
 				243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */,
 			);

@@ -13,9 +13,9 @@ import SwiftUI
 public struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ToastPresenter.self) private var toastPresenter
+    @Environment(\.appRuntimePolicy) private var runtimePolicy
     @State private var viewModel: LoginViewModel
     @FocusState private var focusedField: Field?
-    private let disablesCredentialAutoFill: Bool
 
     private enum Field {
         case username, password
@@ -26,8 +26,7 @@ public struct LoginView: View {
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
         onLogout: @escaping () -> Void,
-        textSize: TextSize = .medium,
-        disablesCredentialAutoFill: Bool = false
+        textSize: TextSize = .medium
     ) {
         let viewModel = LoginViewModel(
             isAuthenticated: isAuthenticated,
@@ -37,12 +36,10 @@ public struct LoginView: View {
             textSize: textSize
         )
         _viewModel = State(initialValue: viewModel)
-        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
-    public init(viewModel: LoginViewModel, disablesCredentialAutoFill: Bool = false) {
+    public init(viewModel: LoginViewModel) {
         _viewModel = State(wrappedValue: viewModel)
-        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
     public var body: some View {
@@ -78,7 +75,7 @@ public struct LoginView: View {
                         .labelStyle(.iconOnly)
                 }
                 .accessibilityLabel("Close")
-                .accessibilityIdentifier("login.close")
+                .accessibilityIdentifier(AccessibilityIdentifier.Login.close)
             }
         }
         .alert("Login Failed", isPresented: Binding(
@@ -127,11 +124,11 @@ public struct LoginView: View {
                     text: $viewModel.username,
                     isSecure: false
                 )
-                .textContentType(disablesCredentialAutoFill ? nil : .username)
+                .textContentType(runtimePolicy.allowsCredentialAutoFill ? .username : nil)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 .focused($focusedField, equals: .username)
-                .accessibilityIdentifier("login.username")
+                .accessibilityIdentifier(AccessibilityIdentifier.Login.username)
                 .onSubmit {
                     focusedField = .password
                 }
@@ -141,9 +138,9 @@ public struct LoginView: View {
                     text: $viewModel.password,
                     isSecure: true
                 )
-                .textContentType(disablesCredentialAutoFill ? nil : .password)
+                .textContentType(runtimePolicy.allowsCredentialAutoFill ? .password : nil)
                 .focused($focusedField, equals: .password)
-                .accessibilityIdentifier("login.password")
+                .accessibilityIdentifier(AccessibilityIdentifier.Login.password)
                 .onSubmit {
                     if viewModel.isLoginEnabled {
                         performLogin()
@@ -189,7 +186,7 @@ public struct LoginView: View {
                 }
                 .disabled(!viewModel.isLoginEnabled)
                 .padding(.horizontal, 20)
-                .accessibilityIdentifier("login.signIn")
+                .accessibilityIdentifier(AccessibilityIdentifier.Login.signIn)
             }
 
             Spacer(minLength: 40)
@@ -253,7 +250,7 @@ public struct LoginView: View {
                         .labelStyle(.iconOnly)
                 }
                 .accessibilityLabel("Close")
-                .accessibilityIdentifier("login.close")
+                .accessibilityIdentifier(AccessibilityIdentifier.Login.close)
             }
         }
     }

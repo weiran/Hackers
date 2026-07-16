@@ -514,7 +514,7 @@ private struct UITestArticleView: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
-        webView.accessibilityIdentifier = "browser.fixtureArticle"
+        webView.accessibilityIdentifier = AccessibilityIdentifier.Browser.fixtureArticle
         loadArticle(in: webView, coordinator: context.coordinator)
         return webView
     }
@@ -599,7 +599,7 @@ private struct UITestMissingArticleView: View {
             systemImage: "exclamationmark.triangle",
             description: Text(url.absoluteString)
         )
-        .accessibilityIdentifier("browser.fixtureArticle.missing")
+        .accessibilityIdentifier(AccessibilityIdentifier.Browser.missingFixtureArticle)
         .accessibilityLabel("Missing UI-test article fixture")
         .accessibilityValue(url.absoluteString)
     }
@@ -823,7 +823,7 @@ struct PostLinkBrowserView: View {
         }
         .tint(.accentColor)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("browser.view")
+        .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .background {

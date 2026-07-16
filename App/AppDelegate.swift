@@ -22,12 +22,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         // process args for testing
         #if DEBUG
-        let isUITesting = UITestingBootstrap.isEnabled
+        let runtimePolicy = UITestingBootstrap.runtimePolicy
         #else
-        let isUITesting = false
+        let runtimePolicy = AppRuntimePolicy.standard
         #endif
         let disableReviewPrompts = ProcessInfo.processInfo.arguments.contains("disableReviewPrompts")
-            || isUITesting
+            || !runtimePolicy.allowsReviewPrompts
         ReviewPromptController.disablePrompts = disableReviewPrompts
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)

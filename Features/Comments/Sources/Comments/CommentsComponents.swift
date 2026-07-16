@@ -91,7 +91,7 @@ struct CommentsContentView: View {
                 }, action: { _, offsetY in
                     updateHeaderState(offsetY: offsetY)
                 })
-                .accessibilityIdentifier("comments.list")
+                .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
                 .safeAreaInset(edge: .top, spacing: 0) {
                     commentScrollTopSafeAreaInset
                 }
@@ -379,7 +379,7 @@ private struct NextCommentFloatingButton: View {
             guard isEnabled else { return }
             onNextThread()
         }
-        .accessibilityIdentifier("comments.nextCommentButton")
+        .accessibilityIdentifier(AccessibilityIdentifier.Comments.nextCommentButton)
     }
 }
 
