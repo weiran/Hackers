@@ -106,7 +106,8 @@ struct MainContentView: View {
                                 },
                                 onWhatsNewDismiss: {
                                     whatsNewCoordinator.markWhatsNewShown()
-                                }
+                                },
+                                disablesCredentialAutoFill: isUITesting
                             )
                         }
                     }
@@ -146,7 +147,8 @@ struct MainContentView: View {
                 },
                 onWhatsNewDismiss: {
                     whatsNewCoordinator.markWhatsNewShown()
-                }
+                },
+                disablesCredentialAutoFill: isUITesting
             )
             .textScaling(for: settingsViewModel.textSize)
             .toastOverlay(toastPresenter)

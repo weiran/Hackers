@@ -21,6 +21,7 @@ public struct SettingsView: View {
     let onLogin: (String, String) async throws -> Void
     let onLogout: () -> Void
     let onWhatsNewDismiss: () -> Void
+    let disablesCredentialAutoFill: Bool
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var showSupport = false
@@ -38,7 +39,8 @@ public struct SettingsView: View {
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
         onLogout: @escaping () -> Void = {},
-        onWhatsNewDismiss: @escaping () -> Void = {}
+        onWhatsNewDismiss: @escaping () -> Void = {},
+        disablesCredentialAutoFill: Bool = false
     ) {
         _viewModel = State(initialValue: viewModel)
         self.isAuthenticated = isAuthenticated
@@ -46,6 +48,7 @@ public struct SettingsView: View {
         self.onLogin = onLogin
         self.onLogout = onLogout
         self.onWhatsNewDismiss = onWhatsNewDismiss
+        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
     public var body: some View {
@@ -88,7 +91,8 @@ public struct SettingsView: View {
                             currentUsername: currentUsername,
                             onLogin: onLogin,
                             onLogout: onLogout,
-                            textSize: viewModel.textSize
+                            textSize: viewModel.textSize,
+                            disablesCredentialAutoFill: disablesCredentialAutoFill
                         )
                         .textScaling(for: viewModel.textSize)
                     }
