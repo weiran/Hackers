@@ -260,7 +260,6 @@ private extension FeedView {
         .listRowSeparator(.hidden, edges: .top)
         .listRowSeparator(.visible, edges: .bottom)
         .contextMenu { contextMenuContent(for: post) }
-        .accessibilityIdentifier("feed.post.\(post.id)")
         .accessibilityValue(post.isRead ? (viewModel.dimReadPosts ? "read, dimmed" : "read") : "unread")
     }
 
