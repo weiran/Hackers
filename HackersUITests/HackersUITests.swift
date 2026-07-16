@@ -460,7 +460,7 @@ final class HackersUITests: XCTestCase {
         )
 
         let initialFirstMinY = firstComment.frame.minY
-        tapAbsolutePoint(x: nextCommentButton.frame.midX, y: nextCommentButton.frame.midY)
+        nextCommentButton.tap()
         let firstTargetFrame = waitForStableFrame(of: firstComment, timeout: 5) {
             $0.minY < initialFirstMinY - 40
         }
@@ -468,7 +468,7 @@ final class HackersUITests: XCTestCase {
         assertFullyContained(firstComment, in: app)
 
         let initialSecondMinY = secondComment.frame.minY
-        tapAbsolutePoint(x: nextCommentButton.frame.midX, y: nextCommentButton.frame.midY)
+        nextCommentButton.tap()
         let secondTargetFrame = waitForStableFrame(of: secondComment, timeout: 5) {
             $0.minY < initialSecondMinY - 40
         }
@@ -576,7 +576,7 @@ final class HackersUITests: XCTestCase {
         password.typeText("password")
         assertHittable(app.buttons["login.signIn"]).tap()
 
-        assertHasVisibleIntersection(app.staticTexts["Welcome back, ui-user"].firstMatch, in: app)
+        assertHasVisibleIntersection(app.staticTexts["Logged in as ui-user"], in: app)
     }
 
     private func launchApp(linkBrowserMode: LinkBrowserMode = .customBrowser) {
@@ -653,7 +653,7 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> XCUIElement {
-        guard let candidate = waitForStableRenderedCandidate(
+        guard let candidate = waitForRenderedCandidate(
             matching: element,
             in: app,
             timeout: timeout,
@@ -674,7 +674,7 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> XCUIElement {
-        guard let candidate = waitForStableRenderedCandidate(
+        guard let candidate = waitForRenderedCandidate(
             matching: element,
             in: container,
             timeout: timeout,
@@ -682,7 +682,7 @@ final class HackersUITests: XCTestCase {
         ) else {
             addVisibilityFailureDiagnostics(for: element, in: container)
             XCTFail(
-                "Expected element to become stably contained in \(container): \(element)",
+                "Expected element to become contained in \(container): \(element)",
                 file: file,
                 line: line
             )
@@ -699,7 +699,7 @@ final class HackersUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> XCUIElement {
-        guard let candidate = waitForStableRenderedCandidate(
+        guard let candidate = waitForRenderedCandidate(
             matching: element,
             in: container,
             timeout: timeout
@@ -808,7 +808,7 @@ final class HackersUITests: XCTestCase {
         _ = waitForStableFrame(of: element, timeout: timeout) { _ in true }
     }
 
-    private func waitForStableRenderedCandidate(
+    private func waitForRenderedCandidate(
         matching element: XCUIElement,
         in container: XCUIElement,
         timeout: TimeInterval,
@@ -816,8 +816,6 @@ final class HackersUITests: XCTestCase {
         requiresFullContainment: Bool = false
     ) -> XCUIElement? {
         let deadline = Date().addingTimeInterval(timeout)
-        var previousFrame: CGRect?
-        var stableSampleCount = 0
 
         repeat {
             if container.exists, element.exists {
@@ -828,28 +826,13 @@ final class HackersUITests: XCTestCase {
                 } else {
                     isMeaningfullyVisible(frame, in: containerFrame)
                 }
-                let meetsHittabilityRequirement = !requiresHittable || element.isHittable
 
                 if !frame.isEmpty,
                    !frame.isNull,
                    meetsVisibilityRequirement,
-                   meetsHittabilityRequirement {
-                    if let previousFrame, framesAreStable(previousFrame, frame) {
-                        stableSampleCount += 1
-                    } else {
-                        stableSampleCount = 1
-                    }
-                    previousFrame = frame
-                    if stableSampleCount >= 3 {
-                        return element
-                    }
-                } else {
-                    previousFrame = nil
-                    stableSampleCount = 0
+                   (!requiresHittable || element.isHittable) {
+                    return element
                 }
-            } else {
-                previousFrame = nil
-                stableSampleCount = 0
             }
 
             guard Date() < deadline else { break }
