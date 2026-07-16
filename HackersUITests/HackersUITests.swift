@@ -873,7 +873,7 @@ final class HackersUITests: XCTestCase {
                         stableSampleCount = 1
                     }
                     previousFrame = frame
-                    if stableSampleCount >= 3 {
+                    if stableSampleCount >= 2 {
                         return frame
                     }
                 } else {
@@ -912,9 +912,14 @@ final class HackersUITests: XCTestCase {
     }
 
     private func edgeSwipeBack() {
-        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: 0.5))
-        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.5))
-        start.press(forDuration: 0.05, thenDragTo: end)
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.5))
+        start.press(
+            forDuration: 0.1,
+            thenDragTo: end,
+            withVelocity: .slow,
+            thenHoldForDuration: 0.1
+        )
     }
 
 }
