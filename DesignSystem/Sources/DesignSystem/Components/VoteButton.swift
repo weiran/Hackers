@@ -26,16 +26,18 @@ public struct VoteButton: View {
     public var body: some View {
         Button(action: action) {
             HStack(spacing: style.spacing) {
-                if votingState.isVoting {
-                    ProgressView()
-                        .scaleEffect(style.progressScale)
-                        .foregroundStyle(style.foregroundColor(for: votingState))
-                } else {
-                    Image(systemName: iconName)
-                        .scaledFont(style.iconFont)
-                        .foregroundStyle(style.foregroundColor(for: votingState))
-                        .accessibilityHidden(true)
-                }
+                Image(systemName: iconName)
+                    .scaledFont(style.iconFont)
+                    .foregroundStyle(style.foregroundColor(for: votingState))
+                    .opacity(votingState.isVoting ? 0 : 1)
+                    .overlay {
+                        if votingState.isVoting {
+                            ProgressView()
+                                .scaleEffect(style.progressScale)
+                                .foregroundStyle(style.foregroundColor(for: votingState))
+                        }
+                    }
+                    .accessibilityHidden(true)
 
                 if style.showScore, let score = votingState.score {
                     Text("\(score)")
