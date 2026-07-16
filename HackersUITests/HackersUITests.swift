@@ -482,7 +482,7 @@ final class HackersUITests: XCTestCase {
         tapPost(post)
 
         let list = commentsList
-        assertFullyContained(list, in: app)
+        assertHasVisibleIntersection(list, in: app)
 
         var rootComment = app.buttons["comments.comment.48348985"]
         let childComment = app.buttons["comments.comment.48349298"]

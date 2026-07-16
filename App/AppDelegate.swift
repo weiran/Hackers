@@ -21,16 +21,23 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         URLCache.shared = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity)
 
         // process args for testing
-        if ProcessInfo.processInfo.arguments.contains("disableReviewPrompts") {
-            ReviewPromptController.disablePrompts = true
-        }
+        #if DEBUG
+        let isUITesting = UITestingBootstrap.isEnabled
+        #else
+        let isUITesting = false
+        #endif
+        let disableReviewPrompts = ProcessInfo.processInfo.arguments.contains("disableReviewPrompts")
+            || isUITesting
+        ReviewPromptController.disablePrompts = disableReviewPrompts
         if ProcessInfo.processInfo.arguments.contains("skipAnimations") {
             UIView.setAnimationsEnabled(false)
         }
 
         // setup review prompt
-        ReviewPromptController.incrementLaunchCounter()
-        ReviewPromptController.requestReview()
+        if !disableReviewPrompts {
+            ReviewPromptController.incrementLaunchCounter()
+            ReviewPromptController.requestReview()
+        }
 
         // init default settings
         UserDefaults.standard.registerDefaults()

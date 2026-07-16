@@ -52,6 +52,13 @@ struct MainContentView: View {
     private var isPresentingModal: Bool {
         navigationStore.showingLogin || navigationStore.showingSettings || showWhatsNew
     }
+    private var isUITesting: Bool {
+        #if DEBUG
+        return UITestingBootstrap.isEnabled
+        #else
+        return false
+        #endif
+    }
     private var isPadLayout: Bool {
         #if targetEnvironment(macCatalyst)
         return true
@@ -120,7 +127,8 @@ struct MainContentView: View {
                 onLogout: {
                     sessionService.unauthenticate()
                 },
-                textSize: settingsViewModel.textSize
+                textSize: settingsViewModel.textSize,
+                disablesCredentialAutoFill: isUITesting
             )
             .textScaling(for: settingsViewModel.textSize)
                 .toastOverlay(toastPresenter)

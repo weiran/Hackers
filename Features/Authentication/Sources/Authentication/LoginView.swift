@@ -15,6 +15,7 @@ public struct LoginView: View {
     @Environment(ToastPresenter.self) private var toastPresenter
     @State private var viewModel: LoginViewModel
     @FocusState private var focusedField: Field?
+    private let disablesCredentialAutoFill: Bool
 
     private enum Field {
         case username, password
@@ -25,7 +26,8 @@ public struct LoginView: View {
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
         onLogout: @escaping () -> Void,
-        textSize: TextSize = .medium
+        textSize: TextSize = .medium,
+        disablesCredentialAutoFill: Bool = false
     ) {
         let viewModel = LoginViewModel(
             isAuthenticated: isAuthenticated,
@@ -35,10 +37,12 @@ public struct LoginView: View {
             textSize: textSize
         )
         _viewModel = State(initialValue: viewModel)
+        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
-    public init(viewModel: LoginViewModel) {
+    public init(viewModel: LoginViewModel, disablesCredentialAutoFill: Bool = false) {
         _viewModel = State(wrappedValue: viewModel)
+        self.disablesCredentialAutoFill = disablesCredentialAutoFill
     }
 
     public var body: some View {
@@ -123,7 +127,7 @@ public struct LoginView: View {
                     text: $viewModel.username,
                     isSecure: false
                 )
-                .textContentType(.username)
+                .textContentType(disablesCredentialAutoFill ? nil : .username)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
                 .focused($focusedField, equals: .username)
@@ -137,7 +141,7 @@ public struct LoginView: View {
                     text: $viewModel.password,
                     isSecure: true
                 )
-                .textContentType(.password)
+                .textContentType(disablesCredentialAutoFill ? nil : .password)
                 .focused($focusedField, equals: .password)
                 .accessibilityIdentifier("login.password")
                 .onSubmit {
