@@ -14,7 +14,6 @@ concurrency:
 
 env:
   CI_DEVICE_NAME: iPhone 17 Pro
-  CI_XCODE_VERSION: "26.5"
   XCODE_VERSION_FILE: .github/xcode-version
 
 jobs:
@@ -25,37 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Install SwiftLint
-        run: |
-          if ! command -v swiftlint >/dev/null 2>&1; then
-            brew install swiftlint
-          fi
-
-      - name: SwiftLint
-        run: swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
-
       - name: Prepare Xcode and simulator
         run: scripts/ci/setup-xcode-simulator.sh
-
-      - name: Clean build
-        run: |
-          set -o pipefail
-          mkdir -p artifacts/logs artifacts/xcresults
-          xcodebuild clean build \
-            -project Hackers.xcodeproj \
-            -scheme Hackers \
-            -destination "$CI_DESTINATION" \
-            -resultBundlePath artifacts/xcresults/Hackers-Nightly-Build.xcresult \
-            2>&1 | tee artifacts/logs/nightly-build.log
-
-      - name: Run module tests
-        run: |
-          set -o pipefail
-          ./run_tests.sh -v 2>&1 | tee artifacts/logs/nightly-tests.log
 
       - name: Run full UI tests
         run: |
           set -o pipefail
+          mkdir -p artifacts/logs
           ./run_ui_tests.sh full 2>&1 | tee artifacts/logs/nightly-ui-tests.log
 
       - name: Upload failure diagnostics

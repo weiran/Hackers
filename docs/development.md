@@ -27,7 +27,7 @@ If the simulator is missing or stale, compare your environment with the CI setup
 scripts/ci/setup-xcode-simulator.sh
 ```
 
-That script selects/prints Xcode, runs first launch setup, selects an iOS runtime matching the chosen Xcode simulator SDK, and creates/boots the expected simulator when needed. It uses `.github/xcode-version` unless `CI_XCODE_VERSION` overrides it for a workflow such as Nightly. CI build and test commands use that simulator's UDID so another installed runtime with the same device name cannot be selected accidentally.
+That script selects/prints Xcode, runs first launch setup, selects an iOS runtime matching the chosen Xcode simulator SDK, and creates/boots the expected simulator when needed. It uses `.github/xcode-version` unless `CI_XCODE_VERSION` explicitly overrides it. CI build and test commands use that simulator's UDID so another installed runtime with the same device name cannot be selected accidentally.
 
 ## Build
 
@@ -175,7 +175,7 @@ Primary workflows:
   * Runs on PRs and pushes to `master`.
   * Required jobs: `lint`, `build`, `test`, and `ui smoke`.
 * `.github/workflows/nightly.yml`
-  * Scheduled nightly validation to catch Xcode/simulator/runtime drift, including full UI tests.
+  * Runs the full functional UI suite that is too expensive for pull-request validation.
 * `.github/workflows/release-testflight.yml`
   * Protected TestFlight release workflow.
 * `.github/workflows/release-appstore.yml`
