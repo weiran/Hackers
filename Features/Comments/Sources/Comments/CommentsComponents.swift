@@ -57,7 +57,6 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
-    @State private var scrollPosition = ScrollPosition(idType: CommentsScrollTarget.self)
     @State private var visibleCommentTarget = VisibleCommentTarget()
 
     var body: some View {
@@ -82,7 +81,6 @@ struct CommentsContentView: View {
                     }
                     .scrollTargetLayout()
                 }
-                .scrollPosition($scrollPosition)
                 .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
                     updateVisibleCommentTarget(visibleTargets: visibleTargets)
                 }

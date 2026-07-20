@@ -296,4 +296,82 @@ final class BrowserCommentsUITests: HackersUITestCase {
         waitForNonExistence(firstChild, timeout: 2)
         assertHasVisibleIntersection(parent, in: app, timeout: 2)
     }
+
+    func testCustomBrowserExpandedCommentPreservesScrollPosition() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: largeCommentsPostID, presentation: .expandedComments),
+            fixtureProfile: .stress
+        ))
+
+        var parent = app.buttons[
+            AccessibilityIdentifier.Comments.comment(UITestFixtureReference.largeCollapsibleRootCommentID)
+        ]
+        let firstChild = app.buttons[
+            AccessibilityIdentifier.Comments.comment(UITestFixtureReference.largeCollapsibleChildCommentID)
+        ]
+        let scrollDownStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let scrollDownEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        for _ in 0 ..< 8 {
+            if parent.exists, parent.frame.minY < 650 { break }
+            scrollDownStart.press(forDuration: 0.05, thenDragTo: scrollDownEnd)
+        }
+        let scrollBackStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
+        let scrollBackEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+        for _ in 0 ..< 4 where parent.exists && parent.frame.minY < 400 {
+            scrollBackStart.press(forDuration: 0.05, thenDragTo: scrollBackEnd)
+        }
+        XCTAssertTrue(parent.exists)
+        XCTAssertGreaterThanOrEqual(parent.frame.minY, 400)
+        XCTAssertLessThan(parent.frame.minY, 650)
+
+        let perturbStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+        let perturbEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
+        perturbStart.press(forDuration: 0.05, thenDragTo: perturbEnd)
+        scrollBackStart.press(forDuration: 0.05, thenDragTo: scrollBackEnd)
+
+        guard let frameBeforeCollapse = waitForStableFrame(of: parent, timeout: 5, condition: { _ in true }) else {
+            return XCTFail("Expected the parent comment frame to settle after returning to it")
+        }
+        tapAbsolutePoint(x: parent.frame.minX + 8, y: parent.frame.minY + 8)
+
+        waitForNonExistence(firstChild, timeout: 2)
+        guard let collapsedFrame = waitForStableFrame(of: parent, timeout: 5, condition: {
+            $0.height < frameBeforeCollapse.height - 40
+        }) else {
+            return XCTFail("Expected the parent comment to collapse")
+        }
+        parent = assertHasVisibleIntersection(parent, in: app)
+        XCTAssertEqual(collapsedFrame.minY, frameBeforeCollapse.minY, accuracy: 4)
+
+        parent.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+
+        let expansionDeadline = Date().addingTimeInterval(0.6)
+        var expansionMinYs: [CGFloat] = []
+        while Date() < expansionDeadline {
+            if parent.exists {
+                expansionMinYs.append(parent.frame.minY)
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.01))
+        }
+
+        guard let expandedFrame = waitForStableFrame(of: parent, timeout: 5, condition: {
+            $0.height > collapsedFrame.height + 40
+        }) else {
+            return XCTFail("Expected the parent comment to expand without leaving the viewport")
+        }
+        XCTAssertEqual(expandedFrame.minY, collapsedFrame.minY, accuracy: 4)
+        let maximumExpansionDisplacement = expansionMinYs
+            .map { abs($0 - collapsedFrame.minY) }
+            .max() ?? 0
+        XCTAssertLessThanOrEqual(
+            maximumExpansionDisplacement,
+            4,
+            "Expansion moved the comment viewport: \(expansionMinYs)"
+        )
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "Expanded comment preserves scroll position"
+        screenshot.lifetime = .deleteOnSuccess
+        add(screenshot)
+    }
 }
