@@ -448,6 +448,32 @@ struct CommentsViewModelTests {
             #expect(sut.visibleComments.count == 2)
         }
 
+        @Test("Flagged placeholder starts collapsed and reveals its replies")
+        @MainActor
+        func flaggedPlaceholderStartsCollapsed() async {
+            let flaggedComment = Domain.Comment(
+                id: 1,
+                age: "1 hour ago",
+                text: "[flagged]",
+                by: "flagged-user",
+                isFlagged: true,
+                level: 1,
+                upvoted: false,
+                visibility: .compact,
+            )
+            let reply = createTestComment(id: 2, level: 2)
+            mockPostUseCase.mockPost = createPostWithComments(comments: [flaggedComment, reply])
+
+            await sut.loadComments()
+
+            #expect(sut.visibleComments.map(\.id) == [flaggedComment.id])
+            #expect(sut.isCommentCollapsed(withID: flaggedComment.id))
+
+            sut.toggleCommentVisibility(flaggedComment)
+
+            #expect(sut.visibleComments.map(\.id) == [flaggedComment.id, reply.id])
+        }
+
         @Test("Toggle uses indexed subtree bounds without hiding following siblings")
         @MainActor
         func toggleUsesIndexedSubtreeBounds() async {

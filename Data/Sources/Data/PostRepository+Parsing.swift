@@ -125,8 +125,8 @@ extension PostRepository {
     }
 
     func parseComment(from element: Element) throws -> Domain.Comment {
-        let text = try commentText(from: element.select(".commtext"))
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let parsedComment = try parsedCommentContent(from: element)
+        guard !parsedComment.text.isEmpty else {
             throw HackersKitError.scraperError
         }
 
@@ -143,18 +143,35 @@ extension PostRepository {
         let voteLinksResult = try voteLinks(from: element)
         let upvoted = voteLinksResult.upvoted
 
-        let parsedText = CommentHTMLParser.parseHTMLText(text)
+        let parsedText = CommentHTMLParser.parseHTMLText(parsedComment.text)
 
         return Domain.Comment(
             id: id,
             age: age,
-            text: text,
+            text: parsedComment.text,
             by: user,
+            isFlagged: parsedComment.isFlagged,
             level: level,
             upvoted: upvoted,
             voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote),
+            visibility: parsedComment.isFlagged ? .compact : .visible,
             parsedText: parsedText,
         )
+    }
+
+    func parsedCommentContent(from element: Element) throws -> (text: String, isFlagged: Bool) {
+        let text = try commentText(from: element.select(".commtext"))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !text.isEmpty {
+            return (text, false)
+        }
+
+        let placeholder = try element.select(".comment").text()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard placeholder == "[flagged]" else {
+            throw HackersKitError.scraperError
+        }
+        return (placeholder, true)
     }
 
     func commentText(from elements: Elements) throws -> String {

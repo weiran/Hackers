@@ -197,6 +197,23 @@ struct PostRepositoryTests {
         }
     }
 
+    @Test("Flagged comments are parsed as collapsed placeholders")
+    func flaggedCommentPlaceholder() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockPostWithFlaggedCommentHTML()
+
+        let post = try await postRepository.getPost(id: 123)
+        let comments = try #require(post.comments)
+
+        #expect(comments.count == 2)
+        #expect(comments[0].id == 201)
+        #expect(comments[0].text == "[flagged]")
+        #expect(comments[0].isFlagged)
+        #expect(comments[0].level == 1)
+        #expect(comments[0].visibility == .compact)
+        #expect(comments[1].id == 202)
+        #expect(comments[1].level == 2)
+    }
+
     @Test("Get Ask HN post includes top text")
     func getAskPostIncludesTopText() async throws {
         mockNetworkManager.stubbedGetResponse = createMockAskPostHTML(id: 456)
@@ -544,6 +561,50 @@ struct PostRepositoryTests {
         </table>
         <table class=\"comment-tree\">
             \(commentsHTML)
+        </table>
+        </body>
+        </html>
+        """
+    }
+
+    private func createMockPostWithFlaggedCommentHTML() -> String {
+        """
+        <html>
+        <body>
+        <table class="fatitem">
+            <tr class="athing" id="123">
+                <td><span class="titleline"><a href="https://example.com/article">Test Article Title</a></span></td>
+            </tr>
+            <tr><td>
+                <span class="score">10 points</span>
+                <span class="age">2 hours ago</span>
+                <a class="hnuser">testuser</a>
+                <a href="item?id=123">2 comments</a>
+            </td></tr>
+        </table>
+        <table class="comment-tree">
+            <tr class="athing comtr coll" id="201"><td><table><tr>
+                <td class="ind" indent="1"><img src="s.gif" width="40"></td>
+                <td class="votelinks nosee"></td>
+                <td class="default">
+                    <span class="comhead">
+                        <a class="hnuser">flagged-user</a>
+                        <span class="age">1 hour ago</span>
+                    </span>
+                    <div class="comment noshow">[flagged]<div class="reply"></div></div>
+                </td>
+            </tr></table></td></tr>
+            <tr class="athing comtr noshow" id="202"><td><table><tr>
+                <td class="ind" indent="2"><img src="s.gif" width="80"></td>
+                <td class="votelinks"></td>
+                <td class="default">
+                    <span class="comhead">
+                        <a class="hnuser">reply-user</a>
+                        <span class="age">30 minutes ago</span>
+                    </span>
+                    <div class="comment"><div class="commtext c00">Visible reply</div></div>
+                </td>
+            </tr></table></td></tr>
         </table>
         </body>
         </html>

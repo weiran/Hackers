@@ -230,7 +230,7 @@ struct CommentsContentView: View {
             isAuthenticated: sessionService.authenticationState == .authenticated,
             canVote: comment.voteLinks?.upvote != nil,
             canUnvote: comment.voteLinks?.unvote != nil,
-            styledText: isCollapsed
+            styledText: isCollapsed && !comment.isFlagged
                 ? nil
                 : CommentTextCache.styledText(for: comment, textScaling: textScaling)
         )

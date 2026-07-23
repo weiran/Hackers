@@ -127,6 +127,7 @@ public final class Comment: @unchecked Sendable {
     public let age: String
     public let text: String
     public let by: String
+    public let isFlagged: Bool
     public var level: Int
     public var upvoteLink: String?
     nonisolated(unsafe) public var upvoted: Bool
@@ -140,6 +141,7 @@ public final class Comment: @unchecked Sendable {
         age: String,
         text: String,
         by: String,
+        isFlagged: Bool = false,
         level: Int,
         upvoted: Bool,
         upvoteLink: String? = nil,
@@ -151,6 +153,7 @@ public final class Comment: @unchecked Sendable {
         self.age = age
         self.text = text
         self.by = by
+        self.isFlagged = isFlagged
         self.level = level
         self.upvoted = upvoted
         self.upvoteLink = upvoteLink
