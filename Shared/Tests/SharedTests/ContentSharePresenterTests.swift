@@ -181,12 +181,14 @@ struct ContentSharePresenterTests {
         #expect(copiedURL == url)
     }
 
-    @Test("Comment share still uses stripped text")
-    func commentShareItemsUseStrippedText() {
-        let items = ContentSharePresenter.items(for: createTestComment())
+    @Test("Comment share uses its Hacker News URL")
+    func commentShareItemsUseHackerNewsURL() {
+        let comment = createTestComment()
+        let items = ContentSharePresenter.items(for: comment)
 
         #expect(items.count == 1)
-        #expect(items.first as? String == "This is a test comment with HTML content.")
+        let source = items.first as? URLActivityItemSource
+        #expect(source?.url == comment.hackerNewsURL)
     }
 
     @Test("Presenter can be called with different data types")

@@ -74,7 +74,7 @@ extension ContentSharePresenter {
     }
 
     static func items(for comment: Comment) -> [Any] {
-        [CommentHTMLParser.plainText(fromHTML: comment.text)]
+        items(for: comment.hackerNewsURL)
     }
 
     static func hackerNewsPostActivities(for url: URL) -> [UIActivity] {
