@@ -59,24 +59,14 @@ For user-reported visual bugs, screenshots are the source of truth.
 
 Follow `docs/release-process.md` as the source of truth.
 
-Key guardrails:
-
-* TestFlight release tags must be `vX.Y.Z+N`, where `X.Y.Z` matches `MARKETING_VERSION` and `N` matches `CURRENT_PROJECT_VERSION`.
-* Update both `Hackers` and `HackersActionExtension` when changing release version or build settings.
-* Update app-facing "What's New" content when the release has user-visible changes.
-* Create or update the GitHub Release notes used for TestFlight "What to Test."
-* App Store release notes are separate public customer copy. Never copy GitHub Release notes, TestFlight "What to Test" text, generated changelogs, pull request links, or `Full Changelog` links into App Store release notes.
-* The `testflight` GitHub Environment is protected and must be approved before upload or App Store submission.
-* Preserve and inspect release artifacts on failure before changing secrets or signing assets.
-* Only force-move a `vX.Y.Z+N` tag during failed release recovery before a usable TestFlight build has completed; after success, treat the tag as immutable.
+Key release invariants: use the documented TestFlight tag/version relationship,
+update both app targets and user-facing release content, and keep App Store copy
+separate from GitHub/TestFlight material. Preserve failure artifacts before
+changing secrets or signing assets; treat a successful release tag as immutable.
 
 ## Critical Guidelines
 
-* Do what has been asked; nothing more, nothing less.
-* Never create files unless absolutely necessary.
-* Always prefer editing existing files.
-* Never proactively create documentation files.
-* Never use `git add .`; add specific relevant changes only.
-* After making a requested change, commit it promptly and surgically by staging only the relevant files or hunks; leave unrelated worktree changes untouched.
-* Commit messages should be concise and descriptive.
-* Never amend existing commits; always create a new commit for additional changes.
+* Keep changes task-scoped; prefer existing files and create only necessary
+  task-owned files.
+* Stage only relevant files or hunks, leave unrelated worktree changes intact,
+  and use concise descriptive commits rather than amending existing ones.
