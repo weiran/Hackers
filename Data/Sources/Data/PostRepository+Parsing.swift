@@ -7,7 +7,15 @@
 
 import Domain
 import Foundation
+import os
 import SwiftSoup
+
+private enum PostParsingLog {
+    static let logger = Logger(
+        subsystem: "com.weiranzhang.Hackers",
+        category: "PostRepository.Parsing"
+    )
+}
 
 extension PostRepository {
     private enum ParseConstants {
@@ -42,12 +50,22 @@ extension PostRepository {
             return [post]
         } else {
             let titleElements = try tableElement.select("tr.athing")
-            let posts = try titleElements.compactMap { titleElement -> Post? in
-                guard let metadataElement = try titleElement.nextElementSibling() else { return nil }
-                let postElements = Elements([titleElement, metadataElement])
-                return try? self.post(from: postElements, type: type)
+            return titleElements.compactMap { titleElement -> Post? in
+                do {
+                    guard let metadataElement = try titleElement.nextElementSibling() else {
+                        throw HackersKitError.scraperError
+                    }
+                    let postElements = Elements([titleElement, metadataElement])
+                    return try self.post(from: postElements, type: type)
+                } catch {
+                    let id = (try? titleElement.attr("id")) ?? "unknown"
+                    let errorDescription = String(describing: error)
+                    PostParsingLog.logger.error(
+                        "Post \(id, privacy: .public) skipped: \(errorDescription, privacy: .private)"
+                    )
+                    return nil
+                }
             }
-            return posts
         }
     }
 
@@ -119,6 +137,11 @@ extension PostRepository {
             do {
                 return try parseComment(from: element)
             } catch {
+                let id = (try? element.attr("id")) ?? "unknown"
+                let errorDescription = String(describing: error)
+                PostParsingLog.logger.error(
+                    "Comment \(id, privacy: .public) skipped: \(errorDescription, privacy: .private)"
+                )
                 return nil
             }
         }

@@ -8,7 +8,6 @@
 import Domain
 import Foundation
 import Networking
-import SwiftSoup
 
 public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     private let networkManager: NetworkManagerProtocol

@@ -14,7 +14,6 @@
 		243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00032E8B000100000001 /* HackersScreenshotTests.swift */; };
 		243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00042E8B000100000001 /* SnapshotHelper.swift */; };
 		243C00102E8B000100000001 /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 243C00122E8B000100000001 /* Shared */; };
-		2406B38728AD083500CB396B /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 2406B38628AD083500CB396B /* SwiftSoup */; };
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
 		241E7B492E51D1C80013EEA1 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B482E51D1C80013EEA1 /* Settings */; };
 		241E802E2E55B5F40013EEA1 /* Comments in Frameworks */ = {isa = PBXBuildFile; productRef = 241E802D2E55B5F40013EEA1 /* Comments */; };
@@ -128,7 +127,6 @@
 				DA78360FD99A4A1D9C1E759C /* Authentication in Frameworks */,
 				24F39F8D18AFB1150055F8DC /* UIKit.framework in Frameworks */,
 				24F39F8918AFB1150055F8DC /* Foundation.framework in Frameworks */,
-				2406B38728AD083500CB396B /* SwiftSoup in Frameworks */,
 				241E7B412E511BC20013EEA1 /* Data in Frameworks */,
 				248256FB2E59D2540068E91E /* Networking in Frameworks */,
 			);
@@ -248,7 +246,6 @@
 			);
 			name = Hackers;
 			packageProductDependencies = (
-				2406B38628AD083500CB396B /* SwiftSoup */,
 				241E7B402E511BC20013EEA1 /* Data */,
 				241E7B482E51D1C80013EEA1 /* Settings */,
 				241E802D2E55B5F40013EEA1 /* Comments */,
@@ -296,7 +293,6 @@
 			);
 			mainGroup = 24F39F7C18AFB1150055F8DC;
 			packageReferences = (
-				2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				241E7B3F2E511BC20013EEA1 /* XCLocalSwiftPackageReference "Data" */,
 				241E7B422E511BE50013EEA1 /* XCLocalSwiftPackageReference "DesignSystem" */,
 				241E7B472E51D1C80013EEA1 /* XCLocalSwiftPackageReference "Features" */,
@@ -753,27 +749,11 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.13.4;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		243C00122E8B000100000001 /* Shared */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 243C00112E8B000100000001 /* XCLocalSwiftPackageReference "Shared" */;
 			productName = Shared;
-		};
-		2406B38628AD083500CB396B /* SwiftSoup */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2406B38528AD083500CB396B /* XCRemoteSwiftPackageReference "SwiftSoup" */;
-			productName = SwiftSoup;
 		};
 		241E7B402E511BC20013EEA1 /* Data */ = {
 			isa = XCSwiftPackageProductDependency;
