@@ -5,6 +5,7 @@ import Shared
 import SwiftUI
 
 struct BrowserControlsView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let fallbackURL: URL
     let onDismiss: @MainActor () -> Void
     @ObservedObject var controller: BrowserController
@@ -46,14 +47,18 @@ struct BrowserControlsView: View {
 
     private var navigationControlsGroup: some View {
         HStack(spacing: 0) {
-            controlButton(systemName: "chevron.backward", isEnabled: controller.canGoBack) {
-                controller.goBack()
+            if controller.canGoBack {
+                controlButton(systemName: "chevron.backward") {
+                    controller.goBack()
+                }
+                .transition(controlTransition)
             }
 
             if controller.canGoForward {
                 controlButton(systemName: "chevron.forward") {
                     controller.goForward()
                 }
+                .transition(controlTransition)
             }
 
             controlButton(systemName: controller.isLoading ? "xmark" : "arrow.clockwise") {
@@ -67,6 +72,12 @@ struct BrowserControlsView: View {
         .padding(.horizontal, 6)
         .modifier(GlassCapsuleBackground())
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+        .animation(WebViewAnimations.standard, value: controller.canGoBack)
+        .animation(WebViewAnimations.standard, value: controller.canGoForward)
+    }
+
+    private var controlTransition: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .scale)
     }
 
     private var shareControlsGroup: some View {
@@ -107,39 +118,9 @@ struct BrowserControlsView: View {
 
     private func controlButton(
         systemName: String,
-        isEnabled: Bool = true,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 14, weight: .semibold))
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.primary)
-        .opacity(isEnabled ? 1 : 0.35)
-        .disabled(!isEnabled)
-        .accessibilityLabel(controlLabel(for: systemName))
-    }
-
-    private func controlLabel(for systemName: String) -> String {
-        switch systemName {
-        case "chevron.backward":
-            return "Back"
-        case "chevron.forward":
-            return "Forward"
-        case "arrow.clockwise":
-            return "Reload"
-        case "xmark":
-            return "Stop"
-        case "square.and.arrow.up":
-            return "Share"
-        case "safari":
-            return "Open in Safari"
-        default:
-            return "Button"
-        }
+        BrowserControlButton(systemName: systemName, action: action)
     }
 }
 
@@ -189,6 +170,144 @@ struct GlassCapsuleBackground: ViewModifier {
 struct GlassCircleBackground: ViewModifier {
     func body(content: Content) -> some View {
         content.glassEffect(.regular.interactive(), in: .circle)
+    }
+}
+
+/// Shared floating browser control button (44×44 glass capsule/circle inhabitant).
+struct BrowserControlButton: View {
+    let systemName: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .semibold))
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
+        .accessibilityLabel(browserControlLabel(for: systemName))
+    }
+}
+
+private func browserControlLabel(for systemName: String) -> String {
+    switch systemName {
+    case "chevron.backward":
+        return "Back"
+    case "chevron.forward":
+        return "Forward"
+    case "arrow.clockwise":
+        return "Reload"
+    case "xmark":
+        return "Stop"
+    case "square.and.arrow.up":
+        return "Share"
+    case "safari":
+        return "Open in Safari"
+    default:
+        return "Button"
+    }
+}
+
+/// Floating top cluster for the iPad browser: close + back/forward/reload (leading),
+/// share/safari (trailing).
+struct PadBrowserTopControls: View {
+    let showsCloseButton: Bool
+    let fallbackURL: URL
+    let onDismiss: @MainActor () -> Void
+    @ObservedObject var controller: BrowserController
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if showsCloseButton {
+                closeButton
+            }
+
+            PadBrowserNavControls(controller: controller)
+
+            Spacer(minLength: 0)
+
+            shareControlsGroup
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var closeButton: some View {
+        Button {
+            Task { @MainActor in onDismiss() }
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 14, weight: .semibold))
+                .frame(width: 20, height: 20)
+                .padding(10)
+        }
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
+        .foregroundStyle(.primary)
+        .accessibilityLabel("Close")
+        .modifier(GlassCircleBackground())
+        .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
+    }
+
+    private var shareControlsGroup: some View {
+        HStack(spacing: 0) {
+            BrowserControlButton(systemName: "square.and.arrow.up") {
+                Task { @MainActor in
+                    let targetURL = controller.currentURL ?? fallbackURL
+                    ContentSharePresenter.shared.shareURL(targetURL, title: controller.currentTitle)
+                }
+            }
+
+            BrowserControlButton(systemName: "safari") {
+                let targetURL = controller.currentURL ?? fallbackURL
+                LinkOpener.openInSystemBrowser(targetURL)
+            }
+        }
+        .padding(.horizontal, 6)
+        .modifier(GlassCapsuleBackground())
+        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+    }
+}
+
+/// Back/forward/reload glass capsule for the iPad browser, shown beside the close button.
+struct PadBrowserNavControls: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject var controller: BrowserController
+
+    var body: some View {
+        HStack(spacing: 0) {
+            if controller.canGoBack {
+                BrowserControlButton(systemName: "chevron.backward") {
+                    controller.goBack()
+                }
+                .transition(controlTransition)
+            }
+
+            if controller.canGoForward {
+                BrowserControlButton(systemName: "chevron.forward") {
+                    controller.goForward()
+                }
+                .transition(controlTransition)
+            }
+
+            BrowserControlButton(systemName: controller.isLoading ? "xmark" : "arrow.clockwise") {
+                if controller.isLoading {
+                    controller.stopLoading()
+                } else {
+                    controller.reload()
+                }
+            }
+        }
+        .padding(.horizontal, 6)
+        .modifier(GlassCapsuleBackground())
+        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
+        .animation(WebViewAnimations.standard, value: controller.canGoBack)
+        .animation(WebViewAnimations.standard, value: controller.canGoForward)
+    }
+
+    private var controlTransition: AnyTransition {
+        reduceMotion ? .opacity : .opacity.combined(with: .scale)
     }
 }
 
