@@ -51,6 +51,31 @@ struct SearchRepositoryTests {
         #expect(!post.age.isEmpty)
     }
 
+    @Test("Hit without external url falls back to Hacker News item url")
+    func hitWithoutURLFallsBackToItemURL() async throws {
+        let mockNetwork = MockNetworkManager()
+        // No "url" field — common for Ask/Show HN posts that have no external link.
+        mockNetwork.nextResponse = """
+        {"nbHits":1,"page":0,"nbPages":1,"hitsPerPage":20,"hits":[{"objectID":"456","title":"Ask HN","points":5,"author":"asker","num_comments":2,"created_at_i": 0}]}
+        """
+        let repository = SearchRepository(
+            networkManager: mockNetwork,
+            currentDate: { Date(timeIntervalSince1970: 86_400) }
+        )
+
+        let page = try await repository.searchPosts(
+            query: "ask",
+            sort: .popular,
+            dateRange: .allTime,
+            page: 0,
+            hitsPerPage: 20
+        )
+
+        let post = try #require(page.posts.first)
+        #expect(post.url.absoluteString == "https://news.ycombinator.com/item?id=456",
+                "Missing url should fall back to the HN item URL built from the validated id")
+    }
+
     @Test("Recent search uses search by date endpoint")
     func recentSearchUsesSearchByDateEndpoint() async throws {
         let mockNetwork = MockNetworkManager()

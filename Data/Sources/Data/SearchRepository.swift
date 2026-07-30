@@ -64,8 +64,12 @@ public final class SearchRepository: SearchUseCase, @unchecked Sendable {
         let posts: [Post] = response.hits.compactMap { hit in
             guard let postID = Int(hit.objectID) else { return nil }
 
+            // Fall back to the HN item URL when the hit has no external url. Build it from
+            // the validated postID rather than the raw objectID string so a URL-invalid
+            // objectID cannot crash here.
             let url = hit.url.flatMap { URL(string: $0) }
-                ?? URL(string: "https://news.ycombinator.com/item?id=\(hit.objectID)")!
+                ?? URL(string: "https://news.ycombinator.com/item?id=\(postID)")
+            guard let url else { return nil }
             let age = ageString(from: hit.createdAt)
 
             return Post(

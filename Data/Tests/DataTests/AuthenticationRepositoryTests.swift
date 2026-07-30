@@ -42,6 +42,22 @@ struct AuthenticationRepositoryTests {
         #expect(userDefaults.string(forKey: "hn_username") == nil)
     }
 
+    @Test("Response with stray 'Login' link but no form is treated as success")
+    func strayLoginLinkWithoutFormIsSuccess() async throws {
+        // A successful login response that happens to contain the word "Login" (e.g. in a
+        // footer link) but not the login form's acct field must not be misclassified as a
+        // failure. This guards the operator-precedence of the failure check.
+        let response = "<html><body>news<a href='/login'>Login</a></body></html>"
+        let network = MockAuthenticationNetworkManager(postResponse: response)
+        let userDefaults = MockAuthenticationUserDefaults()
+        let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
+
+        try await repository.authenticate(username: "user", password: "secret")
+
+        #expect(userDefaults.string(forKey: "hn_username") == "user",
+                "Stray 'Login' without the form should not block successful login")
+    }
+
     @Test("Logout clears cookies and stored username")
     func logoutClearsCookiesAndUsername() async throws {
         let network = MockAuthenticationNetworkManager()

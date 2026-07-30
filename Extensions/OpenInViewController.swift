@@ -22,7 +22,7 @@ class OpenInViewController: UIViewController {
                        shareURL.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
                        let components = URLComponents(url: shareURL, resolvingAgainstBaseURL: true),
                        let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
-                       let id = Int(idString),
+                       let id = Int(idString), id > 0,
                        let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)") {
                         Task { @MainActor in
                             self.openURL(openInURL)

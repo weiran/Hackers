@@ -27,9 +27,6 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
             throw HackersKitError.requestFailure
         }
 
-        // First, get the login page to extract any CSRF tokens or form data
-        let loginPageHTML = try await networkManager.get(url: loginURL)
-
         // Build the login form data
         let encodedUsername = username.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedPassword = password.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
@@ -38,9 +35,14 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         // Submit the login form
         let response = try await networkManager.post(url: loginURL, body: formData)
 
-        // Check if login was successful by looking for signs of authentication
-        // HN redirects to /news on successful login and shows username in header
-        if response.contains("Bad login") || response.contains("Login") && response.contains("name=\"acct\"") {
+        // Check if login was successful by looking for signs of authentication. HN redirects
+        // to /news on a successful login and shows the username in the header; on failure it
+        // re-renders the login form. Detect failure explicitly: "Bad login" outright, or a
+        // page that still contains the login form (both "Login" and the acct input field).
+        // Parentheses make the intended precedence explicit: failure = Bad login OR (form present).
+        let badCredentials = response.contains("Bad login")
+            || (response.contains("Login") && response.contains("name=\"acct\""))
+        if badCredentials {
             throw HackersKitError.authenticationError(error: .badCredentials)
         }
 
