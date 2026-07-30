@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 /// High-performance HTML parser optimized for comment content
 public enum CommentHTMLParser {

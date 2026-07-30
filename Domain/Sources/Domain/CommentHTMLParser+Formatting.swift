@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 extension CommentHTMLParser {
     // MARK: - Types

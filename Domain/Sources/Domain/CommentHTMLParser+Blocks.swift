@@ -5,8 +5,7 @@
 //  Split block/paragraph/link processing from CommentHTMLParser to reduce file length
 //
 
-import Foundation
-import SwiftUI
+import UIKit
 
 extension CommentHTMLParser {
     /// Processes HTML content to extract paragraphs and links with proper formatting
