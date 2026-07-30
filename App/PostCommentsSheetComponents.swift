@@ -17,20 +17,17 @@ struct BrowserControlsView: View {
     }
 
     private var controlsLayout: some View {
-        ZStack {
-            navigationControlsGroup
-                .frame(maxWidth: .infinity, alignment: .center)
+        HStack {
+            closeButton
+                .padding(.leading, safeInsetPaddingLeft)
 
-            HStack {
-                closeButton
-                    .padding(.leading, safeInsetPaddingLeft)
+            Spacer()
 
-                Spacer()
-
+            HStack(spacing: 12) {
+                navigationControlsGroup
                 shareControlsGroup
-                    .padding(.trailing, safeInsetPaddingRight)
             }
-            .frame(maxWidth: .infinity)
+            .padding(.trailing, safeInsetPaddingRight)
         }
         .frame(maxWidth: .infinity)
     }
