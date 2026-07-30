@@ -32,7 +32,20 @@ public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sen
 }
 
 private extension PostRepository {
+    /// Upper bound on how many parent hops are allowed while resolving a comment permalink
+    /// back to its story. A valid HN permalink is at most a few hops from its story; this
+    /// guard prevents a transient or malformed response chain from recursing without limit.
+    private static let maxParentResolutionDepth = 5
+
     func loadPostResolvingCommentIfNeeded(id: Int) async throws -> Post {
+        try await loadPostResolvingCommentIfNeeded(id: id, depth: 0)
+    }
+
+    func loadPostResolvingCommentIfNeeded(id: Int, depth: Int) async throws -> Post {
+        guard depth <= Self.maxParentResolutionDepth else {
+            throw HackersKitError.scraperError
+        }
+
         let html = try await fetchPostHtml(id: id)
         let document = try SwiftSoup.parse(html)
 
@@ -42,7 +55,7 @@ private extension PostRepository {
         }
 
         if let parentID = try parentPostID(from: document), parentID != id {
-            return try await loadPostResolvingCommentIfNeeded(id: parentID)
+            return try await loadPostResolvingCommentIfNeeded(id: parentID, depth: depth + 1)
         }
 
         throw HackersKitError.scraperError
@@ -99,15 +112,30 @@ private extension PostRepository {
 
     func parentPostID(from document: Document) throws -> Int? {
         if let onStoryLink = try document.select("span.onstory a[href^=item?id=]").first() {
-            let href = try onStoryLink.attr("href")
-            return Int(href.components(separatedBy: "=").last ?? "")
+            return try parentID(from: onStoryLink)
         }
 
         if let parentLink = try document.select("span.navs a[href^=item?id=]").first() {
-            let href = try parentLink.attr("href")
-            return Int(href.components(separatedBy: "=").last ?? "")
+            return try parentID(from: parentLink)
         }
 
         return nil
+    }
+
+    /// Extracts the `id` query item from an HN parent/on-story link as a positive integer.
+    /// Uses `URLComponents` so extra query parameters (e.g. `item?id=123&foo=bar`) do not
+    /// corrupt the parsed id, which the previous `components(separatedBy: "=").last`
+    /// approach mishandled.
+    private func parentID(from element: Element) throws -> Int? {
+        let href = try element.attr("href")
+        guard
+            let url = URL(string: href),
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let idValue = components.queryItems?.first(where: { $0.name == "id" })?.value,
+            let id = Int(idValue), id > 0
+        else {
+            return nil
+        }
+        return id
     }
 }

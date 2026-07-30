@@ -252,6 +252,41 @@ struct PostRepositoryTests {
         #expect(post.comments?.contains(where: { $0.id == commentID }) == true)
     }
 
+    @Test("Unresolvable permalink chain is bounded and throws")
+    func unresolvablePermalinkChainThrows() async {
+        // Enqueue a chain of permalinks longer than maxParentResolutionDepth, each pointing
+        // at the next, none of which ever contain a story fatitem. The depth guard must
+        // stop the recursion and throw rather than looping indefinitely.
+        for index in 0..<8 {
+            let current = 2000 + index
+            let parent = 2000 + index + 1
+            let story = 2000 + index + 2
+            mockNetworkManager.enqueueGetResponse(
+                createMockCommentPermalinkHTML(commentID: current, parentCommentID: parent, storyID: story)
+            )
+        }
+
+        await #expect(throws: HackersKitError.self) {
+            _ = try await postRepository.getPost(id: 2000)
+        }
+    }
+
+    @Test("Parent id resolves even with extra query parameters")
+    func parentIDWithExtraQueryParams() async throws {
+        let commentID = 888
+        let storyID = 777
+        mockNetworkManager.enqueueGetResponse(
+            createMockCommentPermalinkWithExtraParamsHTML(commentID: commentID, storyID: storyID)
+        )
+        mockNetworkManager.enqueueGetResponse(
+            createMockSinglePostWithCommentsHTML(storyID: storyID, commentIDs: [commentID])
+        )
+
+        let post = try await postRepository.getPost(id: commentID)
+
+        #expect(post.id == storyID)
+    }
+
     // MARK: - Vote Tests
 
     @Test("Upvote post")
@@ -709,6 +744,24 @@ struct PostRepositoryTests {
                 </td>
             </tr>
         </table>
+        </body>
+        </html>
+        """
+    }
+
+    /// Permalink fixture whose on-story link carries extra query parameters, exercising the
+    /// URLComponents-based parent-id parser (the old `components(separatedBy:)` approach
+    /// would have returned "777&foo=bar" and failed to parse an int).
+    private func createMockCommentPermalinkWithExtraParamsHTML(commentID: Int, storyID: Int) -> String {
+        """
+        <html>
+        <body>
+        <table class=\"fatitem\">
+            <tr class=\"athing\" id=\"\(commentID)\"></tr>
+        </table>
+        <span class=\"navs\">
+            <span class=\"onstory\"> | on: <a href=\"item?id=\(storyID)&foo=bar\">Story Title</a></span>
+        </span>
         </body>
         </html>
         """
