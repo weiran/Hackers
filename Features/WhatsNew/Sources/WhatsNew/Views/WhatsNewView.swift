@@ -6,25 +6,18 @@
 //
 
 import DesignSystem
-import Domain
-import Shared
 import SwiftUI
 
 public struct WhatsNewView: View {
     private let whatsNewData: WhatsNewData
     private let onDismiss: () -> Void
-    private let settingsUseCase: any SettingsUseCase
-    @State private var embeddedBrowserEnabled: Bool
 
     public init(
         whatsNewData: WhatsNewData,
-        onDismiss: @escaping () -> Void,
-        settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()
+        onDismiss: @escaping () -> Void
     ) {
         self.whatsNewData = whatsNewData
         self.onDismiss = onDismiss
-        self.settingsUseCase = settingsUseCase
-        _embeddedBrowserEnabled = State(initialValue: settingsUseCase.linkBrowserMode == .customBrowser)
     }
 
     public var body: some View {
@@ -80,18 +73,7 @@ public struct WhatsNewView: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            enableEmbeddedBrowserButton
             continueButton
-        }
-    }
-
-    private var enableEmbeddedBrowserButton: some View {
-        actionButton(
-            title: embeddedBrowserEnabled ? "Embedded Browser Enabled" : "Enable Embedded Browser",
-            isEnabled: !embeddedBrowserEnabled,
-            style: .primary
-        ) {
-            enableEmbeddedBrowser()
         }
     }
 
@@ -99,13 +81,6 @@ public struct WhatsNewView: View {
         actionButton(title: "Continue", style: .secondary) {
             onDismiss()
         }
-    }
-
-    private func enableEmbeddedBrowser() {
-        guard !embeddedBrowserEnabled else { return }
-        settingsUseCase.linkBrowserMode = .customBrowser
-        embeddedBrowserEnabled = true
-        onDismiss()
     }
 
     private enum ActionButtonStyle {
