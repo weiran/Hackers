@@ -31,7 +31,7 @@ struct SettingsViewModelTests {
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
 
-        func clearCache() { clearCacheCallCount += 1 }
+        func clearCache() async { clearCacheCallCount += 1 }
         func cacheUsageBytes() async -> Int64 {
             cacheUsageCallCount += 1
             return cacheUsageBytesValue

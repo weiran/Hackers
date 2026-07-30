@@ -7,6 +7,7 @@
 
 import Domain
 import Foundation
+import WebKit
 
 public protocol UserDefaultsProtocol: Sendable {
     func object(forKey defaultName: String) -> Any?
@@ -141,55 +142,74 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    public func clearCache() {
-        // Remove all cached URL responses (affects AsyncImage and URLSession.shared consumers)
+    public func clearCache() async {
+        // Only clear caches we can actually control, and keep this set in sync with
+        // cacheUsageBytes() so the reported figure and the reclaimed space match.
+
+        // 1. URLCache: backs AsyncImage thumbnails and URLSession.shared responses.
         URLCache.shared.removeAllCachedResponses()
 
-        // Also purge temporary directory contents to reclaim space
-        let fileManager = FileManager.default
-        let tempDir = fileManager.temporaryDirectory
-        if let items = try? fileManager.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil) {
-            for url in items {
-                // Best-effort removal; ignore errors to avoid disrupting UX
-                try? fileManager.removeItem(at: url)
+        // 2. WKWebView persistent website data (HTTP cache, IndexedDB, local storage,
+        //    cookies, etc.) left behind by the in-app article browser. This is the only
+        //    cache the app produces that grows without bound, so it is the main target.
+        await clearWebsiteData()
+    }
+
+    @MainActor
+    private func clearWebsiteData() async {
+        await withCheckedContinuation { continuation in
+            WKWebsiteDataStore.default().removeData(
+                ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                modifiedSince: .distantPast
+            ) {
+                continuation.resume()
             }
         }
     }
 
     public func cacheUsageBytes() async -> Int64 {
-        let fileManager = FileManager.default
+        var total: Int64 = 0
 
-        func directorySize(at url: URL) -> Int64 {
-            var total: Int64 = 0
-            let resourceKeys: Set<URLResourceKey> = [
-                .isRegularFileKey,
-                .totalFileAllocatedSizeKey,
-                .fileAllocatedSizeKey
-            ]
-            if let enumerator = fileManager.enumerator(
-                at: url,
-                includingPropertiesForKeys: Array(resourceKeys),
-                options: [.skipsHiddenFiles, .skipsPackageDescendants]
-            ) {
-                for case let fileURL as URL in enumerator {
-                    guard let values = try? fileURL.resourceValues(forKeys: resourceKeys),
-                          values.isRegularFile == true
-                    else { continue }
-                    if let size = values.totalFileAllocatedSize ?? values.fileAllocatedSize {
-                        total += Int64(size)
-                    }
-                }
-            }
-            return total
+        // URLCache on-disk usage (exact, capped, under our control).
+        total += Int64(URLCache.shared.currentDiskUsage)
+
+        // WKWebView website data on disk. There is no public byte API on
+        // WKWebsiteDataStore, so we measure its backing directory directly.
+        // This is the same data clearCache() purges above.
+        if let webKitURL = webKitDirectoryURL() {
+            total += directorySize(at: webKitURL)
         }
+
+        return total
+    }
+
+    private func webKitDirectoryURL() -> URL? {
+        let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
+        return library?.appendingPathComponent("WebKit", isDirectory: true)
+    }
+
+    private func directorySize(at url: URL) -> Int64 {
+        let fileManager = FileManager.default
+        let resourceKeys: Set<URLResourceKey> = [
+            .isRegularFileKey,
+            .totalFileAllocatedSizeKey,
+            .fileAllocatedSizeKey
+        ]
+        guard let enumerator = fileManager.enumerator(
+            at: url,
+            includingPropertiesForKeys: Array(resourceKeys),
+            options: [.skipsHiddenFiles, .skipsPackageDescendants]
+        ) else { return 0 }
 
         var total: Int64 = 0
-        // Include Library/Caches where URLCache stores responses
-        if let cachesURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
-            total += directorySize(at: cachesURL)
+        for case let fileURL as URL in enumerator {
+            guard let values = try? fileURL.resourceValues(forKeys: resourceKeys),
+                  values.isRegularFile == true
+            else { continue }
+            if let size = values.totalFileAllocatedSize ?? values.fileAllocatedSize {
+                total += Int64(size)
+            }
         }
-        // Include tmp directory where we might place transient files
-        total += directorySize(at: fileManager.temporaryDirectory)
         return total
     }
 }

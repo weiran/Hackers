@@ -200,7 +200,7 @@ public struct SettingsView: View {
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("This removes cached images and network responses to reduce storage.")
+                        Text("This removes cached images, network responses, and in-app browser data to reduce storage.")
                     }
                 }
             }

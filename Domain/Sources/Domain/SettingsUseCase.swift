@@ -44,7 +44,7 @@ public protocol SettingsUseCase: AnyObject, Sendable {
     var textSize: TextSize { get set }
     var compactFeedDesign: Bool { get set }
     var dimReadPosts: Bool { get set }
-    func clearCache()
+    func clearCache() async
     func cacheUsageBytes() async -> Int64
 }
 

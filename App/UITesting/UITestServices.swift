@@ -23,7 +23,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         dimReadPosts = configuration.dimReadPosts
     }
 
-    func clearCache() {}
+    func clearCache() async {}
 
     func cacheUsageBytes() async -> Int64 {
         0

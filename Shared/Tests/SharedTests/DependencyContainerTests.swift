@@ -141,7 +141,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
     var dimReadPosts: Bool = true
-    func clearCache() {}
+    func clearCache() async {}
     func cacheUsageBytes() async -> Int64 { 0 }
 }
 

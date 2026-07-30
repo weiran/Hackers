@@ -740,7 +740,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    func clearCache() {}
+    func clearCache() async {}
 
     func cacheUsageBytes() async -> Int64 { 0 }
 }

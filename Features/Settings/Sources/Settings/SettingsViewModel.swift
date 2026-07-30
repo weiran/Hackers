@@ -107,8 +107,11 @@ public final class SettingsViewModel: @unchecked Sendable {
 
     // User actions
     public func clearCache() {
-        settingsUseCase.clearCache()
-        refreshCacheUsage()
+        Task { [weak self] in
+            guard let self else { return }
+            await settingsUseCase.clearCache()
+            await MainActor.run { self.refreshCacheUsage() }
+        }
     }
 
     public func refreshCacheUsage() {

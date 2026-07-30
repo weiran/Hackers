@@ -295,4 +295,53 @@ struct SettingsRepositoryTests {
         #expect(safariMode == true)
         #expect(mode == .customBrowser)
     }
+
+    // MARK: - Cache Usage & Clear Cache Tests
+
+    @Test("Cache usage counts the WebKit website data directory")
+    func cacheUsageCountsWebKitDirectory() async throws {
+        let repository = SettingsRepository()
+        let webKitDir = try webKitDirectoryURL()
+        let markerDir = webKitDir
+            .appendingPathComponent("CacheUsageTest", isDirectory: true)
+        let markerFile = markerDir.appendingPathComponent("cache-usage-marker.bin")
+
+        // Seed a known-size file inside the measured WebKit directory.
+        try? FileManager.default.createDirectory(at: markerDir, withIntermediateDirectories: true)
+        let payload = Data(count: 256 * 1024) // 256 KB
+        try payload.write(to: markerFile)
+        defer { try? FileManager.default.removeItem(at: markerDir) }
+
+        let bytes = await repository.cacheUsageBytes()
+
+        // The reported figure must include the file we just wrote.
+        #expect(bytes >= 256 * 1024)
+    }
+
+    @Test("Clearing cache runs both URLCache and WKWebView purge without throwing")
+    func clearCacheRunsBothPurges() async {
+        let repository = SettingsRepository()
+
+        // Seed URLCache so its clear path has something to remove.
+        let url = URL(string: "https://example.com/clear-cache-test")!
+        let response = URLResponse(url: url, mimeType: "text/plain", expectedContentLength: 8, textEncodingName: nil)
+        URLCache.shared.storeCachedResponse(
+            CachedURLResponse(response: response, data: Data(count: 32 * 1024)),
+            for: URLRequest(url: url)
+        )
+        defer { URLCache.shared.removeCachedResponse(for: URLRequest(url: url)) }
+
+        // The clear must complete (it awaits the WKWebsiteDataStore purge).
+        await repository.clearCache()
+
+        // The cached URL response must be gone.
+        #expect(URLCache.shared.cachedResponse(for: URLRequest(url: url)) == nil)
+    }
+
+    private func webKitDirectoryURL() throws -> URL {
+        let library = try #require(
+            FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
+        )
+        return library.appendingPathComponent("WebKit", isDirectory: true)
+    }
 }
