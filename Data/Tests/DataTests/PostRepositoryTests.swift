@@ -328,9 +328,8 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.lastGetURL != nil)
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("news.ycombinator.com"))
         #expect(mockNetworkManager.lastGetURL!.absoluteString.contains("vote"))
-
-        // Verify comment state is updated after successful upvote
-        #expect(comment.upvoted == true, "Comment should be marked as upvoted after successful API call")
+        // The repository performs the vote and reports success/failure; it does not mutate
+        // the caller's comment. Optimistic upvoted state is owned by the view model.
     }
 
     // Unvote comment test removed

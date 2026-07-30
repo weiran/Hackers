@@ -198,12 +198,16 @@ struct CommentsContentView: View {
 
     private func upvoteComment(withID commentID: Int, in post: Post) {
         guard let comment = viewModel.comment(withID: commentID) else { return }
-        Task { await votingViewModel.upvote(comment: comment, in: post) }
+        Task { await votingViewModel.upvote(comment: comment, in: post) { [viewModel] updated in
+            viewModel.replace(comment: updated)
+        } }
     }
 
     private func unvoteComment(withID commentID: Int, in post: Post) {
         guard let comment = viewModel.comment(withID: commentID) else { return }
-        Task { await votingViewModel.unvote(comment: comment, in: post) }
+        Task { await votingViewModel.unvote(comment: comment, in: post) { [viewModel] updated in
+            viewModel.replace(comment: updated)
+        } }
     }
 
     private func copyComment(withID commentID: Int) {

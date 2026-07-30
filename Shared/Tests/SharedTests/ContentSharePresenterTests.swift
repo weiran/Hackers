@@ -63,7 +63,6 @@ struct ContentSharePresenterTests {
             by: "commentuser",
             level: 0,
             upvoted: false,
-            upvoteLink: nil,
             voteLinks: nil,
             visibility: .visible,
             parsedText: nil,

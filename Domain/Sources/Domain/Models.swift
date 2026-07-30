@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Observation
 
 // MARK: - Voting System
 
@@ -37,7 +36,7 @@ public struct VotingState: Sendable {
 
 public protocol Votable: Identifiable, Sendable {
     var id: Int { get }
-    var upvoted: Bool { get set }
+    var upvoted: Bool { get }
     var voteLinks: VoteLinks? { get }
 }
 
@@ -121,20 +120,23 @@ public enum PostType: String, CaseIterable, Sendable {
     case bookmarks
 }
 
-@Observable
-public final class Comment: @unchecked Sendable {
-    nonisolated(unsafe) public let id: Int
+/// An immutable, parsed Hacker News comment.
+///
+/// Deliberately a value type so it can be produced off the main actor by the parser and
+/// observed on the main actor without unsynchronized sharing. UI-facing mutable state
+/// (upvoted, visibility) is owned and mutated by the `@MainActor` view models that hold a
+/// `[Comment]`, never by mutating a shared instance.
+public struct Comment: Sendable, Identifiable {
+    public let id: Int
     public let age: String
     public let text: String
     public let by: String
     public let isFlagged: Bool
-    public var level: Int
-    public var upvoteLink: String?
-    nonisolated(unsafe) public var upvoted: Bool
-    nonisolated(unsafe) public var voteLinks: VoteLinks?
-    public var visibility: CommentVisibilityType
-    @ObservationIgnored
-    public var parsedText: AttributedString?
+    public let level: Int
+    public let upvoted: Bool
+    public let voteLinks: VoteLinks?
+    public let visibility: CommentVisibilityType
+    public let parsedText: AttributedString?
 
     public init(
         id: Int,
@@ -144,7 +146,6 @@ public final class Comment: @unchecked Sendable {
         isFlagged: Bool = false,
         level: Int,
         upvoted: Bool,
-        upvoteLink: String? = nil,
         voteLinks: VoteLinks? = nil,
         visibility: CommentVisibilityType = .visible,
         parsedText: AttributedString? = nil,
@@ -156,21 +157,51 @@ public final class Comment: @unchecked Sendable {
         self.isFlagged = isFlagged
         self.level = level
         self.upvoted = upvoted
-        self.upvoteLink = upvoteLink
         self.voteLinks = voteLinks
         self.visibility = visibility
         self.parsedText = parsedText
     }
-
 }
 
 extension Comment: Hashable {
-    nonisolated(unsafe) public static func == (lhs: Comment, rhs: Comment) -> Bool {
+    /// Identity-based equality: two comments with the same id are considered equal so that
+    /// value copies with differing presentation state (e.g. visibility) collapse correctly
+    /// in sets/dictionaries keyed by comment.
+    public static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
     }
 
-    nonisolated(unsafe) public func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+public extension Comment {
+    /// Returns a copy with a different `upvoted` flag. For value-type optimistic updates.
+    func with(upvoted: Bool) -> Comment {
+        Comment(
+            id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
+            parsedText: parsedText
+        )
+    }
+
+    /// Returns a copy with different `voteLinks`. For value-type optimistic updates.
+    func with(voteLinks: VoteLinks?) -> Comment {
+        Comment(
+            id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
+            parsedText: parsedText
+        )
+    }
+
+    /// Returns a copy with different `visibility`. For value-type collapse/expand updates.
+    func withVisibility(_ visibility: CommentVisibilityType) -> Comment {
+        Comment(
+            id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
+            parsedText: parsedText
+        )
     }
 }
 

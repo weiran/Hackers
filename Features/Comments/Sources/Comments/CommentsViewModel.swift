@@ -49,6 +49,14 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var error: Error? { commentsLoader.error }
     public private(set) var isPostLoading: Bool
 
+    /// Mutable access to the loaded comments for value-type updates (visibility, voting).
+    /// `comments` is read-only; mutating state goes through here so changes also trigger
+    /// the visible-projection refresh where appropriate.
+    private var allComments: [Comment] {
+        get { commentsLoader.data }
+        set { commentsLoader.data = newValue }
+    }
+
     @MainActor
     public init(
         postID: Int,
@@ -215,13 +223,16 @@ public final class CommentsViewModel: @unchecked Sendable {
     public func voteOnComment(_ comment: Comment, upvote: Bool) async throws {
         guard upvote else { return }
         guard let post else { return }
+        guard let index = indexByID[comment.id] else { return }
 
-        comment.upvoted = true
+        // Optimistic update applied to the owned value copy.
+        let original = allComments[index]
+        allComments[index] = original.with(upvoted: true)
 
         do {
-            try await voteUseCase.upvote(comment: comment, for: post)
+            try await voteUseCase.upvote(comment: original.with(upvoted: false), for: post)
         } catch {
-            comment.upvoted = false
+            allComments[index] = original.with(upvoted: false)
             throw error
         }
     }
@@ -230,9 +241,9 @@ public final class CommentsViewModel: @unchecked Sendable {
     @discardableResult
     public func revealComment(withId id: Int) -> Bool {
         guard let index = indexByID[id] else { return false }
-        let targetComment = comments[index]
+        let targetComment = allComments[index]
         collapsedCommentIDs.remove(targetComment.id)
-        targetComment.visibility = .visible
+        allComments[index] = targetComment.withVisibility(.visible)
 
         if targetComment.level > 0 {
             ensureAncestorVisibility(forCommentAt: index)
@@ -250,23 +261,36 @@ public final class CommentsViewModel: @unchecked Sendable {
     @MainActor
     @discardableResult
     public func toggleCommentVisibility(withID id: Int) -> Comment? {
-        guard let comment = comment(withID: id) else { return nil }
+        guard let index = indexByID[id] else { return nil }
+        let comment = allComments[index]
+        let updated: Comment
         if collapsedCommentIDs.contains(comment.id) {
             collapsedCommentIDs.remove(comment.id)
-            comment.visibility = .visible
+            updated = comment.withVisibility(.visible)
         } else {
             collapsedCommentIDs.insert(comment.id)
-            comment.visibility = .compact
+            updated = comment.withVisibility(.compact)
         }
+        allComments[index] = updated
 
         updateVisibleComments()
-        return comment
+        return updated
     }
 
     @MainActor
     public func comment(withID id: Int) -> Comment? {
         guard let index = indexByID[id] else { return nil }
         return comments[index]
+    }
+
+    /// Writes an updated comment back into the loaded set by id, used for value-type
+    /// optimistic updates (voting) where the caller cannot mutate a shared instance.
+    /// Also refreshes the visible projection so the UI reflects the change.
+    @MainActor
+    public func replace(comment updated: Comment) {
+        guard let index = indexByID[updated.id], allComments.indices.contains(index) else { return }
+        allComments[index] = updated
+        updateVisibleComments()
     }
 
     @MainActor
@@ -341,14 +365,14 @@ private extension CommentsViewModel {
 
         var validCommentIDs = Set<Int>()
         var stack: [(index: Int, id: Int, level: Int)] = []
-        for index in comments.indices {
-            let comment = comments[index]
+        for index in allComments.indices {
+            let comment = allComments[index]
             validCommentIDs.insert(comment.id)
             indexByID[comment.id] = index
             if comment.visibility == .compact {
                 collapsedCommentIDs.insert(comment.id)
             } else if comment.visibility == .hidden {
-                comment.visibility = .visible
+                allComments[index] = comment.withVisibility(.visible)
             }
 
             while let last = stack.last, comment.level <= last.level {
@@ -410,11 +434,12 @@ private extension CommentsViewModel {
     }
 
     func ensureAncestorVisibility(forCommentAt index: Int) {
-        var currentCommentID = comments[index].id
+        var currentCommentID = allComments[index].id
         while let parentIndex = parentIndexByID[currentCommentID] {
-            collapsedCommentIDs.remove(comments[parentIndex].id)
-            comments[parentIndex].visibility = .visible
-            currentCommentID = comments[parentIndex].id
+            let parent = allComments[parentIndex]
+            collapsedCommentIDs.remove(parent.id)
+            allComments[parentIndex] = parent.withVisibility(.visible)
+            currentCommentID = parent.id
         }
     }
 }

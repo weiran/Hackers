@@ -70,8 +70,6 @@ extension PostRepository {
         let response = try await networkManager.get(url: realURL)
         let containsLoginForm = response.contains("<form action=\"/login")
         if containsLoginForm { throw HackersKitError.unauthenticated }
-
-        await MainActor.run { comment.upvoted = true }
     }
 
     public func unvote(comment: Domain.Comment, for _: Post) async throws {
@@ -88,8 +86,6 @@ extension PostRepository {
         let response = try await networkManager.get(url: realURL)
         let containsLoginForm = response.contains("<form action=\"/login")
         if containsLoginForm { throw HackersKitError.unauthenticated }
-
-        await MainActor.run { comment.upvoted = false }
     }
 
     // MARK: - Vote link extraction

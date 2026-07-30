@@ -207,15 +207,24 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 
     private func comments(for postID: Int) -> [Comment] {
         (commentsByPostID[postID] ?? []).map { fixture in
-            let comment = fixture
-            comment.voteLinks = VoteLinks(
-                upvote: URL(
-                    string: "https://news.ycombinator.com/vote?id=\(fixture.id)&how=up"
-                        + "&goto=item%3Fid%3D\(postID)"
+            Comment(
+                id: fixture.id,
+                age: fixture.age,
+                text: fixture.text,
+                by: fixture.by,
+                isFlagged: fixture.isFlagged,
+                level: fixture.level,
+                upvoted: fixture.upvoted,
+                voteLinks: VoteLinks(
+                    upvote: URL(
+                        string: "https://news.ycombinator.com/vote?id=\(fixture.id)&how=up"
+                            + "&goto=item%3Fid%3D\(postID)"
+                    ),
+                    unvote: nil
                 ),
-                unvote: nil
+                visibility: fixture.visibility,
+                parsedText: fixture.parsedText
             )
-            return comment
         }
     }
 

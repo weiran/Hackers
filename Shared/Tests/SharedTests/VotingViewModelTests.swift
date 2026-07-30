@@ -245,13 +245,13 @@ struct VotingViewModelTests {
             upvoted: false
         )
 
-        let firstTask = Task { await viewModel.upvote(comment: firstComment, in: post) }
+        let firstTask = Task { await viewModel.upvote(comment: firstComment, in: post) { _ in } }
         await waitUntilStarted(itemID: firstComment.id, provider: provider)
 
         #expect(viewModel.votingState(for: firstComment).isVoting)
         #expect(!viewModel.votingState(for: secondComment).isVoting)
 
-        let secondTask = Task { await viewModel.upvote(comment: secondComment, in: post) }
+        let secondTask = Task { await viewModel.upvote(comment: secondComment, in: post) { _ in } }
         await waitUntilStarted(itemID: secondComment.id, provider: provider)
 
         provider.finish(itemID: firstComment.id)
@@ -292,12 +292,13 @@ struct VotingViewModelTests {
             upvoted: false,
         )
 
-        // When - upvote comment
-        await votingViewModel.upvote(comment: comment, in: post)
+        // When - upvote comment (capture the applied optimistic state)
+        var appliedComment: Domain.Comment?
+        await votingViewModel.upvote(comment: comment, in: post) { appliedComment = $0 }
 
         // Then
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
-        #expect(comment.upvoted == true, "Comment should be marked as upvoted after upvote")
+        #expect(appliedComment?.upvoted == true, "Comment should be marked as upvoted after upvote")
     }
 
     private func makeComment(id: Int) -> Domain.Comment {
@@ -351,10 +352,11 @@ struct VotingViewModelTests {
             upvoted: false
         )
 
-        await votingViewModel.upvote(comment: comment, in: post)
+        var appliedComment: Domain.Comment?
+        await votingViewModel.upvote(comment: comment, in: post) { appliedComment = $0 }
 
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be attempted")
-        guard let commentUnvote = comment.voteLinks?.unvote else {
+        guard let commentUnvote = appliedComment?.voteLinks?.unvote else {
             Issue.record("Expected synthesized unvote URL for comment")
             return
         }
@@ -393,12 +395,13 @@ struct VotingViewModelTests {
         mockCommentVotingStateProvider.shouldThrow = true
         let viewModel = votingViewModel
 
-        // When
-        await viewModel.upvote(comment: comment, in: post)
+        // When - capture the last applied state (optimistic then revert)
+        var appliedComment: Domain.Comment?
+        await viewModel.upvote(comment: comment, in: post) { appliedComment = $0 }
 
         // Then - Should revert the optimistic update
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
-        #expect(comment.upvoted == false, "Comment should be reverted to original state after error")
+        #expect(appliedComment?.upvoted == false, "Comment should be reverted to original state after error")
         #expect(viewModel.lastError != nil, "Error should be set")
     }
 }

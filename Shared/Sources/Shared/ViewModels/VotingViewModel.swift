@@ -103,53 +103,51 @@ public final class VotingViewModel {
     // MARK: - Comment Voting
 
     // Comment toggle removed
-    public func upvote(comment: Comment, in post: Post) async {
+    /// Upvotes a comment optimistically, writing each state change back through `apply`.
+    ///
+    /// `Comment` is an immutable value type, so the optimistic/reverted state cannot be
+    /// applied by mutating the caller's instance. Instead `apply` receives the updated
+    /// comment each time and is responsible for persisting it to the owning view model's
+    /// storage. The voting network call and error/revert logic stay here.
+    public func upvote(comment: Comment, in post: Post, apply: @escaping (Comment) -> Void) async {
         guard !comment.upvoted, beginVoting(itemID: comment.id) else { return }
         defer { endVoting(itemID: comment.id) }
 
-        // Create a copy of the comment with the original state for the voting provider
-        var commentForVoting = comment
-        commentForVoting.upvoted = false
+        // A copy with the pre-vote state, for the voting provider.
+        let commentForVoting = comment.with(upvoted: false)
         let originalVoteLinks = comment.voteLinks
 
-        // Optimistic UI update
-        comment.upvoted = true
-        comment.voteLinks = ensureUnvoteLinkIfPossible(from: originalVoteLinks)
+        // Optimistic UI update applied through the owner.
+        apply(comment.with(upvoted: true).with(voteLinks: ensureUnvoteLinkIfPossible(from: originalVoteLinks)))
 
         lastError = nil
 
         do {
             try await commentVotingStateProvider.upvoteComment(commentForVoting, for: post)
         } catch {
-            // Revert optimistic changes on error
-            comment.upvoted = false
-            comment.voteLinks = originalVoteLinks
-
-            // Check if error is unauthenticated and show login
+            // Revert optimistic changes on error.
+            apply(comment.with(upvoted: false).with(voteLinks: originalVoteLinks))
             await handleUnauthenticatedIfNeeded(error)
         }
     }
 
-    public func unvote(comment: Comment, in post: Post) async {
+    public func unvote(comment: Comment, in post: Post, apply: @escaping (Comment) -> Void) async {
         guard comment.upvoted, beginVoting(itemID: comment.id) else { return }
         defer { endVoting(itemID: comment.id) }
 
-        // Create a copy of the comment with the original state for the voting provider
-        var commentForVoting = comment
-        commentForVoting.upvoted = true
+        // A copy with the pre-unvote state, for the voting provider.
+        let commentForVoting = comment.with(upvoted: true)
 
-        // Optimistic UI update
-        comment.upvoted = false
+        // Optimistic UI update applied through the owner.
+        apply(comment.with(upvoted: false))
 
         lastError = nil
 
         do {
             try await commentVotingStateProvider.unvoteComment(commentForVoting, for: post)
         } catch {
-            // Revert optimistic changes on error
-            comment.upvoted = true
-
-            // Check if error is unauthenticated and show login
+            // Revert optimistic changes on error.
+            apply(comment.with(upvoted: true))
             await handleUnauthenticatedIfNeeded(error)
         }
     }

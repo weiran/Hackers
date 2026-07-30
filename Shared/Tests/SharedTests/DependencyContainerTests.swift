@@ -153,13 +153,9 @@ private final class StubVotingStateProvider:
     }
 
     func upvote(item _: any Votable) async throws {}
-    func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
-        comment.upvoted = true
-    }
+    func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {}
     func unvote(item _: any Votable) async throws {}
-    func unvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
-        comment.upvoted = false
-    }
+    func unvoteComment(_ comment: Domain.Comment, for _: Post) async throws {}
 }
 
 private final class StubAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {

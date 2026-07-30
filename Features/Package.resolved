@@ -1,5 +1,5 @@
 {
-  "originHash" : "b349464f7afc506f2d123881b65919ed02496d4bada696f176a8a62a7cb04a3f",
+  "originHash" : "62b28751cb0c045da932f2a56e4ceb9c064374bbf5f4994940c40416cd9bf283",
   "pins" : [
     {
       "identity" : "swiftsoup",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nikstar/VariableBlur",
       "state" : {
-        "branch" : "main",
-        "revision" : "5073a0d9080e488a2d317e04859c001a57fbb3e8"
+        "revision" : "1be3226d9ad7225b9ea6e46cf3c67b6861066f9c",
+        "version" : "1.3.0"
       }
     }
   ],

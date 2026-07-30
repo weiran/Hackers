@@ -302,16 +302,18 @@ struct CommentsViewModelTests {
     @Test("Upvoting comment updates state", arguments: [false])
     @MainActor
     func voteOnComment(initialUpvoted: Bool) async throws {
-        // Given
+        // Given - load a comment into the view model so voting can update owned state
         let comment = createTestComment(id: 1, upvoted: initialUpvoted)
-        let expectedUpvoted = true
+        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
+        await sut.loadComments()
         mockVoteUseCase.upvoteCommentCalled = false
 
         // When
-        try await sut.voteOnComment(comment, upvote: expectedUpvoted)
+        try await sut.voteOnComment(comment, upvote: true)
 
-        // Then
-        #expect(comment.upvoted == expectedUpvoted)
+        // Then - re-fetch the owned comment to verify optimistic state
+        let updated = sut.comment(withID: comment.id)
+        #expect(updated?.upvoted == true)
         #expect(mockVoteUseCase.upvoteCommentCalled)
     }
 
@@ -320,13 +322,16 @@ struct CommentsViewModelTests {
     func voteOnCommentFailureReverts() async {
         mockVoteUseCase.shouldThrowError = true
         let comment = createTestComment(id: 9, upvoted: false)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
+        await sut.loadComments()
         mockVoteUseCase.upvoteCommentCalled = false
 
         await #expect(throws: MockError.self) {
             try await sut.voteOnComment(comment, upvote: true)
         }
 
-        #expect(comment.upvoted == false)
+        let reverted = sut.comment(withID: comment.id)
+        #expect(reverted?.upvoted == false)
         #expect(mockVoteUseCase.upvoteCommentCalled)
     }
 
@@ -411,8 +416,9 @@ struct CommentsViewModelTests {
             // When
             sut.toggleCommentVisibility(loadedParent)
 
-            // Then
-            #expect(loadedParent.visibility == Domain.CommentVisibilityType.compact)
+            // Then - re-fetch owned copies since Comment is now a value type
+            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
+            #expect(toggledParent.visibility == Domain.CommentVisibilityType.compact)
             #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
             #expect(sut.isCommentCollapsed(withID: loadedParent.id))
             #expect(!sut.isCommentCollapsed(withID: loadedChild.id))
@@ -424,9 +430,9 @@ struct CommentsViewModelTests {
         func toggleCompactToVisible() async {
             // Given - Set up mock with comments in compact state
             let parentComment = createTestComment(id: 1, level: 0)
+                .withVisibility(Domain.CommentVisibilityType.compact)
             let childComment = createTestComment(id: 2, level: 1)
-            parentComment.visibility = Domain.CommentVisibilityType.compact
-            childComment.visibility = Domain.CommentVisibilityType.hidden
+                .withVisibility(Domain.CommentVisibilityType.hidden)
 
             let testPostWithComments = createPostWithComments(comments: [parentComment, childComment])
             mockPostUseCase.mockPost = testPostWithComments
@@ -441,8 +447,9 @@ struct CommentsViewModelTests {
             // When
             sut.toggleCommentVisibility(loadedParent)
 
-            // Then
-            #expect(loadedParent.visibility == Domain.CommentVisibilityType.visible)
+            // Then - re-fetch owned copy since Comment is now a value type
+            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
+            #expect(toggledParent.visibility == Domain.CommentVisibilityType.visible)
             #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
             #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
             #expect(sut.visibleComments.count == 2)
@@ -493,7 +500,9 @@ struct CommentsViewModelTests {
 
             sut.toggleCommentVisibility(loadedParent)
 
-            #expect(loadedParent.visibility == .compact)
+            // Re-fetch owned copy since Comment is now a value type.
+            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
+            #expect(toggledParent.visibility == .compact)
             #expect(loadedSibling.visibility == .visible)
             #expect(!sut.isCommentCollapsed(withID: loadedSibling.id))
             #expect(sut.visibleComments.map(\.id) == [1, 4])
@@ -508,21 +517,23 @@ struct CommentsViewModelTests {
 
             await sut.loadComments()
 
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
             let staleParent = createTestComment(id: 1, level: 0)
 
             sut.toggleCommentVisibility(staleParent)
 
-            #expect(loadedParent.visibility == .compact)
+            // Re-fetch owned copy since Comment is now a value type.
+            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
+            #expect(toggledParent.visibility == .compact)
             #expect(staleParent.visibility == .visible)
-            #expect(sut.isCommentCollapsed(withID: loadedParent.id))
+            #expect(sut.isCommentCollapsed(withID: toggledParent.id))
             #expect(sut.visibleComments.map(\.id) == [1])
 
-            let toggledParent = sut.toggleCommentVisibility(withID: 1)
+            let reverted = sut.toggleCommentVisibility(withID: 1)
 
-            #expect(toggledParent === loadedParent)
-            #expect(loadedParent.visibility == .visible)
-            #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
+            #expect(reverted?.id == toggledParent.id)
+            let expandedParent = sut.comments.first(where: { $0.id == 1 })!
+            #expect(expandedParent.visibility == .visible)
+            #expect(!sut.isCommentCollapsed(withID: expandedParent.id))
             #expect(sut.visibleComments.map(\.id) == [1, 2])
             #expect(sut.toggleCommentVisibility(withID: 999) == nil)
         }
@@ -574,7 +585,7 @@ struct CommentsViewModelTests {
             let loadedRoot = sut.comments.first(where: { $0.id == 1 })!
             let loadedChild1 = sut.comments.first(where: { $0.id == 2 })!
 
-            #expect(collapsedRoot === loadedRoot)
+            #expect(collapsedRoot?.id == loadedRoot.id)
             #expect(loadedRoot.visibility == Domain.CommentVisibilityType.compact)
             #expect(loadedChild1.visibility == Domain.CommentVisibilityType.visible)
             #expect(loadedChild2.visibility == Domain.CommentVisibilityType.visible)
@@ -587,12 +598,11 @@ struct CommentsViewModelTests {
         func revealCommentUnhidesAncestors() async {
             // Given - Comment chain with collapsed ancestors
             let rootComment = createTestComment(id: 1, level: 0)
+                .withVisibility(.compact)
             let childComment = createTestComment(id: 2, level: 1)
+                .withVisibility(.hidden)
             let grandchildComment = createTestComment(id: 3, level: 2)
-
-            rootComment.visibility = .compact
-            childComment.visibility = .hidden
-            grandchildComment.visibility = .hidden
+                .withVisibility(.hidden)
 
             let post = createPostWithComments(comments: [rootComment, childComment, grandchildComment])
             mockPostUseCase.mockPost = post
