@@ -86,8 +86,7 @@ extension PostRepository {
         }
 
         let scoreElement = try metadataElement.select("span.score")
-        let score = try scoreElement.first()?.text().replacingOccurrences(of: " points", with: "")
-        let scoreInt = Int(score ?? "0") ?? 0
+        let scoreInt = leadingInt(from: try scoreElement.first()?.text())
 
         let ageElement = try metadataElement.select("span.age")
         let age = try ageElement.first()?.attr("title") ?? ""
@@ -102,10 +101,7 @@ extension PostRepository {
         }
 
         let commentLinkText = try commentLinkElement?.text()
-        let commentsCountString = commentLinkText?
-            .components(separatedBy: .whitespaces)
-            .first
-        let commentsCount = Int(commentsCountString ?? "") ?? 0
+        let commentsCount = leadingInt(from: commentLinkText)
 
         let voteLinks = try voteLinks(from: titleElement, metadata: metadataElement)
         let hasAnyVoteLink = voteLinks.upvote != nil || voteLinks.unvote != nil
@@ -205,5 +201,38 @@ extension PostRepository {
             }
         }
         return try elements.html()
+    }
+}
+
+// MARK: - Number Parsing
+
+extension PostRepository {
+    /// Parses the leading integer from HN metadata text such as score or comment counts.
+    ///
+    /// Hacker News renders counts with a trailing noun (`"10 points"`, `"1 point"`,
+    /// `"5 comments"`, `"Discuss"` when there are none) and uses U+00A0 (no-break space)
+    /// as a thousands separator for larger numbers (`"1\u{00A0}234\u{00A0}points"`).
+    /// SwiftSoup's `text()` may collapse that into an ordinary space. Naive `Int(text)`
+    /// parsing therefore fails on the singular form and on space/NBSP-separated values,
+    /// silently yielding 0. This helper extracts the leading digit run — collapsing
+    /// whitespace separators that sit between digits — and falls back to 0 when no digits
+    /// are present.
+    func leadingInt(from text: String?) -> Int {
+        guard let text else { return 0 }
+        let separators: Set<Unicode.Scalar> = [" ", "\u{00A0}", "\u{202F}", "\u{2009}"]
+        var digits = ""
+        var sawDigit = false
+        for scalar in text.unicodeScalars {
+            if CharacterSet.decimalDigits.contains(scalar) {
+                digits.append(Character(scalar))
+                sawDigit = true
+            } else if sawDigit {
+                // HN inserts NBSP (sometimes collapsed to a space) between digit groups as
+                // a thousands separator; keep collecting only while inside the number.
+                if separators.contains(scalar) { continue }
+                break
+            }
+        }
+        return sawDigit ? (Int(digits) ?? 0) : 0
     }
 }

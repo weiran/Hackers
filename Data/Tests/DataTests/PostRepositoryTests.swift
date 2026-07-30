@@ -729,4 +729,91 @@ struct PostRepositoryTests {
     }
 }
 
+@Suite("PostRepository Number Parsing")
+struct PostRepositoryNumberParsingTests {
+    let repository = PostRepository(networkManager: StubNetworkManager())
+
+    @Test("Parses plain plural counts")
+    func plainPlural() {
+        #expect(repository.leadingInt(from: "10 points") == 10)
+        #expect(repository.leadingInt(from: "5 comments") == 5)
+    }
+
+    @Test("Parses singular 'point' form without dropping to zero")
+    func singularPoint() {
+        #expect(repository.leadingInt(from: "1 point") == 1)
+    }
+
+    @Test("Parses 'Discuss' as zero comments")
+    func discuss() {
+        #expect(repository.leadingInt(from: "Discuss") == 0)
+    }
+
+    @Test("Parses NBSP thousands-separated scores")
+    func nbspThousands() {
+        #expect(repository.leadingInt(from: "1\u{00A0}234\u{00A0}points") == 1234)
+        #expect(repository.leadingInt(from: "1\u{00A0}234\u{00A0}comments") == 1234)
+    }
+
+    @Test("Parses narrow no-break space (U+202F) separators")
+    func narrowNbsp() {
+        #expect(repository.leadingInt(from: "1\u{202F}234\u{202F}points") == 1234)
+    }
+
+    @Test("Returns zero for nil and empty input")
+    func nilAndEmpty() {
+        #expect(repository.leadingInt(from: nil) == 0)
+        #expect(repository.leadingInt(from: "") == 0)
+    }
+
+    @Test("Stops at non-digit suffix")
+    func suffix() {
+        #expect(repository.leadingInt(from: "42 points by alice") == 42)
+    }
+}
+
+@Suite("PostRepository NBSP Score Parsing")
+struct PostRepositoryNBSPParsingTests {
+    let network = StubNetworkManager()
+    var postRepository: PostRepository {
+        PostRepository(networkManager: network)
+    }
+
+    @Test("Parses NBSP-formatted score and singular score from feed HTML")
+    func nbspAndSingularScoreFromFeed() async throws {
+        network.enqueue(html: """
+        <html><body><table class="itemlist">
+            <tr class="athing submission" id="1">
+                <td valign="top" class="votelinks"><center><a id='up_1' href='vote?id=1&how=up'><div class='votearrow'></div></a></center></td>
+                <td class="title"><span class="titleline"><a href="https://example.com/a">A</a></span></td>
+            </tr>
+            <tr><td colspan="2"></td><td class="subtext">
+                <span class="score">1\u{00A0}234\u{00A0}points</span>
+                <span class="age" title="t">2 hours ago</span>
+                <a class="hnuser" href="user?id=u">u</a>
+                <a href="item?id=1">1 comment</a>
+            </td></tr>
+            <tr class="athing submission" id="2">
+                <td valign="top" class="votelinks"><center><a id='up_2' href='vote?id=2&how=up'><div class='votearrow'></div></a></center></td>
+                <td class="title"><span class="titleline"><a href="https://example.com/b">B</a></span></td>
+            </tr>
+            <tr><td colspan="2"></td><td class="subtext">
+                <span class="score">1 point</span>
+                <span class="age" title="t">2 hours ago</span>
+                <a class="hnuser" href="user?id=u">u</a>
+                <a href="item?id=2">Discuss</a>
+            </td></tr>
+        </table></body></html>
+        """)
+
+        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+
+        #expect(posts.count == 2)
+        #expect(posts[0].score == 1234, "NBSP-separated score should parse to 1234")
+        #expect(posts[0].commentsCount == 1, "Singular '1 point' comment count should parse to 1")
+        #expect(posts[1].score == 1, "Singular '1 point' score should parse to 1")
+        #expect(posts[1].commentsCount == 0, "'Discuss' should parse to 0 comments")
+    }
+}
+
 // swiftlint:enable type_body_length
