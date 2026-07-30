@@ -225,7 +225,7 @@ struct NetworkManagerTests {
 
     // MARK: - Cookie Management Tests
 
-    @Test("Clear cookies functionality")
+    @Test("Clear cookies scoped to Hacker News domain")
     func clearCookies() {
         let manager = NetworkManager()
 
@@ -241,35 +241,43 @@ struct NetworkManagerTests {
             }
         }
 
-        // Test that clearCookies method completes without errors
+        // clearCookies must complete without errors and be idempotent
         manager.clearCookies()
-        manager.clearCookies() // Test idempotency
+        manager.clearCookies()
 
-        // Test actual cookie clearing functionality with isolated domain
-        let testCookie = HTTPCookie(properties: [
-            .domain: "clear-cookies-test.local",
+        // Seed both an HN session cookie and an unrelated third-party cookie.
+        let hackerNewsCookie = HTTPCookie(properties: [
+            .domain: "news.ycombinator.com",
             .path: "/",
-            .name: "clearTest",
-            .value: "testValue",
+            .name: "user",
+            .value: "hn-session",
+        ])!
+        let otherCookie = HTTPCookie(properties: [
+            .domain: "other-site.example",
+            .path: "/",
+            .name: "prefs",
+            .value: "keep-me",
         ])!
 
-        HTTPCookieStorage.shared.setCookie(testCookie)
+        HTTPCookieStorage.shared.setCookie(hackerNewsCookie)
+        HTTPCookieStorage.shared.setCookie(otherCookie)
 
-        // Verify cookie was set
         let cookiesAfterSet = HTTPCookieStorage.shared.cookies ?? []
-        let cookieWasSet = cookiesAfterSet.contains { cookie in
-            cookie.name == "clearTest" && cookie.domain == "clear-cookies-test.local"
-        }
-        #expect(cookieWasSet, "Test cookie should be set")
+        #expect(cookiesAfterSet.contains { $0.name == "user" && $0.domain.contains("news.ycombinator.com") },
+                "HN cookie should be set")
+        #expect(cookiesAfterSet.contains { $0.name == "prefs" }, "Other cookie should be set")
 
-        // Clear cookies and verify our test cookie was removed
         manager.clearCookies()
 
         let remainingCookies = HTTPCookieStorage.shared.cookies ?? []
-        let testCookieRemains = remainingCookies.contains { cookie in
-            cookie.name == "clearTest" && cookie.domain == "clear-cookies-test.local"
+        let hackerNewsCookieRemains = remainingCookies.contains { cookie in
+            cookie.name == "user" && cookie.domain.contains("news.ycombinator.com")
         }
-        #expect(!testCookieRemains, "Test cookie should be cleared")
+        let otherCookieRemains = remainingCookies.contains { cookie in
+            cookie.name == "prefs" && cookie.domain == "other-site.example"
+        }
+        #expect(!hackerNewsCookieRemains, "HN cookie should be cleared")
+        #expect(otherCookieRemains, "Non-HN cookie should be preserved")
     }
 
     @Test("Contains cookie for URL functionality")

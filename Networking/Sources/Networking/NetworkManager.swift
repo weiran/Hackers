@@ -61,7 +61,13 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
     }
 
     public func clearCookies() {
-        HTTPCookieStorage.shared.cookies?.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
+        // Only clear Hacker News session cookies. The session uses the shared cookie
+        // storage, so deleting every cookie would also wipe cookies belonging to other
+        // domains (e.g. the in-app browser's web content). Scope deletion to HN.
+        let hackerNewsHost = "news.ycombinator.com"
+        for cookie in HTTPCookieStorage.shared.cookies ?? [] where cookie.domain.contains(hackerNewsHost) {
+            HTTPCookieStorage.shared.deleteCookie(cookie)
+        }
     }
 
     public func containsCookie(for url: URL) -> Bool {
