@@ -165,17 +165,11 @@ struct AdaptiveSplitView: View {
     let feedViewModel: FeedViewModel
     @State var settingsViewModel: SettingsViewModel
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    @State private var sidebarWidth: CGFloat = 375
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
         Binding(
             get: { navigationStore.detailPath },
             set: { navigationStore.detailPath = $0 }
         )
-    }
-
-    /// Leading inset for floating browser chrome so it clears the sidebar when visible.
-    private var sidebarLeadingInset: CGFloat {
-        columnVisibility == .detailOnly ? 0 : sidebarWidth
     }
 
     var body: some View {
@@ -186,11 +180,6 @@ struct AdaptiveSplitView: View {
                 isSidebar: true
             )
             .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(key: SidebarWidthPreferenceKey.self, value: proxy.size.width)
-                }
-            )
         } detail: {
             // Detail - CommentsView or empty state
             NavigationStack(path: detailPathBinding) {
@@ -201,8 +190,7 @@ struct AdaptiveSplitView: View {
                 } else if let embeddedURL = navigationStore.embeddedBrowserURL {
                     EmbeddedWebView(url: embeddedURL,
                                     onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: true,
-                                    sidebarLeadingInset: sidebarLeadingInset)
+                                    showsCloseButton: false)
                         .id(embeddedURL.absoluteString)
                 } else if let selectedPost = navigationStore.selectedPost {
                     CommentsView<NavigationStore>(postID: selectedPost.id, initialPost: selectedPost)
@@ -219,20 +207,11 @@ struct AdaptiveSplitView: View {
                 case let .web(url):
                     EmbeddedWebView(url: url,
                                     onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: true,
-                                    sidebarLeadingInset: sidebarLeadingInset)
+                                    showsCloseButton: false)
                 }
             }
         }
-        .onPreferenceChange(SidebarWidthPreferenceKey.self) { sidebarWidth = $0 }
         .textScaling(for: settingsViewModel.textSize)
-    }
-}
-
-private enum SidebarWidthPreferenceKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
     }
 }
 

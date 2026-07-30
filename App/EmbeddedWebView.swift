@@ -175,76 +175,6 @@ final class BrowserController: ObservableObject {
         }
     }
 
-    func applyTopChromeInset(_ topInset: CGFloat) {
-        let inset = max(topInset, 0)
-        applyObscuredTopInset(inset)
-        applyScrollViewTopInset(inset)
-    }
-
-    private func applyObscuredTopInset(_ inset: CGFloat) {
-        guard abs(webView.obscuredContentInsets.top - inset) > 0.5 else { return }
-
-        var obscuredContentInsets = webView.obscuredContentInsets
-        obscuredContentInsets.top = inset
-        webView.obscuredContentInsets = obscuredContentInsets
-    }
-
-    private func applyScrollViewTopInset(_ topInset: CGFloat) {
-        let scrollView = webView.scrollView
-        let automaticTopInset = max(
-            scrollView.adjustedContentInset.top - scrollView.contentInset.top,
-            0
-        )
-        let inset = max(topInset - automaticTopInset, 0)
-
-        if abs(scrollView.contentInset.top - inset) > 0.5 {
-            var contentInset = scrollView.contentInset
-            contentInset.top = inset
-            scrollView.contentInset = contentInset
-        }
-
-        if abs(scrollView.verticalScrollIndicatorInsets.top - inset) > 0.5 {
-            var indicatorInsets = scrollView.verticalScrollIndicatorInsets
-            indicatorInsets.top = inset
-            scrollView.verticalScrollIndicatorInsets = indicatorInsets
-        }
-    }
-
-    func applyLeadingChromeInset(_ leadingInset: CGFloat) {
-        let inset = max(leadingInset, 0)
-        applyObscuredLeadingInset(inset)
-        applyScrollViewLeadingInset(inset)
-    }
-
-    private func applyObscuredLeadingInset(_ inset: CGFloat) {
-        guard abs(webView.obscuredContentInsets.left - inset) > 0.5 else { return }
-
-        var obscuredContentInsets = webView.obscuredContentInsets
-        obscuredContentInsets.left = inset
-        webView.obscuredContentInsets = obscuredContentInsets
-    }
-
-    private func applyScrollViewLeadingInset(_ leadingInset: CGFloat) {
-        let scrollView = webView.scrollView
-        let automaticLeadingInset = max(
-            scrollView.adjustedContentInset.left - scrollView.contentInset.left,
-            0
-        )
-        let inset = max(leadingInset - automaticLeadingInset, 0)
-
-        if abs(scrollView.contentInset.left - inset) > 0.5 {
-            var contentInset = scrollView.contentInset
-            contentInset.left = inset
-            scrollView.contentInset = contentInset
-        }
-
-        if abs(scrollView.horizontalScrollIndicatorInsets.left - inset) > 0.5 {
-            var indicatorInsets = scrollView.horizontalScrollIndicatorInsets
-            indicatorInsets.left = inset
-            scrollView.horizontalScrollIndicatorInsets = indicatorInsets
-        }
-    }
-
     private func resetHeaderBlurTint() {
         pageHeaderBlurTint = nil
         pageHeaderBlurTintURL = nil
@@ -337,9 +267,6 @@ enum WebViewAnimations {
 
 struct EmbeddedWebView: View {
     private static let statusBarBlurFadeExtension: CGFloat = 0
-    private static let padChromeControlHeight: CGFloat = 44
-    private static let padChromeHorizontalMargin: CGFloat = 12
-    private static let padChromeVerticalSpacing: CGFloat = 12
 
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -347,7 +274,6 @@ struct EmbeddedWebView: View {
     let showsToolbar: Bool
     let bottomWebViewInset: CGFloat
     let obscuredBottomInset: CGFloat
-    let sidebarLeadingInset: CGFloat
     @StateObject private var controller: BrowserController
 
     init(
@@ -357,7 +283,6 @@ struct EmbeddedWebView: View {
         showsToolbar: Bool = true,
         bottomWebViewInset: CGFloat = 0,
         obscuredBottomInset: CGFloat = 0,
-        sidebarLeadingInset: CGFloat = 0,
         controller: BrowserController? = nil
     ) {
         self.url = url
@@ -366,7 +291,6 @@ struct EmbeddedWebView: View {
         self.showsToolbar = showsToolbar
         self.bottomWebViewInset = bottomWebViewInset
         self.obscuredBottomInset = obscuredBottomInset
-        self.sidebarLeadingInset = sidebarLeadingInset
         _controller = StateObject(wrappedValue: controller ?? BrowserController())
     }
 
@@ -380,18 +304,26 @@ struct EmbeddedWebView: View {
                 )
                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                 .overlay(alignment: .top) {
-                    if !usesFloatingChrome {
+                    if !isPadLayout {
                         headerBlur
-                    }
-                }
-                .overlay(alignment: .top) {
-                    if usesFloatingChrome {
-                        padTopChrome
                     }
                 }
         }
         .toolbar {
-            if showsToolbar && !isPadLayout {
+            if showsToolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if controller.canGoBack {
+                        backButton
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    if controller.canGoForward {
+                        forwardButton
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    reloadButton
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     shareButton
                 }
@@ -406,51 +338,6 @@ struct EmbeddedWebView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbar(usesFloatingChrome ? .hidden : .automatic, for: .navigationBar)
-        .ignoresSafeArea(edges: usesFloatingChrome ? .all : [])
-    }
-
-    private var usesFloatingChrome: Bool {
-        isPadLayout && showsToolbar
-    }
-
-    private var windowSafeAreaInsets: UIEdgeInsets {
-        PresentationContextProvider.shared.keyWindow?.safeAreaInsets ?? .zero
-    }
-
-    private var effectiveTopInset: CGFloat {
-        guard usesFloatingChrome else { return 0 }
-        return windowSafeAreaInsets.top + Self.padChromeControlHeight + Self.padChromeVerticalSpacing
-    }
-
-    private var effectiveBottomInset: CGFloat {
-        if usesFloatingChrome {
-            return windowSafeAreaInsets.bottom
-        }
-        return obscuredBottomInset
-    }
-
-    private var effectiveLeadingInset: CGFloat {
-        guard usesFloatingChrome else { return 0 }
-        // Page content clears the sidebar with the same margin the floating chrome uses,
-        // so the content's left edge aligns with the close button.
-        return sidebarLeadingInset + Self.padChromeHorizontalMargin
-    }
-
-    @ViewBuilder
-    private var padTopChrome: some View {
-        GlassEffectContainer(spacing: 18) {
-            PadBrowserTopControls(
-                showsCloseButton: showsCloseButton,
-                fallbackURL: url,
-                onDismiss: onDismiss,
-                controller: controller
-            )
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.leading, effectiveLeadingInset)
-        .padding(.trailing, windowSafeAreaInsets.right + Self.padChromeHorizontalMargin)
-        .padding(.top, windowSafeAreaInsets.top + Self.padChromeVerticalSpacing)
     }
 
     private var headerBlur: some View {
@@ -477,9 +364,7 @@ struct EmbeddedWebView: View {
                     controller: controller,
                     url: url,
                     article: article,
-                    obscuredTopInset: effectiveTopInset,
-                    obscuredBottomInset: effectiveBottomInset,
-                    obscuredLeadingInset: effectiveLeadingInset
+                    obscuredBottomInset: obscuredBottomInset
                 )
             } else {
                 UITestMissingArticleView(url: url)
@@ -496,9 +381,7 @@ struct EmbeddedWebView: View {
         BrowserWebView(
             controller: controller,
             url: url,
-            obscuredTopInset: effectiveTopInset,
-            obscuredBottomInset: effectiveBottomInset,
-            obscuredLeadingInset: effectiveLeadingInset
+            obscuredBottomInset: obscuredBottomInset
         )
     }
 
@@ -561,14 +444,30 @@ struct EmbeddedWebView: View {
         .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
+    private var backButton: some View {
+        Button {
+            controller.goBack()
+        } label: {
+            Image(systemName: "chevron.backward")
+        }
+        .accessibilityLabel("Back")
+    }
+
+    private var forwardButton: some View {
+        Button {
+            controller.goForward()
+        } label: {
+            Image(systemName: "chevron.forward")
+        }
+        .accessibilityLabel("Forward")
+    }
+
 }
 
 private struct BrowserWebView: UIViewRepresentable {
     let controller: BrowserController
     let url: URL
-    let obscuredTopInset: CGFloat
     let obscuredBottomInset: CGFloat
-    let obscuredLeadingInset: CGFloat
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -577,23 +476,17 @@ private struct BrowserWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
         controller.setReloadOverride(nil)
-        applyChromeInsets()
+        controller.applyBottomChromeInset(obscuredBottomInset)
         context.coordinator.scheduleLoad(controller: controller, url: url)
         return controller.webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         controller.setReloadOverride(nil)
-        applyChromeInsets()
+        controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
         context.coordinator.scheduleLoad(controller: controller, url: url)
-    }
-
-    private func applyChromeInsets() {
-        controller.applyTopChromeInset(obscuredTopInset)
-        controller.applyBottomChromeInset(obscuredBottomInset)
-        controller.applyLeadingChromeInset(obscuredLeadingInset)
     }
 
     @MainActor
@@ -621,9 +514,7 @@ private struct UITestArticleView: UIViewRepresentable {
     let controller: BrowserController
     let url: URL
     let article: UITestArticleContent
-    let obscuredTopInset: CGFloat
     let obscuredBottomInset: CGFloat
-    let obscuredLeadingInset: CGFloat
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -631,7 +522,7 @@ private struct UITestArticleView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = controller.webView
-        applyChromeInsets()
+        controller.applyBottomChromeInset(obscuredBottomInset)
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
@@ -641,16 +532,10 @@ private struct UITestArticleView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        applyChromeInsets()
+        controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.loadedArticle != article
             || context.coordinator.loadedURL != url else { return }
         loadArticle(in: webView, coordinator: context.coordinator)
-    }
-
-    private func applyChromeInsets() {
-        controller.applyTopChromeInset(obscuredTopInset)
-        controller.applyBottomChromeInset(obscuredBottomInset)
-        controller.applyLeadingChromeInset(obscuredLeadingInset)
     }
 
     private func loadArticle(in webView: WKWebView, coordinator: Coordinator) {
