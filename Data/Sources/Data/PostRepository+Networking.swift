@@ -7,9 +7,16 @@
 
 import Domain
 import Foundation
+import SwiftSoup
 
 extension PostRepository {
     // MARK: - Networking helpers
+
+    /// Upper bound on how many comment pages to fetch for a single thread. Hacker News
+    /// paginates comments roughly 30 per page behind a `<a class="morelink">` link; without
+    /// following it we only ever see the first page. The bound keeps a pathological or
+    /// transient response chain from triggering unbounded requests.
+    private static let maxPostPages = 10
 
     func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         let url: URL
@@ -38,24 +45,46 @@ extension PostRepository {
         return try await networkManager.get(url: url)
     }
 
-    func fetchPostHtml(
-        id: Int,
-    ) async throws -> String {
-        guard let url = hackerNewsURL(id: id) else {
-            throw HackersKitError.requestFailure
+    /// Fetches the full HTML for an item page, following Hacker News' comment pagination.
+    ///
+    /// HN serves comments roughly 30 per page behind a `<a class="morelink" href="...&p=N">`
+    /// link. We fetch pages iteratively and concatenate the HTML so the comment parser sees
+    /// the whole thread. Iteration is bounded by `maxPostPages` so a transient or
+    /// pathological response chain cannot trigger unbounded requests.
+    func fetchPostHtml(id: Int) async throws -> String {
+        var combined = ""
+        var page = 1
+        var hasMore = true
+
+        while hasMore, page <= Self.maxPostPages {
+            guard let url = hackerNewsURL(id: id, page: page) else {
+                throw HackersKitError.requestFailure
+            }
+            let html = try await networkManager.get(url: url)
+            combined += html
+            hasMore = try hasMoreComments(in: html)
+            page += 1
         }
 
-        return try await networkManager.get(url: url)
+        return combined
     }
 
-    func hackerNewsURL(id: Int) -> URL? {
+    /// Returns true when `html` contains a `morelink`, indicating another comment page.
+    private func hasMoreComments(in html: String) throws -> Bool {
+        let document = try SwiftSoup.parse(html)
+        return try !document.select("a.morelink").isEmpty()
+    }
+
+    func hackerNewsURL(id: Int, page: Int = 1) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "news.ycombinator.com"
         components.path = "/item"
-        components.queryItems = [
-            URLQueryItem(name: "id", value: String(id))
-        ]
+        var queryItems = [URLQueryItem(name: "id", value: String(id))]
+        if page > 1 {
+            queryItems.append(URLQueryItem(name: "p", value: String(page)))
+        }
+        components.queryItems = queryItems
         return components.url
     }
 }

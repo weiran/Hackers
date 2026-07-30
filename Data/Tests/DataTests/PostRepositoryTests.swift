@@ -354,6 +354,39 @@ struct PostRepositoryTests {
         #expect(comments[0].text.contains("Comment 456"))
     }
 
+    @Test("Follows comment pagination (morelink) across pages")
+    func getCommentsFollowsPagination() async throws {
+        let storyID = 555
+        // Page 1: the story plus the first two comments and a "More" link.
+        mockNetworkManager.enqueueGetResponse(
+            createMockSinglePostWithCommentsHTML(
+                storyID: storyID, commentIDs: [601, 602], morelink: true
+            )
+        )
+        // Page 2: two further comments and no more link (last page).
+        mockNetworkManager.enqueueGetResponse(
+            createMockCommentsPageHTML(storyID: storyID, commentIDs: [603, 604], morelink: false)
+        )
+        let post = createTestPostWithId(storyID)
+
+        let comments = try await postRepository.getComments(for: post)
+
+        #expect(mockNetworkManager.getCallCount == 2, "Should fetch both comment pages")
+        #expect(comments.count == 4, "Should merge comments across pages")
+        #expect(comments.map(\.id) == [601, 602, 603, 604])
+    }
+
+    @Test("Does not fetch additional pages when there is no morelink")
+    func getCommentsSinglePage() async throws {
+        mockNetworkManager.stubbedGetResponse =
+            createMockSinglePostWithCommentsHTML(storyID: 999, commentIDs: [700, 701], morelink: false)
+        let post = createTestPostWithId(999)
+
+        _ = try await postRepository.getComments(for: post)
+
+        #expect(mockNetworkManager.getCallCount == 1, "Should fetch only the first page")
+    }
+
     // MARK: - Error Handling Tests
 
     @Test("Network error handling")
@@ -508,8 +541,69 @@ struct PostRepositoryTests {
         """
     }
 
-    private func createMockSinglePostWithCommentsHTML(storyID: Int, commentIDs: [Int]) -> String {
-        let commentsHTML = commentIDs.enumerated().map { index, id -> String in
+    private func createMockSinglePostWithCommentsHTML(
+        storyID: Int, commentIDs: [Int], morelink: Bool = false
+    ) -> String {
+        let commentsHTML = commentTreeRowsHTML(storyID: storyID, commentIDs: commentIDs)
+        let moreLinkHTML = morelink ? """
+        <a href="item?id=\(storyID)&p=2" class="morelink">More</a>
+        """ : ""
+
+        return """
+        <html>
+        <body>
+        <table class=\"fatitem\">
+            <tr class=\"athing\" id=\"\(storyID)\">
+                <td>
+                    <span class=\"titleline\">
+                        <a href=\"https://example.com/article\">Test Article Title</a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class=\"score\">10 points</span>
+                    <span class=\"age\" title=\"2023-01-01T10:00:00\">2 hours ago</span>
+                    <a class=\"hnuser\" href=\"user?id=testuser\">testuser</a>
+                    <a href=\"item?id=\(storyID)\">5 comments</a>
+                </td>
+            </tr>
+        </table>
+        <table class=\"comment-tree\">
+            \(commentsHTML)
+            \(moreLinkHTML)
+        </table>
+        </body>
+        </html>
+        """
+    }
+
+    /// Renders a standalone comment page (no fatitem story header) used to model HN's
+    /// paginated comment threads, optionally including a "More" link to the next page.
+    private func createMockCommentsPageHTML(
+        storyID: Int, commentIDs: [Int], morelink: Bool
+    ) -> String {
+        let commentsHTML = commentTreeRowsHTML(storyID: storyID, commentIDs: commentIDs)
+        let moreLinkHTML = morelink ? """
+        <a href="item?id=\(storyID)&p=2" class="morelink">More</a>
+        """ : ""
+
+        return """
+        <html>
+        <body>
+        <table class=\"comment-tree\">
+            \(commentsHTML)
+            \(moreLinkHTML)
+        </table>
+        </body>
+        </html>
+        """
+    }
+
+    /// Shared builder for `<tr class="comtr">` rows used by both the story fixture and the
+    /// standalone comment-page fixture.
+    private func commentTreeRowsHTML(storyID: Int, commentIDs: [Int]) -> String {
+        commentIDs.enumerated().map { index, id -> String in
             let indentWidth = index * 40
             return """
             <tr class=\"athing comtr\" id=\"\(id)\">
@@ -538,33 +632,6 @@ struct PostRepositoryTests {
             </tr>
             """
         }.joined(separator: "\n")
-
-        return """
-        <html>
-        <body>
-        <table class=\"fatitem\">
-            <tr class=\"athing\" id=\"\(storyID)\">
-                <td>
-                    <span class=\"titleline\">
-                        <a href=\"https://example.com/article\">Test Article Title</a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class=\"score\">10 points</span>
-                    <span class=\"age\" title=\"2023-01-01T10:00:00\">2 hours ago</span>
-                    <a class=\"hnuser\" href=\"user?id=testuser\">testuser</a>
-                    <a href=\"item?id=\(storyID)\">5 comments</a>
-                </td>
-            </tr>
-        </table>
-        <table class=\"comment-tree\">
-            \(commentsHTML)
-        </table>
-        </body>
-        </html>
-        """
     }
 
     private func createMockPostWithFlaggedCommentHTML() -> String {
