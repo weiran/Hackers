@@ -22,7 +22,7 @@ let package = Package(
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Shared"),
-        .package(url: "https://github.com/nikstar/VariableBlur", branch: "main")
+        .package(url: "https://github.com/nikstar/VariableBlur", exact: "1.3.0")
     ],
     targets: [
         .target(
