@@ -17,21 +17,21 @@ public struct WhatsNewData: Sendable {
     }
 
     public static func currentWhatsNew() -> WhatsNewData {
-        let embeddedBrowser = WhatsNewItem(
-            title: "Embedded Browser",
-            subtitle: "Open stories inside Hackers and switch back to comments without losing your place.",
+        let threadedComments = WhatsNewItem(
+            title: "Threaded Comment Guides",
+            subtitle: "Comment replies now show clear visual guides so you can follow threads at a glance.",
+            systemImage: "text.insert",
+        )
+
+        let ipadBrowser = WhatsNewItem(
+            title: "Redesigned iPad Browser",
+            subtitle: "The embedded browser gets a cleaner, more native toolbar that makes browsing stories on iPad feel right at home.",
             systemImage: "safari",
         )
 
-        let feedShortcuts = WhatsNewItem(
-            title: "Feed Shortcuts",
-            subtitle: "Tap a story's thumbnail to open the link, or tap the row to jump straight to comments.",
-            systemImage: "hand.tap",
-        )
-
         return WhatsNewData(
-            title: "What's New in Hackers 5.3",
-            items: [embeddedBrowser, feedShortcuts],
+            title: "What's New in Hackers 5.4",
+            items: [threadedComments, ipadBrowser],
         )
     }
 }

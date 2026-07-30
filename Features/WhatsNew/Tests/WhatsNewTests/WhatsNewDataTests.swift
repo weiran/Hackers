@@ -13,12 +13,12 @@ struct WhatsNewDataTests {
     func currentWhatsNewData() {
         let data = WhatsNewData.currentWhatsNew()
 
-        #expect(data.title == "What's New in Hackers 5.3")
+        #expect(data.title == "What's New in Hackers 5.4")
         #expect(data.items.count == 2)
-        #expect(data.items.contains { $0.title == "Embedded Browser" })
-        #expect(data.items.contains { $0.title == "Feed Shortcuts" })
+        #expect(data.items.contains { $0.title == "Threaded Comment Guides" })
+        #expect(data.items.contains { $0.title == "Redesigned iPad Browser" })
         #expect(data.items.contains {
-            $0.subtitle == "Tap a story's thumbnail to open the link, or tap the row to jump straight to comments."
+            $0.subtitle == "Comment replies now show clear visual guides so you can follow threads at a glance."
         })
     }
 
