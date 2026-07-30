@@ -312,17 +312,17 @@ struct EmbeddedWebView: View {
         .ignoresSafeArea(edges: isPadLayout ? [.top, .bottom] : [])
         .toolbar {
             if showsToolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if controller.canGoBack {
                         backButton
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if controller.canGoForward {
                         forwardButton
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     reloadButton
                 }
                 ToolbarItem(placement: .topBarTrailing) {
