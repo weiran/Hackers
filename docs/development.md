@@ -7,7 +7,7 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 * macOS with current Xcode support for the repo's configured Xcode version.
 * Xcode version from `.github/xcode-version` (`26.4` at the time of writing).
 * iOS Simulator runtime for iOS 26.
-* Swift 6.2 toolchain.
+* Swift 6.3 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
 
 The CI simulator device is `iPhone 17 Pro`.
@@ -141,7 +141,7 @@ Avoid view snapshot or full UI tests unless the behavior cannot be covered at a 
 
 ## Coding Standards
 
-Keep changes consistent with the existing Swift 6.2 codebase:
+Keep changes consistent with the existing Swift 6.3 codebase:
 
 * Prefer small, focused types over broad utility objects.
 * Use `async`/`await` for new asynchronous code.

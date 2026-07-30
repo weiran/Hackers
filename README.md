@@ -1,6 +1,6 @@
 # Hackers
 
-[![Swift 6.2](https://img.shields.io/badge/Swift-6.2-orange.svg?logo=swift&logoColor=white)](https://swift.org)
+[![Swift 6.3](https://img.shields.io/badge/Swift-6.3-orange.svg?logo=swift&logoColor=white)](https://swift.org)
 [![CI](https://github.com/weiran/Hackers/actions/workflows/pr.yml/badge.svg)](https://github.com/weiran/Hackers/actions/workflows/pr.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -28,7 +28,7 @@ It focuses on fast feed browsing, readable comment threads, voting, bookmarks, s
 
 * iOS/iPadOS 26 or later
 * Xcode 26.4 for development
-* Swift 6.2
+* Swift 6.3
 
 The app also runs on Apple Silicon Macs and visionOS through Apple's platform compatibility support.
 
