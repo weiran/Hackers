@@ -13,6 +13,10 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
     @State private var selectedPostId: Int?
     @State private var searchText: String
 
+    /// True when the post-type picker menu is shown as a leading toolbar item (sidebar),
+    /// where the navigation title would otherwise duplicate it.
+    private var showsSidebarMenu: Bool { isSidebar && !viewModel.hasActiveSearch }
+
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
@@ -33,15 +37,18 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
 
     public var body: some View {
         contentView
-            .navigationTitle(viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
+            .navigationTitle(showsSidebarMenu ? "" : (viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !viewModel.hasActiveSearch {
-                    ToolbarItem(placement: .principal) {
-                        FeedCategoryToolbarMenu(title: selectedPostType.displayName) {
-                            postTypeTitleMenu
-                        }
+                ToolbarItem(placement: isSidebar ? .topBarLeading : .principal) {
+                    FeedCategoryToolbarMenu(
+                        title: selectedPostType.displayName,
+                        useGlassEffect: !isSidebar
+                    ) {
+                        postTypeTitleMenu
                     }
+                }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     settingsButton
@@ -533,34 +540,45 @@ private extension FeedView {
 
 private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
     let title: String
+    var useGlassEffect: Bool = true
     @ViewBuilder let menuContent: () -> MenuContent
 
     var body: some View {
         Menu {
             menuContent()
         } label: {
-            HStack(spacing: 8) {
-                Text(title)
-                ZStack {
-                    Circle()
-                        .fill(Color.secondary.opacity(0.16))
+            if useGlassEffect {
+                HStack(spacing: 8) {
+                    Text(title)
+                    ZStack {
+                        Circle()
+                            .fill(Color.secondary.opacity(0.16))
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(width: 18, height: 18)
+                }
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .padding(.leading, 14)
+                .padding(.trailing, 10)
+                .frame(height: 44)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+            } else {
+                HStack(spacing: 4) {
+                    Text(title)
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 8, weight: .bold))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
-                .frame(width: 18, height: 18)
+                .font(.headline)
             }
-            .font(.headline.weight(.semibold))
-            .foregroundStyle(.primary)
-            .padding(.leading, 14)
-            .padding(.trailing, 10)
-            .frame(height: 44)
-            .glassEffect(.regular.interactive(), in: .capsule)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
         }
         .buttonStyle(.plain)
-        .menuIndicator(.hidden)
+        .menuIndicator(useGlassEffect ? .hidden : .automatic)
     }
 }
 
