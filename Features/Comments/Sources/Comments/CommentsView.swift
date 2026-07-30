@@ -307,7 +307,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             return
         }
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
+        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
             navigationStore.showPostLink(post)
             return
         }

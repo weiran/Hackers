@@ -53,11 +53,7 @@ struct MainContentView: View {
         navigationStore.showingLogin || navigationStore.showingSettings || showWhatsNew
     }
     private var isPadLayout: Bool {
-        #if targetEnvironment(macCatalyst)
-        return true
-        #else
-        return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
-        #endif
+        DeviceLayout.usesPadLayout
     }
 
     init(container: DependencyContainer = .shared) {

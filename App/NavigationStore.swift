@@ -56,7 +56,7 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPostId = post.id
 
         // For iPhone navigation, use NavigationPath
-        if UIDevice.current.userInterfaceIdiom != .pad && !isRunningOnMac {
+        if !DeviceLayout.usesPadLayout {
             path.append(NavigationDestination.comments(postID: post.id))
         }
     }
@@ -88,7 +88,7 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPostLinkPresentation = nil
 
         if forceCustomBrowser {
-            if UIDevice.current.userInterfaceIdiom == .pad || isRunningOnMac {
+            if DeviceLayout.usesPadLayout {
                 selectedPostLinkPresentation = presentation
             } else {
                 path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
@@ -96,7 +96,7 @@ class NavigationStore: NavigationStoreProtocol {
             return
         }
 
-        if UIDevice.current.userInterfaceIdiom != .pad {
+        if !DeviceLayout.usesPadLayout {
             path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
             return
         }
@@ -115,7 +115,7 @@ class NavigationStore: NavigationStoreProtocol {
         selectedPost = nil
         selectedPostId = id
 
-        if UIDevice.current.userInterfaceIdiom != .pad && !isRunningOnMac {
+        if !DeviceLayout.usesPadLayout {
             path.append(NavigationDestination.comments(postID: id))
         }
     }
@@ -144,7 +144,7 @@ class NavigationStore: NavigationStoreProtocol {
 
     @MainActor
     func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool = true) -> Bool {
-        guard UIDevice.current.userInterfaceIdiom == .pad || isRunningOnMac else { return false }
+        guard DeviceLayout.usesPadLayout else { return false }
         guard url.scheme == "http" || url.scheme == "https" else { return false }
 
         let settings = DependencyContainer.shared.getSettingsUseCase()
@@ -161,14 +161,6 @@ class NavigationStore: NavigationStoreProtocol {
         detailPath.removeAll()
         selectedPostLinkPresentation = nil
         return true
-    }
-
-    private var isRunningOnMac: Bool {
-        #if targetEnvironment(macCatalyst)
-        return true
-        #else
-        return ProcessInfo.processInfo.isiOSAppOnMac
-        #endif
     }
 
     @MainActor

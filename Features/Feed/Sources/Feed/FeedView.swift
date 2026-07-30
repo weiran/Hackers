@@ -516,7 +516,7 @@ private extension FeedView {
         }
 
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if mode == .customBrowser, UIDevice.current.userInterfaceIdiom != .pad {
+        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
             navigationStore.showPostLink(post, presentation: .collapsedBrowser)
             return
         }

@@ -387,11 +387,7 @@ struct EmbeddedWebView: View {
     }
 
     private var isPadLayout: Bool {
-        #if targetEnvironment(macCatalyst)
-            return true
-        #else
-            return UIDevice.current.userInterfaceIdiom == .pad || ProcessInfo.processInfo.isiOSAppOnMac
-        #endif
+        DeviceLayout.usesPadLayout
     }
 
     private var bottomPanelInsetHeight: CGFloat {
