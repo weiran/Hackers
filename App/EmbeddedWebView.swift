@@ -309,6 +309,7 @@ struct EmbeddedWebView: View {
                     }
                 }
         }
+        .ignoresSafeArea(edges: isPadLayout ? [.top, .bottom] : [])
         .toolbar {
             if showsToolbar {
                 ToolbarItem(placement: .topBarLeading) {
