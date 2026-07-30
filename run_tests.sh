@@ -170,10 +170,12 @@ parse_test_failures() {
         done
     fi
 
-    # Compilation errors (top 5)
-    if grep -q "error:" "$output_file"; then
+    # Compilation errors (top 5). Match the compiler diagnostic shape
+    # (file:line:col: error:) so benign runtime OS diagnostics such as
+    # "...with error: Error Domain=NSCocoaErrorDomain ..." do not trip this.
+    if grep -qE "[^[:space:]]+:[0-9]+:[0-9]+:[[:space:]]*error:" "$output_file"; then
         print_status $RED "   🔨 Compilation Errors:"
-        grep "error:" "$output_file" | head -5 | while read -r line; do
+        grep -E "[^[:space:]]+:[0-9]+:[0-9]+:[[:space:]]*error:" "$output_file" | head -5 | while read -r line; do
             if [[ $line =~ ([^:]+):([0-9]+):[0-9]+:\ error:\ (.+) ]]; then
                 local file_name=$(basename "${BASH_REMATCH[1]}")
                 local line_number="${BASH_REMATCH[2]}"
@@ -315,7 +317,7 @@ run_module_tests() {
     if grep -q "Test Case .*failed" "$temp_output"; then
         has_xctest_fail=0
     fi
-    if grep -q "error:" "$temp_output"; then
+    if grep -qE "[^[:space:]]+:[0-9]+:[0-9]+:[[:space:]]*error:" "$temp_output"; then
         has_compilation_error=0
     fi
     if grep -qE "✔ Test run with [0-9]+ tests in [0-9]+ suites passed|Test Suite '.*' passed" "$temp_output"; then
