@@ -55,7 +55,9 @@ struct BookmarksRepositoryTests {
         var post = bookmarkedPosts[0]
         #expect(post.isBookmarked == true)
         #expect(post.title == samplePost.title)
-        #expect(post.voteLinks?.upvote == samplePost.voteLinks?.upvote)
+        // Vote links are intentionally not persisted (their `auth` token is a credential
+        // and expires), so they should round-trip as nil.
+        #expect(post.voteLinks == nil)
 
         // Add another bookmark with older timestamp to ensure ordering by recency
         let olderPost = Post(
@@ -77,6 +79,42 @@ struct BookmarksRepositoryTests {
         #expect(bookmarkedPosts.count == 2)
         post = bookmarkedPosts.first!
         #expect(post.id == samplePost.id) // Most recent first
+    }
+
+    @Test("Bookmarks never persist vote-auth credentials")
+    mutating func bookmarksDoNotPersistVoteAuth() async throws {
+        let store = MockUbiquitousKeyValueStore()
+        let repository = BookmarksRepository(store: store, now: { Date(timeIntervalSince1970: 5678) })
+
+        // A post whose vote URLs carry a per-session `auth` credential.
+        let postWithAuth = Post(
+            id: 100,
+            url: URL(string: "https://example.com/100")!,
+            title: "Secret Vote Post",
+            age: "1 hour ago",
+            commentsCount: 0,
+            by: "tester",
+            score: 1,
+            postType: .news,
+            upvoted: false,
+            voteLinks: VoteLinks(
+                upvote: URL(string: "https://news.ycombinator.com/vote?id=100&how=up&auth=SECRET_TOKEN&goto=news"),
+                unvote: URL(string: "https://news.ycombinator.com/vote?id=100&how=un&auth=SECRET_TOKEN&goto=news")
+            )
+        )
+
+        _ = try await repository.toggleBookmark(post: postWithAuth)
+
+        // The persisted payload must not contain the auth credential.
+        let storedData = try #require(store.data(forKey: "Bookmarks.posts"))
+        let storedJSON = try #require(String(data: storedData, encoding: .utf8))
+        #expect(!storedJSON.contains("auth"), "Persisted bookmark must not contain vote-auth tokens")
+        #expect(!storedJSON.contains("SECRET_TOKEN"), "Persisted bookmark must not contain the auth secret")
+        #expect(!storedJSON.contains("voteLinks"), "Persisted bookmark must not store vote links")
+
+        // And the reloaded post exposes no vote links.
+        let reloaded = await repository.bookmarkedPosts()
+        #expect(reloaded.first?.voteLinks == nil)
     }
 }
 

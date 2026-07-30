@@ -91,23 +91,6 @@ private extension BookmarksRepository {
 }
 
 private struct BookmarkEntry: Codable, Sendable {
-    struct VoteLinksPayload: Codable, Sendable {
-        let upvote: URL?
-        let unvote: URL?
-
-        init(links: VoteLinks?) {
-            upvote = links?.upvote
-            unvote = links?.unvote
-        }
-
-        func makeVoteLinks() -> VoteLinks? {
-            if upvote != nil || unvote != nil {
-                return VoteLinks(upvote: upvote, unvote: unvote)
-            }
-            return nil
-        }
-    }
-
     let id: Int
     let url: URL
     let title: String
@@ -117,7 +100,6 @@ private struct BookmarkEntry: Codable, Sendable {
     let score: Int
     let postTypeRawValue: String
     let upvoted: Bool
-    let voteLinks: VoteLinksPayload?
     let text: String?
     let bookmarkedAt: Date
 
@@ -131,7 +113,11 @@ private struct BookmarkEntry: Codable, Sendable {
         score = post.score
         postTypeRawValue = post.postType.rawValue
         upvoted = post.upvoted
-        voteLinks = VoteLinksPayload(links: post.voteLinks)
+        // Deliberately do not persist voteLinks: their `auth` query parameter is a
+        // per-session credential, and storing it would leak it to iCloud. They also
+        // expire, so voting on a bookmark re-resolves fresh links when the post is
+        // loaded from the Hacker News feed. (Old entries that still carry a voteLinks
+        // key in iCloud decode fine — Codable ignores unknown keys.)
         text = post.text
         self.bookmarkedAt = bookmarkedAt
     }
@@ -149,7 +135,7 @@ private struct BookmarkEntry: Codable, Sendable {
             postType: postType,
             upvoted: upvoted,
             isBookmarked: true,
-            voteLinks: voteLinks?.makeVoteLinks(),
+            voteLinks: nil,
             text: text
         )
     }
