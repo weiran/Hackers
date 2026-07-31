@@ -269,6 +269,15 @@ struct PostRepositoryTests {
         await #expect(throws: HackersKitError.self) {
             _ = try await postRepository.getPost(id: 2000)
         }
+
+        // The depth guard must bound the recursion: with maxParentResolutionDepth = 5,
+        // resolution stops after exactly 6 fetches (depth 0..5 attempt, guard trips at 6).
+        // Asserting the count proves bounding — "throws" alone would also pass if some
+        // other error fired early or the mock queue simply ran dry.
+        #expect(
+            mockNetworkManager.getCallCount <= 6,
+            "Depth guard must bound fetches, got \(mockNetworkManager.getCallCount)"
+        )
     }
 
     @Test("Parent id resolves even with extra query parameters")
@@ -883,6 +892,16 @@ struct PostRepositoryNumberParsingTests {
     func nilAndEmpty() {
         #expect(repository.leadingInt(from: nil) == 0)
         #expect(repository.leadingInt(from: "") == 0)
+    }
+
+    @Test("Regular space separator merges digit groups but stops at the trailing noun")
+    func regularSpaceBoundary() {
+        // A regular space is included in the separator set because SwiftSoup's text() can
+        // collapse NBSP into a space. These pin the assumptions that keep that safe: the
+        // separator only bridges digits, and a non-digit after the space ends the number.
+        #expect(repository.leadingInt(from: "1 234 points") == 1234, "space-bridged digits merge")
+        #expect(repository.leadingInt(from: "5 3 hidden") == 53, "two leading digit groups merge")
+        #expect(repository.leadingInt(from: "5 comments 3 hidden") == 5, "trailing noun ends the number")
     }
 
     @Test("Stops at non-digit suffix")

@@ -129,9 +129,15 @@ extension PostRepository {
     func comments(from document: Document) throws -> [Domain.Comment] {
         let commentElements = try document.select(".comtr")
 
+        // Multi-page comment HTML is concatenated before parsing, and HN's page boundary can
+        // overlap (a comment appearing on two adjacent pages). De-dup by id, keeping the
+        // first occurrence so order and content stay stable.
+        var seen = Set<Int>()
         return commentElements.compactMap { element in
             do {
-                return try parseComment(from: element)
+                let comment = try parseComment(from: element)
+                guard seen.insert(comment.id).inserted else { return nil }
+                return comment
             } catch {
                 let id = (try? element.attr("id")) ?? "unknown"
                 let errorDescription = String(describing: error)

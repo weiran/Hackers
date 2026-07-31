@@ -220,24 +220,6 @@ public final class CommentsViewModel: @unchecked Sendable {
     }
 
     @MainActor
-    public func voteOnComment(_ comment: Comment, upvote: Bool) async throws {
-        guard upvote else { return }
-        guard let post else { return }
-        guard let index = indexByID[comment.id] else { return }
-
-        // Optimistic update applied to the owned value copy.
-        let original = allComments[index]
-        allComments[index] = original.with(upvoted: true)
-
-        do {
-            try await voteUseCase.upvote(comment: original.with(upvoted: false), for: post)
-        } catch {
-            allComments[index] = original.with(upvoted: false)
-            throw error
-        }
-    }
-
-    @MainActor
     @discardableResult
     public func revealComment(withId id: Int) -> Bool {
         guard let index = indexByID[id] else { return false }
@@ -285,12 +267,16 @@ public final class CommentsViewModel: @unchecked Sendable {
 
     /// Writes an updated comment back into the loaded set by id, used for value-type
     /// optimistic updates (voting) where the caller cannot mutate a shared instance.
-    /// Also refreshes the visible projection so the UI reflects the change.
+    ///
+    /// Unlike collapse/expand, a vote changes a comment's content (e.g. `upvoted`) without
+    /// changing which comments are visible. The visible-projection signature only tracks
+    /// collapse state, so we must force `visibleComments` to be reassigned and
+    /// `visibleRevision` bumped or the row won't re-render.
     @MainActor
     public func replace(comment updated: Comment) {
         guard let index = indexByID[updated.id], allComments.indices.contains(index) else { return }
         allComments[index] = updated
-        updateVisibleComments()
+        rebuildVisibleComments(forceRevisionBump: true)
     }
 
     @MainActor
@@ -390,6 +376,15 @@ private extension CommentsViewModel {
     }
 
     func updateVisibleComments() {
+        rebuildVisibleComments(forceRevisionBump: false)
+    }
+
+    /// Rebuilds `visibleComments` from the full comment list. When `forceRevisionBump` is
+    /// false (collapse/expand path), it skips the work when only the collapse signature is
+    /// unchanged. When true (voting/content-update path), it always reassigns
+    /// `visibleComments` and bumps `visibleRevision` because a comment's content changed
+    /// even though its presence/visibility did not.
+    func rebuildVisibleComments(forceRevisionBump: Bool) {
         var updatedComments: [Comment] = []
         var hiddenUntilLevel: Int?
 
@@ -413,7 +408,9 @@ private extension CommentsViewModel {
             )
         }
 
-        guard updatedSignature != visibleSignature else { return }
+        if !forceRevisionBump, updatedSignature == visibleSignature {
+            return
+        }
         visibleComments = updatedComments
         visibleIndexByID = Dictionary(uniqueKeysWithValues: updatedComments.enumerated().map { index, comment in
             (comment.id, index)

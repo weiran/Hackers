@@ -299,40 +299,26 @@ struct CommentsViewModelTests {
         #expect(sut.post?.score == initialScore)
     }
 
-    @Test("Upvoting comment updates state", arguments: [false])
+    @Test("replace(comment:) drives a visible re-render on a content-only change")
     @MainActor
-    func voteOnComment(initialUpvoted: Bool) async throws {
-        // Given - load a comment into the view model so voting can update owned state
-        let comment = createTestComment(id: 1, upvoted: initialUpvoted)
+    func replaceCommentBumpsVisibleRevision() async {
+        // A vote changes a comment's `upvoted` without changing which comments are visible.
+        // The visible-projection signature only tracks collapse state, so replace() must
+        // force visibleComments to be reassigned and visibleRevision bumped, or the row
+        // won't re-render.
+        let comment = createTestComment(id: 1, upvoted: false)
         mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
         await sut.loadComments()
-        mockVoteUseCase.upvoteCommentCalled = false
 
-        // When
-        try await sut.voteOnComment(comment, upvote: true)
+        let revisionBefore = sut.visibleRevision
+        let visibleUpvotedBefore = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
 
-        // Then - re-fetch the owned comment to verify optimistic state
-        let updated = sut.comment(withID: comment.id)
-        #expect(updated?.upvoted == true)
-        #expect(mockVoteUseCase.upvoteCommentCalled)
-    }
+        sut.replace(comment: comment.with(upvoted: true))
 
-    @Test("Vote failure on comment reverts optimistic state")
-    @MainActor
-    func voteOnCommentFailureReverts() async {
-        mockVoteUseCase.shouldThrowError = true
-        let comment = createTestComment(id: 9, upvoted: false)
-        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
-        await sut.loadComments()
-        mockVoteUseCase.upvoteCommentCalled = false
-
-        await #expect(throws: MockError.self) {
-            try await sut.voteOnComment(comment, upvote: true)
-        }
-
-        let reverted = sut.comment(withID: comment.id)
-        #expect(reverted?.upvoted == false)
-        #expect(mockVoteUseCase.upvoteCommentCalled)
+        #expect(sut.visibleRevision > revisionBefore, "A content change must bump visibleRevision")
+        #expect(visibleUpvotedBefore == false)
+        let visibleUpvotedAfter = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
+        #expect(visibleUpvotedAfter == true, "visibleComments must reflect the updated comment")
     }
 
     // MARK: - Comment Visibility Tests
