@@ -239,6 +239,9 @@ extension PostRepository {
                 break
             }
         }
+        // Scoped to HN scores/comment counts (well under Int's range); a digit run that
+        // overflows Int yields 0, which would be wrong-but-plausible if this helper were
+        // reused on arbitrary-length id strings.
         return sawDigit ? (Int(digits) ?? 0) : 0
     }
 }

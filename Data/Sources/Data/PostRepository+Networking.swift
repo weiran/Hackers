@@ -51,6 +51,10 @@ extension PostRepository {
     /// link. We fetch pages iteratively and concatenate the HTML so the comment parser sees
     /// the whole thread. Iteration is bounded by `maxPostPages` so a transient or
     /// pathological response chain cannot trigger unbounded requests.
+    ///
+    /// Failure mode is all-or-nothing: if a later page's request throws, the already-fetched
+    /// earlier pages are discarded and the error propagates. This keeps callers (getPost) from
+    /// rendering a partial thread and is acceptable because the caller surfaces the error.
     func fetchPostHtml(id: Int) async throws -> String {
         var combined = ""
         var page = 1

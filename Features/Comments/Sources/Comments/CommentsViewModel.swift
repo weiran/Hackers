@@ -351,14 +351,20 @@ private extension CommentsViewModel {
 
         var validCommentIDs = Set<Int>()
         var stack: [(index: Int, id: Int, level: Int)] = []
-        for index in allComments.indices {
-            let comment = allComments[index]
+        // Mutate a local copy and assign once: writing through the allComments computed
+        // setter per-element is O(n) each (whole-array copy) and fragile if the accessor
+        // ever stops returning the live backing array.
+        var updated = allComments
+        var didUpdate = false
+        for index in updated.indices {
+            let comment = updated[index]
             validCommentIDs.insert(comment.id)
             indexByID[comment.id] = index
             if comment.visibility == .compact {
                 collapsedCommentIDs.insert(comment.id)
             } else if comment.visibility == .hidden {
-                allComments[index] = comment.withVisibility(.visible)
+                updated[index] = comment.withVisibility(.visible)
+                didUpdate = true
             }
 
             while let last = stack.last, comment.level <= last.level {
@@ -372,6 +378,7 @@ private extension CommentsViewModel {
             stack.append((index: index, id: comment.id, level: comment.level))
         }
 
+        if didUpdate { allComments = updated }
         collapsedCommentIDs.formIntersection(validCommentIDs)
     }
 
@@ -431,12 +438,15 @@ private extension CommentsViewModel {
     }
 
     func ensureAncestorVisibility(forCommentAt index: Int) {
-        var currentCommentID = allComments[index].id
+        // Mutate a local copy and assign once for the same reason as rebuildCommentIndexes.
+        var updated = allComments
+        var currentCommentID = updated[index].id
         while let parentIndex = parentIndexByID[currentCommentID] {
-            let parent = allComments[parentIndex]
+            let parent = updated[parentIndex]
             collapsedCommentIDs.remove(parent.id)
-            allComments[parentIndex] = parent.withVisibility(.visible)
+            updated[parentIndex] = parent.withVisibility(.visible)
             currentCommentID = parent.id
         }
+        allComments = updated
     }
 }
