@@ -78,7 +78,7 @@ public struct WhatsNewView: View {
     }
 
     private var continueButton: some View {
-        actionButton(title: "Continue", style: .secondary) {
+        actionButton(title: "Continue", style: .primary) {
             onDismiss()
         }
     }
