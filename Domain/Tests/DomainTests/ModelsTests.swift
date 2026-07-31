@@ -240,4 +240,35 @@ struct ModelsTests {
             #expect(error != nil, "Error case should be valid")
         }
     }
+
+    // MARK: - Support Product Identifiers
+
+    @Test("Support product identifiers map to the expected kind")
+    func supportProductKinds() {
+        #expect(SupportProductIdentifier.supporterMonthly.kind == .subscription)
+        #expect(SupportProductIdentifier.tipSmall.kind == .tip)
+        #expect(SupportProductIdentifier.tipMedium.kind == .tip)
+        #expect(SupportProductIdentifier.tipLarge.kind == .tip)
+    }
+
+    @Test("Support product identifiers sort subscription first then tips by size")
+    func supportProductSortOrder() {
+        let ordered = SupportProductIdentifier.allCases.sorted(by: { $0.sortOrder < $1.sortOrder })
+        #expect(ordered == [.supporterMonthly, .tipSmall, .tipMedium, .tipLarge])
+    }
+
+    @Test("Unknown product identifiers are rejected")
+    func supportProductUnknownIdentifier() {
+        // availableProducts() uses this lookup to drop StoreKit products whose id is not a
+        // known identifier; verify the raw-value initializer returns nil for unknown ids.
+        #expect(SupportProductIdentifier(rawValue: "com.example.unknown") == nil)
+    }
+
+    @Test("SupportPurchaseError describes each case for users")
+    func supportPurchaseErrorDescriptions() {
+        #expect(SupportPurchaseError.productUnavailable.errorDescription != nil)
+        #expect(SupportPurchaseError.failedVerification.errorDescription != nil)
+        let underlying = SupportPurchaseError.underlying(NSError(domain: "test", code: 1))
+        #expect(underlying.errorDescription != nil)
+    }
 }
