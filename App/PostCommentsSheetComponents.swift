@@ -417,6 +417,15 @@ struct CommentsSheetTopChrome: View {
         interpolate(from: handleThickness, to: resolvedTitleSize.height, progress: easedProgress)
     }
 
+    /// Scale applied to the title content so its measured height fits the morphing
+    /// capsule height. At full expansion this is 1.0 (content and capsule match); as
+    /// the pill shrinks during a drag the content scales down with it instead of
+    /// overflowing, so the text stays constant and just fades out via opacity.
+    private var contentScale: CGFloat {
+        guard resolvedTitleSize.height > 0 else { return 1 }
+        return min(morphHeight / resolvedTitleSize.height, 1)
+    }
+
     private var morphVerticalOffset: CGFloat {
         let handleOffset = (chromeAreaHeight - handleThickness) / 2
         let titleOffset = toolbarControlCenterY.map {
@@ -446,15 +455,24 @@ struct CommentsSheetTopChrome: View {
                 if glassSurfaceOpacity > 0 {
                     ZStack {
                         if let post {
+                            // Hold the title at its fully laid-out size and scale the whole
+                            // thing down to match the morphing capsule height. This keeps the
+                            // text constant during the drag (no re-wrapping/re-truncation as
+                            // the frame narrows) and avoids the 44pt content overflowing the
+                            // shrinking capsule vertically. The opacity fade below drives the
+                            // reveal, and .clipped() guarantees nothing escapes the capsule.
                             CommentsHeaderTitlePillContent(
                                 post: post,
                                 showThumbnails: showThumbnails,
                                 maximumWidth: titleMaximumWidth
                             )
+                                .frame(width: resolvedTitleSize.width)
+                                .scaleEffect(contentScale, anchor: .center)
                                 .opacity(titleContentProgress)
                         }
                     }
                     .frame(width: morphWidth, height: morphHeight)
+                    .clipped()
                     .clipShape(.capsule)
                     .glassEffect(.regular.interactive(), in: .capsule)
                     .glassEffectTransition(.identity)
