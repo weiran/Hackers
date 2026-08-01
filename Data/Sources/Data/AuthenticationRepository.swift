@@ -13,6 +13,9 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     private let networkManager: NetworkManagerProtocol
     private let userDefaults: UserDefaultsProtocol
     private let urlBase = "https://news.ycombinator.com"
+    private static let formAllowedCharacters = CharacterSet(
+        charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._*"
+    )
 
     public init(
         networkManager: NetworkManagerProtocol,
@@ -27,9 +30,10 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
             throw HackersKitError.requestFailure
         }
 
-        // Build the login form data
-        let encodedUsername = username.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedPassword = password.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        // Encode each value for application/x-www-form-urlencoded. URL query encoding leaves
+        // form delimiters such as &, =, and + unescaped, which corrupts complex passwords.
+        let encodedUsername = try Self.formEncoded(username)
+        let encodedPassword = try Self.formEncoded(password)
         let formData = "acct=\(encodedUsername)&pw=\(encodedPassword)&goto=news"
 
         // Submit the login form
@@ -76,5 +80,13 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         // For now, return a basic user object
         // In the future, we could fetch more user details from HN
         return User(username: username, karma: 0, joined: Date())
+    }
+
+    private static func formEncoded(_ value: String) throws -> String {
+        guard let encodedValue = value.addingPercentEncoding(withAllowedCharacters: formAllowedCharacters) else {
+            throw HackersKitError.requestFailure
+        }
+
+        return encodedValue.replacingOccurrences(of: "%20", with: "+")
     }
 }

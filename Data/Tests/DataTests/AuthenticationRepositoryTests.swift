@@ -26,6 +26,24 @@ struct AuthenticationRepositoryTests {
         #expect(network.postBodies.first?.contains("pw=secret") == true)
     }
 
+    @Test("Complex 64-character credentials are form encoded without delimiters")
+    func complexCredentialsUseFormEncoding() async throws {
+        let network = MockAuthenticationNetworkManager()
+        let userDefaults = MockAuthenticationUserDefaults()
+        let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
+        let username = "test user+&"
+        let password = String(repeating: "a", count: 56) + "&=+%/?#é"
+
+        #expect(password.count == 64)
+
+        try await repository.authenticate(username: username, password: password)
+
+        let expectedPassword =
+            String(repeating: "a", count: 56) + "%26%3D%2B%25%2F%3F%23%C3%A9"
+        #expect(network.postBodies == ["acct=test+user%2B%26&pw=\(expectedPassword)&goto=news"])
+        #expect(userDefaults.string(forKey: "hn_username") == username)
+    }
+
     @Test("Bad credentials do not store username")
     func badCredentialsDoNotStoreUsername() async {
         let network = MockAuthenticationNetworkManager(postResponse: "Bad login")
