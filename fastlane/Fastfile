@@ -480,14 +480,20 @@ platform :ios do
 
     archive(build_number: next_build)
 
-    upload_to_testflight(
+    upload_options = {
       api_key: api_key,
       app_identifier: APP_IDENTIFIER,
       ipa: "#{RELEASE_DIR}/Hackers.ipa",
       changelog: notes,
-      distribute_external: true,
       skip_waiting_for_build_processing: false
-    )
+    }
+    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
+    unless groups.empty?
+      upload_options[:distribute_external] = true
+      upload_options[:groups] = groups
+    end
+
+    upload_to_testflight(**upload_options)
 
     FileUtils.mkdir_p(RELEASE_DIR)
     File.write("#{RELEASE_DIR}/build-number.txt", "#{next_build}\n")
@@ -511,13 +517,15 @@ platform :ios do
       app_version: parts[:version],
       build_number: parts[:build_number].to_s,
       changelog: notes,
-      distribute_external: true,
       distribute_only: true,
       skip_waiting_for_build_processing: true
     }
 
     groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
-    distribute_options[:groups] = groups unless groups.empty?
+    unless groups.empty?
+      distribute_options[:distribute_external] = true
+      distribute_options[:groups] = groups
+    end
 
     upload_to_testflight(**distribute_options)
 

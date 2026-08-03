@@ -93,7 +93,18 @@ git push origin "refs/tags/$tag"
 
 When the tag push starts `Release TestFlight`, approve the protected `testflight` deployment in GitHub Actions.
 
-Manual dispatch is also supported:
+A tag push uploads the build and makes it available to internal testers only. External tester distribution is a separate, opt-in step so a build can be uploaded without committing to a beta audience:
+
+```bash
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.3.2+160 \
+  -f distribute_existing=true \
+  -f external_groups="External Testers"
+```
+
+Set `external_groups` to the comma-separated App Store Connect group name(s). Omitting it uploads to internal testers only.
+
+Manual dispatch for an upload-only build is also supported:
 
 ```bash
 gh workflow run release-testflight.yml -f release_tag=v5.3.2+160

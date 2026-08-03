@@ -107,6 +107,7 @@ jobs:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
+          TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
         run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
 
       - name: Distribute Existing TestFlight Build
