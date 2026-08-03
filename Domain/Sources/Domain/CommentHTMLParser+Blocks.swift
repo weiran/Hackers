@@ -187,8 +187,11 @@ extension CommentHTMLParser {
         }
         if let url = resolvedURL {
             linkAttributedString.link = url
-            linkAttributedString.underlineStyle = .single
         }
+        // Underline styling is applied in the presentation layer to keep the
+        // Domain package free of SwiftUI. AttributedString's .underlineStyle
+        // resolves to SwiftUI's Text.LineStyle, which would otherwise pull
+        // SwiftUI symbols into the Domain module.
         return linkAttributedString
     }
 
@@ -215,8 +218,9 @@ extension CommentHTMLParser {
         if let url = resolvedURL {
             let fullRange = linkAttributedString.startIndex ..< linkAttributedString.endIndex
             linkAttributedString[fullRange].link = url
-            linkAttributedString[fullRange].underlineStyle = .single
         }
+        // Underline styling is applied in the presentation layer; see
+        // extractLinkComponent for why Domain avoids .underlineStyle.
         return linkAttributedString
     }
 }

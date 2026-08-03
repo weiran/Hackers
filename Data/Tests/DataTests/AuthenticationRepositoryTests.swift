@@ -22,7 +22,7 @@ struct AuthenticationRepositoryTests {
         try await repository.authenticate(username: "test user", password: "secret")
 
         #expect(userDefaults.string(forKey: "hn_username") == "test user")
-        #expect(network.postBodies.first?.contains("acct=test%20user") == true)
+        #expect(network.postBodies.first?.contains("acct=test+user") == true)
         #expect(network.postBodies.first?.contains("pw=secret") == true)
     }
 

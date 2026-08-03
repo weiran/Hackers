@@ -404,6 +404,7 @@ enum CommentTextCache {
 
         for run in attributed.runs where run.link != nil {
             attributed[run.range].foregroundColor = linkColor
+            attributed[run.range].underlineStyle = .single
         }
 
         styledCache[key] = attributed
