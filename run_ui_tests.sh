@@ -46,6 +46,7 @@ FULL_TESTS=(
   NavigationAndCommentsUITests/testLaunchesDirectExpandedStoryRoute
   NavigationAndCommentsUITests/testNextCommentButtonStartsAtFirstCommentThenAdvances
   NavigationAndCommentsUITests/testCollapsingCommentKeepsRootContextAvailable
+  NavigationAndCommentsUITests/testSwipingCommentRowCollapsesThread
 )
 
 FUNCTIONAL_TEST_SOURCES=(

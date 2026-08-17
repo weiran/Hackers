@@ -180,6 +180,15 @@ public struct SettingsView: View {
                     .accessibilityIdentifier(AccessibilityIdentifier.Settings.dimReadPosts)
                 }
 
+                if #available(iOS 27, *) {
+                    Section(header: Text("Comments")) {
+                        Toggle(isOn: $viewModel.swipeCollapseThreads) {
+                            Label("Swipe to Collapse Threads", systemImage: "minus.circle")
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.swipeCollapseThreads)
+                    }
+                }
+
                 Section(header: Text("Storage")) {
                     HStack(spacing: 12) {
                         Label("Storage Used", systemImage: "externaldrive")

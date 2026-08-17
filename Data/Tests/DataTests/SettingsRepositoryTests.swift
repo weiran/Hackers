@@ -158,6 +158,30 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "DimReadPosts") == true)
     }
 
+    @Test("Swipe collapse threads default value")
+    func swipeCollapseThreadsDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.swipeCollapseThreads == true)
+    }
+
+    @Test("Swipe collapse threads setter and getter")
+    func swipeCollapseThreadsSetterAndGetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.swipeCollapseThreads = false
+        #expect(repository.swipeCollapseThreads == false)
+        #expect(mockUserDefaults.bool(forKey: "SwipeToCollapseThreads") == false)
+
+        repository.swipeCollapseThreads = true
+        #expect(repository.swipeCollapseThreads == true)
+        #expect(mockUserDefaults.bool(forKey: "SwipeToCollapseThreads") == true)
+    }
+
     // MARK: - Remember Feed Category Tests
 
     @Test("Remember feed category default value")

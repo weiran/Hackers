@@ -21,6 +21,7 @@ public enum AccessibilityIdentifier {
         public static let showThumbnails = "settings.showThumbnails"
         public static let compactFeed = "settings.compactFeed"
         public static let dimReadPosts = "settings.dimReadPosts"
+        public static let swipeCollapseThreads = "settings.swipeCollapseThreads"
     }
 
     public enum Login {
@@ -36,6 +37,10 @@ public enum AccessibilityIdentifier {
 
         public static func comment(_ id: Int) -> String {
             "comments.comment.\(id)"
+        }
+
+        public static func collapseThreadAction(_ id: Int) -> String {
+            "comments.collapseThreadAction.\(id)"
         }
 
         public static func vote(_ id: Int) -> String {

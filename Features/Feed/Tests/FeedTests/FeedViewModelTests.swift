@@ -692,6 +692,7 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
     private var storedDimReadPosts: Bool
+    var swipeCollapseThreads: Bool = true
 
     init(
         showThumbnails: Bool,

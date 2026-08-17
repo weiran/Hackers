@@ -84,6 +84,7 @@ struct CommentsContentView: View {
                 .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
                     updateVisibleCommentTarget(visibleTargets: visibleTargets)
                 }
+                .modifier(CommentSwipeActionsContainerModifier())
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 }, action: { _, offsetY in
@@ -194,6 +195,28 @@ struct CommentsContentView: View {
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) }
         )
+        .if(viewModel.swipeCollapseThreads) { row in
+            row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button {
+                    collapseThread(for: state)
+                } label: {
+                    Label(
+                        state.visibility == .visible ? "Collapse Thread" : "Expand Thread",
+                        systemImage: state.visibility == .visible ? "minus.circle" : "plus.circle"
+                    )
+                }
+                .accessibilityIdentifier(AccessibilityIdentifier.Comments.collapseThreadAction(state.id))
+            }
+        }
+    }
+
+    /// Swipe-to-collapse keeps the pre-scroll-view-migration behaviour: collapsing any
+    /// row hides its whole thread from the level-0 root, not just that row's subtree.
+    private func collapseThread(for state: CommentRowState) {
+        guard let comment = viewModel.comment(withID: state.id) else { return }
+        withAnimation(Self.commentCollapseAnimation) {
+            _ = viewModel.hideCommentBranch(comment)
+        }
     }
 
     private func upvoteComment(withID commentID: Int, in post: Post) {
@@ -338,6 +361,19 @@ struct CommentsContentView: View {
             Color.clear
                 .frame(height: commentScrollTopInset)
                 .allowsHitTesting(false)
+        }
+    }
+}
+
+/// Row `swipeActions` only work inside a `List` before iOS 27; `swipeActionsContainer`
+/// extends them to the comments `ScrollView`. On earlier OSes the rows render without
+/// swipe actions.
+private struct CommentSwipeActionsContainerModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 27, *) {
+            content.swipeActionsContainer()
+        } else {
+            content
         }
     }
 }

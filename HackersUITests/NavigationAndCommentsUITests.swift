@@ -151,4 +151,48 @@ final class NavigationAndCommentsUITests: HackersUITestCase {
         assertHittable(app.buttons["Copy"].firstMatch)
         assertHasVisibleIntersection(app.buttons["Share"].firstMatch, in: app)
     }
+
+    func testSwipingCommentRowCollapsesThread() throws {
+        launchApp(linkBrowserMode: .inAppBrowser)
+
+        let post = assertHittable(app.buttons[AccessibilityIdentifier.Feed.post(longCommentsPostID)], timeout: 8)
+        tapPost(post)
+
+        let list = commentsList
+        assertHasVisibleIntersection(list, in: app)
+
+        var rootComment = app.buttons[AccessibilityIdentifier.Comments.comment(UITestFixtureReference.collapsibleRootCommentID)]
+        let childComment = app.buttons[AccessibilityIdentifier.Comments.comment(UITestFixtureReference.collapsibleChildCommentID)]
+        scroll(list, untilVisible: rootComment)
+
+        // scroll(untilVisible:) leaves the row peeking at the bottom screen edge
+        // where system edge gestures steal horizontal swipes; nudge it mid-screen.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)))
+        _ = waitForStableFrame(of: rootComment, timeout: 3) { frame in
+            frame.minY > 100 && frame.maxY < list.frame.maxY - 100
+        }
+        rootComment = assertHasVisibleIntersection(rootComment, in: list)
+        XCTAssertTrue(childComment.exists)
+
+        // A fast flick commits the collapse directly on some runs; a slow
+        // deliberate drag reveals the action button instead. Handle both.
+        rootComment.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5))
+            .press(
+                forDuration: 0.1,
+                thenDragTo: rootComment.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5))
+            )
+
+        if childComment.exists {
+            // The revealed action's label is duplicated by the system ("Collapse
+            // Thread, Collapse Thread"), so query by identifier instead.
+            let collapseButton = app.buttons[
+                AccessibilityIdentifier.Comments.collapseThreadAction(UITestFixtureReference.collapsibleRootCommentID)
+            ]
+            XCTAssertTrue(collapseButton.waitForExistence(timeout: 3), "Swipe should reveal the collapse action")
+            collapseButton.tap()
+        }
+        waitForNonExistence(childComment, timeout: 2)
+        rootComment = assertHasVisibleIntersection(rootComment, in: list)
+    }
 }

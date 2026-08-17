@@ -75,7 +75,7 @@ Voting is optimistic in the UI and link-driven in the data layer. Hacker News vo
 
 Authentication is HN-cookie based. `AuthenticationRepository` posts credentials to `/login`, stores the username in `UserDefaults` under `hn_username`, and treats authentication as valid only when both an HN cookie and stored username exist. Logout clears cookies and the stored username.
 
-Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
+Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, swipe-to-collapse comment threads (iOS 27+), and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
 
 WhatsNew is version-gated by `WhatsNewUseCase`. First launch stores the current version without showing the sheet, minor/major version increases can show it, and `disableWhatsNew` suppresses it for automated runs unless force-show is requested.
 
@@ -96,7 +96,7 @@ Keep the action extension's `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` al
 
 ## Data And Persistence
 
-Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, and `DimReadPosts`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
+Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, `DimReadPosts`, and `SwipeToCollapseThreads`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
 
 Bookmarks use `NSUbiquitousKeyValueStore` under `Bookmarks.posts`. Stored bookmark entries include enough post metadata to render the Bookmarks feed offline from HN feed pages, plus optional vote links and the bookmark timestamp used for recency ordering.
 

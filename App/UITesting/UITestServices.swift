@@ -13,6 +13,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign = false
     var dimReadPosts: Bool
+    var swipeCollapseThreads = true
 
     init() {
         guard let configuration = UITestingBootstrap.configuration else {
