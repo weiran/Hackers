@@ -12,7 +12,7 @@ Keep this file focused on agent operating rules. Prefer updating the canonical d
 
 ## Current Project Shape
 
-* iOS 26+ target, Swift 6.3, SwiftUI, Swift Package modules.
+* iOS 27+ target, Swift 6.4, SwiftUI, Swift Package modules.
 * Packages: `Domain`, `Data`, `Networking`, `Shared`, `DesignSystem`, and feature modules under `Features`.
 * Current feature modules: `Authentication`, `Feed`, `Comments`, `Settings`, and `WhatsNew`.
 * UI state generally uses Swift Observation (`@Observable`, `@Environment`, `@State`) with Combine still present where existing code requires it.

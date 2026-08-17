@@ -5,13 +5,13 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 import PackageDescription
 
 let package = Package(
     name: "Features",
     platforms: [
-        .iOS(.v26)
+        .iOS(.v27)
     ],
     products: [
         .library(name: "Authentication", targets: ["Authentication"]),

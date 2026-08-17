@@ -89,7 +89,7 @@ has_available_ios_runtime() {
     exit(runtimes.any? { |runtime|
       runtime["platform"] == "iOS" &&
         runtime["isAvailable"] != false &&
-        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) == 0
     } ? 0 : 1)
   '
 }
@@ -107,14 +107,35 @@ if [[ -n "$XCODE_VERSION" ]]; then
     "/Applications/Xcode-${XCODE_VERSION}.app"
     "/Applications/Xcode-${XCODE_VERSION}"*.app
   )
+  if [[ "$XCODE_VERSION" == "27.0" ]]; then
+    candidates+=("/Applications/Xcode-beta.app")
+  fi
   shopt -u nullglob
 
+  selected_xcode=""
   for candidate in "${candidates[@]}"; do
-    if [[ -d "$candidate" ]]; then
-      sudo xcode-select -s "$candidate/Contents/Developer"
+    if [[ ! -d "$candidate" ]]; then
+      continue
+    fi
+
+    candidate_version="$({
+      DEVELOPER_DIR="$candidate/Contents/Developer" xcodebuild -version 2>/dev/null || true
+    } | awk '$1 == "Xcode" { print $2; exit }')"
+    if [[ "$candidate_version" == "$XCODE_VERSION" ]]; then
+      selected_xcode="$candidate"
       break
     fi
+
+    echo "Ignoring Xcode candidate $candidate (reports ${candidate_version:-unknown}; expected $XCODE_VERSION)." >&2
   done
+
+  if [[ -z "$selected_xcode" ]]; then
+    echo "Requested Xcode $XCODE_VERSION is not installed on this runner." >&2
+    echo "Checked: ${candidates[*]}" >&2
+    exit 1
+  fi
+
+  sudo xcode-select -s "$selected_xcode/Contents/Developer"
 fi
 
 echo "::group::Selected Xcode"
@@ -155,7 +176,7 @@ RUNTIME_ID="$(
     ios = runtimes.select { |runtime|
       runtime["platform"] == "iOS" &&
         runtime["isAvailable"] != false &&
-        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) == 0
     }
     abort("No iOS simulator runtime compatible with SDK #{sdk_version} found") if ios.empty?
     puts ios.sort_by { |runtime| Gem::Version.new(runtime.fetch("version")) }.last.fetch("identifier")

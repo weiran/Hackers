@@ -36,7 +36,7 @@ env:
 jobs:
   testflight:
     name: testflight
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 120
     environment: testflight
     steps:

@@ -5,9 +5,9 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 ## Requirements
 
 * macOS with current Xcode support for the repo's configured Xcode version.
-* Xcode version from `.github/xcode-version` (`26.4` at the time of writing).
-* iOS Simulator runtime for iOS 26.
-* Swift 6.3 toolchain.
+* Xcode version from `.github/xcode-version` (`27.0` at the time of writing).
+* iOS Simulator runtime for iOS 27.
+* Swift 6.4 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
 
 The CI simulator device is `iPhone 17 Pro`.
@@ -28,6 +28,8 @@ scripts/ci/setup-xcode-simulator.sh
 ```
 
 That script selects/prints Xcode, runs first launch setup, selects an iOS runtime matching the chosen Xcode simulator SDK, and creates/boots the expected simulator when needed. It uses `.github/xcode-version` unless `CI_XCODE_VERSION` explicitly overrides it. CI build and test commands use that simulator's UDID so another installed runtime with the same device name cannot be selected accidentally.
+
+When multiple Xcode versions are installed locally, run the setup script (or set `DEVELOPER_DIR` to the selected Xcode's Developer directory) before invoking the bare `xcodebuild` commands below.
 
 ## Build
 
@@ -141,7 +143,7 @@ Avoid view snapshot or full UI tests unless the behavior cannot be covered at a 
 
 ## Coding Standards
 
-Keep changes consistent with the existing Swift 6.3 codebase:
+Keep changes consistent with the existing Swift 6.4 codebase:
 
 * Prefer small, focused types over broad utility objects.
 * Use `async`/`await` for new asynchronous code.
@@ -170,6 +172,8 @@ brew install swiftlint
 Some existing warnings are non-blocking; do not expand unrelated lint cleanup into feature work unless asked.
 
 ## CI
+
+The build, test, UI, and release workflows use GitHub's `xcode-27` arm64 runner image. The image is a public preview and supplies the Xcode 27 beta/iOS 27 SDK; `.github/xcode-version` remains the single version selector used by the setup script.
 
 Primary workflows:
 

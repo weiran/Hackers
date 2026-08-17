@@ -45,7 +45,7 @@ concurrency:
 jobs:
   submit:
     name: submit app review
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 30
     environment: testflight
     steps:
