@@ -31,6 +31,7 @@ struct PostCommentsSheet: View {
     let onDismiss: @MainActor () -> Void
     let onCollapsedHeightChange: @MainActor (CGFloat) -> Void
     let onBrowserObscuredBottomInsetChange: @MainActor (CGFloat) -> Void
+    let onMediaPlaybackSuspensionChange: @MainActor (Bool) -> Void
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
     @State private var viewModel: CommentsViewModel
@@ -48,7 +49,8 @@ struct PostCommentsSheet: View {
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
         onDismiss: @MainActor @escaping () -> Void,
         onCollapsedHeightChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
-        onBrowserObscuredBottomInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in }
+        onBrowserObscuredBottomInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
+        onMediaPlaybackSuspensionChange: @MainActor @escaping (Bool) -> Void = { _ in }
     ) {
         let initialSheetState: SheetState = switch initialPresentation {
         case .collapsedBrowser:
@@ -69,6 +71,7 @@ struct PostCommentsSheet: View {
         self.onDismiss = onDismiss
         self.onCollapsedHeightChange = onCollapsedHeightChange
         self.onBrowserObscuredBottomInsetChange = onBrowserObscuredBottomInsetChange
+        self.onMediaPlaybackSuspensionChange = onMediaPlaybackSuspensionChange
         fallbackURL = post.url
     }
 
@@ -180,8 +183,12 @@ struct PostCommentsSheet: View {
             }
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
+                onMediaPlaybackSuspensionChange(presentation.isExpanded)
                 onCollapsedHeightChange(collapsedHeight)
                 updateBrowserObscuredBottomInset()
+            }
+            .onChange(of: presentation.isExpanded) { _, isExpanded in
+                onMediaPlaybackSuspensionChange(isExpanded)
             }
             .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
             .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }

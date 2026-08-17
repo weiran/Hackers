@@ -103,6 +103,7 @@ The typed launch contract is:
 * `HACKERS_UI_DIM_READ_POSTS`: set to `1` or `0` for read-state visual coverage.
 * `HACKERS_UI_READ_POST_IDS`: comma-separated post IDs to pre-mark as read.
 * `HACKERS_UI_SHOW_THUMBNAILS`: set to `1` or `0`.
+* `HACKERS_UI_MEDIA_PLAYBACK`: `standard` or `autoplayFixture`; the latter enables the deterministic local media fixture used by browser autoplay regression tests.
 
 Only keys defined by the shared launch contract are accepted once UI testing is enabled. Functional tests use the `functional` profile, screenshot staging uses `marketing`, and oversized/scroll coverage opts into `stress`. Direct routes must refer to a post in the selected profile. A story route cannot use the in-app browser, and fixture article mode fails closed if the selected post has no local article.
 

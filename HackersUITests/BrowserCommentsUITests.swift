@@ -4,6 +4,23 @@ import XCTest
 
 @MainActor
 final class BrowserCommentsUITests: HackersUITestCase {
+    func testCustomBrowserExpandedCommentsBlockMediaAutoplay() throws {
+        launchMediaAutoplayFixture(presentation: .expandedComments)
+
+        assertFullyContained(browserView, in: app)
+        assertHasVisibleIntersection(expandedCommentsTitle, in: app)
+        assertHasVisibleIntersection(commentsList, in: app)
+        assertMediaAutoplayState("blocked")
+    }
+
+    func testCustomBrowserCollapsedCommentsRetainMediaAutoplay() throws {
+        launchMediaAutoplayFixture(presentation: .collapsedBrowser)
+
+        assertHasVisibleIntersection(browserView, in: app)
+        assertMediaAutoplayState("play-resolved")
+        assertMediaAutoplayState("started")
+    }
+
     func testCustomBrowserCommentsSheetCollapsedPreview() throws {
         launchApp(linkBrowserMode: .customBrowser)
 
@@ -20,6 +37,23 @@ final class BrowserCommentsUITests: HackersUITestCase {
         )
         assertHasVisibleIntersection(app.staticTexts["366 comments"].firstMatch, in: collapsedCommentsHeader)
         assertHasVisibleIntersection(app.staticTexts["675"].firstMatch, in: collapsedCommentsHeader)
+    }
+
+    private func launchMediaAutoplayFixture(presentation: PostLinkPresentation) {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: presentation),
+            mediaPlayback: .autoplayFixture
+        ))
+    }
+
+    private func assertMediaAutoplayState(_ state: String, timeout: TimeInterval = 12) {
+        let article = app.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
+        XCTAssertTrue(article.waitForExistence(timeout: timeout), app.debugDescription)
+        XCTAssertTrue(
+            article.staticTexts[state].waitForExistence(timeout: timeout),
+            "Expected media autoplay fixture to report \(state).\n\(app.debugDescription)"
+        )
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {

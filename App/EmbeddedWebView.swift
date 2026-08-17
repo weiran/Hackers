@@ -71,11 +71,22 @@ final class BrowserController: ObservableObject {
     private var observations: [NSKeyValueObservation] = []
     private var pageHeaderBlurTintURL: URL?
     private var reloadOverride: (() -> Void)?
+    private var mediaPlaybackSuspended = false
+    private var requestedMediaPlaybackSuspension = false
+    private var mediaPlaybackSuspensionUpdateInFlight = false
+    private var pendingMediaPlaybackAction: (() -> Void)?
 
-    init() {
+    init(mediaPlaybackSuspended: Bool = false) {
+        requestedMediaPlaybackSuspension = mediaPlaybackSuspended
         let configuration = WKWebViewConfiguration()
         // Some app-shell sites gate rendering on Safari UA tokens; keep the browser identified as Mobile Safari.
         configuration.applicationNameForUserAgent = Self.safariApplicationNameForUserAgent
+        #if DEBUG
+        if UITestingBootstrap.configuration?.mediaPlayback == .autoplayFixture {
+            configuration.mediaTypesRequiringUserActionForPlayback = []
+            configuration.allowsInlineMediaPlayback = true
+        }
+        #endif
         webView = WKWebView(frame: .zero, configuration: configuration)
 
         let navigationDelegate = BrowserNavigationDelegate(controller: self)
@@ -83,6 +94,7 @@ final class BrowserController: ObservableObject {
         webView.navigationDelegate = navigationDelegate
         installStateObservers()
         updateState()
+        applyMediaPlaybackSuspensionIfNeeded()
     }
 
     func load(_ target: URL) {
@@ -90,8 +102,24 @@ final class BrowserController: ObservableObject {
         fallbackURL = target
         guard currentURL != target else { return }
         currentURL = target
-        webView.load(URLRequest(url: target))
-        updateState()
+        enqueueMediaPlaybackAction { [weak self] in
+            guard let self else { return }
+            self.webView.load(URLRequest(url: target))
+            self.updateState()
+        }
+    }
+
+    func loadHTMLString(_ html: String, baseURL: URL?) {
+        enqueueMediaPlaybackAction { [weak self] in
+            guard let self else { return }
+            self.webView.loadHTMLString(html, baseURL: baseURL)
+            self.updateState()
+        }
+    }
+
+    func setMediaPlaybackSuspended(_ suspended: Bool) {
+        requestedMediaPlaybackSuspension = suspended
+        applyMediaPlaybackSuspensionIfNeeded()
     }
 
     func updateState() {
@@ -138,6 +166,39 @@ final class BrowserController: ObservableObject {
         resetHeaderBlurTint()
         webView.goForward()
         updateState()
+    }
+
+    private func enqueueMediaPlaybackAction(_ action: @escaping () -> Void) {
+        pendingMediaPlaybackAction = action
+        applyMediaPlaybackSuspensionIfNeeded()
+    }
+
+    private func applyMediaPlaybackSuspensionIfNeeded() {
+        guard !mediaPlaybackSuspensionUpdateInFlight else { return }
+
+        guard requestedMediaPlaybackSuspension != mediaPlaybackSuspended else {
+            flushPendingMediaPlaybackActionIfReady()
+            return
+        }
+
+        let targetSuspension = requestedMediaPlaybackSuspension
+        mediaPlaybackSuspensionUpdateInFlight = true
+        webView.setAllMediaPlaybackSuspended(targetSuspension) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.mediaPlaybackSuspended = targetSuspension
+                self.mediaPlaybackSuspensionUpdateInFlight = false
+                self.applyMediaPlaybackSuspensionIfNeeded()
+            }
+        }
+    }
+
+    private func flushPendingMediaPlaybackActionIfReady() {
+        guard !mediaPlaybackSuspensionUpdateInFlight,
+              requestedMediaPlaybackSuspension == mediaPlaybackSuspended,
+              let action = pendingMediaPlaybackAction else { return }
+        pendingMediaPlaybackAction = nil
+        action()
     }
 
     func applyBottomChromeInset(_ bottomInset: CGFloat) {
@@ -541,49 +602,23 @@ private struct UITestArticleView: UIViewRepresentable {
         controller.fallbackURL = url
         controller.currentURL = url
         let html = html
-        controller.setReloadOverride { [weak webView] in
-            webView?.loadHTMLString(html, baseURL: url)
+        controller.setReloadOverride { [weak controller] in
+            controller?.loadHTMLString(html, baseURL: url)
         }
-        webView.loadHTMLString(html, baseURL: url)
+        controller.loadHTMLString(html, baseURL: url)
         controller.updateState()
     }
 
     private var html: String {
-        """
-        <!doctype html>
-        <html lang="en">
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>
-            :root { color-scheme: light dark; }
-            body {
-              box-sizing: border-box;
-              max-width: 760px;
-              margin: 0 auto;
-              padding: 32px 24px 180px;
-              font: -apple-system-body;
-              line-height: 1.55;
-              background: Canvas;
-              color: CanvasText;
-            }
-            h1 {
-              margin: 0 0 20px;
-              font: -apple-system-title1;
-              font-weight: 700;
-              line-height: 1.15;
-            }
-            p { margin: 0 0 18px; }
-          </style>
-        </head>
-        <body>
-          <article>
-            <h1>\(escaped(article.title))</h1>
-            <p>\(escaped(article.body))</p>
-          </article>
-        </body>
-        </html>
-        """
+        let resourceName = article.htmlResourceName ?? "ArticleFixture"
+        guard let resourceURL = Bundle.main.url(forResource: resourceName, withExtension: "html"),
+              let resourceHTML = try? String(contentsOf: resourceURL, encoding: .utf8) else {
+            preconditionFailure("Missing UI-test article HTML resource: \(resourceName).html")
+        }
+
+        return resourceHTML
+            .replacingOccurrences(of: "{{TITLE}}", with: escaped(article.title))
+            .replacingOccurrences(of: "{{BODY}}", with: escaped(article.body))
     }
 
     private func escaped(_ value: String) -> String {
@@ -798,12 +833,15 @@ struct PostLinkBrowserView: View {
     @State private var showingCommentsPane = false
     @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
     @State private var browserObscuredBottomInset = PostCommentsSheet.defaultCollapsedBrowserObscuredBottomInset
-    @StateObject private var browserController = BrowserController()
+    @StateObject private var browserController: BrowserController
 
     init(post: Post, presentation: PostLinkPresentation) {
         self.post = post
         self.presentation = presentation
         _showingCommentsPane = State(initialValue: presentation == .expandedComments)
+        _browserController = StateObject(wrappedValue: BrowserController(
+            mediaPlaybackSuspended: presentation == .expandedComments
+        ))
     }
 
     var body: some View {
@@ -825,7 +863,10 @@ struct PostLinkBrowserView: View {
                     initialPresentation: presentation,
                     onDismiss: { dismiss() },
                     onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
-                    onBrowserObscuredBottomInsetChange: { browserObscuredBottomInset = $0 }
+                    onBrowserObscuredBottomInsetChange: { browserObscuredBottomInset = $0 },
+                    onMediaPlaybackSuspensionChange: { isSuspended in
+                        browserController.setMediaPlaybackSuspended(isSuspended)
+                    }
                 )
                 .transition(.move(edge: .bottom))
             }

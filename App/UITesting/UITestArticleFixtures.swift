@@ -7,6 +7,13 @@ import SwiftUI
 struct UITestArticleContent: Equatable {
     let title: String
     let body: String
+    let htmlResourceName: String?
+
+    init(title: String, body: String, htmlResourceName: String? = nil) {
+        self.title = title
+        self.body = body
+        self.htmlResourceName = htmlResourceName
+    }
 }
 
 enum UITestArticleFixtures {
@@ -20,7 +27,10 @@ enum UITestArticleFixtures {
         case "https://www.swift.org/blog/swift-6.2-released/":
             return UITestArticleContent(
                 title: "Swift 6.2 Released",
-                body: "Fixture article loaded from the UI-test Hacker News Active snapshot."
+                body: "Fixture article loaded from the UI-test Hacker News Active snapshot.",
+                htmlResourceName: UITestingBootstrap.configuration?.mediaPlayback == .autoplayFixture
+                    ? "MediaAutoplayFixture"
+                    : nil
             )
         case "https://www.swift.org/documentation/migration-guide/":
             return UITestArticleContent(

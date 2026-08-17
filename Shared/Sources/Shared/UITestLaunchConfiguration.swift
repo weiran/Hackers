@@ -10,6 +10,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         case storyPresentation = "HACKERS_UI_STORY_PRESENTATION"
         case articleSource = "HACKERS_UI_ARTICLE_SOURCE"
         case fixtureProfile = "HACKERS_UI_FIXTURE_PROFILE"
+        case mediaPlayback = "HACKERS_UI_MEDIA_PLAYBACK"
         case readPostIDs = "HACKERS_UI_READ_POST_IDS"
         case dimReadPosts = "HACKERS_UI_DIM_READ_POSTS"
         case showThumbnails = "HACKERS_UI_SHOW_THUMBNAILS"
@@ -30,6 +31,11 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         case functional
         case marketing
         case stress
+    }
+
+    public enum MediaPlayback: String, Equatable, Sendable {
+        case standard
+        case autoplayFixture
     }
 
     public enum ParseError: Error, Equatable, CustomStringConvertible {
@@ -62,6 +68,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     public let route: Route
     public let articleSource: ArticleSource
     public let fixtureProfile: FixtureProfile
+    public let mediaPlayback: MediaPlayback
     public let readPostIDs: Set<Int>
     public let dimReadPosts: Bool
     public let showThumbnails: Bool
@@ -71,6 +78,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         route: Route = .feed,
         articleSource: ArticleSource = .fixture,
         fixtureProfile: FixtureProfile = .functional,
+        mediaPlayback: MediaPlayback = .standard,
         readPostIDs: Set<Int> = [],
         dimReadPosts: Bool = true,
         showThumbnails: Bool = false
@@ -79,6 +87,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         self.route = route
         self.articleSource = articleSource
         self.fixtureProfile = fixtureProfile
+        self.mediaPlayback = mediaPlayback
         self.readPostIDs = readPostIDs
         self.dimReadPosts = dimReadPosts
         self.showThumbnails = showThumbnails
@@ -90,6 +99,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             EnvironmentKey.browserMode.rawValue: browserMode.environmentValue,
             EnvironmentKey.articleSource.rawValue: articleSource.rawValue,
             EnvironmentKey.fixtureProfile.rawValue: fixtureProfile.rawValue,
+            EnvironmentKey.mediaPlayback.rawValue: mediaPlayback.rawValue,
             EnvironmentKey.dimReadPosts.rawValue: dimReadPosts ? "1" : "0",
             EnvironmentKey.showThumbnails.rawValue: showThumbnails ? "1" : "0"
         ]
@@ -134,6 +144,11 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             key: .fixtureProfile,
             default: FixtureProfile.functional
         )
+        let mediaPlayback = try enumValue(
+            environment[EnvironmentKey.mediaPlayback.rawValue],
+            key: .mediaPlayback,
+            default: MediaPlayback.standard
+        )
 
         let readPostIDsKey = EnvironmentKey.readPostIDs.rawValue
         let dimReadPostsKey = EnvironmentKey.dimReadPosts.rawValue
@@ -147,6 +162,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             route: route,
             articleSource: articleSource,
             fixtureProfile: fixtureProfile,
+            mediaPlayback: mediaPlayback,
             readPostIDs: readPostIDs,
             dimReadPosts: dimReadPosts,
             showThumbnails: showThumbnails
