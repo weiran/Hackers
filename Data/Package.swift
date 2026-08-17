@@ -11,7 +11,7 @@ import PackageDescription
 let package = Package(
     name: "Data",
     platforms: [
-        .iOS(.v27)
+        .iOS(.v26)
     ],
     products: [
         .library(

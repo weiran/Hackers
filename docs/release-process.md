@@ -104,6 +104,14 @@ gh workflow run release-testflight.yml \
 
 Set `external_groups` to the comma-separated App Store Connect group name(s). Omitting it uploads to internal testers only.
 
+When the TestFlight "What to Test" text must be limited to a specific customer-facing fix, pass `what_to_test` to override generated GitHub notes:
+
+```bash
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.3.2+160 \
+  -f what_to_test='Fixes audio and video autoplay in the embedded browser.'
+```
+
 Manual dispatch for an upload-only build is also supported:
 
 ```bash
@@ -116,7 +124,7 @@ When you need another build for the same marketing version, bump `CURRENT_PROJEC
 
 The TestFlight workflow resolves `artifacts/release/what-to-test.txt` before upload and creates or updates the GitHub Release for the tag. Draft releases use generated notes from the previous tag. Published releases use generated notes from the previous published release, which makes the candidate changelog cumulative.
 
-Normal workflow-created notes are generated from GitHub release notes. Review and edit the GitHub Release body after the workflow prepares it if the generated text needs cleanup before broader TestFlight or App Store candidacy. Edits made before a TestFlight workflow run can be replaced by the workflow's generated notes.
+When `what_to_test` is omitted, normal workflow-created notes are generated from GitHub release notes. Review and edit the GitHub Release body after the workflow prepares it if the generated text needs cleanup before broader TestFlight or App Store candidacy. Edits made before a TestFlight workflow run can be replaced by the workflow's generated notes.
 
 If you need to create or replace notes manually outside the normal workflow path, use concise user-facing bullets and keep the title aligned with the tag without the leading `v`:
 

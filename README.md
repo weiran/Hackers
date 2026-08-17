@@ -26,7 +26,7 @@ It focuses on fast feed browsing, readable comment threads, voting, bookmarks, s
 
 ## Requirements
 
-* iOS/iPadOS 27 or later
+* iOS/iPadOS 26 or later
 * Xcode 27.0 for development
 * Swift 6.4
 

@@ -11,7 +11,7 @@ import PackageDescription
 let package = Package(
     name: "Features",
     platforms: [
-        .iOS(.v27)
+        .iOS(.v26)
     ],
     products: [
         .library(name: "Authentication", targets: ["Authentication"]),

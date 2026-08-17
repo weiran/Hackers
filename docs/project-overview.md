@@ -1,6 +1,6 @@
 # Project Overview
 
-Hackers is an iOS Hacker News client built with SwiftUI, Swift Package Manager modules, Swift 6.4, and an iOS 27+ deployment target.
+Hackers is an iOS Hacker News client built with SwiftUI, Swift Package Manager modules, Swift 6.4, and an iOS 26+ deployment target.
 
 The app is organized around feature modules, protocol-based use cases, repository implementations, and a small shared dependency container. UI state lives in SwiftUI views and feature ViewModels; networking, parsing, persistence, voting, settings, authentication, and release-note state are kept behind protocols where practical.
 
@@ -25,7 +25,7 @@ The app is organized around feature modules, protocol-based use cases, repositor
 
 ## Module Shape
 
-Each package has its own `Package.swift` and test target. Packages use Swift tools 6.4 and `platforms: [.iOS(.v27)]`.
+Each package has its own `Package.swift` and test target. Packages use Swift tools 6.4 and `platforms: [.iOS(.v26)]`.
 
 Current package set:
 

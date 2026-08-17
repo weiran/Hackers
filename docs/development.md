@@ -6,7 +6,7 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 
 * macOS with current Xcode support for the repo's configured Xcode version.
 * Xcode version from `.github/xcode-version` (`27.0` at the time of writing).
-* iOS Simulator runtime for iOS 27.
+* iOS Simulator runtime for iOS 26 or later.
 * Swift 6.4 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
 
