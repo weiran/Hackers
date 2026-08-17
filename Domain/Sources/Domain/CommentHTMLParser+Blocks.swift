@@ -5,7 +5,7 @@
 //  Split block/paragraph/link processing from CommentHTMLParser to reduce file length
 //
 
-import UIKit
+import Foundation
 
 extension CommentHTMLParser {
     /// Processes HTML content to extract paragraphs and links with proper formatting
@@ -117,7 +117,7 @@ extension CommentHTMLParser {
             }
         }
 
-        return applyParagraphStyling(result)
+        return result
     }
 
     /// Creates double newline for paragraph spacing
@@ -155,17 +155,6 @@ extension CommentHTMLParser {
         }
 
         return result
-    }
-
-    /// Applies paragraph styling with proper line height
-    static func applyParagraphStyling(_ attributedString: AttributedString) -> AttributedString {
-        var styled = attributedString
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.5
-        paragraphStyle.paragraphSpacing = 20.0
-        let fullRange = styled.startIndex ..< styled.endIndex
-        styled[fullRange].paragraphStyle = paragraphStyle
-        return styled
     }
 
     /// Extracts and creates an attributed link component

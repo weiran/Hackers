@@ -15,7 +15,7 @@ import Observation
 public final class SessionService {
     private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
-    nonisolated(unsafe) private var logoutObserver: NSObjectProtocol?
+    @ObservationIgnored private var logoutObserver: NSObjectProtocol?
 
     public init(authenticationUseCase: any AuthenticationUseCase) {
         self.authenticationUseCase = authenticationUseCase
@@ -37,7 +37,7 @@ public final class SessionService {
         }
     }
 
-    deinit {
+    isolated deinit {
         if let observer = logoutObserver {
             NotificationCenter.default.removeObserver(observer)
         }

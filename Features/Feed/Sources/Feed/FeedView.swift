@@ -327,7 +327,7 @@ private extension FeedView {
         VotingContextMenuItems.postVotingMenuItems(
             for: post,
             onVote: {
-                Task {
+                Task { @MainActor in
                     var mutablePost = post
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run {
@@ -338,7 +338,7 @@ private extension FeedView {
                 }
             },
             onUnvote: {
-                Task {
+                Task { @MainActor in
                     var mutablePost = post
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {

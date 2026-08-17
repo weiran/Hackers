@@ -9,6 +9,7 @@
 import Domain
 import UIKit
 
+@MainActor
 public enum DeviceLayout {
     /// True when the interface should use the iPad/Mac split-view layout.
     ///

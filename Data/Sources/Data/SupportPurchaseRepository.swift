@@ -83,26 +83,22 @@ public final class SupportPurchaseRepository: SupportUseCase, @unchecked Sendabl
     }
 
     public func hasActiveSubscription(productId: String) async -> Bool {
-        do {
-            guard let latest = try await Transaction.latest(for: productId) else {
+        guard let latest = await Transaction.latest(for: productId) else {
+            return false
+        }
+
+        switch latest {
+        case .verified(let transaction):
+            if transaction.revocationDate != nil {
                 return false
             }
 
-            switch latest {
-            case .verified(let transaction):
-                if let revocationDate = transaction.revocationDate {
-                    return false
-                }
-
-                if let expirationDate = transaction.expirationDate {
-                    return expirationDate > Date()
-                }
-
-                return true
-            case .unverified:
-                return false
+            if let expirationDate = transaction.expirationDate {
+                return expirationDate > Date()
             }
-        } catch {
+
+            return true
+        case .unverified:
             return false
         }
     }

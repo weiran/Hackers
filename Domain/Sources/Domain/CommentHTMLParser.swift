@@ -112,13 +112,10 @@ public enum CommentHTMLParser {
     // Processes content with paragraph tags, creating proper spacing between paragraphs
     // moved to extension in CommentHTMLParser+Blocks.swift
 
-    // Creates proper paragraph spacing with larger line height
+    // Creates semantic paragraph separators
     // moved to extension in CommentHTMLParser+Blocks.swift
 
     // Processes links and formatting within a text block
-    // moved to extension in CommentHTMLParser+Blocks.swift
-
-    // Applies paragraph styling with proper line height
     // moved to extension in CommentHTMLParser+Blocks.swift
 
     // Extracts and creates an attributed link component

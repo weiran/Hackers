@@ -46,7 +46,7 @@ public final class SearchRepository: SearchUseCase, @unchecked Sendable {
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "tags", value: "story"),
             URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "hitsPerPage", value: String(hitsPerPage)),
+            URLQueryItem(name: "hitsPerPage", value: String(hitsPerPage))
         ]
         if let cutoff = cutoffTimestamp(for: dateRange) {
             queryItems.append(URLQueryItem(name: "numericFilters", value: "created_at_i>\(cutoff)"))

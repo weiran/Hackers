@@ -80,10 +80,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         let initialComments = initialPost?.comments ?? []
         commentsLoader = LoadingStateManager(initialData: initialComments)
         commentsLoader.setLoadFunction(
-            shouldSkipLoad: { [weak self] comments in
-                guard let self else { return false }
-                return !comments.isEmpty
-            },
+            shouldSkipLoad: { comments in !comments.isEmpty },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
             }

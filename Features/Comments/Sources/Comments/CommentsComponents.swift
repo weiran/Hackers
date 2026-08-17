@@ -393,7 +393,7 @@ struct PostHeader: View {
     let matchedGeometryNamespace: Namespace.ID?
     let isMatchedGeometrySource: Bool
     let onLinkTap: () -> Void
-    let onPostUpdated: @Sendable (Post) -> Void
+    let onPostUpdated: @MainActor @Sendable (Post) -> Void
     let onBookmarkToggle: @Sendable () async -> Bool
 
     var body: some View {

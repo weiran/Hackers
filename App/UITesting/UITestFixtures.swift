@@ -222,8 +222,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     ),
                     unvote: nil
                 ),
-                visibility: fixture.visibility,
-                parsedText: fixture.parsedText
+                visibility: fixture.visibility
             )
         }
     }

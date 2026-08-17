@@ -65,7 +65,6 @@ struct ContentSharePresenterTests {
             upvoted: false,
             voteLinks: nil,
             visibility: .visible,
-            parsedText: nil,
         )
     }
 

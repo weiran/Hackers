@@ -93,7 +93,6 @@ private extension PostRepository {
     }
 
     func makeTopTextComment(for post: Post, html: String, in fatitemTable: Element) -> Domain.Comment {
-        let parsedText = CommentHTMLParser.parseHTMLText(html)
         let ageText = (try? fatitemTable.select("span.age").first()?.text())?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             ?? post.age
@@ -106,7 +105,6 @@ private extension PostRepository {
             upvoted: false,
             voteLinks: nil,
             visibility: .visible,
-            parsedText: parsedText,
         )
     }
 

@@ -407,8 +407,26 @@ enum CommentTextCache {
             attributed[run.range].underlineStyle = .single
         }
 
+        applyParagraphStyling(to: &attributed)
+
         styledCache[key] = attributed
         return attributed
+    }
+
+    /// Paragraph metrics are a presentation concern and are applied only after
+    /// semantic parsing has reached the MainActor-backed Comments feature.
+    private static func applyParagraphStyling(to attributed: inout AttributedString) {
+        guard !attributed.characters.isEmpty else { return }
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 1.5
+        paragraphStyle.paragraphSpacing = 20.0
+
+        let fullRange = attributed.startIndex ..< attributed.endIndex
+        let paragraphAttributes = AttributeContainer([
+            .paragraphStyle: paragraphStyle
+        ])
+        attributed[fullRange].mergeAttributes(paragraphAttributes)
     }
 
     private static func baseText(for comment: Comment, textHash: Int) -> AttributedString {

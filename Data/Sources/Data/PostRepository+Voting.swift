@@ -124,7 +124,7 @@ extension PostRepository {
 
         let upvoteHidden: Bool = {
             guard let upElement = upvoteLink else { return false }
-            return (try? upElement.hasClass("nosee")) ?? false
+            return upElement.hasClass("nosee")
         }()
 
         if derivedUnvoteURL == nil, upvoteHidden, let upvoteURL {

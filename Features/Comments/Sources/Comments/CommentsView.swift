@@ -174,7 +174,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
 
     public var body: some View {
         Group {
-            if let post = viewModel.post {
+            if viewModel.post != nil {
                 CommentsContentView(
                     showsPostHeader: showsPostHeader,
                     handleLinkTap: handleLinkTap,
@@ -239,7 +239,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                 }
             }
         }
-        .task {
+        .task { [navigationStore] in
             votingViewModel.navigationStore = navigationStore
             // Set up callback to update navigation store when post changes
             viewModel.onPostUpdated = { [weak navigationStore] updatedPost in
@@ -249,14 +249,14 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             }
             await viewModel.loadComments()
             if let targetID = pendingCommentID {
-                _ = await viewModel.revealComment(withId: targetID)
+                _ = viewModel.revealComment(withId: targetID)
             }
         }
         .if(allowsRefresh) { view in
             view.refreshable {
                 await viewModel.refreshComments()
                 if let targetID = pendingCommentID {
-                    _ = await viewModel.revealComment(withId: targetID)
+                    _ = viewModel.revealComment(withId: targetID)
                 }
             }
         }

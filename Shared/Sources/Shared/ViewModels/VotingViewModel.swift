@@ -7,7 +7,6 @@
 
 import Domain
 import Foundation
-import Shared
 import SwiftUI
 
 @MainActor

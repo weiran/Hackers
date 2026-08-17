@@ -136,7 +136,6 @@ public struct Comment: Sendable, Identifiable {
     public let upvoted: Bool
     public let voteLinks: VoteLinks?
     public let visibility: CommentVisibilityType
-    public let parsedText: AttributedString?
 
     public init(
         id: Int,
@@ -148,7 +147,6 @@ public struct Comment: Sendable, Identifiable {
         upvoted: Bool,
         voteLinks: VoteLinks? = nil,
         visibility: CommentVisibilityType = .visible,
-        parsedText: AttributedString? = nil,
     ) {
         self.id = id
         self.age = age
@@ -159,7 +157,6 @@ public struct Comment: Sendable, Identifiable {
         self.upvoted = upvoted
         self.voteLinks = voteLinks
         self.visibility = visibility
-        self.parsedText = parsedText
     }
 }
 
@@ -181,8 +178,7 @@ public extension Comment {
     func with(upvoted: Bool) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 
@@ -190,8 +186,7 @@ public extension Comment {
     func with(voteLinks: VoteLinks?) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 
@@ -199,8 +194,7 @@ public extension Comment {
     func withVisibility(_ visibility: CommentVisibilityType) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 }
