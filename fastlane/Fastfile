@@ -440,6 +440,10 @@ platform :ios do
       scheme: SCHEME,
       configuration: "Release",
       clean: true,
+      # Xcode 27's optimizer hits a Swift ownership verifier crash in the
+      # unchanged SwiftSoup 2.13.6 dependency at -O; -Osize produces the
+      # same optimized archive without triggering that compiler failure.
+      xcargs: "SWIFT_OPTIMIZATION_LEVEL=-Osize",
       export_method: "app-store",
       export_options: {
         method: "app-store",
