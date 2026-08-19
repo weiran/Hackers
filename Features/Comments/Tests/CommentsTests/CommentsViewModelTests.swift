@@ -233,6 +233,27 @@ struct CommentsViewModelTests {
         #expect(viewModel.swipeCollapseThreads == false)
     }
 
+    @Test("Next comment button visibility responds to settings notifications")
+    @MainActor
+    func showNextCommentButtonSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase,
+            bookmarksController: BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
+        )
+
+        #expect(viewModel.showNextCommentButton == true)
+
+        settingsUseCase.showNextCommentButton = false
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.showNextCommentButton == false)
+    }
+
     @Test("Bookmark notifications update local post state")
     @MainActor
     func bookmarkNotificationsUpdatePostState() async {
@@ -860,6 +881,7 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var compactFeedDesign: Bool = false
     var dimReadPosts: Bool = true
     private var storedSwipeCollapseThreads: Bool = true
+    private var storedShowNextCommentButton: Bool = true
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails
@@ -877,6 +899,14 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedSwipeCollapseThreads }
         set {
             storedSwipeCollapseThreads = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var showNextCommentButton: Bool {
+        get { storedShowNextCommentButton }
+        set {
+            storedShowNextCommentButton = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

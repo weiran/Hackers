@@ -186,6 +186,11 @@ public struct SettingsView: View {
                             Label("Swipe to Collapse Threads", systemImage: "minus.circle")
                         }
                         .accessibilityIdentifier(AccessibilityIdentifier.Settings.swipeCollapseThreads)
+
+                        Toggle(isOn: $viewModel.showNextCommentButton) {
+                            Label("Show Next Comment Button", systemImage: "arrow.down.circle")
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextCommentButton)
                     }
                 }
 

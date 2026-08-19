@@ -45,6 +45,7 @@ public protocol SettingsUseCase: AnyObject, Sendable {
     var compactFeedDesign: Bool { get set }
     var dimReadPosts: Bool { get set }
     var swipeCollapseThreads: Bool { get set }
+    var showNextCommentButton: Bool { get set }
     func clearCache() async
     func cacheUsageBytes() async -> Int64
 }

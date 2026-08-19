@@ -95,7 +95,7 @@ struct CommentsContentView: View {
                     commentScrollTopSafeAreaInset
                 }
                 .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                    if !viewModel.visibleComments.isEmpty {
+                    if viewModel.showNextCommentButton && !viewModel.visibleComments.isEmpty {
                         NextCommentFloatingButton(
                             isEnabled: visibleCommentTarget.hasNextComment,
                             onNextComment: { scrollToNextComment(using: proxy) },

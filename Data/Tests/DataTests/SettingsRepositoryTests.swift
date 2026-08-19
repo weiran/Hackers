@@ -182,6 +182,30 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "SwipeToCollapseThreads") == true)
     }
 
+    @Test("Show next comment button default value")
+    func showNextCommentButtonDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.showNextCommentButton == true)
+    }
+
+    @Test("Show next comment button setter and getter")
+    func showNextCommentButtonSetterAndGetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.showNextCommentButton = false
+        #expect(repository.showNextCommentButton == false)
+        #expect(mockUserDefaults.bool(forKey: "ShowNextCommentButton") == false)
+
+        repository.showNextCommentButton = true
+        #expect(repository.showNextCommentButton == true)
+        #expect(mockUserDefaults.bool(forKey: "ShowNextCommentButton") == true)
+    }
+
     // MARK: - Remember Feed Category Tests
 
     @Test("Remember feed category default value")

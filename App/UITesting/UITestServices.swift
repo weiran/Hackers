@@ -14,6 +14,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var compactFeedDesign = false
     var dimReadPosts: Bool
     var swipeCollapseThreads = true
+    var showNextCommentButton = true
 
     init() {
         guard let configuration = UITestingBootstrap.configuration else {

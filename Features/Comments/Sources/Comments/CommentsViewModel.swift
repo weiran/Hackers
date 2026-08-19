@@ -25,6 +25,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     public private(set) var visibleRevision = 0
     public var showThumbnails: Bool
     public var swipeCollapseThreads: Bool
+    public var showNextCommentButton: Bool
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?
@@ -78,6 +79,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.bookmarksController = bookmarksController ?? DependencyContainer.shared.makeBookmarksController()
         showThumbnails = settingsUseCase.showThumbnails
         swipeCollapseThreads = settingsUseCase.swipeCollapseThreads
+        showNextCommentButton = settingsUseCase.showNextCommentButton
 
         let initialComments = initialPost?.comments ?? []
         commentsLoader = LoadingStateManager(initialData: initialComments)
@@ -102,6 +104,10 @@ public final class CommentsViewModel: @unchecked Sendable {
                 let currentSwipeCollapse = settingsUseCase.swipeCollapseThreads
                 if self.swipeCollapseThreads != currentSwipeCollapse {
                     self.swipeCollapseThreads = currentSwipeCollapse
+                }
+                let currentShowNextButton = settingsUseCase.showNextCommentButton
+                if self.showNextCommentButton != currentShowNextButton {
+                    self.showNextCommentButton = currentShowNextButton
                 }
             }
 
