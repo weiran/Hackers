@@ -363,6 +363,64 @@ struct CommentsViewModelTests {
         #expect(visibleUpvotedAfter == true, "visibleComments must reflect the updated comment")
     }
 
+    @Test("Upvoting a comment through VotingViewModel persists the upvoted state after voting completes")
+    @MainActor
+    func commentUpvoteThroughVotingViewModelSucceeds() async {
+        // Mirrors CommentsContentView.upvoteComment: vote the loaded comment through
+        // VotingViewModel, writing each state change back via replace(comment:).
+        let comment = createTestComment(id: 1, upvoted: false)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
+        await sut.loadComments()
+
+        let provider = StubCommentVotingStateProvider()
+        let votingViewModel = VotingViewModel(
+            votingStateProvider: StubVotingStateProvider(),
+            commentVotingStateProvider: provider,
+            authenticationUseCase: StubAuthenticationUseCase()
+        )
+        let post = sut.post ?? testPost
+
+        let tappedComment = sut.comment(withID: 1)
+        #expect(tappedComment != nil, "The loaded comment must be resolvable by id")
+
+        await votingViewModel.upvote(comment: tappedComment!, in: post) { updated in
+            sut.replace(comment: updated)
+        }
+
+        #expect(provider.upvoteCalls == [1], "The vote request should run for the tapped comment")
+        #expect(
+            sut.visibleComments.first(where: { $0.id == 1 })?.upvoted == true,
+            "After a successful vote the visible projection must show the upvoted state"
+        )
+        #expect(sut.comment(withID: 1)?.upvoted == true)
+    }
+
+    @Test("A failed comment vote reverts the optimistic upvoted state")
+    @MainActor
+    func commentUpvoteThroughVotingViewModelRevertsOnError() async {
+        let comment = createTestComment(id: 1, upvoted: false)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
+        await sut.loadComments()
+
+        let provider = StubCommentVotingStateProvider()
+        provider.errorToThrow = MockError.testError
+        let votingViewModel = VotingViewModel(
+            votingStateProvider: StubVotingStateProvider(),
+            commentVotingStateProvider: provider,
+            authenticationUseCase: StubAuthenticationUseCase()
+        )
+        let post = sut.post ?? testPost
+
+        await votingViewModel.upvote(comment: sut.comment(withID: 1)!, in: post) { updated in
+            sut.replace(comment: updated)
+        }
+
+        #expect(
+            sut.visibleComments.first(where: { $0.id == 1 })?.upvoted == false,
+            "A failed vote must leave the visible projection un-upvoted"
+        )
+    }
+
     // MARK: - Comment Visibility Tests
 
     @Suite("Comment Visibility")
@@ -933,6 +991,41 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     func clearCache() async {}
 
     func cacheUsageBytes() async -> Int64 { 0 }
+}
+
+final class StubAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
+    func authenticate(username _: String, password _: String) async throws {}
+    func logout() async throws {}
+    func isAuthenticated() async -> Bool { false }
+    func getCurrentUser() async -> User? { nil }
+}
+
+final class StubVotingStateProvider: VotingStateProvider, @unchecked Sendable {
+    func votingState(for item: any Votable) -> VotingState {
+        VotingState(
+            isUpvoted: item.upvoted,
+            score: (item as? any ScoredVotable)?.score,
+            canVote: item.voteLinks?.upvote != nil,
+            canUnvote: item.voteLinks?.unvote != nil
+        )
+    }
+
+    func upvote(item _: any Votable) async throws {}
+    func unvote(item _: any Votable) async throws {}
+}
+
+final class StubCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
+    var upvoteCalls: [Int] = []
+    var errorToThrow: Error?
+
+    func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
+        upvoteCalls.append(comment.id)
+        if let errorToThrow {
+            throw errorToThrow
+        }
+    }
+
+    func unvoteComment(_ comment: Domain.Comment, for _: Post) async throws {}
 }
 
 enum MockError: Error {

@@ -161,11 +161,22 @@ public struct Comment: Sendable, Identifiable {
 }
 
 extension Comment: Hashable {
-    /// Identity-based equality: two comments with the same id are considered equal so that
-    /// value copies with differing presentation state (e.g. visibility) collapse correctly
-    /// in sets/dictionaries keyed by comment.
+    /// Content equality: comments are equal only when every rendered field matches.
+    /// SwiftUI's ForEach/LazyVStack row diffing uses `==` to decide whether a row's
+    /// content closure needs re-invoking, so identity-only equality (same id) hid
+    /// content-only updates such as an optimistic upvote and the row kept rendering
+    /// stale state. Hashing stays keyed by id: content-equal comments always share
+    /// an id, so equal values still hash equally.
     public static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
+            && lhs.age == rhs.age
+            && lhs.text == rhs.text
+            && lhs.by == rhs.by
+            && lhs.isFlagged == rhs.isFlagged
+            && lhs.level == rhs.level
+            && lhs.upvoted == rhs.upvoted
+            && lhs.voteLinks == rhs.voteLinks
+            && lhs.visibility == rhs.visibility
     }
 
     public func hash(into hasher: inout Hasher) {

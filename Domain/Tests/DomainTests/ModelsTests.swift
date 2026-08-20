@@ -177,6 +177,27 @@ struct ModelsTests {
         #expect(comment1.hashValue == comment2.hashValue)
     }
 
+    @Test("Comment equality reflects content changes so row diffing sees updates")
+    func commentEqualityTracksContent() {
+        let base = Comment(
+            id: 456,
+            age: "1 hour ago",
+            text: "Test comment",
+            by: "user",
+            level: 0,
+            upvoted: false
+        )
+
+        // Same id but the optimistic vote flipped `upvoted`: the values must compare
+        // unequal or SwiftUI's ForEach row diffing treats the row as unchanged and
+        // keeps rendering stale content.
+        #expect(base != base.with(upvoted: true))
+        #expect(base != base.withVisibility(.compact))
+
+        // Hashing stays keyed by id: equal values must hash equally.
+        #expect(base.hashValue == base.with(upvoted: true).hashValue)
+    }
+
     // MARK: - PostType Tests
 
     @Test("PostType raw values match expected strings")
