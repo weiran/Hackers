@@ -40,7 +40,9 @@ enum UITestingBootstrap {
         guard configuration != nil, let fixtures else { return }
 
         let settingsUseCase = UITestSettingsUseCase()
-        let authenticationUseCase = UITestAuthenticationUseCase()
+        let authenticationUseCase = UITestAuthenticationUseCase(
+            initiallyAuthenticated: UITestingBootstrap.configuration?.authenticated ?? false
+        )
         let bookmarksUseCase = UITestBookmarksUseCase()
         let readStatusUseCase = UITestReadStatusUseCase()
         let votingStateProvider = UITestVotingStateProvider()

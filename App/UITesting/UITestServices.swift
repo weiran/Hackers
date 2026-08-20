@@ -79,6 +79,14 @@ final class UITestAuthenticationUseCase: AuthenticationUseCase, @unchecked Senda
     private let lock = NSLock()
     private var user: User?
 
+    /// Launches with an established session so authenticated flows (voting, account
+    /// settings) can be exercised without driving the login form first.
+    init(initiallyAuthenticated: Bool = false) {
+        if initiallyAuthenticated {
+            user = User(username: "ui-user", karma: 1_337, joined: Date(timeIntervalSince1970: 1_700_000_000))
+        }
+    }
+
     func authenticate(username: String, password: String) async throws {
         guard username == "ui-user", password == "password" else {
             throw HackersKitError.authenticationError(error: .badCredentials)
