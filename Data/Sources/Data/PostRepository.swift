@@ -13,9 +13,17 @@ import SwiftSoup
 public final class PostRepository: PostUseCase, VoteUseCase, CommentUseCase, Sendable {
     let networkManager: NetworkManagerProtocol
     let urlBase = "https://news.ycombinator.com"
+    /// Waits between bounded reconciliation retries. Injectable so tests run instantly.
+    let submissionWaiter: @Sendable (TimeInterval) async -> Void
 
-    public init(networkManager: NetworkManagerProtocol) {
+    public init(
+        networkManager: NetworkManagerProtocol,
+        submissionWaiter: @escaping @Sendable (TimeInterval) async -> Void = { seconds in
+            try? await Task.sleep(for: .seconds(seconds))
+        }
+    ) {
         self.networkManager = networkManager
+        self.submissionWaiter = submissionWaiter
     }
 
     // MARK: - PostUseCase

@@ -861,8 +861,42 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
 }
 
 final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
+    var submitCalls: [CommentSubmissionRequest] = []
+    var submitBaselines: [Set<Int>] = []
+    var submitOutcome: CommentSubmissionOutcome = .confirmed(
+        SubmittedComment(
+            id: 9_000_001,
+            parentID: 0,
+            author: "fixture-user",
+            htmlText: "<p>fixture server html</p>",
+            createdAt: Date(timeIntervalSince1970: 1_787_313_122)
+        )
+    )
+    var submitError: Error?
+    var reconcileCalls: [CommentSubmissionAttempt] = []
+    var reconcileResult: SubmittedComment?
+
     func getComments(for _: Post) async throws -> [Domain.Comment] {
         []
+    }
+
+    func submitComment(
+        _ request: CommentSubmissionRequest,
+        baselineChildIDs: Set<Int>
+    ) async throws -> CommentSubmissionOutcome {
+        submitCalls.append(request)
+        submitBaselines.append(baselineChildIDs)
+        if let submitError {
+            throw submitError
+        }
+        return submitOutcome
+    }
+
+    func reconcileComment(
+        _ attempt: CommentSubmissionAttempt
+    ) async throws -> SubmittedComment? {
+        reconcileCalls.append(attempt)
+        return reconcileResult
     }
 }
 

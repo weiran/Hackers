@@ -205,6 +205,21 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         try await getPost(id: post.id).comments ?? []
     }
 
+    func submitComment(
+        _ request: CommentSubmissionRequest,
+        baselineChildIDs _: Set<Int>
+    ) async throws -> CommentSubmissionOutcome {
+        .unconfirmed(CommentSubmissionAttempt(
+            request: request,
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+    }
+
+    func reconcileComment(_: CommentSubmissionAttempt) async throws -> SubmittedComment? {
+        nil
+    }
+
     private func comments(for postID: Int) -> [Comment] {
         (commentsByPostID[postID] ?? []).map { fixture in
             Comment(
