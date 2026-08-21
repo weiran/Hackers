@@ -1,0 +1,108 @@
+{
+  "font": "/System/Library/Fonts/SFNS.ttf",
+  "colors": {
+    "ink": [9, 8, 14, 255],
+    "paper": [248, 245, 240, 255],
+    "muted": [207, 201, 214, 255],
+    "violet": [160, 111, 237, 255],
+    "ember": [255, 147, 0, 255]
+  },
+  "frames": {
+    "iphone": {
+      "path": "assets/frames/iphone-17-pro-max-deep-blue.png",
+      "screen": [75, 66, 1320, 2868],
+      "radius": 172
+    },
+    "ipad": {
+      "path": "assets/frames/ipad-pro-space-gray.png",
+      "screen": [119, 218, 2048, 2732],
+      "radius": 52
+    }
+  },
+  "slides": [
+    {
+      "id": "focus",
+      "background": "assets/backgrounds/01-focus.png",
+      "screen": "01-feed-built-for-reading.png",
+      "title": "Hacker News,\nin focus.",
+      "subtitle": "A calmer way to follow what matters.",
+      "text_align": "left",
+      "text_top": 0.095,
+      "device": {
+        "iphone": { "height": 0.735, "center": [0.52, 0.695], "rotation": -3 },
+        "ipad": { "height": 0.68, "center": [0.52, 0.70], "rotation": -2 }
+      }
+    },
+    {
+      "id": "open-story",
+      "background": "assets/backgrounds/02-open-story.png",
+      "screen": "02-open-stories-inside-hackers.png",
+      "title": "Open stories\ninside Hackers.",
+      "subtitle": "Read without losing the thread.",
+      "text_align": "left",
+      "text_top": 0.075,
+      "device": {
+        "iphone": { "height": 0.755, "center": [0.48, 0.70], "rotation": 3 },
+        "ipad": { "height": 0.705, "center": [0.50, 0.70], "rotation": 2 }
+      }
+    },
+    {
+      "id": "comments",
+      "background": "assets/backgrounds/03-comments.png",
+      "screen": "03-read-comments-alongside-story.png",
+      "title": "The conversation,\nin context.",
+      "subtitle": "Keep comments beside the story.",
+      "text_align": "left",
+      "text_top": 0.08,
+      "device": {
+        "iphone": { "height": 0.78, "center": [0.53, 0.705], "rotation": -2 },
+        "ipad": { "height": 0.74, "center": [0.51, 0.705], "rotation": -1 }
+      }
+    },
+    {
+      "id": "search",
+      "background": "assets/backgrounds/04-search.png",
+      "screen": "04-search-by-popular-recent-date.png",
+      "title": "Find the signal\nfaster.",
+      "subtitle": "Search by popularity, recency, or date.",
+      "text_align": "center",
+      "text_top": 0.075,
+      "device": {
+        "iphone": { "height": 0.735, "center": [0.53, 0.705], "rotation": 4 },
+        "ipad": { "height": 0.69, "center": [0.52, 0.71], "rotation": 3 }
+      }
+    },
+    {
+      "id": "sync",
+      "background": "assets/backgrounds/05-sync.png",
+      "screen": "05-dim-read-posts-across-devices.png",
+      "title": "Pick up where\nyou left off.",
+      "subtitle": "Keep read status in sync.",
+      "text_align": "left",
+      "text_top": 0.08,
+      "device": {
+        "iphone": { "height": 0.76, "center": [0.49, 0.70], "rotation": -3 },
+        "ipad": { "height": 0.72, "center": [0.50, 0.70], "rotation": -2 }
+      }
+    },
+    {
+      "id": "deep-thread",
+      "background": "assets/backgrounds/06-deep-thread.png",
+      "screen": "06-vote-reply-follow-deep-threads.png",
+      "title": "Go deeper\ninto the thread.",
+      "subtitle": "Vote, reply, and follow along.",
+      "text_align": "left",
+      "text_top": 0.075,
+      "device": {
+        "iphone": { "height": 0.81, "center": [0.52, 0.715], "rotation": 2 },
+        "ipad": { "height": 0.77, "center": [0.50, 0.715], "rotation": 1 }
+      }
+    }
+  ],
+  "outputs": [
+    { "id": "iphone-6.9", "kind": "iphone", "size": [1320, 2868] },
+    { "id": "iphone-6.5-wide", "kind": "iphone", "size": [1284, 2778] },
+    { "id": "iphone-6.5", "kind": "iphone", "size": [1242, 2688] },
+    { "id": "ipad-13", "kind": "ipad", "size": [2064, 2752] }
+  ]
+}
