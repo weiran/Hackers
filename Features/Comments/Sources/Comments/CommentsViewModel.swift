@@ -347,6 +347,123 @@ public final class CommentsViewModel: @unchecked Sendable {
         return visibleComments[nextIndex...].first(where: { $0.level == 0 })?.id
     }
 
+}
+
+private extension CommentsViewModel {
+    struct VisibleCommentSignature: Equatable {
+        let id: Int
+        let visibility: CommentVisibilityType
+    }
+
+    func rebuildCommentIndexes() {
+        indexByID = [:]
+        parentIndexByID = [:]
+
+        var validCommentIDs = Set<Int>()
+        var stack: [(index: Int, id: Int, level: Int)] = []
+        // Mutate a local copy and assign once: writing through the allComments computed
+        // setter per-element is O(n) each (whole-array copy) and fragile if the accessor
+        // ever stops returning the live backing array.
+        var updated = allComments
+        var didUpdate = false
+        for index in updated.indices {
+            let comment = updated[index]
+            validCommentIDs.insert(comment.id)
+            indexByID[comment.id] = index
+            if comment.visibility == .compact {
+                collapsedCommentIDs.insert(comment.id)
+            } else if comment.visibility == .hidden {
+                updated[index] = comment.withVisibility(.visible)
+                didUpdate = true
+            }
+
+            while let last = stack.last, comment.level <= last.level {
+                stack.removeLast()
+            }
+
+            if let parent = stack.last {
+                parentIndexByID[comment.id] = parent.index
+            }
+
+            stack.append((index: index, id: comment.id, level: comment.level))
+        }
+
+        if didUpdate { allComments = updated }
+        collapsedCommentIDs.formIntersection(validCommentIDs)
+    }
+
+    func updateVisibleComments() {
+        rebuildVisibleComments(forceRevisionBump: false)
+    }
+
+    /// Rebuilds `visibleComments` from the full comment list. When `forceRevisionBump` is
+    /// false (collapse/expand path), it skips the work when only the collapse signature is
+    /// unchanged. When true (voting/content-update path), it always reassigns
+    /// `visibleComments` and bumps `visibleRevision` because a comment's content changed
+    /// even though its presence/visibility did not.
+    func rebuildVisibleComments(forceRevisionBump: Bool) {
+        var updatedComments: [Comment] = []
+        var hiddenUntilLevel: Int?
+
+        for comment in comments {
+            if let hiddenLevel = hiddenUntilLevel {
+                guard comment.level <= hiddenLevel else { continue }
+                hiddenUntilLevel = nil
+            }
+
+            updatedComments.append(comment)
+
+            if collapsedCommentIDs.contains(comment.id) {
+                hiddenUntilLevel = comment.level
+            }
+        }
+
+        let updatedSignature = updatedComments.map { comment in
+            VisibleCommentSignature(
+                id: comment.id,
+                visibility: collapsedCommentIDs.contains(comment.id) ? .compact : .visible
+            )
+        }
+
+        if !forceRevisionBump, updatedSignature == visibleSignature {
+            return
+        }
+        visibleComments = updatedComments
+        visibleIndexByID = Dictionary(uniqueKeysWithValues: updatedComments.enumerated().map { index, comment in
+            (comment.id, index)
+        })
+        visibleSignature = updatedSignature
+        visibleRevision += 1
+    }
+
+    func visibleRootComment(of comment: Comment) -> Comment? {
+        guard let commentIndex = indexByID[comment.id] else { return nil }
+
+        for index in (0 ... commentIndex).reversed()
+            where comments[index].level == 0 {
+            return comments[index]
+        }
+
+        return nil
+    }
+
+    func ensureAncestorVisibility(forCommentAt index: Int) {
+        // Mutate a local copy and assign once for the same reason as rebuildCommentIndexes.
+        var updated = allComments
+        var currentCommentID = updated[index].id
+        while let parentIndex = parentIndexByID[currentCommentID] {
+            let parent = updated[parentIndex]
+            collapsedCommentIDs.remove(parent.id)
+            updated[parentIndex] = parent.withVisibility(.visible)
+            currentCommentID = parent.id
+        }
+        allComments = updated
+    }
+}
+
+// MARK: - Comment submission
+
+extension CommentsViewModel {
     // MARK: - Comment submission
 
     /// Submits a comment for this story. The baseline is the caller's currently
@@ -485,117 +602,5 @@ public final class CommentsViewModel: @unchecked Sendable {
             )
         }
         post = updatedPost
-    }
-}
-
-private extension CommentsViewModel {
-    struct VisibleCommentSignature: Equatable {
-        let id: Int
-        let visibility: CommentVisibilityType
-    }
-
-    func rebuildCommentIndexes() {
-        indexByID = [:]
-        parentIndexByID = [:]
-
-        var validCommentIDs = Set<Int>()
-        var stack: [(index: Int, id: Int, level: Int)] = []
-        // Mutate a local copy and assign once: writing through the allComments computed
-        // setter per-element is O(n) each (whole-array copy) and fragile if the accessor
-        // ever stops returning the live backing array.
-        var updated = allComments
-        var didUpdate = false
-        for index in updated.indices {
-            let comment = updated[index]
-            validCommentIDs.insert(comment.id)
-            indexByID[comment.id] = index
-            if comment.visibility == .compact {
-                collapsedCommentIDs.insert(comment.id)
-            } else if comment.visibility == .hidden {
-                updated[index] = comment.withVisibility(.visible)
-                didUpdate = true
-            }
-
-            while let last = stack.last, comment.level <= last.level {
-                stack.removeLast()
-            }
-
-            if let parent = stack.last {
-                parentIndexByID[comment.id] = parent.index
-            }
-
-            stack.append((index: index, id: comment.id, level: comment.level))
-        }
-
-        if didUpdate { allComments = updated }
-        collapsedCommentIDs.formIntersection(validCommentIDs)
-    }
-
-    func updateVisibleComments() {
-        rebuildVisibleComments(forceRevisionBump: false)
-    }
-
-    /// Rebuilds `visibleComments` from the full comment list. When `forceRevisionBump` is
-    /// false (collapse/expand path), it skips the work when only the collapse signature is
-    /// unchanged. When true (voting/content-update path), it always reassigns
-    /// `visibleComments` and bumps `visibleRevision` because a comment's content changed
-    /// even though its presence/visibility did not.
-    func rebuildVisibleComments(forceRevisionBump: Bool) {
-        var updatedComments: [Comment] = []
-        var hiddenUntilLevel: Int?
-
-        for comment in comments {
-            if let hiddenLevel = hiddenUntilLevel {
-                guard comment.level <= hiddenLevel else { continue }
-                hiddenUntilLevel = nil
-            }
-
-            updatedComments.append(comment)
-
-            if collapsedCommentIDs.contains(comment.id) {
-                hiddenUntilLevel = comment.level
-            }
-        }
-
-        let updatedSignature = updatedComments.map { comment in
-            VisibleCommentSignature(
-                id: comment.id,
-                visibility: collapsedCommentIDs.contains(comment.id) ? .compact : .visible
-            )
-        }
-
-        if !forceRevisionBump, updatedSignature == visibleSignature {
-            return
-        }
-        visibleComments = updatedComments
-        visibleIndexByID = Dictionary(uniqueKeysWithValues: updatedComments.enumerated().map { index, comment in
-            (comment.id, index)
-        })
-        visibleSignature = updatedSignature
-        visibleRevision += 1
-    }
-
-    func visibleRootComment(of comment: Comment) -> Comment? {
-        guard let commentIndex = indexByID[comment.id] else { return nil }
-
-        for index in (0 ... commentIndex).reversed()
-            where comments[index].level == 0 {
-            return comments[index]
-        }
-
-        return nil
-    }
-
-    func ensureAncestorVisibility(forCommentAt index: Int) {
-        // Mutate a local copy and assign once for the same reason as rebuildCommentIndexes.
-        var updated = allComments
-        var currentCommentID = updated[index].id
-        while let parentIndex = parentIndexByID[currentCommentID] {
-            let parent = updated[parentIndex]
-            collapsedCommentIDs.remove(parent.id)
-            updated[parentIndex] = parent.withVisibility(.visible)
-            currentCommentID = parent.id
-        }
-        allComments = updated
     }
 }

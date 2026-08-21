@@ -30,7 +30,7 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
         let formData = FormEncoder.encode([
             FormField(name: "acct", value: username),
             FormField(name: "pw", value: password),
-            FormField(name: "goto", value: "news"),
+            FormField(name: "goto", value: "news")
         ])
 
         // Submit the login form

@@ -279,7 +279,7 @@ extension PostRepository {
         let knownMessages = [
             "Please try again.",
             "You're posting too fast. Please slow down.",
-            "You have to be logged in to comment.",
+            "You have to be logged in to comment."
         ]
         return knownMessages.first { message.contains($0) }
     }

@@ -327,6 +327,66 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
     }
 
+
+    private var commentsHeaderBlur: some View {
+        GeometryReader { proxy in
+            ProgressiveHeaderBlurBackground(
+                height: proxy.safeAreaInsets.top + 44 + presentationState.headerBlurTopInset,
+                fadeExtension: presentationState.headerBlurFadeExtension
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func handleLinkTap() {
+        if let onPostLinkTap {
+            onPostLinkTap()
+            return
+        }
+        guard let post = viewModel.post else { return }
+        if navigationStore.openURLInPrimaryContext(post.url) {
+            return
+        }
+        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
+        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
+            navigationStore.showPostLink(post)
+            return
+        }
+        LinkOpener.openURL(post.url, with: post)
+    }
+
+    private func handleHackerNewsPostLink(_ url: URL) -> Bool {
+        guard let itemId = CommentsLinkNavigator.hackerNewsItemID(from: url) else { return false }
+
+        if viewModel.revealComment(withId: itemId) {
+            pendingCommentID = itemId
+            return true
+        }
+
+        if let currentPostId = viewModel.post?.id, currentPostId == itemId {
+            return true
+        }
+
+        navigationStore.showPost(withId: itemId)
+        return true
+    }
+
+    private func toggleCommentVisibility(withID commentID: Int) -> Comment? {
+        viewModel.toggleCommentVisibility(withID: commentID)
+    }
+
+}
+
+enum CommentsLinkNavigator {
+    static func hackerNewsItemID(from url: URL) -> Int? {
+        HackerNewsConstants.itemID(from: url)
+    }
+}
+
+// MARK: - Comment submission
+
+extension CommentsView {
     // MARK: - Comment submission
 
     private func submitComposerDraft() async {
@@ -472,60 +532,5 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             "Hackers could not confirm whether Hacker News accepted this comment. "
                 + "Check the thread before posting it again."
         }
-    }
-
-    private var commentsHeaderBlur: some View {
-        GeometryReader { proxy in
-            ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top + 44 + presentationState.headerBlurTopInset,
-                fadeExtension: presentationState.headerBlurFadeExtension
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .allowsHitTesting(false)
-    }
-
-    private func handleLinkTap() {
-        if let onPostLinkTap {
-            onPostLinkTap()
-            return
-        }
-        guard let post = viewModel.post else { return }
-        if navigationStore.openURLInPrimaryContext(post.url) {
-            return
-        }
-        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
-            navigationStore.showPostLink(post)
-            return
-        }
-        LinkOpener.openURL(post.url, with: post)
-    }
-
-    private func handleHackerNewsPostLink(_ url: URL) -> Bool {
-        guard let itemId = CommentsLinkNavigator.hackerNewsItemID(from: url) else { return false }
-
-        if viewModel.revealComment(withId: itemId) {
-            pendingCommentID = itemId
-            return true
-        }
-
-        if let currentPostId = viewModel.post?.id, currentPostId == itemId {
-            return true
-        }
-
-        navigationStore.showPost(withId: itemId)
-        return true
-    }
-
-    private func toggleCommentVisibility(withID commentID: Int) -> Comment? {
-        viewModel.toggleCommentVisibility(withID: commentID)
-    }
-
-}
-
-enum CommentsLinkNavigator {
-    static func hackerNewsItemID(from url: URL) -> Int? {
-        HackerNewsConstants.itemID(from: url)
     }
 }
