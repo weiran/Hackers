@@ -48,6 +48,42 @@ struct UITestLaunchConfigurationTests {
         #expect(configuration.readPostIDs == [1, 2])
         #expect(configuration.dimReadPosts == false)
         #expect(configuration.showThumbnails)
+        #expect(!configuration.authenticated)
+        #expect(!configuration.commentingEnabled)
+    }
+
+    @Test("Commenting opt-in parses and round-trips")
+    func commentingEnabled() throws {
+        let environment = [
+            "HACKERS_UI_TESTING": "1",
+            "HACKERS_UI_AUTHENTICATED": "1",
+            "HACKERS_UI_COMMENTING_ENABLED": "1"
+        ]
+        let configuration = try #require(try UITestLaunchConfiguration.parse(environment: environment))
+
+        #expect(configuration.authenticated)
+        #expect(configuration.commentingEnabled)
+        #expect(try UITestLaunchConfiguration.parse(environment: [
+            "HACKERS_UI_TESTING": "1",
+            "HACKERS_UI_COMMENTING_ENABLED": "0"
+        ])?.commentingEnabled == false)
+        #expect(
+            UITestLaunchConfiguration(authenticated: true, commentingEnabled: true)
+                .environment["HACKERS_UI_COMMENTING_ENABLED"] == "1"
+        )
+    }
+
+    @Test("Malformed commenting opt-in fails parsing")
+    func malformedCommentingEnabled() {
+        #expect(throws: UITestLaunchConfiguration.ParseError.invalidValue(
+            key: "HACKERS_UI_COMMENTING_ENABLED",
+            value: "yes"
+        )) {
+            try UITestLaunchConfiguration.parse(environment: [
+                "HACKERS_UI_TESTING": "1",
+                "HACKERS_UI_COMMENTING_ENABLED": "yes"
+            ])
+        }
     }
 
     @Test("Encoded environments round-trip through the parser")

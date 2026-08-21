@@ -15,6 +15,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         case dimReadPosts = "HACKERS_UI_DIM_READ_POSTS"
         case showThumbnails = "HACKERS_UI_SHOW_THUMBNAILS"
         case authenticated = "HACKERS_UI_AUTHENTICATED"
+        case commentingEnabled = "HACKERS_UI_COMMENTING_ENABLED"
     }
 
     public enum Route: Equatable, Sendable {
@@ -74,6 +75,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     public let dimReadPosts: Bool
     public let showThumbnails: Bool
     public let authenticated: Bool
+    public let commentingEnabled: Bool
 
     public init(
         browserMode: LinkBrowserMode = .customBrowser,
@@ -84,7 +86,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         readPostIDs: Set<Int> = [],
         dimReadPosts: Bool = true,
         showThumbnails: Bool = false,
-        authenticated: Bool = false
+        authenticated: Bool = false,
+        commentingEnabled: Bool = false
     ) {
         self.browserMode = browserMode
         self.route = route
@@ -95,6 +98,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         self.dimReadPosts = dimReadPosts
         self.showThumbnails = showThumbnails
         self.authenticated = authenticated
+        self.commentingEnabled = commentingEnabled
     }
 
     public var environment: [String: String] {
@@ -106,7 +110,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             EnvironmentKey.mediaPlayback.rawValue: mediaPlayback.rawValue,
             EnvironmentKey.dimReadPosts.rawValue: dimReadPosts ? "1" : "0",
             EnvironmentKey.showThumbnails.rawValue: showThumbnails ? "1" : "0",
-            EnvironmentKey.authenticated.rawValue: authenticated ? "1" : "0"
+            EnvironmentKey.authenticated.rawValue: authenticated ? "1" : "0",
+            EnvironmentKey.commentingEnabled.rawValue: commentingEnabled ? "1" : "0"
         ]
 
         if !readPostIDs.isEmpty {
@@ -159,10 +164,12 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         let dimReadPostsKey = EnvironmentKey.dimReadPosts.rawValue
         let showThumbnailsKey = EnvironmentKey.showThumbnails.rawValue
         let authenticatedKey = EnvironmentKey.authenticated.rawValue
+        let commentingEnabledKey = EnvironmentKey.commentingEnabled.rawValue
         let readPostIDs = try positiveIntegerSet(environment[readPostIDsKey], key: readPostIDsKey)
         let dimReadPosts = try boolean(environment[dimReadPostsKey], key: dimReadPostsKey) ?? true
         let showThumbnails = try boolean(environment[showThumbnailsKey], key: showThumbnailsKey) ?? false
         let authenticated = try boolean(environment[authenticatedKey], key: authenticatedKey) ?? false
+        let commentingEnabled = try boolean(environment[commentingEnabledKey], key: commentingEnabledKey) ?? false
 
         return UITestLaunchConfiguration(
             browserMode: browserMode,
@@ -173,7 +180,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             readPostIDs: readPostIDs,
             dimReadPosts: dimReadPosts,
             showThumbnails: showThumbnails,
-            authenticated: authenticated
+            authenticated: authenticated,
+            commentingEnabled: commentingEnabled
         )
     }
 

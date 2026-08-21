@@ -32,7 +32,8 @@ enum UITestingBootstrap {
     }
 
     static var runtimePolicy: AppRuntimePolicy {
-        isEnabled ? .automation : .standard
+        guard isEnabled else { return .standard }
+        return .automation.withCommenting(configuration?.commentingEnabled ?? false)
     }
 
     @MainActor
