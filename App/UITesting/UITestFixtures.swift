@@ -663,7 +663,10 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             by: by,
             level: level,
             upvoted: false,
-            voteLinks: nil
+            voteLinks: VoteLinks(
+                upvote: URL(string: "https://news.ycombinator.com/vote?id=\(id)&how=up&goto=item"),
+                unvote: nil
+            )
         )
     }
 

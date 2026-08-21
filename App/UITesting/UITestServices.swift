@@ -116,6 +116,14 @@ final class UITestVotingStateProvider: VoteUseCase,
     private let lock = NSLock()
     private var upvotedIDs: Set<Int> = []
 
+    /// Matches the perceived latency of a real Hacker News vote request so voting
+    /// UI exercises the in-flight spinner state instead of completing instantly.
+    private static let voteLatency: UInt64 = 600_000_000
+
+    private func simulateVoteLatency() async {
+        try? await Task.sleep(nanoseconds: Self.voteLatency)
+    }
+
     func votingState(for item: any Votable) -> VotingState {
         let isUpvoted = lock.withLock { upvotedIDs.contains(item.id) || item.upvoted }
         let score = (item as? any ScoredVotable)?.score
@@ -129,18 +137,22 @@ final class UITestVotingStateProvider: VoteUseCase,
     }
 
     func upvote(post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.insert(post.id) }
     }
 
     func upvote(comment: Comment, for post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.insert(comment.id) }
     }
 
     func unvote(post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.remove(post.id) }
     }
 
     func unvote(comment: Comment, for post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.remove(comment.id) }
     }
 
