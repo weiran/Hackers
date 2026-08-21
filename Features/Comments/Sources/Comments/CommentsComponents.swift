@@ -89,6 +89,9 @@ struct CommentsContentView: View {
                 .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
                     updateVisibleCommentTarget(visibleTargets: visibleTargets)
                 }
+                // Scrolling the thread dismisses the keyboard, which collapses
+                // the composer while preserving its draft.
+                .scrollDismissesKeyboard(.immediately)
                 .modifier(CommentSwipeActionsContainerModifier())
                 .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top

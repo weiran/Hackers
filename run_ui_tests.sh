@@ -52,6 +52,12 @@ FULL_TESTS=(
   CommentingUITests/testComposerAndReplyVisibleWhenEnabledAndAuthenticated
   CommentingUITests/testPostingFlowWithSuccessFixture
   CommentingUITests/testPostingFailureKeepsDraft
+  CommentingUITests/testDraftPersistsAcrossCollapseAndReopen
+  CommentingUITests/testReplyShowsTargetUsernameAndFocusedEditor
+  CommentingUITests/testDirtyReplySwitchRequiresConfirmation
+  CommentingUITests/testPostingShowsSpinnerBeforeInsertion
+  CommentingUITests/testOutcomeUnknownAlertCheckAgainResolvesOnce
+  CommentingUITests/testCustomBrowserExpandedCommentsShowsComposer
 )
 
 FUNCTIONAL_TEST_SOURCES=(
