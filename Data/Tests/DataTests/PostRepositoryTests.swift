@@ -39,22 +39,22 @@ struct PostRepositoryTests {
         var lastPostURL: URL?
         var lastPostBody: String?
 
-        func get(url: URL) async throws -> String {
+        func getResponse(url: URL) async throws -> NetworkResponse {
             getCallCount += 1
             lastGetURL = url
             if !getResponses.isEmpty {
                 let response = getResponses.removeFirst()
                 switch response {
                 case let .success(html):
-                    return html
+                    return NetworkResponse(body: html, statusCode: 200, finalURL: url)
                 case let .failure(error):
                     throw error
                 }
             }
-            return stubbedGetResponse
+            return NetworkResponse(body: stubbedGetResponse, statusCode: 200, finalURL: url)
         }
 
-        func post(url: URL, body: String) async throws -> String {
+        func postResponse(url: URL, body: String) async throws -> NetworkResponse {
             postCallCount += 1
             lastPostURL = url
             lastPostBody = body
@@ -62,12 +62,20 @@ struct PostRepositoryTests {
                 let response = postResponses.removeFirst()
                 switch response {
                 case let .success(html):
-                    return html
+                    return NetworkResponse(body: html, statusCode: 200, finalURL: url)
                 case let .failure(error):
                     throw error
                 }
             }
-            return stubbedPostResponse
+            return NetworkResponse(body: stubbedPostResponse, statusCode: 200, finalURL: url)
+        }
+
+        func get(url: URL) async throws -> String {
+            try await getResponse(url: url).body
+        }
+
+        func post(url: URL, body: String) async throws -> String {
+            try await postResponse(url: url, body: body).body
         }
 
         func clearCookies() {
@@ -76,6 +84,10 @@ struct PostRepositoryTests {
 
         func containsCookie(for _: URL) -> Bool {
             false // Return false for testing simplicity
+        }
+
+        func containsCookie(named _: String, for _: URL) -> Bool {
+            false
         }
 
         // MARK: - Helpers

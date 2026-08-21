@@ -169,9 +169,17 @@ private final class MockNetworkManager: NetworkManagerProtocol, @unchecked Senda
         } ?? [])
     }
 
-    func get(url: URL) async throws -> String {
+    func getResponse(url: URL) async throws -> NetworkResponse {
         lastURL = url
-        return nextResponse
+        return NetworkResponse(body: nextResponse, statusCode: 200, finalURL: url)
+    }
+
+    func postResponse(url _: URL, body _: String) async throws -> NetworkResponse {
+        fatalError("Not implemented in mock")
+    }
+
+    func get(url: URL) async throws -> String {
+        try await getResponse(url: url).body
     }
 
     func post(url _: URL, body _: String) async throws -> String {
@@ -181,4 +189,6 @@ private final class MockNetworkManager: NetworkManagerProtocol, @unchecked Senda
     func clearCookies() {}
 
     func containsCookie(for _: URL) -> Bool { false }
+
+    func containsCookie(named _: String, for _: URL) -> Bool { false }
 }

@@ -97,7 +97,7 @@ struct AuthenticationRepositoryTests {
 
         #expect(await repository.isAuthenticated() == false)
 
-        network.hasCookie = true
+        network.cookieNames = ["user"]
         #expect(await repository.isAuthenticated() == false)
 
         userDefaults.set("user", forKey: "hn_username")
@@ -106,31 +106,44 @@ struct AuthenticationRepositoryTests {
 }
 
 private final class MockAuthenticationNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
-    var hasCookie = false
+    var cookieNames: Set<String> = []
     var postBodies: [String] = []
     var clearCookiesCallCount = 0
-    private let postResponse: String
+    private let loginPage: String
 
     init(postResponse: String = "<html><body>news</body></html>") {
-        self.postResponse = postResponse
+        self.loginPage = postResponse
     }
 
-    func get(url _: URL) async throws -> String {
+    func get(url: URL) async throws -> String {
         "<html><body>login</body></html>"
     }
 
     func post(url _: URL, body: String) async throws -> String {
         postBodies.append(body)
-        return postResponse
+        return loginPage
+    }
+
+    func getResponse(url: URL) async throws -> NetworkResponse {
+        NetworkResponse(body: "<html><body>login</body></html>", statusCode: 200, finalURL: url)
+    }
+
+    func postResponse(url: URL, body: String) async throws -> NetworkResponse {
+        postBodies.append(body)
+        return NetworkResponse(body: loginPage, statusCode: 200, finalURL: url)
     }
 
     func clearCookies() {
         clearCookiesCallCount += 1
-        hasCookie = false
+        cookieNames = []
     }
 
     func containsCookie(for _: URL) -> Bool {
-        hasCookie
+        !cookieNames.isEmpty
+    }
+
+    func containsCookie(named name: String, for _: URL) -> Bool {
+        cookieNames.contains(name)
     }
 }
 

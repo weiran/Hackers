@@ -217,33 +217,43 @@ final class StubNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
         responseQueue.append(.failure(error))
     }
 
-    func get(url: URL) async throws -> String {
+    func getResponse(url: URL) async throws -> NetworkResponse {
         urlsRequested.append(url)
         guard !responseQueue.isEmpty else { throw StubError.unexpectedRequest(url) }
         let response = responseQueue.removeFirst()
         switch response {
         case let .success(html):
-            return html
+            return NetworkResponse(body: html, statusCode: 200, finalURL: url)
         case let .failure(error):
             throw error
         }
     }
 
-    func post(url: URL, body _: String) async throws -> String {
+    func postResponse(url: URL, body _: String) async throws -> NetworkResponse {
         urlsRequested.append(url)
         guard !responseQueue.isEmpty else { throw StubError.unexpectedRequest(url) }
         let response = responseQueue.removeFirst()
         switch response {
         case let .success(html):
-            return html
+            return NetworkResponse(body: html, statusCode: 200, finalURL: url)
         case let .failure(error):
             throw error
         }
+    }
+
+    func get(url: URL) async throws -> String {
+        try await getResponse(url: url).body
+    }
+
+    func post(url: URL, body: String) async throws -> String {
+        try await postResponse(url: url, body: body).body
     }
 
     func clearCookies() {}
 
     func containsCookie(for _: URL) -> Bool { false }
+
+    func containsCookie(named _: String, for _: URL) -> Bool { false }
 
     func reset() {
         urlsRequested.removeAll()

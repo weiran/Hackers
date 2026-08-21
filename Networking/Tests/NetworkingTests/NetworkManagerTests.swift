@@ -411,6 +411,8 @@ struct NetworkManagerTests {
 
     // MARK: - Response Encoding Tests
 
+    // MARK: - Response Encoding Tests
+
     @Test("Response string encoding")
     func responseStringEncoding() async throws {
         // Test that responses are properly decoded as UTF-8 strings
@@ -421,5 +423,125 @@ struct NetworkManagerTests {
 
         #expect(!response.isEmpty, "Response should not be empty")
         #expect(response.data(using: .utf8) != nil, "Response should contain valid UTF-8 text")
+    }
+
+    // MARK: - Structured Response Tests
+
+    @Test("Structured GET returns body, status code, and final URL")
+    func structuredGetResponse() async throws {
+        let url = URL(string: "https://example.com/get")!
+        let manager = makeManager()
+
+        let response = try await manager.getResponse(url: url)
+
+        #expect(response.statusCode == 200)
+        #expect(response.finalURL == url)
+        #expect(response.body.contains("ok"))
+    }
+
+    @Test("Structured POST returns body, status code, and final URL")
+    func structuredPostResponse() async throws {
+        let url = URL(string: "https://example.com/post")!
+        let manager = makeManager()
+
+        let response = try await manager.postResponse(url: url, body: "a=b")
+
+        #expect(response.statusCode == 200)
+        #expect(response.finalURL == url)
+        #expect(response.body.contains("method=POST"))
+        #expect(response.body.contains("body=a=b"))
+    }
+
+    @Test("Structured responses surface non-2xx bodies instead of throwing")
+    func structuredNon2xxResponses() async throws {
+        let original = MockURLProtocol.requestHandler
+        defer { MockURLProtocol.requestHandler = original }
+
+        MockURLProtocol.requestHandler = { request in
+            if let url = request.url, url.path.contains("/status/500") {
+                let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (response, Data("server error".utf8), nil)
+            }
+            return try MockURLProtocol.defaultHandler(request)
+        }
+
+        let manager = makeManager()
+
+        let getResponse = try await manager.getResponse(url: URL(string: "https://example.com/status/500")!)
+        #expect(getResponse.statusCode == 500)
+        #expect(getResponse.body == "server error")
+
+        let postResponse = try await manager.postResponse(
+            url: URL(string: "https://example.com/status/500")!,
+            body: "x"
+        )
+        #expect(postResponse.statusCode == 500)
+        #expect(postResponse.body == "server error")
+    }
+
+    // Redirect following cannot be simulated through a custom URLProtocol
+    // (URLSession treats protocol-provided 302 responses as terminal), so the
+    // "finalURL is the post-redirect URL" guarantee is not unit-testable here.
+    // It comes from URLSession's default redirect following plus the final
+    // HTTPURLResponse's url, and was verified against live Hacker News
+    // redirect responses during the commenting contract research.
+
+    @Test("String POST still rejects non-2xx statuses")
+    func postRequestWithServerErrorStatus() async {
+        let original = MockURLProtocol.requestHandler
+        defer { MockURLProtocol.requestHandler = original }
+
+        MockURLProtocol.requestHandler = { request in
+            if let url = request.url, url.path.contains("/post-status/500") {
+                let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (response, Data("error".utf8), nil)
+            }
+            return try MockURLProtocol.defaultHandler(request)
+        }
+
+        let manager = makeManager()
+        let url = URL(string: "https://example.com/post-status/500")!
+        do {
+            _ = try await manager.post(url: url, body: "a=b")
+            Issue.record("Expected badServerResponse error for non-2xx status")
+        } catch {
+            #expect((error as? URLError)?.code == .badServerResponse)
+        }
+    }
+
+    @Test("Named cookie lookup is exact and host scoped")
+    func namedCookieLookup() {
+        let manager = NetworkManager()
+        let hackerNewsURL = URL(string: "https://news.ycombinator.com")!
+        let otherURL = URL(string: "https://other-site.example")!
+
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let userCookie = HTTPCookie(properties: [
+            .domain: "news.ycombinator.com",
+            .path: "/",
+            .name: "user",
+            .value: "hn-session",
+        ])!
+        let prefsCookie = HTTPCookie(properties: [
+            .domain: "news.ycombinator.com",
+            .path: "/",
+            .name: "prefs",
+            .value: "list",
+        ])!
+        HTTPCookieStorage.shared.setCookie(userCookie)
+        HTTPCookieStorage.shared.setCookie(prefsCookie)
+
+        #expect(manager.containsCookie(named: "user", for: hackerNewsURL))
+        #expect(manager.containsCookie(named: "prefs", for: hackerNewsURL))
+        #expect(!manager.containsCookie(named: "session", for: hackerNewsURL), "Unknown cookie names must not match")
+        #expect(!manager.containsCookie(named: "user", for: otherURL), "Named lookup must stay scoped to the HN host")
     }
 }
