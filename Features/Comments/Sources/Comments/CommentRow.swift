@@ -23,6 +23,8 @@ struct CommentRowState: Equatable, Identifiable {
     let isAuthenticated: Bool
     let canVote: Bool
     let canUnvote: Bool
+    let canReply: Bool
+    let isCommentSubmissionInProgress: Bool
     let styledText: AttributedString?
 }
 
@@ -44,6 +46,7 @@ struct CommentRow: View {
     let onUnvote: () -> Void
     let onCopy: () -> Void
     let onShare: () -> Void
+    var onReply: (() -> Void)?
 
     var body: some View {
         rowDisplay
@@ -54,6 +57,11 @@ struct CommentRow: View {
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
             .accessibilityAction(.default, onToggle)
+            .if(state.canReply) { row in
+                row.accessibilityAction(named: Text("Reply to \(state.author)")) {
+                    onReply?()
+                }
+            }
             .contextMenu {
                 if state.isAuthenticated, state.canVote, !state.isUpvoted {
                     Button(action: onUpvote) {
@@ -66,6 +74,12 @@ struct CommentRow: View {
                         Label("Unvote", systemImage: "arrow.uturn.down")
                     }
                     .disabled(state.isVoting)
+                }
+                if state.canReply {
+                    Button(action: { onReply?() }) {
+                        Label("Reply", systemImage: "arrowshape.turn.up.left")
+                    }
+                    .disabled(state.isCommentSubmissionInProgress)
                 }
                 Divider()
                 Button(action: onCopy) {
@@ -124,6 +138,10 @@ struct CommentRow: View {
                     metadataSeparator
                     inlineVoteControl
                 }
+                if state.canReply {
+                    metadataSeparator
+                    inlineReplyControl
+                }
                 Spacer(minLength: 12)
                 Text(shortAge)
                     .scaledFont(.subheadline)
@@ -137,6 +155,24 @@ struct CommentRow: View {
                 }
         }
         .clipped()
+    }
+
+    /// Reply must stay available even when the row has no vote control; the
+    /// buttons consume taps so they never trigger row collapse.
+    private var inlineReplyControl: some View {
+        Button {
+            onReply?()
+        } label: {
+            Image(systemName: "arrowshape.turn.up.left")
+                .scaledFont(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(minWidth: 30, minHeight: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(state.isCommentSubmissionInProgress)
+        .accessibilityLabel("Reply to \(state.author)")
+        .accessibilityIdentifier(AccessibilityIdentifier.Comments.reply(state.id))
     }
 
     @ViewBuilder

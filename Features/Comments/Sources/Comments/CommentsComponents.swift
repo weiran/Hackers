@@ -57,6 +57,11 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
+    let canComment: Bool
+    let composer: CommentComposerModel
+    @Binding var replyScrollTarget: Int?
+    let onReply: (Int, String) -> Void
+    let onSubmitComposerDraft: () -> Void
     @State private var visibleCommentTarget = VisibleCommentTarget()
 
     var body: some View {
@@ -94,22 +99,27 @@ struct CommentsContentView: View {
                 .safeAreaInset(edge: .top, spacing: 0) {
                     commentScrollTopSafeAreaInset
                 }
-                .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                    if viewModel.showNextCommentButton && !viewModel.visibleComments.isEmpty {
-                        NextCommentFloatingButton(
-                            isEnabled: visibleCommentTarget.hasNextComment,
-                            onNextComment: { scrollToNextComment(using: proxy) },
-                            onNextThread: { scrollToNextThread(using: proxy) }
-                        )
-                        .padding(.trailing, 28)
-                        .padding(.bottom, 28)
-                    }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    CommentsFloatingControls(
+                        canComment: canComment,
+                        composer: composer,
+                        showsNextCommentButton: viewModel.showNextCommentButton
+                            && !viewModel.visibleComments.isEmpty,
+                        hasNextComment: visibleCommentTarget.hasNextComment,
+                        onNextComment: { scrollToNextComment(using: proxy) },
+                        onNextThread: { scrollToNextThread(using: proxy) },
+                        onSubmit: onSubmitComposerDraft
+                    )
                 }
                 .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(using: proxy)
                 }
                 .onChange(of: viewModel.visibleRevision) { _, _ in
                     scrollToPendingComment(using: proxy)
+                    scrollToReplyTarget(using: proxy)
+                }
+                .onChange(of: replyScrollTarget) { _, _ in
+                    scrollToReplyTarget(using: proxy)
                 }
                 .task(id: viewModel.visibleRevision) {
                     await CommentTextCache.prewarm(
@@ -163,6 +173,25 @@ struct CommentsContentView: View {
         scrollToComment(withID: targetID, using: proxy)
     }
 
+    /// Scrolls the reply target to the top of the viewport once visible, then
+    /// issues one corrective scroll after the keyboard settles.
+    private func scrollToReplyTarget(using proxy: ScrollViewProxy) {
+        guard let targetID = replyScrollTarget else { return }
+        guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+        }
+        replyScrollTarget = nil
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeInOut(duration: 0.3)) {
+                proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+            }
+        }
+    }
+
     private func scrollToNextComment(using proxy: ScrollViewProxy) {
         guard let targetID = viewModel.nextVisibleCommentID(after: visibleCommentTarget.topCommentID) else { return }
         scrollToComment(withID: targetID, using: proxy)
@@ -193,7 +222,8 @@ struct CommentsContentView: View {
             onUpvote: { upvoteComment(withID: state.id, in: post) },
             onUnvote: { unvoteComment(withID: state.id, in: post) },
             onCopy: { copyComment(withID: state.id) },
-            onShare: { shareComment(withID: state.id) }
+            onShare: { shareComment(withID: state.id) },
+            onReply: { onReply(state.id, state.author) }
         )
         .if(viewModel.swipeCollapseThreads) { row in
             row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -257,6 +287,8 @@ struct CommentsContentView: View {
             isAuthenticated: sessionService.authenticationState == .authenticated,
             canVote: comment.voteLinks?.upvote != nil,
             canUnvote: comment.voteLinks?.unvote != nil,
+            canReply: canComment && comment.id > 0,
+            isCommentSubmissionInProgress: composer.isPosting,
             styledText: isCollapsed && !comment.isFlagged
                 ? nil
                 : CommentTextCache.styledText(for: comment, textScaling: textScaling)
@@ -375,6 +407,49 @@ private struct CommentSwipeActionsContainerModifier: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+/// Bottom floating controls: the shared composer plus the next-comment
+/// button. The composer fills the remaining width; the next-comment button
+/// is omitted while a composer is present and no next comment exists.
+private struct CommentsFloatingControls: View {
+    let canComment: Bool
+    @Bindable var composer: CommentComposerModel
+    let showsNextCommentButton: Bool
+    let hasNextComment: Bool
+    let onNextComment: () -> Void
+    let onNextThread: () -> Void
+    let onSubmit: () -> Void
+
+    var body: some View {
+        if showsControls {
+            HStack(alignment: .bottom, spacing: 12) {
+                if canComment {
+                    CommentComposerView(model: composer, onSubmit: onSubmit)
+                }
+                if showsNextButton {
+                    NextCommentFloatingButton(
+                        isEnabled: hasNextComment,
+                        onNextComment: onNextComment,
+                        onNextThread: onNextThread
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
+            .padding(.trailing, 28)
+            .padding(.bottom, 28)
+        }
+    }
+
+    private var showsControls: Bool {
+        canComment || showsNextCommentButton
+    }
+
+    private var showsNextButton: Bool {
+        // With the composer present, a disabled next-comment button is
+        // omitted so the composer fills the width (plan section 2.3).
+        showsNextCommentButton && (hasNextComment || !canComment)
     }
 }
 

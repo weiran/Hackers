@@ -370,6 +370,14 @@ public final class CommentsViewModel: @unchecked Sendable {
         )
     }
 
+    /// Re-resolves an unconfirmed submission attempt without re-submitting.
+    @MainActor
+    public func reconcileSubmittedComment(
+        attempt: CommentSubmissionAttempt
+    ) async throws -> SubmittedComment? {
+        try await commentUseCase.reconcileComment(attempt)
+    }
+
     /// Inserts a server-confirmed comment into the loaded tree and refreshes
     /// indexes, the visible projection, and the post's comment count. Returns
     /// the inserted comment, an existing comment when the id was already

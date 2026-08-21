@@ -56,6 +56,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.appRuntimePolicy) private var appRuntimePolicy
+    @Environment(SessionService.self) private var sessionService
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
     private let showsToolbar: Bool
@@ -65,6 +67,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     private let isPostHeaderMatchedGeometrySource: Bool
     private let titleVisible: Binding<Bool>?
     private let toolbarGeometry: CommentsToolbarGeometry?
+    private let isInteractionEnabled: Bool
     private let onPostLinkTap: (() -> Void)?
     private let onTitleDragChanged: ((DragGesture.Value) -> Void)?
     private let onTitleDragEnded: ((DragGesture.Value) -> Void)?
@@ -74,6 +77,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var votingViewModel: VotingViewModel
     @State private var titleVisibility: CommentsHeaderTitleVisibility
     @State private var pendingCommentID: Int?
+    @State private var replyScrollTarget: Int?
+    @State private var composer = CommentComposerModel()
 
     public init(
         postID: Int,
@@ -89,6 +94,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         toolbarGeometry: CommentsToolbarGeometry? = nil,
         titleVisible: Binding<Bool>? = nil,
+        isInteractionEnabled: Bool = true,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
@@ -106,6 +112,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.isPostHeaderMatchedGeometrySource = isPostHeaderMatchedGeometrySource
         self.titleVisible = titleVisible
         self.toolbarGeometry = toolbarGeometry
+        self.isInteractionEnabled = isInteractionEnabled
         self.onPostLinkTap = onPostLinkTap
         self.onTitleDragChanged = onTitleDragChanged
         self.onTitleDragEnded = onTitleDragEnded
@@ -140,6 +147,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         headerTitleVisibility: CommentsHeaderTitleVisibility? = nil,
         toolbarGeometry: CommentsToolbarGeometry? = nil,
         titleVisible: Binding<Bool>? = nil,
+        isInteractionEnabled: Bool = true,
         onPostLinkTap: (() -> Void)? = nil,
         onTitleDragChanged: ((DragGesture.Value) -> Void)? = nil,
         onTitleDragEnded: ((DragGesture.Value) -> Void)? = nil,
@@ -162,6 +170,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             headerTitleVisibility: headerTitleVisibility,
             toolbarGeometry: toolbarGeometry,
             titleVisible: titleVisible,
+            isInteractionEnabled: isInteractionEnabled,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,
@@ -170,6 +179,11 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             viewModel: viewModel,
             votingViewModel: votingViewModel
         )
+    }
+
+    private var canComment: Bool {
+        appRuntimePolicy.allowsCommenting
+            && sessionService.authenticationState == .authenticated
     }
 
     public var body: some View {
@@ -189,6 +203,13 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
                     viewModel: viewModel,
                     votingViewModel: votingViewModel,
                     pendingCommentID: $pendingCommentID,
+                    canComment: canComment,
+                    composer: composer,
+                    replyScrollTarget: $replyScrollTarget,
+                    onReply: handleReplyActivation(commentID:author:),
+                    onSubmitComposerDraft: {
+                        Task { await submitComposerDraft() }
+                    }
                 )
             } else if viewModel.isPostLoading {
                 AppLoadingStateView(message: "Loading...")
@@ -283,6 +304,173 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         }
         .task { @MainActor in
             votingViewModel.navigationStore = navigationStore
+        }
+        .alert(
+            composerAlertTitle,
+            isPresented: Binding(
+                get: { composer.alert != nil },
+                set: { if !$0 { composer.alert = nil } }
+            ),
+            presenting: composer.alert
+        ) { alert in
+            composerAlertActions(for: alert)
+        } message: { alert in
+            Text(composerAlertMessage(for: alert))
+        }
+        .onChange(of: canComment) { _, available in
+            guard !available else { return }
+            composer.collapsePreservingDraft()
+        }
+        .onChange(of: isInteractionEnabled) { _, enabled in
+            guard !enabled else { return }
+            composer.collapsePreservingDraft()
+        }
+    }
+
+    // MARK: - Comment submission
+
+    private func submitComposerDraft() async {
+        // Central gate: never issue comment-form network traffic while the
+        // feature or session is unavailable.
+        guard canComment,
+              let author = sessionService.username,
+              !composer.isPosting, composer.canPost else { return }
+
+        let parentID: Int
+        switch composer.target {
+        case .story:
+            parentID = viewModel.postID
+        case let .reply(commentID, _):
+            parentID = commentID
+        }
+
+        composer.beginPosting()
+        do {
+            let outcome = try await viewModel.submitComment(
+                parentID: parentID,
+                text: composer.text,
+                author: author
+            )
+            switch outcome {
+            case let .confirmed(submitted):
+                viewModel.insertSubmittedComment(submitted)
+                composer.postingSucceeded()
+            case let .unconfirmed(attempt):
+                composer.postingBecameUnconfirmed(attempt: attempt)
+            }
+        } catch let error as CommentSubmissionError {
+            switch error {
+            case .unauthenticated:
+                await handleSessionExpiry()
+            case .commentingUnavailable:
+                composer.postingFailed(message: "Hacker News is not accepting replies to this item.")
+            case let .rejected(message):
+                composer.postingFailed(
+                    message: message ?? "Couldn’t post this comment. Your draft has been kept."
+                )
+            case .empty, .invalidTarget, .malformedResponse:
+                composer.postingFailed(
+                    message: "Couldn’t post this comment. Your draft has been kept."
+                )
+            }
+        } catch {
+            composer.postingFailed(
+                message: "Couldn’t post this comment. Your draft has been kept."
+            )
+        }
+    }
+
+    private func reconcileUnconfirmedComment() async {
+        guard case let .outcomeUnknown(attempt) = composer.submissionState else { return }
+        do {
+            if let submitted = try await viewModel.reconcileSubmittedComment(attempt: attempt) {
+                viewModel.insertSubmittedComment(submitted)
+                composer.outcomeUnknownResolved()
+            } else {
+                composer.outcomeUnknownStillUnresolved()
+            }
+        } catch {
+            composer.outcomeUnknownStillUnresolved()
+        }
+    }
+
+    private func handleSessionExpiry() async {
+        // Draft and target stay in the composer; the gate hides all commenting
+        // UI while logged out. If the same comments view survives a re-login,
+        // the preserved collapsed draft reappears.
+        composer.sessionDidExpire()
+        let container = DependencyContainer.shared
+        try? await container.getAuthenticationUseCase().logout()
+        NotificationCenter.default.post(name: .userDidLogout, object: nil)
+        navigationStore.showLogin()
+    }
+
+    // MARK: - Reply activation
+
+    private func handleReplyActivation(commentID: Int, author: String) {
+        guard canComment, !composer.isPosting else { return }
+        let wasDirtySwitch = composer.hasDraft
+            && composer.target != .reply(commentID: commentID, author: author)
+        composer.activateReply(commentID: commentID, author: author)
+        guard !wasDirtySwitch else { return }
+        presentReplyTarget(commentID: commentID)
+    }
+
+    private func confirmDiscardAndReply() {
+        guard case let .discardDraft(newTarget) = composer.alert else { return }
+        composer.confirmTargetReplacement()
+        if case let .reply(commentID, _) = newTarget {
+            presentReplyTarget(commentID: commentID)
+        }
+    }
+
+    private func presentReplyTarget(commentID: Int) {
+        _ = viewModel.revealComment(withId: commentID)
+        replyScrollTarget = commentID
+        composer.expand()
+    }
+
+    // MARK: - Composer alerts
+
+    private var composerAlertTitle: String {
+        switch composer.alert {
+        case .discardDraft: "Discard current draft?"
+        case .outcomeUnknown: "Couldn’t confirm this comment"
+        case nil: ""
+        }
+    }
+
+    @ViewBuilder
+    private func composerAlertActions(for alert: CommentComposerAlert) -> some View {
+        switch alert {
+        case let .discardDraft(newTarget):
+            Button("Keep Editing") { composer.keepCurrentDraft() }
+            switch newTarget {
+            case .reply:
+                Button("Discard & Reply", role: .destructive) { confirmDiscardAndReply() }
+            case .story:
+                Button("Discard & Comment", role: .destructive) { confirmDiscardAndReply() }
+            }
+        case .outcomeUnknown:
+            Button("Check Again") {
+                Task { await reconcileUnconfirmedComment() }
+            }
+            Button("Keep Draft") { composer.alert = nil }
+        }
+    }
+
+    private func composerAlertMessage(for alert: CommentComposerAlert) -> String {
+        switch alert {
+        case let .discardDraft(newTarget):
+            switch newTarget {
+            case let .reply(_, author):
+                "Starting a reply to \(author) will discard what you have written."
+            case .story:
+                "Starting a new comment will discard what you have written."
+            }
+        case .outcomeUnknown:
+            "Hackers could not confirm whether Hacker News accepted this comment. "
+                + "Check the thread before posting it again."
         }
     }
 

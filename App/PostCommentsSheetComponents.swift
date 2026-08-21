@@ -583,6 +583,7 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
             toolbarGeometry: toolbarGeometry,
+            isInteractionEnabled: !scrollDisabled,
             onPostLinkTap: onPostLinkTap,
             onTitleDragChanged: onTitleDragChanged,
             onTitleDragEnded: onTitleDragEnded,

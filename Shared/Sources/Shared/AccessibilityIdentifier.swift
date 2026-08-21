@@ -36,6 +36,17 @@ public enum AccessibilityIdentifier {
         public static let list = "comments.list"
         public static let nextCommentButton = "comments.nextCommentButton"
 
+        public static let composerCollapsed = "comments.composer.collapsed"
+        public static let composerExpanded = "comments.composer.expanded"
+        public static let composerEditor = "comments.composer.editor"
+        public static let composerCancel = "comments.composer.cancel"
+        public static let composerPost = "comments.composer.post"
+        public static let composerSpinner = "comments.composer.spinner"
+        public static let composerReplyLabel = "comments.composer.replyLabel"
+        public static let composerError = "comments.composer.error"
+        public static let discardDraftAlert = "comments.composer.discardDraftAlert"
+        public static let outcomeUnknownAlert = "comments.composer.outcomeUnknownAlert"
+
         public static func comment(_ id: Int) -> String {
             "comments.comment.\(id)"
         }
@@ -46,6 +57,10 @@ public enum AccessibilityIdentifier {
 
         public static func vote(_ id: Int) -> String {
             "comments.vote.\(id)"
+        }
+
+        public static func reply(_ id: Int) -> String {
+            "comments.reply.\(id)"
         }
     }
 
