@@ -22,12 +22,12 @@ enum UITestArticleFixtures {
         case "https://hacktivis.me/articles/cloudflare-turnstile-webgl-fingerprinting":
             return UITestArticleContent(
                 title: "Cloudflare Turnstile requiring fingerprintable WebGL",
-                body: "Fixture article loaded from the UI-test Hacker News Active snapshot."
+                body: "A focused read with the story, context, and conversation kept in one place."
             )
         case "https://www.swift.org/blog/swift-6.2-released/":
             return UITestArticleContent(
                 title: "Swift 6.2 Released",
-                body: "Fixture article loaded from the UI-test Hacker News Active snapshot.",
+                body: "A focused read with the story, context, and conversation kept in one place.",
                 htmlResourceName: UITestingBootstrap.configuration?.mediaPlayback == .autoplayFixture
                     ? "MediaAutoplayFixture"
                     : nil

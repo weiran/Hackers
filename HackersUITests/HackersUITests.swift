@@ -43,7 +43,7 @@ final class FeedAndSettingsUITests: HackersUITestCase {
 
         collapseCommentsByTappingTitle()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browser
         )
     }

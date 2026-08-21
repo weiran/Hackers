@@ -32,7 +32,7 @@ final class BrowserCommentsUITests: HackersUITestCase {
 
         collapseCommentsByTappingTitle()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browser
         )
         assertHasVisibleIntersection(app.staticTexts["366 comments"].firstMatch, in: collapsedCommentsHeader)
@@ -82,7 +82,7 @@ final class BrowserCommentsUITests: HackersUITestCase {
         reloadButton.tap()
         assertFixtureArticleLoaded()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browserView
         )
         let sheetHandle = assertHasVisibleIntersection(commentsSheetHandle, in: app)
@@ -123,7 +123,7 @@ final class BrowserCommentsUITests: HackersUITestCase {
         postTapScreenshot.lifetime = .deleteOnSuccess
         add(postTapScreenshot)
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: app
         )
         assertHasVisibleIntersection(collapsedCommentsHeader, in: app)

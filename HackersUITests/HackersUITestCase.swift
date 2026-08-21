@@ -67,7 +67,7 @@ class HackersUITestCase: XCTestCase {
         let article = app.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
         XCTAssertTrue(article.waitForExistence(timeout: timeout), "Expected the fixture article web view to load")
         XCTAssertTrue(
-            article.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."]
+            article.staticTexts["A focused read with the story, context, and conversation kept in one place."]
                 .waitForExistence(timeout: timeout),
             "Expected fixture article content in the accessibility hierarchy"
         )
