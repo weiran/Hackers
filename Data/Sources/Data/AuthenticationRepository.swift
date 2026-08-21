@@ -13,9 +13,6 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     private let networkManager: NetworkManagerProtocol
     private let userDefaults: UserDefaultsProtocol
     private let urlBase = "https://news.ycombinator.com"
-    private static let formAllowedCharacters = CharacterSet(
-        charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._*"
-    )
 
     public init(
         networkManager: NetworkManagerProtocol,
@@ -26,15 +23,15 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     }
 
     public func authenticate(username: String, password: String) async throws {
-        guard let loginURL = URL(string: "\(urlBase)/login") else {
+        guard let hnURL = URL(string: urlBase), let loginURL = URL(string: "\(urlBase)/login") else {
             throw HackersKitError.requestFailure
         }
 
-        // Encode each value for application/x-www-form-urlencoded. URL query encoding leaves
-        // form delimiters such as &, =, and + unescaped, which corrupts complex passwords.
-        let encodedUsername = try Self.formEncoded(username)
-        let encodedPassword = try Self.formEncoded(password)
-        let formData = "acct=\(encodedUsername)&pw=\(encodedPassword)&goto=news"
+        let formData = FormEncoder.encode([
+            FormField(name: "acct", value: username),
+            FormField(name: "pw", value: password),
+            FormField(name: "goto", value: "news"),
+        ])
 
         // Submit the login form
         let response = try await networkManager.post(url: loginURL, body: formData)
@@ -50,6 +47,12 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
             throw HackersKitError.authenticationError(error: .badCredentials)
         }
 
+        // HN signals a real session solely through a cookie named "user"; a page that
+        // merely looks successful is not enough to treat the account as signed in.
+        guard networkManager.containsCookie(named: "user", for: hnURL) else {
+            throw HackersKitError.authenticationError(error: .sessionNotEstablished)
+        }
+
         // Store username locally for reference
         userDefaults.set(username, forKey: "hn_username")
     }
@@ -63,30 +66,24 @@ public final class AuthenticationRepository: AuthenticationUseCase, Sendable {
     }
 
     public func isAuthenticated() async -> Bool {
-        // Check if we have authentication cookies for HN
+        // A valid session needs both the stored username and the HN session cookie,
+        // which Hacker News sets under the exact name "user".
         guard let hnURL = URL(string: urlBase) else { return false }
 
-        let hasCookies = networkManager.containsCookie(for: hnURL)
+        let hasSessionCookie = networkManager.containsCookie(named: "user", for: hnURL)
         let hasStoredUsername = userDefaults.string(forKey: "hn_username") != nil
 
-        return hasCookies && hasStoredUsername
+        return hasSessionCookie && hasStoredUsername
     }
 
     public func getCurrentUser() async -> User? {
-        guard let username = userDefaults.string(forKey: "hn_username") else {
+        guard await isAuthenticated(),
+              let username = userDefaults.string(forKey: "hn_username") else {
             return nil
         }
 
         // For now, return a basic user object
         // In the future, we could fetch more user details from HN
         return User(username: username, karma: 0, joined: Date())
-    }
-
-    private static func formEncoded(_ value: String) throws -> String {
-        guard let encodedValue = value.addingPercentEncoding(withAllowedCharacters: formAllowedCharacters) else {
-            throw HackersKitError.requestFailure
-        }
-
-        return encodedValue.replacingOccurrences(of: "%20", with: "+")
     }
 }

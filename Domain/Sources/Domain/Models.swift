@@ -237,6 +237,7 @@ public enum HackersKitError: Error, Sendable {
 
 public enum HackersKitAuthenticationError: Error, Sendable {
     case badCredentials
+    case sessionNotEstablished
     case serverUnreachable
     case noInternet
     case unknown
