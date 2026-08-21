@@ -16,6 +16,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         case showThumbnails = "HACKERS_UI_SHOW_THUMBNAILS"
         case authenticated = "HACKERS_UI_AUTHENTICATED"
         case commentingEnabled = "HACKERS_UI_COMMENTING_ENABLED"
+        case commentSubmission = "HACKERS_UI_COMMENT_SUBMISSION"
     }
 
     public enum Route: Equatable, Sendable {
@@ -38,6 +39,13 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     public enum MediaPlayback: String, Equatable, Sendable {
         case standard
         case autoplayFixture
+    }
+
+    public enum CommentSubmissionFixture: String, Equatable, Sendable {
+        case success
+        case delayedSuccess
+        case failure
+        case outcomeUnknown
     }
 
     public enum ParseError: Error, Equatable, CustomStringConvertible {
@@ -76,6 +84,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     public let showThumbnails: Bool
     public let authenticated: Bool
     public let commentingEnabled: Bool
+    public let commentSubmission: CommentSubmissionFixture
 
     public init(
         browserMode: LinkBrowserMode = .customBrowser,
@@ -87,7 +96,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         dimReadPosts: Bool = true,
         showThumbnails: Bool = false,
         authenticated: Bool = false,
-        commentingEnabled: Bool = false
+        commentingEnabled: Bool = false,
+        commentSubmission: CommentSubmissionFixture = .success
     ) {
         self.browserMode = browserMode
         self.route = route
@@ -99,6 +109,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         self.showThumbnails = showThumbnails
         self.authenticated = authenticated
         self.commentingEnabled = commentingEnabled
+        self.commentSubmission = commentSubmission
     }
 
     public var environment: [String: String] {
@@ -111,7 +122,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             EnvironmentKey.dimReadPosts.rawValue: dimReadPosts ? "1" : "0",
             EnvironmentKey.showThumbnails.rawValue: showThumbnails ? "1" : "0",
             EnvironmentKey.authenticated.rawValue: authenticated ? "1" : "0",
-            EnvironmentKey.commentingEnabled.rawValue: commentingEnabled ? "1" : "0"
+            EnvironmentKey.commentingEnabled.rawValue: commentingEnabled ? "1" : "0",
+            EnvironmentKey.commentSubmission.rawValue: commentSubmission.rawValue
         ]
 
         if !readPostIDs.isEmpty {
@@ -159,6 +171,11 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             key: .mediaPlayback,
             default: MediaPlayback.standard
         )
+        let commentSubmission = try enumValue(
+            environment[EnvironmentKey.commentSubmission.rawValue],
+            key: .commentSubmission,
+            default: CommentSubmissionFixture.success
+        )
 
         let readPostIDsKey = EnvironmentKey.readPostIDs.rawValue
         let dimReadPostsKey = EnvironmentKey.dimReadPosts.rawValue
@@ -181,7 +198,8 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             dimReadPosts: dimReadPosts,
             showThumbnails: showThumbnails,
             authenticated: authenticated,
-            commentingEnabled: commentingEnabled
+            commentingEnabled: commentingEnabled,
+            commentSubmission: commentSubmission
         )
     }
 

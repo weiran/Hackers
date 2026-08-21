@@ -106,6 +106,7 @@ struct CommentComposerView: View {
         .padding(12)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
         .padding(.horizontal, 16)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerExpanded)
         .onChange(of: model.presentation) { _, presentation in
             if presentation == .expanded {

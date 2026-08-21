@@ -18,7 +18,10 @@ enum UITestingBootstrap {
 
     static let fixtures: UITestFixtures? = {
         guard let configuration else { return nil }
-        let fixtures = UITestFixtures(profile: configuration.fixtureProfile)
+        let fixtures = UITestFixtures(
+            profile: configuration.fixtureProfile,
+            commentSubmission: configuration.commentSubmission
+        )
         do {
             try fixtures.validate(configuration: configuration)
         } catch {

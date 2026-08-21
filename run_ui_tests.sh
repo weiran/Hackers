@@ -47,12 +47,18 @@ FULL_TESTS=(
   NavigationAndCommentsUITests/testNextCommentButtonStartsAtFirstCommentThenAdvances
   NavigationAndCommentsUITests/testCollapsingCommentKeepsRootContextAvailable
   NavigationAndCommentsUITests/testSwipingCommentRowCollapsesThread
+  CommentingUITests/testCommentingHiddenWhenFeatureDisabledAndAuthenticated
+  CommentingUITests/testCommentingHiddenWhenEnabledAndLoggedOut
+  CommentingUITests/testComposerAndReplyVisibleWhenEnabledAndAuthenticated
+  CommentingUITests/testPostingFlowWithSuccessFixture
+  CommentingUITests/testPostingFailureKeepsDraft
 )
 
 FUNCTIONAL_TEST_SOURCES=(
   HackersUITests/HackersUITests.swift
   HackersUITests/BrowserCommentsUITests.swift
   HackersUITests/NavigationAndCommentsUITests.swift
+  HackersUITests/CommentingUITests.swift
 )
 
 case "$MODE" in

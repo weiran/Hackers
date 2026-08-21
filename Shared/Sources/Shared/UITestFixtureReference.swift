@@ -10,6 +10,10 @@ public enum UITestFixtureReference {
     public static let collapsibleRootCommentID = 48_348_985
     public static let collapsibleChildCommentID = 48_349_298
     public static let firstScreenshotCommentID = 48_354_262
+
+    /// Deterministic server-assigned id for comments submitted through the
+    /// UI-test fixture use case.
+    public static let submittedCommentID = 49_390_001
     public static let laterScreenshotCommentID = 48_354_415
     public static let firstLargeCommentID = 49_000_000
     public static let largeCollapsibleRootCommentID = 49_000_003

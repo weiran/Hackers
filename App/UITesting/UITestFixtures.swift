@@ -9,6 +9,8 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     static let largeCommentsPostID = UITestFixtureReference.largeCommentsPostID
     static let searchOnlyPostID = UITestFixtureReference.searchOnlyPostID
 
+    private static let submittedCommentHTML = "<p>Fixture server-confirmed comment body.</p>"
+
     enum ValidationError: Error, CustomStringConvertible {
         case itemURLCannotOpenAsStory(Int)
         case missingArticleFixture(Int)
@@ -44,7 +46,13 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         searchPosts + [askPost, showPost, jobPost]
     }
 
-    init(profile: UITestLaunchConfiguration.FixtureProfile) {
+    private let commentSubmission: UITestLaunchConfiguration.CommentSubmissionFixture
+
+    init(
+        profile: UITestLaunchConfiguration.FixtureProfile,
+        commentSubmission: UITestLaunchConfiguration.CommentSubmissionFixture = .success
+    ) {
+        self.commentSubmission = commentSubmission
         commentsByPostID = Self.makeCommentsByPostID()
         let functionalPosts = Self.makeActivePosts()
         switch profile {
@@ -207,17 +215,38 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
 
     func submitComment(
         _ request: CommentSubmissionRequest,
-        baselineChildIDs _: Set<Int>
+        baselineChildIDs: Set<Int>
     ) async throws -> CommentSubmissionOutcome {
-        .unconfirmed(CommentSubmissionAttempt(
-            request: request,
-            baselineChildIDs: [],
-            startedAt: Date()
-        ))
+        switch commentSubmission {
+        case .success, .delayedSuccess:
+            if commentSubmission == .delayedSuccess {
+                try await Task.sleep(for: .seconds(1.5))
+            }
+            return .confirmed(submittedComment(for: request))
+        case .failure:
+            throw CommentSubmissionError.rejected(message: "Fixture comment rejection.")
+        case .outcomeUnknown:
+            return .unconfirmed(CommentSubmissionAttempt(
+                request: request,
+                baselineChildIDs: baselineChildIDs,
+                startedAt: Date()
+            ))
+        }
     }
 
-    func reconcileComment(_: CommentSubmissionAttempt) async throws -> SubmittedComment? {
-        nil
+    func reconcileComment(_ attempt: CommentSubmissionAttempt) async throws -> SubmittedComment? {
+        guard commentSubmission == .outcomeUnknown else { return nil }
+        return submittedComment(for: attempt.request)
+    }
+
+    private func submittedComment(for request: CommentSubmissionRequest) -> SubmittedComment {
+        SubmittedComment(
+            id: UITestFixtureReference.submittedCommentID,
+            parentID: request.parentID,
+            author: request.expectedAuthor,
+            htmlText: Self.submittedCommentHTML,
+            createdAt: Date()
+        )
     }
 
     private func comments(for postID: Int) -> [Comment] {

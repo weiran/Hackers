@@ -106,6 +106,7 @@ The typed launch contract is:
 * `HACKERS_UI_MEDIA_PLAYBACK`: `standard` or `autoplayFixture`; the latter enables the deterministic local media fixture used by browser autoplay regression tests.
 * `HACKERS_UI_AUTHENTICATED`: set to `1` or `0` to launch with the deterministic authenticated session fixture.
 * `HACKERS_UI_COMMENTING_ENABLED`: set to `1` or `0`; defaults to `0` and gates the commenting feature surface in UI tests.
+* `HACKERS_UI_COMMENT_SUBMISSION`: `success`, `delayedSuccess`, `failure`, or `outcomeUnknown`; defaults to `success` and only has effect when commenting is enabled.
 
 Only keys defined by the shared launch contract are accepted once UI testing is enabled. Functional tests use the `functional` profile, screenshot staging uses `marketing`, and oversized/scroll coverage opts into `stress`. Direct routes must refer to a post in the selected profile. A story route cannot use the in-app browser, and fixture article mode fails closed if the selected post has no local article. Commenting is disabled in every runtime policy by default; DEBUG builds can enable it locally with the `enableCommenting` launch argument (non-persisting, absent from release builds, ignored when typed UI testing is active).
 
