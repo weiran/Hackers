@@ -346,6 +346,138 @@ public final class CommentsViewModel: @unchecked Sendable {
         guard nextIndex < visibleComments.endIndex else { return nil }
         return visibleComments[nextIndex...].first(where: { $0.level == 0 })?.id
     }
+
+    // MARK: - Comment submission
+
+    /// Submits a comment for this story. The baseline is the caller's currently
+    /// loaded children of the target parent; the repository uses it to resolve
+    /// the server-created comment. Does not mutate the local tree.
+    @MainActor
+    public func submitComment(
+        parentID: Int,
+        text: String,
+        author: String
+    ) async throws -> CommentSubmissionOutcome {
+        let request = CommentSubmissionRequest(
+            storyID: postID,
+            parentID: parentID,
+            expectedAuthor: author,
+            text: text
+        )
+        return try await commentUseCase.submitComment(
+            request,
+            baselineChildIDs: currentChildIDs(of: parentID)
+        )
+    }
+
+    /// Inserts a server-confirmed comment into the loaded tree and refreshes
+    /// indexes, the visible projection, and the post's comment count. Returns
+    /// the inserted comment, an existing comment when the id was already
+    /// present (idempotent), or nil when a reply's parent cannot be placed.
+    @MainActor
+    @discardableResult
+    public func insertSubmittedComment(_ submitted: SubmittedComment) -> Comment? {
+        if let existingIndex = indexByID[submitted.id] {
+            return allComments[existingIndex]
+        }
+
+        var updated = allComments
+
+        if submitted.parentID != postID {
+            guard let parentIndex = indexByID[submitted.parentID],
+                  allComments.indices.contains(parentIndex) else {
+                return nil
+            }
+            let parent = updated[parentIndex]
+
+            // Insert as the final child of the parent's complete subtree.
+            updated.insert(
+                Domain.Comment(
+                    id: submitted.id,
+                    age: "just now",
+                    text: submitted.htmlText,
+                    by: submitted.author,
+                    isFlagged: false,
+                    level: parent.level + 1,
+                    upvoted: false,
+                    voteLinks: nil,
+                    visibility: .visible
+                ),
+                at: firstIndexAfterSubtree(ofParentAt: parentIndex)
+            )
+
+            // Reveal the parent so the reply is visible; unrelated collapse
+            // state is preserved.
+            collapsedCommentIDs.remove(parent.id)
+            if parent.visibility == .compact {
+                updated[parentIndex] = parent.withVisibility(.visible)
+            }
+        } else {
+            // Top-level: appended after the last real comment. The synthetic
+            // story-text row is always first, so appending preserves it there.
+            updated.append(
+                Domain.Comment(
+                    id: submitted.id,
+                    age: "just now",
+                    text: submitted.htmlText,
+                    by: submitted.author,
+                    isFlagged: false,
+                    level: 0,
+                    upvoted: false,
+                    voteLinks: nil,
+                    visibility: .visible
+                )
+            )
+        }
+
+        allComments = updated
+        rebuildCommentIndexes()
+        rebuildVisibleComments(forceRevisionBump: true)
+        synchronizePost(afterInserting: true)
+
+        guard let newIndex = indexByID[submitted.id] else { return nil }
+        return allComments[newIndex]
+    }
+
+    /// Index just past the complete subtree rooted at `parentIndex`, i.e. the
+    /// first later comment whose level is less than or equal to the parent's,
+    /// or the end of the array.
+    private func firstIndexAfterSubtree(ofParentAt parentIndex: Int) -> Int {
+        let parentLevel = allComments[parentIndex].level
+        var index = parentIndex + 1
+        while index < allComments.endIndex, allComments[index].level > parentLevel {
+            index += 1
+        }
+        return index
+    }
+
+    /// Children of the given parent currently loaded in the tree. For the
+    /// story itself, the top-level comment ids.
+    private func currentChildIDs(of parentID: Int) -> Set<Int> {
+        guard let parentIndex = indexByID[parentID] else {
+            return Set(allComments.filter { $0.level == 0 }.map(\.id))
+        }
+        let parentLevel = allComments[parentIndex].level
+        var ids = Set<Int>()
+        for index in (parentIndex + 1) ..< allComments.endIndex {
+            guard allComments[index].level > parentLevel else { break }
+            ids.insert(allComments[index].id)
+        }
+        return ids
+    }
+
+    private func synchronizePost(afterInserting inserted: Bool) {
+        guard var updatedPost = post else { return }
+        updatedPost.comments = allComments.isEmpty ? nil : allComments
+        if inserted {
+            let realCommentCount = allComments.count(where: { $0.id >= 0 })
+            updatedPost.commentsCount = max(
+                updatedPost.commentsCount + 1,
+                realCommentCount
+            )
+        }
+        post = updatedPost
+    }
 }
 
 private extension CommentsViewModel {

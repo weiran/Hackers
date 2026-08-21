@@ -791,6 +791,179 @@ struct CommentsViewModelTests {
         }
     }
 
+    // MARK: - Comment Submission Tests
+
+    @MainActor
+    private func loadComments(into viewModel: CommentsViewModel, comments: [Domain.Comment]) async {
+        mockPostUseCase.mockPost = createPostWithComments(comments: comments)
+        await viewModel.loadComments()
+    }
+
+    @Test("Top-level insertion appends after existing comments")
+    @MainActor
+    func insertTopLevelComment() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let revisionBefore = sut.visibleRevision
+        let countBefore = sut.post?.commentsCount
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 100,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "<p>server html</p>",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.level == 0)
+        #expect(inserted?.age == "just now")
+        #expect(inserted?.text == "<p>server html</p>", "Server HTML, not the draft, becomes the text")
+        #expect(inserted?.voteLinks == nil)
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 4, 5, 100])
+        #expect(sut.visibleComments.map(\.id).last == 100)
+        #expect(sut.visibleRevision > revisionBefore)
+        #expect(sut.post?.commentsCount == countBefore.map { $0 + 1 })
+        #expect(sut.post?.comments?.map(\.id) == sut.comments.map(\.id), "post.comments stays synchronised")
+    }
+
+    @Test("Top-level insertion with only synthetic story text keeps it first")
+    @MainActor
+    func insertTopLevelWithSyntheticOnly() async {
+        var mockPost = testPost
+        mockPost.comments = [createTestComment(id: -1, level: 0)]
+        mockPost.commentsCount = 0
+        mockPostUseCase.mockPost = mockPost
+        await sut.loadComments()
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 100,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "hello",
+            createdAt: Date()
+        ))
+
+        #expect(inserted != nil)
+        #expect(sut.comments.map(\.id) == [-1, 100])
+        #expect(sut.post?.commentsCount == 1, "The synthetic story-text row is excluded from the count")
+    }
+
+    @Test("Reply insertion lands after the parent's complete subtree")
+    @MainActor
+    func insertReplyAfterSubtree() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 2,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.level == 2, "Reply level is parent level + 1")
+        #expect(sut.comments.map(\.id) == [1, 2, 200, 3, 4, 5])
+    }
+
+    @Test("Reply to a trailing parent appends at the array end")
+    @MainActor
+    func insertReplyAtEnd() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 5,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.level == 1)
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 4, 5, 200])
+    }
+
+    @Test("Reply insertion expands the parent and preserves other collapse state")
+    @MainActor
+    func insertReplyRevealsParent() async {
+        await loadComments(into: sut, comments: createTestComments())
+        // Collapse 3 (hiding its child 4) and 5.
+        _ = sut.toggleCommentVisibility(withID: 3)
+        _ = sut.toggleCommentVisibility(withID: 5)
+        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 5])
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 3,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted != nil)
+        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 4, 200, 5], "The revealed parent's subtree includes the new reply")
+        #expect(sut.isCommentCollapsed(withID: 5), "Unrelated collapsed branches remain collapsed")
+    }
+
+    @Test("Inserting a duplicate server id is idempotent")
+    @MainActor
+    func insertDuplicateIsIdempotent() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let first = sut.insertSubmittedComment(SubmittedComment(
+            id: 100, parentID: testPost.id, author: "alice", htmlText: "one", createdAt: Date()
+        ))
+        let countAfterFirst = sut.post?.commentsCount
+        let idsAfterFirst = sut.comments.map(\.id)
+
+        let second = sut.insertSubmittedComment(SubmittedComment(
+            id: 100, parentID: testPost.id, author: "alice", htmlText: "one", createdAt: Date()
+        ))
+
+        #expect(first?.id == 100)
+        #expect(second?.id == 100)
+        #expect(sut.comments.map(\.id) == idsAfterFirst)
+        #expect(sut.post?.commentsCount == countAfterFirst, "Count increments exactly once")
+    }
+
+    @Test("Missing parent does not invent a placement")
+    @MainActor
+    func insertWithMissingParentFails() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let countBefore = sut.post?.commentsCount
+        let idsBefore = sut.comments.map(\.id)
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200, parentID: 999, author: "alice", htmlText: "reply", createdAt: Date()
+        ))
+
+        #expect(inserted == nil)
+        #expect(sut.comments.map(\.id) == idsBefore)
+        #expect(sut.post?.commentsCount == countBefore)
+    }
+
+    @Test("Submitting passes request and baseline child ids to the use case")
+    func submitCommentDelegates() async throws {
+        let tree = [
+            createTestComment(id: 1, level: 0),
+            createTestComment(id: 2, level: 1),
+            createTestComment(id: 3, level: 2),
+            createTestComment(id: 4, level: 2),
+            createTestComment(id: 5, level: 0),
+        ]
+        await loadComments(into: sut, comments: tree)
+
+        let outcome = try await sut.submitComment(parentID: 2, text: "hello", author: "alice")
+
+        guard case .confirmed = outcome else {
+            Issue.record("Expected mock's default confirmed outcome")
+            return
+        }
+        let request = mockCommentUseCase.submitCalls.first
+        #expect(request?.storyID == testPost.id)
+        #expect(request?.parentID == 2)
+        #expect(request?.expectedAuthor == "alice")
+        #expect(request?.text == "hello")
+        #expect(mockCommentUseCase.submitBaselines.first == [3, 4])
+    }
+
     // MARK: - Helper Methods
 
     private func createTestComments() -> [Domain.Comment] {
