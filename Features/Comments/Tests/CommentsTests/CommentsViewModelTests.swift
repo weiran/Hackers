@@ -805,24 +805,48 @@ struct CommentsViewModelTests {
         await loadComments(into: sut, comments: createTestComments())
         let revisionBefore = sut.visibleRevision
         let countBefore = sut.post?.commentsCount
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=100&how=up")!,
+            unvote: URL(string: "vote?id=100&how=un")!
+        )
 
         let inserted = sut.insertSubmittedComment(SubmittedComment(
             id: 100,
             parentID: testPost.id,
             author: "alice",
             htmlText: "<p>server html</p>",
-            createdAt: Date()
+            createdAt: Date(),
+            upvoted: true,
+            voteLinks: voteLinks
         ))
 
         #expect(inserted?.level == 0)
         #expect(inserted?.age == "just now")
         #expect(inserted?.text == "<p>server html</p>", "Server HTML, not the draft, becomes the text")
-        #expect(inserted?.voteLinks == nil)
+        #expect(inserted?.upvoted == true)
+        #expect(inserted?.voteLinks == voteLinks)
         #expect(sut.comments.map(\.id) == [1, 2, 3, 4, 5, 100])
         #expect(sut.visibleComments.map(\.id).last == 100)
         #expect(sut.visibleRevision > revisionBefore)
         #expect(sut.post?.commentsCount == countBefore.map { $0 + 1 })
         #expect(sut.post?.comments?.map(\.id) == sut.comments.map(\.id), "post.comments stays synchronised")
+    }
+
+    @Test("Submitted comments without vote markup still show the default upvoted state")
+    @MainActor
+    func insertCommentWithoutVoteMetadataDefaultsUpvoted() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 101,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "comment without vote markup",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.upvoted == true)
+        #expect(inserted?.voteLinks == nil)
     }
 
     @Test("Top-level insertion with only synthetic story text keeps it first")

@@ -29,13 +29,29 @@ public struct SubmittedComment: Sendable, Equatable {
     public let author: String
     public let htmlText: String
     public let createdAt: Date
+    /// Vote state and links rendered by Hacker News for the newly-created item.
+    ///
+    /// These are optional because a confirmation response can identify the
+    /// comment before the server exposes its voting controls.
+    public let upvoted: Bool
+    public let voteLinks: VoteLinks?
 
-    public init(id: Int, parentID: Int, author: String, htmlText: String, createdAt: Date) {
+    public init(
+        id: Int,
+        parentID: Int,
+        author: String,
+        htmlText: String,
+        createdAt: Date,
+        upvoted: Bool = false,
+        voteLinks: VoteLinks? = nil
+    ) {
         self.id = id
         self.parentID = parentID
         self.author = author
         self.htmlText = htmlText
         self.createdAt = createdAt
+        self.upvoted = upvoted
+        self.voteLinks = voteLinks
     }
 }
 

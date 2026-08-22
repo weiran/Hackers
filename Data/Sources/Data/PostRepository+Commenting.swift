@@ -410,7 +410,9 @@ extension PostRepository {
             parentID: request.parentID,
             author: match.by,
             htmlText: match.text,
-            createdAt: startedAt
+            createdAt: startedAt,
+            upvoted: match.upvoted,
+            voteLinks: match.voteLinks
         )
     }
 

@@ -135,16 +135,29 @@ final class CommentingUITests: HackersUITestCase {
         editor.tap()
         editor.typeText("Draft that survives collapse.")
 
-        // Scrolling the thread dismisses the keyboard immediately; focus loss
-        // collapses the composer while preserving the draft. The swipe starts
-        // on the list above the keyboard.
+        // Scrolling the thread keeps the composer and keyboard open. The swipe
+        // starts on the list above the keyboard.
         let swipeStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
         let swipeEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12))
         swipeStart.press(forDuration: 0.05, thenDragTo: swipeEnd)
 
         XCTAssertTrue(
+            composerEditor.waitForExistence(timeout: 5),
+            "Scrolling should keep the editor expanded"
+        )
+
+        let commentRows = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "comments.comment.")
+        )
+        let visibleCommentRow = commentRows.allElementsBoundByIndex.first {
+            $0.isHittable && hasVisibleIntersection($0, in: commentsList)
+        }
+        XCTAssertNotNil(visibleCommentRow, "A visible comment should be tappable while editing")
+        visibleCommentRow?.tap()
+
+        XCTAssertTrue(
             composerCollapsed.waitForExistence(timeout: 5),
-            "Focus loss should collapse the composer with the draft preserved"
+            "A comment interaction should collapse the composer with the draft preserved"
         )
         XCTAssertTrue(
             composerCollapsed.label.contains("Draft that survives"),

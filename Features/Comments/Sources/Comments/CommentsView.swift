@@ -392,9 +392,15 @@ extension CommentsView {
     private func submitComposerDraft() async {
         // Central gate: never issue comment-form network traffic while the
         // feature or session is unavailable.
-        guard canComment,
-              let author = sessionService.username,
-              !composer.isPosting, composer.canPost else { return }
+        guard composer.isPosting else { return }
+        guard canComment else {
+            composer.postingFailed(message: "Comments are currently unavailable.")
+            return
+        }
+        guard let author = sessionService.username else {
+            await handleSessionExpiry()
+            return
+        }
 
         let parentID: Int
         switch composer.target {
@@ -404,7 +410,6 @@ extension CommentsView {
             parentID = commentID
         }
 
-        composer.beginPosting()
         do {
             let outcome = try await viewModel.submitComment(
                 parentID: parentID,
@@ -413,7 +418,9 @@ extension CommentsView {
             )
             switch outcome {
             case let .confirmed(submitted):
-                viewModel.insertSubmittedComment(submitted)
+                if let inserted = viewModel.insertSubmittedComment(submitted) {
+                    pendingCommentID = inserted.id
+                }
                 composer.postingSucceeded()
             case let .unconfirmed(attempt):
                 composer.postingBecameUnconfirmed(attempt: attempt)
@@ -444,7 +451,9 @@ extension CommentsView {
         guard case let .outcomeUnknown(attempt) = composer.submissionState else { return }
         do {
             if let submitted = try await viewModel.reconcileSubmittedComment(attempt: attempt) {
-                viewModel.insertSubmittedComment(submitted)
+                if let inserted = viewModel.insertSubmittedComment(submitted) {
+                    pendingCommentID = inserted.id
+                }
                 composer.outcomeUnknownResolved()
             } else {
                 composer.outcomeUnknownStillUnresolved()

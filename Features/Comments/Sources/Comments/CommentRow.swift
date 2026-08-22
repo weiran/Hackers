@@ -47,16 +47,17 @@ struct CommentRow: View {
     let onCopy: () -> Void
     let onShare: () -> Void
     var onReply: (() -> Void)?
+    var onInteraction: (() -> Void)?
 
     var body: some View {
         rowDisplay
             .contentShape(.interaction, Rectangle())
-            .onTapGesture(perform: onToggle)
+            .onTapGesture(perform: handleToggle)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier(AccessibilityIdentifier.Comments.comment(state.id))
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
-            .accessibilityAction(.default, onToggle)
+            .accessibilityAction(.default, handleToggle)
             .if(state.canReply) { row in
                 row.accessibilityAction(named: Text("Reply to \(state.author)")) {
                     onReply?()
@@ -64,13 +65,19 @@ struct CommentRow: View {
             }
             .contextMenu {
                 if state.isAuthenticated, state.canVote, !state.isUpvoted {
-                    Button(action: onUpvote) {
+                    Button {
+                        onInteraction?()
+                        onUpvote()
+                    } label: {
                         Label("Upvote", systemImage: "arrow.up")
                     }
                     .disabled(state.isVoting)
                 }
                 if state.isAuthenticated, state.canUnvote, state.isUpvoted {
-                    Button(action: onUnvote) {
+                    Button {
+                        onInteraction?()
+                        onUnvote()
+                    } label: {
                         Label("Unvote", systemImage: "arrow.uturn.down")
                     }
                     .disabled(state.isVoting)
@@ -82,14 +89,25 @@ struct CommentRow: View {
                     .disabled(state.isCommentSubmissionInProgress)
                 }
                 Divider()
-                Button(action: onCopy) {
+                Button {
+                    onInteraction?()
+                    onCopy()
+                } label: {
                     Label("Copy", systemImage: "doc.on.doc")
                 }
                 Divider()
-                Button(action: onShare) {
+                Button {
+                    onInteraction?()
+                    onShare()
+                } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
             }
+    }
+
+    private func handleToggle() {
+        onInteraction?()
+        onToggle()
     }
 
     private var rowDisplay: some View {
@@ -225,7 +243,14 @@ struct CommentRow: View {
                 isVoting: state.isVoting
             ),
             style: .commentInline,
-            action: state.isUpvoted ? onUnvote : onUpvote
+            action: {
+                onInteraction?()
+                if state.isUpvoted {
+                    onUnvote()
+                } else {
+                    onUpvote()
+                }
+            }
         )
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.vote(state.id))

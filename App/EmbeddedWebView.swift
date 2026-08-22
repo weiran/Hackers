@@ -894,6 +894,7 @@ struct PostLinkBrowserView: View {
                 .transition(.move(edge: .bottom))
             }
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .tint(.accentColor)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)

@@ -42,11 +42,13 @@ struct CommentSubmissionTests {
         id: Int,
         author: String,
         indent: Int,
-        html: String
+        html: String,
+        voteLinksHTML: String = ""
     ) -> String {
         """
         <tr class="athing comtr" id="\(id)"><td><table border="0"><tr>\
         <td class="ind" indent="\(indent)"><img src="s.gif" height="1" width="\(indent * 40)"></td>\
+        \(voteLinksHTML)\
         <td class="default"><div style="margin-top:2px; margin-bottom:-10px;">\
         <span class="comhead"><a href="user?id=\(author)" class="hnuser">\(author)</a> \
         <span class="age" title="2026-08-21T12:00:00 1787313600"><a href="item?id=\(id)">0 minutes ago</a></span> \
@@ -112,7 +114,8 @@ struct CommentSubmissionTests {
                 id: newCommentID,
                 author: "alice",
                 indent: 0,
-                html: "First paragraph.<p>Second paragraph."
+                html: "First paragraph.<p>Second paragraph.",
+                voteLinksHTML: "<td class=\"votelinks\"><center><a id=\"up_9001\" class=\"nosee\" href=\"vote?id=9001&amp;how=up\">▲</a><a id=\"un_9001\" href=\"vote?id=9001&amp;how=un\">unvote</a></center></td>"
             ),
         ])
         return .init(body: html, statusCode: 200, finalURL: itemURL)
@@ -165,6 +168,9 @@ struct CommentSubmissionTests {
         #expect(submitted.author == "alice")
         #expect(submitted.htmlText.contains("First paragraph."))
         #expect(submitted.htmlText.contains("Second paragraph."))
+        #expect(submitted.upvoted)
+        #expect(submitted.voteLinks?.upvote?.absoluteString == "vote?id=9001&how=up")
+        #expect(submitted.voteLinks?.unvote?.absoluteString == "vote?id=9001&how=un")
 
         #expect(network.postURLs == [Self.commentURL])
         let body = try #require(network.postBodies.first)

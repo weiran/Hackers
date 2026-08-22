@@ -102,6 +102,14 @@ struct PostCommentsSheet: View {
                 isExpanded: presentation.isExpanded,
                 expandedCommentsTopInset: expandedCommentsTopInset(handleTopInset:)
             )
+            // Keep the sheet's occluding surface at the full container height
+            // while the inner comments viewport makes room for the keyboard.
+            // Otherwise the browser underneath can become visible between the
+            // sheet's new bottom edge and the keyboard during its animation.
+            let sheetContainerSize = CGSize(
+                width: layout.containerSize.width,
+                height: presentation.isExpanded ? containerSize.height : layout.containerSize.height
+            )
             let currentChromeAreaHeight = Self.handleAreaHeight
                 + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
             let showsExpandedPresentation = viewModel.post != nil
@@ -127,7 +135,7 @@ struct PostCommentsSheet: View {
                     toolbarControlCenterY: toolbarControlCenterY,
                     showsExpandedPresentation: showsExpandedPresentation
                 )
-                .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
+                .frame(width: sheetContainerSize.width, height: sheetContainerSize.height, alignment: .top)
                 .background(sheetBackground)
                 .clipShape(sheetShape)
                 .shadow(
@@ -155,10 +163,12 @@ struct PostCommentsSheet: View {
                     }
                 )
             }
-            .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .topLeading)
+            .frame(width: containerSize.width, height: containerSize.height, alignment: .topLeading)
             // Extend the sheet through the top and horizontal container
-            // insets while keeping the bottom region available to the
-            // keyboard-safe expanded composer.
+            // insets. The sheet also owns the keyboard adjustment below:
+            // keeping the outer geometry stable prevents SwiftUI's keyboard
+            // safe-area resize from being applied a second time while the
+            // keyboard is animating in.
             .ignoresSafeArea(edges: [.top, .leading, .trailing])
             .overlay {
                 ExpandedCommentsTopDragHitArea(
@@ -259,7 +269,10 @@ struct PostCommentsSheet: View {
     }
 
     private var sheetBackground: some View {
-        sheetShape.fill(.background)
+        // Keep the browser WebView fully occluded while the keyboard changes
+        // the sheet's measured height. The semantic background style can be
+        // translucent during that resize on the custom-browser presentation.
+        sheetShape.fill(AppColors.background)
     }
 
     private func sheetContent(
@@ -279,11 +292,11 @@ struct PostCommentsSheet: View {
                 .overlay {
                     if layout.contentFadeProgress < 0.01 {
                         Rectangle()
-                            .fill(.background)
+                            .fill(AppColors.background)
                             .allowsHitTesting(false)
                     } else if !isInteractiveMove, layout.contentFadeProgress < 1 {
                         Rectangle()
-                            .fill(.background)
+                            .fill(AppColors.background)
                             .opacity(1 - layout.contentFadeProgress)
                             .allowsHitTesting(false)
                     }
@@ -380,6 +393,10 @@ struct PostCommentsSheet: View {
             height: layout.containerSize.height,
             alignment: .topLeading
         )
+        // The comments host sits above a live WKWebView. Keep this whole
+        // viewport opaque during keyboard-safe layout changes so the WebView
+        // cannot flash through before the inner scroll view redraws.
+        .background(AppColors.background)
     }
 
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {

@@ -506,6 +506,18 @@ extension CommentsViewModel {
             return allComments[existingIndex]
         }
 
+        // A newly submitted HN comment is shown as already upvoted. The
+        // confirmation page normally carries the real vote URLs; when it
+        // does not, keep that local display state without inventing a token.
+        let submittedVoteLinks: VoteLinks? = {
+            guard let links = submitted.voteLinks,
+                  links.upvote != nil || links.unvote != nil else {
+                return nil
+            }
+            return links
+        }()
+        let submittedUpvoted = submitted.upvoted || submittedVoteLinks == nil
+
         var updated = allComments
 
         if submitted.parentID != postID {
@@ -524,8 +536,8 @@ extension CommentsViewModel {
                     by: submitted.author,
                     isFlagged: false,
                     level: parent.level + 1,
-                    upvoted: false,
-                    voteLinks: nil,
+                    upvoted: submittedUpvoted,
+                    voteLinks: submittedVoteLinks,
                     visibility: .visible
                 ),
                 at: firstIndexAfterSubtree(ofParentAt: parentIndex)
@@ -548,8 +560,8 @@ extension CommentsViewModel {
                     by: submitted.author,
                     isFlagged: false,
                     level: 0,
-                    upvoted: false,
-                    voteLinks: nil,
+                    upvoted: submittedUpvoted,
+                    voteLinks: submittedVoteLinks,
                     visibility: .visible
                 )
             )

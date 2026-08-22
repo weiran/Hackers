@@ -39,6 +39,14 @@ private enum CommentsScrollTarget: Hashable {
     }
 }
 
+private struct CommentsBottomControlsHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 struct CommentsContentView: View {
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
@@ -63,6 +71,7 @@ struct CommentsContentView: View {
     let onReply: (Int, String) -> Void
     let onSubmitComposerDraft: () -> Void
     @State private var visibleCommentTarget = VisibleCommentTarget()
+    @State private var bottomControlsHeight: CGFloat = 0
 
     var body: some View {
         Group {
@@ -92,9 +101,16 @@ struct CommentsContentView: View {
                             updateVisibleCommentTarget(visibleTargets: visibleTargets)
                         }
                     }
-                    // Scrolling the thread dismisses the keyboard, which collapses
-                    // the composer while preserving its draft.
-                    .scrollDismissesKeyboard(.immediately)
+                    // Scrolling leaves the editor and keyboard in place.
+                    .scrollDismissesKeyboard(.never)
+                    // A focused editor can cause the first tap after a scroll
+                    // to be handled by the scroll view instead of the row's
+                    // local gesture. Keep that non-scroll interaction path
+                    // explicit so taps and holds still dismiss the composer.
+                    .onTapGesture(perform: dismissComposerForInteraction)
+                    .onLongPressGesture(minimumDuration: 0.5) {
+                        dismissComposerForInteraction()
+                    }
                     .modifier(CommentSwipeActionsContainerModifier())
                     .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
                         geometry.contentOffset.y + geometry.contentInsets.top
@@ -107,6 +123,13 @@ struct CommentsContentView: View {
                     .safeAreaInset(edge: .top, spacing: 0) {
                         commentScrollTopSafeAreaInset
                     }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        if bottomControlsHeight > 0 {
+                            Color.clear
+                                .frame(height: bottomControlsHeight)
+                                .allowsHitTesting(false)
+                        }
+                    }
                     CommentsFloatingControls(
                         canComment: canComment,
                         composer: composer,
@@ -117,8 +140,19 @@ struct CommentsContentView: View {
                         onSubmit: onSubmitComposerDraft
                     )
                     .frame(maxWidth: .infinity)
+                    .background(
+                        GeometryReader { controlsProxy in
+                            Color.clear.preference(
+                                key: CommentsBottomControlsHeightPreferenceKey.self,
+                                value: controlsProxy.size.height
+                            )
+                        }
+                    )
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .onPreferenceChange(CommentsBottomControlsHeightPreferenceKey.self) { height in
+                    bottomControlsHeight = height
+                }
                 .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(using: proxy)
                 }
@@ -179,6 +213,16 @@ struct CommentsContentView: View {
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
         scrollToComment(withID: targetID, using: proxy)
+
+        // The row may not have been laid out yet when visibleRevision changes.
+        // Repeat once after the list has committed the inserted row.
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+            }
+        }
     }
 
     /// Scrolls the reply target to the top of the viewport once visible, then
@@ -231,11 +275,13 @@ struct CommentsContentView: View {
             onUnvote: { unvoteComment(withID: state.id, in: post) },
             onCopy: { copyComment(withID: state.id) },
             onShare: { shareComment(withID: state.id) },
-            onReply: { onReply(state.id, state.author) }
+            onReply: { onReply(state.id, state.author) },
+            onInteraction: dismissComposerForInteraction
         )
         .if(viewModel.swipeCollapseThreads) { row in
             row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 Button {
+                    dismissComposerForInteraction()
                     collapseThread(for: state)
                 } label: {
                     Label(
@@ -255,6 +301,11 @@ struct CommentsContentView: View {
         withAnimation(Self.commentCollapseAnimation) {
             _ = viewModel.hideCommentBranch(comment)
         }
+    }
+
+    private func dismissComposerForInteraction() {
+        guard composer.isExpanded else { return }
+        composer.collapsePreservingDraft()
     }
 
     private func upvoteComment(withID commentID: Int, in post: Post) {
@@ -449,11 +500,11 @@ private struct CommentsFloatingControls: View {
             // The viewport supplied by the sheet already starts at the system
             // horizontal safe area. Keep the control row inset from that
             // viewport, while allowing the list itself to continue beneath it.
-            .padding(.horizontal, 16)
-            // The parent sheet preserves the system bottom safe area. The
-            // collapsed control should sit directly on that boundary; the
-            // expanded editor keeps a small breathing room above the keyboard.
-            .padding(.bottom, composer.isExpanded ? 8 : 0)
+            .padding(.horizontal, 8)
+            // Give the collapsed row a clear visual separation from the
+            // preserved bottom safe area. The expanded editor uses a tighter
+            // keyboard gap.
+            .padding(.bottom, composer.isExpanded ? 8 : 24)
             .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
         }
     }
