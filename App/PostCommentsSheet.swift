@@ -42,6 +42,7 @@ struct PostCommentsSheet: View {
     @State private var keyboardHeight: CGFloat = 0
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var toolbarGeometry = CommentsToolbarGeometry()
+    @State private var isPostHeaderMatchedGeometryEnabled = false
     @Namespace private var postHeaderNamespace
 
     init(
@@ -192,6 +193,16 @@ struct PostCommentsSheet: View {
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
                 DispatchQueue.main.async { @MainActor in
+                    // The comments page can be inserted inside a navigation
+                    // transition. Keep the initial post header static and
+                    // enable matched geometry only after that first frame;
+                    // subsequent collapsed/expanded sheet changes still use
+                    // the shared namespace for their intentional animation.
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        isPostHeaderMatchedGeometryEnabled = true
+                    }
                     onMediaPlaybackSuspensionChange(presentation.isExpanded)
                     onCollapsedHeightChange(collapsedHeight)
                     updateBrowserObscuredBottomInset()
@@ -324,6 +335,7 @@ struct PostCommentsSheet: View {
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
+            isPostHeaderMatchedGeometryEnabled: isPostHeaderMatchedGeometryEnabled,
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
             toolbarGeometry: toolbarGeometry,

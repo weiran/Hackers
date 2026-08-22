@@ -547,6 +547,7 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
     let viewModel: CommentsViewModel
     let votingViewModel: VotingViewModel
     let postHeaderMatchedGeometryNamespace: Namespace.ID?
+    let isPostHeaderMatchedGeometryEnabled: Bool
     let isPostHeaderMatchedGeometrySource: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
     let toolbarGeometry: CommentsToolbarGeometry
@@ -562,6 +563,7 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             && lhs.topContentInset == rhs.topContentInset
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
+            && lhs.isPostHeaderMatchedGeometryEnabled == rhs.isPostHeaderMatchedGeometryEnabled
             && lhs.isPostHeaderMatchedGeometrySource == rhs.isPostHeaderMatchedGeometrySource
             && lhs.showsToolbar == rhs.showsToolbar
             && lhs.dragExpandedTop == rhs.dragExpandedTop
@@ -579,7 +581,9 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             showsToolbar: showsToolbar,
             controlsNavigationBarVisibility: true,
             presentationState: .customBrowser(topContentInset: topContentInset),
-            postHeaderMatchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
+            postHeaderMatchedGeometryNamespace: isPostHeaderMatchedGeometryEnabled
+                ? postHeaderMatchedGeometryNamespace
+                : nil,
             isPostHeaderMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             headerTitleVisibility: titleVisibility,
             toolbarGeometry: toolbarGeometry,
