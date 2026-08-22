@@ -499,9 +499,9 @@ private struct CommentsFloatingControls: View {
             .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
             // The viewport supplied by the sheet already starts at the system
             // horizontal safe area. Lay the control row out like a system
-            // bottom toolbar: inset by the standard bar layout margins from
-            // that safe area, while the list continues beneath it.
-            .padding(.horizontal, 16)
+            // bottom toolbar while collapsed; the expanded editor uses a
+            // tighter inset closer to the screen edges.
+            .padding(.horizontal, composer.isExpanded ? 8 : 16)
             // Give the collapsed row a clear visual separation from the
             // preserved bottom safe area. The expanded editor uses a tighter
             // keyboard gap.
