@@ -79,41 +79,46 @@ struct CommentsContentView: View {
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        postHeaderSection(for: post)
-                        commentsSection(for: post)
+                ZStack(alignment: .bottom) {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 0) {
+                            postHeaderSection(for: post)
+                            commentsSection(for: post)
+                        }
+                        .scrollTargetLayout()
                     }
-                    .scrollTargetLayout()
-                }
-                .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
-                    updateVisibleCommentTarget(visibleTargets: visibleTargets)
-                }
-                // Scrolling the thread dismisses the keyboard, which collapses
-                // the composer while preserving its draft.
-                .scrollDismissesKeyboard(.immediately)
-                .modifier(CommentSwipeActionsContainerModifier())
-                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
-                    geometry.contentOffset.y + geometry.contentInsets.top
-                }, action: { _, offsetY in
-                    updateHeaderState(offsetY: offsetY)
-                })
-                .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    commentScrollTopSafeAreaInset
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
+                        DispatchQueue.main.async { @MainActor in
+                            updateVisibleCommentTarget(visibleTargets: visibleTargets)
+                        }
+                    }
+                    // Scrolling the thread dismisses the keyboard, which collapses
+                    // the composer while preserving its draft.
+                    .scrollDismissesKeyboard(.immediately)
+                    .modifier(CommentSwipeActionsContainerModifier())
+                    .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                        geometry.contentOffset.y + geometry.contentInsets.top
+                    }, action: { _, offsetY in
+                        DispatchQueue.main.async { @MainActor in
+                            updateHeaderState(offsetY: offsetY)
+                        }
+                    })
+                    .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        commentScrollTopSafeAreaInset
+                    }
                     CommentsFloatingControls(
                         canComment: canComment,
                         composer: composer,
-                        showsNextCommentButton: viewModel.showNextCommentButton
-                            && !viewModel.visibleComments.isEmpty,
+                        showsNextCommentButton: viewModel.showNextCommentButton,
                         hasNextComment: visibleCommentTarget.hasNextComment,
                         onNextComment: { scrollToNextComment(using: proxy) },
                         onNextThread: { scrollToNextThread(using: proxy) },
                         onSubmit: onSubmitComposerDraft
                     )
+                    .frame(maxWidth: .infinity)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(using: proxy)
                 }
@@ -414,8 +419,9 @@ private struct CommentSwipeActionsContainerModifier: ViewModifier {
 }
 
 /// Bottom floating controls: the shared composer plus the next-comment
-/// button. The composer fills the remaining width; the next-comment button
-/// is omitted while a composer is present and no next comment exists.
+/// button. The composer fills the remaining width next to a control that is
+/// visible as soon as the comments panel appears and enabled once a target is
+/// available.
 private struct CommentsFloatingControls: View {
     let canComment: Bool
     @Bindable var composer: CommentComposerModel
@@ -440,8 +446,15 @@ private struct CommentsFloatingControls: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
-            .padding(.trailing, 28)
-            .padding(.bottom, 28)
+            // The viewport supplied by the sheet already starts at the system
+            // horizontal safe area. Keep the control row inset from that
+            // viewport, while allowing the list itself to continue beneath it.
+            .padding(.horizontal, 16)
+            // The parent sheet preserves the system bottom safe area. The
+            // collapsed control should sit directly on that boundary; the
+            // expanded editor keeps a small breathing room above the keyboard.
+            .padding(.bottom, composer.isExpanded ? 8 : 0)
+            .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
         }
     }
 
@@ -450,9 +463,9 @@ private struct CommentsFloatingControls: View {
     }
 
     private var showsNextButton: Bool {
-        // With the composer present, a disabled next-comment button is
-        // omitted so the composer fills the width (plan section 2.3).
-        showsNextCommentButton && (hasNextComment || !canComment)
+        // Keep the control in the row from the moment the panel appears. It
+        // remains disabled until the first visible target is known.
+        !composer.isExpanded && showsNextCommentButton
     }
 }
 

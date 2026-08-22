@@ -585,7 +585,11 @@ private struct UITestArticleView: UIViewRepresentable {
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         webView.accessibilityIdentifier = AccessibilityIdentifier.Browser.fixtureArticle
-        loadArticle(in: webView, coordinator: context.coordinator)
+        let coordinator = context.coordinator
+        coordinator.scheduleLoad { [self, weak coordinator] in
+            guard let coordinator else { return }
+            loadArticle(in: webView, coordinator: coordinator)
+        }
         return webView
     }
 
@@ -593,7 +597,11 @@ private struct UITestArticleView: UIViewRepresentable {
         controller.applyBottomChromeInset(obscuredBottomInset)
         guard context.coordinator.loadedArticle != article
             || context.coordinator.loadedURL != url else { return }
-        loadArticle(in: webView, coordinator: context.coordinator)
+        let coordinator = context.coordinator
+        coordinator.scheduleLoad { [self, weak coordinator] in
+            guard let coordinator else { return }
+            loadArticle(in: webView, coordinator: coordinator)
+        }
     }
 
     private func loadArticle(in webView: WKWebView, coordinator: Coordinator) {
@@ -628,9 +636,24 @@ private struct UITestArticleView: UIViewRepresentable {
             .replacingOccurrences(of: ">", with: "&gt;")
     }
 
+    @MainActor
     final class Coordinator {
         var loadedArticle: UITestArticleContent?
         var loadedURL: URL?
+        private var loadTask: Task<Void, Never>?
+
+        func scheduleLoad(operation: @escaping @MainActor () -> Void) {
+            loadTask?.cancel()
+            loadTask = Task { @MainActor in
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                operation()
+            }
+        }
+
+        deinit {
+            loadTask?.cancel()
+        }
     }
 }
 

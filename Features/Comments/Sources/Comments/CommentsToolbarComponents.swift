@@ -229,7 +229,12 @@ struct ShareMenu: View {
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.frame(in: .global).midY
                 } action: { centerY in
-                    toolbarGeometry?.updateControlCenterY(centerY)
+                    // Geometry callbacks run during view updates. Defer the
+                    // observable mutation to the next main-actor turn so
+                    // toolbar presentation does not publish recursively.
+                    DispatchQueue.main.async { @MainActor in
+                        toolbarGeometry?.updateControlCenterY(centerY)
+                    }
                 }
         }
     }

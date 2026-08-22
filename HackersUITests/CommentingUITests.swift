@@ -326,4 +326,39 @@ final class CommentingUITests: HackersUITestCase {
         let composer = assertHasVisibleIntersection(composerCollapsed, in: app)
         XCTAssertTrue(composer.isHittable, "The composer should be usable in the browser comments sheet")
     }
+
+    func testCustomBrowserComposerRemainsAboveKeyboard() throws {
+        XCUIDevice.shared.orientation = .portrait
+        launchApp(configuration: UITestLaunchConfiguration(
+            authenticated: true,
+            commentingEnabled: true
+        ))
+
+        let post = assertHittable(app.buttons[AccessibilityIdentifier.Feed.post(longCommentsPostID)], timeout: 8)
+        tapPost(post)
+
+        assertFullyContained(browserView, in: app)
+        assertHasVisibleIntersection(commentsList, in: app)
+        assertHittable(composerCollapsed).tap()
+
+        let editor = assertHittable(composerEditor)
+        editor.tap()
+        editor.typeText("Keyboard-safe browser draft.")
+
+        let postButton = app.buttons.matching(identifier: AccessibilityIdentifier.Comments.composerPost).firstMatch
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5), "The software keyboard should be visible while editing")
+        XCTAssertTrue(editor.isHittable, "The browser composer editor should remain visible above the keyboard")
+        XCTAssertTrue(postButton.isHittable, "The browser Post action should remain visible above the keyboard")
+        XCTAssertLessThanOrEqual(
+            editor.frame.maxY,
+            keyboard.frame.minY,
+            "The browser editor must not be covered by the keyboard"
+        )
+        XCTAssertLessThanOrEqual(
+            postButton.frame.maxY,
+            keyboard.frame.minY,
+            "The browser Post action must not be covered by the keyboard"
+        )
+    }
 }

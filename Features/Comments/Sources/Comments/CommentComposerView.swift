@@ -44,12 +44,12 @@ struct CommentComposerView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
+            .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24))
-        .padding(.leading, 16)
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerCollapsed)
     }
 
@@ -105,7 +105,6 @@ struct CommentComposerView: View {
         }
         .padding(12)
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
-        .padding(.horizontal, 16)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerExpanded)
         .onChange(of: model.presentation) { _, presentation in

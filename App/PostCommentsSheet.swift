@@ -39,6 +39,7 @@ struct PostCommentsSheet: View {
     @State private var presentation: PostCommentsSheetPresentation
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
+    @State private var keyboardHeight: CGFloat = 0
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var toolbarGeometry = CommentsToolbarGeometry()
     @Namespace private var postHeaderNamespace
@@ -79,13 +80,17 @@ struct PostCommentsSheet: View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let containerSize = resolvedContainerSize(for: proxy)
+            let keyboardAdjustedContainerSize = adjustedContainerSize(
+                containerSize,
+                keyboardHeight: keyboardHeight
+            )
             let expandedHandleAreaHeight = max(
                 proxy.safeAreaInsets.top - safeInsets.top,
                 Self.navigationBarHeight
             )
             let layout = PostCommentsSheetLayout(
                 safeInsets: safeInsets,
-                containerSize: containerSize,
+                containerSize: keyboardAdjustedContainerSize,
                 commentsHorizontalInsets: (
                     proxy.safeAreaInsets.leading,
                     proxy.safeAreaInsets.trailing
@@ -150,7 +155,10 @@ struct PostCommentsSheet: View {
                 )
             }
             .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .topLeading)
-            .ignoresSafeArea(.container)
+            // Extend the sheet through the top and horizontal container
+            // insets while keeping the bottom region available to the
+            // keyboard-safe expanded composer.
+            .ignoresSafeArea(edges: [.top, .leading, .trailing])
             .overlay {
                 ExpandedCommentsTopDragHitArea(
                     isEnabled: showsExpandedPresentation && presentation.isExpanded,
@@ -183,17 +191,37 @@ struct PostCommentsSheet: View {
             }
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
-                onMediaPlaybackSuspensionChange(presentation.isExpanded)
-                onCollapsedHeightChange(collapsedHeight)
-                updateBrowserObscuredBottomInset()
+                DispatchQueue.main.async { @MainActor in
+                    onMediaPlaybackSuspensionChange(presentation.isExpanded)
+                    onCollapsedHeightChange(collapsedHeight)
+                    updateBrowserObscuredBottomInset()
+                }
             }
             .onChange(of: presentation.isExpanded) { _, isExpanded in
-                onMediaPlaybackSuspensionChange(isExpanded)
+                DispatchQueue.main.async { @MainActor in
+                    onMediaPlaybackSuspensionChange(isExpanded)
+                }
             }
-            .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
-            .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
+            .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newHeight in
+                DispatchQueue.main.async { @MainActor in
+                    updateCollapsedHeight(newHeight)
+                }
+            }
+            .onPreferenceChange(ControlsHeightPreferenceKey.self) { newHeight in
+                DispatchQueue.main.async { @MainActor in
+                    updateControlsHeight(newHeight)
+                }
+            }
             .onChange(of: controlsHeight) { _, _ in
-                updateBrowserObscuredBottomInset()
+                DispatchQueue.main.async { @MainActor in
+                    updateBrowserObscuredBottomInset()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { notification in
+                updateKeyboardHeight(keyboardHeight(for: notification))
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                updateKeyboardHeight(0)
             }
         }
     }
@@ -326,11 +354,13 @@ struct PostCommentsSheet: View {
         .frame(width: viewport.width, height: viewport.height, alignment: .topLeading)
         .onScrollPhaseChange { oldPhase, newPhase, context in
             let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
-            presentation.updateScrollDragEligibility(
-                oldPhase: oldPhase,
-                newPhase: newPhase,
-                isAtRestingTop: offsetY <= 1
-            )
+            DispatchQueue.main.async { @MainActor in
+                presentation.updateScrollDragEligibility(
+                    oldPhase: oldPhase,
+                    newPhase: newPhase,
+                    isAtRestingTop: offsetY <= 1
+                )
+            }
         }
         .offset(x: viewport.minX, y: viewport.minY)
         .frame(
@@ -493,6 +523,31 @@ private extension PostCommentsSheet {
         onBrowserObscuredBottomInsetChange(
             PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
         )
+    }
+
+    private func adjustedContainerSize(_ containerSize: CGSize, keyboardHeight: CGFloat) -> CGSize {
+        guard isExpanded, keyboardHeight > 0 else { return containerSize }
+        return CGSize(
+            width: containerSize.width,
+            height: max(containerSize.height - keyboardHeight, 0)
+        )
+    }
+
+    private func keyboardHeight(for notification: Notification) -> CGFloat {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return 0
+        }
+
+        let window = PresentationContextProvider.shared.keyWindow
+        let frameInWindow = window?.convert(keyboardFrame, from: nil) ?? keyboardFrame
+        let windowBottom = window?.bounds.maxY ?? keyboardFrame.maxY
+        return max(0, windowBottom - frameInWindow.minY)
+    }
+
+    private func updateKeyboardHeight(_ newHeight: CGFloat) {
+        let resolvedHeight = newHeight.isFinite ? max(newHeight, 0) : 0
+        guard abs(keyboardHeight - resolvedHeight) > 0.5 else { return }
+        keyboardHeight = resolvedHeight
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {

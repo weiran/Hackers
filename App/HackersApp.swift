@@ -24,10 +24,8 @@ struct HackersApp: App {
         if UITestingBootstrap.isEnabled {
             return UITestingBootstrap.runtimePolicy
         }
-        if ProcessInfo.processInfo.arguments.contains("enableCommenting") {
-            return AppRuntimePolicy.standard.withCommenting(true)
-        }
-        return .standard
+        let commentingEnabled = !ProcessInfo.processInfo.arguments.contains("disableCommenting")
+        return AppRuntimePolicy.standard.withCommenting(commentingEnabled)
         #else
         .standard
         #endif

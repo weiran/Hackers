@@ -58,6 +58,7 @@ FULL_TESTS=(
   CommentingUITests/testPostingShowsSpinnerBeforeInsertion
   CommentingUITests/testOutcomeUnknownAlertCheckAgainResolvesOnce
   CommentingUITests/testCustomBrowserExpandedCommentsShowsComposer
+  CommentingUITests/testCustomBrowserComposerRemainsAboveKeyboard
 )
 
 FUNCTIONAL_TEST_SOURCES=(
