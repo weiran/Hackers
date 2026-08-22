@@ -102,7 +102,18 @@ struct CommentRow: View {
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
+            } preview: {
+                contextMenuPreview
             }
+    }
+
+    /// The default preview snapshots the live row out of the lazy scroll
+    /// container, which cancels the lift and produces a transparent,
+    /// overlapping snapshot. An explicit opaque preview avoids both.
+    private var contextMenuPreview: some View {
+        rowDisplay
+            .frame(width: UIScreen.main.bounds.width)
+            .background(AppColors.background)
     }
 
     private func handleToggle() {
