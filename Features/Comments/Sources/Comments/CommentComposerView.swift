@@ -135,6 +135,7 @@ struct CommentComposerView: View {
             if model.isPosting {
                 ProgressView()
                     .controlSize(.small)
+                    .tint(nil)
                     .frame(minWidth: postLabelWidth)
                     .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerSpinner)
             } else {

@@ -21,6 +21,7 @@ public struct AppLoadingStateView: View {
     public var body: some View {
         VStack(spacing: 12) {
             ProgressView()
+                .tint(nil)
             if let message {
                 Text(message)
                     .scaledFont(.subheadline)

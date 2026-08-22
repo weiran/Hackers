@@ -148,6 +148,7 @@ private extension FeedView {
     private var searchResultsContent: some View {
         if viewModel.isSearchInProgress && viewModel.searchResults.isEmpty {
             ProgressView("Searching...")
+                .tint(nil)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = viewModel.searchError, viewModel.searchResults.isEmpty {
             AppEmptyStateView(
@@ -466,6 +467,7 @@ private extension FeedView {
             HStack {
                 Spacer()
                 ProgressView()
+                    .tint(nil)
                 Spacer()
             }
             .listRowSeparator(.hidden)
