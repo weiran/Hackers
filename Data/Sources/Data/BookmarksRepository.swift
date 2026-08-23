@@ -16,7 +16,7 @@ public protocol UbiquitousKeyValueStoreProtocol: AnyObject, Sendable {
 
 extension NSUbiquitousKeyValueStore: UbiquitousKeyValueStoreProtocol {}
 
-public final class BookmarksRepository: BookmarksUseCase, @unchecked Sendable {
+public actor BookmarksRepository: BookmarksUseCase {
     private enum Constants {
         static let bookmarksKey = "Bookmarks.posts"
     }

@@ -82,6 +82,29 @@ struct FeedViewModelTests {
     }
 
     @MainActor
+    @Test("Failed next page is retried instead of skipped")
+    func failedNextPageRetriesSamePage() async {
+        let postUseCase = StubPostUseCase()
+        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
+        postUseCase.enqueue(.failure(StubError.network))
+        postUseCase.enqueue(.success([SampleData.post(id: 2)]))
+        let viewModel = FeedViewModel(
+            postUseCase: postUseCase,
+            voteUseCase: StubVoteUseCase(),
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
+        )
+
+        await viewModel.loadFeed()
+        await viewModel.loadNextPage()
+        #expect(viewModel.paginationError is StubError)
+        await viewModel.loadNextPage()
+
+        #expect(postUseCase.requestedPages == [1, 2, 2])
+        #expect(viewModel.posts.map(\.id) == [1, 2])
+        #expect(viewModel.paginationError == nil)
+    }
+
+    @MainActor
     @Test("Changing post type refreshes feed and resets pagination")
     func changePostTypeRefreshesFeed() async {
         let postUseCase = StubPostUseCase()
@@ -526,13 +549,15 @@ private enum StubError: Error {
 private final class StubPostUseCase: PostUseCase, @unchecked Sendable {
     private var responses: [Result<[Post], Error>] = []
     private(set) var requestedTypes: [PostType] = []
+    private(set) var requestedPages: [Int] = []
 
     func enqueue(_ result: Result<[Post], Error>) {
         responses.append(result)
     }
 
-    func getPosts(type: PostType, page _: Int, nextId _: Int?) async throws -> [Post] {
+    func getPosts(type: PostType, page: Int, nextId _: Int?) async throws -> [Post] {
         requestedTypes.append(type)
+        requestedPages.append(page)
         guard !responses.isEmpty else { return [] }
         let result = responses.removeFirst()
         switch result {

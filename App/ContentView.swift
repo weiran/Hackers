@@ -91,7 +91,7 @@ struct MainContentView: View {
                                     _ = try await sessionService.authenticate(username: username, password: password)
                                 },
                                 onLogout: {
-                                    sessionService.unauthenticate()
+                                    try await sessionService.unauthenticate()
                                 },
                                 onWhatsNewDismiss: {
                                     whatsNewCoordinator.markWhatsNewShown()
@@ -114,7 +114,7 @@ struct MainContentView: View {
                     _ = try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
-                    sessionService.unauthenticate()
+                    try await sessionService.unauthenticate()
                 },
                 textSize: settingsViewModel.textSize
             )
@@ -130,7 +130,7 @@ struct MainContentView: View {
                     _ = try await sessionService.authenticate(username: username, password: password)
                 },
                 onLogout: {
-                    sessionService.unauthenticate()
+                    try await sessionService.unauthenticate()
                 },
                 onWhatsNewDismiss: {
                     whatsNewCoordinator.markWhatsNewShown()

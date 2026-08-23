@@ -8,7 +8,7 @@
 import Domain
 import Foundation
 
-public final class ReadStatusRepository: ReadStatusUseCase, @unchecked Sendable {
+public actor ReadStatusRepository: ReadStatusUseCase {
     private enum Constants {
         static let readPostsKey = "ReadStatus.posts"
         static let maximumEntries = 5_000

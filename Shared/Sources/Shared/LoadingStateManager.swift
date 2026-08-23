@@ -18,6 +18,7 @@ public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
 
     private var loadData: (@Sendable () async throws -> T)?
     private var shouldSkipLoad: (@Sendable (T) -> Bool)?
+    private var loadGeneration = 0
 
     public init(
         initialData: T,
@@ -54,7 +55,6 @@ public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
 
     @MainActor
     public func refresh() async {
-        guard !isLoading else { return }
         await performLoad()
     }
 
@@ -62,25 +62,31 @@ public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
     private func performLoad() async {
         guard let loadData else { return }
         let loader = loadData
+        loadGeneration += 1
+        let generation = loadGeneration
 
         isLoading = true
         error = nil
-        defer { isLoading = false }
 
         do {
-            let result = try await Task.detached(priority: .userInitiated) {
-                try await loader()
-            }.value
+            let result = try await loader()
+            guard generation == loadGeneration else { return }
             data = result
             hasAttemptedLoad = true
         } catch {
+            guard generation == loadGeneration else { return }
             self.error = error
             hasAttemptedLoad = true
+        }
+        if generation == loadGeneration {
+            isLoading = false
         }
     }
 
     @MainActor
     public func reset() {
+        loadGeneration += 1
+        isLoading = false
         hasAttemptedLoad = false
         error = nil
     }

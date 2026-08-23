@@ -145,7 +145,9 @@ public final class CommentsViewModel: @unchecked Sendable {
             bookmarksController: bookmarksController
         )
     }
+}
 
+extension CommentsViewModel {
     @MainActor
     public func loadComments() async {
         if post == nil {
@@ -360,7 +362,7 @@ private extension CommentsViewModel {
         parentIndexByID = [:]
 
         var validCommentIDs = Set<Int>()
-        var stack: [(index: Int, id: Int, level: Int)] = []
+        var stack: [(index: Int, level: Int)] = []
         // Mutate a local copy and assign once: writing through the allComments computed
         // setter per-element is O(n) each (whole-array copy) and fragile if the accessor
         // ever stops returning the live backing array.
@@ -385,7 +387,7 @@ private extension CommentsViewModel {
                 parentIndexByID[comment.id] = parent.index
             }
 
-            stack.append((index: index, id: comment.id, level: comment.level))
+            stack.append((index: index, level: comment.level))
         }
 
         if didUpdate { allComments = updated }

@@ -8,7 +8,8 @@
 import Domain
 import Foundation
 
-public final class BookmarksController: @unchecked Sendable {
+@MainActor
+public final class BookmarksController {
     private let bookmarksUseCase: any BookmarksUseCase
     private var cachedIDs: Set<Int> = []
 
@@ -16,7 +17,6 @@ public final class BookmarksController: @unchecked Sendable {
         self.bookmarksUseCase = bookmarksUseCase
     }
 
-    @MainActor
     @discardableResult
     public func refreshBookmarks() async -> Set<Int> {
         let ids = await bookmarksUseCase.bookmarkedIDs()
@@ -24,7 +24,6 @@ public final class BookmarksController: @unchecked Sendable {
         return ids
     }
 
-    @MainActor
     public func annotatedPosts(from posts: [Post]) -> [Post] {
         posts.map { post in
             var mutablePost = post
@@ -33,7 +32,6 @@ public final class BookmarksController: @unchecked Sendable {
         }
     }
 
-    @MainActor
     public func bookmarkedPosts() async -> [Post] {
         let posts = await bookmarksUseCase.bookmarkedPosts()
         cachedIDs = Set(posts.map(\.id))
@@ -44,12 +42,10 @@ public final class BookmarksController: @unchecked Sendable {
         }
     }
 
-    @MainActor
     public func isBookmarked(_ postID: Int) -> Bool {
         cachedIDs.contains(postID)
     }
 
-    @MainActor
     @discardableResult
     public func toggle(post: Post) async -> Bool {
         do {

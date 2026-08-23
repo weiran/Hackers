@@ -63,7 +63,7 @@ struct LoginViewModelTests {
     }
 
     @Test("Logout clears authentication state")
-    func logoutClearsState() {
+    func logoutClearsState() async {
         var didLogout = false
         let viewModel = LoginViewModel(
             isAuthenticated: true,
@@ -72,8 +72,9 @@ struct LoginViewModelTests {
             onLogout: { didLogout = true }
         )
 
-        viewModel.logout()
+        let didSucceed = await viewModel.logout()
 
+        #expect(didSucceed)
         #expect(didLogout, "Logout callback should be invoked")
         #expect(!viewModel.isAuthenticated, "Authentication state should reset")
         #expect(viewModel.currentUsername == nil, "Cached username should be cleared")

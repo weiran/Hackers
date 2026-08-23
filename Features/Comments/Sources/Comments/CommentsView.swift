@@ -79,8 +79,10 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var pendingCommentID: Int?
     @State private var replyScrollTarget: Int?
     @State private var composer = CommentComposerModel()
+}
 
-    public init(
+public extension CommentsView {
+    init(
         postID: Int,
         initialPost: Post? = nil,
         targetCommentID: Int? = nil,
@@ -119,7 +121,8 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         self.onPostHeaderDragChanged = onPostHeaderDragChanged
         self.onPostHeaderDragEnded = onPostHeaderDragEnded
         _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
-        _pendingCommentID = State(initialValue: targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil))
+        let initialTargetID = targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil)
+        _pendingCommentID = State(initialValue: initialTargetID)
         if let viewModel {
             _viewModel = State(initialValue: viewModel)
         } else {
@@ -134,7 +137,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
-    public init(
+    init(
         post: Post,
         targetCommentID: Int? = nil,
         showsPostHeader: Bool = true,
@@ -180,13 +183,17 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             votingViewModel: votingViewModel
         )
     }
+}
 
+private extension CommentsView {
     private var canComment: Bool {
         appRuntimePolicy.allowsCommenting
             && sessionService.authenticationState == .authenticated
     }
+}
 
-    public var body: some View {
+public extension CommentsView {
+    var body: some View {
         Group {
             if viewModel.post != nil {
                 CommentsContentView(
@@ -326,8 +333,9 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
             composer.collapsePreservingDraft()
         }
     }
+}
 
-
+private extension CommentsView {
     private var commentsHeaderBlur: some View {
         GeometryReader { proxy in
             ProgressiveHeaderBlurBackground(
@@ -416,34 +424,38 @@ extension CommentsView {
                 text: composer.text,
                 author: author
             )
-            switch outcome {
-            case let .confirmed(submitted):
-                if let inserted = viewModel.insertSubmittedComment(submitted) {
-                    pendingCommentID = inserted.id
-                }
-                composer.postingSucceeded()
-            case let .unconfirmed(attempt):
-                composer.postingBecameUnconfirmed(attempt: attempt)
-            }
+            handleSubmissionOutcome(outcome)
         } catch let error as CommentSubmissionError {
-            switch error {
-            case .unauthenticated:
-                await handleSessionExpiry()
-            case .commentingUnavailable:
-                composer.postingFailed(message: "Hacker News is not accepting replies to this item.")
-            case let .rejected(message):
-                composer.postingFailed(
-                    message: message ?? "Couldn’t post this comment. Your draft has been kept."
-                )
-            case .empty, .invalidTarget, .malformedResponse:
-                composer.postingFailed(
-                    message: "Couldn’t post this comment. Your draft has been kept."
-                )
-            }
+            await handleSubmissionError(error)
         } catch {
             composer.postingFailed(
                 message: "Couldn’t post this comment. Your draft has been kept."
             )
+        }
+    }
+
+    private func handleSubmissionOutcome(_ outcome: CommentSubmissionOutcome) {
+        switch outcome {
+        case let .confirmed(submitted):
+            if let inserted = viewModel.insertSubmittedComment(submitted) {
+                pendingCommentID = inserted.id
+            }
+            composer.postingSucceeded()
+        case let .unconfirmed(attempt):
+            composer.postingBecameUnconfirmed(attempt: attempt)
+        }
+    }
+
+    private func handleSubmissionError(_ error: CommentSubmissionError) async {
+        switch error {
+        case .unauthenticated:
+            await handleSessionExpiry()
+        case .commentingUnavailable:
+            composer.postingFailed(message: "Hacker News is not accepting replies to this item.")
+        case let .rejected(message):
+            composer.postingFailed(message: message ?? "Couldn’t post this comment. Your draft has been kept.")
+        case .empty, .invalidTarget, .malformedResponse:
+            composer.postingFailed(message: "Couldn’t post this comment. Your draft has been kept.")
         }
     }
 

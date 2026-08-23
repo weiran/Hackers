@@ -37,7 +37,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
 
     public var body: some View {
         contentView
-            .navigationTitle(showsSidebarMenu ? "" : (viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName))
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !viewModel.hasActiveSearch {
@@ -91,6 +91,22 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             } message: {
                 Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
             }
+            .alert(
+                "Couldn’t Load More Stories",
+                isPresented: Binding(
+                    get: { viewModel.paginationError != nil },
+                    set: { if !$0 { viewModel.clearPaginationError() } }
+                )
+            ) {
+                Button("Retry") {
+                    Task { await viewModel.loadNextPage() }
+                }
+                Button("Cancel", role: .cancel) {
+                    viewModel.clearPaginationError()
+                }
+            } message: {
+                Text("Check your connection and try again.")
+            }
             .onAppear {
                 votingViewModel.navigationStore = navigationStore
             }
@@ -98,6 +114,10 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
 }
 
 private extension FeedView {
+    var navigationTitle: String {
+        showsSidebarMenu ? "" : (viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
+    }
+
     var primaryPostTypes: [Domain.PostType] {
         [.news, .ask, .show, .jobs, .newest, .best, .active]
     }

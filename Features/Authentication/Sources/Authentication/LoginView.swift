@@ -25,7 +25,7 @@ public struct LoginView: View {
         isAuthenticated: Bool,
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
-        onLogout: @escaping () -> Void,
+        onLogout: @escaping () async throws -> Void,
         textSize: TextSize = .medium
     ) {
         let viewModel = LoginViewModel(
@@ -219,8 +219,13 @@ public struct LoginView: View {
 
             VStack(spacing: 20) {
                 Button {
-                    viewModel.logout()
-                    toastPresenter.show(text: "Signed out", kind: .success)
+                    Task { @MainActor in
+                        if await viewModel.logout() {
+                            toastPresenter.show(text: "Signed out", kind: .success)
+                        } else {
+                            toastPresenter.show(text: "Couldn’t sign out", kind: .failure)
+                        }
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "person.badge.minus")

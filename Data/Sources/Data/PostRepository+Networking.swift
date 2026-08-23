@@ -16,7 +16,7 @@ extension PostRepository {
     /// paginates comments roughly 30 per page behind a `<a class="morelink">` link; without
     /// following it we only ever see the first page. The bound keeps a pathological or
     /// transient response chain from triggering unbounded requests.
-    private static let maxPostPages = 10
+    private static let maxPostPages = 50
 
     func fetchPostsHtml(type: PostType, page: Int, nextId: Int) async throws -> String {
         let url: URL
@@ -70,6 +70,9 @@ extension PostRepository {
             page += 1
         }
 
+        guard !hasMore else {
+            throw HackersKitError.scraperError
+        }
         return combined
     }
 

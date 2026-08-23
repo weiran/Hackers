@@ -855,7 +855,7 @@ struct PostLinkBrowserView: View {
     let presentation: PostLinkPresentation
     @State private var showingCommentsPane = false
     @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
-    @State private var browserObscuredBottomInset = PostCommentsSheet.defaultCollapsedBrowserObscuredBottomInset
+    @State private var browserObscuredBottomInset = PostCommentsSheet.collapsedBrowserBottomInset
     @StateObject private var browserController: BrowserController
 
     init(post: Post, presentation: PostLinkPresentation) {

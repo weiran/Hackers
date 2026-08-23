@@ -39,7 +39,7 @@ private enum CommentsScrollTarget: Hashable {
     }
 }
 
-private struct CommentsBottomControlsHeightPreferenceKey: PreferenceKey {
+private struct BottomControlsHeightKey: PreferenceKey {
     static let defaultValue: CGFloat = 0
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
@@ -96,7 +96,10 @@ struct CommentsContentView: View {
                         }
                         .scrollTargetLayout()
                     }
-                    .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
+                    .onScrollTargetVisibilityChange(
+                        idType: CommentsScrollTarget.self,
+                        threshold: 0.1
+                    ) { visibleTargets in
                         DispatchQueue.main.async { @MainActor in
                             updateVisibleCommentTarget(visibleTargets: visibleTargets)
                         }
@@ -143,14 +146,14 @@ struct CommentsContentView: View {
                     .background(
                         GeometryReader { controlsProxy in
                             Color.clear.preference(
-                                key: CommentsBottomControlsHeightPreferenceKey.self,
+                                key: BottomControlsHeightKey.self,
                                 value: controlsProxy.size.height
                             )
                         }
                     )
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .onPreferenceChange(CommentsBottomControlsHeightPreferenceKey.self) { height in
+                .onPreferenceChange(BottomControlsHeightKey.self) { height in
                     bottomControlsHeight = height
                 }
                 .onChange(of: pendingCommentID) { _, _ in
@@ -173,7 +176,9 @@ struct CommentsContentView: View {
             }
         }
     }
+}
 
+private extension CommentsContentView {
     private func updateHeaderState(offsetY: CGFloat) {
         updateHeaderState(offsetY: offsetY, animatesTitleChange: true)
     }

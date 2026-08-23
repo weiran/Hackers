@@ -16,7 +16,7 @@ enum PostCommentsSheetMetrics {
     static let handleAreaHeight: CGFloat = 22
     static let verticalDragBias: CGFloat = 1.2
 
-    static var defaultCollapsedBrowserObscuredBottomInset: CGFloat {
+    static var collapsedBrowserBottomInset: CGFloat {
         collapsedBrowserControlsHeight
             + collapsedBrowserControlsSpacing
             + collapsedBrowserControlsMargin

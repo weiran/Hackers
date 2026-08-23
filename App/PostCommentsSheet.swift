@@ -5,16 +5,15 @@ import Shared
 import SwiftUI
 import UIKit
 
-// swiftlint:disable type_body_length
-
+// swiftlint:disable:next type_body_length
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
     static let collapsedBrowserControlsHeight: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsHeight
     static let collapsedBrowserControlsSpacing: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsSpacing
     static let collapsedBrowserControlsMargin: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsMargin
-    static var defaultCollapsedBrowserObscuredBottomInset: CGFloat {
-        PostCommentsSheetMetrics.defaultCollapsedBrowserObscuredBottomInset
+    static var collapsedBrowserBottomInset: CGFloat {
+        PostCommentsSheetMetrics.collapsedBrowserBottomInset
     }
 
     private static let handleWidth: CGFloat = 36
@@ -189,7 +188,11 @@ struct PostCommentsSheet: View {
                             scheduleCollapsedUpvoteReenable()
                             return
                         }
-                        settleSheet(predictedTranslation: predictedTranslationHeight, layout.expandedTop, layout.collapsedTop)
+                        settleSheet(
+                            predictedTranslation: predictedTranslationHeight,
+                            layout.expandedTop,
+                            layout.collapsedTop
+                        )
                     },
                     onDragCancelled: {
                         animateSheet(WebViewAnimations.fast) {
@@ -238,7 +241,9 @@ struct PostCommentsSheet: View {
                     updateBrowserObscuredBottomInset()
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { notification in
+            .onReceive(
+                NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
+            ) { notification in
                 updateKeyboardHeight(keyboardHeight(for: notification))
             }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in

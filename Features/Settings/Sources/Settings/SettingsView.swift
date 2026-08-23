@@ -19,7 +19,7 @@ public struct SettingsView: View {
     let isAuthenticated: Bool
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
-    let onLogout: () -> Void
+    let onLogout: () async throws -> Void
     let onWhatsNewDismiss: () -> Void
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
@@ -37,7 +37,7 @@ public struct SettingsView: View {
         isAuthenticated: Bool = false,
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
-        onLogout: @escaping () -> Void = {},
+        onLogout: @escaping () async throws -> Void = {},
         onWhatsNewDismiss: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
@@ -214,7 +214,9 @@ public struct SettingsView: View {
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("This removes cached images, network responses, and in-app browser data to reduce storage.")
+                        Text(
+                            "This removes cached images, network responses, and in-app browser data to reduce storage."
+                        )
                     }
                 }
             }
@@ -249,7 +251,9 @@ public struct SettingsView: View {
         }
         .textScaling(for: viewModel.textSize)
     }
+}
 
+private extension SettingsView {
     private func openGitHub() {
         if let url = URL(string: "https://github.com/weiran/hackers") {
             UIApplication.shared.open(url)

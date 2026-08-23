@@ -16,6 +16,7 @@ import SwiftUI
 @Observable
 public final class FeedViewModel: @unchecked Sendable {
     public var isLoadingMore = false
+    public private(set) var paginationError: Error?
     public var postType: Domain.PostType = .news
 
     private var postIds: Set<Int> = Set()
@@ -89,7 +90,9 @@ public final class FeedViewModel: @unchecked Sendable {
         bookmarksObservation = startObservingBookmarks()
         readStatusObservation = startObservingReadStatus()
     }
+}
 
+extension FeedViewModel {
     @MainActor
     public func loadFeed() async {
         await feedLoader.loadIfNeeded()
@@ -101,18 +104,18 @@ public final class FeedViewModel: @unchecked Sendable {
         guard postType != .bookmarks else { return }
 
         isLoadingMore = true
+        paginationError = nil
+        defer { isLoadingMore = false }
 
-        if postType == .newest || postType == .jobs {
-            lastPostId = posts.last?.id ?? lastPostId
-        } else {
-            pageIndex += 1
-        }
+        let usesCursorPagination = postType == .newest || postType == .jobs
+        let requestedPage = usesCursorPagination ? pageIndex : pageIndex + 1
+        let requestedNextID = usesCursorPagination ? (posts.last?.id ?? lastPostId) : lastPostId
 
         do {
             let fetchedPosts = try await postUseCase.getPosts(
                 type: postType,
-                page: pageIndex,
-                nextId: lastPostId > 0 ? lastPostId : nil,
+                page: requestedPage,
+                nextId: requestedNextID > 0 ? requestedNextID : nil,
             )
 
             await bookmarksController.refreshBookmarks()
@@ -125,12 +128,15 @@ public final class FeedViewModel: @unchecked Sendable {
             // Update the LoadingStateManager's data with appended posts
             feedLoader.data.append(contentsOf: newPosts)
             postIds.formUnion(newPostIds)
-
-            isLoadingMore = false
+            pageIndex = requestedPage
+            lastPostId = requestedNextID
         } catch {
-            // Can't set error directly anymore, could log or handle differently
-            isLoadingMore = false
+            paginationError = error
         }
+    }
+
+    public func clearPaginationError() {
+        paginationError = nil
     }
 
     @MainActor
@@ -210,6 +216,7 @@ public final class FeedViewModel: @unchecked Sendable {
         pageIndex = 1
         lastPostId = 0
         isFetching = false
+        paginationError = nil
         feedLoader.reset()
     }
 

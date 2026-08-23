@@ -111,7 +111,9 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         self.commentingEnabled = commentingEnabled
         self.commentSubmission = commentSubmission
     }
+}
 
+extension UITestLaunchConfiguration {
     public var environment: [String: String] {
         var environment = [
             EnvironmentKey.testing.rawValue: "1",
@@ -202,7 +204,9 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
             commentSubmission: commentSubmission
         )
     }
+}
 
+private extension UITestLaunchConfiguration {
     private static func isTestingEnabled(in environment: [String: String]) throws -> Bool {
         let key = EnvironmentKey.testing.rawValue
         guard let value = environment[key] else { return false }

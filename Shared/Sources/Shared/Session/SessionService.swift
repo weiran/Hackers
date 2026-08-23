@@ -16,14 +16,16 @@ public final class SessionService {
     private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
     @ObservationIgnored private var logoutObserver: NSObjectProtocol?
+    @ObservationIgnored private var currentUserTask: Task<Void, Never>?
+    public private(set) var logoutError: Error?
 
     public init(authenticationUseCase: any AuthenticationUseCase) {
         self.authenticationUseCase = authenticationUseCase
 
-        Task { [weak self] in
-            guard let self else { return }
+        currentUserTask = Task { [weak self, authenticationUseCase] in
             let user = await authenticationUseCase.getCurrentUser()
-            await MainActor.run { self.user = user }
+            guard !Task.isCancelled else { return }
+            self?.user = user
         }
 
         logoutObserver = NotificationCenter.default.addObserver(
@@ -38,6 +40,7 @@ public final class SessionService {
     }
 
     isolated deinit {
+        currentUserTask?.cancel()
         if let observer = logoutObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -52,16 +55,23 @@ public final class SessionService {
     }
 
     public func authenticate(username: String, password: String) async throws -> AuthenticationState {
+        currentUserTask?.cancel()
         try await authenticationUseCase.authenticate(username: username, password: password)
         user = await authenticationUseCase.getCurrentUser()
+        logoutError = nil
         return .authenticated
     }
 
-    public func unauthenticate() {
-        Task { [weak self] in
-            guard let self else { return }
-            try? await authenticationUseCase.logout()
-            await MainActor.run { self.user = nil }
+    public func unauthenticate() async throws {
+        currentUserTask?.cancel()
+        logoutError = nil
+        do {
+            try await authenticationUseCase.logout()
+            user = nil
+        } catch {
+            logoutError = error
+            user = await authenticationUseCase.getCurrentUser()
+            throw error
         }
     }
 

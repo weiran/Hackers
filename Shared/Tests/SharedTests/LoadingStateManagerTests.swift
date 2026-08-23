@@ -193,6 +193,27 @@ struct LoadingStateManagerTests {
         #expect(manager.data == ["concurrent_item1"])
     }
 
+    @Test("A refresh supersedes an in-flight load")
+    func refreshSupersedesInFlightLoad() async {
+        let loadCounter = LoadCounter()
+        let manager = LoadingStateManager(
+            initialData: [] as [String],
+            loadData: {
+                let count = await loadCounter.increment()
+                try await Task.sleep(for: count == 1 ? .milliseconds(100) : .milliseconds(10))
+                return ["item\(count)"]
+            }
+        )
+
+        let firstLoad = Task { await manager.loadIfNeeded() }
+        try? await Task.sleep(for: .milliseconds(10))
+        await manager.refresh()
+        await firstLoad.value
+
+        #expect(manager.data == ["item2"])
+        #expect(manager.isLoading == false)
+    }
+
     @Test("loadIfNeeded with custom shouldSkipLoad logic")
     func customShouldSkipLogic() async {
         let loadCounter = LoadCounter()

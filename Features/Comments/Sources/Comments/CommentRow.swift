@@ -83,9 +83,12 @@ struct CommentRow: View {
                     .disabled(state.isVoting)
                 }
                 if state.canReply {
-                    Button(action: { onReply?() }) {
-                        Label("Reply", systemImage: "arrowshape.turn.up.left")
-                    }
+                    Button(
+                        action: { onReply?() },
+                        label: {
+                            Label("Reply", systemImage: "arrowshape.turn.up.left")
+                        }
+                    )
                     .disabled(state.isCommentSubmissionInProgress)
                 }
                 Divider()
@@ -112,7 +115,7 @@ struct CommentRow: View {
     /// overlapping snapshot. An explicit opaque preview avoids both.
     private var contextMenuPreview: some View {
         rowDisplay
-            .frame(width: UIScreen.main.bounds.width)
+            .containerRelativeFrame(.horizontal)
             .background(AppColors.background)
     }
 

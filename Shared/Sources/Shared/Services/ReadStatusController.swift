@@ -8,7 +8,8 @@
 import Domain
 import Foundation
 
-public final class ReadStatusController: @unchecked Sendable {
+@MainActor
+public final class ReadStatusController {
     private let readStatusUseCase: any ReadStatusUseCase
     private var cachedIDs: Set<Int> = []
     private var externalChangesObserver: NSObjectProtocol?
@@ -28,13 +29,12 @@ public final class ReadStatusController: @unchecked Sendable {
         }
     }
 
-    deinit {
+    isolated deinit {
         if let externalChangesObserver {
             NotificationCenter.default.removeObserver(externalChangesObserver)
         }
     }
 
-    @MainActor
     @discardableResult
     public func refreshReadStatus() async -> Set<Int> {
         let ids = await readStatusUseCase.readPostIDs()
@@ -42,7 +42,6 @@ public final class ReadStatusController: @unchecked Sendable {
         return ids
     }
 
-    @MainActor
     public func annotatedPosts(from posts: [Post]) -> [Post] {
         posts.map { post in
             var mutablePost = post
@@ -51,12 +50,10 @@ public final class ReadStatusController: @unchecked Sendable {
         }
     }
 
-    @MainActor
     public func isRead(_ postID: Int) -> Bool {
         cachedIDs.contains(postID)
     }
 
-    @MainActor
     public func markRead(postID: Int) async {
         cachedIDs.insert(postID)
         await readStatusUseCase.markPostRead(id: postID)

@@ -9,7 +9,7 @@ import Domain
 import Foundation
 import Networking
 
-public final class SearchRepository: SearchUseCase, @unchecked Sendable {
+public actor SearchRepository: SearchUseCase {
     private enum Constants {
         static let popularEndpoint = "https://hn.algolia.com/api/v1/search"
         static let recentEndpoint = "https://hn.algolia.com/api/v1/search_by_date"
