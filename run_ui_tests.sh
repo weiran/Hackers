@@ -37,6 +37,7 @@ FULL_TESTS=(
   BrowserCommentsUITests/testCustomBrowserLargeCommentListReturnsToTopAfterLongScroll
   BrowserCommentsUITests/testCustomBrowserLargeCommentBranchCollapsesAndExpands
   BrowserCommentsUITests/testCustomBrowserExpandedCommentPreservesScrollPosition
+  CommentVotingUITests/testUpvotingCommentShowsUpvotedStateAfterVotingCompletes
   NavigationAndCommentsUITests/testSystemBackSwipeFromCustomBrowserCollapsedComments
   NavigationAndCommentsUITests/testSystemBackSwipeFromCustomBrowserExpandedComments
   NavigationAndCommentsUITests/testSystemBackSwipeFromComments
@@ -64,6 +65,7 @@ FULL_TESTS=(
 FUNCTIONAL_TEST_SOURCES=(
   HackersUITests/HackersUITests.swift
   HackersUITests/BrowserCommentsUITests.swift
+  HackersUITests/CommentVotingUITests.swift
   HackersUITests/NavigationAndCommentsUITests.swift
   HackersUITests/CommentingUITests.swift
 )
