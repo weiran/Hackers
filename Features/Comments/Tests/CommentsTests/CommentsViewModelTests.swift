@@ -341,6 +341,149 @@ struct CommentsViewModelTests {
         #expect(sut.post?.score == initialScore)
     }
 
+    // MARK: - Vote / Fetch Race Tests
+
+    @Test("Applying a vote outcome updates only vote fields")
+    @MainActor
+    func applyPostVoteOutcomeMergesVoteFieldsOnly() {
+        // Given
+        guard let current = sut.post else {
+            #expect(false, "Expected post to be available")
+            return
+        }
+        // Simulate fields a concurrent comments fetch may have refreshed.
+        var currentWithRefreshedFields = current
+        currentWithRefreshedFields.commentsCount = 12
+        currentWithRefreshedFields.isBookmarked = true
+        sut.post = currentWithRefreshedFields
+
+        // A locally-computed outcome carries the vote state at tap time.
+        var outcome = testPost
+        outcome.upvoted = true
+        outcome.score = current.score + 1
+        outcome.voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=1&how=up")!,
+            unvote: URL(string: "vote?id=1&how=un")!
+        )
+
+        // When
+        sut.applyPostVoteOutcome(from: outcome)
+
+        // Then: the vote trio is adopted; unrelated fields are preserved.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == current.score + 1)
+        #expect(sut.post?.voteLinks?.unvote == URL(string: "vote?id=1&how=un")!)
+        #expect(sut.post?.commentsCount == 12)
+        #expect(sut.post?.isBookmarked == true)
+    }
+
+    @Test("Applying a vote outcome without a loaded post adopts it wholesale")
+    @MainActor
+    func applyPostVoteOutcomeWithoutLoadedPost() {
+        // Given
+        let viewModel = CommentsViewModel(
+            postID: 42,
+            initialPost: nil,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
+        )
+        let outcome = Post(
+            id: 42,
+            url: URL(string: "https://example.com")!,
+            title: "Test Post",
+            age: "1 hour ago",
+            commentsCount: 5,
+            by: "testuser",
+            score: 43,
+            postType: .news,
+            upvoted: true
+        )
+
+        // When
+        viewModel.applyPostVoteOutcome(from: outcome)
+
+        // Then
+        #expect(viewModel.post?.upvoted == true)
+        #expect(viewModel.post?.score == 43)
+    }
+
+    @Test("Fetching keeps an unconfirmed local upvote when the server disagrees")
+    @MainActor
+    func fetchKeepsUnconfirmedLocalUpvote() async throws {
+        // Given: a locally-applied upvote the server has not ingested yet.
+        try await sut.voteOnPost(upvote: true)
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 101)
+
+        // When the next fetch returns a snapshot that predates the vote.
+        var serverSnapshot = testPost
+        serverSnapshot.upvoted = false
+        serverSnapshot.score = 100
+        serverSnapshot.commentsCount = 8
+        mockPostUseCase.mockPost = serverSnapshot
+        await sut.refreshComments()
+
+        // Then: local intent wins, anchored on the fresher score, while the
+        // refreshed comment count still comes through.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 101)
+        #expect(sut.post?.commentsCount == 8)
+    }
+
+    @Test("Fetching adopts server vote state once the vote is confirmed")
+    @MainActor
+    func fetchAdoptsConfirmedServerVoteState() async throws {
+        // Given
+        try await sut.voteOnPost(upvote: true)
+
+        // When the server reflects the vote.
+        var serverSnapshot = testPost
+        serverSnapshot.upvoted = true
+        serverSnapshot.score = 105
+        mockPostUseCase.mockPost = serverSnapshot
+        await sut.refreshComments()
+
+        // Then: both sides agree and the server values pass through.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 105)
+    }
+
+    @Test("Fetching anchors the score while a pending unvote is unconfirmed")
+    @MainActor
+    func fetchAnchorsPendingLocalUnvote() async {
+        // Given: a previously-upvoted post whose unvote landed locally only.
+        var initiallyUpvoted = testPost
+        initiallyUpvoted.upvoted = true
+        initiallyUpvoted.score = 102
+        let viewModel = CommentsViewModel(
+            post: initiallyUpvoted,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
+        )
+        var reverted = initiallyUpvoted
+        reverted.upvoted = false
+        reverted.score = 101
+        viewModel.applyPostVoteOutcome(from: reverted)
+        #expect(viewModel.post?.upvoted == false)
+
+        // When the next fetch returns a snapshot that predates the unvote.
+        var serverSnapshot = initiallyUpvoted
+        serverSnapshot.commentsCount = 9
+        mockPostUseCase.mockPost = serverSnapshot
+        await viewModel.refreshComments()
+
+        // Then: the local unvote survives and the stale +1 is removed.
+        #expect(viewModel.post?.upvoted == false)
+        #expect(viewModel.post?.score == 101)
+        #expect(viewModel.post?.commentsCount == 9)
+    }
+
     @Test("replace(comment:) drives a visible re-render on a content-only change")
     @MainActor
     func replaceCommentBumpsVisibleRevision() async {

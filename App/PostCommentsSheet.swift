@@ -544,7 +544,7 @@ struct PostCommentsSheet: View {
                 await votingViewModel.upvote(post: &updatedPost)
             }
             await MainActor.run {
-                viewModel.post = updatedPost
+                viewModel.applyPostVoteOutcome(from: updatedPost)
             }
         }
     }

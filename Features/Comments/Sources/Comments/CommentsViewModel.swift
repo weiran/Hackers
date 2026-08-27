@@ -186,7 +186,7 @@ extension CommentsViewModel {
             let commentCountExcludingStoryText = loadedComments.count(where: { $0.id >= 0 })
 
             await MainActor.run {
-                self.post = annotatedPost
+                self.post = reconciledPost(annotatedPost)
                 self.post?.commentsCount = max(annotatedPost.commentsCount, commentCountExcludingStoryText)
                 self.isPostLoading = false
                 self.onCommentsLoaded?(loadedComments)
@@ -218,6 +218,22 @@ extension CommentsViewModel {
             post = currentPost
             throw error
         }
+    }
+
+    /// Merges a locally-computed post vote outcome (the optimistic/reverted
+    /// snapshot produced by `VotingViewModel`) into the loaded post without
+    /// clobbering unrelated fields a concurrent comments fetch may have just
+    /// refreshed, such as score drift from other readers or bookmark state.
+    @MainActor
+    public func applyPostVoteOutcome(from updated: Post) {
+        guard var current = post, current.id == updated.id else {
+            post = updated
+            return
+        }
+        current.upvoted = updated.upvoted
+        current.score = updated.score
+        current.voteLinks = updated.voteLinks
+        post = current
     }
 
     @MainActor
@@ -352,6 +368,24 @@ extension CommentsViewModel {
 }
 
 private extension CommentsViewModel {
+    /// A comments fetch can race a locally-applied post vote: the fetched
+    /// snapshot may predate Hacker News registering the vote and come back
+    /// looking un-voted. When the local post's vote state disagrees with the
+    /// fresh snapshot, keep the local intent and anchor the snapshot's score
+    /// with the pending ±1 delta. Fresh vote links still win so later
+    /// unvote taps use current tokens; once the server confirms the vote,
+    /// both sides agree and the snapshot passes through untouched.
+    func reconciledPost(_ serverPost: Post) -> Post {
+        guard let local = post, local.id == serverPost.id,
+              local.upvoted != serverPost.upvoted else {
+            return serverPost
+        }
+        var reconciled = serverPost
+        reconciled.upvoted = local.upvoted
+        reconciled.score = local.upvoted ? serverPost.score + 1 : max(serverPost.score - 1, 0)
+        return reconciled
+    }
+
     struct VisibleCommentSignature: Equatable {
         let id: Int
         let visibility: CommentVisibilityType

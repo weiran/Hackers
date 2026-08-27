@@ -428,13 +428,12 @@ private extension CommentsContentView {
         PostHeader(
             post: post,
             votingViewModel: votingViewModel,
-            isLoadingComments: viewModel.isLoading,
             showThumbnails: viewModel.showThumbnails,
             matchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             onLinkTap: { handleLinkTap() },
             onPostUpdated: { updatedPost in
-                viewModel.post = updatedPost
+                viewModel.applyPostVoteOutcome(from: updatedPost)
             },
             onBookmarkToggle: { await viewModel.toggleBookmark() }
         )
@@ -575,7 +574,6 @@ private struct NextCommentFloatingButton: View {
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
-    let isLoadingComments: Bool
     let showThumbnails: Bool
     let matchedGeometryNamespace: Namespace.ID?
     let isMatchedGeometrySource: Bool
@@ -619,7 +617,6 @@ struct PostHeader: View {
     }
 
     private func handleUpvote() async -> Bool {
-        guard !isLoadingComments else { return false }
         guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
 
         var mutablePost = post
@@ -636,7 +633,6 @@ struct PostHeader: View {
     }
 
     private func handleUnvote() async -> Bool {
-        guard !isLoadingComments else { return true }
         guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
 
         var mutablePost = post
