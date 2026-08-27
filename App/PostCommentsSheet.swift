@@ -112,6 +112,11 @@ struct PostCommentsSheet: View {
             let currentChromeAreaHeight = Self.handleAreaHeight
                 + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
             let showsExpandedPresentation = viewModel.post != nil
+            let commentsBottomSafeInset = if presentation.isExpanded, keyboardHeight > 0 {
+                0 as CGFloat
+            } else {
+                safeInsets.bottom
+            }
             let titleMaximumWidth = max(
                 containerSize.width
                     - proxy.safeAreaInsets.leading
@@ -132,7 +137,8 @@ struct PostCommentsSheet: View {
                     chromeAreaHeight: currentChromeAreaHeight,
                     titleMaximumWidth: titleMaximumWidth,
                     toolbarControlCenterY: toolbarControlCenterY,
-                    showsExpandedPresentation: showsExpandedPresentation
+                    showsExpandedPresentation: showsExpandedPresentation,
+                    commentsBottomSafeInset: commentsBottomSafeInset
                 )
                 .frame(width: sheetContainerSize.width, height: sheetContainerSize.height, alignment: .top)
                 .background(sheetBackground)
@@ -286,13 +292,15 @@ struct PostCommentsSheet: View {
         chromeAreaHeight: CGFloat,
         titleMaximumWidth: CGFloat,
         toolbarControlCenterY: CGFloat?,
-        showsExpandedPresentation: Bool
+        showsExpandedPresentation: Bool,
+        commentsBottomSafeInset: CGFloat
     ) -> some View {
         ZStack(alignment: .top) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     layout: layout,
-                    showsPostHeader: true
+                    showsPostHeader: true,
+                    bottomSafeInset: commentsBottomSafeInset
                 )
                 .overlay {
                     if layout.contentFadeProgress < 0.01 {
@@ -341,7 +349,8 @@ struct PostCommentsSheet: View {
 
     private func expandedCommentsView(
         layout: PostCommentsSheetLayout,
-        showsPostHeader: Bool
+        showsPostHeader: Bool,
+        bottomSafeInset: CGFloat
     ) -> some View {
         let viewport = layout.commentsViewport
 
@@ -381,6 +390,17 @@ struct PostCommentsSheet: View {
             }
         )
         .equatable()
+        // The sheet lays its viewport across the full window height, so the
+        // system bottom safe area never reaches the hosted comments view and
+        // the floating composer row would rest inside the home indicator
+        // zone. Mirror the device inset here; while the keyboard is up the
+        // viewport already ends at the keyboard top, like the standard
+        // presentation, so no extra inset applies then.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Color.clear
+                .frame(height: bottomSafeInset)
+                .allowsHitTesting(false)
+        }
         .frame(width: viewport.width, height: viewport.height, alignment: .topLeading)
         .onScrollPhaseChange { oldPhase, newPhase, context in
             let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
