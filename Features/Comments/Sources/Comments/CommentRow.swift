@@ -112,11 +112,22 @@ struct CommentRow: View {
 
     /// The default preview snapshots the live row out of the lazy scroll
     /// container, which cancels the lift and produces a transparent,
-    /// overlapping snapshot. An explicit opaque preview avoids both.
+    /// overlapping snapshot. An explicit opaque preview avoids both. The
+    /// system hosts the preview away from the scroll container, so the row's
+    /// container-relative sizing cannot resolve there and collapses to the
+    /// content's ideal width; anchor it to the real window width instead.
     private var contextMenuPreview: some View {
         rowDisplay
-            .containerRelativeFrame(.horizontal)
+            .frame(width: contextMenuPreviewWidth)
             .background(AppColors.background)
+    }
+
+    private var contextMenuPreviewWidth: CGFloat {
+        let presentationContext = PresentationContextProvider.shared
+        if let window = presentationContext.keyWindow {
+            return window.bounds.width
+        }
+        return presentationContext.windowScene?.screen.bounds.width ?? 390
     }
 
     private func handleToggle() {
