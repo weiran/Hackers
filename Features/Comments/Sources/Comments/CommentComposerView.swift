@@ -186,6 +186,9 @@ struct CommentComposerView: View {
                 ? Metrics.expandedEditorMinHeight
                 : Metrics.collapsedEditorMinHeight,
                 alignment: model.isExpanded ? .topLeading : .leading)
+            // Locks the field while a submission is in flight; the model's
+            // collapse guard keeps a focus loss here from closing the card.
+            .disabled(model.isPosting)
             .accessibilityLabel("Add a comment")
             .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerEditor)
         }
