@@ -353,11 +353,15 @@ private extension CommentsView {
     }
 
     private func handleLinkTap() {
+        // Self posts have no external link; their URL is the HN item page of
+        // this very view, so opening it would just re-push these comments.
+        guard let post = viewModel.post,
+              !HackerNewsConstants.isItemURL(post.url)
+        else { return }
         if let onPostLinkTap {
             onPostLinkTap()
             return
         }
-        guard let post = viewModel.post else { return }
         if navigationStore.openURLInPrimaryContext(post.url) {
             return
         }

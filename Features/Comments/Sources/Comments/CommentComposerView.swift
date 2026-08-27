@@ -113,9 +113,18 @@ struct CommentComposerView: View {
         }
         .onChange(of: model.presentation) { _, presentation in
             if presentation == .expanded {
-                // Focus on the next main-actor turn so the editor exists first.
+                // Give the growth spring a clear beat before summoning the
+                // keyboard: raising both simultaneously buries the morph
+                // under the keyboard slide and viewport relayout. Reduced
+                // Motion keeps the previous immediate behavior.
                 Task { @MainActor in
-                    await Task.yield()
+                    if reduceMotion {
+                        await Task.yield()
+                    } else {
+                        try? await Task.sleep(for: .milliseconds(220))
+                    }
+                    // The composer may have collapsed again during the wait.
+                    guard model.isExpanded else { return }
                     isEditorFocused = true
                 }
             } else {

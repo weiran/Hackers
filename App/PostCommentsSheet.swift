@@ -33,12 +33,17 @@ struct PostCommentsSheet: View {
     let onMediaPlaybackSuspensionChange: @MainActor (Bool) -> Void
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var presentation: PostCommentsSheetPresentation
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
     @State private var keyboardHeight: CGFloat = 0
+    // The keyboard reports its target frame once, ahead of the slide; this is
+    // the transaction the viewport resize rides so it tracks the system
+    // keyboard instead of snapping to its final height.
+    @State private var keyboardResizeAnimation = Animation.easeInOut(duration: 0.25)
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var toolbarGeometry = CommentsToolbarGeometry()
     @State private var isPostHeaderMatchedGeometryEnabled = false
@@ -250,9 +255,11 @@ struct PostCommentsSheet: View {
             .onReceive(
                 NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
             ) { notification in
+                keyboardResizeAnimation = keyboardAnimation(from: notification)
                 updateKeyboardHeight(keyboardHeight(for: notification))
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { notification in
+                keyboardResizeAnimation = keyboardAnimation(from: notification)
                 updateKeyboardHeight(0)
             }
         }
@@ -598,10 +605,23 @@ private extension PostCommentsSheet {
         return max(0, windowBottom - frameInWindow.minY)
     }
 
+    private func keyboardAnimation(from notification: Notification) -> Animation {
+        if reduceMotion {
+            return .easeInOut(duration: 0.1)
+        }
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        return .easeInOut(duration: max(duration ?? 0.25, 0.05))
+    }
+
     private func updateKeyboardHeight(_ newHeight: CGFloat) {
         let resolvedHeight = newHeight.isFinite ? max(newHeight, 0) : 0
         guard abs(keyboardHeight - resolvedHeight) > 0.5 else { return }
-        keyboardHeight = resolvedHeight
+        // Animate the resize so the comments viewport (and the floating
+        // composer with it) tracks the keyboard slide instead of jumping to
+        // its final height in a single frame and masking the morph.
+        withAnimation(keyboardResizeAnimation) {
+            keyboardHeight = resolvedHeight
+        }
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {

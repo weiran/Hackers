@@ -606,9 +606,11 @@ struct PostHeader: View {
                 onVote: { Task { await handleUpvote() } },
                 onUnvote: { Task { await handleUnvote() } }
             )
-            Divider()
-            Button { onLinkTap() } label: {
-                Label("Open Link", systemImage: "safari")
+            if !HackerNewsConstants.isItemURL(post.url) {
+                Divider()
+                Button { onLinkTap() } label: {
+                    Label("Open Link", systemImage: "safari")
+                }
             }
             Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
                 Label("Share", systemImage: "square.and.arrow.up")
