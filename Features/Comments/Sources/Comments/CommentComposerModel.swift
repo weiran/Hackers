@@ -210,11 +210,15 @@ public final class CommentComposerModel {
 /// which caller mutated the presentation. Callers supply their Reduce Motion
 /// environment value; the composer view uses the same helper.
 enum ComposerMotion {
+    /// Shared motion curve for the composer capsule growth AND the keyboard
+    /// viewport resize (mirrored in the app target's sheet). Identical curves
+    /// let the capsule read as glued to the keyboard's top edge while it
+    /// grows, matching message-bar-style input accessories.
     static func animation(isReducedMotion: Bool) -> Animation {
         if isReducedMotion {
             .easeInOut(duration: 0.2)
         } else {
-            .spring(response: 0.32, dampingFraction: 0.84)
+            .easeInOut(duration: 0.25)
         }
     }
 }

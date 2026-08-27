@@ -111,18 +111,10 @@ struct CommentComposerView: View {
         }
         .onChange(of: model.presentation) { _, presentation in
             if presentation == .expanded {
-                // Expansion triggered from outside this view (reply
-                // activation, discard confirmation): give the growth spring a
-                // clear beat, then bring the keyboard in. The collapsed-pill
-                // tap path uses expandFromCollapsed() instead, which leads
-                // with the keyboard and morphs afterwards.
+                // Focus lands with the expansion so the keyboard and the
+                // capsule growth travel together.
                 Task { @MainActor in
-                    if reduceMotion {
-                        await Task.yield()
-                    } else {
-                        try? await Task.sleep(for: .milliseconds(220))
-                    }
-                    // The composer may have collapsed again during the wait.
+                    await Task.yield()
                     guard model.isExpanded else { return }
                     isEditorFocused = true
                 }
@@ -258,21 +250,12 @@ struct CommentComposerView: View {
         onSubmit()
     }
 
-    /// Tapped-pill expansion, keyboard-led: focus lands immediately so the
-    /// keyboard slide starts first, then the capsule stretches into the editor
-    /// card a beat later and reads on its own instead of competing with the
-    /// keyboard's layout change.
+    /// Tapped-pill expansion: the growth spring and the keyboard slide run
+    /// together in one motion.
     private func expandFromCollapsed() {
-        Task { @MainActor in
-            isEditorFocused = true
-            if !reduceMotion {
-                try? await Task.sleep(for: .milliseconds(200))
-            }
-            // A collapse during the wait wins over the pending morph.
-            guard !model.isExpanded else { return }
-            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
-                model.expand()
-            }
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            model.expand()
         }
+        isEditorFocused = true
     }
 }

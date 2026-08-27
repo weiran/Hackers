@@ -609,8 +609,10 @@ private extension PostCommentsSheet {
         if reduceMotion {
             return .easeInOut(duration: 0.1)
         }
-        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-        return .easeInOut(duration: max(duration ?? 0.25, 0.05))
+        // Mirror ComposerMotion.animation so the composer capsule grows on
+        // the same curve the viewport rides, keeping it visually glued to
+        // the keyboard's leading edge throughout the slide.
+        return .easeInOut(duration: 0.25)
     }
 
     private func updateKeyboardHeight(_ newHeight: CGFloat) {
