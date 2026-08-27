@@ -13,6 +13,9 @@ public enum AccessibilityIdentifier {
         public static func post(_ id: Int) -> String {
             "feed.post.\(id)"
         }
+
+        public static let whatsNewPanel = "feed.whatsNewPanel"
+        public static let whatsNewPanelDismiss = "feed.whatsNewPanel.dismiss"
     }
 
     public enum Settings {

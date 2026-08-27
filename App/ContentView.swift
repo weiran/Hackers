@@ -25,6 +25,7 @@ struct MainContentView: View {
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
     @State private var showWhatsNew = false
+    @State private var showWhatsNewPanel = false
     private var navigationPathBinding: Binding<NavigationPath> {
         Binding(
             get: { navigationStore.path },
@@ -55,6 +56,18 @@ struct MainContentView: View {
     private var isPadLayout: Bool {
         DeviceLayout.usesPadLayout
     }
+    private var whatsNewPanel: WhatsNewPanel? {
+        guard showWhatsNewPanel else { return nil }
+        return whatsNewCoordinator.makeWhatsNewPanel(
+            onOpen: { showWhatsNew = true },
+            onDismiss: {
+                whatsNewCoordinator.markWhatsNewShown()
+                withAnimation(.default) {
+                    showWhatsNewPanel = false
+                }
+            }
+        )
+    }
 
     init(container: DependencyContainer = .shared) {
         whatsNewCoordinator = WhatsNewCoordinator(
@@ -65,12 +78,17 @@ struct MainContentView: View {
     var body: some View {
         Group {
             if isPadLayout {
-                AdaptiveSplitView(feedViewModel: feedViewModel, settingsViewModel: settingsViewModel)
+                AdaptiveSplitView(
+                    feedViewModel: feedViewModel,
+                    settingsViewModel: settingsViewModel,
+                    whatsNewPanel: whatsNewPanel
+                )
             } else {
                 NavigationStack(path: navigationPathBinding) {
                     FeedView<NavigationStore>(
                         viewModel: feedViewModel,
-                        isSidebar: false
+                        isSidebar: false,
+                        whatsNewPanel: whatsNewPanel
                     )
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         switch destination {
@@ -139,7 +157,16 @@ struct MainContentView: View {
             .textScaling(for: settingsViewModel.textSize)
             .toastOverlay(toastPresenter)
         }
-        .sheet(isPresented: $showWhatsNew) {
+        .sheet(
+            isPresented: $showWhatsNew,
+            onDismiss: {
+                // Also covers swipe-to-dismiss, so the panel doesn't return for this version.
+                whatsNewCoordinator.markWhatsNewShown()
+                withAnimation(.default) {
+                    showWhatsNewPanel = false
+                }
+            }
+        ) {
             whatsNewCoordinator
                 .makeWhatsNewView {
                     showWhatsNew = false
@@ -149,7 +176,7 @@ struct MainContentView: View {
         }
         .task {
             if whatsNewCoordinator.shouldShowWhatsNew() {
-                showWhatsNew = true
+                showWhatsNewPanel = true
             }
         }
     }
@@ -160,6 +187,7 @@ struct AdaptiveSplitView: View {
     @Environment(SessionService.self) private var sessionService
     let feedViewModel: FeedViewModel
     @State var settingsViewModel: SettingsViewModel
+    var whatsNewPanel: WhatsNewPanel?
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
         Binding(
@@ -173,7 +201,8 @@ struct AdaptiveSplitView: View {
             // Sidebar - FeedView
             FeedView<NavigationStore>(
                 viewModel: feedViewModel,
-                isSidebar: true
+                isSidebar: true,
+                whatsNewPanel: whatsNewPanel
             )
             .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
         } detail: {

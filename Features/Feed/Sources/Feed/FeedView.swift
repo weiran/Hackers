@@ -7,6 +7,7 @@ import SwiftUI
 public struct FeedView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     let isSidebar: Bool
+    let whatsNewPanel: WhatsNewPanel?
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
@@ -20,7 +21,8 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
-        isSidebar: Bool = false
+        isSidebar: Bool = false,
+        whatsNewPanel: WhatsNewPanel? = nil
     ) {
         _viewModel = State(initialValue: viewModel)
         _selectedPostType = State(initialValue: viewModel.postType)
@@ -33,6 +35,7 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
         _searchText = State(initialValue: viewModel.searchQuery)
         self.isSidebar = isSidebar
+        self.whatsNewPanel = whatsNewPanel
     }
 
     public var body: some View {
@@ -228,6 +231,12 @@ private extension FeedView {
         enablePagination: Bool,
         enableSearchPagination: Bool
     ) -> some View {
+        if !enableSearchPagination, let whatsNewPanel {
+            WhatsNewPanelRow(panel: whatsNewPanel)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+        }
         ForEach(posts, id: \.id) { post in
             postRow(
                 for: post,
