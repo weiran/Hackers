@@ -113,18 +113,32 @@ final class FeedAndSettingsUITests: HackersUITestCase {
 
         let username = assertHittable(app.textFields[AccessibilityIdentifier.Login.username])
         let password = assertHittable(app.secureTextFields[AccessibilityIdentifier.Login.password])
+
+        // Once the username field is focused, the software keyboard covers
+        // the password field and the Sign In button. Focus hops with the
+        // return key and the keyboard is dismissed before every tap so no
+        // step depends on where the keyboard happens to sit.
         username.tap()
-        username.typeText("ui-user")
-        password.tap()
-        password.typeText("wrong")
-        assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
+        username.typeText("ui-user\n")
+        password.typeText("wrong\n")
+
         let loginFailure = assertFullyContained(app.alerts["Login Failed"], in: app)
         assertHittable(loginFailure.buttons["OK"]).tap()
+        waitForFrameToSettle(password, timeout: 2)
 
-        password.tap()
+        dismissLoginKeyboard()
+        assertHittable(password).tap()
+        password.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 8))
         password.typeText("password")
-        assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
+        dismissLoginKeyboard()
 
+        assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
         assertHasVisibleIntersection(app.staticTexts["Logged in as ui-user"], in: app)
+    }
+
+    private func dismissLoginKeyboard() {
+        let swipeStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3))
+        let swipeEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
+        swipeStart.press(forDuration: 0.05, thenDragTo: swipeEnd)
     }
 }
