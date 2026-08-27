@@ -43,10 +43,8 @@ extension PostRepository {
         guard let unvoteURL = voteLinks.unvote else {
             throw HackersKitError.scraperError
         }
-        guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        let voteResponse = try await networkManager.getResponse(url: url)
-        try await confirmUnvoteAccepted(itemID: post.id, voteResponse: voteResponse)
+        try await submitUnvote(itemID: post.id, unvoteURL: unvoteURL)
     }
 
     public func upvote(comment: Domain.Comment, for _: Post) async throws {
@@ -71,46 +69,39 @@ extension PostRepository {
         guard let unvoteURL = voteLinks.unvote else {
             throw HackersKitError.scraperError
         }
-        guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        let voteResponse = try await networkManager.getResponse(url: url)
-        try await confirmUnvoteAccepted(itemID: comment.id, voteResponse: voteResponse)
+        try await submitUnvote(itemID: comment.id, unvoteURL: unvoteURL)
     }
 
     // MARK: - Unvote verification
 
-    /// Verifies an unvote took effect before letting the caller report success.
+    /// Performs an unvote and checks whether Hacker News actually applied it.
     ///
-    /// HN's response shape does not reliably reveal refusals: a vote outside its
-    /// unvote window can come back looking exactly like an accepted one (HTTP 200,
-    /// redirected to whence) while the server keeps the vote. Refusals are therefore
-    /// decided from actual page state: an item we are still upvoted on keeps its
-    /// `un_<id>` link or a hidden (`nosee`) upvote arrow. The vote response is checked
-    /// first — HN usually redirects to a page containing the item — and only when it
-    /// doesn't show the item is the item page fetched for ground truth.
-    func confirmUnvoteAccepted(itemID: Int, voteResponse: NetworkResponse) async throws {
-        let body = voteResponse.body
+    /// Verified against production HN: an applied vote 302-redirects to the link's
+    /// `goto` target, while a refused unvote (nothing to remove, or a vote outside
+    /// the unvote window) is silently ignored and returns the very same redirect —
+    /// there is no error response to detect. The only truthful signal is the vote
+    /// state the response page shows: an item we are still upvoted on keeps its
+    /// `un_<id>` link or a hidden (`nosee`) upvote arrow. The `goto` parameter is
+    /// therefore rewritten to the item's own page so the redirect response always
+    /// carries that state, keeping the whole check to this single request. Bare
+    /// error pages served at /vote ("Can't make that vote.") remain immediate
+    /// refusals.
+    func submitUnvote(itemID: Int, unvoteURL: URL) async throws {
+        guard let url = resolvedUnvoteURL(unvoteURL, itemID: itemID) else {
+            throw HackersKitError.scraperError
+        }
+
+        let response = try await networkManager.getResponse(url: url)
+        let body = response.body
         try throwIfLoginRequired(body)
 
-        if isRefusalServedInPlace(voteResponse, body: body) {
+        if isRefusalServedInPlace(response, body: body) {
             throw HackersKitError.voteRejected
         }
 
-        switch try voteState(from: body, itemID: itemID) {
-        case .upvoted:
+        if try voteState(from: body, itemID: itemID) == .upvoted {
             // The page HN returned still shows our vote standing.
-            throw HackersKitError.voteRejected
-        case .unupvoted:
-            return
-        case .inconclusive:
-            break
-        }
-
-        guard let itemPageURL = hackerNewsURL(id: itemID) else {
-            throw HackersKitError.requestFailure
-        }
-        let itemHTML = try await networkManager.get(url: itemPageURL)
-        if try voteState(from: itemHTML, itemID: itemID) == .upvoted {
             throw HackersKitError.voteRejected
         }
     }
@@ -133,8 +124,8 @@ extension PostRepository {
         return .unupvoted
     }
 
-    /// Some refusals are unmistakable without a refetch: HN serves bare error pages
-    /// ("Can't make that vote.") at the /vote endpoint instead of redirecting.
+    /// Some refusals are unmistakable: HN serves bare error pages ("Can't make that
+    /// vote.") at the /vote endpoint instead of redirecting to the goto target.
     private func isRefusalServedInPlace(_ response: NetworkResponse, body: String) -> Bool {
         let lowered = body.lowercased()
         guard response.finalURL.path == "/vote" else { return false }
@@ -148,6 +139,20 @@ extension PostRepository {
             body.contains("<form action=\"/login") ||
             body.contains("You have to be logged in")
         if containsLoginForm { throw HackersKitError.unauthenticated }
+    }
+
+    /// Resolves the unvote link to an absolute URL and rewrites its `goto` target to
+    /// the item's own page, so HN's redirect response contains the item's vote state.
+    private func resolvedUnvoteURL(_ voteURL: URL, itemID: Int) -> URL? {
+        guard var urlString = resolvedVoteURL(voteURL)?.absoluteString else { return nil }
+
+        let itemTarget = "goto=item%3Fid%3D\(itemID)"
+        if let range = urlString.range(of: "goto=[^&]*", options: .regularExpression) {
+            urlString.replaceSubrange(range, with: itemTarget)
+        } else {
+            urlString += "&" + itemTarget
+        }
+        return URL(string: urlString)
     }
 
     private func resolvedVoteURL(_ voteURL: URL) -> URL? {

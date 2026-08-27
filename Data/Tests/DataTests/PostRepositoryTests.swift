@@ -333,60 +333,37 @@ struct PostRepositoryTests {
 
     // Unvote post test removed
 
-    @Test("Unvote accepted when vote response already shows the vote removed")
+    @Test("Unvote accepted when response shows the vote removed")
     func unvotePostAcceptedFromVoteResponse() async throws {
-        let voteLinks = VoteLinks(
-            upvote: URL(string: "/vote?id=123&how=up")!,
-            unvote: URL(string: "/vote?id=123&how=un&goto=item%3Fid%3D123")!
-        )
-        let post = createTestPost(voteLinks: voteLinks)
-        // HN redirected to the item page, which shows a plain (not hidden) upvote
-        // arrow — proof the vote is gone. No refetch needed.
-        mockNetworkManager.enqueueGetResponse(
-            upvotedItemPageHTML(id: 123, upvoted: false),
-            redirectedTo: URL(string: "https://news.ycombinator.com/item?id=123")!
-        )
-
-        try await postRepository.unvote(post: post)
-
-        #expect(mockNetworkManager.getCallCount == 1)
-        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("how=un") == true)
-    }
-
-    @Test("Unvote accepted when refetched item page shows the vote removed")
-    func unvotePostAcceptedVerifiedByRefetch() async throws {
         let voteLinks = VoteLinks(
             upvote: URL(string: "/vote?id=123&how=up")!,
             unvote: URL(string: "/vote?id=123&how=un&goto=news")!
         )
         let post = createTestPost(voteLinks: voteLinks)
-        // Redirect to a feed page that doesn't contain item 123 — inconclusive.
-        mockNetworkManager.enqueueGetResponse(
-            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
-            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
-        )
-        // Ground truth: the item now shows a plain upvote arrow.
+        // HN redirects to the rewritten goto target (the item page), which shows a
+        // plain (not hidden) upvote arrow — proof the vote is gone.
         mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: false))
 
         try await postRepository.unvote(post: post)
 
-        #expect(mockNetworkManager.getCallCount == 2)
-        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("item?id=123") == true)
+        #expect(mockNetworkManager.getCallCount == 1, "Unvote must be a single request")
+        #expect(
+            mockNetworkManager.lastGetURL?.absoluteString.contains("goto=item%3Fid%3D123") == true,
+            "goto must be rewritten to the item page so the response carries the vote state"
+        )
+        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("how=un") == true)
     }
 
-    @Test("Unvote refused when vote response still shows the vote standing")
+    @Test("Unvote refused when response still shows the vote standing")
     func unvoteRefusedWhenVoteResponseStillShowsVote() async throws {
         let voteLinks = VoteLinks(
             upvote: URL(string: "/vote?id=123&how=up")!,
             unvote: URL(string: "/vote?id=123&how=un&goto=item%3Fid%3D123")!
         )
         let post = createTestPost(voteLinks: voteLinks)
-        // A months-old unvote: HN answers with a normal-looking redirect to the item
-        // page, but the unvote link is still there — the vote was kept.
-        mockNetworkManager.enqueueGetResponse(
-            upvotedItemPageHTML(id: 123, upvoted: true),
-            redirectedTo: URL(string: "https://news.ycombinator.com/item?id=123")!
-        )
+        // A months-old unvote: HN answers with a normal-looking redirect page, but
+        // the unvote link is still there — the vote was silently kept.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: true))
 
         do {
             try await postRepository.unvote(post: post)
@@ -400,31 +377,23 @@ struct PostRepositoryTests {
         #expect(mockNetworkManager.getCallCount == 1)
     }
 
-    @Test("Unvote refused detected via item page refetch")
-    func unvoteRefusedDetectedByItemRefetch() async throws {
+    @Test("Unvote with no recognizable item in response counts as applied")
+    func unvoteInconclusiveResponseCountsAsApplied() async throws {
         let voteLinks = VoteLinks(
             upvote: URL(string: "/vote?id=123&how=up")!,
             unvote: URL(string: "/vote?id=123&how=un&goto=news")!
         )
         let post = createTestPost(voteLinks: voteLinks)
-        // Redirect to a feed page that doesn't contain item 123 — inconclusive.
+        // HN silently ignores refused unvotes with a success-looking redirect; when
+        // the response doesn't contain the item at all there is nothing more to
+        // learn, and no extra request may be made.
         mockNetworkManager.enqueueGetResponse(
-            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
-            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
+            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>"
         )
-        // Ground truth: the item is still upvoted.
-        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: true))
 
-        do {
-            try await postRepository.unvote(post: post)
-            Issue.record("Expected voteRejected when the refetched page still shows the vote")
-        } catch let error as HackersKitError {
-            guard case HackersKitError.voteRejected = error else {
-                Issue.record("Expected voteRejected, got \(error)")
-                return
-            }
-        }
-        #expect(mockNetworkManager.getCallCount == 2)
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.getCallCount == 1, "No verification refetch may be issued")
     }
 
     @Test("Unvote refused with vote-too-old error page throws voteRejected")
@@ -492,6 +461,32 @@ struct PostRepositoryTests {
                 return
             }
         }
+    }
+
+    @Test("Comment unvote verifies the comment's own state")
+    func unvoteCommentRefusedByState() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=456&how=up")!,
+            unvote: URL(string: "/vote?id=456&how=un&goto=item%3Fid%3D123")!
+        )
+        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
+        let post = createTestPost()
+        // Response still shows comment 456 as upvoted: unvote silently ignored.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 456, upvoted: true))
+
+        do {
+            try await postRepository.unvote(comment: comment, for: post)
+            Issue.record("Expected voteRejected when the comment is still shown upvoted")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(
+            mockNetworkManager.lastGetURL?.absoluteString.contains("goto=item%3Fid%3D456") == true,
+            "goto must point at the comment so its own vote state comes back"
+        )
     }
 
     @Test("Upvote post without vote links")
