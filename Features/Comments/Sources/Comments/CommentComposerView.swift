@@ -96,9 +96,7 @@ struct CommentComposerView: View {
             // accessible name and tap target without affecting layout.
             if !model.isExpanded {
                 Button {
-                    withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
-                        model.expand()
-                    }
+                    expandFromCollapsed()
                 } label: {
                     Color.clear
                         .contentShape(Rectangle())
@@ -113,10 +111,11 @@ struct CommentComposerView: View {
         }
         .onChange(of: model.presentation) { _, presentation in
             if presentation == .expanded {
-                // Give the growth spring a clear beat before summoning the
-                // keyboard: raising both simultaneously buries the morph
-                // under the keyboard slide and viewport relayout. Reduced
-                // Motion keeps the previous immediate behavior.
+                // Expansion triggered from outside this view (reply
+                // activation, discard confirmation): give the growth spring a
+                // clear beat, then bring the keyboard in. The collapsed-pill
+                // tap path uses expandFromCollapsed() instead, which leads
+                // with the keyboard and morphs afterwards.
                 Task { @MainActor in
                     if reduceMotion {
                         await Task.yield()
@@ -257,5 +256,23 @@ struct CommentComposerView: View {
         model.beginPosting()
         isEditorFocused = true
         onSubmit()
+    }
+
+    /// Tapped-pill expansion, keyboard-led: focus lands immediately so the
+    /// keyboard slide starts first, then the capsule stretches into the editor
+    /// card a beat later and reads on its own instead of competing with the
+    /// keyboard's layout change.
+    private func expandFromCollapsed() {
+        Task { @MainActor in
+            isEditorFocused = true
+            if !reduceMotion {
+                try? await Task.sleep(for: .milliseconds(200))
+            }
+            // A collapse during the wait wins over the pending morph.
+            guard !model.isExpanded else { return }
+            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                model.expand()
+            }
+        }
     }
 }
