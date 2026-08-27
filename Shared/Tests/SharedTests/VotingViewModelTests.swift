@@ -253,7 +253,7 @@ struct VotingViewModelTests {
         #expect(post.upvoted == true, "Vote must remain shown when HN doesn't process the unvote")
         #expect(post.score == 10, "Score must be restored when HN doesn't process the unvote")
         #expect(post.voteLinks?.unvote != nil, "Vote links must be restored so unvote can be retried")
-        #expect(viewModel.lastError != nil, "Failure should surface an error")
+        #expect(viewModel.lastError != nil, "Generic failure should surface an error")
     }
 
     @Test("Rejected post unvote stays upvoted and stops offering unvote")
@@ -272,7 +272,10 @@ struct VotingViewModelTests {
             post.voteLinks?.unvote == nil,
             "Stale unvote affordance should be dropped once HN refuses it"
         )
-        #expect(viewModel.lastError != nil, "Rejection should surface an explanatory error")
+        #expect(
+            viewModel.lastError == nil,
+            "A refused unvote should revert silently, without an alert"
+        )
     }
 
     @Test("Rejected comment unvote stays upvoted and stops offering unvote")
@@ -296,7 +299,10 @@ struct VotingViewModelTests {
         #expect(applied.upvoted == true, "HN kept the vote, so the UI must stay upvoted")
         #expect(applied.voteLinks?.unvote == nil, "Stale unvote affordance should be dropped")
         #expect(applied.voteLinks?.upvote != nil)
-        #expect(viewModel.lastError != nil, "Rejection should surface an explanatory error")
+        #expect(
+            viewModel.lastError == nil,
+            "A refused unvote should revert silently, without an alert"
+        )
     }
 
     private func makeTestPost(upvoted: Bool) -> Post {

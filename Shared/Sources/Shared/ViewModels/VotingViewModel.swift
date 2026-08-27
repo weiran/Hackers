@@ -208,6 +208,9 @@ public final class VotingViewModel {
 
     private func handleUnauthenticatedIfNeeded(_ error: Error) async {
         guard case HackersKitError.unauthenticated = error else {
+            // A refused unvote (HN kept the vote) is communicated by reverting the
+            // optimistic UI alone; no alert is wanted for it.
+            if case HackersKitError.voteRejected = error { return }
             lastError = error
             return
         }
