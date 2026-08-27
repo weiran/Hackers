@@ -7,6 +7,7 @@
 
 import Domain
 import Foundation
+import Networking
 import SwiftSoup
 
 extension PostRepository {
@@ -44,7 +45,8 @@ extension PostRepository {
         }
         guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        try await submitUnvote(to: url)
+        let voteResponse = try await networkManager.getResponse(url: url)
+        try await confirmUnvoteAccepted(itemID: post.id, voteResponse: voteResponse)
     }
 
     public func upvote(comment: Domain.Comment, for _: Post) async throws {
@@ -71,38 +73,81 @@ extension PostRepository {
         }
         guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        try await submitUnvote(to: url)
+        let voteResponse = try await networkManager.getResponse(url: url)
+        try await confirmUnvoteAccepted(itemID: comment.id, voteResponse: voteResponse)
     }
 
     // MARK: - Unvote verification
 
-    /// Performs an unvote and verifies Hacker News actually accepted it.
+    /// Verifies an unvote took effect before letting the caller report success.
     ///
-    /// An accepted vote redirects to the whence page. A refused one (e.g. an unvote
-    /// outside the short window HN allows) is served in place at the /vote endpoint as
-    /// a bare error page such as "Can't make that vote." — HTTP 200, so without these
-    /// checks it would silently look successful.
-    func submitUnvote(to url: URL) async throws {
-        let response = try await networkManager.getResponse(url: url)
-        let body = response.body
+    /// HN's response shape does not reliably reveal refusals: a vote outside its
+    /// unvote window can come back looking exactly like an accepted one (HTTP 200,
+    /// redirected to whence) while the server keeps the vote. Refusals are therefore
+    /// decided from actual page state: an item we are still upvoted on keeps its
+    /// `un_<id>` link or a hidden (`nosee`) upvote arrow. The vote response is checked
+    /// first — HN usually redirects to a page containing the item — and only when it
+    /// doesn't show the item is the item page fetched for ground truth.
+    func confirmUnvoteAccepted(itemID: Int, voteResponse: NetworkResponse) async throws {
+        let body = voteResponse.body
+        try throwIfLoginRequired(body)
+
+        if isRefusalServedInPlace(voteResponse, body: body) {
+            throw HackersKitError.voteRejected
+        }
+
+        switch try voteState(from: body, itemID: itemID) {
+        case .upvoted:
+            // The page HN returned still shows our vote standing.
+            throw HackersKitError.voteRejected
+        case .unupvoted:
+            return
+        case .inconclusive:
+            break
+        }
+
+        guard let itemPageURL = hackerNewsURL(id: itemID) else {
+            throw HackersKitError.requestFailure
+        }
+        let itemHTML = try await networkManager.get(url: itemPageURL)
+        if try voteState(from: itemHTML, itemID: itemID) == .upvoted {
+            throw HackersKitError.voteRejected
+        }
+    }
+
+    private enum ItemVoteState {
+        case upvoted
+        case unupvoted
+        case inconclusive
+    }
+
+    private func voteState(from html: String, itemID: Int) throws -> ItemVoteState {
+        guard let document = try? SwiftSoup.parse(html),
+              let upvoteLink = try document.select("a#up_\(itemID)").first()
+        else { return .inconclusive }
+
+        let unvoteLink = try document.select("a#un_\(itemID)").first()
+        if unvoteLink != nil || upvoteLink.hasClass("nosee") {
+            return .upvoted
+        }
+        return .unupvoted
+    }
+
+    /// Some refusals are unmistakable without a refetch: HN serves bare error pages
+    /// ("Can't make that vote.") at the /vote endpoint instead of redirecting.
+    private func isRefusalServedInPlace(_ response: NetworkResponse, body: String) -> Bool {
+        let lowered = body.lowercased()
+        guard response.finalURL.path == "/vote" else { return false }
+        return lowered.contains("make that vote")
+            || lowered.contains("too old to be modified")
+            || !lowered.contains("<table")
+    }
+
+    private func throwIfLoginRequired(_ body: String) throws {
         let containsLoginForm =
             body.contains("<form action=\"/login") ||
             body.contains("You have to be logged in")
         if containsLoginForm { throw HackersKitError.unauthenticated }
-
-        let loweredBody = body.lowercased()
-        // HN redirects accepted votes to the whence/goto page, so any response still
-        // served at /vote is a refusal — either a known error text like
-        // "Can't make that vote." or an unrecognized bare error page.
-        guard response.finalURL.path == "/vote" else { return }
-        let recognizedRefusal =
-            loweredBody.contains("make that vote") ||
-            loweredBody.contains("too old to be modified")
-        // Unrecognized bare pages are treated as refusals too; only structurally
-        // complete pages there would be something unexpected.
-        if recognizedRefusal || !loweredBody.contains("<table") {
-            throw HackersKitError.voteRejected
-        }
     }
 
     private func resolvedVoteURL(_ voteURL: URL) -> URL? {

@@ -333,22 +333,98 @@ struct PostRepositoryTests {
 
     // Unvote post test removed
 
-    @Test("Unvote post accepted when HN redirects to whence page")
-    func unvotePostAccepted() async throws {
+    @Test("Unvote accepted when vote response already shows the vote removed")
+    func unvotePostAcceptedFromVoteResponse() async throws {
         let voteLinks = VoteLinks(
             upvote: URL(string: "/vote?id=123&how=up")!,
-            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+            unvote: URL(string: "/vote?id=123&how=un&goto=item%3Fid%3D123")!
         )
         let post = createTestPost(voteLinks: voteLinks)
+        // HN redirected to the item page, which shows a plain (not hidden) upvote
+        // arrow — proof the vote is gone. No refetch needed.
         mockNetworkManager.enqueueGetResponse(
-            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
-            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
+            upvotedItemPageHTML(id: 123, upvoted: false),
+            redirectedTo: URL(string: "https://news.ycombinator.com/item?id=123")!
         )
 
         try await postRepository.unvote(post: post)
 
         #expect(mockNetworkManager.getCallCount == 1)
         #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("how=un") == true)
+    }
+
+    @Test("Unvote accepted when refetched item page shows the vote removed")
+    func unvotePostAcceptedVerifiedByRefetch() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // Redirect to a feed page that doesn't contain item 123 — inconclusive.
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
+            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
+        )
+        // Ground truth: the item now shows a plain upvote arrow.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: false))
+
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.getCallCount == 2)
+        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("item?id=123") == true)
+    }
+
+    @Test("Unvote refused when vote response still shows the vote standing")
+    func unvoteRefusedWhenVoteResponseStillShowsVote() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=item%3Fid%3D123")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // A months-old unvote: HN answers with a normal-looking redirect to the item
+        // page, but the unvote link is still there — the vote was kept.
+        mockNetworkManager.enqueueGetResponse(
+            upvotedItemPageHTML(id: 123, upvoted: true),
+            redirectedTo: URL(string: "https://news.ycombinator.com/item?id=123")!
+        )
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected when the vote is still shown after unvoting")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(mockNetworkManager.getCallCount == 1)
+    }
+
+    @Test("Unvote refused detected via item page refetch")
+    func unvoteRefusedDetectedByItemRefetch() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // Redirect to a feed page that doesn't contain item 123 — inconclusive.
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
+            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
+        )
+        // Ground truth: the item is still upvoted.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: true))
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected when the refetched page still shows the vote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(mockNetworkManager.getCallCount == 2)
     }
 
     @Test("Unvote refused with vote-too-old error page throws voteRejected")
@@ -371,6 +447,7 @@ struct PostRepositoryTests {
                 return
             }
         }
+        #expect(mockNetworkManager.getCallCount == 1, "Bare refusal should not trigger a refetch")
     }
 
     @Test("Unknown bare error page served at /vote also throws voteRejected")
@@ -588,6 +665,53 @@ struct PostRepositoryTests {
             upvoted: upvoted,
             voteLinks: voteLinks,
         )
+    }
+
+    /// Minimal item page showing the item's vote area the way HN renders it for a
+    /// logged-in user: an upvoted item has a hidden (`nosee`) arrow plus an unvote
+    /// link, an un-upvoted item a plain arrow.
+    private func upvotedItemPageHTML(id: Int, upvoted: Bool) -> String {
+        let voteArea: String
+        if upvoted {
+            voteArea = """
+                <a id='up_\(id)' class='clicky nosee' href='vote?id=\(id)&how=up&auth=t'>
+                    <div class='votearrow' title='upvote'></div>
+                </a>
+                """
+        } else {
+            voteArea = """
+                <a id='up_\(id)' href='vote?id=\(id)&how=up'>
+                    <div class='votearrow' title='upvote'></div>
+                </a>
+                """
+        }
+        let unvoteArea = upvoted
+            ? "\n<span id='unv_\(id)'> | <a id='un_\(id)' class='clicky' href='vote?id=\(id)&how=un&auth=t'>unvote</a></span>"
+            : ""
+
+        return """
+        <html>
+        <body>
+        <table class="fatitem">
+            <tr class="athing" id="\(id)">
+                <td valign="top" class="votelinks">
+                    <center>
+                        \(voteArea)
+                    </center>
+                </td>
+                <td class="title"><span class="titleline"><a href="https://example.com/a">Title</a></span></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td class="subtext">
+                    <span class="score" id="score_\(id)">10 points</span>
+                    <span class="age">2 hours ago</span>\(unvoteArea)
+                </td>
+            </tr>
+        </table>
+        </body>
+        </html>
+        """
     }
 
     private func createMockPostsHTML() -> String {
