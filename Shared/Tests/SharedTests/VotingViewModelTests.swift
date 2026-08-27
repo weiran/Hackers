@@ -29,6 +29,7 @@ struct VotingViewModelTests {
     final class MockVotingStateProvider: VotingStateProvider, @unchecked Sendable {
         var upvoteCalled = false
         var errorToThrow: Error?
+        var unvoteErrorToThrow: Error?
 
         func votingState(for item: any Votable) -> VotingState {
             VotingState(
@@ -43,12 +44,15 @@ struct VotingViewModelTests {
             if let errorToThrow { throw errorToThrow }
         }
 
-        func unvote(item _: any Votable) async throws {}
+        func unvote(item _: any Votable) async throws {
+            if let unvoteErrorToThrow { throw unvoteErrorToThrow }
+        }
     }
 
     final class MockCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
         var upvoteCommentCalled = false
         var shouldThrow = false
+        var unvoteErrorToThrow: Error?
 
         func upvoteComment(_: Domain.Comment, for _: Post) async throws {
             upvoteCommentCalled = true
@@ -57,7 +61,9 @@ struct VotingViewModelTests {
             }
         }
 
-        func unvoteComment(_: Domain.Comment, for _: Post) async throws {}
+        func unvoteComment(_: Domain.Comment, for _: Post) async throws {
+            if let unvoteErrorToThrow { throw unvoteErrorToThrow }
+        }
     }
 
     final class BlockingCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
@@ -218,6 +224,97 @@ struct VotingViewModelTests {
         #expect(absolute.contains("how=un"), "Unvote URL should set how=un")
         #expect(absolute.contains("auth=abc123"), "Unvote URL should preserve auth token")
         #expect(absolute.contains("goto=news"), "Unvote URL should preserve goto parameter")
+    }
+
+    // MARK: - Unvote Rejection Tests
+
+    @Test("Successful post unvote clears unvote link")
+    @MainActor
+    func successfulPostUnvoteClearsUnvoteLink() async throws {
+        var post = makeTestPost(upvoted: true)
+
+        await votingViewModel.unvote(post: &post)
+
+        #expect(post.upvoted == false, "Optimistic unvote should stand on success")
+        #expect(post.score == 9, "Score should decrement on successful unvote")
+        #expect(post.voteLinks?.unvote == nil, "Unvote link should be cleared after unvoting")
+        #expect(votingViewModel.lastError == nil)
+    }
+
+    @Test("Failed post unvote restores upvoted state, score, and vote links")
+    @MainActor
+    func failedPostUnvoteRestoresState() async throws {
+        mockVotingStateProvider.unvoteErrorToThrow = HackersKitError.requestFailure
+        let viewModel = votingViewModel
+        var post = makeTestPost(upvoted: true)
+
+        await viewModel.unvote(post: &post)
+
+        #expect(post.upvoted == true, "Vote must remain shown when HN doesn't process the unvote")
+        #expect(post.score == 10, "Score must be restored when HN doesn't process the unvote")
+        #expect(post.voteLinks?.unvote != nil, "Vote links must be restored so unvote can be retried")
+        #expect(viewModel.lastError != nil, "Failure should surface an error")
+    }
+
+    @Test("Rejected post unvote stays upvoted and stops offering unvote")
+    @MainActor
+    func rejectedPostUnvoteDropsUnvoteLink() async throws {
+        mockVotingStateProvider.unvoteErrorToThrow = HackersKitError.voteRejected
+        let viewModel = votingViewModel
+        var post = makeTestPost(upvoted: true)
+
+        await viewModel.unvote(post: &post)
+
+        #expect(post.upvoted == true, "HN kept the vote, so the UI must stay upvoted")
+        #expect(post.score == 10, "Score must be restored when HN refuses the unvote")
+        #expect(post.voteLinks?.upvote != nil)
+        #expect(
+            post.voteLinks?.unvote == nil,
+            "Stale unvote affordance should be dropped once HN refuses it"
+        )
+        #expect(viewModel.lastError != nil, "Rejection should surface an explanatory error")
+    }
+
+    @Test("Rejected comment unvote stays upvoted and stops offering unvote")
+    @MainActor
+    func rejectedCommentUnvoteDropsUnvoteLink() async throws {
+        mockCommentVotingStateProvider.unvoteErrorToThrow = HackersKitError.voteRejected
+        let viewModel = votingViewModel
+        let post = makeTestPost(upvoted: true)
+        let comment = makeComment(id: 7)
+            .with(upvoted: true)
+            .with(
+                voteLinks: VoteLinks(
+                    upvote: URL(string: "/vote?id=7&how=up")!,
+                    unvote: URL(string: "/vote?id=7&how=un&goto=item%3Fid%3D1")!
+                )
+            )
+        var applied = comment
+
+        await viewModel.unvote(comment: comment, in: post) { applied = $0 }
+
+        #expect(applied.upvoted == true, "HN kept the vote, so the UI must stay upvoted")
+        #expect(applied.voteLinks?.unvote == nil, "Stale unvote affordance should be dropped")
+        #expect(applied.voteLinks?.upvote != nil)
+        #expect(viewModel.lastError != nil, "Rejection should surface an explanatory error")
+    }
+
+    private func makeTestPost(upvoted: Bool) -> Post {
+        Post(
+            id: 1,
+            url: URL(string: "https://example.com")!,
+            title: "Post",
+            age: "1h",
+            commentsCount: 0,
+            by: "user",
+            score: 10,
+            postType: .news,
+            upvoted: upvoted,
+            voteLinks: VoteLinks(
+                upvote: URL(string: "/vote?id=1&how=up"),
+                unvote: URL(string: "/vote?id=1&how=un&goto=news")
+            )
+        )
     }
 
     // MARK: - Comment Voting Tests

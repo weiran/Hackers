@@ -42,17 +42,9 @@ extension PostRepository {
         guard let unvoteURL = voteLinks.unvote else {
             throw HackersKitError.scraperError
         }
+        guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
-
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm =
-            response.contains("<form action=\"/login") ||
-            response.contains("You have to be logged in")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try await submitUnvote(to: url)
     }
 
     public func upvote(comment: Domain.Comment, for _: Post) async throws {
@@ -77,15 +69,51 @@ extension PostRepository {
         guard let unvoteURL = voteLinks.unvote else {
             throw HackersKitError.scraperError
         }
+        guard let url = resolvedVoteURL(unvoteURL) else { throw HackersKitError.scraperError }
 
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
+        try await submitUnvote(to: url)
+    }
 
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
+    // MARK: - Unvote verification
+
+    /// Performs an unvote and verifies Hacker News actually accepted it.
+    ///
+    /// An accepted vote redirects to the whence page. A refused one (e.g. an unvote
+    /// outside the short window HN allows) is served in place at the /vote endpoint as
+    /// a bare error page such as "Can't make that vote." — HTTP 200, so without these
+    /// checks it would silently look successful.
+    func submitUnvote(to url: URL) async throws {
+        let response = try await networkManager.getResponse(url: url)
+        let body = response.body
+        let containsLoginForm =
+            body.contains("<form action=\"/login") ||
+            body.contains("You have to be logged in")
         if containsLoginForm { throw HackersKitError.unauthenticated }
+
+        let loweredBody = body.lowercased()
+        // HN redirects accepted votes to the whence/goto page, so any response still
+        // served at /vote is a refusal — either a known error text like
+        // "Can't make that vote." or an unrecognized bare error page.
+        guard response.finalURL.path == "/vote" else { return }
+        let recognizedRefusal =
+            loweredBody.contains("make that vote") ||
+            loweredBody.contains("too old to be modified")
+        // Unrecognized bare pages are treated as refusals too; only structurally
+        // complete pages there would be something unexpected.
+        if recognizedRefusal || !loweredBody.contains("<table") {
+            throw HackersKitError.voteRejected
+        }
+    }
+
+    private func resolvedVoteURL(_ voteURL: URL) -> URL? {
+        let reference = voteURL.absoluteString
+        guard !reference.hasPrefix("http") else { return URL(string: reference) }
+
+        // Leading-slash references would otherwise join into a "//vote" double-slash
+        // path; normalize so every resolved vote URL lives directly under /vote.
+        var path = Substring(reference)
+        while path.first == "/" { path = path.dropFirst() }
+        return URL(string: urlBase + "/" + path)
     }
 
     // MARK: - Vote link extraction

@@ -232,7 +232,21 @@ public enum HackersKitError: Error, Sendable {
     case requestFailure
     case scraperError
     case unauthenticated
+    /// Hacker News refused the vote itself (e.g. an unvote outside the short window
+    /// it allows), served as a bare error page rather than the usual whence redirect.
+    case voteRejected
     case authenticationError(error: HackersKitAuthenticationError)
+}
+
+extension HackersKitError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .voteRejected:
+            "Hacker News didn’t accept this vote. Votes can only be undone shortly after they’re cast."
+        default:
+            nil
+        }
+    }
 }
 
 public enum HackersKitAuthenticationError: Error, Sendable {

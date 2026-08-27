@@ -25,7 +25,7 @@ struct PostRepositoryTests {
 
     final class MockNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
         private enum PendingResponse {
-            case success(String)
+            case success(String, redirectedTo: URL?)
             case failure(Error)
         }
 
@@ -45,8 +45,10 @@ struct PostRepositoryTests {
             if !getResponses.isEmpty {
                 let response = getResponses.removeFirst()
                 switch response {
-                case let .success(html):
-                    return NetworkResponse(body: html, statusCode: 200, finalURL: url)
+                case let .success(html, redirect):
+                    // Mirrors URLSession redirect handling: a nil redirect means HN
+                    // served this response at the requested URL itself.
+                    return NetworkResponse(body: html, statusCode: 200, finalURL: redirect ?? url)
                 case let .failure(error):
                     throw error
                 }
@@ -61,7 +63,7 @@ struct PostRepositoryTests {
             if !postResponses.isEmpty {
                 let response = postResponses.removeFirst()
                 switch response {
-                case let .success(html):
+                case let .success(html, _):
                     return NetworkResponse(body: html, statusCode: 200, finalURL: url)
                 case let .failure(error):
                     throw error
@@ -93,7 +95,13 @@ struct PostRepositoryTests {
         // MARK: - Helpers
 
         func enqueueGetResponse(_ html: String) {
-            getResponses.append(.success(html))
+            getResponses.append(.success(html, redirectedTo: nil))
+        }
+
+        /// Enqueues a success response whose final URL differs from the request, modelling
+        /// HN's redirect to the whence/goto page after an accepted vote.
+        func enqueueGetResponse(_ html: String, redirectedTo finalURL: URL) {
+            getResponses.append(.success(html, redirectedTo: finalURL))
         }
 
         func enqueueGetError(_ error: Error) {
@@ -101,7 +109,7 @@ struct PostRepositoryTests {
         }
 
         func enqueuePostResponse(_ html: String) {
-            postResponses.append(.success(html))
+            postResponses.append(.success(html, redirectedTo: nil))
         }
 
         func enqueuePostError(_ error: Error) {
@@ -324,6 +332,90 @@ struct PostRepositoryTests {
     }
 
     // Unvote post test removed
+
+    @Test("Unvote post accepted when HN redirects to whence page")
+    func unvotePostAccepted() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>",
+            redirectedTo: URL(string: "https://news.ycombinator.com/news")!
+        )
+
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.getCallCount == 1)
+        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("how=un") == true)
+    }
+
+    @Test("Unvote refused with vote-too-old error page throws voteRejected")
+    func unvotePostRejectedTooOld() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body>Vote too old to be modified.</body></html>"
+        )
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected for an out-of-window unvote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+    }
+
+    @Test("Unknown bare error page served at /vote also throws voteRejected")
+    func unvotePostRejectedUnknownErrorPage() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // No redirect away from /vote and no page structure — must not count as success.
+        mockNetworkManager.enqueueGetResponse("<html><body>Some future refusal text.</body></html>")
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected for a refusal served at /vote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+    }
+
+    @Test("Rejected comment unvote throws voteRejected")
+    func unvoteCommentRejected() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=456&how=up")!,
+            unvote: URL(string: "/vote?id=456&how=un&goto=item%3Fid%3D123")!
+        )
+        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
+        let post = createTestPost()
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body>Can't make that vote.</body></html>"
+        )
+
+        do {
+            try await postRepository.unvote(comment: comment, for: post)
+            Issue.record("Expected voteRejected for a refused comment unvote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+    }
 
     @Test("Upvote post without vote links")
     func upvotePostWithoutVoteLinks() async {
