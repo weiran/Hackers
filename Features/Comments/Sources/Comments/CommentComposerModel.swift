@@ -9,6 +9,7 @@
 import Domain
 import Foundation
 import Observation
+import SwiftUI
 
 public enum CommentComposerTarget: Equatable, Sendable {
     case story
@@ -201,5 +202,19 @@ public final class CommentComposerModel {
     /// failed to find the comment.
     func outcomeUnknownStillUnresolved() {
         alert = .outcomeUnknown
+    }
+}
+
+/// The transaction animation every composer expansion/collapse must run in,
+/// so the glass capsule tweens between its pill and card shapes no matter
+/// which caller mutated the presentation. Callers supply their Reduce Motion
+/// environment value; the composer view uses the same helper.
+enum ComposerMotion {
+    static func animation(isReducedMotion: Bool) -> Animation {
+        if isReducedMotion {
+            .easeInOut(duration: 0.2)
+        } else {
+            .spring(response: 0.32, dampingFraction: 0.84)
+        }
     }
 }

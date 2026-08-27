@@ -51,6 +51,7 @@ struct CommentsContentView: View {
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
     @Environment(\.textScaling) private var textScaling
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(SessionService.self) private var sessionService
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
@@ -310,7 +311,9 @@ private extension CommentsContentView {
 
     private func dismissComposerForInteraction() {
         guard composer.isExpanded else { return }
-        composer.collapsePreservingDraft()
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.collapsePreservingDraft()
+        }
     }
 
     private func upvoteComment(withID commentID: Int, in post: Post) {
@@ -519,11 +522,11 @@ private struct CommentsFloatingControls: View {
         canComment || showsNextCommentButton
     }
 
-    private var showsNextButton: Bool {
-        // Keep the control in the row from the moment the panel appears. It
-        // remains disabled until the first visible target is known.
-        !composer.isExpanded && showsNextCommentButton
-    }
+        private var showsNextButton: Bool {
+            // Keep the control in the row from the moment the panel appears. It
+            // remains disabled until the first visible target is known.
+            !composer.isExpanded && showsNextCommentButton
+        }
 }
 
 private struct NextCommentFloatingButton: View {

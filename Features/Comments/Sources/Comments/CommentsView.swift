@@ -57,6 +57,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.appRuntimePolicy) private var appRuntimePolicy
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(SessionService.self) private var sessionService
     private let showsPostHeader: Bool
     private let allowsRefresh: Bool
@@ -326,11 +327,15 @@ public extension CommentsView {
         }
         .onChange(of: canComment) { _, available in
             guard !available else { return }
-            composer.collapsePreservingDraft()
+            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                composer.collapsePreservingDraft()
+            }
         }
         .onChange(of: isInteractionEnabled) { _, enabled in
             guard !enabled else { return }
-            composer.collapsePreservingDraft()
+            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                composer.collapsePreservingDraft()
+            }
         }
     }
 }
@@ -440,7 +445,9 @@ extension CommentsView {
             if let inserted = viewModel.insertSubmittedComment(submitted) {
                 pendingCommentID = inserted.id
             }
-            composer.postingSucceeded()
+            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                composer.postingSucceeded()
+            }
         case let .unconfirmed(attempt):
             composer.postingBecameUnconfirmed(attempt: attempt)
         }
@@ -466,7 +473,9 @@ extension CommentsView {
                 if let inserted = viewModel.insertSubmittedComment(submitted) {
                     pendingCommentID = inserted.id
                 }
-                composer.outcomeUnknownResolved()
+                withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                    composer.outcomeUnknownResolved()
+                }
             } else {
                 composer.outcomeUnknownStillUnresolved()
             }
@@ -479,7 +488,9 @@ extension CommentsView {
         // Draft and target stay in the composer; the gate hides all commenting
         // UI while logged out. If the same comments view survives a re-login,
         // the preserved collapsed draft reappears.
-        composer.sessionDidExpire()
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.sessionDidExpire()
+        }
         let container = DependencyContainer.shared
         try? await container.getAuthenticationUseCase().logout()
         NotificationCenter.default.post(name: .userDidLogout, object: nil)
@@ -492,14 +503,18 @@ extension CommentsView {
         guard canComment, !composer.isPosting else { return }
         let wasDirtySwitch = composer.hasDraft
             && composer.target != .reply(commentID: commentID, author: author)
-        composer.activateReply(commentID: commentID, author: author)
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.activateReply(commentID: commentID, author: author)
+        }
         guard !wasDirtySwitch else { return }
         presentReplyTarget(commentID: commentID)
     }
 
     private func confirmDiscardAndReply() {
         guard case let .discardDraft(newTarget) = composer.alert else { return }
-        composer.confirmTargetReplacement()
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.confirmTargetReplacement()
+        }
         if case let .reply(commentID, _) = newTarget {
             presentReplyTarget(commentID: commentID)
         }
@@ -508,7 +523,9 @@ extension CommentsView {
     private func presentReplyTarget(commentID: Int) {
         _ = viewModel.revealComment(withId: commentID)
         replyScrollTarget = commentID
-        composer.expand()
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.expand()
+        }
     }
 
     // MARK: - Composer alerts

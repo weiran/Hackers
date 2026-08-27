@@ -2,7 +2,7 @@
 //  CommentComposerView.swift
 //  Comments
 //
-//  The shared bottom composer for top-level comments and replies.
+//  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
 import DesignSystem
@@ -16,171 +16,198 @@ struct CommentComposerView: View {
         static let cardVerticalPadding: CGFloat = 6
         static let cardTopPadding: CGFloat = 9
         static let editorTopPadding: CGFloat = 8
+        static let actionRowHeight: CGFloat = 36
         // Match the editor's visible horizontal inset to the card's 6pt inset
         // plus the editor's 8pt top inset.
         static let editorHorizontalPadding: CGFloat = cardVerticalPadding + editorTopPadding
+        // The collapsed pill reproduces the original 48pt footprint. The
+        // vertical-axis TextField adds ~2pt of intrinsic chrome, hence 46.
+        static let collapsedEditorMinHeight: CGFloat = 46
+        static let expandedEditorMinHeight: CGFloat = 40
+        // Space between the editor and the action row inside the expanded card.
+        static let expandedEditorBottomInset: CGFloat = 4
     }
 
     @Bindable var model: CommentComposerModel
     let onSubmit: () -> Void
 
     @FocusState private var isEditorFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        if model.isExpanded {
-            expandedComposer
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-        } else {
-            collapsedComposer
-        }
+        composerSurface
     }
 
-    // MARK: - Collapsed
-
-    private var collapsedComposer: some View {
-        Button {
-            model.expand()
-        } label: {
-            VStack(alignment: .leading, spacing: 2) {
-                if let username = model.replyUsername {
-                    Text("Replying to \(username)")
-                        .scaledFont(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                }
-                Text(model.draftPreview ?? "Add a comment…")
-                    .scaledFont(.subheadline)
-                    .foregroundStyle(
-                        model.draftPreview == nil
-                            ? Color.primary.opacity(0.72)
-                            : Color.primary
-                    )
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+    /// One persistent glass surface hosts one persistent content stack: no
+    /// subtree ever structurally replaces another, every dimension tween is a
+    /// plain number (paddings, the action row height, opacities). That keeps
+    /// the Liquid Glass capsule tracking a smoothly interpolated frame so
+    /// expanding stretches the pill into the editor card instead of snapping.
+    private var composerSurface: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if let username = model.replyUsername {
+                Text("Replying to \(username)")
+                    .scaledFont(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, Metrics.editorHorizontalPadding)
+                    .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerReplyLabel)
             }
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24))
-        .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerCollapsed)
-    }
 
-    // MARK: - Expanded
+            editorBlock
 
-    private var expandedComposer: some View {
-        GlassEffectContainer(spacing: 4) {
-            VStack(alignment: .leading, spacing: 2) {
-                if let username = model.replyUsername {
-                    Text("Replying to \(username)")
-                        .scaledFont(.footnote)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, Metrics.editorHorizontalPadding)
-                        .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerReplyLabel)
-                }
+            actionRow
+                // Tweaking the row's height numerically lets the glass surface
+                // ride the same animation instead of jumping to a new size.
+                .frame(height: model.isExpanded ? Metrics.actionRowHeight : 0, alignment: .center)
+                .padding(.bottom, model.isExpanded ? 2 : 0)
+                .opacity(model.isExpanded ? 1 : 0)
+                .clipped()
+                .allowsHitTesting(model.isExpanded)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    ZStack(alignment: .topLeading) {
-                        if model.text.isEmpty {
-                            Text("Add a comment…")
-                                .scaledFont(.callout)
-                                .foregroundStyle(Color.primary.opacity(0.72))
-                                .padding(.top, Metrics.editorTopPadding)
-                                .padding(.horizontal, Metrics.editorHorizontalPadding)
-                                .padding(.bottom, 4)
-                                .allowsHitTesting(false)
-                        }
-
-                        TextField(
-                            "",
-                            text: Binding(
-                                get: { model.text },
-                                set: { newValue in
-                                    // Keep the editor focused while the post is
-                                    // in flight, but ignore any late text events
-                                    // after submission has started.
-                                    guard !model.isPosting else { return }
-                                    model.text = newValue
-                                }
-                            ),
-                            axis: .vertical
-                        )
-                        .lineLimit(1 ... 8)
-                        .focused($isEditorFocused)
-                        .submitLabel(.send)
-                        .onSubmit { postIfPossible() }
-                        .multilineTextAlignment(.leading)
-                        // Match CommentRow's callout typography and the app's text scaling.
-                        .scaledFont(.callout)
-                        .foregroundStyle(.primary)
-                        .tint(AppColors.appTintColor)
-                        .padding(.top, Metrics.editorTopPadding)
-                        .padding(.horizontal, Metrics.editorHorizontalPadding)
-                        .padding(.bottom, 4)
-                        .frame(maxWidth: .infinity, minHeight: 40, alignment: .topLeading)
-                        .accessibilityLabel("Add a comment")
-                        .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerEditor)
-                    }
-
-                    HStack(alignment: .center) {
-                        cancelButton
-
-                        Spacer(minLength: 8)
-
-                        postButton
-                    }
+            if let inlineError = model.inlineError {
+                Text(inlineError)
+                    .scaledFont(.footnote)
+                    .foregroundStyle(.red)
                     .padding(.horizontal, Metrics.cardHorizontalPadding)
-                    .padding(.bottom, 2)
-                }
-
-                if let inlineError = model.inlineError {
-                    Text(inlineError)
-                        .scaledFont(.footnote)
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, Metrics.cardHorizontalPadding)
-                        .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerError)
-                }
+                    .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerError)
             }
-            .padding(.top, model.replyUsername == nil ? Metrics.cardVerticalPadding : Metrics.cardTopPadding)
-            .padding(.bottom, Metrics.cardVerticalPadding)
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24))
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerExpanded)
-            .onChange(of: model.presentation) { _, presentation in
-                if presentation == .expanded {
-                    // Focus on the next main-actor turn so the editor exists first.
-                    Task { @MainActor in
-                        await Task.yield()
-                        isEditorFocused = true
+        }
+        // The expanded card restores the original surface breathing room on
+        // top of the content paddings; collapsed keeps the bare 48pt pill.
+        .padding(
+            .top,
+            model.isExpanded
+                ? (model.replyUsername == nil ? Metrics.cardVerticalPadding : Metrics.cardTopPadding)
+                : 0
+        )
+        .padding(.bottom, model.isExpanded ? Metrics.cardVerticalPadding : 0)
+        .animation(ComposerMotion.animation(isReducedMotion: reduceMotion), value: model.isExpanded)
+        // Without this the glass renderer blends/cross-fades the surface
+        // across state changes instead of visibly reshaping it; .identity
+        // makes the capsule track the interpolated frame directly.
+        .glassEffectTransition(.identity)
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24))
+        .contentShape(.rect(cornerRadius: 24))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerExpanded)
+        .overlay {
+            // While collapsed the whole card is the expand affordance; an
+            // invisible labelled button on top keeps the pill's original
+            // accessible name and tap target without affecting layout.
+            if !model.isExpanded {
+                Button {
+                    withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                        model.expand()
                     }
-                } else {
-                    // External comment interactions collapse the model directly.
-                    // Resign focus here as well so the keyboard follows that
-                    // state change instead of leaving a detached editor focused.
-                    isEditorFocused = false
+                } label: {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .accessibilityLabel(
+                            model.draftPreview ?? "Add a comment…"
+                        )
                 }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerCollapsed)
+                .transition(.opacity)
             }
-            .onChange(of: isEditorFocused) { _, focused in
-                // Losing focus collapses the composer while keeping the draft,
-                // except while a submission is in flight.
-                if !focused, model.isExpanded {
+        }
+        .onChange(of: model.presentation) { _, presentation in
+            if presentation == .expanded {
+                // Focus on the next main-actor turn so the editor exists first.
+                Task { @MainActor in
+                    await Task.yield()
+                    isEditorFocused = true
+                }
+            } else {
+                // External comment interactions collapse the model directly.
+                // Resign focus here as well so the keyboard follows that
+                // state change instead of leaving a detached editor focused.
+                isEditorFocused = false
+            }
+        }
+        .onChange(of: isEditorFocused) { _, focused in
+            // Losing focus collapses the composer while keeping the draft,
+            // except while a submission is in flight.
+            if !focused, model.isExpanded {
+                withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
                     model.collapsePreservingDraft()
                 }
             }
-            .onAppear {
-                if model.isExpanded {
-                    isEditorFocused = true
-                }
+        }
+        .onAppear {
+            if model.isExpanded {
+                isEditorFocused = true
             }
         }
+    }
+
+    private var editorBlock: some View {
+        // Vertically top-anchored while expanded (multi-line growth) and
+        // vertically centered in the pill while collapsed; the editor's
+        // top inset tweens numerically with the state so neither the field
+        // nor its placeholder jumps between states.
+        ZStack(alignment: model.isExpanded ? .topLeading : .leading) {
+            if model.text.isEmpty {
+                Text("Add a comment…")
+                    .scaledFont(.callout)
+                    .foregroundStyle(Color.primary.opacity(0.72))
+                    .padding(.top, model.isExpanded ? Metrics.editorTopPadding : 0)
+                    .padding(.horizontal, Metrics.editorHorizontalPadding)
+                    .allowsHitTesting(false)
+            }
+
+            TextField(
+                "",
+                text: Binding(
+                    get: { model.text },
+                    set: { newValue in
+                        // Keep the editor focused while the post is
+                        // in flight, but ignore any late text events
+                        // after submission has started.
+                        guard !model.isPosting else { return }
+                        model.text = newValue
+                    }
+                ),
+                axis: .vertical
+            )
+            .lineLimit(model.isExpanded ? 1 ... 8 : 1 ... 1)
+            .focused($isEditorFocused)
+            .submitLabel(.send)
+            .onSubmit { postIfPossible() }
+            .multilineTextAlignment(.leading)
+            // Match CommentRow's callout typography and the app's text scaling.
+            .scaledFont(.callout)
+            .foregroundStyle(.primary)
+            .tint(AppColors.appTintColor)
+            .padding(.top, model.isExpanded ? Metrics.editorTopPadding : 0)
+            .padding(.bottom, model.isExpanded ? Metrics.expandedEditorBottomInset : 0)
+            .padding(.horizontal, Metrics.editorHorizontalPadding)
+            .frame(maxWidth: .infinity, minHeight: model.isExpanded
+                ? Metrics.expandedEditorMinHeight
+                : Metrics.collapsedEditorMinHeight,
+                alignment: model.isExpanded ? .topLeading : .leading)
+            .accessibilityLabel("Add a comment")
+            .accessibilityIdentifier(AccessibilityIdentifier.Comments.composerEditor)
+        }
+    }
+
+    private var actionRow: some View {
+        HStack(alignment: .center) {
+            cancelButton
+
+            Spacer(minLength: 8)
+
+            postButton
+        }
+        .padding(.horizontal, Metrics.cardHorizontalPadding)
     }
 
     private var cancelButton: some View {
         Button {
             isEditorFocused = false
-            model.cancel()
+            withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+                model.cancel()
+            }
         } label: {
             Image(systemName: "xmark")
                 .font(.system(size: 15, weight: .semibold))
