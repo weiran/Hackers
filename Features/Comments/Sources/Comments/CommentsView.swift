@@ -24,24 +24,6 @@ public enum CommentsPresentationState: Equatable, Sendable {
         }
     }
 
-    var headerBlurTopInset: CGFloat {
-        switch self {
-        case .standard:
-            0
-        case .customBrowser:
-            0
-        }
-    }
-
-    var headerBlurFadeExtension: CGFloat {
-        switch self {
-        case .standard:
-            0
-        case .customBrowser:
-            32
-        }
-    }
-
     var usesCustomHeaderBlur: Bool {
         switch self {
         case .standard:
@@ -342,12 +324,16 @@ public extension CommentsView {
 
 private extension CommentsView {
     private var commentsHeaderBlur: some View {
+        // The custom-browser presentation hides the real navigation bar
+        // background so the sheet's own chrome (handle/title capsule) stays
+        // crisp; render the system bar material in its place so the header
+        // matches the standard presentation's system-blurred navigation bar.
         GeometryReader { proxy in
-            ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top + 44 + presentationState.headerBlurTopInset,
-                fadeExtension: presentationState.headerBlurFadeExtension
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            Rectangle()
+                .fill(.bar)
+                .frame(height: proxy.safeAreaInsets.top + 44)
+                .ignoresSafeArea(edges: .top)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .allowsHitTesting(false)
     }
