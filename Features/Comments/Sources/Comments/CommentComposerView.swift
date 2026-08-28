@@ -161,9 +161,8 @@ struct CommentComposerView: View {
                 text: Binding(
                     get: { model.text },
                     set: { newValue in
-                        // Keep the editor focused while the post is
-                        // in flight, but ignore any late text events
-                        // after submission has started.
+                        // The editor is disabled while the post is in
+                        // flight; ignore any late text events too.
                         guard !model.isPosting else { return }
                         model.text = newValue
                     }
@@ -249,7 +248,11 @@ struct CommentComposerView: View {
         // Transition synchronously so focus changes cannot collapse the
         // composer before the async submission task starts.
         model.beginPosting()
-        isEditorFocused = true
+        // Resign focus before the in-flight disable commits. Re-asserting
+        // focus here instead leaves a pending focus request that lands on
+        // the disabled editor and wedges the keyboard: it survives the
+        // collapse after a successful post and never resigns.
+        isEditorFocused = false
         onSubmit()
     }
 

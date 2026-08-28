@@ -285,6 +285,32 @@ final class CommentingUITests: HackersUITestCase {
         XCTAssertTrue(submittedRow.waitForExistence(timeout: 10))
     }
 
+    func testDelayedPostingCollapsesComposerAndKeyboard() {
+        launchComments(authenticated: true, commenting: true, submission: .delayedSuccess)
+        let composer = assertHittable(composerCollapsed)
+        composer.tap()
+
+        let editor = assertHittable(composerEditor)
+        editor.tap()
+        editor.typeText("Draft whose keyboard must leave after posting.")
+
+        let post = app.buttons.matching(identifier: AccessibilityIdentifier.Comments.composerPost).firstMatch
+        XCTAssertTrue(post.waitForExistence(timeout: 5))
+        post.tap()
+
+        XCTAssertTrue(
+            composerCollapsed.waitForExistence(timeout: 15),
+            "The composer should collapse after a successful post"
+        )
+        // Give the keyboard-hide animation plenty of room to finish; a wedged
+        // focus state keeps the keyboard up indefinitely after the collapse.
+        RunLoop.current.run(until: Date().addingTimeInterval(3))
+        XCTAssertFalse(
+            app.keyboards.firstMatch.exists,
+            "The keyboard should be dismissed after the composer collapses"
+        )
+    }
+
     func testOutcomeUnknownAlertCheckAgainResolvesOnce() {
         launchComments(authenticated: true, commenting: true, submission: .outcomeUnknown)
         let composer = assertHittable(composerCollapsed)

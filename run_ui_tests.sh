@@ -57,6 +57,7 @@ FULL_TESTS=(
   CommentingUITests/testReplyShowsTargetUsernameAndFocusedEditor
   CommentingUITests/testDirtyReplySwitchRequiresConfirmation
   CommentingUITests/testPostingShowsSpinnerBeforeInsertion
+  CommentingUITests/testDelayedPostingCollapsesComposerAndKeyboard
   CommentingUITests/testOutcomeUnknownAlertCheckAgainResolvesOnce
   CommentingUITests/testCustomBrowserExpandedCommentsShowsComposer
   CommentingUITests/testCustomBrowserComposerRemainsAboveKeyboard
