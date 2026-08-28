@@ -188,7 +188,7 @@ struct SettingsRepositoryTests {
 
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        #expect(repository.showNextCommentButton == true)
+        #expect(repository.showNextCommentButton == false)
     }
 
     @Test("Show next comment button setter and getter")
