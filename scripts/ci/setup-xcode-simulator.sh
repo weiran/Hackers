@@ -100,40 +100,55 @@ if [[ -z "$XCODE_VERSION" && -f "$XCODE_VERSION_FILE" ]]; then
 fi
 
 if [[ -n "$XCODE_VERSION" ]]; then
+  XCODE_MAJOR="${XCODE_VERSION%%.*}"
   shopt -s nullglob
   candidates=(
     "/Applications/Xcode_${XCODE_VERSION}.app"
     "/Applications/Xcode_${XCODE_VERSION}"*.app
     "/Applications/Xcode-${XCODE_VERSION}.app"
     "/Applications/Xcode-${XCODE_VERSION}"*.app
+    "/Applications/Xcode_${XCODE_MAJOR}_beta"*.app
   )
-  if [[ "$XCODE_VERSION" == "27.0" ]]; then
+  if [[ -d "/Applications/Xcode-beta.app" ]]; then
     candidates+=("/Applications/Xcode-beta.app")
   fi
   shopt -u nullglob
 
-  selected_xcode=""
+  matched_candidates=()
   for candidate in "${candidates[@]}"; do
     if [[ ! -d "$candidate" ]]; then
       continue
     fi
 
-    candidate_version="$({
+    candidate_output="$({
       DEVELOPER_DIR="$candidate/Contents/Developer" xcodebuild -version 2>/dev/null || true
-    } | awk '$1 == "Xcode" { print $2; exit }')"
-    if [[ "$candidate_version" == "$XCODE_VERSION" ]]; then
-      selected_xcode="$candidate"
-      break
+    })"
+    candidate_version="$(awk '$1 == "Xcode" { print $2; exit }' <<<"$candidate_output")"
+    if [[ "$candidate_version" != "$XCODE_VERSION" ]]; then
+      echo "Ignoring Xcode candidate $candidate (reports ${candidate_version:-unknown}; expected $XCODE_VERSION)." >&2
+      continue
     fi
 
-    echo "Ignoring Xcode candidate $candidate (reports ${candidate_version:-unknown}; expected $XCODE_VERSION)." >&2
+    candidate_build="$(awk '$1 == "Build" { print $3; exit }' <<<"$candidate_output")"
+    matched_candidates+=("${candidate_build:-0}|$candidate")
   done
 
-  if [[ -z "$selected_xcode" ]]; then
+  if [[ ${#matched_candidates[@]} -eq 0 ]]; then
     echo "Requested Xcode $XCODE_VERSION is not installed on this runner." >&2
     echo "Checked: ${candidates[*]}" >&2
     exit 1
   fi
+
+  # Several seeds of the same Xcode version can coexist on beta-season runner
+  # images. Prefer the newest build because App Store Connect only accepts
+  # uploads from the latest seed.
+  selected_xcode="$(
+    printf '%s\n' "${matched_candidates[@]}" |
+      sort -t'|' -k1,1 |
+      tail -1 |
+      cut -d'|' -f2-
+  )"
+  echo "Selected Xcode $selected_xcode (newest of ${#matched_candidates[@]} matching candidate(s))."
 
   sudo xcode-select -s "$selected_xcode/Contents/Developer"
 fi
