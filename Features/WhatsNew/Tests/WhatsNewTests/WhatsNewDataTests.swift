@@ -13,13 +13,34 @@ struct WhatsNewDataTests {
     func currentWhatsNewData() {
         let data = WhatsNewData.currentWhatsNew()
 
-        #expect(data.title == "What's New in Hackers 5.4.1")
-        #expect(data.items.count == 1)
-        #expect(data.items.contains { $0.title == "Embedded Browser Media Stays Quiet" })
-        #expect(data.items.contains {
-            $0.subtitle == "Audio and video in the embedded browser no longer start playing automatically."
-        })
-        #expect(data.items.contains { $0.systemImage == "pause.circle.fill" })
+        let expectedItems: [(title: String, subtitle: String, systemImage: String)] = [
+            (
+                "Join the Conversation",
+                "Share your take on any story with the new comment composer, right where you read.",
+                "text.bubble.fill"
+            ),
+            (
+                "Reply to Comments",
+                "Dive into threads and reply to any comment to keep the discussion going.",
+                "arrowshape.turn.up.left.fill"
+            ),
+            (
+                "Upvote the Best",
+                "Sign in with your Hacker News account to comment and upvote — it all counts on the site too.",
+                "arrow.up.circle.fill"
+            ),
+        ]
+
+        #expect(data.title == "What's New in Hackers 5.5.0")
+        #expect(data.items.count == expectedItems.count)
+
+        for expected in expectedItems {
+            #expect(data.items.contains {
+                $0.title == expected.title &&
+                    $0.subtitle == expected.subtitle &&
+                    $0.systemImage == expected.systemImage
+            })
+        }
     }
 
     @Test("WhatsNewItem has proper initialization")

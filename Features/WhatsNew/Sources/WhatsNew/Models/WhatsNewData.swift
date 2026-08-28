@@ -17,15 +17,27 @@ public struct WhatsNewData: Sendable {
     }
 
     public static func currentWhatsNew() -> WhatsNewData {
-        let embeddedBrowserMedia = WhatsNewItem(
-            title: "Embedded Browser Media Stays Quiet",
-            subtitle: "Audio and video in the embedded browser no longer start playing automatically.",
-            systemImage: "pause.circle.fill",
+        let joinConversation = WhatsNewItem(
+            title: "Join the Conversation",
+            subtitle: "Share your take on any story with the new comment composer, right where you read.",
+            systemImage: "text.bubble.fill",
+        )
+
+        let replyToComments = WhatsNewItem(
+            title: "Reply to Comments",
+            subtitle: "Dive into threads and reply to any comment to keep the discussion going.",
+            systemImage: "arrowshape.turn.up.left.fill",
+        )
+
+        let upvoteComments = WhatsNewItem(
+            title: "Upvote the Best",
+            subtitle: "Sign in with your Hacker News account to comment and upvote — it all counts on the site too.",
+            systemImage: "arrow.up.circle.fill",
         )
 
         return WhatsNewData(
-            title: "What's New in Hackers 5.4.1",
-            items: [embeddedBrowserMedia],
+            title: "What's New in Hackers 5.5.0",
+            items: [joinConversation, replyToComments, upvoteComments],
         )
     }
 }
