@@ -42,6 +42,16 @@ struct BrowserControlsView: View {
         return max(inset, 12)
     }
 
+    private var showsNavigationButtons: Bool {
+        controller.canGoBack || controller.canGoForward
+    }
+
+    /// A lone reload button gets the same glass circle as the close button;
+    /// once back/forward join, the glass grows into their shared capsule.
+    private var navigationGlassShape: AnyShape {
+        showsNavigationButtons ? AnyShape(Capsule()) : AnyShape(Circle())
+    }
+
     private var navigationControlsGroup: some View {
         HStack(spacing: 0) {
             if controller.canGoBack {
@@ -66,8 +76,8 @@ struct BrowserControlsView: View {
                 }
             }
         }
-        .padding(.horizontal, 6)
-        .modifier(GlassCapsuleBackground())
+        .padding(.horizontal, showsNavigationButtons ? 6 : 0)
+        .glassEffect(.regular.interactive(), in: navigationGlassShape)
         .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6)
         .animation(WebViewAnimations.standard, value: controller.canGoBack)
         .animation(WebViewAnimations.standard, value: controller.canGoForward)
