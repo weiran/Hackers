@@ -329,15 +329,9 @@ struct PostCommentsSheet: View {
             .accessibilityHidden(layout.contentFadeProgress >= 0.5)
 
             sheetHandle(
-                expandedTop: layout.expandedTop,
-                collapsedTop: layout.collapsedTop,
-                handleTopInset: layout.handleTopInset,
+                layout: layout,
                 chromeAreaHeight: chromeAreaHeight,
-                titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress),
-                morphProgress: layout.contentFadeProgress,
-                barTitleFrame: toolbarGeometry.barTitleFrame,
-                isBarTitleSuppressed: toolbarGeometry.isBarTitleSuppressed,
-                containerWidth: layout.containerSize.width
+                toolbarGeometry: toolbarGeometry
             )
         }
     }
@@ -433,16 +427,12 @@ struct PostCommentsSheet: View {
     }
 
     private func sheetHandle(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat,
-        handleTopInset: CGFloat,
+        layout: PostCommentsSheetLayout,
         chromeAreaHeight: CGFloat,
-        titleProgress: CGFloat,
-        morphProgress: CGFloat,
-        barTitleFrame: CGRect,
-        isBarTitleSuppressed: Bool,
-        containerWidth: CGFloat
+        toolbarGeometry: CommentsToolbarGeometry
     ) -> some View {
+        let handleTopInset = layout.handleTopInset
+        let titleProgress = titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
         return ZStack(alignment: .top) {
@@ -450,11 +440,11 @@ struct PostCommentsSheet: View {
                 post: viewModel.post,
                 showThumbnails: viewModel.showThumbnails,
                 titleProgress: titleProgress,
-                morphProgress: morphProgress,
+                morphProgress: layout.contentFadeProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
-                isBarTitleSuppressed: isBarTitleSuppressed,
-                barTitleFrame: barTitleFrame,
-                containerWidth: containerWidth,
+                isBarTitleSuppressed: toolbarGeometry.isBarTitleSuppressed,
+                barTitleFrame: toolbarGeometry.barTitleFrame,
+                containerWidth: layout.containerSize.width,
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
                 handleWidth: Self.handleWidth,
@@ -469,7 +459,12 @@ struct PostCommentsSheet: View {
                     .fill(.background.opacity(0.001))
                     .frame(width: Self.expandedHandleHitTargetWidth, height: handleHitTargetHeight)
                     .contentShape(Rectangle())
-                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                    .highPriorityGesture(
+                        handleDragGesture(
+                            expandedTop: layout.expandedTop,
+                            collapsedTop: layout.collapsedTop
+                        )
+                    )
                     .allowsHitTesting(titleProgress <= 0.5)
                     .accessibilityElement()
                     .accessibilityLabel("Comments sheet handle")
