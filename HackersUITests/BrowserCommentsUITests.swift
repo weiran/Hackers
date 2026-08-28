@@ -193,9 +193,24 @@ final class BrowserCommentsUITests: HackersUITestCase {
         let post = assertHittable(app.buttons[AccessibilityIdentifier.Feed.post(longCommentsPostID)], timeout: 8)
         tapPost(post)
 
-        collapseCommentsByTappingTitle()
+        // Collapse by dragging the content down so the scroll offset stays
+        // at the top for the re-expand assertions below.
+        let firstCommentForDrag = assertHasVisibleIntersection(
+            app.buttons[AccessibilityIdentifier.Comments.comment(UITestFixtureReference.firstLongCommentID)],
+            in: app
+        )
+        let collapseDragStart = app.coordinate(withNormalizedOffset: CGVector(
+            dx: firstCommentForDrag.frame.midX / app.frame.width,
+            dy: firstCommentForDrag.frame.midY / app.frame.height
+        ))
+        collapseDragStart.press(
+            forDuration: 0.1,
+            thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        )
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
+
         let sheetHandle = assertHasVisibleIntersection(commentsSheetHandle, in: app)
-        XCTAssertGreaterThan(sheetHandle.frame.minY, app.frame.midY)
+        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
 
         let handle = app.coordinate(withNormalizedOffset: CGVector(
             dx: sheetHandle.frame.midX / app.frame.width,

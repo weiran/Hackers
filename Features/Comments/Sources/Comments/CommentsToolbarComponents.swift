@@ -23,6 +23,14 @@ public final class CommentsHeaderTitleVisibility {
 @Observable
 public final class CommentsToolbarGeometry {
     public var controlCenterY: CGFloat?
+    /// Global frame of the bar title pill, published by the bar so the
+    /// custom-browser sheet can mirror it exactly while a drag moves the
+    /// title into the sheet layer.
+    public var barTitleFrame: CGRect = .zero
+    /// True while the custom-browser sheet is being dragged: the in-sheet
+    /// capsule owns the title so it can track the finger, and the bar title
+    /// steps aside until the drag settles.
+    public var isBarTitleSuppressed = false
 
     public init() {}
 
@@ -30,12 +38,25 @@ public final class CommentsToolbarGeometry {
         guard controlCenterY != centerY else { return }
         controlCenterY = centerY
     }
+
+    public func updateBarTitleFrame(_ frame: CGRect) {
+        guard barTitleFrame != frame else { return }
+        barTitleFrame = frame
+    }
+
+    public func setBarTitleSuppressed(_ suppressed: Bool) {
+        guard isBarTitleSuppressed != suppressed else { return }
+        isBarTitleSuppressed = suppressed
+    }
 }
 
 struct ToolbarTitle: View {
     let post: Post
     let showThumbnails: Bool
     let titleVisibility: CommentsHeaderTitleVisibility
+    var accessibilityIdentifier: String? = nil
+    var isAlwaysHittable: Bool = false
+    var barTitleSuppression: CommentsToolbarGeometry? = nil
     let onTap: @MainActor @Sendable () -> Void
     let onDragChanged: ((DragGesture.Value) -> Void)?
     let onDragEnded: ((DragGesture.Value) -> Void)?
@@ -46,8 +67,18 @@ struct ToolbarTitle: View {
             showThumbnails: showThumbnails,
             titleVisibility: titleVisibility,
             accessibilityHint: "Open link",
+            accessibilityIdentifier: accessibilityIdentifier,
+            isAlwaysHittable: isAlwaysHittable,
+            barTitleSuppression: barTitleSuppression,
             onTap: onTap
         )
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            DispatchQueue.main.async { @MainActor in
+                barTitleSuppression?.updateBarTitleFrame(frame)
+            }
+        }
         .simultaneousGesture(titleDragGesture)
     }
 
@@ -67,6 +98,9 @@ public struct CommentsHeaderTitleButton: View {
     private let showThumbnails: Bool
     private let titleVisibility: CommentsHeaderTitleVisibility
     private let accessibilityHint: String
+    private let accessibilityIdentifier: String?
+    private let isAlwaysHittable: Bool
+    private let barTitleSuppression: CommentsToolbarGeometry?
     private let hitHeight: CGFloat
     private let fillsAvailableWidth: Bool
     private let usesOffsetTransition: Bool
@@ -77,6 +111,9 @@ public struct CommentsHeaderTitleButton: View {
         showThumbnails: Bool,
         titleVisibility: CommentsHeaderTitleVisibility,
         accessibilityHint: String,
+        accessibilityIdentifier: String? = nil,
+        isAlwaysHittable: Bool = false,
+        barTitleSuppression: CommentsToolbarGeometry? = nil,
         hitHeight: CGFloat = 44,
         fillsAvailableWidth: Bool = false,
         usesOffsetTransition: Bool = true,
@@ -86,6 +123,9 @@ public struct CommentsHeaderTitleButton: View {
         self.showThumbnails = showThumbnails
         self.titleVisibility = titleVisibility
         self.accessibilityHint = accessibilityHint
+        self.accessibilityIdentifier = accessibilityIdentifier
+        self.isAlwaysHittable = isAlwaysHittable
+        self.barTitleSuppression = barTitleSuppression
         self.hitHeight = hitHeight
         self.fillsAvailableWidth = fillsAvailableWidth
         self.usesOffsetTransition = usesOffsetTransition
@@ -94,6 +134,7 @@ public struct CommentsHeaderTitleButton: View {
 
     public var body: some View {
         let isVisible = titleVisibility.isVisible
+        let isBarTitleShown = isVisible && !(barTitleSuppression?.isBarTitleSuppressed ?? false)
         let maxWidth: CGFloat? = fillsAvailableWidth ? .infinity : nil
 
         Button(action: onTap) {
@@ -102,7 +143,7 @@ public struct CommentsHeaderTitleButton: View {
                     .hidden()
                     .accessibilityHidden(true)
 
-                if isVisible {
+                if isBarTitleShown {
                     CommentsHeaderTitlePill(post: post, showThumbnails: showThumbnails)
                         .transition(usesOffsetTransition ? Self.visibilityTransition : .opacity)
                 }
@@ -111,10 +152,13 @@ public struct CommentsHeaderTitleButton: View {
             .frame(height: hitHeight, alignment: .top)
         }
         .buttonStyle(.plain)
-        .allowsHitTesting(isVisible)
-        .disabled(!isVisible)
+        .allowsHitTesting(isVisible || isAlwaysHittable)
+        .disabled(!isVisible && !isAlwaysHittable)
         .accessibilityLabel(post.title)
         .accessibilityHint(accessibilityHint)
+        .if(accessibilityIdentifier != nil) { view in
+            view.accessibilityIdentifier(accessibilityIdentifier ?? "")
+        }
         .accessibilityHidden(!isVisible)
         .animation(.easeInOut(duration: 0.3), value: isVisible)
     }

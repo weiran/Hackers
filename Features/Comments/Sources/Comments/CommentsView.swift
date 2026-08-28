@@ -24,7 +24,7 @@ public enum CommentsPresentationState: Equatable, Sendable {
         }
     }
 
-    var usesCustomHeaderBlur: Bool {
+    var isEmbeddedBrowser: Bool {
         switch self {
         case .standard:
             false
@@ -217,30 +217,24 @@ public extension CommentsView {
             view
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
-                .toolbarBackground(
-                    presentationState.usesCustomHeaderBlur ? .hidden : .automatic,
-                    for: .navigationBar
-                )
-                .overlay(alignment: .top) {
-                    if showsToolbar, presentationState.usesCustomHeaderBlur {
-                        commentsHeaderBlur
-                    }
-                }
         }
         .toolbar {
             if controlsNavigationBarVisibility && showsToolbar {
-                if !presentationState.usesCustomHeaderBlur {
-                    ToolbarItem(placement: .principal) {
-                        if let post = viewModel.post {
-                            ToolbarTitle(
-                                post: post,
-                                showThumbnails: viewModel.showThumbnails,
-                                titleVisibility: titleVisibility,
-                                onTap: handleLinkTap,
-                                onDragChanged: onTitleDragChanged,
-                                onDragEnded: onTitleDragEnded,
-                            )
-                        }
+                ToolbarItem(placement: .principal) {
+                    if let post = viewModel.post {
+                        ToolbarTitle(
+                            post: post,
+                            showThumbnails: viewModel.showThumbnails,
+                            titleVisibility: titleVisibility,
+                            accessibilityIdentifier: presentationState.isEmbeddedBrowser
+                                ? AccessibilityIdentifier.Browser.expandedCommentsTitle
+                                : nil,
+                            isAlwaysHittable: presentationState.isEmbeddedBrowser,
+                            barTitleSuppression: presentationState.isEmbeddedBrowser ? toolbarGeometry : nil,
+                            onTap: handleLinkTap,
+                            onDragChanged: onTitleDragChanged,
+                            onDragEnded: onTitleDragEnded,
+                        )
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -323,21 +317,6 @@ public extension CommentsView {
 }
 
 private extension CommentsView {
-    private var commentsHeaderBlur: some View {
-        // The custom-browser presentation hides the real navigation bar
-        // background so the sheet's own chrome (handle/title capsule) stays
-        // crisp; render the system bar material in its place so the header
-        // matches the standard presentation's system-blurred navigation bar.
-        GeometryReader { proxy in
-            Rectangle()
-                .fill(.bar)
-                .frame(height: proxy.safeAreaInsets.top + 44)
-                .ignoresSafeArea(edges: .top)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .allowsHitTesting(false)
-    }
-
     private func handleLinkTap() {
         // Self posts have no external link; their URL is the HN item page of
         // this very view, so opening it would just re-push these comments.

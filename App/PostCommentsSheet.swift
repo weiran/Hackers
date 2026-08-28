@@ -24,7 +24,6 @@ struct PostCommentsSheet: View {
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let expandedTopDragTrailingPassthroughWidth: CGFloat = 88
-    private static let toolbarControlExclusionWidth: CGFloat = 88
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
@@ -122,16 +121,6 @@ struct PostCommentsSheet: View {
             } else {
                 safeInsets.bottom
             }
-            let titleMaximumWidth = max(
-                containerSize.width
-                    - proxy.safeAreaInsets.leading
-                    - proxy.safeAreaInsets.trailing
-                    - (Self.toolbarControlExclusionWidth * 2),
-                0
-            )
-            let toolbarControlCenterY = toolbarGeometry.controlCenterY.map {
-                $0 - layout.alignedTop
-            }
 
             ZStack(alignment: .topLeading) {
                 Color.clear.allowsHitTesting(false)
@@ -140,8 +129,6 @@ struct PostCommentsSheet: View {
                     layout: layout,
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
-                    titleMaximumWidth: titleMaximumWidth,
-                    toolbarControlCenterY: toolbarControlCenterY,
                     showsExpandedPresentation: showsExpandedPresentation,
                     commentsBottomSafeInset: commentsBottomSafeInset
                 )
@@ -190,6 +177,7 @@ struct PostCommentsSheet: View {
                     onTap: collapseSheet,
                     onDragChanged: { translation in
                         presentation.updateHandleDrag(translationHeight: max(0, translation.height))
+                        toolbarGeometry.setBarTitleSuppressed(true)
                     },
                     onDragEnded: { translation, predictedTranslationHeight in
                         presentation.updateHandleDrag(
@@ -297,8 +285,6 @@ struct PostCommentsSheet: View {
         layout: PostCommentsSheetLayout,
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
-        titleMaximumWidth: CGFloat,
-        toolbarControlCenterY: CGFloat?,
         showsExpandedPresentation: Bool,
         commentsBottomSafeInset: CGFloat
     ) -> some View {
@@ -347,9 +333,11 @@ struct PostCommentsSheet: View {
                 collapsedTop: layout.collapsedTop,
                 handleTopInset: layout.handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
-                titleMaximumWidth: titleMaximumWidth,
-                toolbarControlCenterY: toolbarControlCenterY,
-                titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
+                titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress),
+                morphProgress: layout.contentFadeProgress,
+                barTitleFrame: toolbarGeometry.barTitleFrame,
+                isBarTitleSuppressed: toolbarGeometry.isBarTitleSuppressed,
+                containerWidth: layout.containerSize.width
             )
         }
     }
@@ -383,6 +371,9 @@ struct PostCommentsSheet: View {
                     translation: value.translation,
                     systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
                 )
+                if presentation.isTrackingDrag {
+                    toolbarGeometry.setBarTitleSuppressed(true)
+                }
             },
             onTitleDragEnded: { value in
                 guard presentation.canEndExpandedToolbarDrag() else {
@@ -446,9 +437,11 @@ struct PostCommentsSheet: View {
         collapsedTop: CGFloat,
         handleTopInset: CGFloat,
         chromeAreaHeight: CGFloat,
-        titleMaximumWidth: CGFloat,
-        toolbarControlCenterY: CGFloat?,
-        titleProgress: CGFloat
+        titleProgress: CGFloat,
+        morphProgress: CGFloat,
+        barTitleFrame: CGRect,
+        isBarTitleSuppressed: Bool,
+        containerWidth: CGFloat
     ) -> some View {
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
@@ -457,18 +450,17 @@ struct PostCommentsSheet: View {
                 post: viewModel.post,
                 showThumbnails: viewModel.showThumbnails,
                 titleProgress: titleProgress,
+                morphProgress: morphProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
+                isBarTitleSuppressed: isBarTitleSuppressed,
+                barTitleFrame: barTitleFrame,
+                containerWidth: containerWidth,
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
-                titleMaximumWidth: titleMaximumWidth,
-                toolbarControlCenterY: toolbarControlCenterY,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
-                navigationBarHeight: Self.navigationBarHeight,
-                onTitleTap: collapseSheet
+                navigationBarHeight: Self.navigationBarHeight
             )
-            .simultaneousGesture(titlePillDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-            .allowsHitTesting(titleProgress > 0.5)
 
             HStack {
                 Spacer()
@@ -559,6 +551,7 @@ struct PostCommentsSheet: View {
         guard isExpanded else { return }
         animateSheet {
             presentation.collapse()
+            toolbarGeometry.setBarTitleSuppressed(true)
         }
     }
 }
@@ -663,6 +656,9 @@ private extension PostCommentsSheet {
                     translation: value.translation,
                     systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
                 )
+                if presentation.isInteractiveMove {
+                    toolbarGeometry.setBarTitleSuppressed(true)
+                }
             }
             .onEnded { value in
                 guard presentation.canEndSheetDrag(
@@ -680,6 +676,7 @@ private extension PostCommentsSheet {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
                 presentation.updateHandleDrag(translationHeight: value.translation.height)
+                toolbarGeometry.setBarTitleSuppressed(true)
             }
             .onEnded { value in
                 if !presentation.canEndHandleDrag() {
@@ -689,24 +686,6 @@ private extension PostCommentsSheet {
                     presentation.updateHandleDrag(translationHeight: endTranslation)
                 }
                 guard presentation.canEndHandleDrag() else {
-                    scheduleCollapsedUpvoteReenable()
-                    return
-                }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-            }
-    }
-
-    private func titlePillDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 18, coordinateSpace: .global)
-            .onChanged { value in
-                presentation.updateExpandedToolbarDrag(
-                    startX: value.startLocation.x,
-                    translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
-                )
-            }
-            .onEnded { value in
-                guard presentation.canEndExpandedToolbarDrag() else {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
@@ -726,6 +705,9 @@ private extension PostCommentsSheet {
                 expandedTop: expandedTop,
                 collapsedTop: collapsedTop
             )
+            // Once settled expanded the real bar title owns the top again;
+            // while collapsed the bar is hidden anyway.
+            toolbarGeometry.setBarTitleSuppressed(!presentation.isExpanded)
         }
         scheduleCollapsedUpvoteReenable()
     }

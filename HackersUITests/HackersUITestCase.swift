@@ -58,6 +58,11 @@ class HackersUITestCase: XCTestCase {
     }
 
     func collapseCommentsByTappingTitle() {
+        // The bar title only appears once the comments have been scrolled;
+        // bring it in like a reader would before tapping it to collapse.
+        if !expandedCommentsTitle.exists || !expandedCommentsTitle.isHittable {
+            commentsList.swipeUp()
+        }
         let title = assertHasVisibleIntersection(expandedCommentsTitle, in: app)
         tapAbsolutePoint(x: title.frame.maxX - 12, y: title.frame.midY)
         assertHasVisibleIntersection(collapsedCommentsHeader, in: app)

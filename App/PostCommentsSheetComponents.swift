@@ -368,131 +368,148 @@ enum CollapsedHeaderHeightPreferenceKey: PreferenceKey {
 
 struct CommentsSheetTopChrome: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var measuredTitleSize: CGSize = .zero
     let post: Post?
     let showThumbnails: Bool
+    /// Scroll/expansion-driven progress: keeps the handle hidden while the
+    /// real bar title is showing and fades it in as the sheet collapses.
     let titleProgress: CGFloat
+    /// Expansion progress while the sheet is under the finger; drives the
+    /// capsule's travel from the bar title's frame down to the grab handle.
+    let morphProgress: CGFloat
     let isInteractiveMove: Bool
+    let isBarTitleSuppressed: Bool
+    let barTitleFrame: CGRect
+    let containerWidth: CGFloat
     let handleTopInset: CGFloat
     let chromeAreaHeight: CGFloat
-    let titleMaximumWidth: CGFloat
-    let toolbarControlCenterY: CGFloat?
     let handleWidth: CGFloat
     let handleThickness: CGFloat
     let navigationBarHeight: CGFloat
-    let onTitleTap: () -> Void
 
     private var progress: CGFloat {
         min(max(titleProgress, 0), 1)
+    }
+
+    private var dragProgress: CGFloat {
+        min(max(morphProgress, 0), 1)
     }
 
     private var easedProgress: CGFloat {
         progress * progress * (3 - (2 * progress))
     }
 
-    private var handleOpacity: CGFloat {
-        1 - titleContentProgress
+    private var easedDragProgress: CGFloat {
+        dragProgress * dragProgress * (3 - (2 * dragProgress))
     }
 
-    private var glassSurfaceOpacity: CGFloat {
-        min(max(easedProgress / 0.18, 0), 1)
+    private var handleOpacity: CGFloat {
+        1 - titleContentProgress
     }
 
     private var titleContentProgress: CGFloat {
         min(max((easedProgress - 0.24) / 0.52, 0), 1)
     }
 
-    private var resolvedTitleSize: CGSize {
-        guard measuredTitleSize.width > 0, measuredTitleSize.height > 0 else {
-            return CGSize(width: 220, height: navigationBarHeight)
-        }
-        return measuredTitleSize
+    private var dragTitleContentProgress: CGFloat {
+        min(max((easedDragProgress - 0.24) / 0.52, 0), 1)
+    }
+
+    /// The bar title's measured frame; while it is unavailable the capsule
+    /// stays hidden, so the handoff always starts from the real geometry.
+    private var barTitleSize: CGSize {
+        barTitleFrame.size
     }
 
     private var morphWidth: CGFloat {
-        interpolate(from: handleWidth, to: resolvedTitleSize.width, progress: easedProgress)
+        interpolate(from: handleWidth, to: barTitleSize.width, progress: easedDragProgress)
     }
 
     private var morphHeight: CGFloat {
-        interpolate(from: handleThickness, to: resolvedTitleSize.height, progress: easedProgress)
+        interpolate(from: handleThickness, to: barTitleSize.height, progress: easedDragProgress)
     }
 
-    /// Scale applied to the title content so its measured height fits the morphing
-    /// capsule height. At full expansion this is 1.0 (content and capsule match); as
-    /// the pill shrinks during a drag the content scales down with it instead of
-    /// overflowing, so the text stays constant and just fades out via opacity.
+    /// Scale applied to the title content so it fits the morphing capsule.
+    /// The text is laid out at the bar pill's full width and scaled as one,
+    /// so it never re-wraps mid-drag.
     private var contentScale: CGFloat {
-        guard resolvedTitleSize.height > 0 else { return 1 }
-        return min(morphHeight / resolvedTitleSize.height, 1)
+        guard barTitleSize.height > 0 else { return 1 }
+        return min(morphHeight / barTitleSize.height, 1)
     }
 
-    private var morphVerticalOffset: CGFloat {
-        let handleOffset = (chromeAreaHeight - handleThickness) / 2
-        let titleOffset = toolbarControlCenterY.map {
-            max($0 - handleTopInset - (resolvedTitleSize.height / 2), 0)
-        } ?? max((chromeAreaHeight - resolvedTitleSize.height) / 2, 0)
-        return interpolate(from: handleOffset, to: titleOffset, progress: easedProgress)
+    private var handleVerticalOffset: CGFloat {
+        max((chromeAreaHeight - handleThickness) / 2, 0)
+    }
+
+    /// Offsets are relative to the capsule's laid-out position (centered
+    /// horizontally, padded to the chrome top), and the interpolation endpoints
+    /// are chrome-local, so the pill rides the sheet one-to-one during the
+    /// drag: it starts exactly on the bar pill and settles on the handle.
+    private var capsuleOffsetX: CGFloat {
+        (barTitleFrame.midX - containerWidth / 2) * easedDragProgress
+    }
+
+    private var capsuleOffsetY: CGFloat {
+        let desiredTop = interpolate(
+            from: handleVerticalOffset,
+            to: barTitleFrame.minY,
+            progress: easedDragProgress
+        )
+        return desiredTop - handleTopInset
     }
 
     var body: some View {
         ZStack(alignment: .top) {
-            if let post {
-                measuredTitleContent(for: post)
-            }
-
-            morphingChrome
+            dragTitleCapsule
                 .padding(.top, handleTopInset)
-                .offset(y: morphVerticalOffset)
+                .offset(x: capsuleOffsetX, y: capsuleOffsetY)
+
+            grabHandle
+                .padding(.top, handleTopInset)
+                .offset(y: handleVerticalOffset)
         }
         .frame(maxWidth: .infinity)
         .frame(height: navigationBarHeight + handleTopInset, alignment: .top)
         .animation(isInteractiveMove ? nil : chromeAnimation, value: progress)
+        .animation(isInteractiveMove ? nil : chromeAnimation, value: dragProgress)
+        .accessibilityHidden(true)
+        .allowsHitTesting(false)
     }
 
-    private var morphingChrome: some View {
-        Button(action: onTitleTap) {
-            ZStack {
-                if glassSurfaceOpacity > 0 {
-                    ZStack {
-                        if let post {
-                            // Hold the title at its fully laid-out size and scale the whole
-                            // thing down to match the morphing capsule height. This keeps the
-                            // text constant during the drag (no re-wrapping/re-truncation as
-                            // the frame narrows) and avoids the 44pt content overflowing the
-                            // shrinking capsule vertically. The opacity fade below drives the
-                            // reveal, and .clipped() guarantees nothing escapes the capsule.
-                            CommentsHeaderTitlePillContent(
-                                post: post,
-                                showThumbnails: showThumbnails,
-                                maximumWidth: titleMaximumWidth
-                            )
-                                .frame(width: resolvedTitleSize.width)
-                                .scaleEffect(contentScale, anchor: .center)
-                                .opacity(titleContentProgress)
-                        }
-                    }
-                    .frame(width: morphWidth, height: morphHeight)
-                    .clipped()
-                    .clipShape(.capsule)
-                    .glassEffect(.regular.interactive(), in: .capsule)
-                    .glassEffectTransition(.identity)
-                    .opacity(glassSurfaceOpacity)
+    /// Capsule shown only while the bar title is suppressed (drag or
+    /// collapse in flight): identical frame to the bar pill at handoff, so
+    /// the swap between the two layers is invisible.
+    @ViewBuilder
+    private var dragTitleCapsule: some View {
+        if isBarTitleSuppressed,
+           barTitleSize.width > 1,
+           let post {
+            let glassSurfaceOpacity = min(max(easedDragProgress / 0.18, 0), 1)
+            if glassSurfaceOpacity > 0 {
+                ZStack {
+                    CommentsHeaderTitlePillContent(
+                        post: post,
+                        showThumbnails: showThumbnails,
+                        maximumWidth: barTitleSize.width
+                    )
+                        .frame(width: barTitleSize.width)
+                        .scaleEffect(contentScale, anchor: .center)
+                        .opacity(dragTitleContentProgress)
                 }
-                Capsule()
-                    .fill(.secondary.opacity(0.52))
-                    .frame(width: handleWidth, height: handleThickness)
-                    .opacity(handleOpacity)
-                    .allowsHitTesting(false)
+                .frame(width: morphWidth, height: morphHeight)
+                .clipped()
+                .clipShape(.capsule)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .glassEffectTransition(.identity)
+                .opacity(glassSurfaceOpacity)
             }
-            .frame(width: morphWidth, height: morphHeight)
-            .contentShape(.capsule)
         }
-        .buttonStyle(.plain)
-        .disabled(progress <= 0.5)
-        .accessibilityIdentifier(AccessibilityIdentifier.Browser.expandedCommentsTitle)
-        .accessibilityLabel(post?.title ?? "Comments sheet handle")
-        .accessibilityHint("Collapse comments")
-        .accessibilityHidden(progress <= 0.5)
+    }
+
+    private var grabHandle: some View {
+        Capsule()
+            .fill(.secondary.opacity(0.52))
+            .frame(width: handleWidth, height: handleThickness)
+            .opacity(handleOpacity)
     }
 
     private var chromeAnimation: Animation {
@@ -503,39 +520,8 @@ struct CommentsSheetTopChrome: View {
         }
     }
 
-    private func measuredTitleContent(for post: Post) -> some View {
-        CommentsHeaderTitlePillContent(
-            post: post,
-            showThumbnails: showThumbnails,
-            maximumWidth: titleMaximumWidth
-        )
-            .hidden()
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(key: TitlePillSizePreferenceKey.self, value: proxy.size)
-                }
-            )
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-            .onPreferenceChange(TitlePillSizePreferenceKey.self) { newValue in
-                guard newValue.width > 0, newValue.height > 0 else { return }
-                measuredTitleSize = newValue
-            }
-    }
-
     private func interpolate(from start: CGFloat, to end: CGFloat, progress: CGFloat) -> CGFloat {
         start + ((end - start) * progress)
-    }
-}
-
-private struct TitlePillSizePreferenceKey: PreferenceKey {
-    static let defaultValue: CGSize = .zero
-
-    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
-        let next = nextValue()
-        if next.width > 0, next.height > 0 {
-            value = next
-        }
     }
 }
 

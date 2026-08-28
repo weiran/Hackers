@@ -898,7 +898,6 @@ struct PostLinkBrowserView: View {
         .tint(.accentColor)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
-        .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .background {
             NavigationBackSwipeRestorer()
