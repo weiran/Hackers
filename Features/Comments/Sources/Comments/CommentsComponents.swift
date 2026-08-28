@@ -291,7 +291,7 @@ private extension CommentsContentView {
                     collapseThread(for: state)
                 } label: {
                     Label(
-                        state.visibility == .visible ? "Collapse Thread" : "Expand Thread",
+                        state.visibility == .visible ? "Collapse" : "Expand",
                         systemImage: state.visibility == .visible ? "minus.circle" : "plus.circle"
                     )
                 }
