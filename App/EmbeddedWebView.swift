@@ -153,6 +153,24 @@ final class BrowserController: ObservableObject {
         let inset = max(bottomInset, 0)
         applyObscuredBottomInset(inset)
         applyScrollViewBottomInset(inset)
+        // Safe-area insets only settle once the view is in the window and
+        // laid out, so re-apply after this update pass.
+        DispatchQueue.main.async { [weak self] in
+            self?.applyStatusBarObscuredInset()
+        }
+    }
+
+    /// The status-bar blur strip covers the top of the full-bleed web view;
+    /// tell WebKit so sticky and fixed page elements rest below the strip
+    /// instead of under the status indicators, as in Safari.
+    private func applyStatusBarObscuredInset() {
+        guard !DeviceLayout.usesPadLayout else { return }
+        let topInset = webView.safeAreaInsets.top
+        guard abs(webView.obscuredContentInsets.top - topInset) > 0.5 else { return }
+
+        var obscuredContentInsets = webView.obscuredContentInsets
+        obscuredContentInsets.top = topInset
+        webView.obscuredContentInsets = obscuredContentInsets
     }
 
     private func applyObscuredBottomInset(_ inset: CGFloat) {
