@@ -13,50 +13,6 @@ import SwiftUI
 import UIKit
 import WebKit
 
-struct PageHeaderBlurTint: Equatable {
-    let red: Double
-    let green: Double
-    let blue: Double
-    let alpha: Double
-
-    var color: Color {
-        Color(red: red, green: green, blue: blue, opacity: alpha)
-    }
-
-    init?(_ uiColor: UIColor?) {
-        guard let uiColor else { return nil }
-        let resolvedColor = uiColor.resolvedColor(with: UITraitCollection.current)
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        if resolvedColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
-            self.init(red: red, green: green, blue: blue, alpha: alpha)
-            return
-        }
-
-        var white: CGFloat = 0
-        if resolvedColor.getWhite(&white, alpha: &alpha) {
-            self.init(red: white, green: white, blue: white, alpha: alpha)
-            return
-        }
-
-        return nil
-    }
-
-    private init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-        self.red = Self.rounded(red)
-        self.green = Self.rounded(green)
-        self.blue = Self.rounded(blue)
-        self.alpha = Self.rounded(alpha)
-    }
-
-    private static func rounded(_ value: CGFloat) -> Double {
-        (Double(value) * 1000).rounded() / 1000
-    }
-}
-
 @MainActor
 final class BrowserController: ObservableObject {
     @Published var currentURL: URL?
@@ -64,12 +20,10 @@ final class BrowserController: ObservableObject {
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
-    @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
     var fallbackURL: URL?
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
-    private var pageHeaderBlurTintURL: URL?
     private var reloadOverride: (() -> Void)?
     private var mediaPlaybackSuspended = false
     private var requestedMediaPlaybackSuspension = false
@@ -88,6 +42,7 @@ final class BrowserController: ObservableObject {
         }
         #endif
         webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.scrollView.topEdgeEffect.isHidden = true
 
         let navigationDelegate = BrowserNavigationDelegate(controller: self)
         self.navigationDelegate = navigationDelegate
@@ -124,10 +79,6 @@ final class BrowserController: ObservableObject {
 
     func updateState() {
         let updatedURL = webView.url ?? currentURL ?? fallbackURL
-        if pageHeaderBlurTintURL != updatedURL {
-            pageHeaderBlurTint = nil
-            pageHeaderBlurTintURL = nil
-        }
         currentURL = updatedURL
         currentTitle = webView.title
         canGoBack = webView.canGoBack
@@ -136,7 +87,6 @@ final class BrowserController: ObservableObject {
     }
 
     func reload() {
-        resetHeaderBlurTint()
         if let reloadOverride {
             reloadOverride()
         } else {
@@ -156,14 +106,12 @@ final class BrowserController: ObservableObject {
 
     func goBack() {
         guard webView.canGoBack else { return }
-        resetHeaderBlurTint()
         webView.goBack()
         updateState()
     }
 
     func goForward() {
         guard webView.canGoForward else { return }
-        resetHeaderBlurTint()
         webView.goForward()
         updateState()
     }
@@ -236,11 +184,6 @@ final class BrowserController: ObservableObject {
         }
     }
 
-    private func resetHeaderBlurTint() {
-        pageHeaderBlurTint = nil
-        pageHeaderBlurTintURL = nil
-    }
-
     private func installStateObservers() {
         observations = [
             webView.observe(\.url, options: [.new]) { [weak self] _, _ in
@@ -257,19 +200,8 @@ final class BrowserController: ObservableObject {
             },
             webView.observe(\.isLoading, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
-            },
-            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
-                Task { @MainActor [weak self] in self?.updateHeaderTintFromPageBackground() }
             }
         ]
-    }
-
-    func updateHeaderTintFromPageBackground() {
-        guard let updatedTint = PageHeaderBlurTint(webView.underPageBackgroundColor) else { return }
-        if pageHeaderBlurTint != updatedTint {
-            pageHeaderBlurTint = updatedTint
-        }
-        pageHeaderBlurTintURL = currentURL
     }
 
     private static var safariApplicationNameForUserAgent: String {
@@ -293,7 +225,7 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateState(refreshesHeaderTint: true)
+        updateState()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -308,12 +240,9 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
         updateState()
     }
 
-    private func updateState(refreshesHeaderTint: Bool = false) {
+    private func updateState() {
         Task { @MainActor [weak controller] in
             controller?.updateState()
-            if refreshesHeaderTint {
-                controller?.updateHeaderTintFromPageBackground()
-            }
         }
     }
 }
@@ -327,7 +256,7 @@ enum WebViewAnimations {
 }
 
 struct EmbeddedWebView: View {
-    private static let statusBarBlurFadeExtension: CGFloat = 0
+    private static let headerBlurHeight: CGFloat = 48
 
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -403,17 +332,11 @@ struct EmbeddedWebView: View {
     }
 
     private var headerBlur: some View {
-        GeometryReader { proxy in
-            ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top,
-                fadeExtension: Self.statusBarBlurFadeExtension,
-                tintMiddleLocation: 0.45,
-                tint: controller.pageHeaderBlurTint?.color
-            )
+        ProgressiveBlur()
+            .frame(height: Self.headerBlurHeight)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .animation(.easeInOut(duration: 0.2), value: controller.pageHeaderBlurTint)
-        .allowsHitTesting(false)
+            .ignoresSafeArea(edges: .top)
+            .allowsHitTesting(false)
     }
 
     @ViewBuilder
@@ -445,12 +368,12 @@ struct EmbeddedWebView: View {
             url: url,
             obscuredBottomInset: obscuredBottomInset
         )
+        .ignoresSafeArea(edges: .top)
     }
 
     private var isPadLayout: Bool {
         DeviceLayout.usesPadLayout
     }
-
     private var bottomPanelInsetHeight: CGFloat {
         guard !showsToolbar else { return 0 }
         return bottomWebViewInset
@@ -520,6 +443,27 @@ struct EmbeddedWebView: View {
         .accessibilityLabel("Forward")
     }
 
+}
+
+/// A thin system material masked by a vertical fade, giving a progressive
+/// blur whose height we control directly (the system scroll edge effect
+/// sizes its gradient from the safe area and cannot be shortened).
+private struct ProgressiveBlur: View {
+    var body: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .mask(
+                LinearGradient(
+                    stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black, location: 0.45),
+                        .init(color: .clear, location: 1)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+    }
 }
 
 private struct BrowserWebView: UIViewRepresentable {
