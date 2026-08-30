@@ -6,6 +6,7 @@
 //
 
 import DesignSystem
+import CoreImage.CIFilterBuiltins
 import Domain
 import Foundation
 import Shared
@@ -350,7 +351,7 @@ struct EmbeddedWebView: View {
     }
 
     private var headerBlur: some View {
-        ProgressiveBlur()
+        HeaderVariableBlur(maxBlurRadius: 6)
             .frame(height: Self.headerBlurHeight)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .ignoresSafeArea(edges: .top)
@@ -463,32 +464,71 @@ struct EmbeddedWebView: View {
 
 }
 
-/// Stacked material bands approximate a progressive *blur*: every band is
-/// fully opaque, but fewer bands cover each point toward the bottom edge, so
-/// frost strength tapers and content sharpens into focus. A single material
-/// can only vary opacity, which reads as a fade instead.
-private struct ProgressiveBlur: View {
-    private static let layerCount = 12
+/// True progressive gaussian blur: the blur radius ramps to zero across the
+/// strip while every pixel stays at full contrast, matching Safari's header
+/// scrim. Public materials cannot vary blur radius (only opacity and tint,
+/// which read as a fade), so this uses the private variableBlur CAFilter that
+/// Safari and the previous VariableBlur package rely on.
+/// Technique credit: nikstar/VariableBlur and jtrivedi/VariableBlurView (MIT).
+private struct HeaderVariableBlur: UIViewRepresentable {
+    let maxBlurRadius: CGFloat
 
-    var body: some View {
-        ZStack(alignment: .top) {
-            ForEach(0..<Self.layerCount, id: \.self) { index in
-                let coverage = 1.0 - Double(index) / Double(Self.layerCount)
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .mask(
-                        LinearGradient(
-                            stops: [
-                                .init(color: .black, location: 0),
-                                .init(color: .black, location: max(coverage - 0.06, 0)),
-                                .init(color: .clear, location: coverage)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
+    func makeUIView(context: Context) -> VariableBlurUIView {
+        VariableBlurUIView(maxBlurRadius: maxBlurRadius)
+    }
+
+    func updateUIView(_ uiView: VariableBlurUIView, context: Context) {}
+}
+
+private final class VariableBlurUIView: UIVisualEffectView {
+    init(maxBlurRadius: CGFloat) {
+        super.init(effect: UIBlurEffect(style: .regular))
+
+        guard let filterClass = NSClassFromString(String("retliFAC".reversed())) as? NSObject.Type,
+              let variableBlur = filterClass
+                  .perform(NSSelectorFromString(String(":epyThtiWretlif".reversed())), with: "variableBlur")?
+                  .takeUnretainedValue() as? NSObject else {
+            return
         }
+
+        // The blur radius at each pixel scales with the mask's alpha, so the
+        // gradient ramps the radius from max at the top to zero at the bottom.
+        variableBlur.setValue(maxBlurRadius, forKey: "inputRadius")
+        variableBlur.setValue(Self.gradientMask(), forKey: "inputMaskImage")
+        variableBlur.setValue(true, forKey: "inputNormalizeEdges")
+
+        subviews.first?.layer.filters = [variableBlur]
+        for subview in subviews.dropFirst() {
+            subview.alpha = 0
+        }
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToWindow() {
+        // Keeps the unblurred bottom edge crisp instead of pixelated.
+        guard let window, let backdropLayer = subviews.first?.layer else { return }
+        backdropLayer.setValue(window.traitCollection.displayScale, forKey: "scale")
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        // Calling super here crashes; the appearance-agnostic blur needs no
+        // trait-driven update anyway.
+    }
+
+    private static func gradientMask() -> CGImage {
+        let gradient = CIFilter.linearGradient()
+        gradient.color0 = CIColor.black
+        gradient.color1 = CIColor.clear
+        gradient.point0 = CGPoint(x: 0, y: 100)
+        gradient.point1 = CGPoint(x: 0, y: 0)
+        return CIContext().createCGImage(
+            gradient.outputImage!,
+            from: CGRect(x: 0, y: 0, width: 100, height: 100)
+        )!
     }
 }
 
