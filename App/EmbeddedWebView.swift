@@ -463,24 +463,32 @@ struct EmbeddedWebView: View {
 
 }
 
-/// A thin system material masked by a vertical fade, giving a progressive
-/// blur whose height we control directly (the system scroll edge effect
-/// sizes its gradient from the safe area and cannot be shortened).
+/// Stacked material bands approximate a progressive *blur*: every band is
+/// fully opaque, but fewer bands cover each point toward the bottom edge, so
+/// frost strength tapers and content sharpens into focus. A single material
+/// can only vary opacity, which reads as a fade instead.
 private struct ProgressiveBlur: View {
+    private static let layerCount = 12
+
     var body: some View {
-        Rectangle()
-            .fill(.ultraThinMaterial)
-            .mask(
-                LinearGradient(
-                    stops: [
-                        .init(color: .black, location: 0),
-                        .init(color: .black, location: 0.45),
-                        .init(color: .clear, location: 1)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
+        ZStack(alignment: .top) {
+            ForEach(0..<Self.layerCount, id: \.self) { index in
+                let coverage = 1.0 - Double(index) / Double(Self.layerCount)
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .mask(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .black, location: 0),
+                                .init(color: .black, location: max(coverage - 0.06, 0)),
+                                .init(color: .clear, location: coverage)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+            }
+        }
     }
 }
 
