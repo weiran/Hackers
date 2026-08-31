@@ -25,7 +25,9 @@ The app is organized around feature modules, protocol-based use cases, repositor
 
 ## Module Shape
 
-Each package has its own `Package.swift` and test target. Packages use Swift tools 6.4 and `platforms: [.iOS(.v26)]`.
+Each top-level Swift package has its own `Package.swift` and test target. The feature
+modules are products within the shared `Features/Package.swift`, rather than separate
+packages. Packages use Swift tools 6.4 and `platforms: [.iOS(.v26)]`.
 
 Current package set:
 

@@ -48,8 +48,15 @@ xcodebuild clean build -project Hackers.xcodeproj -scheme Hackers -destination '
 Quick build status check:
 
 ```bash
-xcodebuild build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 17 Pro' 2>&1 | grep "BUILD"
+set -o pipefail
+xcodebuild build \
+  -project Hackers.xcodeproj \
+  -scheme Hackers \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  2>&1 | tee /tmp/hackers-build.log
 ```
+
+The `pipefail` setting preserves the `xcodebuild` exit status when output is piped.
 
 ## Test
 
@@ -71,6 +78,9 @@ Specific modules:
 ./run_tests.sh Domain
 ./run_tests.sh Feed Comments Settings
 ```
+
+When multiple feature modules are selected, the runner groups them into one
+`Features-Package` invocation while preserving the requested test filters.
 
 Do not use `swift test` as the project validation command. Packages target iOS and use iOS-only APIs, so tests must run through Xcode with an iOS Simulator destination.
 

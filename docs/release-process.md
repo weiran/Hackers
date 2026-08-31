@@ -36,6 +36,16 @@ Before starting a release, confirm:
 * The match repository contains App Store signing assets for both bundle IDs:
   * `com.weiranzhang.Hackers`
   * `com.weiranzhang.Hackers.ActionExtension`
+* Your local `master` is current, clean, and points to the commit intended for release:
+
+  ```bash
+  git fetch origin master --tags
+  git status --short
+  git rev-parse master
+  git rev-parse origin/master
+  ```
+
+  The two commit IDs should match before creating a release tag.
 
 ## Release Checklist
 
@@ -82,7 +92,10 @@ Commit and push the release-prep change to `master` after required checks pass.
 
 ## Tag And Trigger TestFlight
 
-Tag format must be `v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`.
+Tag format for build-tracked releases must be
+`v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`. Some fastlane helper code accepts
+the older `vX.Y.Z` form, but do not use suffix-less tags for TestFlight or App Store
+releases.
 
 ```bash
 tag=v5.3.2+160
@@ -235,6 +248,14 @@ If a release fails:
 Only force-move a release tag during in-progress failed release recovery. Once a TestFlight build has completed successfully, treat the tag as immutable.
 
 ## Appendix: Recovery Commands
+
+Before force-moving a failed release tag, verify that no release workflow is still
+running and that App Store Connect has not received a usable build:
+
+```bash
+git ls-remote origin "refs/tags/$tag"
+gh run list --workflow release-testflight.yml --limit 10
+```
 
 Force-move a failed release tag only before a usable TestFlight build exists:
 

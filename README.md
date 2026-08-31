@@ -4,7 +4,7 @@
 [![CI](https://github.com/weiran/Hackers/actions/workflows/pr.yml/badge.svg)](https://github.com/weiran/Hackers/actions/workflows/pr.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Hackers is an open-source Hacker News client for iPhone and iPad.
+Hackers is an open-source Hacker News client for iPhone and iPad, built with SwiftUI.
 
 It focuses on fast feed browsing, readable comment threads, voting, bookmarks, search, Dynamic Type, VoiceOver, dark mode, and a native iOS/iPadOS experience. Version 5 is a SwiftUI rebuild with a modular Swift Package layout.
 
@@ -24,13 +24,16 @@ It focuses on fast feed browsing, readable comment threads, voting, bookmarks, s
 * Supports Dynamic Type, VoiceOver, dark mode, and high-contrast-friendly styling.
 * No ads, no tracking, no analytics.
 
+The repository currently targets iOS and iPadOS. Apple Silicon Mac compatibility may be
+available through Apple's platform support, but iOS/iPadOS are the platforms covered by
+the project's build and CI configuration.
+
 ## Requirements
 
-* iOS/iPadOS 26 or later
-* Xcode 27.0 for development
+* macOS
+* Xcode 27.0 (see [.github/xcode-version](.github/xcode-version))
+* iOS 26 or later Simulator runtime
 * Swift 6.4
-
-The app also runs on Apple Silicon Macs and visionOS through Apple's platform compatibility support.
 
 ## Build
 
@@ -61,20 +64,32 @@ Do not use `swift test` for project validation; the packages target iOS APIs and
 
 ## Documentation
 
-The maintained docs are intentionally small:
+Start with the contributor documentation:
 
 * [Project overview](docs/project-overview.md)
 * [Development guide](docs/development.md)
 * [Release process](docs/release-process.md)
+* [Documentation index](docs/README.md)
+* [Contributing](CONTRIBUTING.md)
+* [Security policy](SECURITY.md)
+* [Support](SUPPORT.md)
 
 ## Contributing
 
-Issues and pull requests are welcome. Before opening a PR:
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
+before starting work. In particular:
 
-* Run `./run_tests.sh`.
-* Keep changes scoped.
+* Search existing issues and pull requests before opening a new one.
+* Explain the problem and proposed solution before investing in a large change.
+* Run the relevant checks and report what you ran in the pull request.
 * Add or update tests for behavior changes.
-* Follow the existing SwiftUI, Swift Testing, and package patterns.
+
+For a quick local check, run:
+
+```bash
+./run_tests.sh
+./run_ui_tests.sh smoke
+```
 
 ## Privacy
 
