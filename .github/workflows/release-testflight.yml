@@ -23,6 +23,10 @@ on:
         description: "Optional custom TestFlight What to Test text; overrides generated notes"
         required: false
         type: string
+      local_ipa_asset:
+        description: "Optional IPA asset already attached to the release tag; skips the GitHub-hosted archive"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -106,7 +110,7 @@ jobs:
           fi
 
       - name: Upload to TestFlight
-        if: ${{ github.event.inputs.distribute_existing != 'true' }}
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset == '' }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -118,6 +122,31 @@ jobs:
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
         run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
+
+      - name: Download local IPA asset
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          LOCAL_IPA_ASSET: ${{ github.event.inputs.local_ipa_asset }}
+        run: |
+          gh release download "$RELEASE_TAG" \
+            --pattern "$LOCAL_IPA_ASSET" \
+            --dir artifacts/release \
+            --clobber
+          test -f "artifacts/release/$LOCAL_IPA_ASSET"
+
+      - name: Upload local IPA to TestFlight
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset != '' }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
+          LOCAL_IPA_PATH: artifacts/release/${{ github.event.inputs.local_ipa_asset }}
+          TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+        run: bundle exec fastlane ios upload_existing_testflight release_tag:"$RELEASE_TAG" ipa_path:"$LOCAL_IPA_PATH"
 
       - name: Distribute Existing TestFlight Build
         if: ${{ github.event.inputs.distribute_existing == 'true' }}

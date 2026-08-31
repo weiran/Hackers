@@ -19,6 +19,13 @@ Releases are source-controlled and tag-driven:
 * TestFlight upload uses `.github/workflows/release-testflight.yml`.
 * App Store submission uses `.github/workflows/release-appstore.yml`.
 
+When the GitHub-hosted Xcode image cannot build the project, a locally built IPA can
+still use the protected GitHub upload path. Attach the IPA to the release tag as a
+GitHub Release asset, then dispatch TestFlight with `local_ipa_asset` set to the exact
+asset filename. The workflow downloads that asset on the GitHub runner and uses the
+same App Store Connect secrets and protected environment as a normal upload; it does
+not archive a second build.
+
 ## Prerequisites
 
 Before starting a release, confirm:
@@ -130,6 +137,20 @@ Manual dispatch for an upload-only build is also supported:
 ```bash
 gh workflow run release-testflight.yml -f release_tag=v5.3.2+160
 ```
+
+To upload a locally built IPA attached to the release, use:
+
+```bash
+gh release upload v5.5.0+166 artifacts/release/Hackers.ipa --clobber
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.5.0+166 \
+  -f local_ipa_asset=Hackers.ipa
+```
+
+The local IPA must already contain the intended marketing version and build number,
+both app targets must be signed for distribution, and the filename must match the
+asset passed to `local_ipa_asset`. Do not upload a locally built IPA under a tag whose
+build number does not match the IPA.
 
 When you need another build for the same marketing version, bump `CURRENT_PROJECT_VERSION`, create a new release-prep commit, and tag the new commit with the new `+N` value.
 
