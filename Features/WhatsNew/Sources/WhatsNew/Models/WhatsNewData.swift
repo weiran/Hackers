@@ -29,15 +29,15 @@ public struct WhatsNewData: Sendable {
             systemImage: "arrowshape.turn.up.left.fill",
         )
 
-        let upvoteComments = WhatsNewItem(
-            title: "Upvote the Best",
-            subtitle: "Sign in with your Hacker News account to comment and upvote — it all counts on the site too.",
-            systemImage: "arrow.up.circle.fill",
+        let swipeToCollapse = WhatsNewItem(
+            title: "Swipe to Collapse Threads",
+            subtitle: "Swipe on a comment to collapse its whole thread — a favorite gesture is back.",
+            systemImage: "chevron.up.chevron.down",
         )
 
         return WhatsNewData(
-            title: "What's New in Hackers 5.5.0",
-            items: [joinConversation, replyToComments, upvoteComments],
+            title: "What's New in Hackers 5.5",
+            items: [joinConversation, replyToComments, swipeToCollapse],
         )
     }
 }

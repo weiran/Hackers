@@ -25,13 +25,13 @@ struct WhatsNewDataTests {
                 "arrowshape.turn.up.left.fill"
             ),
             (
-                "Upvote the Best",
-                "Sign in with your Hacker News account to comment and upvote — it all counts on the site too.",
-                "arrow.up.circle.fill"
+                "Swipe to Collapse Threads",
+                "Swipe on a comment to collapse its whole thread — a favorite gesture is back.",
+                "chevron.up.chevron.down"
             ),
         ]
 
-        #expect(data.title == "What's New in Hackers 5.5.0")
+        #expect(data.title == "What's New in Hackers 5.5")
         #expect(data.items.count == expectedItems.count)
 
         for expected in expectedItems {

@@ -261,7 +261,9 @@ private extension SettingsView {
     }
 
     private var feedbackBodyLines: [String] {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let version = Self.displayVersion(
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        ) ?? "Unknown"
         let deviceIdentifier = UIDevice.current.modelIdentifier
         let systemVersion = UIDevice.current.systemVersion
         return [
@@ -284,8 +286,20 @@ private extension SettingsView {
         )
     }
 
+    static func displayVersion(_ version: String?) -> String? {
+        guard var components = version?.split(separator: "."), !components.isEmpty else {
+            return version
+        }
+        if components.count > 2, components.last == "0" {
+            components.removeLast()
+        }
+        return components.joined(separator: ".")
+    }
+
     private var versionLabel: some View {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let appVersion = Self.displayVersion(
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        )
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         let versionText = [appVersion, buildNumber.map { "(\($0))" }]
             .compactMap(\.self)
