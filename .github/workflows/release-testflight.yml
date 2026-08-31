@@ -132,6 +132,7 @@ jobs:
             --dir artifacts/release \
             --clobber
           test -f "artifacts/release/$LOCAL_IPA_ASSET"
+          ls -lh "artifacts/release/$LOCAL_IPA_ASSET"
 
       - name: Upload local IPA to TestFlight
         if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset != '' }}
@@ -141,7 +142,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
-          LOCAL_IPA_PATH: artifacts/release/${{ github.event.inputs.local_ipa_asset }}
+          LOCAL_IPA_PATH: ${{ github.workspace }}/artifacts/release/${{ github.event.inputs.local_ipa_asset }}
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
         run: bundle exec fastlane ios upload_existing_testflight release_tag:"$RELEASE_TAG" ipa_path:"$LOCAL_IPA_PATH"
 
