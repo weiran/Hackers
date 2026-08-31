@@ -544,6 +544,7 @@ platform :ios do
     parts = release_tag_parts(tag)
     ipa_path = options[:ipa_path] || ENV["LOCAL_IPA_PATH"]
     UI.user_error!("IPA path is required") if ipa_path.to_s.strip.empty?
+    ipa_path = File.expand_path(ipa_path, REPO_ROOT) unless ipa_path.start_with?("/")
     UI.user_error!("IPA not found: #{ipa_path}") unless File.file?(ipa_path)
 
     notes = release_notes
