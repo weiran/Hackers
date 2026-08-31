@@ -111,7 +111,9 @@ git tag "$tag" master
 git push origin "refs/tags/$tag"
 ```
 
-When the tag push starts `Release TestFlight`, approve the protected `testflight` deployment in GitHub Actions.
+The TestFlight workflow is manually dispatched so a release can use a locally built
+IPA when the GitHub-hosted Xcode image is not suitable. Approve the protected
+`testflight` deployment in GitHub Actions.
 
 A tag push uploads the build and makes it available to internal testers only. External tester distribution is a separate, opt-in step so a build can be uploaded without committing to a beta audience:
 

@@ -3,7 +3,18 @@
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store</string>
+    <string>app-store-connect</string>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.weiranzhang.Hackers</key>
+        <string>match AppStore com.weiranzhang.Hackers</string>
+        <key>com.weiranzhang.Hackers.ActionExtension</key>
+        <string>match AppStore com.weiranzhang.Hackers.ActionExtension</string>
+    </dict>
+    <key>teamID</key>
+    <string>2KB59GPA9B</string>
     <key>uploadSymbols</key>
     <true/>
 </dict>
