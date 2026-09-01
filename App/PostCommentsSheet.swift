@@ -488,6 +488,9 @@ struct PostCommentsSheet: View {
         collapsedHeaderView(onExpand: {
             animateSheet {
                 presentation.expand()
+                // The collapsed header expands the sheet directly, bypassing
+                // settleSheet(), so return title ownership to the system bar.
+                toolbarGeometry.setBarTitleSuppressed(false)
             }
         })
         .background(
