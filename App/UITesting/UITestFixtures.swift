@@ -220,7 +220,9 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         switch commentSubmission {
         case .success, .delayedSuccess:
             if commentSubmission == .delayedSuccess {
-                try await Task.sleep(for: .seconds(1.5))
+                // Keep the in-flight state observable through the spinner test's
+                // polling and absence windows on slower CI runners.
+                try await Task.sleep(for: .seconds(6))
             }
             return .confirmed(submittedComment(for: request))
         case .failure:
