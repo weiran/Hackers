@@ -133,7 +133,12 @@ final class FeedAndSettingsUITests: HackersUITestCase {
         dismissLoginKeyboard()
 
         assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
-        assertHasVisibleIntersection(app.staticTexts["Logged in as ui-user"], in: app)
+        let accountButton = app.buttons[AccessibilityIdentifier.Settings.account]
+        expectation(
+            for: NSPredicate(format: "label == %@", "Logged in as ui-user"),
+            evaluatedWith: accountButton
+        )
+        waitForExpectations(timeout: 5)
     }
 
     private func dismissLoginKeyboard() {

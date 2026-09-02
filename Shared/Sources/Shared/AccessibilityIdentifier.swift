@@ -20,6 +20,7 @@ public enum AccessibilityIdentifier {
 
     public enum Settings {
         public static let form = "settings.form"
+        public static let account = "settings.account"
         public static let close = "settings.close"
         public static let showThumbnails = "settings.showThumbnails"
         public static let compactFeed = "settings.compactFeed"

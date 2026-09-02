@@ -82,6 +82,7 @@ public struct SettingsView: View {
                             }
                         },
                     )
+                    .accessibilityIdentifier(AccessibilityIdentifier.Settings.account)
                     .sheet(isPresented: $showLogin) {
                         LoginView(
                             isAuthenticated: isAuthenticated,
