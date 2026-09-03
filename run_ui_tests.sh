@@ -51,6 +51,7 @@ FULL_TESTS=(
   CommentingUITests/testCommentingHiddenWhenFeatureDisabledAndAuthenticated
   CommentingUITests/testCommentingHiddenWhenEnabledAndLoggedOut
   CommentingUITests/testComposerAndReplyVisibleWhenEnabledAndAuthenticated
+  CommentingUITests/testCollapsedComposerUsesOnlyBottomSafeAreaInset
   CommentingUITests/testPostingFlowWithSuccessFixture
   CommentingUITests/testPostingFailureKeepsDraft
   CommentingUITests/testDraftPersistsAcrossCollapseAndReopen
@@ -60,6 +61,7 @@ FULL_TESTS=(
   CommentingUITests/testDelayedPostingCollapsesComposerAndKeyboard
   CommentingUITests/testOutcomeUnknownAlertCheckAgainResolvesOnce
   CommentingUITests/testCustomBrowserExpandedCommentsShowsComposer
+  CommentingUITests/testCustomBrowserCollapsedComposerUsesOnlyBottomSafeAreaInset
   CommentingUITests/testCustomBrowserComposerRemainsAboveKeyboard
 )
 

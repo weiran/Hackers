@@ -521,10 +521,10 @@ private struct CommentsFloatingControls: View {
             // bottom toolbar while collapsed; the expanded editor uses a
             // tighter inset closer to the screen edges.
             .padding(.horizontal, composer.isExpanded ? 8 : 16)
-            // Give the collapsed row a clear visual separation from the
-            // preserved bottom safe area. The expanded editor uses a tighter
-            // keyboard gap.
-            .padding(.bottom, composer.isExpanded ? 8 : 24)
+            // Keep both states close to their containing safe area. The
+            // enclosing comments host already reserves the system inset, so
+            // this is only the toolbar's internal breathing room.
+            .padding(.bottom, 8)
             .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
         }
     }

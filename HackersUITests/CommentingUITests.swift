@@ -75,6 +75,19 @@ final class CommentingUITests: HackersUITestCase {
         XCTAssertTrue(reply.waitForExistence(timeout: 5), "Real comments should offer an inline reply action")
     }
 
+    func testCollapsedComposerUsesOnlyBottomSafeAreaInset() {
+        launchComments(authenticated: true, commenting: true)
+
+        let composer = assertHittable(composerCollapsed)
+        let gapBelowComposer = app.frame.maxY - composer.frame.maxY
+
+        XCTAssertLessThanOrEqual(
+            gapBelowComposer,
+            52,
+            "The collapsed composer should sit just above the system bottom safe area, not float above an extra margin. Gap: \(gapBelowComposer)"
+        )
+    }
+
     func testPostingFlowWithSuccessFixture() {
         launchComments(authenticated: true, commenting: true)
         let composer = assertHittable(composerCollapsed)
@@ -364,6 +377,27 @@ final class CommentingUITests: HackersUITestCase {
         )
         let composer = assertHasVisibleIntersection(composerCollapsed, in: app)
         XCTAssertTrue(composer.isHittable, "The composer should be usable in the browser comments sheet")
+    }
+
+    func testCustomBrowserCollapsedComposerUsesOnlyBottomSafeAreaInset() throws {
+        XCUIDevice.shared.orientation = .portrait
+        launchApp(configuration: UITestLaunchConfiguration(
+            authenticated: true,
+            commentingEnabled: true
+        ))
+
+        let post = assertHittable(app.buttons[AccessibilityIdentifier.Feed.post(longCommentsPostID)], timeout: 8)
+        tapPost(post)
+
+        assertFullyContained(browserView, in: app)
+        let composer = assertHittable(composerCollapsed)
+        let gapBelowComposer = app.frame.maxY - composer.frame.maxY
+
+        XCTAssertLessThanOrEqual(
+            gapBelowComposer,
+            52,
+            "The browser-sheet composer should sit just above the system bottom safe area, not float above an extra margin. Gap: \(gapBelowComposer)"
+        )
     }
 
     func testCustomBrowserComposerRemainsAboveKeyboard() throws {
