@@ -83,8 +83,8 @@ final class CommentingUITests: HackersUITestCase {
 
         XCTAssertLessThanOrEqual(
             gapBelowComposer,
-            52,
-            "The collapsed composer should sit just above the system bottom safe area, not float above an extra margin. Gap: \(gapBelowComposer)"
+            30,
+            "The collapsed composer should occupy the system bottom-bar lane instead of floating above it. Gap: \(gapBelowComposer)"
         )
     }
 
@@ -395,8 +395,8 @@ final class CommentingUITests: HackersUITestCase {
 
         XCTAssertLessThanOrEqual(
             gapBelowComposer,
-            52,
-            "The browser-sheet composer should sit just above the system bottom safe area, not float above an extra margin. Gap: \(gapBelowComposer)"
+            30,
+            "The browser-sheet composer should occupy the system bottom-bar lane instead of floating above it. Gap: \(gapBelowComposer)"
         )
     }
 

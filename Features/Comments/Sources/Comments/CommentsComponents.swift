@@ -135,7 +135,7 @@ struct CommentsContentView: View {
                                 .allowsHitTesting(false)
                         }
                     }
-                    CommentsFloatingControls(
+                    CommentsBottomBar(
                         canComment: canComment,
                         composer: composer,
                         showsNextCommentButton: viewModel.showNextCommentButton,
@@ -488,11 +488,10 @@ private struct CommentSwipeActionsContainerModifier: ViewModifier {
     }
 }
 
-/// Bottom floating controls: the shared composer plus the next-comment
-/// button. The composer fills the remaining width next to a control that is
-/// visible as soon as the comments panel appears and enabled once a target is
-/// available.
-private struct CommentsFloatingControls: View {
+/// Shared bottom-bar controls for normal comments and embedded-browser
+/// comments. The bar extends through the container safe area, which is the
+/// same bottom lane occupied by a system `bottomBar` toolbar item.
+private struct CommentsBottomBar: View {
     let canComment: Bool
     @Bindable var composer: CommentComposerModel
     let showsNextCommentButton: Bool
@@ -517,14 +516,14 @@ private struct CommentsFloatingControls: View {
             }
             .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
             // The viewport supplied by the sheet already starts at the system
-            // horizontal safe area. Lay the control row out like a system
-            // bottom toolbar while collapsed; the expanded editor uses a
-            // tighter inset closer to the screen edges.
+            // horizontal safe area. The expanded editor uses a tighter inset
+            // closer to the screen edges.
             .padding(.horizontal, composer.isExpanded ? 8 : 16)
-            // Keep both states close to their containing safe area. The
-            // enclosing comments host already reserves the system inset, so
-            // this is only the toolbar's internal breathing room.
+            // This is the bar's internal breathing room, not a safe-area
+            // offset. The modifier below lets the bar occupy the system
+            // bottom-bar lane while the scroll view still reserves its height.
             .padding(.bottom, 8)
+            .ignoresSafeArea(.container, edges: .bottom)
             .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
         }
     }
