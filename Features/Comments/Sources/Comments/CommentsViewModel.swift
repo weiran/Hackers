@@ -563,7 +563,8 @@ extension CommentsViewModel {
             }
             let parent = updated[parentIndex]
 
-            // Insert as the final child of the parent's complete subtree.
+            // Insert immediately after the parent so the newest reply appears
+            // at the top of that thread, ahead of existing descendants.
             updated.insert(
                 Domain.Comment(
                     id: submitted.id,
@@ -576,7 +577,7 @@ extension CommentsViewModel {
                     voteLinks: submittedVoteLinks,
                     visibility: .visible
                 ),
-                at: firstIndexAfterSubtree(ofParentAt: parentIndex)
+                at: parentIndex + 1
             )
 
             // Reveal the parent so the reply is visible; unrelated collapse
@@ -610,18 +611,6 @@ extension CommentsViewModel {
 
         guard let newIndex = indexByID[submitted.id] else { return nil }
         return allComments[newIndex]
-    }
-
-    /// Index just past the complete subtree rooted at `parentIndex`, i.e. the
-    /// first later comment whose level is less than or equal to the parent's,
-    /// or the end of the array.
-    private func firstIndexAfterSubtree(ofParentAt parentIndex: Int) -> Int {
-        let parentLevel = allComments[parentIndex].level
-        var index = parentIndex + 1
-        while index < allComments.endIndex, allComments[index].level > parentLevel {
-            index += 1
-        }
-        return index
     }
 
     /// Children of the given parent currently loaded in the tree. For the

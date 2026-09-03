@@ -73,6 +73,7 @@ struct CommentsContentView: View {
     let onSubmitComposerDraft: () -> Void
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var bottomControlsHeight: CGFloat = 0
+    @State private var collapsedThreadScrollTarget: Int?
 
     var body: some View {
         Group {
@@ -163,6 +164,7 @@ struct CommentsContentView: View {
                 .onChange(of: viewModel.visibleRevision) { _, _ in
                     scrollToPendingComment(using: proxy)
                     scrollToReplyTarget(using: proxy)
+                    scrollToCollapsedThread(using: proxy)
                 }
                 .onChange(of: replyScrollTarget) { _, _ in
                     scrollToReplyTarget(using: proxy)
@@ -250,6 +252,15 @@ private extension CommentsContentView {
         }
     }
 
+    private func scrollToCollapsedThread(using proxy: ScrollViewProxy) {
+        guard let targetID = collapsedThreadScrollTarget else { return }
+
+        withAnimation(Self.commentCollapseAnimation) {
+            proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+        }
+        collapsedThreadScrollTarget = nil
+    }
+
     private func scrollToNextComment(using proxy: ScrollViewProxy) {
         guard let targetID = viewModel.nextVisibleCommentID(after: visibleCommentTarget.topCommentID) else { return }
         scrollToComment(withID: targetID, using: proxy)
@@ -305,7 +316,8 @@ private extension CommentsContentView {
     private func collapseThread(for state: CommentRowState) {
         guard let comment = viewModel.comment(withID: state.id) else { return }
         withAnimation(Self.commentCollapseAnimation) {
-            _ = viewModel.hideCommentBranch(comment)
+            guard let rootComment = viewModel.hideCommentBranch(comment) else { return }
+            collapsedThreadScrollTarget = rootComment.id
         }
     }
 

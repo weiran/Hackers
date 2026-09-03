@@ -1014,21 +1014,21 @@ struct CommentsViewModelTests {
         #expect(sut.post?.commentsCount == 1, "The synthetic story-text row is excluded from the count")
     }
 
-    @Test("Reply insertion lands after the parent's complete subtree")
+    @Test("Reply insertion becomes the first child of its parent")
     @MainActor
-    func insertReplyAfterSubtree() async {
+    func insertReplyAtTopOfThread() async {
         await loadComments(into: sut, comments: createTestComments())
 
         let inserted = sut.insertSubmittedComment(SubmittedComment(
             id: 200,
-            parentID: 2,
+            parentID: 3,
             author: "alice",
             htmlText: "reply",
             createdAt: Date()
         ))
 
         #expect(inserted?.level == 2, "Reply level is parent level + 1")
-        #expect(sut.comments.map(\.id) == [1, 2, 200, 3, 4, 5])
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 200, 4, 5])
     }
 
     @Test("Reply to a trailing parent appends at the array end")
@@ -1066,7 +1066,7 @@ struct CommentsViewModelTests {
         ))
 
         #expect(inserted != nil)
-        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 4, 200, 5], "The revealed parent's subtree includes the new reply")
+        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 200, 4, 5], "The revealed parent's newest reply appears first")
         #expect(sut.isCommentCollapsed(withID: 5), "Unrelated collapsed branches remain collapsed")
     }
 

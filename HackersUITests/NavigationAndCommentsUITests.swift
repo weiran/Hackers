@@ -194,5 +194,12 @@ final class NavigationAndCommentsUITests: HackersUITestCase {
         }
         waitForNonExistence(childComment, timeout: 2)
         rootComment = assertHasVisibleIntersection(rootComment, in: list)
+        let rootFrame = waitForStableFrame(of: rootComment, timeout: 3) {
+            $0.minY <= list.frame.minY + 24
+        }
+        XCTAssertNotNil(
+            rootFrame,
+            "Collapsing a thread should align its root comment with the top of the comments list. root: \(rootComment.frame), list: \(list.frame)"
+        )
     }
 }
