@@ -125,6 +125,19 @@ final class CommentingUITests: HackersUITestCase {
         )
     }
 
+    func testComposerKeyboardUsesReturnKey() {
+        launchComments(authenticated: true, commenting: true)
+
+        assertHittable(composerCollapsed).tap()
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5))
+
+        let returnKey = keyboard.buttons.matching(
+            NSPredicate(format: "label ==[c] %@", "Return")
+        ).firstMatch
+        XCTAssertTrue(returnKey.waitForExistence(timeout: 5), "The comment composer should use the standard Return key")
+    }
+
     func testPostingFlowWithSuccessFixture() {
         launchComments(authenticated: true, commenting: true)
         let composer = assertHittable(composerCollapsed)

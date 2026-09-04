@@ -189,7 +189,7 @@ struct CommentComposerView: View {
             )
             .lineLimit(model.isExpanded ? 1 ... 8 : 1 ... 1)
             .focused($isEditorFocused)
-            .submitLabel(.send)
+            .submitLabel(.return)
             .onSubmit { postIfPossible() }
             .multilineTextAlignment(.leading)
             // Match CommentRow's callout typography and the app's text scaling.
