@@ -28,13 +28,10 @@ enum CommentComposerSubmissionState: Equatable, Sendable {
 }
 
 enum CommentComposerAlert: Identifiable, Equatable {
-    case discardDraft(newTarget: CommentComposerTarget)
     case outcomeUnknown
 
     var id: String {
         switch self {
-        case .discardDraft:
-            "discardDraft"
         case .outcomeUnknown:
             "outcomeUnknown"
         }
@@ -98,10 +95,6 @@ public final class CommentComposerModel {
 
     func activateTopLevel() {
         guard !isPosting else { return }
-        if hasDraft, target != .story {
-            alert = .discardDraft(newTarget: .story)
-            return
-        }
         target = .story
         presentation = .expanded
     }
@@ -113,28 +106,8 @@ public final class CommentComposerModel {
             presentation = .expanded
             return
         }
-        if hasDraft {
-            alert = .discardDraft(newTarget: newTarget)
-            return
-        }
-        text = ""
         target = newTarget
         presentation = .expanded
-    }
-
-    /// Applies a confirmed discard: clears the old draft and switches to the
-    /// pending target from the discard alert.
-    func confirmTargetReplacement() {
-        guard case let .discardDraft(newTarget) = alert else { return }
-        alert = nil
-        text = ""
-        inlineError = nil
-        target = newTarget
-        presentation = .expanded
-    }
-
-    func keepCurrentDraft() {
-        alert = nil
     }
 
     // MARK: - Presentation

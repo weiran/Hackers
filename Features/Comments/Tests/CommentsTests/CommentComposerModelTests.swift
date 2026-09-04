@@ -82,34 +82,24 @@ struct CommentComposerModelTests {
         #expect(model.replyUsername == nil)
     }
 
-    @Test("Dirty target switches require confirmation")
+    @Test("Dirty target switches preserve the draft and retarget immediately")
     func dirtyTargetSwitch() {
         let model = CommentComposerModel()
         model.activateReply(commentID: 5, author: "alice")
         model.text = "precious draft"
 
         model.activateReply(commentID: 7, author: "bob")
-        #expect(model.alert == .discardDraft(newTarget: .reply(commentID: 7, author: "bob")))
-        #expect(model.text == "precious draft", "Keep Editing default preserves the draft")
-        #expect(model.target == .reply(commentID: 5, author: "alice"))
-
-        model.keepCurrentDraft()
         #expect(model.alert == nil)
         #expect(model.text == "precious draft")
-        #expect(model.target == .reply(commentID: 5, author: "alice"))
-
-        model.activateReply(commentID: 7, author: "bob")
-        model.confirmTargetReplacement()
-        #expect(model.text.isEmpty)
         #expect(model.target == .reply(commentID: 7, author: "bob"))
         #expect(model.isExpanded)
 
-        // Switching a dirty reply draft back to a top-level comment works too.
+        // Switching a dirty reply draft back to a top-level comment also
+        // preserves the text while changing the target.
         model.text = "another draft"
         model.activateTopLevel()
-        #expect(model.alert == .discardDraft(newTarget: .story))
-        model.confirmTargetReplacement()
-        #expect(model.text.isEmpty)
+        #expect(model.alert == nil)
+        #expect(model.text == "another draft")
         #expect(model.target == .story)
     }
 

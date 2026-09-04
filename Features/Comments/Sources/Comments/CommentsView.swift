@@ -470,23 +470,10 @@ extension CommentsView {
 
     private func handleReplyActivation(commentID: Int, author: String) {
         guard canComment, !composer.isPosting else { return }
-        let wasDirtySwitch = composer.hasDraft
-            && composer.target != .reply(commentID: commentID, author: author)
         withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
             composer.activateReply(commentID: commentID, author: author)
         }
-        guard !wasDirtySwitch else { return }
         presentReplyTarget(commentID: commentID)
-    }
-
-    private func confirmDiscardAndReply() {
-        guard case let .discardDraft(newTarget) = composer.alert else { return }
-        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
-            composer.confirmTargetReplacement()
-        }
-        if case let .reply(commentID, _) = newTarget {
-            presentReplyTarget(commentID: commentID)
-        }
     }
 
     private func presentReplyTarget(commentID: Int) {
@@ -501,7 +488,6 @@ extension CommentsView {
 
     private var composerAlertTitle: String {
         switch composer.alert {
-        case .discardDraft: "Discard current draft?"
         case .outcomeUnknown: "Couldn’t confirm this comment"
         case nil: ""
         }
@@ -510,14 +496,6 @@ extension CommentsView {
     @ViewBuilder
     private func composerAlertActions(for alert: CommentComposerAlert) -> some View {
         switch alert {
-        case let .discardDraft(newTarget):
-            Button("Keep Editing") { composer.keepCurrentDraft() }
-            switch newTarget {
-            case .reply:
-                Button("Discard & Reply", role: .destructive) { confirmDiscardAndReply() }
-            case .story:
-                Button("Discard & Comment", role: .destructive) { confirmDiscardAndReply() }
-            }
         case .outcomeUnknown:
             Button("Check Again") {
                 Task { await reconcileUnconfirmedComment() }
@@ -528,13 +506,6 @@ extension CommentsView {
 
     private func composerAlertMessage(for alert: CommentComposerAlert) -> String {
         switch alert {
-        case let .discardDraft(newTarget):
-            switch newTarget {
-            case let .reply(_, author):
-                "Starting a reply to \(author) will discard what you have written."
-            case .story:
-                "Starting a new comment will discard what you have written."
-            }
         case .outcomeUnknown:
             "Hackers could not confirm whether Hacker News accepted this comment. "
                 + "Check the thread before posting it again."

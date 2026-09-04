@@ -296,7 +296,7 @@ final class CommentingUITests: HackersUITestCase {
         )
     }
 
-    func testDirtyReplySwitchRequiresConfirmation() {
+    func testDirtyReplySwitchPreservesDraftWithoutConfirmation() {
         launchComments(authenticated: true, commenting: true)
 
         let firstReply = replyButton(commentID: UITestFixtureReference.firstScreenshotCommentID)
@@ -310,38 +310,20 @@ final class CommentingUITests: HackersUITestCase {
         scroll(commentsList, untilVisible: secondReply)
         assertHittable(secondReply).tap()
 
-        let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 5), "Switching targets with a draft should ask for confirmation")
-
-        let keepEditing = alert.buttons["Keep Editing"]
-        XCTAssertTrue(keepEditing.exists)
-        keepEditing.tap()
-
-        XCTAssertTrue(composerEditor.waitForExistence(timeout: 5), "Keep Editing preserves the expanded draft")
-        let keptDraft = composerEditor.value as? String ?? ""
-        XCTAssertTrue(keptDraft.contains("precious draft"), "Keep Editing preserves the text, got: \(keptDraft)")
-        let keptLabel = app.descendants(matching: .any)
-            .matching(identifier: AccessibilityIdentifier.Comments.composerReplyLabel)
-            .firstMatch
-        XCTAssertTrue(keptLabel.label.contains("manakov_dev"), "Keep Editing preserves the original target")
-
-        scroll(commentsList, untilVisible: secondReply)
-        assertHittable(secondReply).tap()
-        XCTAssertTrue(alert.waitForExistence(timeout: 5))
-        let discardAndReply = alert.buttons["Discard & Reply"]
-        XCTAssertTrue(discardAndReply.exists)
-        discardAndReply.tap()
-
         let switchedLabel = app.descendants(matching: .any)
             .matching(identifier: AccessibilityIdentifier.Comments.composerReplyLabel)
             .firstMatch
         XCTAssertTrue(switchedLabel.waitForExistence(timeout: 5))
         XCTAssertTrue(
             switchedLabel.label.contains("lexicality"),
-            "Discard & Reply should switch to the new target, got: \(switchedLabel.label)"
+            "Switching replies should immediately retarget the composer, got: \(switchedLabel.label)"
         )
-        let clearedDraft = composerEditor.value as? String ?? ""
-        XCTAssertTrue(clearedDraft.isEmpty, "Discard & Reply clears the old text, got: \(clearedDraft)")
+        let preservedDraft = composerEditor.value as? String ?? ""
+        XCTAssertTrue(preservedDraft.contains("precious draft"), "Switching replies should preserve the text, got: \(preservedDraft)")
+        XCTAssertFalse(
+            app.alerts.firstMatch.waitForExistence(timeout: 1),
+            "Switching replies with a draft should not show a confirmation dialog"
+        )
     }
 
     // MARK: - Spinner and outcome-unknown flows
