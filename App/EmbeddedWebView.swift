@@ -905,7 +905,6 @@ struct PostLinkBrowserView: View {
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .tint(.accentColor)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
         .navigationBarTitleDisplayMode(.inline)
