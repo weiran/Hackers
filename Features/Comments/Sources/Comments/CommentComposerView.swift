@@ -148,12 +148,26 @@ struct CommentComposerView: View {
         // nor its placeholder jumps between states.
         ZStack(alignment: model.isExpanded ? .topLeading : .leading) {
             if model.text.isEmpty {
-                Text("Add a comment…")
-                    .scaledFont(.callout)
-                    .foregroundStyle(Color.primary.opacity(0.72))
-                    .padding(.top, model.isExpanded ? Metrics.editorTopPadding : 0)
-                    .padding(.horizontal, Metrics.editorHorizontalPadding)
-                    .allowsHitTesting(false)
+                if model.isExpanded {
+                    Text("Add a comment…")
+                        .scaledFont(.callout)
+                        .foregroundStyle(Color.primary.opacity(0.72))
+                        .padding(.top, Metrics.editorTopPadding)
+                        .padding(.horizontal, Metrics.editorHorizontalPadding)
+                        .allowsHitTesting(false)
+                } else {
+                    HStack(spacing: 8) {
+                        Image(systemName: "message")
+                            .scaledFont(.callout)
+                            .accessibilityLabel("Add comment icon")
+
+                        Text("Add a comment…")
+                            .scaledFont(.callout)
+                    }
+                        .foregroundStyle(Color.primary.opacity(0.72))
+                        .padding(.horizontal, Metrics.editorHorizontalPadding)
+                        .allowsHitTesting(false)
+                }
             }
 
             TextField(

@@ -81,6 +81,16 @@ final class CommentingUITests: HackersUITestCase {
         XCTAssertTrue(reply.waitForExistence(timeout: 5), "Real comments should offer an inline reply action")
     }
 
+    func testEmptyCollapsedComposerShowsCommentIconAndPlaceholder() {
+        launchComments(authenticated: true, commenting: true)
+
+        let icon = app.images["Add comment icon"]
+        XCTAssertTrue(icon.waitForExistence(timeout: 5), "An empty collapsed composer should show its comment icon")
+
+        let placeholder = app.staticTexts["Add a comment…"]
+        XCTAssertTrue(placeholder.waitForExistence(timeout: 5), "An empty collapsed composer should retain its placeholder")
+    }
+
     func testCollapsedComposerUsesTwentyFourPointScreenMargins() {
         launchComments(authenticated: true, commenting: true)
 
