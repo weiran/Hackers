@@ -489,8 +489,8 @@ private struct CommentSwipeActionsContainerModifier: ViewModifier {
 }
 
 /// Shared bottom-bar controls for normal comments and embedded-browser
-/// comments. The bar extends through the container safe area, which is the
-/// same bottom lane occupied by a system `bottomBar` toolbar item.
+/// comments. The row ends at the container's bottom safe-area baseline, like
+/// a system `bottomBar` toolbar item.
 private struct CommentsBottomBar: View {
     let canComment: Bool
     @Bindable var composer: CommentComposerModel
@@ -515,15 +515,16 @@ private struct CommentsBottomBar: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
-            // The viewport supplied by the sheet already starts at the system
-            // horizontal safe area. The expanded editor uses a tighter inset
-            // closer to the screen edges.
-            .padding(.horizontal, composer.isExpanded ? 8 : 16)
-            // This is the bar's internal breathing room, not a safe-area
-            // offset. The modifier below lets the bar occupy the system
-            // bottom-bar lane while the scroll view still reserves its height.
-            .padding(.bottom, 8)
-            .ignoresSafeArea(.container, edges: .bottom)
+            // The collapsed pill keeps equal margins on every screen edge.
+            // The expanded editor preserves its original compact inset above
+            // the keyboard and beside the screen edges.
+            .padding(.horizontal, composer.isExpanded ? 8 : 24)
+            .padding(.bottom, composer.isExpanded ? 8 : 0)
+            // SwiftUI lays the row above the home-indicator safe area. Move
+            // only the collapsed pill into that region far enough to give it
+            // the requested 24pt physical screen margin; the expanded editor
+            // remains on its keyboard-safe baseline.
+            .offset(y: composer.isExpanded ? 0 : 10)
             .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
         }
     }

@@ -15,6 +15,12 @@ final class CommentingUITests: HackersUITestCase {
             .firstMatch
     }
 
+    private var composerExpanded: XCUIElement {
+        app.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Comments.composerExpanded)
+            .firstMatch
+    }
+
     private var composerError: XCUIElement {
         app.staticTexts.matching(identifier: AccessibilityIdentifier.Comments.composerError).firstMatch
     }
@@ -75,16 +81,37 @@ final class CommentingUITests: HackersUITestCase {
         XCTAssertTrue(reply.waitForExistence(timeout: 5), "Real comments should offer an inline reply action")
     }
 
-    func testCollapsedComposerUsesOnlyBottomSafeAreaInset() {
+    func testCollapsedComposerUsesTwentyFourPointScreenMargins() {
         launchComments(authenticated: true, commenting: true)
 
         let composer = assertHittable(composerCollapsed)
+        let nextButton = assertHittable(nextCommentButton)
         let gapBelowComposer = app.frame.maxY - composer.frame.maxY
 
-        XCTAssertLessThanOrEqual(
+        XCTAssertEqual(composer.frame.minX, 24, accuracy: 4)
+        XCTAssertEqual(app.frame.maxX - nextButton.frame.maxX, 24, accuracy: 4)
+
+        XCTAssertEqual(
             gapBelowComposer,
-            30,
-            "The collapsed composer should occupy the system bottom-bar lane instead of floating above it. Gap: \(gapBelowComposer)"
+            24,
+            accuracy: 4,
+            "The collapsed composer should keep 24pt screen margins. Bottom gap: \(gapBelowComposer)"
+        )
+    }
+
+    func testExpandedComposerRestoresOriginalKeyboardMargin() {
+        launchComments(authenticated: true, commenting: true)
+
+        assertHittable(composerCollapsed).tap()
+
+        let composer = assertHasVisibleIntersection(composerExpanded, in: app)
+        let keyboard = app.keyboards.firstMatch
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5), "The software keyboard should be visible while editing")
+        XCTAssertEqual(
+            keyboard.frame.minY - composer.frame.maxY,
+            52,
+            accuracy: 4,
+            "The expanded composer should preserve its original keyboard margin"
         )
     }
 
@@ -379,7 +406,7 @@ final class CommentingUITests: HackersUITestCase {
         XCTAssertTrue(composer.isHittable, "The composer should be usable in the browser comments sheet")
     }
 
-    func testCustomBrowserCollapsedComposerUsesOnlyBottomSafeAreaInset() throws {
+    func testCustomBrowserCollapsedComposerUsesTwentyFourPointScreenMargins() throws {
         XCUIDevice.shared.orientation = .portrait
         launchApp(configuration: UITestLaunchConfiguration(
             authenticated: true,
@@ -391,12 +418,17 @@ final class CommentingUITests: HackersUITestCase {
 
         assertFullyContained(browserView, in: app)
         let composer = assertHittable(composerCollapsed)
+        let nextButton = assertHittable(nextCommentButton)
         let gapBelowComposer = app.frame.maxY - composer.frame.maxY
 
-        XCTAssertLessThanOrEqual(
+        XCTAssertEqual(composer.frame.minX, 24, accuracy: 4)
+        XCTAssertEqual(app.frame.maxX - nextButton.frame.maxX, 24, accuracy: 4)
+
+        XCTAssertEqual(
             gapBelowComposer,
-            30,
-            "The browser-sheet composer should occupy the system bottom-bar lane instead of floating above it. Gap: \(gapBelowComposer)"
+            24,
+            accuracy: 4,
+            "The browser-sheet composer should keep 24pt screen margins. Bottom gap: \(gapBelowComposer)"
         )
     }
 
@@ -418,11 +450,18 @@ final class CommentingUITests: HackersUITestCase {
         editor.tap()
         editor.typeText("Keyboard-safe browser draft.")
 
+        let composer = assertHasVisibleIntersection(composerExpanded, in: app)
         let postButton = app.buttons.matching(identifier: AccessibilityIdentifier.Comments.composerPost).firstMatch
         let keyboard = app.keyboards.firstMatch
         XCTAssertTrue(keyboard.waitForExistence(timeout: 5), "The software keyboard should be visible while editing")
         XCTAssertTrue(editor.isHittable, "The browser composer editor should remain visible above the keyboard")
         XCTAssertTrue(postButton.isHittable, "The browser Post action should remain visible above the keyboard")
+        XCTAssertEqual(
+            keyboard.frame.minY - composer.frame.maxY,
+            52,
+            accuracy: 4,
+            "The browser composer should preserve its original keyboard margin"
+        )
         XCTAssertLessThanOrEqual(
             editor.frame.maxY,
             keyboard.frame.minY,
