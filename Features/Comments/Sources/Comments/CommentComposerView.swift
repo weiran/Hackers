@@ -23,6 +23,10 @@ struct CommentComposerView: View {
         // The collapsed pill reproduces the original 48pt footprint. The
         // vertical-axis TextField adds ~2pt of intrinsic chrome, hence 46.
         static let collapsedEditorMinHeight: CGFloat = 46
+        // A collapsed reply keeps its target label visually paired with the
+        // placeholder rather than vertically centering it in the full pill.
+        static let collapsedReplyEditorTopPadding: CGFloat = 4
+        static let collapsedReplyEditorMinHeight: CGFloat = 29
         static let expandedEditorMinHeight: CGFloat = 40
         // Space between the editor and the action row inside the expanded card.
         static let expandedEditorBottomInset: CGFloat = 4
@@ -76,9 +80,9 @@ struct CommentComposerView: View {
         // top of the content paddings; collapsed keeps the bare 48pt pill.
         .padding(
             .top,
-            model.isExpanded
-                ? (model.replyUsername == nil ? Metrics.cardVerticalPadding : Metrics.cardTopPadding)
-                : 0
+            model.replyUsername == nil
+                ? (model.isExpanded ? Metrics.cardVerticalPadding : 0)
+                : (model.isExpanded ? Metrics.cardTopPadding : Metrics.cardVerticalPadding)
         )
         .padding(.bottom, model.isExpanded ? Metrics.cardVerticalPadding : 0)
         .animation(ComposerMotion.animation(isReducedMotion: reduceMotion), value: model.isExpanded)
@@ -142,10 +146,10 @@ struct CommentComposerView: View {
     }
 
     private var editorBlock: some View {
-        // Vertically top-anchored while expanded (multi-line growth) and
-        // vertically centered in the pill while collapsed; the editor's
-        // top inset tweens numerically with the state so neither the field
-        // nor its placeholder jumps between states.
+        // Vertically top-anchored while expanded (multi-line growth) or
+        // replying, and vertically centered in a top-level collapsed pill.
+        // The editor's top inset tweens numerically with the state so neither
+        // the field nor its placeholder jumps between states.
         ZStack(alignment: model.isExpanded ? .topLeading : .leading) {
             if model.text.isEmpty {
                 if model.isExpanded {
@@ -192,13 +196,20 @@ struct CommentComposerView: View {
             .scaledFont(.callout)
             .foregroundStyle(.primary)
             .tint(AppColors.appTintColor)
-            .padding(.top, model.isExpanded ? Metrics.editorTopPadding : 0)
+            .padding(
+                .top,
+                model.isExpanded
+                    ? Metrics.editorTopPadding
+                    : (model.replyUsername == nil ? 0 : Metrics.collapsedReplyEditorTopPadding)
+            )
             .padding(.bottom, model.isExpanded ? Metrics.expandedEditorBottomInset : 0)
             .padding(.horizontal, Metrics.editorHorizontalPadding)
             .frame(maxWidth: .infinity, minHeight: model.isExpanded
                 ? Metrics.expandedEditorMinHeight
-                : Metrics.collapsedEditorMinHeight,
-                alignment: model.isExpanded ? .topLeading : .leading)
+                : (model.replyUsername == nil
+                    ? Metrics.collapsedEditorMinHeight
+                    : Metrics.collapsedReplyEditorMinHeight),
+                alignment: model.isExpanded || model.replyUsername != nil ? .topLeading : .leading)
             // Locks the field while a submission is in flight; the model's
             // collapse guard keeps a focus loss here from closing the card.
             .disabled(model.isPosting)

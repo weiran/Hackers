@@ -248,6 +248,41 @@ final class CommentingUITests: HackersUITestCase {
         )
     }
 
+    func testCollapsedReplyLabelKeepsCardTopInset() {
+        launchComments(authenticated: true, commenting: true)
+
+        let reply = replyButton(commentID: UITestFixtureReference.firstScreenshotCommentID)
+        scroll(commentsList, untilVisible: reply)
+        assertHittable(reply).tap()
+
+        let replyLabel = app.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Comments.composerReplyLabel)
+            .firstMatch
+        XCTAssertTrue(replyLabel.waitForExistence(timeout: 5))
+
+        let targetRow = app.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Comments.comment(UITestFixtureReference.firstScreenshotCommentID))
+            .firstMatch
+        assertHittable(targetRow).tap()
+
+        let collapsedComposer = assertHittable(composerCollapsed)
+        XCTAssertGreaterThanOrEqual(
+            replyLabel.frame.minY - collapsedComposer.frame.minY,
+            6,
+            "A collapsed reply label should retain the card's top inset"
+        )
+        XCTAssertLessThanOrEqual(
+            composerEditor.frame.minY - replyLabel.frame.maxY,
+            8,
+            "A collapsed reply label should stay visually paired with its editor"
+        )
+        XCTAssertLessThanOrEqual(
+            collapsedComposer.frame.maxY - composerEditor.frame.maxY,
+            8,
+            "A collapsed reply editor should retain the card's bottom inset"
+        )
+    }
+
     func testDirtyReplySwitchRequiresConfirmation() {
         launchComments(authenticated: true, commenting: true)
 
