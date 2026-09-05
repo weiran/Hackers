@@ -251,6 +251,7 @@ struct PostCommentsSheet: View {
                 updateKeyboardHeight(0)
             }
         }
+        .tint(AppColors.appTintColor)
     }
 
     private var isExpanded: Bool {

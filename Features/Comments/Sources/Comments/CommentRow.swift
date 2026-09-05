@@ -64,47 +64,52 @@ struct CommentRow: View {
                 }
             }
             .contextMenu {
-                if state.isAuthenticated, state.canVote, !state.isUpvoted {
-                    Button {
-                        onInteraction?()
-                        onUpvote()
-                    } label: {
-                        Label("Upvote", systemImage: "arrow.up")
-                    }
-                    .disabled(state.isVoting)
-                }
-                if state.isAuthenticated, state.canUnvote, state.isUpvoted {
-                    Button {
-                        onInteraction?()
-                        onUnvote()
-                    } label: {
-                        Label("Unvote", systemImage: "arrow.uturn.down")
-                    }
-                    .disabled(state.isVoting)
-                }
-                if state.canReply {
-                    Button(
-                        action: { onReply?() },
-                        label: {
-                            Label("Reply", systemImage: "arrowshape.turn.up.left")
+                Group {
+                    if state.isAuthenticated, state.canVote, !state.isUpvoted {
+                        Button {
+                            onInteraction?()
+                            onUpvote()
+                        } label: {
+                            Label("Upvote", systemImage: "arrow.up")
                         }
-                    )
-                    .disabled(state.isCommentSubmissionInProgress)
+                        .disabled(state.isVoting)
+                    }
+                    if state.isAuthenticated, state.canUnvote, state.isUpvoted {
+                        Button {
+                            onInteraction?()
+                            onUnvote()
+                        } label: {
+                            Label("Unvote", systemImage: "arrow.uturn.down")
+                        }
+                        .disabled(state.isVoting)
+                    }
+                    if state.canReply {
+                        Button(
+                            action: { onReply?() },
+                            label: {
+                                Label("Reply", systemImage: "arrowshape.turn.up.left")
+                            }
+                        )
+                        .disabled(state.isCommentSubmissionInProgress)
+                    }
+                    Divider()
+                    Button {
+                        onInteraction?()
+                        onCopy()
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    Divider()
+                    Button {
+                        onInteraction?()
+                        onShare()
+                    } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
                 }
-                Divider()
-                Button {
-                    onInteraction?()
-                    onCopy()
-                } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
-                }
-                Divider()
-                Button {
-                    onInteraction?()
-                    onShare()
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                }
+                // Context-menu icons use the system's neutral appearance;
+                // they should not inherit the comments screen's app tint.
+                .tint(nil)
             } preview: {
                 contextMenuPreview
             }

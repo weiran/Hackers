@@ -213,6 +213,7 @@ public extension CommentsView {
                 AppLoadingStateView(message: "Loading...")
             }
         }
+        .tint(AppColors.appTintColor)
         .if(controlsNavigationBarVisibility) { view in
             view
                 .navigationBarTitleDisplayMode(.inline)

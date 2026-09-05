@@ -611,20 +611,25 @@ struct PostHeader: View {
         }
         .buttonStyle(.plain)
         .contextMenu {
-            VotingContextMenuItems.postVotingMenuItems(
-                for: post,
-                onVote: { Task { await handleUpvote() } },
-                onUnvote: { Task { await handleUnvote() } }
-            )
-            if !HackerNewsConstants.isItemURL(post.url) {
-                Divider()
-                Button { onLinkTap() } label: {
-                    Label("Open Link", systemImage: "safari")
+            Group {
+                VotingContextMenuItems.postVotingMenuItems(
+                    for: post,
+                    onVote: { Task { await handleUpvote() } },
+                    onUnvote: { Task { await handleUnvote() } }
+                )
+                if !HackerNewsConstants.isItemURL(post.url) {
+                    Divider()
+                    Button { onLinkTap() } label: {
+                        Label("Open Link", systemImage: "safari")
+                    }
+                }
+                Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
             }
-            Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
+            // Menu icons stay neutral even though the surrounding comments
+            // presentation uses the app tint for interactive affordances.
+            .tint(nil)
         }
     }
 
