@@ -110,29 +110,7 @@ struct CommentRow: View {
                 // Context-menu icons use the system's neutral appearance;
                 // they should not inherit the comments screen's app tint.
                 .tint(nil)
-            } preview: {
-                contextMenuPreview
             }
-    }
-
-    /// The default preview snapshots the live row out of the lazy scroll
-    /// container, which cancels the lift and produces a transparent,
-    /// overlapping snapshot. An explicit opaque preview avoids both. The
-    /// system hosts the preview away from the scroll container, so the row's
-    /// container-relative sizing cannot resolve there and collapses to the
-    /// content's ideal width; anchor it to the real window width instead.
-    private var contextMenuPreview: some View {
-        rowDisplay
-            .frame(width: contextMenuPreviewWidth)
-            .background(AppColors.background)
-    }
-
-    private var contextMenuPreviewWidth: CGFloat {
-        let presentationContext = PresentationContextProvider.shared
-        if let window = presentationContext.keyWindow {
-            return window.bounds.width
-        }
-        return presentationContext.windowScene?.screen.bounds.width ?? 390
     }
 
     private func handleToggle() {
@@ -147,6 +125,11 @@ struct CommentRow: View {
             .padding(.top, state.level == 0 ? Metrics.verticalPadding : Metrics.nestedTopPadding)
             .padding(.bottom, Metrics.verticalPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
+            // The row must provide an opaque surface for the system's native
+            // context-menu lift snapshot. The app background keeps this
+            // visually identical in the scroll view while preventing adjacent
+            // comments from showing through the preview.
+            .background(AppColors.background)
             .overlay(alignment: .leading) {
                 threadRails
                     .padding(.leading, Metrics.horizontalPadding)
