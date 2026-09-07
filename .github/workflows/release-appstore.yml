@@ -38,6 +38,9 @@ on:
 permissions:
   contents: write
 
+env:
+  XCODE_VERSION_FILE: .github/xcode-version
+
 concurrency:
   group: release-appstore-${{ github.event.inputs.release_tag }}
   cancel-in-progress: false
@@ -53,6 +56,9 @@ jobs:
         with:
           fetch-depth: 0
           ref: master
+
+      - name: Prepare Xcode
+        run: scripts/ci/setup-xcode-simulator.sh --xcode-only
 
       - name: Install Bundler dependencies
         run: |

@@ -5,7 +5,7 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 ## Requirements
 
 * macOS with current Xcode support for the repo's configured Xcode version.
-* Xcode version from `.github/xcode-version` (`27.0` at the time of writing).
+* Xcode version from `.github/xcode-version` (`27.0`; GitHub's `xcode-27` image currently provides Xcode 27 beta 6).
 * iOS Simulator runtime for iOS 26 or later.
 * Swift 6.4 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
@@ -187,7 +187,7 @@ Some existing warnings are non-blocking; do not expand unrelated lint cleanup in
 
 ## CI
 
-The build, test, UI, and release workflows use GitHub's `xcode-27` arm64 runner image. The image is a public preview and supplies the Xcode 27 beta/iOS 27 SDK; `.github/xcode-version` remains the single version selector used by the setup script.
+The build, test, UI, and release workflows use GitHub's `xcode-27` arm64 runner image. The image is a public preview and currently supplies Xcode 27 beta 6 with the iOS 27 SDK. Xcode beta 6 reports version `27.0`, so `.github/xcode-version` remains `27.0` and is the single version selector used by the setup script. The App Store submission workflow runs that selector explicitly before Fastlane so uploads use the same Xcode image contract as builds and TestFlight.
 
 Primary workflows:
 
