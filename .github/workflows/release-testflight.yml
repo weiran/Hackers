@@ -13,9 +13,15 @@ on:
         type: boolean
         default: false
       external_groups:
-        description: "Optional comma-separated external TestFlight groups"
+        description: "Comma-separated external TestFlight groups"
         required: false
         type: string
+        default: "External Testers"
+      submit_beta_review:
+        description: "Submit the external build for TestFlight beta review when Apple requires it"
+        required: false
+        type: boolean
+        default: true
       what_to_test:
         description: "Optional custom TestFlight What to Test text; overrides generated notes"
         required: false
@@ -106,6 +112,15 @@ jobs:
             exit 1
           fi
 
+      - name: Validate external TestFlight distribution
+        env:
+          EXTERNAL_GROUPS: ${{ github.event.inputs.external_groups }}
+        run: |
+          if [ -z "${EXTERNAL_GROUPS//[[:space:]]/}" ]; then
+            echo "At least one external TestFlight group is required" >&2
+            exit 1
+          fi
+
       - name: Upload to TestFlight
         if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset == '' }}
         env:
@@ -118,6 +133,7 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
         run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
 
       - name: Download local IPA asset
@@ -144,6 +160,7 @@ jobs:
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           LOCAL_IPA_PATH: ${{ github.workspace }}/artifacts/release/${{ github.event.inputs.local_ipa_asset }}
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
         run: bundle exec fastlane ios upload_existing_testflight release_tag:"$RELEASE_TAG" ipa_path:"$LOCAL_IPA_PATH"
 
       - name: Distribute Existing TestFlight Build
@@ -155,6 +172,7 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
         run: bundle exec fastlane ios distribute_existing_testflight release_tag:"$RELEASE_TAG"
 
       - name: Release summary

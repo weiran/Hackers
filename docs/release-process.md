@@ -13,8 +13,9 @@ Releases are source-controlled and tag-driven:
 * `CURRENT_PROJECT_VERSION` controls the App Store Connect build number, for example `160`.
 * The GitHub Release title/body is used as TestFlight "What to Test."
 * App Store release notes are separate public-facing customer copy. They must not be copied from GitHub Release notes, TestFlight notes, generated changelog output, pull request links, or `Full Changelog` links.
+* Every TestFlight build is distributed to the configured external tester group. If Apple requires TestFlight beta review, the workflow submits the build for that review automatically.
 * Published vs draft GitHub Release status is the release-state differentiator:
-  * draft = built and available internally, not yet marked for App Store candidacy
+  * draft = built and available to the configured TestFlight audience, not yet marked for App Store candidacy
   * published = selected for App Store release candidacy
 * TestFlight upload uses `.github/workflows/release-testflight.yml`.
 * App Store submission uses `.github/workflows/release-appstore.yml`.
@@ -115,7 +116,17 @@ The TestFlight workflow is manually dispatched so a release can use a locally bu
 IPA when the GitHub-hosted Xcode image is not suitable. Approve the protected
 `testflight` deployment in GitHub Actions.
 
-A tag push uploads the build and makes it available to internal testers only. External tester distribution is a separate, opt-in step so a build can be uploaded without committing to a beta audience:
+A TestFlight dispatch uploads the build and distributes it to the `External Testers` group by default. Set `external_groups` to a comma-separated list of App Store Connect external testing groups when a different group is needed:
+
+```bash
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.3.2+160 \
+  -f external_groups="External Testers"
+```
+
+The workflow waits for processing before distributing the build. TestFlight beta-review submission is enabled by default; pass `-f submit_beta_review=false` only when the external build is already approved or beta-review submission will be handled manually. An empty `external_groups` value is rejected.
+
+To distribute an already uploaded build without uploading a new binary, use:
 
 ```bash
 gh workflow run release-testflight.yml \
@@ -123,8 +134,6 @@ gh workflow run release-testflight.yml \
   -f distribute_existing=true \
   -f external_groups="External Testers"
 ```
-
-Set `external_groups` to the comma-separated App Store Connect group name(s). Omitting it uploads to internal testers only.
 
 When the TestFlight "What to Test" text must be limited to a specific customer-facing fix, pass `what_to_test` to override generated GitHub notes:
 
@@ -134,7 +143,7 @@ gh workflow run release-testflight.yml \
   -f what_to_test='Fixes audio and video autoplay in the embedded browser.'
 ```
 
-Manual dispatch for an upload-only build is also supported:
+Manual dispatch is the supported upload path:
 
 ```bash
 gh workflow run release-testflight.yml -f release_tag=v5.3.2+160

@@ -358,6 +358,14 @@ def release_notes
   ENV.fetch("WHAT_TO_TEST", "").strip
 end
 
+def testflight_external_groups
+  ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
+end
+
+def submit_beta_review?
+  !%w[0 false no off].include?(ENV.fetch("SUBMIT_BETA_REVIEW", "true").strip.downcase)
+end
+
 def validate_app_store_release_notes!(notes)
   forbidden_patterns = [
     /github\.com/i,
@@ -491,11 +499,11 @@ platform :ios do
       changelog: notes,
       skip_waiting_for_build_processing: false
     }
-    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
-    unless groups.empty?
-      upload_options[:distribute_external] = true
-      upload_options[:groups] = groups
-    end
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
+    upload_options[:distribute_external] = true
+    upload_options[:groups] = groups
+    upload_options[:submit_beta_review] = submit_beta_review?
 
     upload_to_testflight(**upload_options)
 
@@ -522,14 +530,14 @@ platform :ios do
       build_number: parts[:build_number].to_s,
       changelog: notes,
       distribute_only: true,
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: false
     }
 
-    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
-    unless groups.empty?
-      distribute_options[:distribute_external] = true
-      distribute_options[:groups] = groups
-    end
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
+    distribute_options[:distribute_external] = true
+    distribute_options[:groups] = groups
+    distribute_options[:submit_beta_review] = submit_beta_review?
 
     upload_to_testflight(**distribute_options)
 
@@ -550,18 +558,18 @@ platform :ios do
     notes = release_notes
     UI.user_error!("GitHub Release notes are required for TestFlight What to Test") if notes.empty?
 
-    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
     upload_options = {
       api_key: app_store_connect_key,
       app_identifier: APP_IDENTIFIER,
       ipa: ipa_path,
       changelog: notes,
-      skip_waiting_for_build_processing: false
+      skip_waiting_for_build_processing: false,
+      distribute_external: true,
+      groups: groups,
+      submit_beta_review: submit_beta_review?
     }
-    unless groups.empty?
-      upload_options[:distribute_external] = true
-      upload_options[:groups] = groups
-    end
 
     upload_to_testflight(**upload_options)
     UI.success("Uploaded local Hackers #{parts[:version]} (#{parts[:build_number]}) IPA to TestFlight")
