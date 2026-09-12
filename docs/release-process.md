@@ -32,8 +32,8 @@ not archive a second build.
 Before starting a release, confirm:
 
 * `master` is green for required checks: `lint`, `build`, `test`, and `ui smoke`.
-* The `testflight` GitHub Environment exists and requires approval.
-* The `testflight` environment has these secrets:
+* The `app-store-connect` GitHub Environment exists and requires approval.
+* The `app-store-connect` environment has these secrets:
   * `APP_STORE_CONNECT_API_KEY_ID`
   * `APP_STORE_CONNECT_ISSUER_ID`
   * `APP_STORE_CONNECT_API_KEY_P8`
@@ -114,7 +114,7 @@ git push origin "refs/tags/$tag"
 
 The TestFlight workflow is manually dispatched so a release can use a locally built
 IPA when the GitHub-hosted Xcode image is not suitable. Approve the protected
-`testflight` deployment in GitHub Actions.
+`app-store-connect` deployment in GitHub Actions.
 
 A TestFlight dispatch uploads the build and distributes it to the `External Testers` group by default. Set `external_groups` to a comma-separated list of App Store Connect external testing groups when a different group is needed:
 
@@ -264,7 +264,7 @@ Optional inputs:
 * `cancel_pending_version`: pending App Store version to cancel before submission.
 * `cancel_only`: cancel the pending version without submitting a build.
 
-The workflow runs through the protected `testflight` environment and submits the processed build for App Review. Do not submit if the final notes are copied from GitHub/TestFlight content or contain links back to GitHub.
+The workflow runs through the protected `app-store-connect` environment and submits the processed build for App Review. Do not submit if the final notes are copied from GitHub/TestFlight content or contain links back to GitHub.
 
 ## Failure Handling
 
