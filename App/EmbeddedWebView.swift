@@ -162,11 +162,15 @@ final class BrowserController: ObservableObject {
     }
 
     /// The status-bar blur strip covers the top of the full-bleed web view;
-    /// tell WebKit so sticky and fixed page elements rest below the strip
-    /// instead of under the status indicators, as in Safari.
+    /// tell WebKit so sticky and fixed page elements dock below the strip
+    /// instead of under the status indicators, as in Safari. The inset must
+    /// be the status bar height from the window: SwiftUI's hosting inflates
+    /// the web view's own safe area by the hidden navigation-bar region, and
+    /// using it docks page chrome ~50pt too low, which reads as a large
+    /// empty band above sites like JetKVM.
     private func applyStatusBarObscuredInset() {
         guard !DeviceLayout.usesPadLayout else { return }
-        let topInset = webView.safeAreaInsets.top
+        guard let topInset = webView.window?.safeAreaInsets.top, topInset > 0 else { return }
         guard abs(webView.obscuredContentInsets.top - topInset) > 0.5 else { return }
 
         var obscuredContentInsets = webView.obscuredContentInsets
