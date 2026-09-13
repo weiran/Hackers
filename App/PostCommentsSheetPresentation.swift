@@ -171,15 +171,27 @@ struct PostCommentsSheetPresentation {
         return true
     }
 
+    func targetState(
+        forPredictedTranslation predictedTranslation: CGFloat,
+        expandedTop: CGFloat,
+        collapsedTop: CGFloat
+    ) -> SheetState {
+        let baseTop = isExpanded ? expandedTop : collapsedTop
+        let predictedTop = baseTop + predictedTranslation
+        let midpoint = (expandedTop + collapsedTop) / 2
+        return predictedTop <= midpoint ? .expanded : .collapsed
+    }
+
     mutating func settle(
         predictedTranslation: CGFloat,
         expandedTop: CGFloat,
         collapsedTop: CGFloat
     ) {
-        let baseTop = isExpanded ? expandedTop : collapsedTop
-        let predictedTop = baseTop + predictedTranslation
-        let midpoint = (expandedTop + collapsedTop) / 2
-        sheetState = predictedTop <= midpoint ? .expanded : .collapsed
+        sheetState = targetState(
+            forPredictedTranslation: predictedTranslation,
+            expandedTop: expandedTop,
+            collapsedTop: collapsedTop
+        )
         dragTranslation = 0
         isTrackingDrag = false
         dragStartAllowsSheetDrag = false
@@ -251,5 +263,70 @@ struct PostCommentsSheetLayout {
         handleTopInset = safeInsets.top * min(max(expansionProgress, 0), 1)
         self.expandedCommentsTopInset = expandedCommentsTopInset(safeInsets.top)
         contentFadeProgress = min(max(expansionProgress, 0), 1)
+    }
+}
+
+/// A settle animation that starts at the drag gesture's release velocity: the
+/// SwiftUI analog of UIKit's
+/// `UIView.animate(...usingSpringWithDamping:initialSpringVelocity:)`, which
+/// cannot drive this SwiftUI-owned layout directly. The sheet keeps the
+/// finger's speed through the release instead of restarting from rest, then
+/// glides the rest of the way on a critically damped spring (no overshoot).
+struct SheetSettleAnimation: CustomAnimation {
+    static let defaultStiffness: CGFloat = 32
+    static let maximumDuration: TimeInterval = 0.4
+
+    /// Release velocity in progress units per second, normalized against the
+    /// remaining travel and clamped to `stiffness`, the threshold past which
+    /// a critically damped spring would overshoot its resting position.
+    private let initialVelocity: CGFloat
+    private let stiffness: CGFloat
+
+    /// - Parameters:
+    ///   - velocity: Release velocity along the sheet's vertical axis in
+    ///     points per second (positive drives the sheet downward).
+    ///   - distance: Signed distance from the release position to the settle
+    ///     target in points (positive when the target is below).
+    init(velocity: CGFloat, distance: CGFloat, stiffness: CGFloat = Self.defaultStiffness) {
+        self.stiffness = stiffness
+        var normalizedVelocity: CGFloat = 0
+        if abs(distance) > 0.5 {
+            normalizedVelocity = min(max(velocity / distance, 0), stiffness)
+            if !normalizedVelocity.isFinite {
+                normalizedVelocity = 0
+            }
+        }
+        initialVelocity = normalizedVelocity
+    }
+
+    var duration: TimeInterval {
+        Self.maximumDuration
+    }
+
+    func animate<V: VectorArithmetic>(
+        value: V,
+        time: TimeInterval,
+        context: inout AnimationContext<V>
+    ) -> V? {
+        guard time >= 0, time < duration else { return nil }
+        let progress = Self.progress(
+            at: time,
+            stiffness: stiffness,
+            initialVelocity: initialVelocity
+        )
+        var scaledValue = value
+        scaledValue.scale(by: progress)
+        return scaledValue
+    }
+
+    /// Closed-form critically damped spring:
+    /// `x(t) = 1 - (1 + (ω - v₀)·t)·e^(-ωt)` with `x(0) = 0`, `x'(0) = v₀`.
+    static func progress(
+        at time: TimeInterval,
+        stiffness: CGFloat,
+        initialVelocity: CGFloat
+    ) -> CGFloat {
+        let t = CGFloat(time)
+        return 1 - (1 + (stiffness - initialVelocity) * t) * exp(-stiffness * t)
     }
 }

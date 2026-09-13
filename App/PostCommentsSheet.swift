@@ -179,7 +179,7 @@ struct PostCommentsSheet: View {
                         presentation.updateHandleDrag(translationHeight: max(0, translation.height))
                         toolbarGeometry.setBarTitleSuppressed(true)
                     },
-                    onDragEnded: { translation, predictedTranslationHeight in
+                    onDragEnded: { translation, predictedTranslationHeight, velocity in
                         presentation.updateHandleDrag(
                             translationHeight: max(0, translation.height, predictedTranslationHeight)
                         )
@@ -189,6 +189,7 @@ struct PostCommentsSheet: View {
                         }
                         settleSheet(
                             predictedTranslation: predictedTranslationHeight,
+                            releaseVelocity: velocity,
                             layout.expandedTop,
                             layout.collapsedTop
                         )
@@ -377,6 +378,7 @@ struct PostCommentsSheet: View {
                 }
                 settleSheet(
                     predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
                     layout.expandedTop,
                     layout.collapsedTop
                 )
@@ -665,7 +667,12 @@ private extension PostCommentsSheet {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+                settleSheet(
+                    predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
+                    expandedTop,
+                    collapsedTop
+                )
             }
     }
 
@@ -686,7 +693,12 @@ private extension PostCommentsSheet {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+                settleSheet(
+                    predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
+                    expandedTop,
+                    collapsedTop
+                )
             }
     }
 
@@ -695,8 +707,26 @@ private extension PostCommentsSheet {
         return leadingInset + 56
     }
 
-    private func settleSheet(predictedTranslation: CGFloat, _ expandedTop: CGFloat, _ collapsedTop: CGFloat) {
-        animateSheet {
+    private func settleSheet(
+        predictedTranslation: CGFloat,
+        releaseVelocity: CGFloat,
+        _ expandedTop: CGFloat,
+        _ collapsedTop: CGFloat
+    ) {
+        // Hand the sheet to the settle animation at the finger's release
+        // velocity so the gesture and animation velocities match at the
+        // handoff; a flick keeps flying while a slow release glides.
+        let baseTop = presentation.isExpanded ? expandedTop : collapsedTop
+        let releaseTop = min(max(baseTop + presentation.dragTranslation, expandedTop), collapsedTop)
+        let targetTop = presentation.targetState(
+            forPredictedTranslation: predictedTranslation,
+            expandedTop: expandedTop,
+            collapsedTop: collapsedTop
+        ) == .expanded ? expandedTop : collapsedTop
+        withAnimation(Animation(SheetSettleAnimation(
+            velocity: releaseVelocity,
+            distance: targetTop - releaseTop
+        ))) {
             presentation.settle(
                 predictedTranslation: predictedTranslation,
                 expandedTop: expandedTop,
@@ -727,7 +757,7 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
     let trailingPassthroughWidth: CGFloat
     let onTap: () -> Void
     let onDragChanged: (_ translation: CGSize) -> Void
-    let onDragEnded: (_ translation: CGSize, _ predictedTranslationHeight: CGFloat) -> Void
+    let onDragEnded: (_ translation: CGSize, _ predictedTranslationHeight: CGFloat, _ velocity: CGFloat) -> Void
     let onDragCancelled: () -> Void
 
     func makeUIView(context: Context) -> WindowAttachmentObserverView {
@@ -862,7 +892,8 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
                 let predictedTranslationHeight = translation.y + (velocity.y * 0.2)
                 configuration.onDragEnded(
                     translation.size,
-                    max(translation.y, predictedTranslationHeight)
+                    max(translation.y, predictedTranslationHeight),
+                    velocity.y
                 )
                 hasActiveDrag = false
 
