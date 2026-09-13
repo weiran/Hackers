@@ -444,6 +444,7 @@ struct PostCommentsSheet: View {
                 morphProgress: layout.contentFadeProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
                 isBarTitleSuppressed: toolbarGeometry.isBarTitleSuppressed,
+                isBarTitleVisible: expandedTitleVisibility.isVisible,
                 barTitleFrame: toolbarGeometry.barTitleFrame,
                 containerWidth: layout.containerSize.width,
                 handleTopInset: handleTopInset,

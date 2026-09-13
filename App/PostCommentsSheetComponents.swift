@@ -388,6 +388,11 @@ struct CommentsSheetTopChrome: View {
     let morphProgress: CGFloat
     let isInteractiveMove: Bool
     let isBarTitleSuppressed: Bool
+    /// Whether the comments are scrolled down far enough for the bar title
+    /// pill to be showing; the morphing capsule stands in for that pill, so
+    /// it must not appear when the pill itself is hidden at the top of the
+    /// list.
+    let isBarTitleVisible: Bool
     let barTitleFrame: CGRect
     let containerWidth: CGFloat
     let handleTopInset: CGFloat
@@ -486,11 +491,13 @@ struct CommentsSheetTopChrome: View {
     }
 
     /// Capsule shown only while the bar title is suppressed (drag or
-    /// collapse in flight): identical frame to the bar pill at handoff, so
-    /// the swap between the two layers is invisible.
+    /// collapse in flight) and the title pill it replaces was actually
+    /// showing: identical frame to the bar pill at handoff, so the swap
+    /// between the two layers is invisible.
     @ViewBuilder
     private var dragTitleCapsule: some View {
         if isBarTitleSuppressed,
+           isBarTitleVisible,
            barTitleSize.width > 1,
            let post {
             let glassSurfaceOpacity = min(max(easedDragProgress / 0.18, 0), 1)
