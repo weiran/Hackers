@@ -18,7 +18,7 @@ public struct AppRuntimePolicy: Equatable, Sendable {
     public static let standard = AppRuntimePolicy(
         allowsCredentialAutoFill: true,
         allowsReviewPrompts: true,
-        allowsCommenting: false
+        allowsCommenting: true
     )
 
     public static let automation = AppRuntimePolicy(

@@ -7,6 +7,7 @@ struct AppRuntimePolicyTests {
     func standardPolicy() {
         #expect(AppRuntimePolicy.standard.allowsCredentialAutoFill)
         #expect(AppRuntimePolicy.standard.allowsReviewPrompts)
+        #expect(AppRuntimePolicy.standard.allowsCommenting)
     }
 
     @Test("Automation runtime removes nondeterministic system behavior")
@@ -15,10 +16,9 @@ struct AppRuntimePolicyTests {
         #expect(!AppRuntimePolicy.automation.allowsReviewPrompts)
     }
 
-    @Test("Commenting stays disabled until explicitly enabled")
+    @Test("Commenting stays disabled unless explicitly enabled")
     func commentingDefaults() {
-        #expect(!AppRuntimePolicy.standard.allowsCommenting)
-        #expect(!AppRuntimePolicy.automation.allowsCommenting)
+        #expect(AppRuntimePolicy.automation.allowsCommenting == false)
         #expect(!AppRuntimePolicy(
             allowsCredentialAutoFill: true,
             allowsReviewPrompts: true
@@ -38,6 +38,10 @@ struct AppRuntimePolicyTests {
         #expect(!automationEnabled.allowsCredentialAutoFill)
         #expect(!automationEnabled.allowsReviewPrompts)
 
-        #expect(AppRuntimePolicy.standard.withCommenting(false) == AppRuntimePolicy.standard)
+        #expect(AppRuntimePolicy.standard.withCommenting(false) == AppRuntimePolicy(
+            allowsCredentialAutoFill: true,
+            allowsReviewPrompts: true,
+            allowsCommenting: false
+        ))
     }
 }
