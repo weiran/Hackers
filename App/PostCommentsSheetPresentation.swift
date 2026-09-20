@@ -326,7 +326,7 @@ struct SheetSettleAnimation: CustomAnimation {
         stiffness: CGFloat,
         initialVelocity: CGFloat
     ) -> CGFloat {
-        let t = CGFloat(time)
-        return 1 - (1 + (stiffness - initialVelocity) * t) * exp(-stiffness * t)
+        let elapsed = CGFloat(time)
+        return 1 - (1 + (stiffness - initialVelocity) * elapsed) * exp(-stiffness * elapsed)
     }
 }
