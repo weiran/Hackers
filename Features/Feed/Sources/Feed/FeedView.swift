@@ -44,14 +44,17 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !viewModel.hasActiveSearch {
-                ToolbarItem(placement: isSidebar ? .topBarLeading : .principal) {
-                    FeedCategoryToolbarMenu(
-                        title: selectedPostType.displayName,
-                        useGlassEffect: !isSidebar
-                    ) {
-                        postTypeTitleMenu
+                    if isSidebar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            FeedCategoryToolbarMenu(title: selectedPostType.displayName) {
+                                postTypeTitleMenu
+                            }
+                        }
+                    } else {
+                        ToolbarTitleMenu {
+                            postTypeTitleMenu
+                        }
                     }
-                }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     settingsButton
@@ -69,8 +72,9 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                     searchText = newValue
                 }
             }
-            .onChange(of: selectedPostType) { _, _ in
+            .onChange(of: selectedPostType) { _, newType in
                 selectedPostId = nil
+                Task { await viewModel.changePostType(newType) }
             }
             .task { @Sendable in
                 votingViewModel.navigationStore = navigationStore
@@ -512,9 +516,6 @@ private extension FeedView {
     private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
         Button {
             selectedPostType = postType
-            Task {
-                await viewModel.changePostType(postType)
-            }
         } label: {
             HStack {
                 Image(systemName: postType.iconName)
@@ -571,45 +572,21 @@ private extension FeedView {
 
 private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
     let title: String
-    var useGlassEffect: Bool = true
     @ViewBuilder let menuContent: () -> MenuContent
 
     var body: some View {
         Menu {
             menuContent()
         } label: {
-            if useGlassEffect {
-                HStack(spacing: 8) {
-                    Text(title)
-                    ZStack {
-                        Circle()
-                            .fill(Color.secondary.opacity(0.16))
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(width: 18, height: 18)
-                }
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .padding(.leading, 14)
-                .padding(.trailing, 10)
-                .frame(height: 44)
-                .glassEffect(.regular.interactive(), in: .capsule)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-            } else {
-                HStack(spacing: 4) {
-                    Text(title)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .font(.headline)
+            HStack(spacing: 4) {
+                Text(title)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.secondary)
             }
+            .font(.headline)
         }
         .buttonStyle(.plain)
-        .menuIndicator(useGlassEffect ? .hidden : .automatic)
     }
 }
 
