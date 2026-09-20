@@ -37,7 +37,7 @@ SCREENSHOT_RAW_DIMENSIONS = {
 }.freeze
 
 def app_store_connect_key
-  # Secrets pasted into the app-store-connect environment may carry CRLF
+  # Secrets pasted into the release environment may carry CRLF
   # endings or stray padding from copy/paste; normalize before OpenSSL parses it.
   key_content = ENV.fetch("APP_STORE_CONNECT_API_KEY_P8", "")
     .gsub("\r\n", "\n")
@@ -47,9 +47,9 @@ def app_store_connect_key
   if key_content.empty?
     UI.user_error!(
       "APP_STORE_CONNECT_API_KEY_P8 is empty or missing from the " \
-      "app-store-connect environment. Copy it (and APP_STORE_CONNECT_API_KEY_ID, " \
-      "APP_STORE_CONNECT_API_KEY_ISSUER_ID, MATCH_PASSWORD) from the old " \
-      "testflight environment: Settings → Environments → app-store-connect."
+      "testflight environment. Add it (and APP_STORE_CONNECT_API_KEY_ID, " \
+      "APP_STORE_CONNECT_API_KEY_ISSUER_ID, MATCH_PASSWORD) to the " \
+      "testflight environment secrets."
     )
   end
 
@@ -58,7 +58,7 @@ def app_store_connect_key
     UI.user_error!(
       "APP_STORE_CONNECT_API_KEY_P8 is not an intact .p8 PEM (missing BEGIN/END " \
       "PRIVATE KEY envelope). Re-paste the raw AuthKey_<KEY_ID>.p8 contents into " \
-      "the app-store-connect environment secret."
+      "the testflight environment secret."
     )
   end
 
