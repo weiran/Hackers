@@ -37,10 +37,26 @@ SCREENSHOT_RAW_DIMENSIONS = {
 }.freeze
 
 def app_store_connect_key
+  # Secrets pasted into the app-store-connect environment may carry CRLF
+  # endings or stray padding from copy/paste; normalize before OpenSSL parses it.
+  key_content = ENV.fetch("APP_STORE_CONNECT_API_KEY_P8")
+    .gsub("\r\n", "\n")
+    .gsub("\r", "\n")
+    .strip
+
+  unless key_content.start_with?("-----BEGIN PRIVATE KEY-----") &&
+         key_content.end_with?("-----END PRIVATE KEY-----")
+    UI.user_error!(
+      "APP_STORE_CONNECT_API_KEY_P8 is not an intact .p8 PEM (missing BEGIN/END " \
+      "PRIVATE KEY envelope). Re-paste the raw AuthKey_<KEY_ID>.p8 contents into " \
+      "the app-store-connect environment secret."
+    )
+  end
+
   app_store_connect_api_key(
     key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
     issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
-    key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_P8"),
+    key_content: key_content + "\n",
     is_key_content_base64: false
   )
 end
