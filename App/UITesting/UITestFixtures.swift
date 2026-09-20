@@ -542,6 +542,57 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     age: "3 hours ago",
                     text: "The tooling is better now, but the same tradeoff remains: block too loosely and costs spike, block too tightly and users leave.",
                     level: 4
+                ),
+                // Trailing level-0 roots keep content below the collapsible
+                // thread: collapsing 48_348_985 must leave enough list height
+                // for its root to scroll to the top of the viewport.
+                makeComment(
+                    id: 48_355_001,
+                    by: "kstrauser",
+                    age: "6 hours ago",
+                    text: "We ended up shipping a challenge only for account creation and password resets, and the support tickets essentially stopped."
+                ),
+                makeComment(
+                    id: 48_355_002,
+                    by: "jcims",
+                    age: "4 hours ago",
+                    text: "The pixel-level fingerprinting arms race feels unwinnable for browsers, which is probably why attention moved to heuristics."
+                ),
+                makeComment(
+                    id: 48_355_003,
+                    by: "saurik",
+                    age: "3 hours ago",
+                    text: "Every one of these systems trains itself on the traffic it already likes, so of course anything unusual looks like an attacker."
+                ),
+                makeComment(
+                    id: 48_355_004,
+                    by: "tptacek",
+                    age: "2 hours ago",
+                    text: "It is wild how quickly turnstile-style interstitials went from novelty to the default tax on anyone blocking third-party scripts."
+                ),
+                makeComment(
+                    id: 48_355_005,
+                    by: "Lockal",
+                    age: "2 hours ago",
+                    text: "Archive links and reader modes break under these gates too, which hurts accessibility more than it stops the abuse traffic."
+                ),
+                makeComment(
+                    id: 48_355_006,
+                    by: "mcguire",
+                    age: "1 hour ago",
+                    text: "Half the time the challenge is just checking whether my ad blocker is on, and the site works fine once it is paused."
+                ),
+                makeComment(
+                    id: 48_355_007,
+                    by: "Retr0id",
+                    age: "1 hour ago",
+                    text: "The WebGL fingerprint query set has not changed in years, so the exotic signals are more Tradition than telemetry at this point."
+                ),
+                makeComment(
+                    id: 48_355_008,
+                    by: "colejohnson66",
+                    age: "28 minutes ago",
+                    text: "Nobody at these companies is deciding to gate the site; a risk vendor's default dashboard slider is making the call."
                 )
             ],
             48_347_354: [

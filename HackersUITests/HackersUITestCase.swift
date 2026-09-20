@@ -192,9 +192,14 @@ class HackersUITestCase: XCTestCase {
         return isMeaningfullyVisible(element.frame, in: container.frame)
     }
 
-    func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {
-        for _ in 0 ..< maxSwipes where !hasVisibleIntersection(element, in: container) {
-            container.swipeUp()
+    /// Controlled half-viewport drags instead of `swipeUp()` flings: fling
+    /// momentum outlives the settle window, so the visibility check runs
+    /// mid-scroll and a repeat swipe pushes the target further away.
+    func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxDrags: Int = 8) {
+        let start = container.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let end = container.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        for _ in 0 ..< maxDrags where !hasVisibleIntersection(element, in: container) {
+            start.press(forDuration: 0.05, thenDragTo: end)
             waitForFrameToSettle(element, timeout: 1)
         }
     }

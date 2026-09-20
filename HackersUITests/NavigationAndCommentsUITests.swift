@@ -194,12 +194,51 @@ final class NavigationAndCommentsUITests: HackersUITestCase {
         }
         waitForNonExistence(childComment, timeout: 2)
         rootComment = assertHasVisibleIntersection(rootComment, in: list)
-        let rootFrame = waitForStableFrame(of: rootComment, timeout: 3) {
-            $0.minY <= list.frame.minY + 24
+        // The list extends under the top bar on Dynamic Island devices, where
+        // scrolling aligns the row flush with the visible content area rather
+        // than the raw list frame (older runtimes pushed it under the bar).
+        // The collapsed root must be the topmost reachable row either way:
+        // only the one content-adjacent row may remain hittable above it,
+        // tucked under the bar. A mis-scrolled or clamped collapse leaves
+        // several fully visible rows stacked above the root instead.
+        let rootFrame = waitForStableFrame(of: rootComment, timeout: 3) { frame in
+            self.hittableCommentRowsAbove(y: frame.minY).count <= 1
+        }
+        if rootFrame == nil {
+            dumpCommentRowDiagnostics(relativeTo: rootComment.frame.minY)
         }
         XCTAssertNotNil(
             rootFrame,
             "Collapsing a thread should align its root comment with the top of the comments list. root: \(rootComment.frame), list: \(list.frame)"
         )
+    }
+
+    private func hittableCommentRowsAbove(y: CGFloat, tolerance: CGFloat = 8) -> [XCUIElement] {
+        let rows = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "comments.comment.")
+        ).allElementsBoundByIndex
+        return rows.filter { row in
+            row.exists
+                && row.isHittable
+                && row.frame.minY < y - tolerance
+        }
+    }
+
+    private func dumpCommentRowDiagnostics(relativeTo rootMinY: CGFloat) {
+        let rows = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "comments.comment.")
+        ).allElementsBoundByIndex
+        let lines = rows.map { row -> String in
+            let frame = row.exists ? row.frame : .null
+            let hittable = (row.exists ? row.isHittable : false)
+            return "\(row.identifier) frame=\(frame) hittable=\(hittable) above=\(frame.minY < rootMinY - 8)"
+        }
+        let dump = XCTAttachment(string: """
+        rootMinY=\(rootMinY) list=\(commentsList.frame)
+        \(lines.joined(separator: "\n"))
+        """)
+        dump.name = "Collapsed root row diagnostics"
+        dump.lifetime = .keepAlways
+        add(dump)
     }
 }

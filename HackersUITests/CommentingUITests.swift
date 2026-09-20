@@ -159,7 +159,7 @@ final class CommentingUITests: HackersUITestCase {
             "The composer should collapse after a successful post"
         )
         let submittedRow = submittedCommentRow()
-        scroll(commentsList, untilVisible: submittedRow, maxSwipes: 30)
+        scroll(commentsList, untilVisible: submittedRow, maxDrags: 30)
         XCTAssertTrue(
             submittedRow.waitForExistence(timeout: 10),
             "The server-confirmed comment should be inserted into the tree"
@@ -361,7 +361,7 @@ final class CommentingUITests: HackersUITestCase {
             "The delayed success should eventually collapse the composer"
         )
         let submittedRow = submittedCommentRow()
-        scroll(commentsList, untilVisible: submittedRow, maxSwipes: 30)
+        scroll(commentsList, untilVisible: submittedRow, maxDrags: 30)
         XCTAssertTrue(submittedRow.waitForExistence(timeout: 10))
     }
 
@@ -418,7 +418,7 @@ final class CommentingUITests: HackersUITestCase {
             "A successful Check Again should insert the comment and clear the composer"
         )
         let submittedRow = submittedCommentRow()
-        scroll(commentsList, untilVisible: submittedRow, maxSwipes: 30)
+        scroll(commentsList, untilVisible: submittedRow, maxDrags: 30)
         XCTAssertTrue(
             submittedRow.waitForExistence(timeout: 10),
             "The reconciled comment should be inserted exactly once"
