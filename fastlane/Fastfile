@@ -39,10 +39,19 @@ SCREENSHOT_RAW_DIMENSIONS = {
 def app_store_connect_key
   # Secrets pasted into the app-store-connect environment may carry CRLF
   # endings or stray padding from copy/paste; normalize before OpenSSL parses it.
-  key_content = ENV.fetch("APP_STORE_CONNECT_API_KEY_P8")
+  key_content = ENV.fetch("APP_STORE_CONNECT_API_KEY_P8", "")
     .gsub("\r\n", "\n")
     .gsub("\r", "\n")
     .strip
+
+  if key_content.empty?
+    UI.user_error!(
+      "APP_STORE_CONNECT_API_KEY_P8 is empty or missing from the " \
+      "app-store-connect environment. Copy it (and APP_STORE_CONNECT_API_KEY_ID, " \
+      "APP_STORE_CONNECT_API_KEY_ISSUER_ID, MATCH_PASSWORD) from the old " \
+      "testflight environment: Settings → Environments → app-store-connect."
+    )
+  end
 
   unless key_content.start_with?("-----BEGIN PRIVATE KEY-----") &&
          key_content.end_with?("-----END PRIVATE KEY-----")
