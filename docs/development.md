@@ -98,7 +98,7 @@ Nightly validation runs every functional UI test, explicitly excluding screensho
 ./run_ui_tests.sh full
 ```
 
-UI tests write result bundles under `artifacts/xcresults` by default, then verify that the bundle contains exactly the requested test manifest. Both modes use explicit `-only-testing` selectors, so screenshot generation and newly added test classes cannot enter a functional run accidentally. Keep the fully qualified manifest in `run_ui_tests.sh` in the same order as the test methods across the listed functional test source files; the runner fails before building if the class or method inventory drifts. It uses `DESTINATION` when set, otherwise a CI simulator selected by `CI_DEVICE_UDID` or `CI_DESTINATION`, and finally the local `iPhone 17 Pro` default. Use functional UI tests when validating app launch, top-level navigation, browser presentation, or behavior that cannot be covered reliably through package tests.
+UI tests write result bundles under `artifacts/xcresults` by default, then verify that the bundle contains exactly the requested test manifest. Both modes use explicit `-only-testing` selectors, so screenshot generation and newly added test classes cannot enter a functional run accidentally. Keep the fully qualified manifest in `run_ui_tests.sh` in the same order as the test methods across the listed functional test source files; the runner fails before building if the class or method inventory drifts. It uses `DESTINATION` when set, otherwise a CI simulator selected by `CI_DEVICE_UDID` or `CI_DESTINATION`, and finally the local `iPhone 17 Pro` default. Prefer functional UI tests for complex features. Preserve the `.xcresult` bundle and record the exact command, destination, fixture configuration, and selected tests so the run can be verified and repeated.
 
 UI tests should use the deterministic fixture layer under `App/UITesting`, not live Hacker News or Algolia. `UITestingBootstrap.swift` owns launch parsing and dependency wiring, while fixture data, fake services, and article fixtures live in focused companion files. `HACKERS_UI_TESTING=1` is the sole opt-in and installs dependency overrides for posts, comments, search, settings, authentication, bookmarks, read state, voting, and article content. It also selects the shared automation runtime policy, which disables nondeterministic system behavior such as review prompts and credential AutoFill without threading test flags through feature initializers. Invalid values and incompatible route options fail at launch rather than silently falling back.
 
@@ -143,17 +143,7 @@ Tests live beside their package:
 * `DesignSystem/Tests/`
 * `Features/*/Tests/`
 
-Use Swift Testing (`import Testing`, `@Suite`, `@Test`) for new tests unless an existing target clearly uses a different local pattern.
-
-Focus tests on:
-
-* Domain models and parser behavior
-* Repository parsing and persistence behavior
-* ViewModel state transitions
-* Shared services
-* Regression cases for Hacker News markup changes
-
-Avoid view snapshot or full UI tests unless the behavior cannot be covered at a lower level.
+End-to-end UI tests are the default. Add an isolated test only when it catches a concrete regression the UI suite cannot observe. Before writing an isolated test, list the plausible failure modes and write the test before the implementation. Use Swift Testing (`import Testing`, `@Suite`, `@Test`) when an isolated test is justified, unless an existing target clearly uses a different local pattern.
 
 ## Coding Standards
 

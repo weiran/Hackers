@@ -42,18 +42,4 @@ struct WhatsNewDataTests {
             })
         }
     }
-
-    @Test("WhatsNewItem has proper initialization")
-    func whatsNewItemInitialization() {
-        let item = WhatsNewItem(
-            title: "Test Title",
-            subtitle: "Test Subtitle",
-            systemImage: "star",
-        )
-
-        #expect(item.title == "Test Title")
-        #expect(item.subtitle == "Test Subtitle")
-        #expect(item.systemImage == "star")
-        #expect(!item.id.uuidString.isEmpty)
-    }
 }

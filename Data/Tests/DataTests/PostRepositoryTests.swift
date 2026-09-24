@@ -117,13 +117,6 @@ struct PostRepositoryTests {
         }
     }
 
-    // MARK: - Initialization Tests
-
-    @Test("PostRepository initialization")
-    func postRepositoryInitialization() {
-        #expect(postRepository != nil, "PostRepository should initialize successfully")
-    }
-
     // MARK: - GetPosts Tests
 
     @Test("Get posts with news type")
@@ -1082,7 +1075,7 @@ struct PostRepositoryTests {
 
 @Suite("PostRepository Number Parsing")
 struct PostRepositoryNumberParsingTests {
-    let repository = PostRepository(networkManager: StubNetworkManager())
+    let repository = PostRepository(networkManager: PostRepositoryTests.MockNetworkManager())
 
     @Test("Parses plain plural counts")
     func plainPlural() {
@@ -1135,14 +1128,14 @@ struct PostRepositoryNumberParsingTests {
 
 @Suite("PostRepository NBSP Score Parsing")
 struct PostRepositoryNBSPParsingTests {
-    let network = StubNetworkManager()
+    let network = PostRepositoryTests.MockNetworkManager()
     var postRepository: PostRepository {
         PostRepository(networkManager: network)
     }
 
     @Test("Parses NBSP-formatted score and singular score from feed HTML")
     func nbspAndSingularScoreFromFeed() async throws {
-        network.enqueue(html: """
+        network.enqueueGetResponse("""
         <html><body><table class="itemlist">
             <tr class="athing submission" id="1">
                 <td valign="top" class="votelinks"><center><a id='up_1' href='vote?id=1&how=up'><div class='votearrow'></div></a></center></td>

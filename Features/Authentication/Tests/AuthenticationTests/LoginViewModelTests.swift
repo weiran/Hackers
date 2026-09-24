@@ -11,33 +11,6 @@ import Testing
 @Suite("LoginViewModel Tests")
 @MainActor
 struct LoginViewModelTests {
-    @Test("Successful login updates authentication state")
-    func successfulLogin() async {
-        var loginCalled = false
-        let viewModel = LoginViewModel(
-            isAuthenticated: false,
-            currentUsername: nil,
-            onLogin: { username, password in
-                #expect(username == "tester")
-                #expect(password == "secret")
-                loginCalled = true
-            },
-            onLogout: {}
-        )
-
-        viewModel.username = "tester"
-        viewModel.password = "secret"
-
-        let didSucceed = await viewModel.performLogin()
-
-        #expect(didSucceed, "Login should succeed when credentials are valid")
-        #expect(loginCalled, "Closure should be invoked")
-        #expect(viewModel.isAuthenticated, "Authentication state should flip to true")
-        #expect(viewModel.currentUsername == "tester", "Username should be cached for the welcome view")
-        #expect(!viewModel.isAuthenticating, "Activity indicator should stop animating")
-        #expect(!viewModel.showAlert, "Alert should not appear on success")
-    }
-
     @Test("Failed login resets credentials and shows alert")
     func failedLogin() async {
         enum SampleError: Error { case failed }

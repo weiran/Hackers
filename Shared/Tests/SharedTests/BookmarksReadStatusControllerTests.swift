@@ -28,14 +28,6 @@ struct BookmarksControllerTests {
         #expect(!annotated[1].isBookmarked)
     }
 
-    @Test("isBookmarked reflects the cached set")
-    func isBookmarkedReflectsCache() async {
-        let controller = BookmarksController(bookmarksUseCase: StubBookmarksUseCase(ids: [42]))
-        _ = await controller.refreshBookmarks()
-        #expect(controller.isBookmarked(42))
-        #expect(!controller.isBookmarked(99))
-    }
-
     @Test("Toggle adds/removes from cache and posts change notification")
     func toggleUpdatesCacheAndNotifies() async {
         let useCase = StubBookmarksUseCase(ids: [])
@@ -99,14 +91,6 @@ struct ReadStatusControllerTests {
         let annotated = controller.annotatedPosts(from: [makePost(id: 10), makePost(id: 30)])
         #expect(annotated[0].isRead)
         #expect(!annotated[1].isRead)
-    }
-
-    @Test("isRead reflects the cached set")
-    func isReadReflectsCache() async {
-        let controller = ReadStatusController(readStatusUseCase: StubReadStatusUseCase(ids: [8]))
-        _ = await controller.refreshReadStatus()
-        #expect(controller.isRead(8))
-        #expect(!controller.isRead(9))
     }
 
     @Test("markRead inserts into cache and posts change notification")

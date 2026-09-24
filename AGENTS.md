@@ -45,6 +45,19 @@ For UI smoke coverage, use:
 ./run_ui_tests.sh smoke
 ```
 
+## Test Policy
+
+* Never write unit tests after writing the code they test. If isolated testing is
+  necessary, first write down every plausible failure mode, then write the tests
+  and implementation in that order.
+* Strongly prefer end-to-end UI tests as the sole testing mechanism. Use them to
+  verify complex features through the real app flow. Add an isolated test only
+  when it catches a concrete regression the end-to-end suite cannot observe.
+* At the end of each end-to-end test run, produce a verifiable, repeatable
+  artifact: retain the `.xcresult` bundle and record the exact command,
+  destination, fixture configuration, and selected tests. For visual claims,
+  also retain screenshots of the tested state.
+
 ## Visual Regression Verification
 
 For user-reported visual bugs, screenshots are the source of truth.

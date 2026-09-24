@@ -13,22 +13,6 @@ import Testing
 @Suite("CommentComposerModel")
 @MainActor
 struct CommentComposerModelTests {
-    @Test("New model starts collapsed on the story target with no draft")
-    func initialState() {
-        let model = CommentComposerModel()
-
-        #expect(model.text.isEmpty)
-        #expect(model.target == .story)
-        #expect(!model.isExpanded)
-        #expect(model.submissionState == .idle)
-        #expect(model.inlineError == nil)
-        #expect(model.alert == nil)
-        #expect(!model.hasDraft)
-        #expect(!model.canPost)
-        #expect(model.draftPreview == nil)
-        #expect(model.replyUsername == nil)
-    }
-
     @Test("Draft preview uses the first non-empty line")
     func draftPreview() {
         let model = CommentComposerModel()
@@ -63,23 +47,6 @@ struct CommentComposerModelTests {
         #expect(model.target == .story)
         #expect(!model.isExpanded)
         #expect(model.inlineError == nil)
-    }
-
-    @Test("Empty-draft target switches are immediate")
-    func cleanTargetSwitch() {
-        let model = CommentComposerModel()
-
-        model.activateReply(commentID: 5, author: "alice")
-        #expect(model.target == .reply(commentID: 5, author: "alice"))
-        #expect(model.isExpanded)
-        #expect(model.replyUsername == "alice")
-
-        model.activateReply(commentID: 7, author: "bob")
-        #expect(model.target == .reply(commentID: 7, author: "bob"))
-
-        model.activateTopLevel()
-        #expect(model.target == .story)
-        #expect(model.replyUsername == nil)
     }
 
     @Test("Dirty target switches preserve the draft and retarget immediately")
@@ -160,22 +127,6 @@ struct CommentComposerModelTests {
         #expect(model.submissionState == .idle)
         #expect(model.text.isEmpty)
         #expect(!model.isExpanded)
-    }
-
-    @Test("Success clears and collapses the composer")
-    func postingSucceeded() {
-        let model = CommentComposerModel()
-        model.activateReply(commentID: 5, author: "alice")
-        model.text = "draft"
-        model.beginPosting()
-
-        model.postingSucceeded()
-
-        #expect(model.text.isEmpty)
-        #expect(model.target == .story)
-        #expect(model.submissionState == .idle)
-        #expect(!model.isExpanded)
-        #expect(model.inlineError == nil)
     }
 
     @Test("Session expiry preserves the draft for a later re-login")

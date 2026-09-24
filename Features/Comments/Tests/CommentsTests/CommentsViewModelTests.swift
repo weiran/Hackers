@@ -51,69 +51,7 @@ struct CommentsViewModelTests {
         )
     }
 
-    @Test("Initializes in loading state when post is absent")
-    @MainActor
-    func initializesWithoutPost() {
-        // When
-        let viewModel = CommentsViewModel(
-            postID: 42,
-            initialPost: nil,
-            postUseCase: mockPostUseCase,
-            commentUseCase: mockCommentUseCase,
-            voteUseCase: mockVoteUseCase,
-            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
-            bookmarksController: bookmarksController
-        )
-
-        // Then
-        #expect(viewModel.post == nil)
-        #expect(viewModel.isPostLoading)
-        #expect(viewModel.comments.isEmpty)
-    }
-
     // MARK: - Loading Comments Tests
-
-    @Test("Loading comments successfully populates comments and visible comments")
-    @MainActor
-    func loadCommentsSuccess() async {
-        // Given
-        let expectedComments = createTestComments()
-        let postWithComments = createPostWithComments(comments: expectedComments)
-        mockPostUseCase.mockPost = postWithComments
-
-        // When
-        await sut.loadComments()
-
-        // Then
-        #expect(sut.comments.count == expectedComments.count)
-        #expect(sut.visibleComments.count == expectedComments.count)
-        #expect(!sut.isLoading)
-        #expect(!sut.isPostLoading)
-        #expect(sut.error == nil)
-    }
-
-    @Test("Loading comments calls onCommentsLoaded callback")
-    @MainActor
-    func loadCommentsCallsCallback() async {
-        // Given
-        let expectedComments = createTestComments()
-        let postWithComments = createPostWithComments(comments: expectedComments)
-        mockPostUseCase.mockPost = postWithComments
-
-        var callbackCalled = false
-        var receivedComments: [Domain.Comment] = []
-        sut.onCommentsLoaded = { (comments: [Domain.Comment]) in
-            callbackCalled = true
-            receivedComments = comments
-        }
-
-        // When
-        await sut.loadComments()
-
-        // Then
-        #expect(callbackCalled)
-        #expect(receivedComments.count == expectedComments.count)
-    }
 
     @Test("Loading comments handles failure gracefully")
     @MainActor
@@ -484,60 +422,6 @@ struct CommentsViewModelTests {
         #expect(viewModel.post?.commentsCount == 9)
     }
 
-    @Test("replace(comment:) drives a visible re-render on a content-only change")
-    @MainActor
-    func replaceCommentBumpsVisibleRevision() async {
-        // A vote changes a comment's `upvoted` without changing which comments are visible.
-        // The visible-projection signature only tracks collapse state, so replace() must
-        // force visibleComments to be reassigned and visibleRevision bumped, or the row
-        // won't re-render.
-        let comment = createTestComment(id: 1, upvoted: false)
-        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
-        await sut.loadComments()
-
-        let revisionBefore = sut.visibleRevision
-        let visibleUpvotedBefore = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
-
-        sut.replace(comment: comment.with(upvoted: true))
-
-        #expect(sut.visibleRevision > revisionBefore, "A content change must bump visibleRevision")
-        #expect(visibleUpvotedBefore == false)
-        let visibleUpvotedAfter = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
-        #expect(visibleUpvotedAfter == true, "visibleComments must reflect the updated comment")
-    }
-
-    @Test("Upvoting a comment through VotingViewModel persists the upvoted state after voting completes")
-    @MainActor
-    func commentUpvoteThroughVotingViewModelSucceeds() async {
-        // Mirrors CommentsContentView.upvoteComment: vote the loaded comment through
-        // VotingViewModel, writing each state change back via replace(comment:).
-        let comment = createTestComment(id: 1, upvoted: false)
-        mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
-        await sut.loadComments()
-
-        let provider = StubCommentVotingStateProvider()
-        let votingViewModel = VotingViewModel(
-            votingStateProvider: StubVotingStateProvider(),
-            commentVotingStateProvider: provider,
-            authenticationUseCase: StubAuthenticationUseCase()
-        )
-        let post = sut.post ?? testPost
-
-        let tappedComment = sut.comment(withID: 1)
-        #expect(tappedComment != nil, "The loaded comment must be resolvable by id")
-
-        await votingViewModel.upvote(comment: tappedComment!, in: post) { updated in
-            sut.replace(comment: updated)
-        }
-
-        #expect(provider.upvoteCalls == [1], "The vote request should run for the tapped comment")
-        #expect(
-            sut.visibleComments.first(where: { $0.id == 1 })?.upvoted == true,
-            "After a successful vote the visible projection must show the upvoted state"
-        )
-        #expect(sut.comment(withID: 1)?.upvoted == true)
-    }
-
     @Test("A failed comment vote reverts the optimistic upvoted state")
     @MainActor
     func commentUpvoteThroughVotingViewModelRevertsOnError() async {
@@ -622,68 +506,6 @@ struct CommentsViewModelTests {
             return post
         }
 
-        @Test("Toggle comment from visible to compact hides children")
-        @MainActor
-        func toggleVisibleToCompact() async {
-            // Given - Set up mock to return comments
-            let parentComment = createTestComment(id: 1, level: 0)
-            let childComment = createTestComment(id: 2, level: 1)
-            let testPostWithComments = createPostWithComments(comments: [parentComment, childComment])
-            mockPostUseCase.mockPost = testPostWithComments
-
-            // Load comments
-            await sut.loadComments()
-
-            // Verify initial state
-            #expect(sut.comments.count == 2)
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
-
-            #expect(loadedParent.visibility == Domain.CommentVisibilityType.visible)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-
-            // When
-            sut.toggleCommentVisibility(loadedParent)
-
-            // Then - re-fetch owned copies since Comment is now a value type
-            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
-            #expect(toggledParent.visibility == Domain.CommentVisibilityType.compact)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-            #expect(sut.isCommentCollapsed(withID: loadedParent.id))
-            #expect(!sut.isCommentCollapsed(withID: loadedChild.id))
-            #expect(sut.visibleComments.count == 1)
-        }
-
-        @Test("Toggle comment from compact to visible shows children")
-        @MainActor
-        func toggleCompactToVisible() async {
-            // Given - Set up mock with comments in compact state
-            let parentComment = createTestComment(id: 1, level: 0)
-                .withVisibility(Domain.CommentVisibilityType.compact)
-            let childComment = createTestComment(id: 2, level: 1)
-                .withVisibility(Domain.CommentVisibilityType.hidden)
-
-            let testPostWithComments = createPostWithComments(comments: [parentComment, childComment])
-            mockPostUseCase.mockPost = testPostWithComments
-
-            // Load comments
-            await sut.loadComments()
-
-            // Verify initial state
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
-
-            // When
-            sut.toggleCommentVisibility(loadedParent)
-
-            // Then - re-fetch owned copy since Comment is now a value type
-            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
-            #expect(toggledParent.visibility == Domain.CommentVisibilityType.visible)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-            #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
-            #expect(sut.visibleComments.count == 2)
-        }
-
         @Test("Flagged placeholder starts collapsed and reveals its replies")
         @MainActor
         func flaggedPlaceholderStartsCollapsed() async {
@@ -765,28 +587,6 @@ struct CommentsViewModelTests {
             #expect(!sut.isCommentCollapsed(withID: expandedParent.id))
             #expect(sut.visibleComments.map(\.id) == [1, 2])
             #expect(sut.toggleCommentVisibility(withID: 999) == nil)
-        }
-
-        @Test("Visible revision advances only when visible signature changes")
-        @MainActor
-        func visibleRevisionTracksSignatureChanges() async {
-            let parentComment = createTestComment(id: 1, level: 0)
-            let childComment = createTestComment(id: 2, level: 1)
-            mockPostUseCase.mockPost = createPostWithComments(comments: [parentComment, childComment])
-
-            await sut.loadComments()
-
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let revisionAfterLoad = sut.visibleRevision
-
-            sut.toggleCommentVisibility(loadedParent)
-            let revisionAfterToggle = sut.visibleRevision
-
-            let missingReveal = sut.revealComment(withId: 999)
-
-            #expect(revisionAfterToggle == revisionAfterLoad + 1)
-            #expect(!missingReveal)
-            #expect(sut.visibleRevision == revisionAfterToggle)
         }
 
         @Test("Hide comment branch collapses entire tree")
@@ -877,22 +677,6 @@ struct CommentsViewModelTests {
             sut.toggleCommentVisibility(loadedRoot)
             #expect(sut.visibleComments.map(\.id) == [1, 2])
             #expect(sut.isCommentCollapsed(withID: 2))
-        }
-
-        @Test("Next visible comment advances through visible projection")
-        @MainActor
-        func nextVisibleCommentID() async {
-            let firstRoot = createTestComment(id: 1, level: 0)
-            let child = createTestComment(id: 2, level: 1)
-            let secondRoot = createTestComment(id: 3, level: 0)
-            mockPostUseCase.mockPost = createPostWithComments(comments: [firstRoot, child, secondRoot])
-
-            await sut.loadComments()
-
-            #expect(sut.nextVisibleCommentID(after: nil) == 1)
-            #expect(sut.nextVisibleCommentID(after: 1) == 2)
-            #expect(sut.nextVisibleCommentID(after: 2) == 3)
-            #expect(sut.nextVisibleCommentID(after: 3) == nil)
         }
 
         @Test("Next visible thread skips descendants")

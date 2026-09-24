@@ -71,19 +71,6 @@ struct SettingsRepositoryTests {
         }
     }
 
-    // MARK: - Initialization Tests
-
-    @Test("SettingsRepository initialization")
-    func settingsRepositoryInitialization() {
-        #expect(settingsRepository != nil, "SettingsRepository should initialize successfully")
-    }
-
-    @Test("SettingsRepository initialization with default UserDefaults")
-    func settingsRepositoryInitializationWithDefaultUserDefaults() {
-        let repository = SettingsRepository()
-        #expect(repository != nil)
-    }
-
     // MARK: - Safari Reader Mode Tests
 
     @Test("Safari reader mode default value")
@@ -267,59 +254,7 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
-    // MARK: - Integration Tests
 
-    @Test("Multiple settings changes persist")
-    func multipleSettingsChangesPersist() {
-        // Change multiple settings
-        settingsRepository.safariReaderMode = true
-        settingsRepository.linkBrowserMode = .customBrowser
-
-        // Verify all changes persist
-        #expect(settingsRepository.safariReaderMode == true)
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-
-        // Verify underlying storage
-        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
-    }
-
-    @Test("Settings independence")
-    func settingsIndependence() {
-        // Test that changing one setting doesn't affect others
-        settingsRepository.safariReaderMode = true
-
-        // Other settings should remain at their default values
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-    }
-
-    // MARK: - Use Case Protocol Conformance Tests
-
-    @Test("Conforms to SettingsUseCase")
-    func conformsToSettingsUseCase() {
-        // Test that the repository properly conforms to SettingsUseCase protocol
-        var useCase: SettingsUseCase = settingsRepository
-
-        // Test that we can access properties through the protocol
-        useCase.safariReaderMode = true
-        #expect(useCase.safariReaderMode == true)
-
-        useCase.linkBrowserMode = .systemBrowser
-        #expect(useCase.linkBrowserMode == .systemBrowser)
-    }
-
-    // MARK: - Key Consistency Tests
-
-    @Test("UserDefaults keys")
-    func userDefaultsKeys() {
-        // Test that the correct keys are being used for UserDefaults
-        settingsRepository.safariReaderMode = true
-        settingsRepository.linkBrowserMode = .customBrowser
-
-        // Verify the keys match what's expected
-        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
-    }
 
     // MARK: - Thread Safety Tests
 

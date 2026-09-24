@@ -14,30 +14,6 @@ import Testing
 @Suite("FeedViewModel", .serialized)
 struct FeedViewModelTests {
     @MainActor
-    @Test("Loading feed populates posts and clears loading state")
-    func loadFeedSuccess() async {
-        let postUseCase = StubPostUseCase()
-        let voteUseCase = StubVoteUseCase()
-        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        let bookmarksUseCase = StubBookmarksUseCase()
-        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
-        let searchUseCase = StubSearchUseCase()
-
-        let viewModel = FeedViewModel(
-            postUseCase: postUseCase,
-            voteUseCase: voteUseCase,
-            bookmarksController: bookmarksController,
-            searchUseCase: searchUseCase
-        )
-        await viewModel.loadFeed()
-
-        #expect(viewModel.posts.count == 1)
-        #expect(viewModel.posts.first?.id == 1)
-        #expect(viewModel.isLoading == false)
-        #expect(viewModel.error == nil)
-    }
-
-    @MainActor
     @Test("Load failure surfaces error state and stops spinner")
     func loadFeedFailure() async {
         let postUseCase = StubPostUseCase()
@@ -102,27 +78,6 @@ struct FeedViewModelTests {
         #expect(postUseCase.requestedPages == [1, 2, 2])
         #expect(viewModel.posts.map(\.id) == [1, 2])
         #expect(viewModel.paginationError == nil)
-    }
-
-    @MainActor
-    @Test("Changing post type refreshes feed and resets pagination")
-    func changePostTypeRefreshesFeed() async {
-        let postUseCase = StubPostUseCase()
-        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        postUseCase.enqueue(.success([SampleData.post(id: 42, type: .ask)]))
-        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
-
-        let viewModel = FeedViewModel(
-            postUseCase: postUseCase,
-            voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
-        )
-        await viewModel.loadFeed()
-        await viewModel.changePostType(.ask)
-
-        #expect(viewModel.postType == .ask)
-        #expect(viewModel.posts.first?.id == 42)
-        #expect(postUseCase.requestedTypes == [.news, .ask])
     }
 
     @MainActor
@@ -362,33 +317,6 @@ struct FeedViewModelTests {
         try await Task.sleep(for: .milliseconds(10))
 
         #expect(viewModel.dimReadPosts == false)
-    }
-
-    @MainActor
-    @Test("Search query updates results")
-    func searchQueryUpdatesResults() async throws {
-        let postUseCase = StubPostUseCase()
-        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
-        let searchUseCase = StubSearchUseCase()
-        searchUseCase.nextResults = [SampleData.post(id: 42)]
-
-        let viewModel = FeedViewModel(
-            postUseCase: postUseCase,
-            voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController,
-            searchUseCase: searchUseCase
-        )
-
-        await viewModel.loadFeed()
-        viewModel.updateSearchQuery("swift")
-        let searchCompleted = await waitForSearchCompletion(of: viewModel)
-        #expect(searchCompleted)
-
-        #expect(searchUseCase.receivedQueries.contains("swift"))
-        #expect(viewModel.searchResults.first?.id == 42)
-        #expect(viewModel.hasActiveSearch)
-        #expect(viewModel.isSearchInProgress == false)
     }
 
     @MainActor

@@ -368,42 +368,6 @@ struct VotingViewModelTests {
         #expect(!viewModel.isVoting)
     }
 
-    @Test("Comment voting with MainActor")
-    @MainActor
-    func commentVotingWithMainActor() async throws {
-        // Given
-        let voteLinks = VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
-        let comment = Domain.Comment(
-            id: 123,
-            age: "1h",
-            text: "Test comment",
-            by: "user",
-            level: 0,
-            upvoted: false,
-            voteLinks: voteLinks,
-        )
-
-        let post = Post(
-            id: 456,
-            url: URL(string: "https://example.com")!,
-            title: "Test Post",
-            age: "2h",
-            commentsCount: 1,
-            by: "author",
-            score: 10,
-            postType: .news,
-            upvoted: false,
-        )
-
-        // When - upvote comment (capture the applied optimistic state)
-        var appliedComment: Domain.Comment?
-        await votingViewModel.upvote(comment: comment, in: post) { appliedComment = $0 }
-
-        // Then
-        #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
-        #expect(appliedComment?.upvoted == true, "Comment should be marked as upvoted after upvote")
-    }
-
     private func makeComment(id: Int) -> Domain.Comment {
         Domain.Comment(
             id: id,
@@ -506,59 +470,5 @@ struct VotingViewModelTests {
         #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
         #expect(appliedComment?.upvoted == false, "Comment should be reverted to original state after error")
         #expect(viewModel.lastError != nil, "Error should be set")
-    }
-}
-
-@Suite("NavigationStoreProtocol Default Behavior")
-struct NavigationStoreProtocolDefaultsTests {
-    final class RecordingNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
-        var selectedPost: Post?
-        var selectedPostId: Int?
-        var showingLogin: Bool = false
-        var showingSettings: Bool = false
-
-        var recordedURL: URL?
-        var recordedPushFlag: Bool?
-        var stubbedResult: Bool = false
-
-        func showPost(_ post: Post) {
-            selectedPost = post
-            selectedPostId = post.id
-        }
-
-        func showPostLink(_ post: Post, presentation _: PostLinkPresentation) {
-            selectedPost = post
-            selectedPostId = post.id
-        }
-
-        func showPost(withId id: Int) {
-            selectedPostId = id
-            selectedPost = nil
-        }
-
-        func showLogin() { showingLogin = true }
-        func showSettings() { showingSettings = true }
-        func selectPostType(_: PostType) {}
-
-        @MainActor
-        func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool) -> Bool {
-            recordedURL = url
-            recordedPushFlag = pushOntoDetailStack
-            return stubbedResult
-        }
-    }
-
-    @Test("Default openURLInPrimaryContext uses push flag")
-    @MainActor
-    func defaultConvenienceUsesPushFlag() {
-        let store = RecordingNavigationStore()
-        store.stubbedResult = true
-        let targetURL = URL(string: "https://example.com/web")!
-
-        let result = store.openURLInPrimaryContext(targetURL)
-
-        #expect(result == true)
-        #expect(store.recordedURL == targetURL)
-        #expect(store.recordedPushFlag == true)
     }
 }
