@@ -404,6 +404,23 @@ extension FeedViewModel {
     }
 }
 
+extension FeedViewModel {
+    func refreshBookmarkAnnotations() async {
+        await bookmarksController.refreshBookmarks()
+        if postType == .bookmarks {
+            let posts = await bookmarksController.bookmarkedPosts()
+            await readStatusController.refreshReadStatus()
+            guard postType == .bookmarks else { return }
+            feedLoader.data = readStatusController.annotatedPosts(from: posts)
+            postIds = Set(posts.map(\.id))
+        } else {
+            feedLoader.data = bookmarksController.annotatedPosts(from: feedLoader.data)
+        }
+        searchResults = bookmarksController.annotatedPosts(from: searchResults)
+    }
+
+}
+
 private extension FeedViewModel {
     func configureFeedLoader() {
         // Set up the loading function after initialization.
@@ -448,13 +465,14 @@ private extension FeedViewModel {
         NotificationCenter.default.publisher(for: .bookmarksDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
-                guard
-                    let postId = notification.userInfo?["postId"] as? Int,
-                    let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
-                else { return }
                 Task { @MainActor [weak self] in
                     guard let self else { return }
-                    await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
+                    if let postId = notification.userInfo?["postId"] as? Int,
+                       let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool {
+                        await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
+                    } else {
+                        await self.refreshBookmarkAnnotations()
+                    }
                 }
             }
     }

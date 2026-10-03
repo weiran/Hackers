@@ -408,6 +408,27 @@ struct CommentSubmissionTests {
         #expect(submitted?.id == Self.newCommentID)
     }
 
+    @Test("Item-page reconciliation follows the story morelink")
+    func itemPageReconciliationFollowsMorelink() async throws {
+        let pageOne = Self.itemPage(rows: [
+            Self.commentRow(id: 8_000, author: "bob", indent: 0, html: "existing")
+        ]) + "<a class=\"morelink\" href=\"item?id=100&p=2\">More</a>"
+        let pageTwo = Self.itemPage(rows: [
+            Self.commentRow(id: Self.newCommentID, author: "alice", indent: 0, html: "First paragraph.<p>Second paragraph.")
+        ])
+        network.enqueueGet(pageOne)
+        network.enqueueGet(pageTwo)
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: Self.request(),
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted?.id == Self.newCommentID)
+        #expect(network.getRequestURLs.map(\.query) == ["id=100", "id=100&p=2"])
+    }
+
     @Test("Threads page fallback hydrates through the item page")
     func threadsFallback() async throws {
         // Item-page polling misses the comment...
@@ -431,6 +452,157 @@ struct CommentSubmissionTests {
 
         #expect(submitted?.id == Self.newCommentID)
         #expect(submitted?.htmlText.contains("Second paragraph.") == true)
+    }
+
+    @Test("Threads fallback prefers the semantic onstory link over the age permalink")
+    func threadsFallbackUsesOnstoryContext() async throws {
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        let threads = """
+        <html><body><table><tr class="athing" id="\(Self.newCommentID)">
+        <td><span class="age"><a href="item?id=\(Self.newCommentID)">1 minute ago</a></span>
+        <span class="onstory"><a href="item?id=\(Self.storyID)">Example story</a></span></td>
+        </tr></table></body></html>
+        """
+        network.enqueueGet(threads)
+        network.enqueueGet(Self.acceptedPage)
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: Self.request(),
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted?.id == Self.newCommentID)
+    }
+
+    @Test("Threads fallback carries an established story context to nested rows")
+    func threadsFallbackCarriesRootStoryContext() async throws {
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        let threads = """
+        <html><body><table>
+        <tr class="athing comtr" id="8999"><td class="ind" indent="0"></td><td><span class="onstory"><a href="item?id=\(Self.storyID)">Example story</a></span></td></tr>
+        <tr class="athing comtr" id="\(Self.newCommentID)"><td class="ind" indent="1"></td><td><span class="age"><a href="item?id=\(Self.newCommentID)">1 minute ago</a></span></td></tr>
+        </table></body></html>
+        """
+        network.enqueueGet(threads)
+        network.enqueueGet(Self.acceptedPage)
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: Self.request(),
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted?.id == Self.newCommentID)
+    }
+
+    @Test("Threads fallback scopes nested rows to the most recent root story")
+    func threadsFallbackScopesNestedRowsToMostRecentRootStory() async throws {
+        let request = CommentSubmissionRequest(
+            storyID: 200,
+            parentID: 200,
+            expectedAuthor: "alice",
+            text: "First paragraph.\n\nSecond paragraph."
+        )
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        let threads = """
+        <html><body><table class="threads">
+        <tr class="athing comtr" id="9100"><td class="ind" indent="0"></td><td>
+        <span class="onstory"><a href="item?id=100">First story</a></span></td></tr>
+        <tr class="athing comtr" id="9101"><td class="ind" indent="1"></td><td>
+        <span class="age"><a href="item?id=9101">1 minute ago</a></span></td></tr>
+        <tr class="athing comtr" id="9200"><td class="ind" indent="0"></td><td>
+        <span class="onstory"><a href="item?id=200">Second story</a></span></td></tr>
+        <tr class="athing comtr" id="\(Self.newCommentID)"><td class="ind" indent="1"></td><td>
+        <span class="age"><a href="item?id=\(Self.newCommentID)">1 minute ago</a></span></td></tr>
+        <tr class="athing comtr" id="9300"><td class="ind" indent="0"></td><td>Unmarked root</td></tr>
+        <tr class="athing comtr" id="9301"><td class="ind" indent="1"></td><td>
+        <span class="age"><a href="item?id=9301">1 minute ago</a></span></td></tr>
+        </table></body></html>
+        """
+        network.enqueueGet(.init(
+            body: threads,
+            finalURL: URL(string: "https://news.ycombinator.com/threads?id=alice")!
+        ))
+        network.enqueueGet(Self.itemPage(rows: [
+            Self.commentRow(
+                id: Self.newCommentID,
+                author: "alice",
+                indent: 0,
+                html: "First paragraph.<p>Second paragraph."
+            )
+        ]))
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: request,
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted?.id == Self.newCommentID)
+    }
+
+    @Test("Threads fallback clears context after an unmarked depth-zero root")
+    func threadsFallbackClearsContextAfterUnmarkedRoot() async throws {
+        let request = CommentSubmissionRequest(
+            storyID: 200,
+            parentID: 200,
+            expectedAuthor: "alice",
+            text: "First paragraph.\n\nSecond paragraph."
+        )
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        network.enqueueGet(Self.itemPage(rows: []))
+        let threads = """
+        <html><body><table class="threads">
+        <tr class="athing comtr" id="9200"><td class="ind" indent="0"></td><td>
+        <span class="onstory"><a href="item?id=200">Second story</a></span></td></tr>
+        <tr class="athing comtr" id="9300"><td class="ind" indent="0"></td><td>Unmarked root</td></tr>
+        <tr class="athing comtr" id="9301"><td class="ind" indent="1"></td><td>
+        <span class="age"><a href="item?id=9301">1 minute ago</a></span></td></tr>
+        </table></body></html>
+        """
+        network.enqueueGet(.init(
+            body: threads,
+            finalURL: URL(string: "https://news.ycombinator.com/threads?id=alice")!
+        ))
+        network.enqueueGet(Self.itemPage(rows: [
+            Self.commentRow(
+                id: 9301,
+                author: "alice",
+                indent: 0,
+                html: "First paragraph.<p>Second paragraph."
+            )
+        ]))
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: request,
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted == nil)
+    }
+
+    @Test("Sole same-author candidate with different text stays unresolved")
+    func soleCandidateMustMatchText() async throws {
+        network.enqueueGet(Self.itemPage(rows: [
+            Self.commentRow(id: Self.newCommentID, author: "alice", indent: 0, html: "different draft")
+        ]))
+
+        let submitted = try await repository.reconcileComment(CommentSubmissionAttempt(
+            request: Self.request(),
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+
+        #expect(submitted == nil)
     }
 
     @Test("Ambiguous duplicate candidates do not resolve")

@@ -76,6 +76,29 @@ struct SearchRepositoryTests {
                 "Missing url should fall back to the HN item URL built from the validated id")
     }
 
+    @Test("Missing hit timestamp uses the injected current date")
+    func missingTimestampUsesInjectedClock() async throws {
+        let mockNetwork = MockNetworkManager()
+        mockNetwork.nextResponse = """
+        {"nbHits":1,"page":0,"nbPages":1,"hitsPerPage":20,"hits":[{"objectID":"789","title":"No timestamp","points":1,"author":"tester","num_comments":0}]}
+        """
+        let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let repository = SearchRepository(networkManager: mockNetwork, currentDate: { fixedDate })
+
+        let page = try await repository.searchPosts(
+            query: "timestamp",
+            sort: .popular,
+            dateRange: .allTime,
+            page: 0,
+            hitsPerPage: 20
+        )
+
+        let post = try #require(page.posts.first)
+        // RelativeDateTimeFormatter on the simulator renders an exact same-time
+        // value as "in 0 seconds"; a wall-clock fallback would be years away.
+        #expect(post.age == "in 0 seconds")
+    }
+
     @Test("Recent search uses search by date endpoint")
     func recentSearchUsesSearchByDateEndpoint() async throws {
         let mockNetwork = MockNetworkManager()

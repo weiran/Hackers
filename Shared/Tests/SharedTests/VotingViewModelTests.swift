@@ -472,3 +472,25 @@ struct VotingViewModelTests {
         #expect(viewModel.lastError != nil, "Error should be set")
     }
 }
+
+extension VotingViewModelTests {
+    @Test("Successful comment unvote clears unvote link and preserves upvote link")
+    @MainActor
+    func successfulCommentUnvoteClearsUnvoteLink() async throws {
+        let viewModel = votingViewModel
+        let post = makeTestPost(upvoted: true)
+        let upvoteURL = URL(string: "/vote?id=7&how=up")!
+        let unvoteURL = URL(string: "/vote?id=7&how=un&goto=item%3Fid%3D1")!
+        let comment = makeComment(id: 7)
+            .with(upvoted: true)
+            .with(voteLinks: VoteLinks(upvote: upvoteURL, unvote: unvoteURL))
+        var applied = comment
+
+        await viewModel.unvote(comment: comment, in: post) { applied = $0 }
+
+        #expect(applied.upvoted == false)
+        #expect(applied.voteLinks?.upvote == upvoteURL)
+        #expect(applied.voteLinks?.unvote == nil)
+    }
+
+}

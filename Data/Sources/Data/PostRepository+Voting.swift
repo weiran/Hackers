@@ -32,10 +32,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm =
-            response.contains("<form action=\"/login") ||
-            response.contains("You have to be logged in")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try throwIfLoginRequired(response)
     }
 
     public func unvote(post: Post) async throws {
@@ -60,8 +57,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try throwIfLoginRequired(response)
     }
 
     public func unvote(comment: Domain.Comment, for _: Post) async throws {
@@ -135,10 +131,14 @@ extension PostRepository {
     }
 
     private func throwIfLoginRequired(_ body: String) throws {
+        let loweredBody = body.lowercased()
         let containsLoginForm =
-            body.contains("<form action=\"/login") ||
-            body.contains("You have to be logged in")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+            loweredBody.range(
+                of: #"<form\b[^>]*\baction\s*=\s*[\"']/login\b"#,
+                options: .regularExpression
+            ) != nil
+        let containsLoginMessage = loweredBody.contains("you have to be logged in")
+        if containsLoginForm || containsLoginMessage { throw HackersKitError.unauthenticated }
     }
 
     /// Resolves the unvote link to an absolute URL and rewrites its `goto` target to

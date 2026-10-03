@@ -18,6 +18,10 @@ public actor ReadStatusRepository: ReadStatusUseCase {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let now: () -> Date
+    private var cachedEntries: [ReadStatusEntry] = []
+    private var hasLoadedCache = false
+    private var cacheIsCorrupt = false
+    private var cachedData: Data?
 
     public init(
         store: UbiquitousKeyValueStoreProtocol = NSUbiquitousKeyValueStore.default,
@@ -36,36 +40,59 @@ public actor ReadStatusRepository: ReadStatusUseCase {
     }
 
     public func readPostIDs() async -> Set<Int> {
-        let entries = loadEntries()
-        return Set(entries.map(\.id))
+        refreshCacheFromStore()
+        return Set(cachedEntries.map(\.id))
     }
 
     public func markPostRead(id: Int) async {
-        var entries = loadEntries()
-        entries.removeAll { $0.id == id }
-        entries.insert(ReadStatusEntry(id: id, readAt: now()), at: 0)
-        entries = Array(entries.sorted { $0.readAt > $1.readAt }.prefix(Constants.maximumEntries))
-        persist(entries)
+        refreshCacheFromStore()
+        // A malformed payload is not an empty history. Keep the raw bytes and
+        // last known-good snapshot intact rather than replacing recoverable data.
+        guard !cacheIsCorrupt else { return }
+
+        cachedEntries.removeAll { $0.id == id }
+        let entry = ReadStatusEntry(id: id, readAt: now())
+        let index = cachedEntries.firstIndex { $0.readAt <= entry.readAt } ?? cachedEntries.endIndex
+        cachedEntries.insert(entry, at: index)
+        if cachedEntries.count > Constants.maximumEntries {
+            cachedEntries.removeLast(cachedEntries.count - Constants.maximumEntries)
+        }
+        persist(cachedEntries)
     }
 }
 
 private extension ReadStatusRepository {
-    func loadEntries() -> [ReadStatusEntry] {
+    func refreshCacheFromStore() {
         _ = store.synchronize()
-        guard let data = store.data(forKey: Constants.readPostsKey) else {
-            return []
+        let data = store.data(forKey: Constants.readPostsKey)
+        // Reuse decoded entries only while the actual store bytes are unchanged.
+        // A notification can arrive after a local mutation, so it is not a write guard.
+        guard !hasLoadedCache || data != cachedData else { return }
+        cachedData = data
+        guard let data else {
+            cachedEntries = []
+            hasLoadedCache = true
+            cacheIsCorrupt = false
+            return
         }
 
         guard let entries = try? decoder.decode([ReadStatusEntry].self, from: data) else {
-            return []
+            // Preserve any last-known-good in-memory state and refuse all local
+            // writes until a valid external payload arrives.
+            hasLoadedCache = true
+            cacheIsCorrupt = true
+            return
         }
 
-        return entries.sorted { $0.readAt > $1.readAt }
+        cachedEntries = entries.sorted { $0.readAt > $1.readAt }
+        hasLoadedCache = true
+        cacheIsCorrupt = false
     }
 
     func persist(_ entries: [ReadStatusEntry]) {
         guard let data = try? encoder.encode(entries) else { return }
         store.set(data, forKey: Constants.readPostsKey)
+        cachedData = data
         _ = store.synchronize()
     }
 }

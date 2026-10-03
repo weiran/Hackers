@@ -104,7 +104,7 @@ Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Curr
 
 Bookmarks use `NSUbiquitousKeyValueStore` under `Bookmarks.posts`. Stored bookmark entries include enough post metadata to render the Bookmarks feed offline from HN feed pages, plus optional vote links and the bookmark timestamp used for recency ordering.
 
-Read state uses `NSUbiquitousKeyValueStore` under `ReadStatus.posts`. It stores recent read IDs with timestamps and trims to 5,000 entries. Feed and search rows are annotated from this state, and `dimReadPosts` controls whether read rows are visually dimmed.
+Read state uses `NSUbiquitousKeyValueStore` under `ReadStatus.posts`. It stores recent read IDs with timestamps and trims to 5,000 entries. The repository checks stored bytes before each read or mutation and reuses decoded entries only while those bytes are unchanged. Bookmark and read-history repositories preserve malformed stored payloads and their last valid snapshots, refusing writes until valid data returns. Feed and search rows are annotated from this state, and `dimReadPosts` controls whether read rows are visually dimmed. Shared controllers refresh external changes without applying snapshots invalidated by local mutations; generic bookmark changes update Feed and Comments annotations.
 
 Authentication stores only the HN username in `UserDefaults`; the authenticated session itself is held by shared HN cookies in `HTTPCookieStorage`. Networking deliberately preserves shared cookie behavior so login, voting, and page fetches see the same session.
 

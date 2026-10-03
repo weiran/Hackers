@@ -34,10 +34,7 @@ extension CommentHTMLParser {
         segments.sort { $0.range.location < $1.range.location }
 
         guard !segments.isEmpty else {
-            let stripped = preserveWhitespace
-                ? stripHTMLTagsPreservingWhitespace(text)
-                : stripHTMLTagsAndNormalizeWhitespace(text)
-            return AttributedString(stripped)
+            return AttributedString(cleanDisplayText(text, preservingWhitespace: preserveWhitespace))
         }
 
         var result = AttributedString()
@@ -50,7 +47,7 @@ extension CommentHTMLParser {
                 preserveWhitespace: preserveWhitespace,
                 into: &result,
             )
-            appendFormattedSegment(segment, into: &result)
+            appendFormattedSegment(segment, preservingWhitespace: preserveWhitespace, into: &result)
             lastEnd = NSMaxRange(segment.range)
         }
         appendRemainingText(
@@ -103,15 +100,17 @@ extension CommentHTMLParser {
         if segment.range.location > lastEnd {
             let beforeRange = NSRange(location: lastEnd, length: segment.range.location - lastEnd)
             let beforeText = nsString.substring(with: beforeRange)
-            let cleanText = preserveWhitespace
-                ? stripHTMLTagsPreservingWhitespace(beforeText)
-                : stripHTMLTagsAndNormalizeWhitespace(beforeText)
+            let cleanText = cleanDisplayText(beforeText, preservingWhitespace: preserveWhitespace)
             if !cleanText.isEmpty { result += AttributedString(cleanText) }
         }
     }
 
-    private static func appendFormattedSegment(_ segment: FormatSegment, into result: inout AttributedString) {
-        let cleanContent = stripHTMLTagsPreservingWhitespace(segment.content)
+    private static func appendFormattedSegment(
+        _ segment: FormatSegment,
+        preservingWhitespace: Bool,
+        into result: inout AttributedString,
+    ) {
+        let cleanContent = cleanDisplayText(segment.content, preservingWhitespace: preservingWhitespace)
         guard !cleanContent.isEmpty else { return }
         var formattedString = AttributedString(cleanContent)
         switch segment.type {
@@ -133,20 +132,28 @@ extension CommentHTMLParser {
     ) {
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let cleanText = preserveWhitespace
-                ? stripHTMLTagsPreservingWhitespace(remainingText)
-                : stripHTMLTagsAndNormalizeWhitespace(remainingText)
+            let cleanText = cleanDisplayText(remainingText, preservingWhitespace: preserveWhitespace)
             if !cleanText.isEmpty { result += AttributedString(cleanText) }
         }
     }
 
     // Determine if formatting tags overlap
     private static func hasNestedFormattingTags(_ text: String) -> Bool {
-        let boldMatches = boldRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-        let italicMatches = italicRegex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-        for boldMatch in boldMatches {
-            for italicMatch in italicMatches where NSIntersectionRange(boldMatch.range, italicMatch.range).length > 0 {
-                return true
+        let fullRange = NSRange(location: 0, length: text.utf16.count)
+        let formatMatches = [
+            boldRegex.matches(in: text, range: fullRange),
+            italicRegex.matches(in: text, range: fullRange),
+            inlineCodeRegex.matches(in: text, range: fullRange)
+        ]
+        for firstType in formatMatches.indices {
+            for secondType in firstType ..< formatMatches.count {
+                for firstMatch in formatMatches[firstType] {
+                    for secondMatch in formatMatches[secondType] where
+                        (firstType != secondType || firstMatch.range != secondMatch.range) &&
+                        NSIntersectionRange(firstMatch.range, secondMatch.range).length > 0 {
+                        return true
+                    }
+                }
             }
         }
         return false
@@ -154,9 +161,7 @@ extension CommentHTMLParser {
 
     // For nested tags, strip all HTML and rebuild clean text
     private static func processNestedFormattingTags(_ text: String, preserveWhitespace: Bool) -> AttributedString {
-        let cleanText = preserveWhitespace
-            ? stripHTMLTagsPreservingWhitespace(text)
-            : stripHTMLTagsAndNormalizeWhitespace(text)
+        let cleanText = cleanDisplayText(text, preservingWhitespace: preserveWhitespace)
         return AttributedString(cleanText)
     }
 

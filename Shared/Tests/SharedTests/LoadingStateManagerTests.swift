@@ -6,6 +6,7 @@
 //
 
 @testable import Shared
+import Foundation
 import Testing
 
 private actor LoadCounter {
@@ -200,4 +201,100 @@ struct LoadingStateManagerTests {
         #expect(manager.isLoading == false)
     }
 
+}
+
+private actor CancellationAwareLoadGate {
+    private let cancellationError: Error
+    private var started = false
+    private var startWaiter: CheckedContinuation<Void, Never>?
+    private var continuation: CheckedContinuation<[String], Error>?
+    private var cancellationHandled = false
+    private var cancellationWaiter: CheckedContinuation<Void, Never>?
+
+    init(cancellationError: Error) {
+        self.cancellationError = cancellationError
+    }
+
+    func load() async throws -> [String] {
+        started = true
+        startWaiter?.resume()
+        startWaiter = nil
+        return try await withTaskCancellationHandler(operation: {
+            try await withCheckedThrowingContinuation { continuation in
+                self.continuation = continuation
+                if Task.isCancelled {
+                    handleCancellation()
+                }
+            }
+        }, onCancel: {
+            Task { await self.handleCancellation() }
+        })
+    }
+
+    func waitUntilStarted() async {
+        if started { return }
+        await withCheckedContinuation { continuation in
+            startWaiter = continuation
+        }
+    }
+
+    private func handleCancellation() {
+        guard !cancellationHandled else { return }
+        cancellationHandled = true
+        continuation?.resume(throwing: cancellationError)
+        continuation = nil
+        cancellationWaiter?.resume()
+        cancellationWaiter = nil
+    }
+
+    func waitUntilCancellationHandled() async {
+        if cancellationHandled { return }
+        await withCheckedContinuation { continuation in
+            cancellationWaiter = continuation
+        }
+    }
+}
+
+
+
+extension LoadingStateManagerTests {
+    @Test("Cancellation abandons a gated load without consuming an attempt")
+    func cancellationAbandonsLoad() async {
+        let gate = CancellationAwareLoadGate(cancellationError: CancellationError())
+        let manager = LoadingStateManager(
+            initialData: [] as [String],
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { try await gate.load() }
+        )
+
+        let loadTask = Task { await manager.refresh() }
+        await gate.waitUntilStarted()
+        loadTask.cancel()
+        await gate.waitUntilCancellationHandled()
+        await loadTask.value
+
+        #expect(manager.error == nil)
+        #expect(manager.hasAttemptedLoad == false)
+        #expect(manager.isLoading == false)
+    }
+
+    @Test("A cancelled network load is treated as abandonment")
+    func cancelledNetworkLoadAbandonsLoad() async {
+        let gate = CancellationAwareLoadGate(cancellationError: URLError(.cancelled))
+        let manager = LoadingStateManager(
+            initialData: [] as [String],
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { try await gate.load() }
+        )
+
+        let loadTask = Task { await manager.refresh() }
+        await gate.waitUntilStarted()
+        loadTask.cancel()
+        await gate.waitUntilCancellationHandled()
+        await loadTask.value
+
+        #expect(manager.error == nil)
+        #expect(manager.hasAttemptedLoad == false)
+        #expect(manager.isLoading == false)
+    }
 }

@@ -153,6 +153,10 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingStateProvider.unvoteComment(commentForVoting, for: post)
+            let clearedVoteLinks = comment.voteLinks.map {
+                VoteLinks(upvote: $0.upvote, unvote: nil)
+            }
+            apply(comment.with(upvoted: false).with(voteLinks: clearedVoteLinks))
         } catch {
             // Revert optimistic changes on error.
             apply(comment.with(upvoted: true))

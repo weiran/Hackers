@@ -1202,3 +1202,36 @@ private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -
         visibility: .visible,
     )
 }
+
+extension CommentsViewModelTests {
+    @MainActor
+    @Test("A late vote update preserves current content and collapsed visibility")
+    func voteUpdatePreservesCurrentComment() async throws {
+        let original = createTestComment(id: 1)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [original])
+        await sut.loadComments()
+        let newer = Domain.Comment(id: 1, age: "now", text: "Updated server text", by: "user1", level: 0, upvoted: false)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [newer])
+        await sut.refreshComments()
+        _ = sut.toggleCommentVisibility(withID: 1)
+        let current = try #require(sut.comment(withID: 1))
+        sut.replace(comment: original.with(upvoted: true))
+        let result = try #require(sut.comment(withID: 1))
+        #expect(result.upvoted)
+        #expect(result.text == newer.text)
+        #expect(result.age == newer.age)
+        #expect(result.visibility == current.visibility)
+    }
+
+    @MainActor
+    @Test("A generic bookmark refresh annotates the currently resolved story")
+    func genericBookmarkRefreshAnnotatesStory() async {
+        await sut.loadComments()
+        mockBookmarksUseCase.posts = [testPost]
+        await sut.refreshBookmarkAnnotations()
+        #expect(sut.post?.isBookmarked == true)
+        mockBookmarksUseCase.posts = []
+        await sut.refreshBookmarkAnnotations()
+        #expect(sut.post?.isBookmarked == false)
+    }
+}

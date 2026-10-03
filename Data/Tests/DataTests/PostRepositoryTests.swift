@@ -1171,3 +1171,26 @@ struct PostRepositoryNBSPParsingTests {
 }
 
 // swiftlint:enable type_body_length
+
+extension PostRepositoryTests {
+    @Test("Comment upvote rejects unauthenticated message without a login form")
+    func upvoteCommentRejectsUnauthenticatedMessage() async {
+        let voteLinks = VoteLinks(upvote: URL(string: "/vote?id=456&how=up")!, unvote: nil)
+        let comment = createTestComment(voteLinks: voteLinks)
+        let post = createTestPost()
+        mockNetworkManager.stubbedGetResponse = "You have to be logged in to vote."
+
+        do {
+            try await postRepository.upvote(comment: comment, for: post)
+            Issue.record("Expected unauthenticated comment vote response")
+        } catch let error as HackersKitError {
+            guard case .unauthenticated = error else {
+                Issue.record("Expected HackersKitError.unauthenticated, got \(error)")
+                return
+            }
+        } catch {
+            Issue.record("Expected HackersKitError.unauthenticated, got \(error)")
+        }
+    }
+
+}

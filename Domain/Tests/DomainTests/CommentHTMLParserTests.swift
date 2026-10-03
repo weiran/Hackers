@@ -86,3 +86,91 @@ struct CommentHTMLParserTests {
         #expect(String(CommentHTMLParser.parseHTMLText("<a>plain &amp; safe</a>").characters) == "plain & safe")
     }
 }
+
+extension CommentHTMLParserTests {
+    @Test("HTML entity decoding supports numeric scalars and rejects invalid values")
+    func hTMLEntityDecodingNumericScalars() {
+        let input = "caf&#233; &#x1F642; &#x110000; &#xD800;"
+        let result = CommentHTMLParser.decodeHTMLEntities(input)
+        #expect(result == "café 🙂 &#x110000; &#xD800;", "Valid numeric entities should decode while invalid scalars remain literal")
+    }
+
+    @Test("HTML entity decoding is single pass")
+    func hTMLEntityDecodingSinglePass() {
+        #expect(CommentHTMLParser.decodeHTMLEntities("&amp;lt;") == "&lt;", "Entity decoding must not recursively decode its own output")
+    }
+
+    @Test("HTML entity decoding does not swallow later entities after plain ampersands")
+    func hTMLEntityDecodingHandlesPlainAmpersandText() {
+        #expect(CommentHTMLParser.decodeHTMLEntities("AT&T &amp; Co") == "AT&T & Co",
+                "Malformed ampersands must not prevent subsequent entities from decoding")
+    }
+
+    @Test("Decoded whitespace is normalized after entity decoding")
+    func decodedWhitespaceIsNormalizedAfterEntityDecoding() {
+        #expect(String(CommentHTMLParser.parseHTMLText("A&nbsp;&nbsp;B").characters) == "A B",
+                "Adjacent nbsp entities should collapse to one display space")
+        #expect(String(CommentHTMLParser.parseHTMLText("A &nbsp; B").characters) == "A B",
+                "Whitespace surrounding nbsp should retain the pre-task normalized display form")
+    }
+
+    @Test("Decoded whitespace is normalized in formatted and linked text")
+    func decodedWhitespaceIsNormalizedInFormattedAndLinkedText() {
+        let formatted = CommentHTMLParser.parseHTMLText("A <b>B&nbsp;&nbsp;C&#10;D</b> E")
+        #expect(String(formatted.characters) == "A B C D E",
+                "Formatted non-paragraph text should collapse whitespace decoded from entities")
+
+        let linked = CommentHTMLParser.parseHTMLText("<a href=\"https://example.com\">A&nbsp;&nbsp;B&#10;C</a>")
+        #expect(String(linked.characters) == "A B C",
+                "Link text should collapse whitespace decoded from entities")
+    }
+
+    @Test("Link URL attributes decode entities after raw extraction")
+    func linkURLAttributeDecodesEntitiesAfterRawExtraction() {
+        let result = CommentHTMLParser.parseHTMLText("<a href=\"https://example.com/?a=1&amp;b=2\">query</a>")
+        let text = String(result.characters)
+        let range = text.range(of: "query")!
+        let start = result.characters.index(result.characters.startIndex, offsetBy: text.distance(from: text.startIndex, to: range.lowerBound))
+        let end = result.characters.index(result.characters.startIndex, offsetBy: text.distance(from: text.startIndex, to: range.upperBound))
+        #expect(result[start ..< end].link?.absoluteString == "https://example.com/?a=1&b=2",
+                "URL entities should decode once after the raw href value is extracted")
+    }
+
+    @Test("Escaped markup remains literal text")
+    func escapedMarkupRemainsLiteral() {
+        let result = CommentHTMLParser.parseHTMLText("&lt;b&gt;literal&lt;/b&gt;")
+        #expect(String(result.characters) == "<b>literal</b>", "Escaped tags must not become formatting tags")
+        let fullRange = result.startIndex ..< result.endIndex
+        #expect(result[fullRange].inlinePresentationIntent == nil,
+                "Escaped literal markup must not receive formatting attributes")
+    }
+
+    @Test("Nested bold and code emits content once")
+    func nestedBoldAndCodeEmitsContentOnce() {
+        let result = CommentHTMLParser.parseHTMLText("<b><code>x</code></b>")
+        #expect(String(result.characters) == "x", "Nested formatting must not duplicate text")
+    }
+
+    @Test("Paragraph parsing treats an opening p tag as a separator when closing tag is absent")
+    func paragraphSeparatorWithoutClosingTag() {
+        let result = CommentHTMLParser.parseHTMLText("First paragraph.<p>Second paragraph.")
+        #expect(String(result.characters) == "First paragraph.\n\nSecond paragraph.", "Opening p tags should delimit paragraphs even without a closing tag")
+    }
+
+    @Test("Paragraph parsing trims entity whitespace around empty outer chunks")
+    func paragraphTrimsEntityWhitespaceAroundEmptyChunks() {
+        #expect(String(CommentHTMLParser.parseHTMLText("&nbsp;<p>B").characters) == "B",
+                "Whitespace-only entity prefixes should not create a blank paragraph")
+        #expect(String(CommentHTMLParser.parseHTMLText("<p>B</p>&nbsp;").characters) == "B",
+                "Whitespace-only entity suffixes should not create a blank paragraph")
+    }
+
+    @Test("Paragraph parsing trims entity whitespace around nonempty outer chunks")
+    func paragraphTrimsEntityWhitespaceAroundNonemptyChunks() {
+        #expect(String(CommentHTMLParser.parseHTMLText("&nbsp;A<p>B").characters) == "A\n\nB",
+                "Entity whitespace must not lead text before a paragraph")
+        #expect(String(CommentHTMLParser.parseHTMLText("<p>B</p>A&nbsp;").characters) == "B\n\nA",
+                "Entity whitespace must not trail text after a paragraph")
+    }
+
+}

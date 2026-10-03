@@ -70,7 +70,8 @@ public actor SearchRepository: SearchUseCase {
             let url = hit.url.flatMap { URL(string: $0) }
                 ?? URL(string: "https://news.ycombinator.com/item?id=\(postID)")
             guard let url else { return nil }
-            let age = ageString(from: hit.createdAt)
+            let timestamp = hit.created_at_i ?? currentDate().timeIntervalSince1970
+            let age = ageString(from: timestamp)
 
             return Post(
                 id: postID,
@@ -117,7 +118,6 @@ private extension SearchRepository {
         let story_text: String?
 
         var commentsCount: Int? { num_comments }
-        var createdAt: TimeInterval { created_at_i ?? Date().timeIntervalSince1970 }
         var storyText: String? { story_text }
     }
 

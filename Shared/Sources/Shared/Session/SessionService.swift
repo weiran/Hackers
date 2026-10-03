@@ -17,15 +17,19 @@ public final class SessionService {
     private let authenticationUseCase: any AuthenticationUseCase
     @ObservationIgnored private var logoutObserver: NSObjectProtocol?
     @ObservationIgnored private var currentUserTask: Task<Void, Never>?
+    private var currentUserGeneration = 0
     public private(set) var logoutError: Error?
 
     public init(authenticationUseCase: any AuthenticationUseCase) {
         self.authenticationUseCase = authenticationUseCase
 
+        currentUserGeneration += 1
+        let generation = currentUserGeneration
         currentUserTask = Task { [weak self, authenticationUseCase] in
             let user = await authenticationUseCase.getCurrentUser()
             guard !Task.isCancelled else { return }
-            self?.user = user
+            guard let self, self.currentUserGeneration == generation else { return }
+            self.user = user
         }
 
         logoutObserver = NotificationCenter.default.addObserver(
@@ -33,8 +37,9 @@ public final class SessionService {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
-                self?.user = nil
+            guard let self else { return }
+            MainActor.assumeIsolated {
+                self.handleLogoutNotification()
             }
         }
     }
@@ -56,6 +61,7 @@ public final class SessionService {
 
     public func authenticate(username: String, password: String) async throws -> AuthenticationState {
         currentUserTask?.cancel()
+        currentUserGeneration += 1
         try await authenticationUseCase.authenticate(username: username, password: password)
         user = await authenticationUseCase.getCurrentUser()
         logoutError = nil
@@ -64,6 +70,7 @@ public final class SessionService {
 
     public func unauthenticate() async throws {
         currentUserTask?.cancel()
+        currentUserGeneration += 1
         logoutError = nil
         do {
             try await authenticationUseCase.logout()
@@ -73,6 +80,12 @@ public final class SessionService {
             user = await authenticationUseCase.getCurrentUser()
             throw error
         }
+    }
+
+    private func handleLogoutNotification() {
+        currentUserTask?.cancel()
+        currentUserGeneration += 1
+        user = nil
     }
 
     public enum AuthenticationState {

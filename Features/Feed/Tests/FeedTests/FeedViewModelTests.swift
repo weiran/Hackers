@@ -715,3 +715,24 @@ private enum SampleData {
         )
     }
 }
+
+extension FeedViewModelTests {
+    @MainActor
+    @Test("Generic bookmark refresh annotates both current feed and search results")
+    func genericBookmarkRefreshAnnotatesFeedAndSearch() async throws {
+        let useCase = StubBookmarksUseCase()
+        let posts = StubPostUseCase()
+        posts.enqueue(.success([SampleData.post(id: 1)]))
+        let viewModel = FeedViewModel(postUseCase: posts, voteUseCase: StubVoteUseCase(), bookmarksController: BookmarksController(bookmarksUseCase: useCase))
+        await viewModel.loadFeed()
+        viewModel.searchResults = [SampleData.post(id: 1)]
+        _ = try await useCase.toggleBookmark(post: SampleData.post(id: 1))
+        await viewModel.refreshBookmarkAnnotations()
+        #expect(viewModel.posts.first?.isBookmarked == true)
+        #expect(viewModel.searchResults.first?.isBookmarked == true)
+        _ = try await useCase.toggleBookmark(post: SampleData.post(id: 1))
+        await viewModel.refreshBookmarkAnnotations()
+        #expect(viewModel.posts.first?.isBookmarked == false)
+        #expect(viewModel.searchResults.first?.isBookmarked == false)
+    }
+}

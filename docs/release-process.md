@@ -135,6 +135,19 @@ gh workflow run release-testflight.yml \
   -f external_groups="External Testers"
 ```
 
+Existing-build distribution, local IPA upload, and App Store submission validate the
+Release version and build number of both app targets in the requested Git tag.
+They select that tag's version/build even when the workflow checkout has advanced
+to a newer version. Keep running the maintained workflow/Fastlane code; do not
+check out old release automation merely to select an older build. New archives
+still require the checked-out app's marketing version to match the release tag.
+
+Offline release selection checks:
+
+```bash
+ruby scripts/tests/release-tag-tests.rb
+```
+
 When the TestFlight "What to Test" text must be limited to a specific customer-facing fix, pass `what_to_test` to override generated GitHub notes:
 
 ```bash

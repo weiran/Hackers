@@ -6,6 +6,7 @@ require "cgi"
 require "digest"
 require "json"
 require "pathname"
+require "open3"
 
 REPO_ROOT = File.expand_path("..", __dir__)
 PROJECT = File.join(REPO_ROOT, "Hackers.xcodeproj")
@@ -279,10 +280,41 @@ def set_app_store_signing
   project.save
 end
 
-def validate_release_tag!(tag)
+def release_tag_project(tag)
+  source, status = Open3.capture2(
+    "git", "show", "refs/tags/#{tag}:Hackers.xcodeproj/project.pbxproj",
+    chdir: REPO_ROOT, err: File::NULL
+  )
+  UI.user_error!("Cannot read project metadata from release tag #{tag}") unless status.success?
+  source
+end
+
+def validate_release_tag!(tag, source: :checkout)
   UI.user_error!("Release tag is required") if tag.to_s.empty?
 
-  tag_version = release_tag_parts(tag)[:version]
+  parts = release_tag_parts(tag)
+  if source == :tag
+    require_release_tag_build_number!(tag)
+    require "nanaimo"
+    objects = Nanaimo::Reader.new(release_tag_project(tag)).parse!.as_ruby.fetch("objects")
+    %w[Hackers HackersActionExtension].each do |name|
+      target = objects.values.find { |item| item["isa"] == "PBXNativeTarget" && item["name"] == name }
+      UI.user_error!("Target #{name} is missing from tag #{tag}") unless target
+      configurations = objects.fetch(target.fetch("buildConfigurationList")).fetch("buildConfigurations")
+        .select { |id| objects.fetch(id)["name"] == "Release" }
+      UI.user_error!("Target #{name} has no Release configuration in tag #{tag}") if configurations.empty?
+      configurations.each do |id|
+        settings = objects.fetch(id).fetch("buildSettings")
+        unless settings["MARKETING_VERSION"].to_s == parts[:version] &&
+               settings["CURRENT_PROJECT_VERSION"].to_s == parts[:build_number].to_s
+          UI.user_error!("Tag #{tag} does not match #{name} version/build metadata")
+        end
+      end
+    end
+    return
+  end
+
+  tag_version = parts[:version]
   current_version = marketing_version
   return if tag_version == current_version
 
@@ -474,7 +506,7 @@ platform :ios do
       configuration: "Release",
       clean: true,
       # Xcode 27's optimizer hits a Swift ownership verifier crash in the
-      # unchanged SwiftSoup 2.13.6 dependency at -O; -Osize produces the
+      # unchanged SwiftSoup 2.13.9 dependency at -O; -Osize produces the
       # same optimized archive without triggering that compiler failure.
       xcargs: "SWIFT_OPTIMIZATION_LEVEL=-Osize",
       export_method: "app-store",
@@ -540,7 +572,7 @@ platform :ios do
   desc "Distribute an existing TestFlight build to external testers"
   lane :distribute_existing_testflight do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
-    validate_release_tag!(tag)
+    validate_release_tag!(tag, source: :tag)
     require_release_tag_build_number!(tag)
     parts = release_tag_parts(tag)
 
@@ -572,7 +604,7 @@ platform :ios do
   desc "Upload a locally built IPA to TestFlight"
   lane :upload_existing_testflight do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
-    validate_release_tag!(tag)
+    validate_release_tag!(tag, source: :tag)
     require_release_tag_build_number!(tag)
     parts = release_tag_parts(tag)
     ipa_path = options[:ipa_path] || ENV["LOCAL_IPA_PATH"]
@@ -603,7 +635,7 @@ platform :ios do
   desc "Submit a processed App Store Connect build for App Review"
   lane :submit_app_review do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
-    validate_release_tag!(tag)
+    validate_release_tag!(tag, source: :tag)
     require_release_tag_build_number!(tag)
     tag_build_number = release_tag_parts(tag)[:build_number]
 
@@ -611,7 +643,7 @@ platform :ios do
     log_app_store_versions(api_key)
     cancel_pending_app_store_release!(api_key, ENV["CANCEL_PENDING_VERSION"]) if ENV["CANCEL_PENDING_VERSION"].to_s != ""
 
-    version = marketing_version
+    version = release_tag_parts(tag)[:version]
     notes = release_notes
     UI.user_error!("Release notes are required for App Store submission") if notes.empty?
     validate_app_store_release_notes!(notes)

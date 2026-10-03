@@ -89,10 +89,9 @@ extension CommentHTMLParser {
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let trimmedBeforeText = beforeText.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmedBeforeText.isEmpty {
+                let beforeAttributedText = trimDisplayWhitespace(processLinksInText(beforeText))
+                if !beforeAttributedText.characters.isEmpty {
                     if !result.characters.isEmpty { result += createParagraphSpacing() }
-                    let beforeAttributedText = processLinksInText(trimmedBeforeText)
                     result += beforeAttributedText
                 }
             }
@@ -110,10 +109,10 @@ extension CommentHTMLParser {
 
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let trimmed = remainingText.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty {
+            let trimmed = trimDisplayWhitespace(processLinksInText(remainingText))
+            if !trimmed.characters.isEmpty {
                 if !result.characters.isEmpty { result += createParagraphSpacing() }
-                result += processLinksInText(trimmed)
+                result += trimmed
             }
         }
 
@@ -164,9 +163,10 @@ extension CommentHTMLParser {
         let textRange = match.range(at: 3)
         guard urlRange.location != NSNotFound, textRange.location != NSNotFound else { return nil }
 
-        let urlString = nsString.substring(with: urlRange)
+        // Extract the raw attribute first, then decode entities in its value.
+        let urlString = decodeHTMLEntities(nsString.substring(with: urlRange))
         let linkText = nsString.substring(with: textRange)
-        let cleanLinkText = stripHTMLTagsAndNormalizeWhitespace(linkText)
+        let cleanLinkText = cleanDisplayText(linkText, preservingWhitespace: false)
         guard !cleanLinkText.isEmpty else { return nil }
 
         var linkAttributedString = AttributedString(cleanLinkText)
@@ -195,7 +195,8 @@ extension CommentHTMLParser {
         let textRange = match.range(at: 3)
         guard urlRange.location != NSNotFound, textRange.location != NSNotFound else { return nil }
 
-        let urlString = nsString.substring(with: urlRange)
+        // Extract the raw attribute first, then decode entities in its value.
+        let urlString = decodeHTMLEntities(nsString.substring(with: urlRange))
         let linkText = nsString.substring(with: textRange)
         guard !linkText.isEmpty else { return nil }
 

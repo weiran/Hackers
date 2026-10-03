@@ -106,43 +106,49 @@ public final class NetworkManager: NSObject, URLSessionDelegate, URLSessionTaskD
         // storage, so deleting every cookie would also wipe cookies belonging to other
         // domains (e.g. the in-app browser's web content). Scope deletion to HN.
         let hackerNewsHost = "news.ycombinator.com"
-        for cookie in HTTPCookieStorage.shared.cookies ?? [] where cookie.domain.contains(hackerNewsHost) {
+        for cookie in HTTPCookieStorage.shared.cookies ?? [] where
+            Self.hostMatchesCookieDomain(cookie.domain, cookieDomain: hackerNewsHost) {
             HTTPCookieStorage.shared.deleteCookie(cookie)
         }
     }
 
     public func containsCookie(for url: URL) -> Bool {
-        if let scopedCookies = HTTPCookieStorage.shared.cookies(for: url), !scopedCookies.isEmpty {
+        guard let host = url.host else { return false }
+
+        if let scopedCookies = HTTPCookieStorage.shared.cookies(for: url),
+           scopedCookies.contains(where: { Self.hostMatchesCookieDomain(host, cookieDomain: $0.domain) }) {
             return true
         }
 
-        guard let host = url.host else { return false }
-
         let allCookies = HTTPCookieStorage.shared.cookies ?? []
-        return allCookies.contains { cookie in
-            let domain = cookie.domain.trimmingCharacters(in: CharacterSet(charactersIn: "."))
-            return host == cookie.domain
-                || host == domain
-                || host.hasSuffix(domain)
-        }
+        return allCookies.contains { Self.hostMatchesCookieDomain(host, cookieDomain: $0.domain) }
     }
 
     public func containsCookie(named name: String, for url: URL) -> Bool {
+        guard let host = url.host else { return false }
+
         if let scopedCookies = HTTPCookieStorage.shared.cookies(for: url),
-           scopedCookies.contains(where: { $0.name == name }) {
+           scopedCookies.contains(where: {
+               $0.name == name && Self.hostMatchesCookieDomain(host, cookieDomain: $0.domain)
+           }) {
             return true
         }
 
-        guard let host = url.host else { return false }
-
         let allCookies = HTTPCookieStorage.shared.cookies ?? []
-        return allCookies.contains { cookie in
-            guard cookie.name == name else { return false }
-            let domain = cookie.domain.trimmingCharacters(in: CharacterSet(charactersIn: "."))
-            return host == cookie.domain
-                || host == domain
-                || host.hasSuffix(domain)
+        return allCookies.contains {
+            $0.name == name && Self.hostMatchesCookieDomain(host, cookieDomain: $0.domain)
         }
+    }
+
+    /// Compares a cookie domain to a URL host using the RFC domain boundary.
+    /// A leading dot is optional in cookie domains; suffixes only match when
+    /// separated by a dot, preventing lookalikes such as evilnews.ycombinator.com.
+    private static func hostMatchesCookieDomain(_ host: String, cookieDomain: String) -> Bool {
+        let normalizedDomain = cookieDomain.hasPrefix(".")
+            ? String(cookieDomain.dropFirst()).lowercased()
+            : cookieDomain.lowercased()
+        let normalizedHost = host.lowercased()
+        return normalizedHost == normalizedDomain || normalizedHost.hasSuffix("." + normalizedDomain)
     }
 
     // Follow redirects by default; no custom handling needed

@@ -25,6 +25,8 @@ public actor BookmarksRepository: BookmarksUseCase {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
     private let now: () -> Date
+    private var cachedEntries: [BookmarkEntry] = []
+    private var cacheIsCorrupt = false
 
     public init(
         store: UbiquitousKeyValueStoreProtocol = NSUbiquitousKeyValueStore.default,
@@ -43,44 +45,59 @@ public actor BookmarksRepository: BookmarksUseCase {
     }
 
     public func bookmarkedIDs() async -> Set<Int> {
-        let entries = loadEntries()
-        return Set(entries.map(\.id))
+        refreshCacheFromStore()
+        return Set(cachedEntries.map(\.id))
     }
 
     public func bookmarkedPosts() async -> [Post] {
-        loadEntries().map { $0.makePost() }
+        refreshCacheFromStore()
+        return cachedEntries.map { $0.makePost() }
     }
 
     @discardableResult
     public func toggleBookmark(post: Post) async throws -> Bool {
-        var entries = loadEntries()
+        // Mutations must observe the latest external snapshot so a delayed iCloud
+        // update cannot be overwritten by a stale local cache.
+        refreshCacheFromStore()
+        // A malformed payload is not an empty bookmark list. Refuse the mutation
+        // so the original bytes and the last-known-good snapshot remain intact.
+        guard !cacheIsCorrupt else { throw HackersKitError.scraperError }
 
-        if let index = entries.firstIndex(where: { $0.id == post.id }) {
-            entries.remove(at: index)
-            try persist(entries)
+        var updatedEntries = cachedEntries
+        if let index = updatedEntries.firstIndex(where: { $0.id == post.id }) {
+            updatedEntries.remove(at: index)
+            try persist(updatedEntries)
+            cachedEntries = updatedEntries
             return false
         } else {
             let entry = BookmarkEntry(post: post, bookmarkedAt: now())
-            entries.append(entry)
-            entries.sort { $0.bookmarkedAt > $1.bookmarkedAt }
-            try persist(entries)
+            updatedEntries.append(entry)
+            updatedEntries.sort { $0.bookmarkedAt > $1.bookmarkedAt }
+            try persist(updatedEntries)
+            cachedEntries = updatedEntries
             return true
         }
     }
 }
 
 private extension BookmarksRepository {
-    func loadEntries() -> [BookmarkEntry] {
+    func refreshCacheFromStore() {
         _ = store.synchronize()
         guard let data = store.data(forKey: Constants.bookmarksKey) else {
-            return []
+            cachedEntries = []
+            cacheIsCorrupt = false
+            return
         }
 
         guard let entries = try? decoder.decode([BookmarkEntry].self, from: data) else {
-            return []
+            // Preserve the existing in-memory snapshot and refuse writes until a
+            // subsequent external refresh supplies a valid payload.
+            cacheIsCorrupt = true
+            return
         }
 
-        return entries.sorted { $0.bookmarkedAt > $1.bookmarkedAt }
+        cachedEntries = entries.sorted { $0.bookmarkedAt > $1.bookmarkedAt }
+        cacheIsCorrupt = false
     }
 
     func persist(_ entries: [BookmarkEntry]) throws {

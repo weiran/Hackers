@@ -66,6 +66,12 @@ Use the project test runner:
 ./run_tests.sh
 ```
 
+The runner requires a successful `xcodebuild` exit and a positive executed-test summary. Its offline regression harness covers failure markers, misleading success summaries, crashes, and interruption:
+
+```bash
+bash scripts/tests/run-tests-harness-tests.sh
+```
+
 Verbose:
 
 ```bash

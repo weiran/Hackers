@@ -115,13 +115,17 @@ public final class CommentsViewModel: @unchecked Sendable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let self else { return }
-                guard let postId = notification.userInfo?["postId"] as? Int,
-                      postId == self.postID,
-                      let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
-                else { return }
-                if var currentPost = self.post {
-                    currentPost.isBookmarked = isBookmarked
-                    self.post = currentPost
+                if let postId = notification.userInfo?["postId"] as? Int,
+                   let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool {
+                    guard postId == self.post?.id else { return }
+                    if var currentPost = self.post {
+                        currentPost.isBookmarked = isBookmarked
+                        self.post = currentPost
+                    }
+                } else {
+                    Task { @MainActor [weak self] in
+                        await self?.refreshBookmarkAnnotations()
+                    }
                 }
             }
     }
@@ -295,15 +299,25 @@ extension CommentsViewModel {
     /// Writes an updated comment back into the loaded set by id, used for value-type
     /// optimistic updates (voting) where the caller cannot mutate a shared instance.
     ///
-    /// Unlike collapse/expand, a vote changes a comment's content (e.g. `upvoted`) without
+    /// Merge only vote fields into the current row so late outcomes preserve its content
+    /// and collapse state. Unlike collapse/expand, a vote changes `upvoted` without
     /// changing which comments are visible. The visible-projection signature only tracks
     /// collapse state, so we must force `visibleComments` to be reassigned and
     /// `visibleRevision` bumped or the row won't re-render.
     @MainActor
     public func replace(comment updated: Comment) {
         guard let index = indexByID[updated.id], allComments.indices.contains(index) else { return }
-        allComments[index] = updated
+        allComments[index] = allComments[index]
+            .with(upvoted: updated.upvoted)
+            .with(voteLinks: updated.voteLinks)
         rebuildVisibleComments(forceRevisionBump: true)
+    }
+
+    func refreshBookmarkAnnotations() async {
+        await bookmarksController.refreshBookmarks()
+        if let currentPost = post {
+            post = bookmarksController.annotatedPosts(from: [currentPost]).first
+        }
     }
 
     @MainActor

@@ -310,3 +310,124 @@ struct NetworkManagerTests {
         #expect(!manager.containsCookie(named: "user", for: otherURL), "Named lookup must stay scoped to the HN host")
     }
 }
+
+extension NetworkManagerTests {
+
+    @Test("Cookie domain matching uses exact and dot-boundary normalized hosts")
+    func cookieDomainMatchingUsesDotBoundary() {
+        let manager = NetworkManager()
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let cookies = [
+            ("exact", "news.ycombinator.com"),
+            ("subdomain", ".news.ycombinator.com"),
+            ("nested", "api.news.ycombinator.com"),
+            ("case", "NEWS.YCOMBINATOR.COM"),
+            ("suffix-prefix-lookalike", "evilnews.ycombinator.com"),
+            ("suffix-lookalike", "news.ycombinator.com.evil.com"),
+        ].compactMap { name, domain in
+            HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: name,
+                .value: "1",
+            ])
+        }
+        for cookie in cookies {
+            HTTPCookieStorage.shared.setCookie(cookie)
+        }
+
+        let exactURL = URL(string: "https://NEWS.YCOMBINATOR.COM")!
+        let childURL = URL(string: "https://api.news.ycombinator.com")!
+
+        #expect(manager.containsCookie(for: exactURL), "Exact and leading-dot domains should match case-insensitively")
+        #expect(manager.containsCookie(for: childURL), "Subdomains should match on a dot boundary")
+        #expect(manager.containsCookie(named: "case", for: exactURL), "Named lookup should use normalized host matching")
+
+        // Verify a leading-dot domain independently, without an exact-domain
+        // cookie that could mask a lookup failure.
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        if let leadingDotCookie = HTTPCookie(properties: [
+            .domain: ".news.ycombinator.com",
+            .path: "/",
+            .name: "leading-dot",
+            .value: "1",
+        ]) {
+            HTTPCookieStorage.shared.setCookie(leadingDotCookie)
+        }
+        #expect(manager.containsCookie(named: "leading-dot", for: exactURL),
+                "Leading-dot cookie domains should match independently")
+
+        // Lookalike domains must not be treated as cookies for the Hacker News host.
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        for (name, domain) in [
+            ("suffix-prefix-lookalike", "evilnews.ycombinator.com"),
+            ("suffix-lookalike", "news.ycombinator.com.evil.com"),
+        ] {
+            if let cookie = HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: name,
+                .value: "1",
+            ]) {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        #expect(!manager.containsCookie(for: URL(string: "https://news.ycombinator.com")!),
+                "Suffix lookalike cookie domains must not match the HN host")
+    }
+
+    @Test("Clearing cookies preserves lookalike domains")
+    func clearCookiesPreservesLookalikeDomains() {
+        let manager = NetworkManager()
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let domains = [
+            "news.ycombinator.com",
+            ".news.ycombinator.com",
+            "api.news.ycombinator.com",
+            "NEWS.YCOMBINATOR.COM",
+            "evilnews.ycombinator.com",
+            "news.ycombinator.com.evil.com",
+            "other.example",
+        ]
+        let hackerNewsCookieNames = domains.indices.prefix(4).map { "cookie\($0)" }
+        for (index, domain) in domains.enumerated() {
+            if let cookie = HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: "cookie\(index)",
+                .value: "1",
+            ]) {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+
+        manager.clearCookies()
+
+        let remainingCookies = HTTPCookieStorage.shared.cookies ?? []
+        for name in hackerNewsCookieNames {
+            #expect(!remainingCookies.contains { $0.name == name }, "Hacker News cookie \(name) should be cleared")
+        }
+        #expect(remainingCookies.contains { $0.name == "cookie4" && $0.domain.lowercased() == "evilnews.ycombinator.com" },
+                "Prefix lookalikes must be preserved")
+        #expect(remainingCookies.contains { $0.name == "cookie5" && $0.domain.lowercased() == "news.ycombinator.com.evil.com" },
+                "Suffix lookalikes must be preserved")
+        #expect(remainingCookies.contains { $0.name == "cookie6" && $0.domain == "other.example" },
+                "Unrelated cookies must be preserved")
+    }
+}

@@ -309,12 +309,9 @@ extension PostRepository {
             if delay > 0 {
                 await submissionWaiter(delay)
             }
-            guard let url = URL(string: "\(urlBase)/item?id=\(storyID)") else {
-                throw HackersKitError.requestFailure
-            }
-            let page = try await networkManager.getResponse(url: url)
+            let page = try await fetchPostHtml(id: storyID)
             if let submitted = try matchSubmittedComment(
-                in: page.body,
+                in: page,
                 request: request,
                 baselineChildIDs: baselineChildIDs,
                 startedAt: Date()
@@ -335,24 +332,45 @@ extension PostRepository {
             return nil
         }
         let rows = (try? document.select("tr.athing").array()) ?? []
+        var surroundingStoryID: Int?
+        var hydratedStoryPages: [Int: String] = [:]
         for row in rows.prefix(10) {
             guard let rowID = Int(try row.attr("id")) else {
                 continue
             }
-            // The row's on-link must point at the target story.
-            let onLink = (try? row.select("a[href^=item?id=]").array())?.first
-            guard let href = try onLink?.attr("href"),
-                  href.contains("id=\(request.storyID)") else {
+            let rowDepth = threadsIndent(for: row)
+            let directStoryID = threadsStoryID(for: row)
+            let rowStoryID: Int?
+            if let directStoryID {
+                // A semantic marker on this row starts (or corrects) the current
+                // group context, regardless of whether the row is rooted or nested.
+                surroundingStoryID = directStoryID
+                rowStoryID = directStoryID
+            } else if rowDepth > 0 {
+                // Nested rows may omit `.onstory`; only the immediately established
+                // root context can be inherited during this document traversal.
+                rowStoryID = surroundingStoryID
+            } else {
+                // An unmarked root starts no story group and must not carry context
+                // from an earlier group in the same table.
+                surroundingStoryID = nil
+                rowStoryID = nil
+            }
+            guard rowStoryID == request.storyID else {
                 continue
             }
             // Hydrate the candidate through the item page so the inserted
             // comment carries server-rendered HTML.
-            guard let itemURL = URL(string: "\(urlBase)/item?id=\(request.storyID)") else {
-                continue
+            let itemPage: String
+            if let cachedPage = hydratedStoryPages[request.storyID] {
+                itemPage = cachedPage
+            } else {
+                let fetchedPage = try await fetchPostHtml(id: request.storyID)
+                hydratedStoryPages[request.storyID] = fetchedPage
+                itemPage = fetchedPage
             }
-            let itemPage = try await networkManager.getResponse(url: itemURL)
             if let submitted = try matchSubmittedComment(
-                in: itemPage.body,
+                in: itemPage,
                 request: request,
                 baselineChildIDs: [],
                 startedAt: Date(),
@@ -395,14 +413,14 @@ extension PostRepository {
             candidates = candidates.filter { $0.level == 0 }
         }
 
-        if candidates.count > 1 {
-            let normalizedText = CommentTextNormalizer.normalizeSubmitted(request.text)
-            let exact = candidates.filter {
-                CommentTextNormalizer.normalizeServerHTML($0.text) == normalizedText
-            }
-            guard exact.count == 1 else { return nil }
-            candidates = exact
+        // Content is part of the identity even when author/parent/baseline leave a
+        // single candidate. A sole same-author comment with a different draft must
+        // remain unresolved rather than being guessed as the submission.
+        let normalizedText = CommentTextNormalizer.normalizeSubmitted(request.text)
+        candidates = candidates.filter {
+            CommentTextNormalizer.normalizeServerHTML($0.text) == normalizedText
         }
+        guard candidates.count == 1 else { return nil }
 
         guard let match = candidates.last else { return nil }
         return SubmittedComment(
@@ -414,6 +432,54 @@ extension PostRepository {
             upvoted: match.upvoted,
             voteLinks: match.voteLinks
         )
+    }
+
+    private func threadsStoryID(for row: Element) -> Int? {
+        func storyID(from element: Element) -> Int? {
+            guard let href = try? element.attr("href"),
+                  let components = URLComponents(string: href),
+                  let value = components.queryItems?.first(where: { $0.name == "id" })?.value,
+                  let id = Int(value), id > 0 else {
+                return nil
+            }
+            return id
+        }
+
+        if let links = try? row.select(".onstory a[href^=item?id=]").array(),
+           let link = links.first,
+           let id = storyID(from: link) {
+            return id
+        }
+
+        // Older /threads markup rendered an unclassed `on: <a ...>` link. It is
+        // still safe to accept that form only when the row explicitly labels the
+        // link as "on:" and the link is not nested in the comment-age metadata.
+        if let links = try? row.select("a[href^=item?id=]").array() {
+            for link in links {
+                let inAge = link.parents().array().contains(where: { ancestor in
+                    ancestor.hasClass("age")
+                })
+                let linkText = ((try? link.text()) ?? "")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                let parentText = link.parent()?.ownText()
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                guard !inAge,
+                      linkText.hasPrefix("on:") || parentText == "on:",
+                      let id = storyID(from: link) else { continue }
+                return id
+            }
+        }
+        return nil
+    }
+
+    private func threadsIndent(for row: Element) -> Int {
+        guard let indentValue = try? row.select("td.ind[indent]").first()?.attr("indent"),
+              let indent = Int(indentValue) else {
+            return 0
+        }
+        return max(indent, 0)
     }
 
     private func child(of parentID: Int, comment: Domain.Comment, in all: [Domain.Comment]) -> Bool {

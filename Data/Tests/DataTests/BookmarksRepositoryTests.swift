@@ -116,6 +116,56 @@ struct BookmarksRepositoryTests {
         let reloaded = await repository.bookmarkedPosts()
         #expect(reloaded.first?.voteLinks == nil)
     }
+
+    @Test("Malformed bookmark bytes are not overwritten by a toggle")
+    mutating func malformedBookmarksArePreserved() async throws {
+        let store = MockUbiquitousKeyValueStore()
+        let corrupt = Data([0xca, 0xfe, 0xba, 0xbe])
+        store.set(corrupt, forKey: "Bookmarks.posts")
+        let repository = BookmarksRepository(store: store, now: { Date(timeIntervalSince1970: 1) })
+
+        await #expect(throws: Error.self) {
+            _ = try await repository.toggleBookmark(post: samplePost)
+        }
+
+        #expect(store.data(forKey: "Bookmarks.posts") == corrupt)
+    }
+
+    @Test("Bookmark toggle merges the latest external snapshot")
+    mutating func toggleBookmarkRefreshesExternalState() async throws {
+        let store = MockUbiquitousKeyValueStore()
+        let repository = BookmarksRepository(store: store, now: { Date(timeIntervalSince1970: 1) })
+        let externalRepository = BookmarksRepository(store: store, now: { Date(timeIntervalSince1970: 2) })
+        let externalPost = Post(
+            id: 7,
+            url: URL(string: "https://example.com/7")!,
+            title: "External Post",
+            age: "1 hour ago",
+            commentsCount: 0,
+            by: "tester",
+            score: 2,
+            postType: .news,
+            upvoted: false
+        )
+        let localPost = Post(
+            id: 99,
+            url: URL(string: "https://example.com/99")!,
+            title: "Local Post",
+            age: "now",
+            commentsCount: 0,
+            by: "tester",
+            score: 3,
+            postType: .news,
+            upvoted: false
+        )
+
+        _ = try await repository.toggleBookmark(post: samplePost)
+        _ = try await externalRepository.toggleBookmark(post: externalPost)
+        _ = try await repository.toggleBookmark(post: localPost)
+
+        let ids = await repository.bookmarkedIDs()
+        #expect(ids == [samplePost.id, externalPost.id, localPost.id])
+    }
 }
 
 private final class MockUbiquitousKeyValueStore: UbiquitousKeyValueStoreProtocol, @unchecked Sendable {

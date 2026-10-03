@@ -75,6 +75,10 @@ public final class LoadingStateManager<T: Sendable>: @unchecked Sendable {
             hasAttemptedLoad = true
         } catch {
             guard generation == loadGeneration else { return }
+            if error is CancellationError || (error as? URLError)?.code == .cancelled {
+                isLoading = false
+                return
+            }
             self.error = error
             hasAttemptedLoad = true
         }
