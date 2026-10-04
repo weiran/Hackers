@@ -145,6 +145,22 @@ extension CommentHTMLParserTests {
                 "Escaped literal markup must not receive formatting attributes")
     }
 
+    // Issue #378: escaped tag names must survive both display and copy parsing,
+    // including HN's paragraphs without closing tags and real emphasis nearby.
+    @Test("Preserves the literal HTML tags reported in issue 378", arguments: [
+        "style", "table", "figure", "aside", "video", "audio", "iframes"
+    ])
+    func reportedHTMLTagsRemainLiteral(tag: String) throws {
+        let html = "RSS elements:<p>Use &lt;\(tag)&gt; with <i>care</i>."
+        let result = CommentHTMLParser.parseHTMLText(html)
+        #expect(String(result.characters) == "RSS elements:\n\nUse <\(tag)> with care.")
+        let literalRange = try #require(result.range(of: "<\(tag)>"))
+        #expect(result[literalRange].inlinePresentationIntent == nil)
+        let emphasisRange = try #require(result.range(of: "care"))
+        #expect(result[emphasisRange].inlinePresentationIntent == .emphasized)
+        #expect(CommentHTMLParser.plainText(fromHTML: html).contains("<\(tag)>"))
+    }
+
     @Test("Nested bold and code emits content once")
     func nestedBoldAndCodeEmitsContentOnce() {
         let result = CommentHTMLParser.parseHTMLText("<b><code>x</code></b>")
