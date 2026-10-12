@@ -646,31 +646,31 @@ struct VerticalBrowserToolbar: ToolbarContent {
     @ObservedObject var controller: BrowserController
 
     var body: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
+        ToolbarItem(id: "browser.close", placement: .cancellationAction) {
             Button("Close", systemImage: "xmark", action: onDismiss)
         }
         .axisBehavior(.verticalPreferred)
         if !showsComments {
             if controller.canGoBack {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(id: "browser.back", placement: .topBarTrailing) {
                     Button("Back", systemImage: "chevron.backward", action: controller.goBack)
                 }
                 .axisBehavior(.verticalPreferred)
             }
             if controller.canGoForward {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(id: "browser.forward", placement: .topBarTrailing) {
                     Button("Forward", systemImage: "chevron.forward", action: controller.goForward)
                 }
                 .axisBehavior(.verticalPreferred)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(id: "browser.reload", placement: .topBarTrailing) {
                 Button(controller.isLoading ? "Stop" : "Reload",
                        systemImage: controller.isLoading ? "xmark" : "arrow.clockwise") {
                     if controller.isLoading { controller.stopLoading() } else { controller.reload() }
                 }
             }
             .axisBehavior(.verticalPreferred)
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(id: "browser.share", placement: .topBarTrailing) {
                 Button("Share", systemImage: "square.and.arrow.up") {
                     ContentSharePresenter.shared.shareURL(
                         controller.currentURL ?? fallbackURL, title: controller.currentTitle
@@ -678,16 +678,35 @@ struct VerticalBrowserToolbar: ToolbarContent {
                 }
             }
             .axisBehavior(.verticalPreferred)
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(id: "browser.safari", placement: .topBarTrailing) {
                 Button("Open in Safari", systemImage: "safari") {
                     LinkOpener.openInSystemBrowser(controller.currentURL ?? fallbackURL)
                 }
             }
             .axisBehavior(.verticalPreferred)
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
         }
-        ToolbarItem(placement: .topBarTrailing) {
-            Button(showsComments ? "Show Article" : "Show Comments",
-                   systemImage: showsComments ? "doc.text" : "message", action: onToggleComments)
+        ToolbarItem(id: "browser.commentsToggle", placement: .topBarTrailing) {
+            // Keep one button alive as the browser actions enter/leave the bar,
+            // so the system can move it rather than replacing the whole item.
+            Button(action: onToggleComments) {
+                Label {
+                    Text(showsComments ? "Show Article" : "Show Comments")
+                } icon: {
+                    if showsComments {
+                        ThumbnailView(
+                            url: fallbackURL,
+                            thumbnailSize: CGSize(width: 24, height: 24)
+                        )
+                        .frame(width: 24, height: 24)
+                        .clipShape(.rect(cornerRadius: 6))
+                    } else {
+                        Image(systemName: "message")
+                    }
+                }
+                .labelStyle(.iconOnly)
+            }
+            .accessibilityLabel(showsComments ? "Show Article" : "Show Comments")
         }
         .axisBehavior(.verticalPreferred)
     }
