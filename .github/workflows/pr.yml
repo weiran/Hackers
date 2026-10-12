@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Prepare Xcode and simulator
-        run: scripts/ci/setup-xcode-simulator.sh
+        run: scripts/ci/setup-xcode-simulator.sh --download-ios-platform
 
       - name: Run module tests
         run: |
@@ -103,7 +103,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Prepare Xcode and simulator
-        run: scripts/ci/setup-xcode-simulator.sh
+        run: scripts/ci/setup-xcode-simulator.sh --download-ios-platform
 
       - name: Run UI smoke tests
         run: |
