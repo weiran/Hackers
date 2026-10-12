@@ -33,6 +33,7 @@ struct PostCommentsSheet: View {
     let fallbackURL: URL
     @ObservedObject private var browserController: BrowserController
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.usesVerticalBrowserControls) private var usesVerticalBrowserControls
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var presentation: PostCommentsSheetPresentation
@@ -88,16 +89,15 @@ struct PostCommentsSheet: View {
                 containerSize,
                 keyboardHeight: keyboardHeight
             )
-            let expandedHandleAreaHeight = max(
-                proxy.safeAreaInsets.top - safeInsets.top,
-                Self.navigationBarHeight
-            )
+            let expandedHandleAreaHeight = usesVerticalBrowserControls
+                ? Self.handleAreaHeight
+                : max(proxy.safeAreaInsets.top - safeInsets.top, Self.navigationBarHeight)
             let layout = PostCommentsSheetLayout(
                 safeInsets: safeInsets,
                 containerSize: keyboardAdjustedContainerSize,
                 commentsHorizontalInsets: (
-                    proxy.safeAreaInsets.leading,
-                    proxy.safeAreaInsets.trailing
+                    usesVerticalBrowserControls ? 0 : proxy.safeAreaInsets.leading,
+                    usesVerticalBrowserControls ? 0 : proxy.safeAreaInsets.trailing
                 ),
                 collapsedHeight: collapsedHeight,
                 controlsHeight: controlsHeight,
@@ -133,8 +133,8 @@ struct PostCommentsSheet: View {
                     commentsBottomSafeInset: commentsBottomSafeInset
                 )
                 .frame(width: sheetContainerSize.width, height: sheetContainerSize.height, alignment: .top)
-                .background(sheetBackground)
-                .clipShape(sheetShape)
+                .background(sheetShape(expansionProgress: layout.expansionProgress).fill(AppColors.background))
+                .clipShape(sheetShape(expansionProgress: layout.expansionProgress))
                 .shadow(
                     color: .black.opacity(0.12),
                     radius: 10,
@@ -143,22 +143,24 @@ struct PostCommentsSheet: View {
                 )
                 .offset(y: layout.alignedTop)
 
-                CollapsedBrowserControlsOverlay(
-                    isVisible: presentation.showsCollapsedControls,
-                    fallbackURL: fallbackURL,
-                    onDismiss: onDismiss,
-                    controller: browserController
-                )
-                .frame(width: layout.containerSize.width, alignment: .center)
-                .offset(y: layout.controlsTop)
-                .background(
-                    GeometryReader { controlsProxy in
-                        Color.clear.preference(
-                            key: ControlsHeightPreferenceKey.self,
-                            value: controlsProxy.size.height
-                        )
-                    }
-                )
+                if !usesVerticalBrowserControls {
+                    CollapsedBrowserControlsOverlay(
+                        isVisible: presentation.showsCollapsedControls,
+                        fallbackURL: fallbackURL,
+                        onDismiss: onDismiss,
+                        controller: browserController
+                    )
+                    .frame(width: layout.containerSize.width, alignment: .center)
+                    .offset(y: layout.controlsTop)
+                    .background(
+                        GeometryReader { controlsProxy in
+                            Color.clear.preference(
+                                key: ControlsHeightPreferenceKey.self,
+                                value: controlsProxy.size.height
+                            )
+                        }
+                    )
+                }
             }
             .frame(width: containerSize.width, height: containerSize.height, alignment: .topLeading)
             // Extend the sheet through the top and horizontal container
@@ -166,7 +168,7 @@ struct PostCommentsSheet: View {
             // keeping the outer geometry stable prevents SwiftUI's keyboard
             // safe-area resize from being applied a second time while the
             // keyboard is animating in.
-            .ignoresSafeArea(edges: [.top, .leading, .trailing])
+            .ignoresSafeArea(edges: usesVerticalBrowserControls ? [.top] : [.top, .leading, .trailing])
             .overlay {
                 ExpandedCommentsTopDragHitArea(
                     isEnabled: showsExpandedPresentation && presentation.isExpanded,
@@ -253,6 +255,27 @@ struct PostCommentsSheet: View {
             }
         }
         .tint(AppColors.appTintColor)
+        .toolbar {
+            if #available(iOS 27.1, *), usesVerticalBrowserControls {
+                VerticalBrowserToolbar(
+                    fallbackURL: fallbackURL,
+                    onDismiss: onDismiss,
+                    onToggleComments: {
+                        if isExpanded {
+                            collapseSheet()
+                        } else {
+                            animateSheet { presentation.expand() }
+                        }
+                    },
+                    showsComments: isExpanded,
+                    controller: browserController
+                )
+            }
+        }
+        .navigationBarBackButtonHidden(usesVerticalBrowserControls)
+        .onChange(of: usesVerticalBrowserControls) { _, _ in
+            updateBrowserObscuredBottomInset()
+        }
     }
 
     private var isExpanded: Bool {
@@ -267,20 +290,18 @@ struct PostCommentsSheet: View {
         Self.handleAreaHeight
     }
 
-    private var sheetShape: UnevenRoundedRectangle {
-        UnevenRoundedRectangle(
-            topLeadingRadius: Self.collapsedTopCornerRadius,
+    private func sheetShape(expansionProgress: CGFloat) -> UnevenRoundedRectangle {
+        // Follow the same progress as the sheet's position during both drags
+        // and animated settling. The Duo panel seals the web view at full height.
+        let radius = usesVerticalBrowserControls
+            ? Self.collapsedTopCornerRadius * (1 - min(max(expansionProgress, 0), 1))
+            : Self.collapsedTopCornerRadius
+        return UnevenRoundedRectangle(
+            topLeadingRadius: radius,
             bottomLeadingRadius: 0,
             bottomTrailingRadius: 0,
-            topTrailingRadius: Self.collapsedTopCornerRadius
+            topTrailingRadius: radius
         )
-    }
-
-    private var sheetBackground: some View {
-        // Keep the browser WebView fully occluded while the keyboard changes
-        // the sheet's measured height. The semantic background style can be
-        // translucent during that resize on the custom-browser presentation.
-        sheetShape.fill(AppColors.background)
     }
 
     private func sheetContent(
@@ -417,14 +438,16 @@ struct PostCommentsSheet: View {
         .background(AppColors.background)
     }
 
+    private var expandedChromeHeight: CGFloat {
+        usesVerticalBrowserControls ? Self.handleAreaHeight : Self.navigationBarHeight
+    }
+
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset + Self.navigationBarHeight + Self.expandedContentSpacing
+        handleTopInset + expandedChromeHeight + Self.expandedContentSpacing
     }
 
     private func expandedTopDragHitAreaHeight(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset
-            + Self.navigationBarHeight
-            + Self.expandedContentSpacing
+        handleTopInset + expandedChromeHeight + Self.expandedContentSpacing
     }
 
     private func sheetHandle(
@@ -451,7 +474,7 @@ struct PostCommentsSheet: View {
                 chromeAreaHeight: chromeAreaHeight,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
-                navigationBarHeight: Self.navigationBarHeight
+                navigationBarHeight: expandedChromeHeight
             )
 
             HStack {
@@ -478,7 +501,7 @@ struct PostCommentsSheet: View {
             .padding(.top, handleTopInset)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Self.navigationBarHeight + handleTopInset, alignment: .top)
+        .frame(height: expandedChromeHeight + handleTopInset, alignment: .top)
     }
 
     private func titleChromeProgress(contentFadeProgress: CGFloat) -> CGFloat {
@@ -575,7 +598,9 @@ private extension PostCommentsSheet {
 
     private func updateBrowserObscuredBottomInset() {
         onBrowserObscuredBottomInsetChange(
-            PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
+            usesVerticalBrowserControls
+                ? collapsedHeight
+                : PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
         )
     }
 
@@ -638,6 +663,9 @@ private extension PostCommentsSheet {
     private func resolvedContainerSize(for proxy: GeometryProxy) -> CGSize {
         let size = proxy.size
         let insets = proxy.safeAreaInsets
+        if usesVerticalBrowserControls {
+            return CGSize(width: size.width, height: size.height + insets.top + insets.bottom)
+        }
         let fullSize = CGSize(
             width: size.width + insets.leading + insets.trailing,
             height: size.height + insets.top + insets.bottom

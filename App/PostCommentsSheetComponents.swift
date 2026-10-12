@@ -543,6 +543,7 @@ struct CommentsSheetTopChrome: View {
 }
 
 struct StableCommentsHost: View, @preconcurrency Equatable {
+    @Environment(\.usesVerticalBrowserControls) private var usesVerticalBrowserControls
     let postID: Int
     let topContentInset: CGFloat
     let showsPostHeader: Bool
@@ -582,7 +583,7 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             showsPostHeader: showsPostHeader,
             allowsRefresh: false,
             showsToolbar: showsToolbar,
-            controlsNavigationBarVisibility: true,
+            controlsNavigationBarVisibility: !usesVerticalBrowserControls,
             presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: isPostHeaderMatchedGeometryEnabled
                 ? postHeaderMatchedGeometryNamespace
@@ -600,5 +601,94 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             votingViewModel: votingViewModel
         )
         .scrollDisabled(scrollDisabled)
+    }
+}
+
+// Read the system's bar placement, rather than identifying hardware or guessing
+// from size classes. A nil edge preserves the existing iPhone presentation.
+private struct UsesVerticalBrowserControlsKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var usesVerticalBrowserControls: Bool {
+        get { self[UsesVerticalBrowserControlsKey.self] }
+        set { self[UsesVerticalBrowserControlsKey.self] = newValue }
+    }
+}
+
+struct AdaptiveBrowserControls: ViewModifier {
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 27.1, *) {
+            content.modifier(VerticalBrowserControlsEnvironment())
+        } else {
+            content
+        }
+    }
+}
+
+@available(iOS 27.1, *)
+private struct VerticalBrowserControlsEnvironment: ViewModifier {
+    @Environment(\.toolbarVerticalEdge) private var verticalEdge
+
+    func body(content: Content) -> some View {
+        content.environment(\.usesVerticalBrowserControls, verticalEdge != nil)
+    }
+}
+
+@available(iOS 27.1, *)
+struct VerticalBrowserToolbar: ToolbarContent {
+    let fallbackURL: URL
+    let onDismiss: @MainActor () -> Void
+    let onToggleComments: @MainActor () -> Void
+    let showsComments: Bool
+    @ObservedObject var controller: BrowserController
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Close", systemImage: "xmark", action: onDismiss)
+        }
+        .axisBehavior(.verticalPreferred)
+        if !showsComments {
+            if controller.canGoBack {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Back", systemImage: "chevron.backward", action: controller.goBack)
+                }
+                .axisBehavior(.verticalPreferred)
+            }
+            if controller.canGoForward {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Forward", systemImage: "chevron.forward", action: controller.goForward)
+                }
+                .axisBehavior(.verticalPreferred)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(controller.isLoading ? "Stop" : "Reload",
+                       systemImage: controller.isLoading ? "xmark" : "arrow.clockwise") {
+                    if controller.isLoading { controller.stopLoading() } else { controller.reload() }
+                }
+            }
+            .axisBehavior(.verticalPreferred)
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Share", systemImage: "square.and.arrow.up") {
+                    ContentSharePresenter.shared.shareURL(
+                        controller.currentURL ?? fallbackURL, title: controller.currentTitle
+                    )
+                }
+            }
+            .axisBehavior(.verticalPreferred)
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Open in Safari", systemImage: "safari") {
+                    LinkOpener.openInSystemBrowser(controller.currentURL ?? fallbackURL)
+                }
+            }
+            .axisBehavior(.verticalPreferred)
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(showsComments ? "Show Article" : "Show Comments",
+                   systemImage: showsComments ? "doc.text" : "message", action: onToggleComments)
+        }
+        .axisBehavior(.verticalPreferred)
     }
 }

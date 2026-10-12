@@ -4,6 +4,40 @@ import XCTest
 
 @MainActor
 final class BrowserCommentsUITests: HackersUITestCase {
+    func testBrowserControlsAdaptToVerticalBar() throws {
+        if ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo" {
+            XCUIDevice.shared.orientation = .landscapeRight
+        }
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        assertFixtureArticleLoaded()
+        let close = assertHittable(app.buttons["Close"])
+        let reload = assertHittable(app.buttons["Reload"])
+        let share = assertHittable(app.buttons["Share"])
+        let safari = assertHittable(app.buttons["Open in Safari"])
+        if ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo" {
+            XCTAssertGreaterThan(close.frame.midX, app.frame.width * 0.8)
+            for control in [reload, share, safari] {
+                XCTAssertEqual(control.frame.midX, close.frame.midX, accuracy: 2)
+            }
+        } else {
+            XCTAssertLessThan(close.frame.midX, app.frame.width * 0.2)
+            XCTAssertEqual(close.frame.midY, reload.frame.midY, accuracy: 2)
+        }
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Collapsed browser controls"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        assertHittable(collapsedCommentsHeader).tap()
+        assertHasVisibleIntersection(commentsList, in: app)
+        let expanded = XCTAttachment(screenshot: app.screenshot())
+        expanded.name = "Expanded browser comments"
+        expanded.lifetime = .keepAlways
+        add(expanded)
+    }
+
     func testCustomBrowserExpandedCommentsBlockMediaAutoplay() throws {
         launchMediaAutoplayFixture(presentation: .expandedComments)
 

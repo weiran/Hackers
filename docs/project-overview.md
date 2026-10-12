@@ -85,6 +85,8 @@ WhatsNew is version-gated by `WhatsNewUseCase`. First launch stores the current 
 
 Navigation differs by device class. iPhone uses a `NavigationStack`; iPad and iOS-on-Mac use `NavigationSplitView` with a sidebar feed and detail comments/browser area. `NavigationStore` owns selected posts, pending deep links, modal presentation, and embedded browser state.
 
+The custom story browser reads `toolbarVerticalEdge` on iOS 27.1+ to adopt native vertical toolbar items on iPhone Duo. Individual symbol actions use `axisBehavior(.verticalPreferred)`; the system owns placement and overflow. When the edge is nil (including ordinary iPhones and the Duo inner display in portrait), the original floating browser controls and comments toolbar remain. The vertical presentation keeps comments inside the toolbar-safe viewport and provides a Show Comments/Show Article action in the rail. In this presentation, the panel's top corner radius follows expansion progress to zero at full height, and the top content inset reserves only the drag-handle area plus the physical safe inset, without a horizontal navigation-bar allowance.
+
 ## Action Extension
 
 The action extension is "Open in Hackers." It accepts one shared web URL and only handles Hacker News item URLs from `news.ycombinator.com` with an `id` query item.

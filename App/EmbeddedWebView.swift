@@ -911,6 +911,7 @@ struct PostLinkBrowserView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
+        .modifier(AdaptiveBrowserControls())
         .navigationBarTitleDisplayMode(.inline)
         .background {
             NavigationBackSwipeRestorer()
