@@ -15,23 +15,13 @@ struct WhatsNewDataTests {
 
         let expectedItems: [(title: String, subtitle: String, systemImage: String)] = [
             (
-                "Join the Conversation",
-                "Share your take on any story with the new comment composer, right where you read.",
-                "text.bubble.fill"
-            ),
-            (
-                "Reply to Comments",
-                "Dive into threads and reply to any comment to keep the discussion going.",
-                "arrowshape.turn.up.left.fill"
-            ),
-            (
-                "Swipe to Collapse Threads",
-                "Swipe on a comment to collapse its whole thread — a favorite gesture is back.",
-                "chevron.up.chevron.down"
+                "iPhone Duo Support",
+                "Support for iPhone Duo’s distinctive design.",
+                "rectangle.split.2x1"
             ),
         ]
 
-        #expect(data.title == "What's New in Hackers 5.5")
+        #expect(data.title == "What's New in Hackers 5.6")
         #expect(data.items.count == expectedItems.count)
 
         for expected in expectedItems {

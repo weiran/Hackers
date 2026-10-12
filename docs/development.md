@@ -5,7 +5,7 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 ## Requirements
 
 * macOS with current Xcode support for the repo's configured Xcode version.
-* Xcode version from `.github/xcode-version` (`27.0`; GitHub's `xcode-27` image currently provides Xcode 27 beta 6).
+* Xcode version from `.github/xcode-version` (`27.1`, required for the iPhone Duo toolbar APIs).
 * iOS Simulator runtime for iOS 26 or later.
 * Swift 6.4 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
