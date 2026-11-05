@@ -74,6 +74,7 @@ struct CommentsContentView: View {
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var bottomControlsHeight: CGFloat = 0
     @State private var collapsedThreadScrollTarget: Int?
+    @State private var scrollPosition = ScrollPosition(idType: CommentsScrollTarget.self)
 
     var body: some View {
         Group {
@@ -98,6 +99,9 @@ struct CommentsContentView: View {
                         }
                         .scrollTargetLayout()
                     }
+                    // Track the top comment so SwiftUI keeps it in place when the width
+                    // changes and rows reflow (for example folding an iPhone Duo).
+                    .scrollPosition($scrollPosition, anchor: .top)
                     .onScrollTargetVisibilityChange(
                         idType: CommentsScrollTarget.self,
                         threshold: 0.1

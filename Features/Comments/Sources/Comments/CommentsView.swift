@@ -331,11 +331,6 @@ private extension CommentsView {
         if navigationStore.openURLInPrimaryContext(post.url) {
             return
         }
-        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
-            navigationStore.showPostLink(post)
-            return
-        }
         LinkOpener.openURL(post.url, with: post)
     }
 
@@ -351,7 +346,10 @@ private extension CommentsView {
             return true
         }
 
-        navigationStore.showPost(withId: itemId)
+        // Push the linked item over these comments so Back returns here.
+        if !navigationStore.openURLInPrimaryContext(url) {
+            navigationStore.showPost(withId: itemId)
+        }
         return true
     }
 

@@ -21,15 +21,17 @@ struct MainContentView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
     @Environment(ToastPresenter.self) private var toastPresenter
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let whatsNewCoordinator: WhatsNewCoordinator
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showWhatsNew = false
     @State private var showWhatsNewPanel = false
-    private var navigationPathBinding: Binding<NavigationPath> {
+    private var preferredCompactColumnBinding: Binding<NavigationSplitViewColumn> {
         Binding(
-            get: { navigationStore.path },
-            set: { navigationStore.path = $0 }
+            get: { navigationStore.preferredCompactColumn },
+            set: { navigationStore.preferredCompactColumn = $0 }
         )
     }
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
@@ -53,8 +55,16 @@ struct MainContentView: View {
     private var isPresentingModal: Bool {
         navigationStore.showingLogin || navigationStore.showingSettings || showWhatsNew
     }
-    private var isPadLayout: Bool {
-        DeviceLayout.usesPadLayout
+    private var effectiveHorizontalSizeClass: UserInterfaceSizeClass? {
+        #if DEBUG
+        if let override = UITestSizeClassOverride.shared.horizontalSizeClass {
+            return override
+        }
+        #endif
+        return horizontalSizeClass
+    }
+    private var isRegularWidth: Bool {
+        effectiveHorizontalSizeClass == .regular
     }
     private var whatsNewPanel: WhatsNewPanel? {
         guard showWhatsNewPanel else { return nil }
@@ -76,53 +86,39 @@ struct MainContentView: View {
     }
 
     var body: some View {
-        Group {
-            if isPadLayout {
-                AdaptiveSplitView(
-                    feedViewModel: feedViewModel,
-                    settingsViewModel: settingsViewModel,
-                    whatsNewPanel: whatsNewPanel
-                )
-            } else {
-                NavigationStack(path: navigationPathBinding) {
-                    FeedView<NavigationStore>(
-                        viewModel: feedViewModel,
-                        isSidebar: false,
-                        whatsNewPanel: whatsNewPanel
-                    )
-                    .navigationDestination(for: NavigationDestination.self) { destination in
-                        switch destination {
-                        case let .comments(postID):
-                            let initialPost: Post? = {
-                                guard navigationStore.selectedPost?.id == postID else { return nil }
-                                return navigationStore.selectedPost
-                            }()
-                            CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
-                        case let .postBrowser(post, presentation):
-                            PostLinkBrowserView(post: post, presentation: presentation)
-                        case .settings:
-                            SettingsView(
-                                viewModel: settingsViewModel,
-                                isAuthenticated: sessionService.authenticationState == .authenticated,
-                                currentUsername: sessionService.username,
-                                onLogin: { username, password in
-                                    _ = try await sessionService.authenticate(username: username, password: password)
-                                },
-                                onLogout: {
-                                    try await sessionService.unauthenticate()
-                                },
-                                onWhatsNewDismiss: {
-                                    whatsNewCoordinator.markWhatsNewShown()
-                                }
-                            )
-                        }
+        // One adaptive split view for every size: it shows feed and detail side by side
+        // in regular width (iPad, iPhone Duo inner display) and collapses to a single
+        // stack in compact width, keeping each column's state across folds and resizes.
+        NavigationSplitView(
+            columnVisibility: $columnVisibility,
+            preferredCompactColumn: preferredCompactColumnBinding
+        ) {
+            FeedView<NavigationStore>(
+                viewModel: feedViewModel,
+                isSidebar: isRegularWidth,
+                whatsNewPanel: whatsNewPanel
+            )
+        } detail: {
+            NavigationStack(path: detailPathBinding) {
+                Group {
+                    if let root = navigationStore.detailRoot {
+                        detailView(for: root)
+                    } else {
+                        EmptyDetailView()
                     }
+                }
+                .navigationDestination(for: NavigationDetailDestination.self) { destination in
+                    detailView(for: destination)
                 }
             }
         }
+        .environment(\.horizontalSizeClass, effectiveHorizontalSizeClass)
         .textScaling(for: settingsViewModel.textSize)
         .buttonStyle(AppDefaultButtonStyle())
         .accentColor(.accentColor)
+        .onChange(of: isRegularWidth, initial: true) { _, isRegular in
+            DeviceLayout.hasRegularWidthWindow = isRegular
+        }
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
         .sheet(isPresented: showingLoginBinding) {
             LoginView(
@@ -180,63 +176,31 @@ struct MainContentView: View {
             }
         }
     }
-}
 
-struct AdaptiveSplitView: View {
-    @Environment(NavigationStore.self) private var navigationStore
-    @Environment(SessionService.self) private var sessionService
-    let feedViewModel: FeedViewModel
-    @State var settingsViewModel: SettingsViewModel
-    var whatsNewPanel: WhatsNewPanel?
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    private var detailPathBinding: Binding<[NavigationDetailDestination]> {
-        Binding(
-            get: { navigationStore.detailPath },
-            set: { navigationStore.detailPath = $0 }
-        )
-    }
-
-    var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar - FeedView
-            FeedView<NavigationStore>(
-                viewModel: feedViewModel,
-                isSidebar: true,
-                whatsNewPanel: whatsNewPanel
+    @ViewBuilder
+    private func detailView(for destination: NavigationDetailDestination) -> some View {
+        switch destination {
+        case let .comments(postID):
+            CommentsView<NavigationStore>(
+                postID: postID,
+                initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil
             )
-            .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
-        } detail: {
-            // Detail - CommentsView or empty state
-            NavigationStack(path: detailPathBinding) {
-                if let selectedPost = navigationStore.selectedPost,
-                   let browserPresentation = navigationStore.selectedPostLinkPresentation {
-                    PostLinkBrowserView(post: selectedPost, presentation: browserPresentation)
-                        .id("browser-\(selectedPost.id)")
-                } else if let embeddedURL = navigationStore.embeddedBrowserURL {
-                    EmbeddedWebView(url: embeddedURL,
-                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: false)
-                        .id(embeddedURL.absoluteString)
-                } else if let selectedPost = navigationStore.selectedPost {
-                    CommentsView<NavigationStore>(postID: selectedPost.id, initialPost: selectedPost)
-                        .id(selectedPost.id) // Add id to force re-render when post changes
-                } else if let selectedPostId = navigationStore.selectedPostId {
-                    CommentsView<NavigationStore>(postID: selectedPostId, initialPost: nil)
-                        .id(selectedPostId)
-                } else {
-                    EmptyDetailView()
-                }
-            }
-            .navigationDestination(for: NavigationDetailDestination.self) { destination in
-                switch destination {
-                case let .web(url):
-                    EmbeddedWebView(url: url,
-                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: false)
-                }
-            }
+            .id(postID)
+        case let .postBrowser(post, presentation):
+            PostLinkBrowserView(
+                post: post,
+                presentation: presentation,
+                onClose: { navigationStore.dismissDetail() }
+            )
+            .id("browser-\(post.id)")
+        case let .web(url):
+            EmbeddedWebView(
+                url: url,
+                onDismiss: { navigationStore.dismissDetail() },
+                showsCloseButton: false
+            )
+            .id(url.absoluteString)
         }
-        .textScaling(for: settingsViewModel.textSize)
     }
 }
 

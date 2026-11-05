@@ -11,6 +11,7 @@
 		AA2000010000000000000001 /* HackersUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000001 /* HackersUITestCase.swift */; };
 		AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000002 /* BrowserCommentsUITests.swift */; };
 		AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */; };
+		AA20000100000000000000F1 /* FoldContinuityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000100000000000000F1 /* FoldContinuityUITests.swift */; };
 		AA2000010000000000000004 /* CommentVotingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000004 /* CommentVotingUITests.swift */; };
 		AA2000010000000000000005 /* CommentingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000005 /* CommentingUITests.swift */; };
 		AA2000010000000000000007 /* ComposerScreenshotDiag.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000007 /* ComposerScreenshotDiag.swift */; };
@@ -73,6 +74,7 @@
 		AA1000010000000000000001 /* HackersUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersUITestCase.swift; sourceTree = "<group>"; };
 		AA1000010000000000000002 /* BrowserCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserCommentsUITests.swift; sourceTree = "<group>"; };
 		AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationAndCommentsUITests.swift; sourceTree = "<group>"; };
+		AA10000100000000000000F1 /* FoldContinuityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldContinuityUITests.swift; sourceTree = "<group>"; };
 		AA1000010000000000000004 /* CommentVotingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentVotingUITests.swift; sourceTree = "<group>"; };
 		AA1000010000000000000005 /* CommentingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentingUITests.swift; sourceTree = "<group>"; };
 		AA1000010000000000000007 /* ComposerScreenshotDiag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerScreenshotDiag.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 				AA1000010000000000000001 /* HackersUITestCase.swift */,
 				AA1000010000000000000002 /* BrowserCommentsUITests.swift */,
 				AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */,
+				AA10000100000000000000F1 /* FoldContinuityUITests.swift */,
 				AA1000010000000000000004 /* CommentVotingUITests.swift */,
 				AA1000010000000000000005 /* CommentingUITests.swift */,
 				AA1000010000000000000007 /* ComposerScreenshotDiag.swift */,
@@ -370,6 +373,7 @@
 				AA2000010000000000000001 /* HackersUITestCase.swift in Sources */,
 				AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */,
 				AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */,
+				AA20000100000000000000F1 /* FoldContinuityUITests.swift in Sources */,
 				AA2000010000000000000004 /* CommentVotingUITests.swift in Sources */,
 				AA2000010000000000000005 /* CommentingUITests.swift in Sources */,
 				AA2000010000000000000007 /* ComposerScreenshotDiag.swift in Sources */,
