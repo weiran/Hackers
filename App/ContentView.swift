@@ -25,6 +25,7 @@ struct MainContentView: View {
     private let whatsNewCoordinator: WhatsNewCoordinator
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
+    @State private var commentsViewModels = CommentsViewModelCache()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showWhatsNew = false
     @State private var showWhatsNewPanel = false
@@ -111,6 +112,11 @@ struct MainContentView: View {
                     detailView(for: destination)
                 }
             }
+            // iOS uses different navigation-bar hosts for the Duo's compact outer display
+            // and regular inner display. Recreate only that host at the trait boundary so
+            // toolbar representations don't leave blank platform slots. Detail models and
+            // scroll anchors live above it and survive the replacement.
+            .id(effectiveHorizontalSizeClass)
         }
         .environment(\.horizontalSizeClass, effectiveHorizontalSizeClass)
         .textScaling(for: settingsViewModel.textSize)
@@ -183,7 +189,11 @@ struct MainContentView: View {
         case let .comments(postID):
             CommentsView<NavigationStore>(
                 postID: postID,
-                initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil
+                initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil,
+                viewModel: commentsViewModels.viewModel(
+                    postID: postID,
+                    initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil
+                )
             )
             .id(postID)
         case let .postBrowser(post, presentation):
@@ -201,6 +211,35 @@ struct MainContentView: View {
             )
             .id(url.absoluteString)
         }
+    }
+}
+
+/// Keeps loaded comments and collapse state stable while SwiftUI reevaluates the detail
+/// column through an iPhone Duo fold. Without this cache, `CommentsView.init` constructed
+/// throwaway models for every intermediate width even though `@State` retained only one.
+@MainActor
+private final class CommentsViewModelCache {
+    private static let capacity = 8
+    private var models: [Int: CommentsViewModel] = [:]
+    private var recentPostIDs: [Int] = []
+
+    func viewModel(postID: Int, initialPost: Post?) -> CommentsViewModel {
+        if let model = models[postID] {
+            markRecent(postID)
+            return model
+        }
+        let model = CommentsViewModel(postID: postID, initialPost: initialPost)
+        models[postID] = model
+        markRecent(postID)
+        if recentPostIDs.count > Self.capacity {
+            models[recentPostIDs.removeFirst()] = nil
+        }
+        return model
+    }
+
+    private func markRecent(_ postID: Int) {
+        recentPostIDs.removeAll(where: { $0 == postID })
+        recentPostIDs.append(postID)
     }
 }
 

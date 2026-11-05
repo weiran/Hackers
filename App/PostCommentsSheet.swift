@@ -31,6 +31,7 @@ struct PostCommentsSheet: View {
     let onBrowserObscuredBottomInsetChange: @MainActor (CGFloat) -> Void
     let onMediaPlaybackSuspensionChange: @MainActor (Bool) -> Void
     let fallbackURL: URL
+    @Binding private var requestedExpanded: Bool
     @ObservedObject private var browserController: BrowserController
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.usesVerticalBrowserControls) private var usesVerticalBrowserControls
@@ -52,6 +53,7 @@ struct PostCommentsSheet: View {
     init(
         post: Post,
         controller: BrowserController,
+        isExpanded: Binding<Bool>,
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
         onDismiss: @MainActor @escaping () -> Void,
         onCollapsedHeightChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
@@ -73,6 +75,7 @@ struct PostCommentsSheet: View {
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
         _browserController = ObservedObject(wrappedValue: controller)
+        _requestedExpanded = isExpanded
         _presentation = State(initialValue: PostCommentsSheetPresentation(sheetState: initialSheetState))
         self.onDismiss = onDismiss
         self.onCollapsedHeightChange = onCollapsedHeightChange
@@ -143,7 +146,7 @@ struct PostCommentsSheet: View {
                 )
                 .offset(y: layout.alignedTop)
 
-                if !usesVerticalBrowserControls {
+                if #unavailable(iOS 27.1) {
                     CollapsedBrowserControlsOverlay(
                         isVisible: presentation.showsCollapsedControls,
                         fallbackURL: fallbackURL,
@@ -255,26 +258,21 @@ struct PostCommentsSheet: View {
             }
         }
         .tint(AppColors.appTintColor)
-        .toolbar {
-            if #available(iOS 27.1, *), usesVerticalBrowserControls {
-                VerticalBrowserToolbar(
-                    fallbackURL: fallbackURL,
-                    onDismiss: onDismiss,
-                    onToggleComments: {
-                        if isExpanded {
-                            collapseSheet()
-                        } else {
-                            animateSheet { presentation.expand() }
-                        }
-                    },
-                    showsComments: isExpanded,
-                    controller: browserController
-                )
-            }
-        }
-        .navigationBarBackButtonHidden(usesVerticalBrowserControls)
         .onChange(of: usesVerticalBrowserControls) { _, _ in
             updateBrowserObscuredBottomInset()
+        }
+        .onChange(of: requestedExpanded) { _, shouldExpand in
+            guard shouldExpand != isExpanded else { return }
+            if shouldExpand {
+                animateSheet { presentation.expand() }
+            } else {
+                collapseSheet()
+            }
+        }
+        .onChange(of: isExpanded) { _, expanded in
+            if requestedExpanded != expanded {
+                requestedExpanded = expanded
+            }
         }
     }
 
@@ -367,6 +365,7 @@ struct PostCommentsSheet: View {
         let viewport = layout.commentsViewport
 
         return StableCommentsHost(
+            usesVerticalBrowserControls: usesVerticalBrowserControls,
             postID: viewModel.postID,
             topContentInset: layout.expandedCommentsTopInset,
             showsPostHeader: showsPostHeader,

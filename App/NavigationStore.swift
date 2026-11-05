@@ -32,6 +32,7 @@ class NavigationStore: NavigationStoreProtocol {
     var showingLogin = false
     var showingSettings = false
     var pendingPostId: Int?
+    private var commentScrollAnchors: [Int: Int] = [:]
 
     func showPost(_ post: Domain.Post) {
         selectedPost = post
@@ -67,6 +68,7 @@ class NavigationStore: NavigationStoreProtocol {
         detailRoot = nil
         detailPath.removeAll()
         preferredCompactColumn = .sidebar
+        commentScrollAnchors.removeAll()
     }
 
     func showLogin() {
@@ -105,6 +107,14 @@ class NavigationStore: NavigationStoreProtocol {
             showDetailRoot(destination)
         }
         return true
+    }
+
+    func commentScrollAnchor(for postID: Int) -> Int? {
+        commentScrollAnchors[postID]
+    }
+
+    func setCommentScrollAnchor(_ commentID: Int?, for postID: Int) {
+        commentScrollAnchors[postID] = commentID
     }
 
     /// Closes the top detail screen, returning to the feed when it was the root.

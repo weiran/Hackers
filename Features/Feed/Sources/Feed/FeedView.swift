@@ -14,10 +14,6 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
     @State private var selectedPostId: Int?
     @State private var searchText: String
 
-    /// True when the post-type picker menu is shown as a leading toolbar item (sidebar),
-    /// where the navigation title would otherwise duplicate it.
-    private var showsSidebarMenu: Bool { isSidebar && !viewModel.hasActiveSearch }
-
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
@@ -43,22 +39,14 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // The same system title menu in every layout, so folding doesn't swap
+                // the category control for a different kind of item.
                 if !viewModel.hasActiveSearch {
-                    if isSidebar {
-                        ToolbarItem(placement: .topBarLeading) {
-                            FeedCategoryToolbarMenu(title: selectedPostType.displayName) {
-                                postTypeTitleMenu
-                            }
-                        }
-                    } else {
-                        ToolbarTitleMenu {
-                            postTypeTitleMenu
-                        }
+                    ToolbarTitleMenu {
+                        postTypeTitleMenu
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    settingsButton
-                }
+                settingsToolbarItem
                 ToolbarSpacer(.flexible, placement: .bottomBar)
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
@@ -127,8 +115,23 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
 }
 
 private extension FeedView {
+    @ToolbarContentBuilder
+    var settingsToolbarItem: some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            // Moves into the vertical toolbar rail on iPhone Duo; unchanged elsewhere.
+            ToolbarItem(id: "feed.settings", placement: .navigationBarTrailing) {
+                settingsButton
+            }
+            .axisBehavior(.verticalPreferred)
+        } else {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                settingsButton
+            }
+        }
+    }
+
     var navigationTitle: String {
-        showsSidebarMenu ? "" : (viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName)
+        viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName
     }
 
     var primaryPostTypes: [Domain.PostType] {
@@ -557,26 +560,6 @@ private extension FeedView {
     private func shouldShowVoteActions(for post: Domain.Post) -> Bool {
         (post.voteLinks?.upvote != nil && !post.upvoted)
             || (post.voteLinks?.unvote != nil && post.upvoted)
-    }
-}
-
-private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
-    let title: String
-    @ViewBuilder let menuContent: () -> MenuContent
-
-    var body: some View {
-        Menu {
-            menuContent()
-        } label: {
-            HStack(spacing: 4) {
-                Text(title)
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.secondary)
-            }
-            .font(.headline)
-        }
-        .buttonStyle(.plain)
     }
 }
 

@@ -53,24 +53,50 @@ final class FoldContinuityUITests: HackersUITestCase {
         let reference = try XCTUnwrap(topVisibleElement(prefix: "comments.comment.", in: commentsList))
         attachScreenshot("Comments before unfold")
 
-        setHorizontalSizeClass(regular: true)
-        assertHasVisibleIntersection(element(reference.identifier), in: app)
-        let unfolded = try XCTUnwrap(waitForStableFrame(of: element(reference.identifier), timeout: 3) { _ in true })
-        attachScreenshot("Comments unfolded")
-        XCTAssertLessThanOrEqual(
-            abs(unfolded.minY - reference.minY),
-            maxShift,
-            "Comment \(reference.identifier) moved from \(reference.minY) to \(unfolded.minY) when unfolding"
-        )
+        for cycle in 1...3 {
+            setHorizontalSizeClass(regular: true)
+            let unfolded = try XCTUnwrap(
+                waitForStableFrame(of: element(reference.identifier), timeout: 3) { _ in true }
+            )
+            XCTAssertLessThanOrEqual(
+                abs(unfolded.minY - reference.minY),
+                maxShift,
+                "Comment \(reference.identifier) drifted on unfold cycle \(cycle)"
+            )
 
+            setHorizontalSizeClass(regular: false)
+            assertHasVisibleIntersection(commentsList, in: app)
+            let refolded = try XCTUnwrap(
+                waitForStableFrame(of: element(reference.identifier), timeout: 3) { _ in true }
+            )
+            XCTAssertLessThanOrEqual(
+                abs(refolded.minY - reference.minY),
+                maxShift,
+                "Comment \(reference.identifier) accumulated drift by fold cycle \(cycle)"
+            )
+        }
+        attachScreenshot("Comments after three fold cycles")
+    }
+
+    /// The persistent split detail must update the comments host when the bar changes axis;
+    /// otherwise it can retain a hidden navigation bar and blank toolbar item slots.
+    func testBrowserControlsSurviveSizeClassChanges() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .expandedComments)
+        ))
         setHorizontalSizeClass(regular: false)
-        assertHasVisibleIntersection(commentsList, in: app)
-        let refolded = try XCTUnwrap(waitForStableFrame(of: element(reference.identifier), timeout: 3) { _ in true })
-        attachScreenshot("Comments folded again")
-        XCTAssertLessThanOrEqual(
-            abs(refolded.minY - reference.minY),
-            maxShift,
-            "Comment \(reference.identifier) moved from \(reference.minY) to \(refolded.minY) when folding"
+        assertHasVisibleIntersection(commentsList, in: app, timeout: 8)
+        assertHittable(app.buttons["Show Article"])
+
+        for _ in 0..<3 {
+            setHorizontalSizeClass(regular: true)
+            setHorizontalSizeClass(regular: false)
+        }
+        attachScreenshot("Browser controls after three fold cycles")
+        assertHittable(app.buttons["Show Article"])
+        assertHittable(
+            app.buttons.matching(NSPredicate(format: "identifier == 'BackButton' OR label == 'Back'")).firstMatch
         )
     }
 
