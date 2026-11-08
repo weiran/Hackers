@@ -91,7 +91,7 @@ extension PostRepository {
         let ageElement = try metadataElement.select("span.age")
         let age = try ageElement.first()?.attr("title") ?? ""
 
-        let byElement = try metadataElement.select("a.hnuser")
+        let byElement = try metadataElement.select("a.hnuser, a[href^=\"user?id=\"]")
         let by = try byElement.first()?.text() ?? ""
 
         let linkElements = try metadataElement.select("a")
@@ -156,7 +156,7 @@ extension PostRepository {
         }
 
         let age = try element.select(".age").text()
-        let user = try element.select(".hnuser").text()
+        let user = try element.select(".comhead a.hnuser, .comhead a[href^=\"user?id=\"]").first()?.text() ?? ""
         let idValue = try element.attr("id")
         guard let id = Int(idValue), !idValue.isEmpty else {
             throw HackersKitError.scraperError
