@@ -61,7 +61,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var titleVisibility: CommentsHeaderTitleVisibility
     @State private var pendingCommentID: Int?
     @State private var replyScrollTarget: Int?
-    @State private var composer = CommentComposerModel()
+    @State private var composer: CommentComposerModel
     @State private var isToolbarRefreshing = false
 }
 
@@ -107,11 +107,9 @@ public extension CommentsView {
         _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
         let initialTargetID = targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil)
         _pendingCommentID = State(initialValue: initialTargetID)
-        if let viewModel {
-            _viewModel = State(initialValue: viewModel)
-        } else {
-            _viewModel = State(initialValue: CommentsViewModel(postID: postID, initialPost: initialPost))
-        }
+        let resolvedViewModel = viewModel ?? CommentsViewModel(postID: postID, initialPost: initialPost)
+        _viewModel = State(initialValue: resolvedViewModel)
+        _composer = State(initialValue: resolvedViewModel.composer)
         if let votingViewModel {
             _votingViewModel = State(initialValue: votingViewModel)
         } else {

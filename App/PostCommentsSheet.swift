@@ -53,6 +53,7 @@ struct PostCommentsSheet: View {
     init(
         post: Post,
         controller: BrowserController,
+        viewModel: CommentsViewModel? = nil,
         isExpanded: Binding<Bool>,
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
         onDismiss: @MainActor @escaping () -> Void,
@@ -67,7 +68,7 @@ struct PostCommentsSheet: View {
             .expanded
         }
 
-        _viewModel = State(initialValue: CommentsViewModel(post: post))
+        _viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
         let container = DependencyContainer.shared
         _votingViewModel = State(initialValue: VotingViewModel(
             votingStateProvider: container.getVotingStateProvider(),

@@ -5,6 +5,7 @@
 //  Created by Codex on 2025-09-18.
 //
 
+import Comments
 import DesignSystem
 import CoreImage.CIFilterBuiltins
 import Domain
@@ -556,7 +557,9 @@ private struct BrowserWebView: UIViewRepresentable {
         context.coordinator.requestedURL = url
         controller.setReloadOverride(nil)
         controller.applyBottomChromeInset(obscuredBottomInset)
-        context.coordinator.scheduleLoad(controller: controller, url: url)
+        if controller.currentURL == nil {
+            context.coordinator.scheduleLoad(controller: controller, url: url)
+        }
         return controller.webView
     }
 
@@ -607,9 +610,14 @@ private struct UITestArticleView: UIViewRepresentable {
         webView.scrollView.backgroundColor = .clear
         webView.accessibilityIdentifier = AccessibilityIdentifier.Browser.fixtureArticle
         let coordinator = context.coordinator
-        coordinator.scheduleLoad { [self, weak coordinator] in
-            guard let coordinator else { return }
-            loadArticle(in: webView, coordinator: coordinator)
+        if controller.currentURL == nil {
+            coordinator.scheduleLoad { [self, weak coordinator] in
+                guard let coordinator else { return }
+                loadArticle(in: webView, coordinator: coordinator)
+            }
+        } else {
+            coordinator.loadedArticle = article
+            coordinator.loadedURL = url
         }
         return webView
     }
@@ -880,16 +888,24 @@ struct PostLinkBrowserView: View {
     @State private var browserObscuredBottomInset = PostCommentsSheet.collapsedBrowserBottomInset
     @State private var commentsAreExpanded: Bool
     @StateObject private var browserController: BrowserController
+    private let commentsViewModel: CommentsViewModel
 
-    init(post: Post, presentation: PostLinkPresentation, onClose: (@MainActor () -> Void)? = nil) {
+    init(
+        post: Post,
+        presentation: PostLinkPresentation,
+        controller: BrowserController? = nil,
+        commentsViewModel: CommentsViewModel? = nil,
+        onClose: (@MainActor () -> Void)? = nil
+    ) {
         self.post = post
         self.presentation = presentation
         self.onClose = onClose
         _showingCommentsPane = State(initialValue: presentation == .expandedComments)
         _commentsAreExpanded = State(initialValue: presentation == .expandedComments)
-        _browserController = StateObject(wrappedValue: BrowserController(
+        _browserController = StateObject(wrappedValue: controller ?? BrowserController(
             mediaPlaybackSuspended: presentation == .expandedComments
         ))
+        self.commentsViewModel = commentsViewModel ?? CommentsViewModel(post: post)
     }
 
     var body: some View {
@@ -908,6 +924,7 @@ struct PostLinkBrowserView: View {
                 PostCommentsSheet(
                     post: post,
                     controller: browserController,
+                    viewModel: commentsViewModel,
                     isExpanded: $commentsAreExpanded,
                     initialPresentation: presentation,
                     onDismiss: close,

@@ -100,6 +100,60 @@ final class FoldContinuityUITests: HackersUITestCase {
         )
     }
 
+    func testBrowserFormStateSurvivesSizeClassChanges() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        setHorizontalSizeClass(regular: false)
+        assertFixtureArticleLoaded()
+
+        let note = assertHittable(app.webViews.textFields["Reader note"])
+        note.tap()
+        note.typeText("Keep this browser state")
+        XCTAssertTrue((note.value as? String)?.hasPrefix("Keep this") == true)
+        app.webViews.staticTexts["Swift 6.2 Released"].tap()
+
+        setHorizontalSizeClass(regular: true)
+        setHorizontalSizeClass(regular: false)
+
+        let restored = assertHittable(app.webViews.textFields["Reader note"])
+        XCTAssertTrue((restored.value as? String)?.hasPrefix("Keep this") == true)
+    }
+
+    func testCommentDraftSurvivesSizeClassChanges() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .inAppBrowser,
+            route: .comments(postID: screenshotPostID),
+            authenticated: true,
+            commentingEnabled: true
+        ))
+        setHorizontalSizeClass(regular: false)
+        assertHasVisibleIntersection(commentsList, in: app, timeout: 8)
+
+        let collapsed = app.buttons
+            .matching(identifier: AccessibilityIdentifier.Comments.composerCollapsed).firstMatch
+        assertHittable(collapsed).tap()
+        let editor = app.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Comments.composerEditor).firstMatch
+        assertHittable(editor).typeText("Draft survives a display transfer")
+
+        let comment = app.buttons
+            .matching(NSPredicate(format: "identifier BEGINSWITH %@", "comments.comment."))
+            .allElementsBoundByIndex.first { $0.isHittable && hasVisibleIntersection($0, in: commentsList) }
+        try XCTUnwrap(comment).tap()
+        XCTAssertTrue(assertHittable(collapsed).label.contains("Draft survives"))
+
+        for _ in 0..<2 {
+            setHorizontalSizeClass(regular: true)
+            setHorizontalSizeClass(regular: false)
+        }
+
+        XCTAssertTrue(assertHittable(collapsed).label.contains("Draft survives"))
+        collapsed.tap()
+        XCTAssertTrue((assertHittable(editor).value as? String)?.contains("Draft survives a display transfer") == true)
+    }
+
     // MARK: - Helpers
 
     private func setHorizontalSizeClass(regular: Bool) {

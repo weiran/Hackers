@@ -26,6 +26,7 @@ struct MainContentView: View {
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
     @State private var commentsViewModels = CommentsViewModelCache()
+    @State private var browserControllers = BrowserControllerCache()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showWhatsNew = false
     @State private var showWhatsNewPanel = false
@@ -125,6 +126,11 @@ struct MainContentView: View {
         .onChange(of: isRegularWidth, initial: true) { _, isRegular in
             DeviceLayout.hasRegularWidthWindow = isRegular
         }
+        .onChange(of: navigationStore.detailRoot) { _, root in
+            guard root == nil else { return }
+            commentsViewModels.removeAll()
+            browserControllers.removeAll()
+        }
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
         .sheet(isPresented: showingLoginBinding) {
             LoginView(
@@ -200,6 +206,11 @@ struct MainContentView: View {
             PostLinkBrowserView(
                 post: post,
                 presentation: presentation,
+                controller: browserControllers.controller(
+                    key: "post:\(post.id)",
+                    mediaPlaybackSuspended: presentation == .expandedComments
+                ),
+                commentsViewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post),
                 onClose: { navigationStore.dismissDetail() }
             )
             .id("browser-\(post.id)")
@@ -207,10 +218,42 @@ struct MainContentView: View {
             EmbeddedWebView(
                 url: url,
                 onDismiss: { navigationStore.dismissDetail() },
-                showsCloseButton: false
+                showsCloseButton: false,
+                controller: browserControllers.controller(key: "url:\(url.absoluteString)")
             )
             .id(url.absoluteString)
         }
+    }
+}
+
+@MainActor
+private final class BrowserControllerCache {
+    private static let capacity = 8
+    private var controllers: [String: BrowserController] = [:]
+    private var recentKeys: [String] = []
+
+    func controller(key: String, mediaPlaybackSuspended: Bool = false) -> BrowserController {
+        if let controller = controllers[key] {
+            markRecent(key)
+            return controller
+        }
+        let controller = BrowserController(mediaPlaybackSuspended: mediaPlaybackSuspended)
+        controllers[key] = controller
+        markRecent(key)
+        if recentKeys.count > Self.capacity {
+            controllers[recentKeys.removeFirst()] = nil
+        }
+        return controller
+    }
+
+    private func markRecent(_ key: String) {
+        recentKeys.removeAll(where: { $0 == key })
+        recentKeys.append(key)
+    }
+
+    func removeAll() {
+        controllers.removeAll()
+        recentKeys.removeAll()
     }
 }
 
@@ -240,6 +283,11 @@ private final class CommentsViewModelCache {
     private func markRecent(_ postID: Int) {
         recentPostIDs.removeAll(where: { $0 == postID })
         recentPostIDs.append(postID)
+    }
+
+    func removeAll() {
+        models.removeAll()
+        recentPostIDs.removeAll()
     }
 }
 

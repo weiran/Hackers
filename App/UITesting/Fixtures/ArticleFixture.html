@@ -22,12 +22,21 @@
       line-height: 1.15;
     }
     p { margin: 0 0 18px; }
+    label { display: block; margin: 28px 0 8px; font-weight: 600; }
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      font: -apple-system-body;
+    }
   </style>
 </head>
 <body>
-  <article>
+  <article id="fixture-page">
     <h1>{{TITLE}}</h1>
     <p>{{BODY}}</p>
+    <label for="reader-note">Reader note</label>
+    <input id="reader-note" aria-label="Reader note" placeholder="Type a note">
   </article>
 </body>
 </html>
