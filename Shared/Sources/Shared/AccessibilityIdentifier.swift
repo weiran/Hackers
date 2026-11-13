@@ -27,6 +27,7 @@ public enum AccessibilityIdentifier {
         public static let dimReadPosts = "settings.dimReadPosts"
         public static let swipeCollapseThreads = "settings.swipeCollapseThreads"
         public static let showNextCommentButton = "settings.showNextCommentButton"
+        public static let nextCommentButtonAction = "settings.nextCommentButtonAction"
     }
 
     public enum Login {

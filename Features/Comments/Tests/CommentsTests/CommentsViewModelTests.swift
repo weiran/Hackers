@@ -192,6 +192,27 @@ struct CommentsViewModelTests {
         #expect(viewModel.showNextCommentButton == false)
     }
 
+    @Test("Next comment button action follows settings changes")
+    @MainActor
+    func nextCommentButtonActionSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        settingsUseCase.nextCommentButtonAction = .nextTopLevelComment
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
+        )
+        #expect(viewModel.nextCommentButtonAction == .nextTopLevelComment)
+
+        settingsUseCase.nextCommentButtonAction = .nextComment
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.nextCommentButtonAction == .nextComment)
+    }
+
     @Test("Bookmark notifications update local post state")
     @MainActor
     func bookmarkNotificationsUpdatePostState() async {
@@ -1098,6 +1119,7 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool = true
     private var storedSwipeCollapseThreads: Bool = true
     private var storedShowNextCommentButton: Bool = true
+    private var storedNextCommentButtonAction: NextCommentButtonAction = .nextComment
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails
@@ -1123,6 +1145,14 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedShowNextCommentButton }
         set {
             storedShowNextCommentButton = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var nextCommentButtonAction: NextCommentButtonAction {
+        get { storedNextCommentButtonAction }
+        set {
+            storedNextCommentButtonAction = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

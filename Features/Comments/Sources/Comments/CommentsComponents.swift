@@ -17,11 +17,15 @@ import UIKit
 private final class VisibleCommentTarget {
     var topCommentID: Int?
     var hasNextComment = false
+    var hasNextThread = false
 
-    func update(topCommentID: Int?, hasNextComment: Bool) {
-        guard self.topCommentID != topCommentID || self.hasNextComment != hasNextComment else { return }
+    func update(topCommentID: Int?, hasNextComment: Bool, hasNextThread: Bool) {
+        guard self.topCommentID != topCommentID
+            || self.hasNextComment != hasNextComment
+            || self.hasNextThread != hasNextThread else { return }
         self.topCommentID = topCommentID
         self.hasNextComment = hasNextComment
+        self.hasNextThread = hasNextThread
     }
 }
 
@@ -152,6 +156,8 @@ struct CommentsContentView: View {
                         composer: composer,
                         showsNextCommentButton: viewModel.showNextCommentButton,
                         hasNextComment: visibleCommentTarget.hasNextComment,
+                        hasNextThread: visibleCommentTarget.hasNextThread,
+                        action: viewModel.nextCommentButtonAction,
                         onNextComment: { scrollToNextComment(using: proxy) },
                         onNextThread: { scrollToNextThread(using: proxy) },
                         onSubmit: onSubmitComposerDraft
@@ -231,7 +237,8 @@ private extension CommentsContentView {
         }
         visibleCommentTarget.update(
             topCommentID: topID,
-            hasNextComment: viewModel.hasNextVisibleComment(after: topID)
+            hasNextComment: viewModel.hasNextVisibleComment(after: topID),
+            hasNextThread: viewModel.nextVisibleThreadID(after: topID) != nil
         )
     }
 
@@ -570,6 +577,8 @@ private struct CommentsBottomBar: View {
     @Bindable var composer: CommentComposerModel
     let showsNextCommentButton: Bool
     let hasNextComment: Bool
+    let hasNextThread: Bool
+    let action: NextCommentButtonAction
     let onNextComment: () -> Void
     let onNextThread: () -> Void
     let onSubmit: () -> Void
@@ -582,7 +591,8 @@ private struct CommentsBottomBar: View {
                 }
                 if showsNextButton {
                     NextCommentFloatingButton(
-                        isEnabled: hasNextComment,
+                        isEnabled: action == .nextComment ? hasNextComment : hasNextThread,
+                        action: action,
                         onNextComment: onNextComment,
                         onNextThread: onNextThread
                     )
@@ -616,6 +626,7 @@ private struct CommentsBottomBar: View {
 
 private struct NextCommentFloatingButton: View {
     let isEnabled: Bool
+    let action: NextCommentButtonAction
     let onNextComment: () -> Void
     let onNextThread: () -> Void
     @State private var performedLongPress = false
@@ -626,9 +637,9 @@ private struct NextCommentFloatingButton: View {
                 performedLongPress = false
                 return
             }
-            onNextComment()
+            performPrimaryAction()
         } label: {
-            Image(systemName: "arrow.down")
+            Image(systemName: iconName)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(isEnabled ? Color.primary : Color.secondary)
                 .frame(width: 48, height: 48)
@@ -644,16 +655,36 @@ private struct NextCommentFloatingButton: View {
                     guard isEnabled else { return }
                     performedLongPress = true
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onNextThread()
+                    performAlternateAction()
                 }
         )
-        .accessibilityLabel("Next comment")
-        .accessibilityHint("Long press for next thread")
-        .accessibilityAction(named: Text("Next thread")) {
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint("Long press for \(alternateAccessibilityLabel.lowercased())")
+        .accessibilityAction(named: Text(alternateAccessibilityLabel)) {
             guard isEnabled else { return }
-            onNextThread()
+            performAlternateAction()
         }
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.nextCommentButton)
+    }
+
+    private var iconName: String {
+        action == .nextComment ? "arrow.down" : "arrow.down.to.line"
+    }
+
+    private var accessibilityLabel: String {
+        action == .nextComment ? "Next comment" : "Next top-level comment"
+    }
+
+    private var alternateAccessibilityLabel: String {
+        action == .nextComment ? "Next top-level comment" : "Next comment"
+    }
+
+    private func performPrimaryAction() {
+        if action == .nextComment { onNextComment() } else { onNextThread() }
+    }
+
+    private func performAlternateAction() {
+        if action == .nextComment { onNextThread() } else { onNextComment() }
     }
 }
 

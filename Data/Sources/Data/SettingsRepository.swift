@@ -41,6 +41,7 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         setDefaultIfNeeded(true, forKey: "DimReadPosts")
         setDefaultIfNeeded(true, forKey: "SwipeToCollapseThreads")
         setDefaultIfNeeded(false, forKey: "ShowNextCommentButton")
+        setDefaultIfNeeded(NextCommentButtonAction.nextComment.rawValue, forKey: "NextCommentButtonAction")
     }
 
     private func migrateLinkBrowserModeIfNeeded() {
@@ -159,6 +160,17 @@ public final class SettingsRepository: SettingsUseCase, @unchecked Sendable {
         }
         set {
             userDefaults.set(newValue, forKey: "ShowNextCommentButton")
+        }
+    }
+
+    public var nextCommentButtonAction: NextCommentButtonAction {
+        get {
+            NextCommentButtonAction(
+                rawValue: userDefaults.integer(forKey: "NextCommentButtonAction")
+            ) ?? .nextComment
+        }
+        set {
+            userDefaults.set(newValue.rawValue, forKey: "NextCommentButtonAction")
         }
     }
 

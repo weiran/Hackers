@@ -52,6 +52,13 @@ public final class SettingsViewModel: @unchecked Sendable {
         didSet { propagateChangesIfNeeded(\.showNextCommentButton, showNextCommentButton) }
     }
 
+    public var nextCommentButtonAction: NextCommentButtonAction = .nextComment {
+        didSet {
+            guard hasLoadedSettings else { return }
+            settingsUseCase.nextCommentButtonAction = nextCommentButtonAction
+        }
+    }
+
     public var cacheUsageText: String = "Calculating…"
 
     public init(settingsUseCase: any SettingsUseCase = DependencyContainer.shared.getSettingsUseCase()) {
@@ -70,6 +77,7 @@ public final class SettingsViewModel: @unchecked Sendable {
         dimReadPosts = settingsUseCase.dimReadPosts
         swipeCollapseThreads = settingsUseCase.swipeCollapseThreads
         showNextCommentButton = settingsUseCase.showNextCommentButton
+        nextCommentButtonAction = settingsUseCase.nextCommentButtonAction
 
         hasLoadedSettings = true
     }

@@ -46,8 +46,28 @@ public protocol SettingsUseCase: AnyObject, Sendable {
     var dimReadPosts: Bool { get set }
     var swipeCollapseThreads: Bool { get set }
     var showNextCommentButton: Bool { get set }
+    var nextCommentButtonAction: NextCommentButtonAction { get set }
     func clearCache() async
     func cacheUsageBytes() async -> Int64
+}
+
+public extension SettingsUseCase {
+    var nextCommentButtonAction: NextCommentButtonAction {
+        get { .nextComment }
+        set {}
+    }
+}
+
+public enum NextCommentButtonAction: Int, CaseIterable, Sendable {
+    case nextComment = 0
+    case nextTopLevelComment = 1
+
+    public var displayName: String {
+        switch self {
+        case .nextComment: "Next Comment"
+        case .nextTopLevelComment: "Next Top-Level Comment"
+        }
+    }
 }
 
 public enum LinkBrowserMode: Int, CaseIterable, Sendable {
