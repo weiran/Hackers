@@ -62,7 +62,6 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var pendingCommentID: Int?
     @State private var replyScrollTarget: Int?
     @State private var composer: CommentComposerModel
-    @State private var isToolbarRefreshing = false
 }
 
 public extension CommentsView {
@@ -328,29 +327,13 @@ private extension CommentsView {
     @ToolbarContentBuilder
     var commentsActionsToolbarItems: some ToolbarContent {
         if #available(iOS 27.1, *) {
-            AdaptiveCommentsToolbarActions(
-                post: viewModel.post,
-                isRefreshing: isToolbarRefreshing,
-                onRefresh: allowsRefresh ? { refreshFromToolbar() } : nil
-            )
+            AdaptiveCommentsToolbarActions(post: viewModel.post)
         } else {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if let post = viewModel.post {
                     ShareMenu(post: post, toolbarGeometry: toolbarGeometry)
                 }
             }
-        }
-    }
-
-    private func refreshFromToolbar() {
-        guard !isToolbarRefreshing else { return }
-        isToolbarRefreshing = true
-        Task {
-            await viewModel.refreshComments()
-            if let targetID = pendingCommentID {
-                _ = viewModel.revealComment(withId: targetID)
-            }
-            isToolbarRefreshing = false
         }
     }
 

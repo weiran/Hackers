@@ -289,16 +289,8 @@ struct ShareMenu: View {
 @available(iOS 27.1, *)
 struct AdaptiveCommentsToolbarActions: ToolbarContent {
     let post: Post?
-    let isRefreshing: Bool
-    let onRefresh: (() -> Void)?
 
     var body: some ToolbarContent {
-        if let onRefresh {
-            ToolbarItem(id: "comments.refresh", placement: .topBarTrailing) {
-                Button("Refresh", systemImage: "arrow.clockwise", action: onRefresh)
-                    .disabled(isRefreshing)
-            }
-        }
         if let post {
             ToolbarItem(id: "comments.share", placement: .topBarTrailing) {
                 Button("Share", systemImage: "square.and.arrow.up") {

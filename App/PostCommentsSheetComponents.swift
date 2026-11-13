@@ -616,21 +616,25 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
 
 // Read the system's bar placement, rather than identifying hardware or guessing
 // from size classes. A nil edge preserves the existing iPhone presentation.
-private struct UsesVerticalBrowserControlsKey: EnvironmentKey {
-    static let defaultValue = false
+private struct VerticalBrowserControlsEdgeKey: EnvironmentKey {
+    static let defaultValue: HorizontalEdge? = nil
 }
 
 extension EnvironmentValues {
+    var verticalBrowserControlsEdge: HorizontalEdge? {
+        get { self[VerticalBrowserControlsEdgeKey.self] }
+        set { self[VerticalBrowserControlsEdgeKey.self] = newValue }
+    }
+
     var usesVerticalBrowserControls: Bool {
-        get { self[UsesVerticalBrowserControlsKey.self] }
-        set { self[UsesVerticalBrowserControlsKey.self] = newValue }
+        verticalBrowserControlsEdge != nil
     }
 }
 
 struct AdaptiveBrowserControls: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(iOS 27.1, *) {
+        if #available(iOS 27.1, *), UIDevice.current.userInterfaceIdiom != .pad {
             content.modifier(VerticalBrowserControlsEnvironment())
         } else {
             content
@@ -643,6 +647,6 @@ private struct VerticalBrowserControlsEnvironment: ViewModifier {
     @Environment(\.toolbarVerticalEdge) private var verticalEdge
 
     func body(content: Content) -> some View {
-        content.environment(\.usesVerticalBrowserControls, verticalEdge != nil)
+        content.environment(\.verticalBrowserControlsEdge, verticalEdge)
     }
 }

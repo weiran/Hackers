@@ -100,6 +100,16 @@ struct MainContentView: View {
                 isSidebar: isRegularWidth,
                 whatsNewPanel: whatsNewPanel
             )
+            .overlay(alignment: .trailing) {
+                if isRegularWidth {
+                    Rectangle()
+                        .fill(Color(uiColor: .separator))
+                        .frame(width: 1)
+                        .ignoresSafeArea(edges: .vertical)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
         } detail: {
             NavigationStack(path: detailPathBinding) {
                 Group {
@@ -119,6 +129,7 @@ struct MainContentView: View {
             // scroll anchors live above it and survive the replacement.
             .id(effectiveHorizontalSizeClass)
         }
+        .navigationSplitViewStyle(.balanced)
         .environment(\.horizontalSizeClass, effectiveHorizontalSizeClass)
         .textScaling(for: settingsViewModel.textSize)
         .buttonStyle(AppDefaultButtonStyle())
@@ -203,17 +214,48 @@ struct MainContentView: View {
             )
             .id(postID)
         case let .postBrowser(post, presentation):
-            PostLinkBrowserView(
-                post: post,
-                presentation: presentation,
-                controller: browserControllers.controller(
-                    key: "post:\(post.id)",
-                    mediaPlaybackSuspended: presentation == .expandedComments
-                ),
-                commentsViewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post),
-                onClose: { navigationStore.dismissDetail() }
-            )
-            .id("browser-\(post.id)")
+            if isRegularWidth {
+                Group {
+                    if presentation == .expandedComments {
+                        CommentsView<NavigationStore>(
+                            postID: post.id,
+                            initialPost: post,
+                            viewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post)
+                        )
+                        .id(post.id)
+                    } else {
+                        let controller = browserControllers.controller(key: "post:\(post.id)")
+                        EmbeddedWebView(
+                            url: post.url,
+                            onDismiss: { navigationStore.dismissDetail() },
+                            showsCloseButton: false,
+                            controller: controller
+                        )
+                        .modifier(AdaptiveBrowserControls())
+                        .onAppear {
+                            controller.setMediaPlaybackSuspended(false)
+                        }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
+                        .id("browser-\(post.id)")
+                    }
+                }
+                .toolbar {
+                    storyToggle(post: post, presentation: presentation)
+                }
+            } else {
+                PostLinkBrowserView(
+                    post: post,
+                    presentation: presentation,
+                    controller: browserControllers.controller(
+                        key: "post:\(post.id)",
+                        mediaPlaybackSuspended: presentation == .expandedComments
+                    ),
+                    commentsViewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post),
+                    onClose: { navigationStore.dismissDetail() }
+                )
+                .id("browser-\(post.id)")
+            }
         case let .web(url):
             EmbeddedWebView(
                 url: url,
@@ -221,7 +263,40 @@ struct MainContentView: View {
                 showsCloseButton: false,
                 controller: browserControllers.controller(key: "url:\(url.absoluteString)")
             )
+            .modifier(AdaptiveBrowserControls())
             .id(url.absoluteString)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private func storyToggle(post: Post, presentation: PostLinkPresentation) -> some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            ToolbarItem(id: "story.toggle", placement: .topBarPinnedTrailing) {
+                storyToggleButton(post: post, presentation: presentation)
+            }
+            .axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
+            ToolbarSpacer(.fixed, placement: .topBarPinnedTrailing)
+                .axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
+        } else {
+            ToolbarItem(placement: .topBarTrailing) {
+                storyToggleButton(post: post, presentation: presentation)
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+        }
+    }
+
+    private func storyToggleButton(post: Post, presentation: PostLinkPresentation) -> some View {
+        let showingComments = presentation == .expandedComments
+        return Button(
+            showingComments ? "Show Article" : "Show Comments",
+            systemImage: showingComments ? "safari" : "message"
+        ) {
+            browserControllers.controller(key: "post:\(post.id)")
+                .setMediaPlaybackSuspended(!showingComments)
+            navigationStore.showPostLink(
+                post,
+                presentation: showingComments ? .collapsedBrowser : .expandedComments
+            )
         }
     }
 }

@@ -154,7 +154,162 @@ final class FoldContinuityUITests: HackersUITestCase {
         XCTAssertTrue((assertHittable(editor).value as? String)?.contains("Draft survives a display transfer") == true)
     }
 
+    func testWideStoryUsesDetailBrowserAndNativeSidebar() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        guard let window = app.windows.allElementsBoundByIndex.first(where: { $0.frame.width >= 800 }) else {
+            throw XCTSkip("Requires an open landscape Duo or a wide iPad window")
+        }
+        assertFixtureArticleLoaded()
+        let post = window.buttons[AccessibilityIdentifier.Feed.post(screenshotPostID)]
+        assertHittable(post)
+        XCTAssertFalse(collapsedCommentsHeader.exists)
+        XCTAssertFalse(commentsSheetHandle.exists)
+
+        let article = window.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
+        let expandedWidth = article.frame.width
+        let title = article.staticTexts["Swift 6.2 Released"]
+        func assertViewportTitleFits() {
+            XCTAssertNotNil(waitForStableFrame(of: title, timeout: 5) {
+                $0.minX >= article.frame.minX + 8 && $0.maxX <= article.frame.maxX - 8
+            }, "A viewport-width heading must remain inside the readable browser column")
+        }
+        assertViewportTitleFits()
+        let note = assertHittable(article.textFields["Reader note"])
+        note.tap()
+        note.typeText("Keep this page when hiding the feed")
+        article.staticTexts["Swift 6.2 Released"].tap()
+        attachScreenshot("Wide native browser with sidebar")
+
+        let sidebarButton = window.buttons.matching(NSPredicate(
+            format: "identifier CONTAINS[c] 'sidebar' OR label CONTAINS[c] 'sidebar'"
+        )).firstMatch
+        assertHittable(sidebarButton).tap()
+        XCTAssertTrue(waitForStableFrame(of: article, timeout: 5) {
+            $0.width > expandedWidth + 100
+        } != nil)
+        XCTAssertFalse(post.isHittable)
+        XCTAssertTrue((note.value as? String)?.contains("Keep this page") == true)
+        attachScreenshot("Wide native browser with sidebar hidden")
+
+        assertHittable(sidebarButton).tap()
+        let feed = window.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Feed.list).firstMatch
+        assertHasVisibleIntersection(feed, in: window)
+        assertHittable(window.buttons[AccessibilityIdentifier.Feed.settingsButton])
+        XCTAssertTrue((note.value as? String)?.contains("Keep this page") == true)
+        attachScreenshot("Wide native browser sidebar restored")
+        assertViewportTitleFits()
+
+        // Repeating the transition catches stale native insets on cached web views.
+        assertHittable(sidebarButton).tap()
+        XCTAssertNotNil(waitForStableFrame(of: article, timeout: 5) { $0.width > expandedWidth + 100 })
+        assertViewportTitleFits()
+        assertHittable(sidebarButton).tap()
+        XCTAssertNotNil(waitForStableFrame(of: article, timeout: 5) { abs($0.width - expandedWidth) < 2 })
+        attachScreenshot("Wide viewport after repeated sidebar transition")
+        assertViewportTitleFits()
+    }
+
+    func testWideCommentsUseDetailWithoutCustomSheet() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .expandedComments)
+        ))
+        guard let window = app.windows.allElementsBoundByIndex.first(where: { $0.frame.width >= 800 }) else {
+            throw XCTSkip("Requires an open landscape Duo or a wide iPad window")
+        }
+        assertHittable(window.buttons[AccessibilityIdentifier.Feed.post(screenshotPostID)])
+        assertHasVisibleIntersection(commentsList, in: app)
+        XCTAssertFalse(commentsSheetHandle.exists)
+        XCTAssertFalse(collapsedCommentsHeader.exists)
+        assertWideToolbarButton("Show Article", in: window)
+        XCTAssertFalse(window.buttons["Refresh"].exists)
+        assertWideToolbarButton("Share", in: window)
+        attachScreenshot("Wide comments in native detail")
+    }
+
+    // Failure modes: missing/inaccessible toggle, wrong post's comments, custom sheet
+    // returning in wide layout, lost browser form state, or duplicate toolbar controls.
+    func testWideBrowserSwitchesToCommentsAndPreservesPage() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        guard let window = app.windows.allElementsBoundByIndex.first(where: { $0.frame.width >= 800 }) else {
+            throw XCTSkip("Requires an open landscape Duo or a wide iPad window")
+        }
+        assertFixtureArticleLoaded()
+        let article = window.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
+        let note = assertHittable(article.textFields["Reader note"])
+        note.tap()
+        note.typeText("Preserve this page through comments")
+        article.staticTexts["Swift 6.2 Released"].tap()
+        assertWideToolbarButton("Show Comments", in: window).tap()
+        assertHasVisibleIntersection(commentsList, in: window)
+        XCTAssertFalse(commentsSheetHandle.exists)
+        XCTAssertFalse(collapsedCommentsHeader.exists)
+        XCTAssertEqual(window.buttons.matching(NSPredicate(format: "label == 'Show Article'")).count, 1)
+        attachScreenshot("Wide toolbar switched to comments")
+        assertWideToolbarButton("Show Article", in: window).tap()
+        assertFixtureArticleLoaded()
+        XCTAssertTrue((assertHittable(article.textFields["Reader note"]).value as? String)?
+            .contains("Preserve this page through comments") == true)
+        assertWideToolbarButton("Show Comments", in: window)
+        attachScreenshot("Wide toolbar restored browser page")
+    }
+
+    // Failure modes: search remains in the detail rail, duplicate search controls,
+    // activation searches the wrong column, or opening search loses the article.
+    func testWideSearchStaysInFeedHeader() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        guard let window = app.windows.allElementsBoundByIndex.first(where: { $0.frame.width >= 800 }) else {
+            throw XCTSkip("Requires an open landscape Duo or a wide iPad window")
+        }
+        assertFixtureArticleLoaded()
+        let feed = window.descendants(matching: .any)
+            .matching(identifier: AccessibilityIdentifier.Feed.list).firstMatch
+        assertHasVisibleIntersection(feed, in: window)
+        let feedFrame = feed.frame
+        let search = assertWideToolbarButton("Search", in: window)
+        XCTAssertEqual(window.buttons.matching(NSPredicate(format: "label == 'Search'")).count, 1)
+        XCTAssertLessThanOrEqual(search.frame.maxX, feedFrame.maxX + 1)
+        let settings = window.buttons[AccessibilityIdentifier.Feed.settingsButton]
+        XCTAssertLessThanOrEqual(abs(search.frame.midY - settings.frame.midY), 1)
+        // Search should have its own chrome to the left of Settings; inspect the
+        // retained screenshot for separate groups as well as checking their order.
+        XCTAssertLessThan(search.frame.maxX, settings.frame.minX)
+        attachScreenshot("Duo search in feed header with article open")
+        search.tap()
+        let field = window.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertTrue(field.isHittable)
+        field.tap()
+        field.typeText("Migration Guide")
+        let result = window.buttons[AccessibilityIdentifier.Feed.post(searchOnlyPostID)]
+        assertHasVisibleIntersection(result, in: window, timeout: 8)
+        XCTAssertLessThanOrEqual(result.frame.maxX, feedFrame.maxX + 1)
+        XCTAssertTrue(window.webViews[AccessibilityIdentifier.Browser.fixtureArticle].exists)
+        attachScreenshot("Duo feed search results with article retained")
+    }
+
     // MARK: - Helpers
+
+    /// Duo's application frame can describe the inactive outer display. Toolbar buttons
+    /// on the inner display must be checked against the actual wide window instead.
+    @discardableResult
+    private func assertWideToolbarButton(_ title: String, in window: XCUIElement) -> XCUIElement {
+        let button = window.buttons[title]
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        assertHasVisibleIntersection(button, in: window)
+        XCTAssertTrue(button.isHittable)
+        return button
+    }
 
     private func setHorizontalSizeClass(regular: Bool) {
         let name = regular ? UITestSizeClassNotification.regular : UITestSizeClassNotification.compact
@@ -174,6 +329,9 @@ final class FoldContinuityUITests: HackersUITestCase {
             if regular {
                 // The split view shows its sidebar and detail columns together (side by side
                 // on a wide display, or the sidebar over the detail on the narrow outer one).
+                if self.app.webViews[AccessibilityIdentifier.Browser.fixtureArticle].exists {
+                    return !self.commentsSheetHandle.exists
+                }
                 return feed.exists && feed.frame.width < windowWidth
                     && (self.app.staticTexts["Select a Post"].exists || self.commentsList.exists)
             }

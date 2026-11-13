@@ -3,6 +3,7 @@ import Domain
 import Foundation
 import Shared
 import SwiftUI
+import UIKit
 
 public struct FeedView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
@@ -46,9 +47,17 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                         postTypeTitleMenu
                     }
                 }
-                settingsToolbarItem
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                if #available(iOS 27.1, *), isSidebar, UIDevice.current.userInterfaceIdiom == .phone {
+                    DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+                        .axisBehavior(.horizontalOnly)
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                        .axisBehavior(.horizontalOnly)
+                    settingsToolbarItem
+                } else {
+                    settingsToolbarItem
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                }
             }
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
@@ -304,6 +313,7 @@ private extension FeedView {
         if isSelected {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(Color(.tertiarySystemFill))
+                .padding(.horizontal, 8)
         } else {
             Color.clear
         }

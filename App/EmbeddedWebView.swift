@@ -22,6 +22,7 @@ final class BrowserController: ObservableObject {
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
+    @Published private(set) var pageBackgroundColor = UIColor.systemBackground
     var fallbackURL: URL?
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
@@ -31,6 +32,10 @@ final class BrowserController: ObservableObject {
     private var requestedMediaPlaybackSuspension = false
     private var mediaPlaybackSuspensionUpdateInFlight = false
     private var pendingMediaPlaybackAction: (() -> Void)?
+    private var bottomChromeInset: CGFloat = 0
+    private var usesNativeViewport = false
+    private var usesVerticalToolbar = false
+    private var hasConfiguredObscuredInsets = false
 
     init(mediaPlaybackSuspended: Bool = false) {
         requestedMediaPlaybackSuspension = mediaPlaybackSuspended
@@ -43,12 +48,16 @@ final class BrowserController: ObservableObject {
             configuration.allowsInlineMediaPlayback = true
         }
         #endif
-        webView = WKWebView(frame: .zero, configuration: configuration)
+        let browserWebView = ChromeAwareWebView(frame: .zero, configuration: configuration)
+        webView = browserWebView
         webView.scrollView.topEdgeEffect.isHidden = true
 
         let navigationDelegate = BrowserNavigationDelegate(controller: self)
         self.navigationDelegate = navigationDelegate
         webView.navigationDelegate = navigationDelegate
+        browserWebView.onLayout = { [weak self] in
+            self?.updateChromeInsets()
+        }
         installStateObservers()
         updateState()
         applyMediaPlaybackSuspensionIfNeeded()
@@ -151,40 +160,41 @@ final class BrowserController: ObservableObject {
         action()
     }
 
-    func applyBottomChromeInset(_ bottomInset: CGFloat) {
-        let inset = max(bottomInset, 0)
-        applyObscuredBottomInset(inset)
-        applyScrollViewBottomInset(inset)
-        // Safe-area insets only settle once the view is in the window and
-        // laid out, so re-apply after this update pass.
+    func applyBottomChromeInset(_ bottomInset: CGFloat, usesNativeViewport: Bool = false, usesVerticalToolbar: Bool = false) {
+        self.usesVerticalToolbar = usesVerticalToolbar
+        if self.usesNativeViewport != usesNativeViewport {
+            self.usesNativeViewport = usesNativeViewport
+            if usesNativeViewport && hasConfiguredObscuredInsets {
+                webView.obscuredContentInsets = .zero
+                webView.scrollView.contentInset = .zero
+                webView.scrollView.verticalScrollIndicatorInsets = .zero
+                hasConfiguredObscuredInsets = false
+            }
+        }
+        bottomChromeInset = max(bottomInset, 0)
+        updateChromeInsets()
         DispatchQueue.main.async { [weak self] in
-            self?.applyStatusBarObscuredInset()
+            self?.updateChromeInsets()
         }
     }
 
-    /// The status-bar blur strip covers the top of the full-bleed web view;
-    /// tell WebKit so sticky and fixed page elements dock below the strip
-    /// instead of under the status indicators, as in Safari. The inset must
-    /// be the status bar height from the window: SwiftUI's hosting inflates
-    /// the web view's own safe area by the hidden navigation-bar region, and
-    /// using it docks page chrome ~50pt too low, which reads as a large
-    /// empty band above sites like JetKVM.
-    private func applyStatusBarObscuredInset() {
-        guard !DeviceLayout.usesRegularWidthLayout else { return }
-        guard let topInset = webView.window?.safeAreaInsets.top, topInset > 0 else { return }
-        guard abs(webView.obscuredContentInsets.top - topInset) > 0.5 else { return }
-
-        var obscuredContentInsets = webView.obscuredContentInsets
-        obscuredContentInsets.top = topInset
-        webView.obscuredContentInsets = obscuredContentInsets
-    }
-
-    private func applyObscuredBottomInset(_ inset: CGFloat) {
-        guard abs(webView.obscuredContentInsets.bottom - inset) > 0.5 else { return }
-
-        var obscuredContentInsets = webView.obscuredContentInsets
-        obscuredContentInsets.bottom = inset
-        webView.obscuredContentInsets = obscuredContentInsets
+    private func updateChromeInsets() {
+        guard let window = webView.window, !usesNativeViewport || usesVerticalToolbar else { return }
+        // A vertical toolbar leaves the top unobscured. Keep native sizing and
+        // scrolling, but exclude the navigation container's inherited top inset.
+        let obscuredInsets = UIEdgeInsets(
+            top: usesVerticalToolbar ? 0 : window.safeAreaInsets.top,
+            left: 0,
+            bottom: usesVerticalToolbar ? window.safeAreaInsets.bottom : bottomChromeInset,
+            right: 0
+        )
+        if !hasConfiguredObscuredInsets || webView.obscuredContentInsets != obscuredInsets {
+            webView.obscuredContentInsets = obscuredInsets
+            hasConfiguredObscuredInsets = true
+        }
+        if !usesNativeViewport {
+            applyScrollViewBottomInset(bottomChromeInset)
+        }
     }
 
     private func applyScrollViewBottomInset(_ bottomInset: CGFloat) {
@@ -210,6 +220,12 @@ final class BrowserController: ObservableObject {
 
     private func installStateObservers() {
         observations = [
+            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    self.pageBackgroundColor = self.webView.underPageBackgroundColor
+                }
+            },
             webView.observe(\.url, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
             },
@@ -230,6 +246,21 @@ final class BrowserController: ObservableObject {
 
     private static var safariApplicationNameForUserAgent: String {
         "Version/\(UIDevice.current.systemVersion) Mobile/15E148 Safari/604.1"
+    }
+}
+
+/// Refresh native chrome geometry when cached browsers move between layouts.
+private final class ChromeAwareWebView: WKWebView {
+    var onLayout: (() -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        onLayout?()
+    }
+
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        onLayout?()
     }
 }
 
@@ -282,6 +313,7 @@ enum WebViewAnimations {
 struct EmbeddedWebView: View {
     private static let headerBlurHeight: CGFloat = 48
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalBrowserControlsEdge) private var verticalControlsEdge
 
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -310,6 +342,34 @@ struct EmbeddedWebView: View {
     }
 
     var body: some View {
+        Group {
+            if usesSystemBrowserLayout {
+                content
+                    .ignoresSafeArea(.container, edges: verticalControlsEdge == nil ? .bottom : [.top, .bottom])
+                    .background {
+                        if let verticalControlsEdge {
+                            Color(uiColor: controller.pageBackgroundColor)
+                                .ignoresSafeArea(.container, edges: verticalControlsEdge == .leading ? [.leading, .top, .bottom] : [.trailing, .top, .bottom])
+                        }
+                    }
+            } else {
+                extendedBrowserContent
+            }
+        }
+        .toolbarBackground(usesStandardTopToolbar ? .visible : usesSystemBrowserLayout ? .automatic : .hidden, for: .navigationBar)
+        .toolbarBackground(usesStandardTopToolbar ? Color(uiColor: .systemBackground) : .clear, for: .navigationBar)
+        .toolbar { browserToolbar }
+    }
+
+    private var usesStandardTopToolbar: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && showsToolbar
+    }
+
+    private var usesSystemBrowserLayout: Bool {
+        usesStandardTopToolbar || (isPadLayout && showsToolbar)
+    }
+
+    private var extendedBrowserContent: some View {
         GeometryReader { proxy in
             content
                 .frame(
@@ -323,34 +383,36 @@ struct EmbeddedWebView: View {
                         headerBlur
                     }
                 }
+
         }
         .ignoresSafeArea(edges: isPadLayout ? [.top, .bottom] : [])
-        .toolbar {
-            if showsToolbar {
-                // Add items only when they apply so no empty slot is left in a bar, and
-                // give each one a title and symbol so it can sit in the iPhone Duo vertical
-                // bar. Close is the primary navigation item, so it goes first.
-                if showsCloseButton {
-                    ToolbarItem(placement: .cancellationAction) { closeButton }
-                        .preferVerticalToolbarAxis()
-                }
-                if controller.canGoBack {
-                    ToolbarItem(placement: .topBarTrailing) { backButton }
-                        .preferVerticalToolbarAxis()
-                }
-                if controller.canGoForward {
-                    ToolbarItem(placement: .topBarTrailing) { forwardButton }
-                        .preferVerticalToolbarAxis()
-                }
-                ToolbarItem(placement: .topBarTrailing) { reloadButton }
-                    .preferVerticalToolbarAxis()
-                ToolbarItem(placement: .topBarTrailing) { shareButton }
-                    .preferVerticalToolbarAxis()
-                ToolbarItem(placement: .topBarTrailing) { openInSafariButton }
+    }
+
+    @ToolbarContentBuilder
+    private var browserToolbar: some ToolbarContent {
+        if showsToolbar {
+            // Add items only when they apply so no empty slot is left in a bar, and
+            // give each one a title and symbol so it can sit in the iPhone Duo vertical
+            // bar. Close is the primary navigation item, so it goes first.
+            if showsCloseButton {
+                ToolbarItem(placement: .cancellationAction) { closeButton }
                     .preferVerticalToolbarAxis()
             }
+            if controller.canGoBack {
+                ToolbarItem(placement: .topBarTrailing) { backButton }
+                    .preferVerticalToolbarAxis()
+            }
+            if controller.canGoForward {
+                ToolbarItem(placement: .topBarTrailing) { forwardButton }
+                    .preferVerticalToolbarAxis()
+            }
+            ToolbarItem(placement: .topBarTrailing) { reloadButton }
+                .preferVerticalToolbarAxis()
+            ToolbarItem(placement: .topBarTrailing) { shareButton }
+                .preferVerticalToolbarAxis()
+            ToolbarItem(placement: .topBarTrailing) { openInSafariButton }
+                .preferVerticalToolbarAxis()
         }
-        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     private var headerBlur: some View {
@@ -371,7 +433,9 @@ struct EmbeddedWebView: View {
                     controller: controller,
                     url: url,
                     article: article,
-                    obscuredBottomInset: obscuredBottomInset
+                    obscuredBottomInset: obscuredBottomInset,
+                    usesNativeViewport: usesSystemBrowserLayout,
+                    usesVerticalToolbar: verticalControlsEdge != nil
                 )
             } else {
                 UITestMissingArticleView(url: url)
@@ -388,9 +452,11 @@ struct EmbeddedWebView: View {
         BrowserWebView(
             controller: controller,
             url: url,
-            obscuredBottomInset: obscuredBottomInset
+            obscuredBottomInset: obscuredBottomInset,
+            usesNativeViewport: usesSystemBrowserLayout,
+            usesVerticalToolbar: verticalControlsEdge != nil
         )
-        .ignoresSafeArea(edges: .top)
+        .ignoresSafeArea(edges: usesSystemBrowserLayout ? [] : .top)
     }
 
     private var isPadLayout: Bool {
@@ -469,7 +535,7 @@ private extension ToolbarContent {
     @ToolbarContentBuilder
     func preferVerticalToolbarAxis() -> some ToolbarContent {
         if #available(iOS 27.1, *) {
-            axisBehavior(.verticalPreferred)
+            axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
         } else {
             self
         }
@@ -548,6 +614,8 @@ private struct BrowserWebView: UIViewRepresentable {
     let controller: BrowserController
     let url: URL
     let obscuredBottomInset: CGFloat
+    let usesNativeViewport: Bool
+    let usesVerticalToolbar: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -556,7 +624,7 @@ private struct BrowserWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
         controller.setReloadOverride(nil)
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         if controller.currentURL == nil {
             context.coordinator.scheduleLoad(controller: controller, url: url)
         }
@@ -565,7 +633,7 @@ private struct BrowserWebView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         controller.setReloadOverride(nil)
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
         context.coordinator.scheduleLoad(controller: controller, url: url)
@@ -597,6 +665,8 @@ private struct UITestArticleView: UIViewRepresentable {
     let url: URL
     let article: UITestArticleContent
     let obscuredBottomInset: CGFloat
+    let usesNativeViewport: Bool
+    let usesVerticalToolbar: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -604,7 +674,7 @@ private struct UITestArticleView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = controller.webView
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
@@ -623,7 +693,7 @@ private struct UITestArticleView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         guard context.coordinator.loadedArticle != article
             || context.coordinator.loadedURL != url else { return }
         let coordinator = context.coordinator
