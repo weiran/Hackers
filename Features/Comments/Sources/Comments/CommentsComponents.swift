@@ -71,9 +71,14 @@ struct CommentsContentView: View {
     @Binding var replyScrollTarget: Int?
     let onReply: (Int, String) -> Void
     let onSubmitComposerDraft: () -> Void
+    let restoredCommentID: () -> Int?
+    let onTopCommentChange: (Int?) -> Void
     @State private var visibleCommentTarget = VisibleCommentTarget()
     @State private var bottomControlsHeight: CGFloat = 0
     @State private var collapsedThreadScrollTarget: Int?
+    @State private var needsScrollRestoration = true
+    @State private var resizeAnchorID: Int?
+    @State private var resizeSettlingTask: Task<Void, Never>?
 
     var body: some View {
         Group {
@@ -124,6 +129,13 @@ struct CommentsContentView: View {
                             updateHeaderState(offsetY: offsetY)
                         }
                     })
+                    .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { oldWidth, newWidth in
+                        preserveAnchorAcrossResize(
+                            from: oldWidth,
+                            to: newWidth,
+                            using: proxy
+                        )
+                    }
                     .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
                     .safeAreaInset(edge: .top, spacing: 0) {
                         commentScrollTopSafeAreaInset
@@ -162,12 +174,16 @@ struct CommentsContentView: View {
                     scrollToPendingComment(using: proxy)
                 }
                 .onChange(of: viewModel.visibleRevision) { _, _ in
+                    restoreScrollAnchor(using: proxy)
                     scrollToPendingComment(using: proxy)
                     scrollToReplyTarget(using: proxy)
                     scrollToCollapsedThread(using: proxy)
                 }
                 .onChange(of: replyScrollTarget) { _, _ in
                     scrollToReplyTarget(using: proxy)
+                }
+                .onAppear {
+                    restoreScrollAnchor(using: proxy)
                 }
                 .task(id: viewModel.visibleRevision) {
                     await CommentTextCache.prewarm(
@@ -210,10 +226,68 @@ private extension CommentsContentView {
 
     private func updateVisibleCommentTarget(visibleTargets: [CommentsScrollTarget]) {
         let topID = visibleTargets.first?.commentID
+        if !needsScrollRestoration, resizeAnchorID == nil {
+            onTopCommentChange(topID)
+        }
         visibleCommentTarget.update(
             topCommentID: topID,
             hasNextComment: viewModel.hasNextVisibleComment(after: topID)
         )
+    }
+
+    /// Width changes can arrive every frame while the Duo hinge moves. Freeze the comment
+    /// that was at the top when resizing began, keep putting that identity back at the top,
+    /// and release it only after geometry settles. This avoids accumulating reflow drift and
+    /// never reuses a pixel offset from another display.
+    private func preserveAnchorAcrossResize(
+        from oldWidth: CGFloat,
+        to newWidth: CGFloat,
+        using proxy: ScrollViewProxy
+    ) {
+        guard abs(newWidth - oldWidth) > 0.5, !needsScrollRestoration else { return }
+        if resizeAnchorID == nil {
+            resizeAnchorID = restoredCommentID() ?? visibleCommentTarget.topCommentID
+        }
+        guard let commentID = resizeAnchorID else { return }
+
+        resizeSettlingTask?.cancel()
+        Task { @MainActor in
+            await Task.yield()
+            guard !Task.isCancelled else { return }
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+        }
+        resizeSettlingTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+            resizeAnchorID = nil
+            onTopCommentChange(commentID)
+        }
+    }
+
+    /// Restores an identity, not an absolute offset. A real iPhone Duo display transfer can
+    /// recreate this view with entirely different geometry; reusing the old pixel offset can
+    /// place lazy content outside the viewport. The navigation store survives that transfer.
+    private func restoreScrollAnchor(using proxy: ScrollViewProxy) {
+        guard needsScrollRestoration else { return }
+        guard pendingCommentID == nil else {
+            needsScrollRestoration = false
+            return
+        }
+        guard let commentID = restoredCommentID() else {
+            needsScrollRestoration = false
+            return
+        }
+        guard viewModel.visibleComments.contains(where: { $0.id == commentID }) else {
+            // Comments may still be loading. `visibleRevision` will call this again.
+            return
+        }
+
+        Task { @MainActor in
+            await Task.yield()
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+            needsScrollRestoration = false
+        }
     }
 
     private func scrollToPendingComment(using proxy: ScrollViewProxy) {

@@ -5,6 +5,7 @@
 //  Created by Codex on 2025-09-18.
 //
 
+import Comments
 import DesignSystem
 import CoreImage.CIFilterBuiltins
 import Domain
@@ -169,7 +170,7 @@ final class BrowserController: ObservableObject {
     /// using it docks page chrome ~50pt too low, which reads as a large
     /// empty band above sites like JetKVM.
     private func applyStatusBarObscuredInset() {
-        guard !DeviceLayout.usesPadLayout else { return }
+        guard !DeviceLayout.usesRegularWidthLayout else { return }
         guard let topInset = webView.window?.safeAreaInsets.top, topInset > 0 else { return }
         guard abs(webView.obscuredContentInsets.top - topInset) > 0.5 else { return }
 
@@ -280,6 +281,7 @@ enum WebViewAnimations {
 
 struct EmbeddedWebView: View {
     private static let headerBlurHeight: CGFloat = 48
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -325,30 +327,27 @@ struct EmbeddedWebView: View {
         .ignoresSafeArea(edges: isPadLayout ? [.top, .bottom] : [])
         .toolbar {
             if showsToolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if controller.canGoBack {
-                        backButton
-                    }
+                // Add items only when they apply so no empty slot is left in a bar, and
+                // give each one a title and symbol so it can sit in the iPhone Duo vertical
+                // bar. Close is the primary navigation item, so it goes first.
+                if showsCloseButton {
+                    ToolbarItem(placement: .cancellationAction) { closeButton }
+                        .preferVerticalToolbarAxis()
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if controller.canGoForward {
-                        forwardButton
-                    }
+                if controller.canGoBack {
+                    ToolbarItem(placement: .topBarTrailing) { backButton }
+                        .preferVerticalToolbarAxis()
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    reloadButton
+                if controller.canGoForward {
+                    ToolbarItem(placement: .topBarTrailing) { forwardButton }
+                        .preferVerticalToolbarAxis()
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    shareButton
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    openInSafariButton
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if showsCloseButton {
-                        closeButton
-                    }
-                }
+                ToolbarItem(placement: .topBarTrailing) { reloadButton }
+                    .preferVerticalToolbarAxis()
+                ToolbarItem(placement: .topBarTrailing) { shareButton }
+                    .preferVerticalToolbarAxis()
+                ToolbarItem(placement: .topBarTrailing) { openInSafariButton }
+                    .preferVerticalToolbarAxis()
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -395,7 +394,7 @@ struct EmbeddedWebView: View {
     }
 
     private var isPadLayout: Bool {
-        DeviceLayout.usesPadLayout
+        horizontalSizeClass == .regular || DeviceLayout.isRunningOnMac
     }
     private var bottomPanelInsetHeight: CGFloat {
         guard !showsToolbar else { return 0 }
@@ -409,9 +408,8 @@ struct EmbeddedWebView: View {
                 ContentSharePresenter.shared.shareURL(targetURL, title: controller.currentTitle)
             }
         } label: {
-            Image(systemName: "square.and.arrow.up")
+            Label("Share", systemImage: "square.and.arrow.up")
         }
-        .accessibilityLabel("Share")
     }
 
     private var openInSafariButton: some View {
@@ -421,18 +419,16 @@ struct EmbeddedWebView: View {
                 LinkOpener.openInSystemBrowser(targetURL)
             }
         } label: {
-            Image(systemName: "safari")
+            Label("Open in Safari", systemImage: "safari")
         }
-        .accessibilityLabel("Open in Safari")
     }
 
     private var closeButton: some View {
         Button {
             Task { @MainActor in onDismiss() }
         } label: {
-            Image(systemName: "xmark")
+            Label("Close", systemImage: "xmark")
         }
-        .accessibilityLabel("Close")
     }
 
     private var reloadButton: some View {
@@ -443,29 +439,41 @@ struct EmbeddedWebView: View {
                 controller.reload()
             }
         } label: {
-            Image(systemName: controller.isLoading ? "xmark" : "arrow.clockwise")
+            Label(controller.isLoading ? "Stop" : "Reload",
+                  systemImage: controller.isLoading ? "xmark" : "arrow.clockwise")
         }
-        .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
     private var backButton: some View {
         Button {
             controller.goBack()
         } label: {
-            Image(systemName: "chevron.backward")
+            Label("Previous Page", systemImage: "arrow.backward")
         }
-        .accessibilityLabel("Back")
     }
 
     private var forwardButton: some View {
         Button {
             controller.goForward()
         } label: {
-            Image(systemName: "chevron.forward")
+            Label("Next Page", systemImage: "arrow.forward")
         }
-        .accessibilityLabel("Forward")
     }
 
+}
+
+private extension ToolbarContent {
+    /// Symbol items normally choose their own axis, but the embedded web view can stay
+    /// alive while an iPhone Duo changes displays. Explicitly opting in ensures its
+    /// existing items migrate into the vertical bar instead of remaining in a top pill.
+    @ToolbarContentBuilder
+    func preferVerticalToolbarAxis() -> some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            axisBehavior(.verticalPreferred)
+        } else {
+            self
+        }
+    }
 }
 
 /// True progressive gaussian blur: the blur radius ramps to zero across the
@@ -549,7 +557,9 @@ private struct BrowserWebView: UIViewRepresentable {
         context.coordinator.requestedURL = url
         controller.setReloadOverride(nil)
         controller.applyBottomChromeInset(obscuredBottomInset)
-        context.coordinator.scheduleLoad(controller: controller, url: url)
+        if controller.currentURL == nil {
+            context.coordinator.scheduleLoad(controller: controller, url: url)
+        }
         return controller.webView
     }
 
@@ -600,9 +610,14 @@ private struct UITestArticleView: UIViewRepresentable {
         webView.scrollView.backgroundColor = .clear
         webView.accessibilityIdentifier = AccessibilityIdentifier.Browser.fixtureArticle
         let coordinator = context.coordinator
-        coordinator.scheduleLoad { [self, weak coordinator] in
-            guard let coordinator else { return }
-            loadArticle(in: webView, coordinator: coordinator)
+        if controller.currentURL == nil {
+            coordinator.scheduleLoad { [self, weak coordinator] in
+                guard let coordinator else { return }
+                loadArticle(in: webView, coordinator: coordinator)
+            }
+        } else {
+            coordinator.loadedArticle = article
+            coordinator.loadedURL = url
         }
         return webView
     }
@@ -867,25 +882,37 @@ struct PostLinkBrowserView: View {
     @Environment(\.dismiss) private var dismiss
     let post: Post
     let presentation: PostLinkPresentation
+    let onClose: (@MainActor () -> Void)?
     @State private var showingCommentsPane = false
     @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
     @State private var browserObscuredBottomInset = PostCommentsSheet.collapsedBrowserBottomInset
+    @State private var commentsAreExpanded: Bool
     @StateObject private var browserController: BrowserController
+    private let commentsViewModel: CommentsViewModel
 
-    init(post: Post, presentation: PostLinkPresentation) {
+    init(
+        post: Post,
+        presentation: PostLinkPresentation,
+        controller: BrowserController? = nil,
+        commentsViewModel: CommentsViewModel? = nil,
+        onClose: (@MainActor () -> Void)? = nil
+    ) {
         self.post = post
         self.presentation = presentation
+        self.onClose = onClose
         _showingCommentsPane = State(initialValue: presentation == .expandedComments)
-        _browserController = StateObject(wrappedValue: BrowserController(
+        _commentsAreExpanded = State(initialValue: presentation == .expandedComments)
+        _browserController = StateObject(wrappedValue: controller ?? BrowserController(
             mediaPlaybackSuspended: presentation == .expandedComments
         ))
+        self.commentsViewModel = commentsViewModel ?? CommentsViewModel(post: post)
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             EmbeddedWebView(
                 url: post.url,
-                onDismiss: { dismiss() },
+                onDismiss: close,
                 showsCloseButton: false,
                 showsToolbar: false,
                 bottomWebViewInset: browserBottomInset,
@@ -897,8 +924,10 @@ struct PostLinkBrowserView: View {
                 PostCommentsSheet(
                     post: post,
                     controller: browserController,
+                    viewModel: commentsViewModel,
+                    isExpanded: $commentsAreExpanded,
                     initialPresentation: presentation,
-                    onDismiss: { dismiss() },
+                    onDismiss: close,
                     onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
                     onBrowserObscuredBottomInsetChange: { browserObscuredBottomInset = $0 },
                     onMediaPlaybackSuspensionChange: { isSuspended in
@@ -912,6 +941,62 @@ struct PostLinkBrowserView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
         .modifier(AdaptiveBrowserControls())
+        .toolbar {
+            if #available(iOS 27.1, *) {
+                ToolbarItem(id: "browser.commentsToggle", placement: .topBarPinnedTrailing) {
+                    Button(
+                        commentsAreExpanded ? "Show Article" : "Show Comments",
+                        systemImage: commentsAreExpanded ? "doc.text" : "message"
+                    ) {
+                        commentsAreExpanded.toggle()
+                    }
+                }
+                .axisBehavior(.verticalPreferred)
+                if !commentsAreExpanded {
+                    ToolbarItem(id: "browser.share", placement: .primaryAction) {
+                        Button("Share", systemImage: "square.and.arrow.up") {
+                            ContentSharePresenter.shared.shareURL(
+                                browserController.currentURL ?? post.url,
+                                title: browserController.currentTitle
+                            )
+                        }
+                    }
+                    .visibilityPriority(.high)
+                    .axisBehavior(.verticalPreferred)
+                    ToolbarItem(id: "browser.reload", placement: .primaryAction) {
+                        Button(
+                            browserController.isLoading ? "Stop" : "Reload",
+                            systemImage: browserController.isLoading ? "xmark" : "arrow.clockwise"
+                        ) {
+                            if browserController.isLoading {
+                                browserController.stopLoading()
+                            } else {
+                                browserController.reload()
+                            }
+                        }
+                    }
+                    .visibilityPriority(.low)
+                    .axisBehavior(.verticalPreferred)
+                    ToolbarOverflowMenu {
+                        Button(
+                            "Previous Page",
+                            systemImage: "arrow.backward",
+                            action: browserController.goBack
+                        )
+                        .disabled(!browserController.canGoBack)
+                        Button(
+                            "Next Page",
+                            systemImage: "arrow.forward",
+                            action: browserController.goForward
+                        )
+                        .disabled(!browserController.canGoForward)
+                        Button("Open in Safari", systemImage: "safari") {
+                            LinkOpener.openInSystemBrowser(browserController.currentURL ?? post.url)
+                        }
+                    }
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .background {
             NavigationBackSwipeRestorer()
@@ -922,6 +1007,14 @@ struct PostLinkBrowserView: View {
             withAnimation(WebViewAnimations.panel) {
                 showingCommentsPane = true
             }
+        }
+    }
+
+    private func close() {
+        if let onClose {
+            onClose()
+        } else {
+            dismiss()
         }
     }
 

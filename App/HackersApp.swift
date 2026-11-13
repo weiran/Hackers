@@ -49,6 +49,9 @@ struct HackersApp: App {
                 .environment(\.appRuntimePolicy, runtimePolicy)
                 .onAppear {
                     setupAppearance()
+                    #if DEBUG
+                    UITestSizeClassOverride.shared.startListeningIfNeeded()
+                    #endif
                     handleInitialUITestingRouteIfNeeded()
                 }
                 .onOpenURL { url in

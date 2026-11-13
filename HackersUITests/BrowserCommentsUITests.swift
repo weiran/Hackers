@@ -13,18 +13,30 @@ final class BrowserCommentsUITests: HackersUITestCase {
             route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
         ))
         assertFixtureArticleLoaded()
-        let close = assertHittable(app.buttons["Close"])
-        let reload = assertHittable(app.buttons["Reload"])
-        let share = assertHittable(app.buttons["Share"])
-        let safari = assertHittable(app.buttons["Open in Safari"])
-        if ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo" {
-            XCTAssertGreaterThan(close.frame.midX, app.frame.width * 0.8)
-            for control in [reload, share, safari] {
-                XCTAssertEqual(control.frame.midX, close.frame.midX, accuracy: 2)
+        let isDuo = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo"
+        // In the vertical bar the browser is ordinary navigation, so the system Back
+        // button leads the bar (Apple's vertical bar guidance); elsewhere the floating
+        // browser controls keep their own Close button.
+        let leading = assertHittable(
+            isDuo ? app.buttons.matching(NSPredicate(format: "identifier == 'BackButton' OR label == 'Back'")).firstMatch
+                : app.buttons["Close"]
+        )
+        if isDuo {
+            // The vertical bar keeps the pinned comments toggle and high-priority Share;
+            // secondary page actions live in the overflow menu.
+            let toggle = assertHittable(app.buttons["Show Comments"])
+            let share = assertHittable(app.buttons["Share"])
+            XCTAssertGreaterThan(leading.frame.midX, app.frame.width * 0.8)
+            for control in [toggle, share] {
+                XCTAssertEqual(control.frame.midX, leading.frame.midX, accuracy: 2)
+                XCTAssertGreaterThan(control.frame.minY, leading.frame.minY)
             }
         } else {
-            XCTAssertLessThan(close.frame.midX, app.frame.width * 0.2)
-            XCTAssertEqual(close.frame.midY, reload.frame.midY, accuracy: 2)
+            let reload = assertHittable(app.buttons["Reload"])
+            assertHittable(app.buttons["Share"])
+            assertHittable(app.buttons["Open in Safari"])
+            XCTAssertLessThan(leading.frame.midX, app.frame.width * 0.2)
+            XCTAssertEqual(leading.frame.midY, reload.frame.midY, accuracy: 2)
         }
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "Collapsed browser controls"

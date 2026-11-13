@@ -5,127 +5,70 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-import Combine
 import Domain
 import Observation
 import Shared
 import SwiftUI
-import UIKit
 
-enum NavigationDestination: Hashable {
+/// A screen shown in the detail column of the root split view, either as its root or
+/// pushed on top. The same model drives compact and regular widths, so the visible
+/// screen survives size-class changes such as folding an iPhone Duo.
+enum NavigationDetailDestination: Hashable {
     case comments(postID: Int)
     case postBrowser(post: Post, presentation: PostLinkPresentation)
-    case settings
-}
-
-enum NavigationDetailDestination: Hashable {
     case web(URL)
 }
 
 @MainActor
 @Observable
 class NavigationStore: NavigationStoreProtocol {
-    var path: NavigationPath = .init()
     var selectedPost: Domain.Post?
     var selectedPostId: Int?
     var selectedPostType: Domain.PostType = .news
-    var selectedPostLinkPresentation: PostLinkPresentation?
+    var detailRoot: NavigationDetailDestination?
+    var detailPath: [NavigationDetailDestination] = []
+    /// Which column a collapsed (compact-width) split view shows.
+    var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
     var showingLogin = false
     var showingSettings = false
     var pendingPostId: Int?
-    var embeddedBrowserURL: URL?
-    var detailPath: [NavigationDetailDestination] = []
-
-    private var cancellables = Set<AnyCancellable>()
-
-    init() {
-        // Listen for refresh notifications
-        NotificationCenter.default.publisher(for: Notification.Name.refreshRequired)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.path = self?.path ?? .init()
-            }
-            .store(in: &cancellables)
-    }
+    private var commentScrollAnchors: [Int: Int] = [:]
 
     func showPost(_ post: Domain.Post) {
-        embeddedBrowserURL = nil
-        detailPath.removeAll()
-        selectedPostLinkPresentation = nil
         selectedPost = post
         selectedPostId = post.id
-
-        // For iPhone navigation, use NavigationPath
-        if !DeviceLayout.usesPadLayout {
-            path.append(NavigationDestination.comments(postID: post.id))
-        }
+        showDetailRoot(.comments(postID: post.id))
     }
 
     func showPostLink(_ post: Domain.Post, presentation: PostLinkPresentation) {
-        showPostLink(post, presentation: presentation, forceCustomBrowser: false)
-    }
-
-    #if DEBUG
-    func showPostLinkForUITesting(_ post: Domain.Post, presentation: PostLinkPresentation) {
-        showPostLink(post, presentation: presentation, forceCustomBrowser: true)
-    }
-    #endif
-
-    private func showPostLink(
-        _ post: Domain.Post,
-        presentation: PostLinkPresentation,
-        forceCustomBrowser: Bool
-    ) {
         guard !HackerNewsConstants.isItemURL(post.url) else {
             showPost(post)
             return
         }
-
-        embeddedBrowserURL = nil
-        detailPath.removeAll()
         selectedPost = post
         selectedPostId = post.id
-        selectedPostLinkPresentation = nil
-
-        if forceCustomBrowser {
-            if DeviceLayout.usesPadLayout {
-                selectedPostLinkPresentation = presentation
-            } else {
-                path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
-            }
-            return
-        }
-
-        if !DeviceLayout.usesPadLayout {
-            path.append(NavigationDestination.postBrowser(post: post, presentation: presentation))
-            return
-        }
-
-        if openURLInPrimaryContext(post.url) {
-            return
-        }
-
-        LinkOpener.openURL(post.url, with: post)
+        showDetailRoot(.postBrowser(post: post, presentation: presentation))
     }
 
+    #if DEBUG
+    func showPostLinkForUITesting(_ post: Domain.Post, presentation: PostLinkPresentation) {
+        showPostLink(post, presentation: presentation)
+    }
+    #endif
+
     func showPost(withId id: Int) {
-        embeddedBrowserURL = nil
-        detailPath.removeAll()
-        selectedPostLinkPresentation = nil
         selectedPost = nil
         selectedPostId = id
-
-        if !DeviceLayout.usesPadLayout {
-            path.append(NavigationDestination.comments(postID: id))
-        }
+        showDetailRoot(.comments(postID: id))
     }
 
     func clearSelection() {
         selectedPost = nil
         selectedPostId = nil
-        selectedPostLinkPresentation = nil
-        embeddedBrowserURL = nil
+        detailRoot = nil
         detailPath.removeAll()
+        preferredCompactColumn = .sidebar
+        commentScrollAnchors.removeAll()
     }
 
     func showLogin() {
@@ -138,46 +81,57 @@ class NavigationStore: NavigationStoreProtocol {
 
     func selectPostType(_ type: Domain.PostType) {
         selectedPostType = type
-        selectedPostId = nil
         clearSelection()
     }
 
+    /// Opens a link on top of the current detail screen: Hacker News items as comments,
+    /// other web links in the in-app browser. Returns false when the user prefers the
+    /// system browser so the caller can hand the link off instead.
     @MainActor
     func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool = true) -> Bool {
-        guard DeviceLayout.usesPadLayout else { return false }
         guard url.scheme == "http" || url.scheme == "https" else { return false }
 
-        let settings = DependencyContainer.shared.getSettingsUseCase()
-        if settings.linkBrowserMode == .systemBrowser {
-            return false
+        let destination: NavigationDetailDestination
+        if let itemID = HackerNewsConstants.itemID(from: url) {
+            destination = .comments(postID: itemID)
+        } else {
+            let settings = DependencyContainer.shared.getSettingsUseCase()
+            guard settings.linkBrowserMode != .systemBrowser else { return false }
+            destination = .web(url)
         }
 
-        if pushOntoDetailStack, selectedPost != nil {
-            detailPath.append(.web(url))
-            return true
+        if pushOntoDetailStack, detailRoot != nil {
+            detailPath.append(destination)
+            preferredCompactColumn = .detail
+        } else {
+            showDetailRoot(destination)
         }
-
-        embeddedBrowserURL = url
-        detailPath.removeAll()
-        selectedPostLinkPresentation = nil
         return true
     }
 
-    @MainActor
-    func dismissEmbeddedBrowser() {
-        let dismiss = { [weak self] in
-            guard let self else { return }
+    func commentScrollAnchor(for postID: Int) -> Int? {
+        commentScrollAnchors[postID]
+    }
+
+    func setCommentScrollAnchor(_ commentID: Int?, for postID: Int) {
+        commentScrollAnchors[postID] = commentID
+    }
+
+    /// Closes the top detail screen, returning to the feed when it was the root.
+    func dismissDetail() {
+        withAnimation(.easeInOut(duration: 0.25)) {
             if !detailPath.isEmpty {
                 detailPath.removeLast()
             } else {
-                embeddedBrowserURL = nil
-                selectedPostLinkPresentation = nil
+                clearSelection()
             }
         }
+    }
 
-        withAnimation(.easeInOut(duration: 0.25)) {
-            dismiss()
-        }
+    private func showDetailRoot(_ destination: NavigationDetailDestination) {
+        detailPath.removeAll()
+        detailRoot = destination
+        preferredCompactColumn = .detail
     }
 
     // MARK: - Deep Linking
