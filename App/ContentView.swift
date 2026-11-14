@@ -21,15 +21,19 @@ struct MainContentView: View {
     @Environment(NavigationStore.self) private var navigationStore
     @Environment(SessionService.self) private var sessionService
     @Environment(ToastPresenter.self) private var toastPresenter
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let whatsNewCoordinator: WhatsNewCoordinator
     @State private var settingsViewModel = SettingsViewModel()
     @State private var feedViewModel = FeedViewModel()
+    @State private var commentsViewModels = CommentsViewModelCache()
+    @State private var browserControllers = BrowserControllerCache()
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showWhatsNew = false
     @State private var showWhatsNewPanel = false
-    private var navigationPathBinding: Binding<NavigationPath> {
+    private var preferredCompactColumnBinding: Binding<NavigationSplitViewColumn> {
         Binding(
-            get: { navigationStore.path },
-            set: { navigationStore.path = $0 }
+            get: { navigationStore.preferredCompactColumn },
+            set: { navigationStore.preferredCompactColumn = $0 }
         )
     }
     private var detailPathBinding: Binding<[NavigationDetailDestination]> {
@@ -53,8 +57,16 @@ struct MainContentView: View {
     private var isPresentingModal: Bool {
         navigationStore.showingLogin || navigationStore.showingSettings || showWhatsNew
     }
-    private var isPadLayout: Bool {
-        DeviceLayout.usesPadLayout
+    private var effectiveHorizontalSizeClass: UserInterfaceSizeClass? {
+        #if DEBUG
+        if let override = UITestSizeClassOverride.shared.horizontalSizeClass {
+            return override
+        }
+        #endif
+        return horizontalSizeClass
+    }
+    private var isRegularWidth: Bool {
+        effectiveHorizontalSizeClass == .regular
     }
     private var whatsNewPanel: WhatsNewPanel? {
         guard showWhatsNewPanel else { return nil }
@@ -76,53 +88,60 @@ struct MainContentView: View {
     }
 
     var body: some View {
-        Group {
-            if isPadLayout {
-                AdaptiveSplitView(
-                    feedViewModel: feedViewModel,
-                    settingsViewModel: settingsViewModel,
-                    whatsNewPanel: whatsNewPanel
-                )
-            } else {
-                NavigationStack(path: navigationPathBinding) {
-                    FeedView<NavigationStore>(
-                        viewModel: feedViewModel,
-                        isSidebar: false,
-                        whatsNewPanel: whatsNewPanel
-                    )
-                    .navigationDestination(for: NavigationDestination.self) { destination in
-                        switch destination {
-                        case let .comments(postID):
-                            let initialPost: Post? = {
-                                guard navigationStore.selectedPost?.id == postID else { return nil }
-                                return navigationStore.selectedPost
-                            }()
-                            CommentsView<NavigationStore>(postID: postID, initialPost: initialPost)
-                        case let .postBrowser(post, presentation):
-                            PostLinkBrowserView(post: post, presentation: presentation)
-                        case .settings:
-                            SettingsView(
-                                viewModel: settingsViewModel,
-                                isAuthenticated: sessionService.authenticationState == .authenticated,
-                                currentUsername: sessionService.username,
-                                onLogin: { username, password in
-                                    _ = try await sessionService.authenticate(username: username, password: password)
-                                },
-                                onLogout: {
-                                    try await sessionService.unauthenticate()
-                                },
-                                onWhatsNewDismiss: {
-                                    whatsNewCoordinator.markWhatsNewShown()
-                                }
-                            )
-                        }
-                    }
+        // One adaptive split view for every size: it shows feed and detail side by side
+        // in regular width (iPad, iPhone Duo inner display) and collapses to a single
+        // stack in compact width, keeping each column's state across folds and resizes.
+        NavigationSplitView(
+            columnVisibility: $columnVisibility,
+            preferredCompactColumn: preferredCompactColumnBinding
+        ) {
+            FeedView<NavigationStore>(
+                viewModel: feedViewModel,
+                isSidebar: isRegularWidth,
+                whatsNewPanel: whatsNewPanel
+            )
+            .overlay(alignment: .trailing) {
+                if isRegularWidth {
+                    Rectangle()
+                        .fill(Color(uiColor: .separator))
+                        .frame(width: 1)
+                        .ignoresSafeArea(edges: .vertical)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
                 }
             }
+        } detail: {
+            NavigationStack(path: detailPathBinding) {
+                Group {
+                    if let root = navigationStore.detailRoot {
+                        detailView(for: root)
+                    } else {
+                        EmptyDetailView()
+                    }
+                }
+                .navigationDestination(for: NavigationDetailDestination.self) { destination in
+                    detailView(for: destination)
+                }
+            }
+            // iOS uses different navigation-bar hosts for the Duo's compact outer display
+            // and regular inner display. Recreate only that host at the trait boundary so
+            // toolbar representations don't leave blank platform slots. Detail models and
+            // scroll anchors live above it and survive the replacement.
+            .id(effectiveHorizontalSizeClass)
         }
+        .navigationSplitViewStyle(.balanced)
+        .environment(\.horizontalSizeClass, effectiveHorizontalSizeClass)
         .textScaling(for: settingsViewModel.textSize)
         .buttonStyle(AppDefaultButtonStyle())
         .accentColor(.accentColor)
+        .onChange(of: isRegularWidth, initial: true) { _, isRegular in
+            DeviceLayout.hasRegularWidthWindow = isRegular
+        }
+        .onChange(of: navigationStore.detailRoot) { _, root in
+            guard root == nil else { return }
+            commentsViewModels.removeAll()
+            browserControllers.removeAll()
+        }
         .toastOverlay(toastPresenter, isActive: !isPresentingModal)
         .sheet(isPresented: showingLoginBinding) {
             LoginView(
@@ -180,63 +199,170 @@ struct MainContentView: View {
             }
         }
     }
-}
 
-struct AdaptiveSplitView: View {
-    @Environment(NavigationStore.self) private var navigationStore
-    @Environment(SessionService.self) private var sessionService
-    let feedViewModel: FeedViewModel
-    @State var settingsViewModel: SettingsViewModel
-    var whatsNewPanel: WhatsNewPanel?
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    private var detailPathBinding: Binding<[NavigationDetailDestination]> {
-        Binding(
-            get: { navigationStore.detailPath },
-            set: { navigationStore.detailPath = $0 }
-        )
+    @ViewBuilder
+    private func detailView(for destination: NavigationDetailDestination) -> some View {
+        switch destination {
+        case let .comments(postID):
+            CommentsView<NavigationStore>(
+                postID: postID,
+                initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil,
+                viewModel: commentsViewModels.viewModel(
+                    postID: postID,
+                    initialPost: navigationStore.selectedPost?.id == postID ? navigationStore.selectedPost : nil
+                )
+            )
+            .id(postID)
+        case let .postBrowser(post, presentation):
+            if isRegularWidth {
+                Group {
+                    if presentation == .expandedComments {
+                        CommentsView<NavigationStore>(
+                            postID: post.id,
+                            initialPost: post,
+                            viewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post)
+                        )
+                        .id(post.id)
+                    } else {
+                        let controller = browserControllers.controller(key: "post:\(post.id)")
+                        EmbeddedWebView(
+                            url: post.url,
+                            onDismiss: { navigationStore.dismissDetail() },
+                            showsCloseButton: false,
+                            controller: controller
+                        )
+                        .modifier(AdaptiveBrowserControls())
+                        .onAppear {
+                            controller.setMediaPlaybackSuspended(false)
+                        }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
+                        .id("browser-\(post.id)")
+                    }
+                }
+                .toolbar {
+                    storyToggle(post: post, presentation: presentation)
+                }
+            } else {
+                PostLinkBrowserView(
+                    post: post,
+                    presentation: presentation,
+                    controller: browserControllers.controller(
+                        key: "post:\(post.id)",
+                        mediaPlaybackSuspended: presentation == .expandedComments
+                    ),
+                    commentsViewModel: commentsViewModels.viewModel(postID: post.id, initialPost: post),
+                    onClose: { navigationStore.dismissDetail() }
+                )
+                .id("browser-\(post.id)")
+            }
+        case let .web(url):
+            EmbeddedWebView(
+                url: url,
+                onDismiss: { navigationStore.dismissDetail() },
+                showsCloseButton: false,
+                controller: browserControllers.controller(key: "url:\(url.absoluteString)")
+            )
+            .modifier(AdaptiveBrowserControls())
+            .id(url.absoluteString)
+        }
     }
 
-    var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar - FeedView
-            FeedView<NavigationStore>(
-                viewModel: feedViewModel,
-                isSidebar: true,
-                whatsNewPanel: whatsNewPanel
-            )
-            .navigationSplitViewColumnWidth(min: 320, ideal: 375, max: 400)
-        } detail: {
-            // Detail - CommentsView or empty state
-            NavigationStack(path: detailPathBinding) {
-                if let selectedPost = navigationStore.selectedPost,
-                   let browserPresentation = navigationStore.selectedPostLinkPresentation {
-                    PostLinkBrowserView(post: selectedPost, presentation: browserPresentation)
-                        .id("browser-\(selectedPost.id)")
-                } else if let embeddedURL = navigationStore.embeddedBrowserURL {
-                    EmbeddedWebView(url: embeddedURL,
-                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: false)
-                        .id(embeddedURL.absoluteString)
-                } else if let selectedPost = navigationStore.selectedPost {
-                    CommentsView<NavigationStore>(postID: selectedPost.id, initialPost: selectedPost)
-                        .id(selectedPost.id) // Add id to force re-render when post changes
-                } else if let selectedPostId = navigationStore.selectedPostId {
-                    CommentsView<NavigationStore>(postID: selectedPostId, initialPost: nil)
-                        .id(selectedPostId)
-                } else {
-                    EmptyDetailView()
-                }
+    @ToolbarContentBuilder
+    private func storyToggle(post: Post, presentation: PostLinkPresentation) -> some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            ToolbarItem(id: "story.toggle", placement: .topBarPinnedTrailing) {
+                storyToggleButton(post: post, presentation: presentation)
             }
-            .navigationDestination(for: NavigationDetailDestination.self) { destination in
-                switch destination {
-                case let .web(url):
-                    EmbeddedWebView(url: url,
-                                    onDismiss: { navigationStore.dismissEmbeddedBrowser() },
-                                    showsCloseButton: false)
-                }
+            .axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
+            ToolbarSpacer(.fixed, placement: .topBarPinnedTrailing)
+                .axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
+        } else {
+            ToolbarItem(placement: .topBarTrailing) {
+                storyToggleButton(post: post, presentation: presentation)
             }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
         }
-        .textScaling(for: settingsViewModel.textSize)
+    }
+
+    private func storyToggleButton(post: Post, presentation: PostLinkPresentation) -> some View {
+        let showingComments = presentation == .expandedComments
+        return Button(
+            showingComments ? "Show Article" : "Show Comments",
+            systemImage: showingComments ? "safari" : "message"
+        ) {
+            browserControllers.controller(key: "post:\(post.id)")
+                .setMediaPlaybackSuspended(!showingComments)
+            navigationStore.showPostLink(
+                post,
+                presentation: showingComments ? .collapsedBrowser : .expandedComments
+            )
+        }
+    }
+}
+
+@MainActor
+private final class BrowserControllerCache {
+    private static let capacity = 8
+    private var controllers: [String: BrowserController] = [:]
+    private var recentKeys: [String] = []
+
+    func controller(key: String, mediaPlaybackSuspended: Bool = false) -> BrowserController {
+        if let controller = controllers[key] {
+            markRecent(key)
+            return controller
+        }
+        let controller = BrowserController(mediaPlaybackSuspended: mediaPlaybackSuspended)
+        controllers[key] = controller
+        markRecent(key)
+        if recentKeys.count > Self.capacity {
+            controllers[recentKeys.removeFirst()] = nil
+        }
+        return controller
+    }
+
+    private func markRecent(_ key: String) {
+        recentKeys.removeAll(where: { $0 == key })
+        recentKeys.append(key)
+    }
+
+    func removeAll() {
+        controllers.removeAll()
+        recentKeys.removeAll()
+    }
+}
+
+/// Keeps loaded comments and collapse state stable while SwiftUI reevaluates the detail
+/// column through an iPhone Duo fold. Without this cache, `CommentsView.init` constructed
+/// throwaway models for every intermediate width even though `@State` retained only one.
+@MainActor
+private final class CommentsViewModelCache {
+    private static let capacity = 8
+    private var models: [Int: CommentsViewModel] = [:]
+    private var recentPostIDs: [Int] = []
+
+    func viewModel(postID: Int, initialPost: Post?) -> CommentsViewModel {
+        if let model = models[postID] {
+            markRecent(postID)
+            return model
+        }
+        let model = CommentsViewModel(postID: postID, initialPost: initialPost)
+        models[postID] = model
+        markRecent(postID)
+        if recentPostIDs.count > Self.capacity {
+            models[recentPostIDs.removeFirst()] = nil
+        }
+        return model
+    }
+
+    private func markRecent(_ postID: Int) {
+        recentPostIDs.removeAll(where: { $0 == postID })
+        recentPostIDs.append(postID)
+    }
+
+    func removeAll() {
+        models.removeAll()
+        recentPostIDs.removeAll()
     }
 }
 

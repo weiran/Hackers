@@ -543,7 +543,9 @@ struct CommentsSheetTopChrome: View {
 }
 
 struct StableCommentsHost: View, @preconcurrency Equatable {
-    @Environment(\.usesVerticalBrowserControls) private var usesVerticalBrowserControls
+    /// Make the bar axis part of equality. The persistent split-view detail can otherwise
+    /// skip this host during a display transfer and leave the navigation bar hidden.
+    let usesVerticalBrowserControls: Bool
     let postID: Int
     let topContentInset: CGFloat
     let showsPostHeader: Bool
@@ -563,7 +565,8 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
     let onTitleDragEnded: (DragGesture.Value) -> Void
 
     static func == (lhs: StableCommentsHost, rhs: StableCommentsHost) -> Bool {
-        lhs.postID == rhs.postID
+        lhs.usesVerticalBrowserControls == rhs.usesVerticalBrowserControls
+            && lhs.postID == rhs.postID
             && lhs.topContentInset == rhs.topContentInset
             && lhs.showsPostHeader == rhs.showsPostHeader
             && lhs.scrollDisabled == rhs.scrollDisabled
@@ -583,7 +586,9 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
             showsPostHeader: showsPostHeader,
             allowsRefresh: false,
             showsToolbar: showsToolbar,
-            controlsNavigationBarVisibility: !usesVerticalBrowserControls,
+            // iOS 27.1+ always uses the parent browser's system toolbar in every pose.
+            // Older versions still switch between floating controls and the comments bar.
+            controlsNavigationBarVisibility: commentsControlsNavigationBarVisibility,
             presentationState: .customBrowser(topContentInset: topContentInset),
             postHeaderMatchedGeometryNamespace: isPostHeaderMatchedGeometryEnabled
                 ? postHeaderMatchedGeometryNamespace
@@ -602,25 +607,34 @@ struct StableCommentsHost: View, @preconcurrency Equatable {
         )
         .scrollDisabled(scrollDisabled)
     }
+
+    private var commentsControlsNavigationBarVisibility: Bool {
+        if #available(iOS 27.1, *) { return false }
+        return true
+    }
 }
 
 // Read the system's bar placement, rather than identifying hardware or guessing
 // from size classes. A nil edge preserves the existing iPhone presentation.
-private struct UsesVerticalBrowserControlsKey: EnvironmentKey {
-    static let defaultValue = false
+private struct VerticalBrowserControlsEdgeKey: EnvironmentKey {
+    static let defaultValue: HorizontalEdge? = nil
 }
 
 extension EnvironmentValues {
+    var verticalBrowserControlsEdge: HorizontalEdge? {
+        get { self[VerticalBrowserControlsEdgeKey.self] }
+        set { self[VerticalBrowserControlsEdgeKey.self] = newValue }
+    }
+
     var usesVerticalBrowserControls: Bool {
-        get { self[UsesVerticalBrowserControlsKey.self] }
-        set { self[UsesVerticalBrowserControlsKey.self] = newValue }
+        verticalBrowserControlsEdge != nil
     }
 }
 
 struct AdaptiveBrowserControls: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(iOS 27.1, *) {
+        if #available(iOS 27.1, *), UIDevice.current.userInterfaceIdiom != .pad {
             content.modifier(VerticalBrowserControlsEnvironment())
         } else {
             content
@@ -633,81 +647,6 @@ private struct VerticalBrowserControlsEnvironment: ViewModifier {
     @Environment(\.toolbarVerticalEdge) private var verticalEdge
 
     func body(content: Content) -> some View {
-        content.environment(\.usesVerticalBrowserControls, verticalEdge != nil)
-    }
-}
-
-@available(iOS 27.1, *)
-struct VerticalBrowserToolbar: ToolbarContent {
-    let fallbackURL: URL
-    let onDismiss: @MainActor () -> Void
-    let onToggleComments: @MainActor () -> Void
-    let showsComments: Bool
-    @ObservedObject var controller: BrowserController
-
-    var body: some ToolbarContent {
-        ToolbarItem(id: "browser.close", placement: .cancellationAction) {
-            Button("Close", systemImage: "xmark", action: onDismiss)
-        }
-        .axisBehavior(.verticalPreferred)
-        if !showsComments {
-            if controller.canGoBack {
-                ToolbarItem(id: "browser.back", placement: .topBarTrailing) {
-                    Button("Back", systemImage: "chevron.backward", action: controller.goBack)
-                }
-                .axisBehavior(.verticalPreferred)
-            }
-            if controller.canGoForward {
-                ToolbarItem(id: "browser.forward", placement: .topBarTrailing) {
-                    Button("Forward", systemImage: "chevron.forward", action: controller.goForward)
-                }
-                .axisBehavior(.verticalPreferred)
-            }
-            ToolbarItem(id: "browser.reload", placement: .topBarTrailing) {
-                Button(controller.isLoading ? "Stop" : "Reload",
-                       systemImage: controller.isLoading ? "xmark" : "arrow.clockwise") {
-                    if controller.isLoading { controller.stopLoading() } else { controller.reload() }
-                }
-            }
-            .axisBehavior(.verticalPreferred)
-            ToolbarItem(id: "browser.share", placement: .topBarTrailing) {
-                Button("Share", systemImage: "square.and.arrow.up") {
-                    ContentSharePresenter.shared.shareURL(
-                        controller.currentURL ?? fallbackURL, title: controller.currentTitle
-                    )
-                }
-            }
-            .axisBehavior(.verticalPreferred)
-            ToolbarItem(id: "browser.safari", placement: .topBarTrailing) {
-                Button("Open in Safari", systemImage: "safari") {
-                    LinkOpener.openInSystemBrowser(controller.currentURL ?? fallbackURL)
-                }
-            }
-            .axisBehavior(.verticalPreferred)
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-        }
-        ToolbarItem(id: "browser.commentsToggle", placement: .topBarTrailing) {
-            // Keep one button alive as the browser actions enter/leave the bar,
-            // so the system can move it rather than replacing the whole item.
-            Button(action: onToggleComments) {
-                Label {
-                    Text(showsComments ? "Show Article" : "Show Comments")
-                } icon: {
-                    if showsComments {
-                        ThumbnailView(
-                            url: fallbackURL,
-                            thumbnailSize: CGSize(width: 24, height: 24)
-                        )
-                        .frame(width: 24, height: 24)
-                        .clipShape(.rect(cornerRadius: 6))
-                    } else {
-                        Image(systemName: "message")
-                    }
-                }
-                .labelStyle(.iconOnly)
-            }
-            .accessibilityLabel(showsComments ? "Show Article" : "Show Comments")
-        }
-        .axisBehavior(.verticalPreferred)
+        content.environment(\.verticalBrowserControlsEdge, verticalEdge)
     }
 }

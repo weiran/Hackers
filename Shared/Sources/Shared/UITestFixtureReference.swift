@@ -20,3 +20,11 @@ public enum UITestFixtureReference {
     public static let largeCollapsibleRootCommentID = 49_000_003
     public static let largeCollapsibleChildCommentID = 49_000_004
 }
+
+/// Darwin notifications a UI test posts to simulate the window's horizontal size class
+/// changing, as happens when an iPhone Duo folds or unfolds. Neither XCUITest nor `simctl`
+/// can fold the simulator, so the app applies the same trait change itself.
+public enum UITestSizeClassNotification {
+    public static let regular = "com.weiranzhang.Hackers.uitest.horizontalSizeClass.regular"
+    public static let compact = "com.weiranzhang.Hackers.uitest.horizontalSizeClass.compact"
+}
