@@ -128,6 +128,36 @@ final class NavigationAndCommentsUITests: HackersUITestCase {
         XCTAssertNotNil(secondTargetFrame, "The next press should advance to the second comment")
     }
 
+    func testNextTopLevelCommentButtonIsVisibleAlongsideNextCommentAndAdvances() throws {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: longCommentsPostID, presentation: .expandedComments),
+            showNextTopLevelCommentButton: true
+        ))
+
+        assertHittable(app.buttons[AccessibilityIdentifier.Comments.nextCommentButton], timeout: 8)
+        let nextTopLevelButton = assertHittable(
+            app.buttons[AccessibilityIdentifier.Comments.nextTopLevelCommentButton]
+        )
+        let firstComment = assertHasVisibleIntersection(
+            app.buttons[AccessibilityIdentifier.Comments.comment(UITestFixtureReference.firstLongCommentID)],
+            in: app
+        )
+        let secondTopLevelComment = app.buttons[
+            AccessibilityIdentifier.Comments.comment(UITestFixtureReference.secondLongTopLevelCommentID)
+        ]
+
+        let initialFirstMinY = firstComment.frame.minY
+        nextTopLevelButton.tap()
+        let firstTargetFrame = waitForStableFrame(of: firstComment, timeout: 5) {
+            $0.minY < initialFirstMinY - 40
+        }
+        XCTAssertNotNil(firstTargetFrame, "The first press should align the first top-level comment")
+
+        nextTopLevelButton.tap()
+        assertFullyContained(secondTopLevelComment, in: app)
+    }
+
     func testCollapsingCommentKeepsRootContextAvailable() throws {
         launchApp(linkBrowserMode: .inAppBrowser)
 

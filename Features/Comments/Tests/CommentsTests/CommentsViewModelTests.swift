@@ -192,6 +192,27 @@ struct CommentsViewModelTests {
         #expect(viewModel.showNextCommentButton == false)
     }
 
+    @Test("Next top-level comment button visibility follows settings changes")
+    @MainActor
+    func nextTopLevelCommentButtonSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        settingsUseCase.showNextTopLevelCommentButton = true
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase,
+            bookmarksController: bookmarksController
+        )
+        #expect(viewModel.showNextTopLevelCommentButton == true)
+
+        settingsUseCase.showNextTopLevelCommentButton = false
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.showNextTopLevelCommentButton == false)
+    }
+
     @Test("Bookmark notifications update local post state")
     @MainActor
     func bookmarkNotificationsUpdatePostState() async {
@@ -1098,6 +1119,7 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool = true
     private var storedSwipeCollapseThreads: Bool = true
     private var storedShowNextCommentButton: Bool = true
+    private var storedShowNextTopLevelCommentButton = false
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails
@@ -1123,6 +1145,14 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedShowNextCommentButton }
         set {
             storedShowNextCommentButton = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var showNextTopLevelCommentButton: Bool {
+        get { storedShowNextTopLevelCommentButton }
+        set {
+            storedShowNextTopLevelCommentButton = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

@@ -96,7 +96,8 @@ struct UITestLaunchConfigurationTests {
             mediaPlayback: .autoplayFixture,
             readPostIDs: [48_345_248, 48_347_354],
             dimReadPosts: true,
-            showThumbnails: true
+            showThumbnails: true,
+            showNextTopLevelCommentButton: true
         )
 
         #expect(try UITestLaunchConfiguration.parse(environment: expected.environment) == expected)
