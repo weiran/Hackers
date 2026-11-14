@@ -10,8 +10,21 @@ public enum UITestFixtureReference {
     public static let collapsibleRootCommentID = 48_348_985
     public static let collapsibleChildCommentID = 48_349_298
     public static let firstScreenshotCommentID = 48_354_262
+    public static let secondReplyTargetCommentID = 48_353_305
+
+    /// Deterministic server-assigned id for comments submitted through the
+    /// UI-test fixture use case.
+    public static let submittedCommentID = 49_390_001
     public static let laterScreenshotCommentID = 48_354_415
     public static let firstLargeCommentID = 49_000_000
     public static let largeCollapsibleRootCommentID = 49_000_003
     public static let largeCollapsibleChildCommentID = 49_000_004
+}
+
+/// Darwin notifications a UI test posts to simulate the window's horizontal size class
+/// changing, as happens when an iPhone Duo folds or unfolds. Neither XCUITest nor `simctl`
+/// can fold the simulator, so the app applies the same trait change itself.
+public enum UITestSizeClassNotification {
+    public static let regular = "com.weiranzhang.Hackers.uitest.horizontalSizeClass.regular"
+    public static let compact = "com.weiranzhang.Hackers.uitest.horizontalSizeClass.compact"
 }

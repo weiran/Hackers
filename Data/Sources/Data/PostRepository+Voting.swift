@@ -7,6 +7,7 @@
 
 import Domain
 import Foundation
+import Networking
 import SwiftSoup
 
 extension PostRepository {
@@ -31,10 +32,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm =
-            response.contains("<form action=\"/login") ||
-            response.contains("You have to be logged in")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try throwIfLoginRequired(response)
     }
 
     public func unvote(post: Post) async throws {
@@ -43,16 +41,7 @@ extension PostRepository {
             throw HackersKitError.scraperError
         }
 
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
-
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm =
-            response.contains("<form action=\"/login") ||
-            response.contains("You have to be logged in")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try await submitUnvote(itemID: post.id, unvoteURL: unvoteURL)
     }
 
     public func upvote(comment: Domain.Comment, for _: Post) async throws {
@@ -68,8 +57,7 @@ extension PostRepository {
         guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
 
         let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+        try throwIfLoginRequired(response)
     }
 
     public func unvote(comment: Domain.Comment, for _: Post) async throws {
@@ -78,14 +66,104 @@ extension PostRepository {
             throw HackersKitError.scraperError
         }
 
-        let fullURLString = unvoteURL.absoluteString.hasPrefix("http")
-            ? unvoteURL.absoluteString
-            : urlBase + "/" + unvoteURL.absoluteString
-        guard let realURL = URL(string: fullURLString) else { throw HackersKitError.scraperError }
+        try await submitUnvote(itemID: comment.id, unvoteURL: unvoteURL)
+    }
 
-        let response = try await networkManager.get(url: realURL)
-        let containsLoginForm = response.contains("<form action=\"/login")
-        if containsLoginForm { throw HackersKitError.unauthenticated }
+    // MARK: - Unvote verification
+
+    /// Performs an unvote and checks whether Hacker News actually applied it.
+    ///
+    /// Verified against production HN: an applied vote 302-redirects to the link's
+    /// `goto` target, while a refused unvote (nothing to remove, or a vote outside
+    /// the unvote window) is silently ignored and returns the very same redirect —
+    /// there is no error response to detect. The only truthful signal is the vote
+    /// state the response page shows: an item we are still upvoted on keeps its
+    /// `un_<id>` link or a hidden (`nosee`) upvote arrow. The `goto` parameter is
+    /// therefore rewritten to the item's own page so the redirect response always
+    /// carries that state, keeping the whole check to this single request. Bare
+    /// error pages served at /vote ("Can't make that vote.") remain immediate
+    /// refusals.
+    func submitUnvote(itemID: Int, unvoteURL: URL) async throws {
+        guard let url = resolvedUnvoteURL(unvoteURL, itemID: itemID) else {
+            throw HackersKitError.scraperError
+        }
+
+        let response = try await networkManager.getResponse(url: url)
+        let body = response.body
+        try throwIfLoginRequired(body)
+
+        if isRefusalServedInPlace(response, body: body) {
+            throw HackersKitError.voteRejected
+        }
+
+        if try voteState(from: body, itemID: itemID) == .upvoted {
+            // The page HN returned still shows our vote standing.
+            throw HackersKitError.voteRejected
+        }
+    }
+
+    private enum ItemVoteState {
+        case upvoted
+        case unupvoted
+        case inconclusive
+    }
+
+    private func voteState(from html: String, itemID: Int) throws -> ItemVoteState {
+        guard let document = try? SwiftSoup.parse(html),
+              let upvoteLink = try document.select("a#up_\(itemID)").first()
+        else { return .inconclusive }
+
+        let unvoteLink = try document.select("a#un_\(itemID)").first()
+        if unvoteLink != nil || upvoteLink.hasClass("nosee") {
+            return .upvoted
+        }
+        return .unupvoted
+    }
+
+    /// Some refusals are unmistakable: HN serves bare error pages ("Can't make that
+    /// vote.") at the /vote endpoint instead of redirecting to the goto target.
+    private func isRefusalServedInPlace(_ response: NetworkResponse, body: String) -> Bool {
+        let lowered = body.lowercased()
+        guard response.finalURL.path == "/vote" else { return false }
+        return lowered.contains("make that vote")
+            || lowered.contains("too old to be modified")
+            || !lowered.contains("<table")
+    }
+
+    private func throwIfLoginRequired(_ body: String) throws {
+        let loweredBody = body.lowercased()
+        let containsLoginForm =
+            loweredBody.range(
+                of: #"<form\b[^>]*\baction\s*=\s*[\"']/login\b"#,
+                options: .regularExpression
+            ) != nil
+        let containsLoginMessage = loweredBody.contains("you have to be logged in")
+        if containsLoginForm || containsLoginMessage { throw HackersKitError.unauthenticated }
+    }
+
+    /// Resolves the unvote link to an absolute URL and rewrites its `goto` target to
+    /// the item's own page, so HN's redirect response contains the item's vote state.
+    private func resolvedUnvoteURL(_ voteURL: URL, itemID: Int) -> URL? {
+        guard var urlString = resolvedVoteURL(voteURL)?.absoluteString else { return nil }
+
+        let itemTarget = "goto=item%3Fid%3D\(itemID)"
+        if let range = urlString.range(of: "goto=[^&]*", options: .regularExpression) {
+            urlString.replaceSubrange(range, with: itemTarget)
+        } else {
+            urlString += "&" + itemTarget
+        }
+        return URL(string: urlString)
+    }
+
+    private func resolvedVoteURL(_ voteURL: URL) -> URL? {
+        let reference = voteURL.absoluteString
+        guard !reference.hasPrefix("http") else { return URL(string: reference) }
+
+        // Leading-slash references would otherwise join into a "//vote" double-slash
+        // path; normalize so every resolved vote URL lives directly under /vote.
+        var path = Substring(reference)
+        while path.first == "/" { path = path.dropFirst() }
+        return URL(string: urlBase + "/" + path)
     }
 
     // MARK: - Vote link extraction
@@ -124,7 +202,7 @@ extension PostRepository {
 
         let upvoteHidden: Bool = {
             guard let upElement = upvoteLink else { return false }
-            return (try? upElement.hasClass("nosee")) ?? false
+            return upElement.hasClass("nosee")
         }()
 
         if derivedUnvoteURL == nil, upvoteHidden, let upvoteURL {

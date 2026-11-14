@@ -15,4 +15,8 @@ public enum WhatsNewService {
         let whatsNewData = WhatsNewData.currentWhatsNew()
         return WhatsNewView(whatsNewData: whatsNewData, onDismiss: onDismiss)
     }
+
+    public static func currentTitle() -> String {
+        WhatsNewData.currentWhatsNew().title
+    }
 }

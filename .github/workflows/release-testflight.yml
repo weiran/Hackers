@@ -1,9 +1,6 @@
 name: Release TestFlight
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       release_tag:
@@ -16,7 +13,21 @@ on:
         type: boolean
         default: false
       external_groups:
-        description: "Optional comma-separated external TestFlight groups"
+        description: "Comma-separated external TestFlight groups"
+        required: false
+        type: string
+        default: "External Testers"
+      submit_beta_review:
+        description: "Submit the external build for TestFlight beta review when Apple requires it"
+        required: false
+        type: boolean
+        default: true
+      what_to_test:
+        description: "Optional custom TestFlight What to Test text; overrides generated notes"
+        required: false
+        type: string
+      local_ipa_asset:
+        description: "Optional IPA asset already attached to the release tag; skips the GitHub-hosted archive"
         required: false
         type: string
 
@@ -36,14 +47,14 @@ env:
 jobs:
   testflight:
     name: testflight
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 120
     environment: testflight
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.distribute_existing == 'true' && 'master' || github.event.inputs.release_tag || github.ref }}
+          ref: ${{ github.event.inputs.distribute_existing == 'true' && github.ref || github.event.inputs.release_tag || github.ref }}
 
       - name: Prepare Xcode
         run: scripts/ci/setup-xcode-simulator.sh --xcode-only
@@ -57,32 +68,37 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          CUSTOM_WHAT_TO_TEST: ${{ github.event.inputs.what_to_test }}
         run: |
           mkdir -p artifacts/release
           RELEASE_NOTES=artifacts/release/what-to-test.txt
 
-          PREVIOUS_RELEASE_TAG=$(gh release list --json tagName,isDraft,publishedAt --limit 200 \
-            | jq -r --arg TAG "$RELEASE_TAG" '[.[] | select(.isDraft == false and .tagName != $TAG)] | .[0].tagName')
-          PREVIOUS_TAG=$(git tag --sort=-creatordate --list 'v*' \
-            | awk -v TAG="$RELEASE_TAG" 'BEGIN { found=0 } \
-              { if ($0 == TAG) { found=1; next } if (found) { print; exit } }')
-
-          RELEASE_IS_DRAFT=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft 2>/dev/null || echo true)
-
-          if [ "$RELEASE_IS_DRAFT" = "true" ] && [ -n "$PREVIOUS_TAG" ]; then
-            NOTE_START_TAG="$PREVIOUS_TAG"
-          elif [ "$PREVIOUS_RELEASE_TAG" != "null" ] && [ -n "$PREVIOUS_RELEASE_TAG" ]; then
-            NOTE_START_TAG="$PREVIOUS_RELEASE_TAG"
+          if [ -n "$CUSTOM_WHAT_TO_TEST" ]; then
+            printf '%s\n' "$CUSTOM_WHAT_TO_TEST" > "$RELEASE_NOTES"
           else
-            NOTE_START_TAG=""
-          fi
+            PREVIOUS_RELEASE_TAG=$(gh release list --json tagName,isDraft,publishedAt --limit 200 \
+              | jq -r --arg TAG "$RELEASE_TAG" '[.[] | select(.isDraft == false and .tagName != $TAG)] | .[0].tagName')
+            PREVIOUS_TAG=$(git tag --sort=-creatordate --list 'v*' \
+              | awk -v TAG="$RELEASE_TAG" 'BEGIN { found=0 } \
+                { if ($0 == TAG) { found=1; next } if (found) { print; exit } }')
 
-          if [ -n "$NOTE_START_TAG" ]; then
-            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" --arg prev "$NOTE_START_TAG" '{tag_name:$tag, previous_tag_name:$prev}')
-            printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
-          else
-            PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" '{tag_name:$tag}')
-            printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
+            RELEASE_IS_DRAFT=$(gh release view "$RELEASE_TAG" --json isDraft -q .isDraft 2>/dev/null || echo true)
+
+            if [ "$RELEASE_IS_DRAFT" = "true" ] && [ -n "$PREVIOUS_TAG" ]; then
+              NOTE_START_TAG="$PREVIOUS_TAG"
+            elif [ "$PREVIOUS_RELEASE_TAG" != "null" ] && [ -n "$PREVIOUS_RELEASE_TAG" ]; then
+              NOTE_START_TAG="$PREVIOUS_RELEASE_TAG"
+            else
+              NOTE_START_TAG=""
+            fi
+
+            if [ -n "$NOTE_START_TAG" ]; then
+              PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" --arg prev "$NOTE_START_TAG" '{tag_name:$tag, previous_tag_name:$prev}')
+              printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
+            else
+              PAYLOAD=$(jq -nc --arg tag "$RELEASE_TAG" '{tag_name:$tag}')
+              printf '%s' "$PAYLOAD" | gh api --method POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/generate-notes" --input - --jq .body > "$RELEASE_NOTES"
+            fi
           fi
 
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
@@ -96,8 +112,17 @@ jobs:
             exit 1
           fi
 
+      - name: Validate external TestFlight distribution
+        env:
+          EXTERNAL_GROUPS: ${{ github.event.inputs.external_groups }}
+        run: |
+          if [ -z "${EXTERNAL_GROUPS//[[:space:]]/}" ]; then
+            echo "At least one external TestFlight group is required" >&2
+            exit 1
+          fi
+
       - name: Upload to TestFlight
-        if: ${{ github.event.inputs.distribute_existing != 'true' }}
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset == '' }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -108,7 +133,35 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
         run: bundle exec fastlane ios beta release_tag:"$RELEASE_TAG"
+
+      - name: Download local IPA asset
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          LOCAL_IPA_ASSET: ${{ github.event.inputs.local_ipa_asset }}
+        run: |
+          gh release download "$RELEASE_TAG" \
+            --pattern "$LOCAL_IPA_ASSET" \
+            --dir artifacts/release \
+            --clobber
+          test -f "artifacts/release/$LOCAL_IPA_ASSET"
+          ls -lh "artifacts/release/$LOCAL_IPA_ASSET"
+
+      - name: Upload local IPA to TestFlight
+        if: ${{ github.event.inputs.distribute_existing != 'true' && github.event.inputs.local_ipa_asset != '' }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+          WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
+          LOCAL_IPA_PATH: ${{ github.workspace }}/artifacts/release/${{ github.event.inputs.local_ipa_asset }}
+          TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
+        run: bundle exec fastlane ios upload_existing_testflight release_tag:"$RELEASE_TAG" ipa_path:"$LOCAL_IPA_PATH"
 
       - name: Distribute Existing TestFlight Build
         if: ${{ github.event.inputs.distribute_existing == 'true' }}
@@ -119,6 +172,7 @@ jobs:
           RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
           WHAT_TO_TEST_FILE: artifacts/release/what-to-test.txt
           TESTFLIGHT_GROUPS: ${{ github.event.inputs.external_groups }}
+          SUBMIT_BETA_REVIEW: ${{ github.event.inputs.submit_beta_review == 'true' && 'true' || 'false' }}
         run: bundle exec fastlane ios distribute_existing_testflight release_tag:"$RELEASE_TAG"
 
       - name: Release summary

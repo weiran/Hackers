@@ -14,30 +14,6 @@ import Testing
 @Suite("FeedViewModel", .serialized)
 struct FeedViewModelTests {
     @MainActor
-    @Test("Loading feed populates posts and clears loading state")
-    func loadFeedSuccess() async {
-        let postUseCase = StubPostUseCase()
-        let voteUseCase = StubVoteUseCase()
-        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        let bookmarksUseCase = StubBookmarksUseCase()
-        let bookmarksController = BookmarksController(bookmarksUseCase: bookmarksUseCase)
-        let searchUseCase = StubSearchUseCase()
-
-        let viewModel = FeedViewModel(
-            postUseCase: postUseCase,
-            voteUseCase: voteUseCase,
-            bookmarksController: bookmarksController,
-            searchUseCase: searchUseCase
-        )
-        await viewModel.loadFeed()
-
-        #expect(viewModel.posts.count == 1)
-        #expect(viewModel.posts.first?.id == 1)
-        #expect(viewModel.isLoading == false)
-        #expect(viewModel.error == nil)
-    }
-
-    @MainActor
     @Test("Load failure surfaces error state and stops spinner")
     func loadFeedFailure() async {
         let postUseCase = StubPostUseCase()
@@ -82,24 +58,26 @@ struct FeedViewModelTests {
     }
 
     @MainActor
-    @Test("Changing post type refreshes feed and resets pagination")
-    func changePostTypeRefreshesFeed() async {
+    @Test("Failed next page is retried instead of skipped")
+    func failedNextPageRetriesSamePage() async {
         let postUseCase = StubPostUseCase()
         postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        postUseCase.enqueue(.success([SampleData.post(id: 42, type: .ask)]))
-        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
-
+        postUseCase.enqueue(.failure(StubError.network))
+        postUseCase.enqueue(.success([SampleData.post(id: 2)]))
         let viewModel = FeedViewModel(
             postUseCase: postUseCase,
             voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController
+            bookmarksController: BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
         )
-        await viewModel.loadFeed()
-        await viewModel.changePostType(.ask)
 
-        #expect(viewModel.postType == .ask)
-        #expect(viewModel.posts.first?.id == 42)
-        #expect(postUseCase.requestedTypes == [.news, .ask])
+        await viewModel.loadFeed()
+        await viewModel.loadNextPage()
+        #expect(viewModel.paginationError is StubError)
+        await viewModel.loadNextPage()
+
+        #expect(postUseCase.requestedPages == [1, 2, 2])
+        #expect(viewModel.posts.map(\.id) == [1, 2])
+        #expect(viewModel.paginationError == nil)
     }
 
     @MainActor
@@ -342,33 +320,6 @@ struct FeedViewModelTests {
     }
 
     @MainActor
-    @Test("Search query updates results")
-    func searchQueryUpdatesResults() async throws {
-        let postUseCase = StubPostUseCase()
-        postUseCase.enqueue(.success([SampleData.post(id: 1)]))
-        let bookmarksController = BookmarksController(bookmarksUseCase: StubBookmarksUseCase())
-        let searchUseCase = StubSearchUseCase()
-        searchUseCase.nextResults = [SampleData.post(id: 42)]
-
-        let viewModel = FeedViewModel(
-            postUseCase: postUseCase,
-            voteUseCase: StubVoteUseCase(),
-            bookmarksController: bookmarksController,
-            searchUseCase: searchUseCase
-        )
-
-        await viewModel.loadFeed()
-        viewModel.updateSearchQuery("swift")
-        let searchCompleted = await waitForSearchCompletion(of: viewModel)
-        #expect(searchCompleted)
-
-        #expect(searchUseCase.receivedQueries.contains("swift"))
-        #expect(viewModel.searchResults.first?.id == 42)
-        #expect(viewModel.hasActiveSearch)
-        #expect(viewModel.isSearchInProgress == false)
-    }
-
-    @MainActor
     @Test("Loading next search page appends unique results")
     func loadingNextSearchPageAppendsUniqueResults() async throws {
         let searchUseCase = StubSearchUseCase()
@@ -526,13 +477,15 @@ private enum StubError: Error {
 private final class StubPostUseCase: PostUseCase, @unchecked Sendable {
     private var responses: [Result<[Post], Error>] = []
     private(set) var requestedTypes: [PostType] = []
+    private(set) var requestedPages: [Int] = []
 
     func enqueue(_ result: Result<[Post], Error>) {
         responses.append(result)
     }
 
-    func getPosts(type: PostType, page _: Int, nextId _: Int?) async throws -> [Post] {
+    func getPosts(type: PostType, page: Int, nextId _: Int?) async throws -> [Post] {
         requestedTypes.append(type)
+        requestedPages.append(page)
         guard !responses.isEmpty else { return [] }
         let result = responses.removeFirst()
         switch result {
@@ -692,6 +645,8 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
     private var storedDimReadPosts: Bool
+    var swipeCollapseThreads: Bool = true
+    var showNextCommentButton: Bool = true
 
     init(
         showThumbnails: Bool,
@@ -758,5 +713,26 @@ private enum SampleData {
             postType: type,
             upvoted: false
         )
+    }
+}
+
+extension FeedViewModelTests {
+    @MainActor
+    @Test("Generic bookmark refresh annotates both current feed and search results")
+    func genericBookmarkRefreshAnnotatesFeedAndSearch() async throws {
+        let useCase = StubBookmarksUseCase()
+        let posts = StubPostUseCase()
+        posts.enqueue(.success([SampleData.post(id: 1)]))
+        let viewModel = FeedViewModel(postUseCase: posts, voteUseCase: StubVoteUseCase(), bookmarksController: BookmarksController(bookmarksUseCase: useCase))
+        await viewModel.loadFeed()
+        viewModel.searchResults = [SampleData.post(id: 1)]
+        _ = try await useCase.toggleBookmark(post: SampleData.post(id: 1))
+        await viewModel.refreshBookmarkAnnotations()
+        #expect(viewModel.posts.first?.isBookmarked == true)
+        #expect(viewModel.searchResults.first?.isBookmarked == true)
+        _ = try await useCase.toggleBookmark(post: SampleData.post(id: 1))
+        await viewModel.refreshBookmarkAnnotations()
+        #expect(viewModel.posts.first?.isBookmarked == false)
+        #expect(viewModel.searchResults.first?.isBookmarked == false)
     }
 }

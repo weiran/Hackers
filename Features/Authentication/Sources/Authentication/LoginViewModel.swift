@@ -21,13 +21,13 @@ public final class LoginViewModel {
     public let textSize: TextSize
 
     private let onLogin: (String, String) async throws -> Void
-    private let onLogout: () -> Void
+    private let onLogout: () async throws -> Void
 
     public init(
         isAuthenticated: Bool,
         currentUsername: String?,
         onLogin: @escaping (String, String) async throws -> Void,
-        onLogout: @escaping () -> Void,
+        onLogout: @escaping () async throws -> Void,
         textSize: TextSize = .medium,
         username: String = "",
         password: String = ""
@@ -69,9 +69,14 @@ public final class LoginViewModel {
         }
     }
 
-    public func logout() {
-        onLogout()
-        isAuthenticated = false
-        currentUsername = nil
+    public func logout() async -> Bool {
+        do {
+            try await onLogout()
+            isAuthenticated = false
+            currentUsername = nil
+            return true
+        } catch {
+            return false
+        }
     }
 }

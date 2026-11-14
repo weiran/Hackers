@@ -126,6 +126,17 @@ private final class StubPostRepository: PostUseCase, VoteUseCase, CommentUseCase
     func getPosts(type _: PostType, page _: Int, nextId _: Int?) async throws -> [Post] { [] }
     func getPost(id _: Int) async throws -> Post { throw HackersKitError.scraperError }
     func getComments(for _: Post) async throws -> [Domain.Comment] { [] }
+    func submitComment(
+        _ request: CommentSubmissionRequest,
+        baselineChildIDs _: Set<Int>
+    ) async throws -> CommentSubmissionOutcome {
+        .unconfirmed(CommentSubmissionAttempt(
+            request: request,
+            baselineChildIDs: [],
+            startedAt: Date()
+        ))
+    }
+    func reconcileComment(_: CommentSubmissionAttempt) async throws -> SubmittedComment? { nil }
     func upvote(post _: Post) async throws {}
     func upvote(comment _: Domain.Comment, for _: Post) async throws {}
     func unvote(post _: Post) async throws {}
@@ -141,6 +152,8 @@ private final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
     var dimReadPosts: Bool = true
+    var swipeCollapseThreads: Bool = true
+    var showNextCommentButton: Bool = true
     func clearCache() async {}
     func cacheUsageBytes() async -> Int64 { 0 }
 }

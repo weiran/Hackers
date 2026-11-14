@@ -5,9 +5,9 @@ This guide covers local setup, build/test commands, coding standards, CI expecta
 ## Requirements
 
 * macOS with current Xcode support for the repo's configured Xcode version.
-* Xcode version from `.github/xcode-version` (`26.4` at the time of writing).
-* iOS Simulator runtime for iOS 26.
-* Swift 6.3 toolchain.
+* Xcode version from `.github/xcode-version` (`27.1`, required for the iPhone Duo toolbar APIs).
+* iOS Simulator runtime for iOS 26 or later.
+* Swift 6.4 toolchain.
 * Homebrew for optional tools such as SwiftLint and actionlint.
 
 The CI simulator device is `iPhone 17 Pro`.
@@ -27,7 +27,9 @@ If the simulator is missing or stale, compare your environment with the CI setup
 scripts/ci/setup-xcode-simulator.sh
 ```
 
-That script selects/prints Xcode, runs first launch setup, selects an iOS runtime matching the chosen Xcode simulator SDK, and creates/boots the expected simulator when needed. It uses `.github/xcode-version` unless `CI_XCODE_VERSION` explicitly overrides it. CI build and test commands use that simulator's UDID so another installed runtime with the same device name cannot be selected accidentally.
+That script selects/prints Xcode, runs first launch setup, and creates/boots the expected simulator when needed. It uses `.github/xcode-version` unless `CI_XCODE_VERSION` explicitly overrides it. The runtime defaults to the chosen Xcode simulator SDK version; `CI_IOS_RUNTIME_VERSION` selects a different installed runtime explicitly. CI builds with Xcode 27.1 and tests iPhone 17 Pro on iOS 27.0 because the current iOS 27.1 runtime supports only iPhone Duo. CI build and test commands use the selected simulator's UDID so another installed runtime with the same device name cannot be selected accidentally.
+
+When multiple Xcode versions are installed locally, run the setup script (or set `DEVELOPER_DIR` to the selected Xcode's Developer directory) before invoking the bare `xcodebuild` commands below.
 
 ## Build
 
@@ -46,8 +48,15 @@ xcodebuild clean build -project Hackers.xcodeproj -scheme Hackers -destination '
 Quick build status check:
 
 ```bash
-xcodebuild build -project Hackers.xcodeproj -scheme Hackers -destination 'platform=iOS Simulator,name=iPhone 17 Pro' 2>&1 | grep "BUILD"
+set -o pipefail
+xcodebuild build \
+  -project Hackers.xcodeproj \
+  -scheme Hackers \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  2>&1 | tee /tmp/hackers-build.log
 ```
+
+The `pipefail` setting preserves the `xcodebuild` exit status when output is piped.
 
 ## Test
 
@@ -55,6 +64,12 @@ Use the project test runner:
 
 ```bash
 ./run_tests.sh
+```
+
+The runner requires a successful `xcodebuild` exit and a positive executed-test summary. Its offline regression harness covers failure markers, misleading success summaries, crashes, and interruption:
+
+```bash
+bash scripts/tests/run-tests-harness-tests.sh
 ```
 
 Verbose:
@@ -69,6 +84,9 @@ Specific modules:
 ./run_tests.sh Domain
 ./run_tests.sh Feed Comments Settings
 ```
+
+When multiple feature modules are selected, the runner groups them into one
+`Features-Package` invocation while preserving the requested test filters.
 
 Do not use `swift test` as the project validation command. Packages target iOS and use iOS-only APIs, so tests must run through Xcode with an iOS Simulator destination.
 
@@ -86,7 +104,7 @@ Nightly validation runs every functional UI test, explicitly excluding screensho
 ./run_ui_tests.sh full
 ```
 
-UI tests write result bundles under `artifacts/xcresults` by default, then verify that the bundle contains exactly the requested test manifest. Both modes use explicit `-only-testing` selectors, so screenshot generation and newly added test classes cannot enter a functional run accidentally. Keep the fully qualified manifest in `run_ui_tests.sh` in the same order as the test methods across the listed functional test source files; the runner fails before building if the class or method inventory drifts. It uses `DESTINATION` when set, otherwise a CI simulator selected by `CI_DEVICE_UDID` or `CI_DESTINATION`, and finally the local `iPhone 17 Pro` default. Use functional UI tests when validating app launch, top-level navigation, browser presentation, or behavior that cannot be covered reliably through package tests.
+UI tests write result bundles under `artifacts/xcresults` by default, then verify that the bundle contains exactly the requested test manifest. Both modes use explicit `-only-testing` selectors, so screenshot generation and newly added test classes cannot enter a functional run accidentally. Keep the fully qualified manifest in `run_ui_tests.sh` in the same order as the test methods across the listed functional test source files; the runner fails before building if the class or method inventory drifts. It uses `DESTINATION` when set, otherwise a CI simulator selected by `CI_DEVICE_UDID` or `CI_DESTINATION`, and finally the local `iPhone 17 Pro` default. Prefer functional UI tests for complex features. Preserve the `.xcresult` bundle and record the exact command, destination, fixture configuration, and selected tests so the run can be verified and repeated.
 
 UI tests should use the deterministic fixture layer under `App/UITesting`, not live Hacker News or Algolia. `UITestingBootstrap.swift` owns launch parsing and dependency wiring, while fixture data, fake services, and article fixtures live in focused companion files. `HACKERS_UI_TESTING=1` is the sole opt-in and installs dependency overrides for posts, comments, search, settings, authentication, bookmarks, read state, voting, and article content. It also selects the shared automation runtime policy, which disables nondeterministic system behavior such as review prompts and credential AutoFill without threading test flags through feature initializers. Invalid values and incompatible route options fail at launch rather than silently falling back.
 
@@ -101,8 +119,12 @@ The typed launch contract is:
 * `HACKERS_UI_DIM_READ_POSTS`: set to `1` or `0` for read-state visual coverage.
 * `HACKERS_UI_READ_POST_IDS`: comma-separated post IDs to pre-mark as read.
 * `HACKERS_UI_SHOW_THUMBNAILS`: set to `1` or `0`.
+* `HACKERS_UI_MEDIA_PLAYBACK`: `standard` or `autoplayFixture`; the latter enables the deterministic local media fixture used by browser autoplay regression tests.
+* `HACKERS_UI_AUTHENTICATED`: set to `1` or `0` to launch with the deterministic authenticated session fixture.
+* `HACKERS_UI_COMMENTING_ENABLED`: set to `1` or `0`; defaults to `0` and gates the commenting feature surface in UI tests.
+* `HACKERS_UI_COMMENT_SUBMISSION`: `success`, `delayedSuccess`, `failure`, or `outcomeUnknown`; defaults to `success` and only has effect when commenting is enabled.
 
-Only keys defined by the shared launch contract are accepted once UI testing is enabled. Functional tests use the `functional` profile, screenshot staging uses `marketing`, and oversized/scroll coverage opts into `stress`. Direct routes must refer to a post in the selected profile. A story route cannot use the in-app browser, and fixture article mode fails closed if the selected post has no local article.
+Only keys defined by the shared launch contract are accepted once UI testing is enabled. Functional tests use the `functional` profile, screenshot staging uses `marketing`, and oversized/scroll coverage opts into `stress`. Direct routes must refer to a post in the selected profile. A story route cannot use the in-app browser, and fixture article mode fails closed if the selected post has no local article. The standard release and DEBUG runtime policies enable commenting, with a DEBUG-only `disableCommenting` launch argument to opt out locally (non-persisting, absent from release builds, ignored when typed UI testing is active); the typed UI-testing automation policy still defaults commenting off and requires `HACKERS_UI_COMMENTING_ENABLED=1`.
 
 Functional scenarios are grouped into feed/settings, browser/comments, and navigation/comments classes. Reuse `HackersUITestCase` for typed launch configuration, semantic selectors, rendered visibility assertions, gestures, and failure diagnostics; keep scenario-specific expectations in the owning test class. Screenshot staging intentionally retains its stricter capture-specific visibility rules.
 
@@ -127,21 +149,11 @@ Tests live beside their package:
 * `DesignSystem/Tests/`
 * `Features/*/Tests/`
 
-Use Swift Testing (`import Testing`, `@Suite`, `@Test`) for new tests unless an existing target clearly uses a different local pattern.
-
-Focus tests on:
-
-* Domain models and parser behavior
-* Repository parsing and persistence behavior
-* ViewModel state transitions
-* Shared services
-* Regression cases for Hacker News markup changes
-
-Avoid view snapshot or full UI tests unless the behavior cannot be covered at a lower level.
+End-to-end UI tests are the default. Add an isolated test only when it catches a concrete regression the UI suite cannot observe. Before writing an isolated test, list the plausible failure modes and write the test before the implementation. Use Swift Testing (`import Testing`, `@Suite`, `@Test`) when an isolated test is justified, unless an existing target clearly uses a different local pattern.
 
 ## Coding Standards
 
-Keep changes consistent with the existing Swift 6.3 codebase:
+Keep changes consistent with the existing Swift 6.4 codebase:
 
 * Prefer small, focused types over broad utility objects.
 * Use `async`/`await` for new asynchronous code.
@@ -170,6 +182,8 @@ brew install swiftlint
 Some existing warnings are non-blocking; do not expand unrelated lint cleanup into feature work unless asked.
 
 ## CI
+
+The build, test, UI, and release workflows use GitHub's `xcode-27` arm64 runner image. The image is a public preview and currently supplies Xcode 27 beta 6 with the iOS 27 SDK. Xcode beta 6 reports version `27.0`, so `.github/xcode-version` remains `27.0` and is the single version selector used by the setup script. The App Store submission workflow runs that selector explicitly before Fastlane so uploads use the same Xcode image contract as builds and TestFlight.
 
 Primary workflows:
 

@@ -76,6 +76,29 @@ struct SearchRepositoryTests {
                 "Missing url should fall back to the HN item URL built from the validated id")
     }
 
+    @Test("Missing hit timestamp uses the injected current date")
+    func missingTimestampUsesInjectedClock() async throws {
+        let mockNetwork = MockNetworkManager()
+        mockNetwork.nextResponse = """
+        {"nbHits":1,"page":0,"nbPages":1,"hitsPerPage":20,"hits":[{"objectID":"789","title":"No timestamp","points":1,"author":"tester","num_comments":0}]}
+        """
+        let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let repository = SearchRepository(networkManager: mockNetwork, currentDate: { fixedDate })
+
+        let page = try await repository.searchPosts(
+            query: "timestamp",
+            sort: .popular,
+            dateRange: .allTime,
+            page: 0,
+            hitsPerPage: 20
+        )
+
+        let post = try #require(page.posts.first)
+        // RelativeDateTimeFormatter on the simulator renders an exact same-time
+        // value as "in 0 seconds"; a wall-clock fallback would be years away.
+        #expect(post.age == "in 0 seconds")
+    }
+
     @Test("Recent search uses search by date endpoint")
     func recentSearchUsesSearchByDateEndpoint() async throws {
         let mockNetwork = MockNetworkManager()
@@ -169,9 +192,17 @@ private final class MockNetworkManager: NetworkManagerProtocol, @unchecked Senda
         } ?? [])
     }
 
-    func get(url: URL) async throws -> String {
+    func getResponse(url: URL) async throws -> NetworkResponse {
         lastURL = url
-        return nextResponse
+        return NetworkResponse(body: nextResponse, statusCode: 200, finalURL: url)
+    }
+
+    func postResponse(url _: URL, body _: String) async throws -> NetworkResponse {
+        fatalError("Not implemented in mock")
+    }
+
+    func get(url: URL) async throws -> String {
+        try await getResponse(url: url).body
     }
 
     func post(url _: URL, body _: String) async throws -> String {
@@ -181,4 +212,6 @@ private final class MockNetworkManager: NetworkManagerProtocol, @unchecked Senda
     func clearCookies() {}
 
     func containsCookie(for _: URL) -> Bool { false }
+
+    func containsCookie(named _: String, for _: URL) -> Bool { false }
 }

@@ -7,7 +7,6 @@
 
 import Domain
 import Foundation
-import Shared
 import SwiftUI
 
 @MainActor
@@ -71,6 +70,7 @@ public final class VotingViewModel {
         defer { endVoting(itemID: post.id) }
 
         let originalScore = post.score
+        let originalVoteLinks = post.voteLinks
 
         // Create a copy of the post with the original state for the voting provider
         var postForVoting = post
@@ -95,6 +95,14 @@ public final class VotingViewModel {
             // Revert optimistic changes on error
             post.upvoted = true
             post.score = originalScore
+            post.voteLinks = originalVoteLinks
+
+            // Hacker News kept the vote (e.g. an unvote outside its unvote window):
+            // drop the stale unvote link so the UI stops offering a change the server
+            // will refuse, while keeping the upvoted state the vote is still in.
+            if case HackersKitError.voteRejected = error, let links = post.voteLinks {
+                post.voteLinks = VoteLinks(upvote: links.upvote, unvote: nil)
+            }
 
             await handleUnauthenticatedIfNeeded(error)
         }
@@ -145,9 +153,23 @@ public final class VotingViewModel {
 
         do {
             try await commentVotingStateProvider.unvoteComment(commentForVoting, for: post)
+            let clearedVoteLinks = comment.voteLinks.map {
+                VoteLinks(upvote: $0.upvote, unvote: nil)
+            }
+            apply(comment.with(upvoted: false).with(voteLinks: clearedVoteLinks))
         } catch {
             // Revert optimistic changes on error.
             apply(comment.with(upvoted: true))
+
+            // Like post unvotes: when Hacker News refuses (kept vote), drop the stale
+            // unvote link but leave the comment upvoted as it actually is server-side.
+            if case HackersKitError.voteRejected = error, let links = comment.voteLinks {
+                apply(
+                    comment.with(upvoted: true)
+                        .with(voteLinks: VoteLinks(upvote: links.upvote, unvote: nil))
+                )
+            }
+
             await handleUnauthenticatedIfNeeded(error)
         }
     }
@@ -190,6 +212,9 @@ public final class VotingViewModel {
 
     private func handleUnauthenticatedIfNeeded(_ error: Error) async {
         guard case HackersKitError.unauthenticated = error else {
+            // A refused unvote (HN kept the vote) is communicated by reverting the
+            // optimistic UI alone; no alert is wanted for it.
+            if case HackersKitError.voteRejected = error { return }
             lastError = error
             return
         }

@@ -30,6 +30,7 @@ public struct SupportView: View {
             if viewModel.isLoading && viewModel.subscriptionProduct == nil && viewModel.tipProducts.isEmpty {
                 ProgressView()
                     .progressViewStyle(.circular)
+                    .tint(nil)
             }
         }
         .refreshable {
@@ -101,6 +102,7 @@ public struct SupportView: View {
                         if viewModel.processingProductId == product.id {
                             ProgressView()
                                 .progressViewStyle(.circular)
+                                .tint(nil)
                                 .padding(.trailing, 16)
                         }
                     }
@@ -167,6 +169,7 @@ public struct SupportView: View {
                             if viewModel.processingProductId == product.id {
                                 ProgressView()
                                     .progressViewStyle(.circular)
+                                    .tint(nil)
                                     .padding(.trailing, 16)
                             }
                         }
@@ -226,6 +229,7 @@ public struct SupportView: View {
             Spacer()
             ProgressView(title)
                 .progressViewStyle(.circular)
+                .tint(nil)
             Spacer()
         }
     }
@@ -242,6 +246,7 @@ public struct SupportView: View {
                     if viewModel.isRestoring {
                         ProgressView()
                             .progressViewStyle(.circular)
+                            .tint(nil)
                     }
                 }
             }

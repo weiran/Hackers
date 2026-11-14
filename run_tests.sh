@@ -314,35 +314,38 @@ run_module_tests() {
     if grep -qE "(^|[[:space:]])✘ |failed after [0-9.]+ seconds with [0-9]+ issue|recorded an issue at|✘ Test run with [0-9]+ tests .* failed" "$temp_output"; then
         has_swift_fail=0
     fi
-    if grep -q "Test Case .*failed" "$temp_output"; then
+    if grep -qE "Test (Case|Suite) .*failed|Executed [0-9]+ tests?, with [1-9][0-9]* failures?|Executed [0-9]+ tests?, with [0-9]+ failures?.*\([1-9][0-9]* unexpected\)" "$temp_output"; then
         has_xctest_fail=0
     fi
     if grep -qE "[^[:space:]]+:[0-9]+:[0-9]+:[[:space:]]*error:" "$temp_output"; then
         has_compilation_error=0
     fi
-    if grep -qE "✔ Test run with [0-9]+ tests in [0-9]+ suites passed|Test Suite '.*' passed" "$temp_output"; then
+    # A successful run must report at least one executed test. Keep the
+    # patterns POSIX/Bash 3.2 compatible for macOS CI and accept singular or
+    # plural grammar emitted by different Xcode releases. XCTest summaries
+    # must include the complete zero-failure clause.
+    if grep -qE "✔ Test run with [1-9][0-9]* tests? .* passed" "$temp_output" || \
+       grep -qE "Executed [1-9][0-9]* tests?, with 0 failures" "$temp_output"; then
         has_pass_summary=0
     fi
     if [ "${exit_code:-0}" -ge 128 ] || grep -qiE "segmentation fault|abort trap|bus error|trace/bpt trap|killed:|crashed" "$temp_output"; then
         has_process_crash=0
     fi
 
-    # If xcodebuild failed without a test/build failure, only normalize to success when
-    # the output contains a definitive pass summary and the process itself did not crash.
+    # Preserve every nonzero xcodebuild exit. A passing-looking log cannot make
+    # a failed or interrupted process successful.
     if [ "${exit_code:-0}" -ne 0 ]; then
-        if [ $has_swift_fail -ne 0 ] && \
-           [ $has_xctest_fail -ne 0 ] && \
-           [ $has_compilation_error -ne 0 ] && \
-           [ $has_pass_summary -eq 0 ] && \
-           [ $has_process_crash -ne 0 ]; then
-            exit_code=0
-        else
-            exit_code=1
-        fi
+        exit_code=1
     fi
 
-    # If we detected real test failures, compilation errors, or a tool crash, force failure.
-    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ] || [ $has_compilation_error -eq 0 ] || [ $has_process_crash -eq 0 ]; then
+    # If we detected real test failures, compilation errors, or a tool crash,
+    # force failure. A generic TEST FAILED banner may be emitted spuriously by
+    # Swift Testing, so detailed markers and the process exit remain
+    # authoritative. Exit zero is only success with a positive executed-test
+    # summary.
+    if [ $has_swift_fail -eq 0 ] || [ $has_xctest_fail -eq 0 ] || \
+       [ $has_compilation_error -eq 0 ] || [ $has_process_crash -eq 0 ] || \
+       [ $has_pass_summary -ne 0 ]; then
         exit_code=1
     fi
 
@@ -353,8 +356,8 @@ run_module_tests() {
 
     if [ "${exit_code:-0}" -eq 0 ]; then
         # Success - extract test summary
-        local test_summary=$(grep -E "Executed [0-9]+ tests|✔.*tests.*passed" "$temp_output" | tail -1)
-        local swift_summary=$(grep -E "✔ Test run with [0-9]+ tests" "$temp_output" | tail -1)
+        local test_summary=$(grep -E "Executed [1-9][0-9]* tests?, with 0 failures|✔ Test run with [1-9][0-9]* tests? .* passed" "$temp_output" | tail -1)
+        local swift_summary=$(grep -E "✔ Test run with [1-9][0-9]* tests? .* passed" "$temp_output" | tail -1)
 
         if [[ "$only_testing" == *" "* ]]; then
             print_status $GREEN "✅ ${module_name} tests passed (${duration}s)"

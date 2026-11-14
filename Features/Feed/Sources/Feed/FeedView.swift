@@ -3,24 +3,23 @@ import Domain
 import Foundation
 import Shared
 import SwiftUI
+import UIKit
 
 public struct FeedView<Store: NavigationStoreProtocol>: View {
     @Environment(Store.self) private var navigationStore
     let isSidebar: Bool
+    let whatsNewPanel: WhatsNewPanel?
     @State private var viewModel: FeedViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var selectedPostType: Domain.PostType
     @State private var selectedPostId: Int?
     @State private var searchText: String
 
-    /// True when the post-type picker menu is shown as a leading toolbar item (sidebar),
-    /// where the navigation title would otherwise duplicate it.
-    private var showsSidebarMenu: Bool { isSidebar && !viewModel.hasActiveSearch }
-
     public init(
         viewModel: FeedViewModel = FeedViewModel(),
         votingViewModel: VotingViewModel? = nil,
-        isSidebar: Bool = false
+        isSidebar: Bool = false,
+        whatsNewPanel: WhatsNewPanel? = nil
     ) {
         _viewModel = State(initialValue: viewModel)
         _selectedPostType = State(initialValue: viewModel.postType)
@@ -33,28 +32,32 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
         _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
         _searchText = State(initialValue: viewModel.searchQuery)
         self.isSidebar = isSidebar
+        self.whatsNewPanel = whatsNewPanel
     }
 
     public var body: some View {
         contentView
-            .navigationTitle(showsSidebarMenu ? "" : (viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName))
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // The same system title menu in every layout, so folding doesn't swap
+                // the category control for a different kind of item.
                 if !viewModel.hasActiveSearch {
-                ToolbarItem(placement: isSidebar ? .topBarLeading : .principal) {
-                    FeedCategoryToolbarMenu(
-                        title: selectedPostType.displayName,
-                        useGlassEffect: !isSidebar
-                    ) {
+                    ToolbarTitleMenu {
                         postTypeTitleMenu
                     }
                 }
+                if #available(iOS 27.1, *), isSidebar, UIDevice.current.userInterfaceIdiom == .phone {
+                    DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+                        .axisBehavior(.horizontalOnly)
+                    ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                        .axisBehavior(.horizontalOnly)
+                    settingsToolbarItem
+                } else {
+                    settingsToolbarItem
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    DefaultToolbarItem(kind: .search, placement: .bottomBar)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    settingsButton
-                }
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
             .searchable(text: $searchText, placement: .toolbar, prompt: "Search Hacker News")
             .searchToolbarBehavior(.minimize)
@@ -66,8 +69,9 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
                     searchText = newValue
                 }
             }
-            .onChange(of: selectedPostType) { _, _ in
+            .onChange(of: selectedPostType) { _, newType in
                 selectedPostId = nil
+                Task { await viewModel.changePostType(newType) }
             }
             .task { @Sendable in
                 votingViewModel.navigationStore = navigationStore
@@ -91,13 +95,54 @@ public struct FeedView<Store: NavigationStoreProtocol>: View {
             } message: {
                 Text(votingViewModel.lastError?.localizedDescription ?? "Failed to vote. Please try again.")
             }
+            .alert(
+                "Couldn’t Load More Stories",
+                isPresented: Binding(
+                    get: { viewModel.paginationError != nil },
+                    set: { if !$0 { viewModel.clearPaginationError() } }
+                )
+            ) {
+                Button("Retry") {
+                    Task { await viewModel.loadNextPage() }
+                }
+                Button("Cancel", role: .cancel) {
+                    viewModel.clearPaginationError()
+                }
+            } message: {
+                Text("Check your connection and try again.")
+            }
             .onAppear {
                 votingViewModel.navigationStore = navigationStore
+                if isSidebar {
+                    selectedPostId = navigationStore.selectedPostId
+                }
+            }
+            .onChange(of: navigationStore.selectedPostId) { _, postID in
+                if isSidebar { selectedPostId = postID }
             }
     }
 }
 
 private extension FeedView {
+    @ToolbarContentBuilder
+    var settingsToolbarItem: some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            // Moves into the vertical toolbar rail on iPhone Duo; unchanged elsewhere.
+            ToolbarItem(id: "feed.settings", placement: .navigationBarTrailing) {
+                settingsButton
+            }
+            .axisBehavior(.verticalPreferred)
+        } else {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                settingsButton
+            }
+        }
+    }
+
+    var navigationTitle: String {
+        viewModel.hasActiveSearch ? "Search" : selectedPostType.displayName
+    }
+
     var primaryPostTypes: [Domain.PostType] {
         [.news, .ask, .show, .jobs, .newest, .best, .active]
     }
@@ -148,6 +193,7 @@ private extension FeedView {
     private var searchResultsContent: some View {
         if viewModel.isSearchInProgress && viewModel.searchResults.isEmpty {
             ProgressView("Searching...")
+                .tint(nil)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = viewModel.searchError, viewModel.searchResults.isEmpty {
             AppEmptyStateView(
@@ -173,27 +219,18 @@ private extension FeedView {
         enablePagination: Bool,
         enableSearchPagination: Bool = false
     ) -> some View {
-        Group {
-            if isSidebar {
-                List {
-                    feedRows(
-                        posts: posts,
-                        enablePagination: enablePagination,
-                        enableSearchPagination: enableSearchPagination
-                    )
-                }
-                .listStyle(.sidebar)
-            } else {
-                List {
-                    feedRows(
-                        posts: posts,
-                        enablePagination: enablePagination,
-                        enableSearchPagination: enableSearchPagination
-                    )
-                }
-                .listStyle(.plain)
-            }
+        // Keep one List for both the sidebar and compact presentations. Width changes (such
+        // as folding an iPhone Duo) then resize this same scroll view, and the system keeps
+        // the reader's place, instead of tearing down one list and building another.
+        List {
+            feedRows(
+                posts: posts,
+                enablePagination: enablePagination,
+                enableSearchPagination: enableSearchPagination
+            )
         }
+        .listStyle(.plain)
+        .scrollContentBackground(isSidebar ? .hidden : .automatic)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .id(selectedPostType)
         .accessibilityIdentifier(
@@ -207,6 +244,12 @@ private extension FeedView {
         enablePagination: Bool,
         enableSearchPagination: Bool
     ) -> some View {
+        if !enableSearchPagination, let whatsNewPanel {
+            WhatsNewPanelRow(panel: whatsNewPanel)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+        }
         ForEach(posts, id: \.id) { post in
             postRow(
                 for: post,
@@ -231,7 +274,7 @@ private extension FeedView {
             compactMode: viewModel.compactFeedDesign,
             dimReadPost: viewModel.dimReadPosts,
             onLinkTap: { handleLinkTap(post: post) },
-            onCommentsTap: isSidebar ? nil : { handlePostTap(post: post) },
+            onCommentsTap: { handlePostTap(post: post) },
             onPostUpdated: { updatedPost in
                 viewModel.replacePost(updatedPost)
             },
@@ -239,16 +282,9 @@ private extension FeedView {
                 await viewModel.toggleBookmark(for: post)
             }
         )
-        .if(isSidebar) { view in
-            view
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-                .listRowBackground(sidebarRowBackground(isSelected: selectedPostId == post.id))
-                .onTapGesture {
-                    selectedPostId = post.id
-                    handlePostTap(post: post)
-                }
-        }
+        // Same row structure in both presentations, so rows keep their identity when the
+        // width changes; only values differ.
+        .listRowBackground(sidebarRowBackground(isSelected: isSidebar && selectedPostId == post.id))
         .onAppear {
             if enablePagination, post == viewModel.posts.last {
                 Task {
@@ -277,6 +313,7 @@ private extension FeedView {
         if isSelected {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(Color(.tertiarySystemFill))
+                .padding(.horizontal, 8)
         } else {
             Color.clear
         }
@@ -327,7 +364,7 @@ private extension FeedView {
         VotingContextMenuItems.postVotingMenuItems(
             for: post,
             onVote: {
-                Task {
+                Task { @MainActor in
                     var mutablePost = post
                     await votingViewModel.upvote(post: &mutablePost)
                     await MainActor.run {
@@ -338,7 +375,7 @@ private extension FeedView {
                 }
             },
             onUnvote: {
-                Task {
+                Task { @MainActor in
                     var mutablePost = post
                     await votingViewModel.unvote(post: &mutablePost)
                     await MainActor.run {
@@ -466,6 +503,7 @@ private extension FeedView {
             HStack {
                 Spacer()
                 ProgressView()
+                    .tint(nil)
                 Spacer()
             }
             .listRowSeparator(.hidden)
@@ -481,9 +519,6 @@ private extension FeedView {
     private func postTypeMenuButton(for postType: Domain.PostType) -> some View {
         Button {
             selectedPostType = postType
-            Task {
-                await viewModel.changePostType(postType)
-            }
         } label: {
             HStack {
                 Image(systemName: postType.iconName)
@@ -516,7 +551,8 @@ private extension FeedView {
         }
 
         let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
+        if mode == .customBrowser {
+            selectedPostId = post.id
             navigationStore.showPostLink(post, presentation: .collapsedBrowser)
             return
         }
@@ -525,7 +561,6 @@ private extension FeedView {
             navigationStore.showPost(post)
             selectedPostId = post.id
         }
-
         if navigationStore.openURLInPrimaryContext(post.url, pushOntoDetailStack: !isSidebar) {
             return
         }
@@ -535,50 +570,6 @@ private extension FeedView {
     private func shouldShowVoteActions(for post: Domain.Post) -> Bool {
         (post.voteLinks?.upvote != nil && !post.upvoted)
             || (post.voteLinks?.unvote != nil && post.upvoted)
-    }
-}
-
-private struct FeedCategoryToolbarMenu<MenuContent: View>: View {
-    let title: String
-    var useGlassEffect: Bool = true
-    @ViewBuilder let menuContent: () -> MenuContent
-
-    var body: some View {
-        Menu {
-            menuContent()
-        } label: {
-            if useGlassEffect {
-                HStack(spacing: 8) {
-                    Text(title)
-                    ZStack {
-                        Circle()
-                            .fill(Color.secondary.opacity(0.16))
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(width: 18, height: 18)
-                }
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .padding(.leading, 14)
-                .padding(.trailing, 10)
-                .frame(height: 44)
-                .glassEffect(.regular.interactive(), in: .capsule)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-            } else {
-                HStack(spacing: 4) {
-                    Text(title)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .font(.headline)
-            }
-        }
-        .buttonStyle(.plain)
-        .menuIndicator(useGlassEffect ? .hidden : .automatic)
     }
 }
 

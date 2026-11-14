@@ -27,6 +27,8 @@ struct SettingsViewModelTests {
         var textSize: TextSize = .medium
         var compactFeedDesign = false
         var dimReadPosts = true
+        var swipeCollapseThreads = true
+        var showNextCommentButton = true
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
@@ -47,6 +49,8 @@ struct SettingsViewModelTests {
         mockSettingsUseCase.textSize = .large
         mockSettingsUseCase.compactFeedDesign = true
         mockSettingsUseCase.dimReadPosts = false
+        mockSettingsUseCase.swipeCollapseThreads = false
+        mockSettingsUseCase.showNextCommentButton = false
 
         let viewModel = settingsViewModel
 
@@ -57,6 +61,8 @@ struct SettingsViewModelTests {
         #expect(viewModel.textSize == .large)
         #expect(viewModel.compactFeedDesign == true)
         #expect(viewModel.dimReadPosts == false)
+        #expect(viewModel.swipeCollapseThreads == false)
+        #expect(viewModel.showNextCommentButton == false)
     }
 
     @Test("Setting changes persist to use case")
@@ -70,6 +76,8 @@ struct SettingsViewModelTests {
         viewModel.textSize = .large
         viewModel.compactFeedDesign = true
         viewModel.dimReadPosts = false
+        viewModel.swipeCollapseThreads = false
+        viewModel.showNextCommentButton = false
 
         #expect(mockSettingsUseCase.safariReaderMode == true)
         #expect(mockSettingsUseCase.linkBrowserMode == .inAppBrowser)
@@ -78,6 +86,8 @@ struct SettingsViewModelTests {
         #expect(mockSettingsUseCase.textSize == .large)
         #expect(mockSettingsUseCase.compactFeedDesign == true)
         #expect(mockSettingsUseCase.dimReadPosts == false)
+        #expect(mockSettingsUseCase.swipeCollapseThreads == false)
+        #expect(mockSettingsUseCase.showNextCommentButton == false)
     }
 
     @Test("Cache usage refresh formats byte count")

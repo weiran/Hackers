@@ -33,6 +33,7 @@ struct UITestLaunchConfigurationTests {
             "HACKERS_UI_STORY_PRESENTATION": "expandedComments",
             "HACKERS_UI_ARTICLE_SOURCE": "live",
             "HACKERS_UI_FIXTURE_PROFILE": "stress",
+            "HACKERS_UI_MEDIA_PLAYBACK": "autoplayFixture",
             "HACKERS_UI_READ_POST_IDS": "1, 2,2",
             "HACKERS_UI_DIM_READ_POSTS": "0",
             "HACKERS_UI_SHOW_THUMBNAILS": "1"
@@ -43,9 +44,46 @@ struct UITestLaunchConfigurationTests {
         #expect(configuration.route == .story(postID: 48_350_598, presentation: .expandedComments))
         #expect(configuration.articleSource == .live)
         #expect(configuration.fixtureProfile == .stress)
+        #expect(configuration.mediaPlayback == .autoplayFixture)
         #expect(configuration.readPostIDs == [1, 2])
         #expect(configuration.dimReadPosts == false)
         #expect(configuration.showThumbnails)
+        #expect(!configuration.authenticated)
+        #expect(!configuration.commentingEnabled)
+    }
+
+    @Test("Commenting opt-in parses and round-trips")
+    func commentingEnabled() throws {
+        let environment = [
+            "HACKERS_UI_TESTING": "1",
+            "HACKERS_UI_AUTHENTICATED": "1",
+            "HACKERS_UI_COMMENTING_ENABLED": "1"
+        ]
+        let configuration = try #require(try UITestLaunchConfiguration.parse(environment: environment))
+
+        #expect(configuration.authenticated)
+        #expect(configuration.commentingEnabled)
+        #expect(try UITestLaunchConfiguration.parse(environment: [
+            "HACKERS_UI_TESTING": "1",
+            "HACKERS_UI_COMMENTING_ENABLED": "0"
+        ])?.commentingEnabled == false)
+        #expect(
+            UITestLaunchConfiguration(authenticated: true, commentingEnabled: true)
+                .environment["HACKERS_UI_COMMENTING_ENABLED"] == "1"
+        )
+    }
+
+    @Test("Malformed commenting opt-in fails parsing")
+    func malformedCommentingEnabled() {
+        #expect(throws: UITestLaunchConfiguration.ParseError.invalidValue(
+            key: "HACKERS_UI_COMMENTING_ENABLED",
+            value: "yes"
+        )) {
+            try UITestLaunchConfiguration.parse(environment: [
+                "HACKERS_UI_TESTING": "1",
+                "HACKERS_UI_COMMENTING_ENABLED": "yes"
+            ])
+        }
     }
 
     @Test("Encoded environments round-trip through the parser")
@@ -55,6 +93,7 @@ struct UITestLaunchConfigurationTests {
             route: .story(postID: 48_350_598, presentation: .expandedComments),
             articleSource: .fixture,
             fixtureProfile: .marketing,
+            mediaPlayback: .autoplayFixture,
             readPostIDs: [48_345_248, 48_347_354],
             dimReadPosts: true,
             showThumbnails: true
@@ -164,7 +203,8 @@ struct UITestLaunchConfigurationTests {
 
     @Test("Malformed booleans and ID lists fail parsing", arguments: [
         ["HACKERS_UI_DIM_READ_POSTS": "true"],
-        ["HACKERS_UI_READ_POST_IDS": "1,nope"]
+        ["HACKERS_UI_READ_POST_IDS": "1,nope"],
+        ["HACKERS_UI_MEDIA_PLAYBACK": "unexpected"]
     ])
     func malformedValues(values: [String: String]) {
         #expect(throws: UITestLaunchConfiguration.ParseError.self) {

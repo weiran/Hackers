@@ -9,6 +9,8 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
     static let largeCommentsPostID = UITestFixtureReference.largeCommentsPostID
     static let searchOnlyPostID = UITestFixtureReference.searchOnlyPostID
 
+    private static let submittedCommentHTML = "<p>Fixture server-confirmed comment body.</p>"
+
     enum ValidationError: Error, CustomStringConvertible {
         case itemURLCannotOpenAsStory(Int)
         case missingArticleFixture(Int)
@@ -44,7 +46,13 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         searchPosts + [askPost, showPost, jobPost]
     }
 
-    init(profile: UITestLaunchConfiguration.FixtureProfile) {
+    private let commentSubmission: UITestLaunchConfiguration.CommentSubmissionFixture
+
+    init(
+        profile: UITestLaunchConfiguration.FixtureProfile,
+        commentSubmission: UITestLaunchConfiguration.CommentSubmissionFixture = .success
+    ) {
+        self.commentSubmission = commentSubmission
         commentsByPostID = Self.makeCommentsByPostID()
         let functionalPosts = Self.makeActivePosts()
         switch profile {
@@ -205,6 +213,44 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
         try await getPost(id: post.id).comments ?? []
     }
 
+    func submitComment(
+        _ request: CommentSubmissionRequest,
+        baselineChildIDs: Set<Int>
+    ) async throws -> CommentSubmissionOutcome {
+        switch commentSubmission {
+        case .success, .delayedSuccess:
+            if commentSubmission == .delayedSuccess {
+                // Keep the in-flight state observable through the spinner test's
+                // polling and absence windows on slower CI runners.
+                try await Task.sleep(for: .seconds(6))
+            }
+            return .confirmed(submittedComment(for: request))
+        case .failure:
+            throw CommentSubmissionError.rejected(message: "Fixture comment rejection.")
+        case .outcomeUnknown:
+            return .unconfirmed(CommentSubmissionAttempt(
+                request: request,
+                baselineChildIDs: baselineChildIDs,
+                startedAt: Date()
+            ))
+        }
+    }
+
+    func reconcileComment(_ attempt: CommentSubmissionAttempt) async throws -> SubmittedComment? {
+        guard commentSubmission == .outcomeUnknown else { return nil }
+        return submittedComment(for: attempt.request)
+    }
+
+    private func submittedComment(for request: CommentSubmissionRequest) -> SubmittedComment {
+        SubmittedComment(
+            id: UITestFixtureReference.submittedCommentID,
+            parentID: request.parentID,
+            author: request.expectedAuthor,
+            htmlText: Self.submittedCommentHTML,
+            createdAt: Date()
+        )
+    }
+
     private func comments(for postID: Int) -> [Comment] {
         (commentsByPostID[postID] ?? []).map { fixture in
             Comment(
@@ -222,8 +268,7 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     ),
                     unvote: nil
                 ),
-                visibility: fixture.visibility,
-                parsedText: fixture.parsedText
+                visibility: fixture.visibility
             )
         }
     }
@@ -497,6 +542,57 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
                     age: "3 hours ago",
                     text: "The tooling is better now, but the same tradeoff remains: block too loosely and costs spike, block too tightly and users leave.",
                     level: 4
+                ),
+                // Trailing level-0 roots keep content below the collapsible
+                // thread: collapsing 48_348_985 must leave enough list height
+                // for its root to scroll to the top of the viewport.
+                makeComment(
+                    id: 48_355_001,
+                    by: "kstrauser",
+                    age: "6 hours ago",
+                    text: "We ended up shipping a challenge only for account creation and password resets, and the support tickets essentially stopped."
+                ),
+                makeComment(
+                    id: 48_355_002,
+                    by: "jcims",
+                    age: "4 hours ago",
+                    text: "The pixel-level fingerprinting arms race feels unwinnable for browsers, which is probably why attention moved to heuristics."
+                ),
+                makeComment(
+                    id: 48_355_003,
+                    by: "saurik",
+                    age: "3 hours ago",
+                    text: "Every one of these systems trains itself on the traffic it already likes, so of course anything unusual looks like an attacker."
+                ),
+                makeComment(
+                    id: 48_355_004,
+                    by: "tptacek",
+                    age: "2 hours ago",
+                    text: "It is wild how quickly turnstile-style interstitials went from novelty to the default tax on anyone blocking third-party scripts."
+                ),
+                makeComment(
+                    id: 48_355_005,
+                    by: "Lockal",
+                    age: "2 hours ago",
+                    text: "Archive links and reader modes break under these gates too, which hurts accessibility more than it stops the abuse traffic."
+                ),
+                makeComment(
+                    id: 48_355_006,
+                    by: "mcguire",
+                    age: "1 hour ago",
+                    text: "Half the time the challenge is just checking whether my ad blocker is on, and the site works fine once it is paused."
+                ),
+                makeComment(
+                    id: 48_355_007,
+                    by: "Retr0id",
+                    age: "1 hour ago",
+                    text: "The WebGL fingerprint query set has not changed in years, so the exotic signals are more Tradition than telemetry at this point."
+                ),
+                makeComment(
+                    id: 48_355_008,
+                    by: "colejohnson66",
+                    age: "28 minutes ago",
+                    text: "Nobody at these companies is deciding to gate the site; a risk vendor's default dashboard slider is making the call."
                 )
             ],
             48_347_354: [
@@ -664,7 +760,10 @@ final class UITestFixtures: PostUseCase, CommentUseCase, SearchUseCase, @uncheck
             by: by,
             level: level,
             upvoted: false,
-            voteLinks: nil
+            voteLinks: VoteLinks(
+                upvote: URL(string: "https://news.ycombinator.com/vote?id=\(id)&how=up&goto=item"),
+                unvote: nil
+            )
         )
     }
 

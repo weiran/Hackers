@@ -9,7 +9,7 @@ import Domain
 import Foundation
 import Networking
 
-public final class SearchRepository: SearchUseCase, @unchecked Sendable {
+public actor SearchRepository: SearchUseCase {
     private enum Constants {
         static let popularEndpoint = "https://hn.algolia.com/api/v1/search"
         static let recentEndpoint = "https://hn.algolia.com/api/v1/search_by_date"
@@ -46,7 +46,7 @@ public final class SearchRepository: SearchUseCase, @unchecked Sendable {
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "tags", value: "story"),
             URLQueryItem(name: "page", value: String(page)),
-            URLQueryItem(name: "hitsPerPage", value: String(hitsPerPage)),
+            URLQueryItem(name: "hitsPerPage", value: String(hitsPerPage))
         ]
         if let cutoff = cutoffTimestamp(for: dateRange) {
             queryItems.append(URLQueryItem(name: "numericFilters", value: "created_at_i>\(cutoff)"))
@@ -70,7 +70,8 @@ public final class SearchRepository: SearchUseCase, @unchecked Sendable {
             let url = hit.url.flatMap { URL(string: $0) }
                 ?? URL(string: "https://news.ycombinator.com/item?id=\(postID)")
             guard let url else { return nil }
-            let age = ageString(from: hit.createdAt)
+            let timestamp = hit.created_at_i ?? currentDate().timeIntervalSince1970
+            let age = ageString(from: timestamp)
 
             return Post(
                 id: postID,
@@ -117,7 +118,6 @@ private extension SearchRepository {
         let story_text: String?
 
         var commentsCount: Int? { num_comments }
-        var createdAt: TimeInterval { created_at_i ?? Date().timeIntervalSince1970 }
         var storyText: String? { story_text }
     }
 

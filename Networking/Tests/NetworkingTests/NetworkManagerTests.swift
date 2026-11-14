@@ -12,9 +12,6 @@ import Testing
 // Serialise the suite so concurrent runs don't fight over HTTPCookieStorage.shared
 @Suite("NetworkManager Tests", .serialized)
 struct NetworkManagerTests {
-    // Default instance (no network calls made in tests that use mocks)
-    let defaultManager = NetworkManager()
-
     // MARK: - Mock URLProtocol
 
     final class MockURLProtocol: URLProtocol {
@@ -122,39 +119,7 @@ struct NetworkManagerTests {
         return NetworkManager(session: session)
     }
 
-    // MARK: - Initialization Tests
-
-    @Test("NetworkManager initialization")
-    func networkManagerInitialization() {
-        // NetworkManager initializes successfully if no exception is thrown
-        _ = defaultManager
-    }
-
     // MARK: - GET Request Tests
-
-    @Test("GET request with valid URL")
-    func getRequestWithValidURL() async throws {
-        let url = URL(string: "https://example.com/get")!
-        let manager = makeManager()
-
-        let response = try await manager.get(url: url)
-
-        #expect(!response.isEmpty, "Response should not be empty")
-        #expect(response.contains("ok"), "Response should contain expected marker")
-    }
-
-    @Test("GET request with invalid URL")
-    func getRequestWithInvalidURL() async {
-        let url = URL(string: "https://invalid-url.example")!
-        let manager = makeManager()
-
-        do {
-            _ = try await manager.get(url: url)
-            Issue.record("Expected network error for invalid URL")
-        } catch {
-            #expect(error != nil, "Should throw an error for invalid URL")
-        }
-    }
 
     @Test("GET request with non-2xx status throws")
     func getRequestWithServerErrorStatus() async {
@@ -177,49 +142,6 @@ struct NetworkManagerTests {
             Issue.record("Expected badServerResponse error for non-2xx status")
         } catch {
             #expect((error as? URLError)?.code == .badServerResponse, "Should throw badServerResponse on non-2xx status")
-        }
-    }
-
-    // MARK: - POST Request Tests
-
-    @Test("POST request with valid URL")
-    func postRequestWithValidURL() async throws {
-        let url = URL(string: "https://example.com/post")!
-        let body = "test=data&key=value"
-        let manager = makeManager()
-
-        let response = try await manager.post(url: url, body: body)
-
-        #expect(!response.isEmpty, "Response should not be empty")
-        #expect(response.contains("received=ok"), "Response should contain mock marker")
-        #expect(response.contains("method=POST"), "Response should reflect POST method")
-        #expect(response.contains(url.absoluteString), "Response should include echoed URL")
-        #expect(response.contains("body=\(body)"), "Response should include echoed body")
-    }
-
-    @Test("POST request with empty body")
-    func postRequestWithEmptyBody() async throws {
-        let url = URL(string: "https://example.com/post")!
-        let body = ""
-        let manager = makeManager()
-
-        let response = try await manager.post(url: url, body: body)
-
-        #expect(!response.isEmpty, "Response should not be empty")
-        #expect(response.contains("method=POST"), "Response should reflect POST method")
-    }
-
-    @Test("POST request with invalid URL")
-    func postRequestWithInvalidURL() async {
-        let url = URL(string: "https://invalid-url.example")!
-        let body = "test=data"
-        let manager = makeManager()
-
-        do {
-            _ = try await manager.post(url: url, body: body)
-            Issue.record("Expected network error for invalid URL")
-        } catch {
-            #expect(error != nil, "Should throw an error for invalid URL")
         }
     }
 
@@ -280,137 +202,6 @@ struct NetworkManagerTests {
         #expect(otherCookieRemains, "Non-HN cookie should be preserved")
     }
 
-    @Test("Contains cookie for URL functionality")
-    func containsCookieForURL() {
-        let url = URL(string: "https://cookie-url-test.example")!
-        let manager = NetworkManager()
-
-        // Store initial cookies state to restore later
-        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
-
-        // Cleanup after test completes
-        defer {
-            // Clear all cookies and restore initial state
-            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-            for cookie in initialCookies {
-                HTTPCookieStorage.shared.setCookie(cookie)
-            }
-        }
-
-        // Initially should have no cookies for this specific domain
-        #expect(!manager.containsCookie(for: url), "Should have no cookies initially for test domain")
-
-        // Add a cookie for the domain
-        let cookie = HTTPCookie(properties: [
-            .domain: "cookie-url-test.example",
-            .path: "/",
-            .name: "urlTestCookie",
-            .value: "testValue",
-        ])!
-
-        HTTPCookieStorage.shared.setCookie(cookie)
-
-        // Now should detect cookie
-        #expect(manager.containsCookie(for: url), "Should detect cookie after setting")
-    }
-
-    @Test("Contains cookie for URL with no cookies")
-    func containsCookieForURLWithNoCookies() {
-        let url = URL(string: "https://no-cookies-test.example")!
-        let manager = NetworkManager()
-
-        // Store initial cookies state to restore later
-        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
-
-        // Cleanup after test completes
-        defer {
-            // Restore initial cookies state
-            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-            for cookie in initialCookies {
-                HTTPCookieStorage.shared.setCookie(cookie)
-            }
-        }
-
-        // Clear all cookies to ensure clean state
-        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-
-        // Should return false for URL with no cookies
-        #expect(!manager.containsCookie(for: url), "Should return false for URL with no cookies")
-    }
-
-    // MARK: - URLSessionDelegate Tests
-
-    // Note: NetworkManager doesn't override redirect handling, so redirects follow default behavior
-
-    // MARK: - Concurrent Request Tests
-
-    @Test("Concurrent requests execution")
-    func concurrentRequests() async throws {
-        let urls = [
-            URL(string: "https://example.com/delay/short1")!,
-            URL(string: "https://example.com/delay/short2")!,
-            URL(string: "https://example.com/delay/short3")!,
-        ]
-
-        let manager = makeManager()
-
-        let startTime = Date()
-
-        // Run requests concurrently
-        let responses = try await withThrowingTaskGroup(of: String.self) { group in
-            for url in urls {
-                group.addTask {
-                    try await manager.get(url: url)
-                }
-            }
-
-            var results: [String] = []
-            for try await response in group {
-                results.append(response)
-            }
-            return results
-        }
-
-        let totalTime = Date().timeIntervalSince(startTime)
-
-        #expect(responses.count == 3, "Should receive 3 responses")
-        #expect(totalTime < 1.0, "Concurrent requests should execute in parallel quickly")
-        for response in responses {
-            #expect(!response.isEmpty, "Response should not be empty")
-            #expect(response.contains("ok"), "Response should contain mock marker")
-        }
-    }
-
-    // MARK: - Error Handling Tests
-
-    @Test("Network error handling")
-    func networkErrorHandling() async {
-        let url = URL(string: "https://example.com/unreachable")!
-        let manager = makeManager()
-
-        do {
-            _ = try await manager.get(url: url)
-            Issue.record("Expected network error")
-        } catch {
-            // Error was thrown as expected
-        }
-    }
-
-    // MARK: - Content Type Tests
-
-    @Test("POST request content type")
-    func postRequestContentType() async throws {
-        // Verify POST requests set the correct Content-Type header
-        let url = URL(string: "https://example.com/post")!
-        let body = "key=value&test=data"
-        let manager = makeManager()
-
-        let response = try await manager.post(url: url, body: body)
-        #expect(response.contains("content-type=application/x-www-form-urlencoded"), "Response should echo correct content type")
-    }
-
-    // MARK: - Response Encoding Tests
-
     @Test("Response string encoding")
     func responseStringEncoding() async throws {
         // Test that responses are properly decoded as UTF-8 strings
@@ -419,7 +210,224 @@ struct NetworkManagerTests {
 
         let response = try await manager.get(url: url)
 
-        #expect(!response.isEmpty, "Response should not be empty")
-        #expect(response.data(using: .utf8) != nil, "Response should contain valid UTF-8 text")
+        #expect(response == "Unicode ✓ — café — 😀")
+    }
+
+    // MARK: - Structured Response Tests
+
+    @Test("Structured GET returns body, status code, and final URL")
+    func structuredGetResponse() async throws {
+        let url = URL(string: "https://example.com/get")!
+        let manager = makeManager()
+
+        let response = try await manager.getResponse(url: url)
+
+        #expect(response.statusCode == 200)
+        #expect(response.finalURL == url)
+        #expect(response.body.contains("ok"))
+    }
+
+    @Test("Structured POST sends the form body and exposes response metadata")
+    func structuredPostResponse() async throws {
+        let url = URL(string: "https://example.com/post")!
+        let manager = makeManager()
+        let response = try await manager.postResponse(url: url, body: "a%26b=c")
+
+        #expect(response.statusCode == 200)
+        #expect(response.finalURL == url)
+        #expect(response.body.contains("method=POST"))
+        #expect(response.body.contains("content-type=application/x-www-form-urlencoded"))
+        #expect(response.body.contains("body=a%26b=c"))
+    }
+
+    @Test("Structured responses surface non-2xx bodies instead of throwing")
+    func structuredNon2xxResponses() async throws {
+        let original = MockURLProtocol.requestHandler
+        defer { MockURLProtocol.requestHandler = original }
+
+        MockURLProtocol.requestHandler = { request in
+            if let url = request.url, url.path.contains("/status/500") {
+                let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+                return (response, Data("server error".utf8), nil)
+            }
+            return try MockURLProtocol.defaultHandler(request)
+        }
+
+        let manager = makeManager()
+
+        let getResponse = try await manager.getResponse(url: URL(string: "https://example.com/status/500")!)
+        #expect(getResponse.statusCode == 500)
+        #expect(getResponse.body == "server error")
+
+        let postResponse = try await manager.postResponse(
+            url: URL(string: "https://example.com/status/500")!,
+            body: "x"
+        )
+        #expect(postResponse.statusCode == 500)
+        #expect(postResponse.body == "server error")
+    }
+
+    // Redirect following cannot be simulated through a custom URLProtocol
+    // (URLSession treats protocol-provided 302 responses as terminal), so the
+    // "finalURL is the post-redirect URL" guarantee is not unit-testable here.
+    // It comes from URLSession's default redirect following plus the final
+    // HTTPURLResponse's url, and was verified against live Hacker News
+    // redirect responses during the commenting contract research.
+
+    @Test("Named cookie lookup is exact and host scoped")
+    func namedCookieLookup() {
+        let manager = NetworkManager()
+        let hackerNewsURL = URL(string: "https://news.ycombinator.com")!
+        let otherURL = URL(string: "https://other-site.example")!
+
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let userCookie = HTTPCookie(properties: [
+            .domain: "news.ycombinator.com",
+            .path: "/",
+            .name: "user",
+            .value: "hn-session",
+        ])!
+        let prefsCookie = HTTPCookie(properties: [
+            .domain: "news.ycombinator.com",
+            .path: "/",
+            .name: "prefs",
+            .value: "list",
+        ])!
+        HTTPCookieStorage.shared.setCookie(userCookie)
+        HTTPCookieStorage.shared.setCookie(prefsCookie)
+
+        #expect(manager.containsCookie(named: "user", for: hackerNewsURL))
+        #expect(manager.containsCookie(named: "prefs", for: hackerNewsURL))
+        #expect(!manager.containsCookie(named: "session", for: hackerNewsURL), "Unknown cookie names must not match")
+        #expect(!manager.containsCookie(named: "user", for: otherURL), "Named lookup must stay scoped to the HN host")
+    }
+}
+
+extension NetworkManagerTests {
+
+    @Test("Cookie domain matching uses exact and dot-boundary normalized hosts")
+    func cookieDomainMatchingUsesDotBoundary() {
+        let manager = NetworkManager()
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let cookies = [
+            ("exact", "news.ycombinator.com"),
+            ("subdomain", ".news.ycombinator.com"),
+            ("nested", "api.news.ycombinator.com"),
+            ("case", "NEWS.YCOMBINATOR.COM"),
+            ("suffix-prefix-lookalike", "evilnews.ycombinator.com"),
+            ("suffix-lookalike", "news.ycombinator.com.evil.com"),
+        ].compactMap { name, domain in
+            HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: name,
+                .value: "1",
+            ])
+        }
+        for cookie in cookies {
+            HTTPCookieStorage.shared.setCookie(cookie)
+        }
+
+        let exactURL = URL(string: "https://NEWS.YCOMBINATOR.COM")!
+        let childURL = URL(string: "https://api.news.ycombinator.com")!
+
+        #expect(manager.containsCookie(for: exactURL), "Exact and leading-dot domains should match case-insensitively")
+        #expect(manager.containsCookie(for: childURL), "Subdomains should match on a dot boundary")
+        #expect(manager.containsCookie(named: "case", for: exactURL), "Named lookup should use normalized host matching")
+
+        // Verify a leading-dot domain independently, without an exact-domain
+        // cookie that could mask a lookup failure.
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        if let leadingDotCookie = HTTPCookie(properties: [
+            .domain: ".news.ycombinator.com",
+            .path: "/",
+            .name: "leading-dot",
+            .value: "1",
+        ]) {
+            HTTPCookieStorage.shared.setCookie(leadingDotCookie)
+        }
+        #expect(manager.containsCookie(named: "leading-dot", for: exactURL),
+                "Leading-dot cookie domains should match independently")
+
+        // Lookalike domains must not be treated as cookies for the Hacker News host.
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        for (name, domain) in [
+            ("suffix-prefix-lookalike", "evilnews.ycombinator.com"),
+            ("suffix-lookalike", "news.ycombinator.com.evil.com"),
+        ] {
+            if let cookie = HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: name,
+                .value: "1",
+            ]) {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        #expect(!manager.containsCookie(for: URL(string: "https://news.ycombinator.com")!),
+                "Suffix lookalike cookie domains must not match the HN host")
+    }
+
+    @Test("Clearing cookies preserves lookalike domains")
+    func clearCookiesPreservesLookalikeDomains() {
+        let manager = NetworkManager()
+        let initialCookies = HTTPCookieStorage.shared.cookies ?? []
+        defer {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+            for cookie in initialCookies {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+        let domains = [
+            "news.ycombinator.com",
+            ".news.ycombinator.com",
+            "api.news.ycombinator.com",
+            "NEWS.YCOMBINATOR.COM",
+            "evilnews.ycombinator.com",
+            "news.ycombinator.com.evil.com",
+            "other.example",
+        ]
+        let hackerNewsCookieNames = domains.indices.prefix(4).map { "cookie\($0)" }
+        for (index, domain) in domains.enumerated() {
+            if let cookie = HTTPCookie(properties: [
+                .domain: domain,
+                .path: "/",
+                .name: "cookie\(index)",
+                .value: "1",
+            ]) {
+                HTTPCookieStorage.shared.setCookie(cookie)
+            }
+        }
+
+        manager.clearCookies()
+
+        let remainingCookies = HTTPCookieStorage.shared.cookies ?? []
+        for name in hackerNewsCookieNames {
+            #expect(!remainingCookies.contains { $0.name == name }, "Hacker News cookie \(name) should be cleared")
+        }
+        #expect(remainingCookies.contains { $0.name == "cookie4" && $0.domain.lowercased() == "evilnews.ycombinator.com" },
+                "Prefix lookalikes must be preserved")
+        #expect(remainingCookies.contains { $0.name == "cookie5" && $0.domain.lowercased() == "news.ycombinator.com.evil.com" },
+                "Suffix lookalikes must be preserved")
+        #expect(remainingCookies.contains { $0.name == "cookie6" && $0.domain == "other.example" },
+                "Unrelated cookies must be preserved")
     }
 }

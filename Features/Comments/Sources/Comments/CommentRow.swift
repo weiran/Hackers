@@ -23,6 +23,8 @@ struct CommentRowState: Equatable, Identifiable {
     let isAuthenticated: Bool
     let canVote: Bool
     let canUnvote: Bool
+    let canReply: Bool
+    let isCommentSubmissionInProgress: Bool
     let styledText: AttributedString?
 }
 
@@ -44,38 +46,76 @@ struct CommentRow: View {
     let onUnvote: () -> Void
     let onCopy: () -> Void
     let onShare: () -> Void
+    var onReply: (() -> Void)?
+    var onInteraction: (() -> Void)?
 
     var body: some View {
         rowDisplay
             .contentShape(.interaction, Rectangle())
-            .onTapGesture(perform: onToggle)
+            .onTapGesture(perform: handleToggle)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier(AccessibilityIdentifier.Comments.comment(state.id))
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(state.visibility == .visible ? "Tap to collapse" : "Tap to expand")
-            .accessibilityAction(.default, onToggle)
-            .contextMenu {
-                if state.isAuthenticated, state.canVote, !state.isUpvoted {
-                    Button(action: onUpvote) {
-                        Label("Upvote", systemImage: "arrow.up")
-                    }
-                    .disabled(state.isVoting)
-                }
-                if state.isAuthenticated, state.canUnvote, state.isUpvoted {
-                    Button(action: onUnvote) {
-                        Label("Unvote", systemImage: "arrow.uturn.down")
-                    }
-                    .disabled(state.isVoting)
-                }
-                Divider()
-                Button(action: onCopy) {
-                    Label("Copy", systemImage: "doc.on.doc")
-                }
-                Divider()
-                Button(action: onShare) {
-                    Label("Share", systemImage: "square.and.arrow.up")
+            .accessibilityAction(.default, handleToggle)
+            .if(state.canReply) { row in
+                row.accessibilityAction(named: Text("Reply to \(state.author)")) {
+                    onReply?()
                 }
             }
+            .contextMenu {
+                Group {
+                    if state.isAuthenticated, state.canVote, !state.isUpvoted {
+                        Button {
+                            onInteraction?()
+                            onUpvote()
+                        } label: {
+                            Label("Upvote", systemImage: "arrow.up")
+                        }
+                        .disabled(state.isVoting)
+                    }
+                    if state.isAuthenticated, state.canUnvote, state.isUpvoted {
+                        Button {
+                            onInteraction?()
+                            onUnvote()
+                        } label: {
+                            Label("Unvote", systemImage: "arrow.uturn.down")
+                        }
+                        .disabled(state.isVoting)
+                    }
+                    if state.canReply {
+                        Button(
+                            action: { onReply?() },
+                            label: {
+                                Label("Reply", systemImage: "arrowshape.turn.up.left")
+                            }
+                        )
+                        .disabled(state.isCommentSubmissionInProgress)
+                    }
+                    Divider()
+                    Button {
+                        onInteraction?()
+                        onCopy()
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    Divider()
+                    Button {
+                        onInteraction?()
+                        onShare()
+                    } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                }
+                // Context-menu icons use the system's neutral appearance;
+                // they should not inherit the comments screen's app tint.
+                .tint(nil)
+            }
+    }
+
+    private func handleToggle() {
+        onInteraction?()
+        onToggle()
     }
 
     private var rowDisplay: some View {
@@ -85,6 +125,11 @@ struct CommentRow: View {
             .padding(.top, state.level == 0 ? Metrics.verticalPadding : Metrics.nestedTopPadding)
             .padding(.bottom, Metrics.verticalPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
+            // The row must provide an opaque surface for the system's native
+            // context-menu lift snapshot. The app background keeps this
+            // visually identical in the scroll view while preventing adjacent
+            // comments from showing through the preview.
+            .background(AppColors.background)
             .overlay(alignment: .leading) {
                 threadRails
                     .padding(.leading, Metrics.horizontalPadding)
@@ -124,6 +169,10 @@ struct CommentRow: View {
                     metadataSeparator
                     inlineVoteControl
                 }
+                if state.canReply {
+                    metadataSeparator
+                    inlineReplyControl
+                }
                 Spacer(minLength: 12)
                 Text(shortAge)
                     .scaledFont(.subheadline)
@@ -137,6 +186,24 @@ struct CommentRow: View {
                 }
         }
         .clipped()
+    }
+
+    /// Reply must stay available even when the row has no vote control; the
+    /// buttons consume taps so they never trigger row collapse.
+    private var inlineReplyControl: some View {
+        Button {
+            onReply?()
+        } label: {
+            Image(systemName: "arrowshape.turn.up.left")
+                .scaledFont(.subheadline)
+                .foregroundStyle(.secondary)
+                .frame(minWidth: 30, minHeight: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(state.isCommentSubmissionInProgress)
+        .accessibilityLabel("Reply to \(state.author)")
+        .accessibilityIdentifier(AccessibilityIdentifier.Comments.reply(state.id))
     }
 
     @ViewBuilder
@@ -189,7 +256,14 @@ struct CommentRow: View {
                 isVoting: state.isVoting
             ),
             style: .commentInline,
-            action: state.isUpvoted ? onUnvote : onUpvote
+            action: {
+                onInteraction?()
+                if state.isUpvoted {
+                    onUnvote()
+                } else {
+                    onUpvote()
+                }
+            }
         )
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityIdentifier.Comments.vote(state.id))
@@ -407,8 +481,26 @@ enum CommentTextCache {
             attributed[run.range].underlineStyle = .single
         }
 
+        applyParagraphStyling(to: &attributed)
+
         styledCache[key] = attributed
         return attributed
+    }
+
+    /// Paragraph metrics are a presentation concern and are applied only after
+    /// semantic parsing has reached the MainActor-backed Comments feature.
+    private static func applyParagraphStyling(to attributed: inout AttributedString) {
+        guard !attributed.characters.isEmpty else { return }
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 1.5
+        paragraphStyle.paragraphSpacing = 20.0
+
+        let fullRange = attributed.startIndex ..< attributed.endIndex
+        let paragraphAttributes = AttributeContainer([
+            .paragraphStyle: paragraphStyle
+        ])
+        attributed[fullRange].mergeAttributes(paragraphAttributes)
     }
 
     private static func baseText(for comment: Comment, textHash: Int) -> AttributedString {

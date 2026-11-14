@@ -6,6 +6,7 @@ require "cgi"
 require "digest"
 require "json"
 require "pathname"
+require "open3"
 
 REPO_ROOT = File.expand_path("..", __dir__)
 PROJECT = File.join(REPO_ROOT, "Hackers.xcodeproj")
@@ -37,10 +38,35 @@ SCREENSHOT_RAW_DIMENSIONS = {
 }.freeze
 
 def app_store_connect_key
+  # Secrets pasted into the release environment may carry CRLF
+  # endings or stray padding from copy/paste; normalize before OpenSSL parses it.
+  key_content = ENV.fetch("APP_STORE_CONNECT_API_KEY_P8", "")
+    .gsub("\r\n", "\n")
+    .gsub("\r", "\n")
+    .strip
+
+  if key_content.empty?
+    UI.user_error!(
+      "APP_STORE_CONNECT_API_KEY_P8 is empty or missing from the " \
+      "testflight environment. Add it (and APP_STORE_CONNECT_API_KEY_ID, " \
+      "APP_STORE_CONNECT_API_KEY_ISSUER_ID, MATCH_PASSWORD) to the " \
+      "testflight environment secrets."
+    )
+  end
+
+  unless key_content.start_with?("-----BEGIN PRIVATE KEY-----") &&
+         key_content.end_with?("-----END PRIVATE KEY-----")
+    UI.user_error!(
+      "APP_STORE_CONNECT_API_KEY_P8 is not an intact .p8 PEM (missing BEGIN/END " \
+      "PRIVATE KEY envelope). Re-paste the raw AuthKey_<KEY_ID>.p8 contents into " \
+      "the testflight environment secret."
+    )
+  end
+
   app_store_connect_api_key(
     key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
     issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
-    key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_P8"),
+    key_content: key_content + "\n",
     is_key_content_base64: false
   )
 end
@@ -254,10 +280,41 @@ def set_app_store_signing
   project.save
 end
 
-def validate_release_tag!(tag)
+def release_tag_project(tag)
+  source, status = Open3.capture2(
+    "git", "show", "refs/tags/#{tag}:Hackers.xcodeproj/project.pbxproj",
+    chdir: REPO_ROOT, err: File::NULL
+  )
+  UI.user_error!("Cannot read project metadata from release tag #{tag}") unless status.success?
+  source
+end
+
+def validate_release_tag!(tag, source: :checkout)
   UI.user_error!("Release tag is required") if tag.to_s.empty?
 
-  tag_version = release_tag_parts(tag)[:version]
+  parts = release_tag_parts(tag)
+  if source == :tag
+    require_release_tag_build_number!(tag)
+    require "nanaimo"
+    objects = Nanaimo::Reader.new(release_tag_project(tag)).parse!.as_ruby.fetch("objects")
+    %w[Hackers HackersActionExtension].each do |name|
+      target = objects.values.find { |item| item["isa"] == "PBXNativeTarget" && item["name"] == name }
+      UI.user_error!("Target #{name} is missing from tag #{tag}") unless target
+      configurations = objects.fetch(target.fetch("buildConfigurationList")).fetch("buildConfigurations")
+        .select { |id| objects.fetch(id)["name"] == "Release" }
+      UI.user_error!("Target #{name} has no Release configuration in tag #{tag}") if configurations.empty?
+      configurations.each do |id|
+        settings = objects.fetch(id).fetch("buildSettings")
+        unless settings["MARKETING_VERSION"].to_s == parts[:version] &&
+               settings["CURRENT_PROJECT_VERSION"].to_s == parts[:build_number].to_s
+          UI.user_error!("Tag #{tag} does not match #{name} version/build metadata")
+        end
+      end
+    end
+    return
+  end
+
+  tag_version = parts[:version]
   current_version = marketing_version
   return if tag_version == current_version
 
@@ -358,6 +415,14 @@ def release_notes
   ENV.fetch("WHAT_TO_TEST", "").strip
 end
 
+def testflight_external_groups
+  ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
+end
+
+def submit_beta_review?
+  !%w[0 false no off].include?(ENV.fetch("SUBMIT_BETA_REVIEW", "true").strip.downcase)
+end
+
 def validate_app_store_release_notes!(notes)
   forbidden_patterns = [
     /github\.com/i,
@@ -440,6 +505,10 @@ platform :ios do
       scheme: SCHEME,
       configuration: "Release",
       clean: true,
+      # Xcode 27's optimizer hits a Swift ownership verifier crash in the
+      # unchanged SwiftSoup 2.13.9 dependency at -O; -Osize produces the
+      # same optimized archive without triggering that compiler failure.
+      xcargs: "SWIFT_OPTIMIZATION_LEVEL=-Osize",
       export_method: "app-store",
       export_options: {
         method: "app-store",
@@ -487,11 +556,11 @@ platform :ios do
       changelog: notes,
       skip_waiting_for_build_processing: false
     }
-    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
-    unless groups.empty?
-      upload_options[:distribute_external] = true
-      upload_options[:groups] = groups
-    end
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
+    upload_options[:distribute_external] = true
+    upload_options[:groups] = groups
+    upload_options[:submit_beta_review] = submit_beta_review?
 
     upload_to_testflight(**upload_options)
 
@@ -503,7 +572,7 @@ platform :ios do
   desc "Distribute an existing TestFlight build to external testers"
   lane :distribute_existing_testflight do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
-    validate_release_tag!(tag)
+    validate_release_tag!(tag, source: :tag)
     require_release_tag_build_number!(tag)
     parts = release_tag_parts(tag)
 
@@ -518,24 +587,55 @@ platform :ios do
       build_number: parts[:build_number].to_s,
       changelog: notes,
       distribute_only: true,
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: false
     }
 
-    groups = ENV.fetch("TESTFLIGHT_GROUPS", "").split(",").map(&:strip).reject(&:empty?)
-    unless groups.empty?
-      distribute_options[:distribute_external] = true
-      distribute_options[:groups] = groups
-    end
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
+    distribute_options[:distribute_external] = true
+    distribute_options[:groups] = groups
+    distribute_options[:submit_beta_review] = submit_beta_review?
 
     upload_to_testflight(**distribute_options)
 
     UI.success("Distributed Hackers #{parts[:version]} (#{parts[:build_number]}) to external TestFlight testers")
   end
 
+  desc "Upload a locally built IPA to TestFlight"
+  lane :upload_existing_testflight do |options|
+    tag = options[:release_tag] || ENV["RELEASE_TAG"]
+    validate_release_tag!(tag, source: :tag)
+    require_release_tag_build_number!(tag)
+    parts = release_tag_parts(tag)
+    ipa_path = options[:ipa_path] || ENV["LOCAL_IPA_PATH"]
+    UI.user_error!("IPA path is required") if ipa_path.to_s.strip.empty?
+    ipa_path = File.expand_path(ipa_path, REPO_ROOT) unless ipa_path.start_with?("/")
+    UI.user_error!("IPA not found: #{ipa_path}") unless File.file?(ipa_path)
+
+    notes = release_notes
+    UI.user_error!("GitHub Release notes are required for TestFlight What to Test") if notes.empty?
+
+    groups = testflight_external_groups
+    UI.user_error!("At least one external TestFlight group is required") if groups.empty?
+    upload_options = {
+      api_key: app_store_connect_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: ipa_path,
+      changelog: notes,
+      skip_waiting_for_build_processing: false,
+      distribute_external: true,
+      groups: groups,
+      submit_beta_review: submit_beta_review?
+    }
+
+    upload_to_testflight(**upload_options)
+    UI.success("Uploaded local Hackers #{parts[:version]} (#{parts[:build_number]}) IPA to TestFlight")
+  end
+
   desc "Submit a processed App Store Connect build for App Review"
   lane :submit_app_review do |options|
     tag = options[:release_tag] || ENV["RELEASE_TAG"]
-    validate_release_tag!(tag)
+    validate_release_tag!(tag, source: :tag)
     require_release_tag_build_number!(tag)
     tag_build_number = release_tag_parts(tag)[:build_number]
 
@@ -543,7 +643,7 @@ platform :ios do
     log_app_store_versions(api_key)
     cancel_pending_app_store_release!(api_key, ENV["CANCEL_PENDING_VERSION"]) if ENV["CANCEL_PENDING_VERSION"].to_s != ""
 
-    version = marketing_version
+    version = release_tag_parts(tag)[:version]
     notes = release_notes
     UI.user_error!("Release notes are required for App Store submission") if notes.empty?
     validate_app_store_release_notes!(notes)

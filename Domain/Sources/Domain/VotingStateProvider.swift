@@ -39,7 +39,7 @@ public final class DefaultVotingStateProvider: VotingStateProvider, Sendable {
         switch item {
         case let post as Post:
             try await voteUseCase.upvote(post: post)
-        case let comment as Comment:
+        case is Comment:
             // For comments, we need the parent post - this will be handled by the calling code
             throw HackersKitError.requestFailure
         default:
@@ -51,7 +51,7 @@ public final class DefaultVotingStateProvider: VotingStateProvider, Sendable {
         switch item {
         case let post as Post:
             try await voteUseCase.unvote(post: post)
-        case let comment as Comment:
+        case is Comment:
             // For comments, we need the parent post - this will be handled by the calling code
             throw HackersKitError.requestFailure
         default:

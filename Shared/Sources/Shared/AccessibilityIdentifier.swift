@@ -13,14 +13,20 @@ public enum AccessibilityIdentifier {
         public static func post(_ id: Int) -> String {
             "feed.post.\(id)"
         }
+
+        public static let whatsNewPanel = "feed.whatsNewPanel"
+        public static let whatsNewPanelDismiss = "feed.whatsNewPanel.dismiss"
     }
 
     public enum Settings {
         public static let form = "settings.form"
+        public static let account = "settings.account"
         public static let close = "settings.close"
         public static let showThumbnails = "settings.showThumbnails"
         public static let compactFeed = "settings.compactFeed"
         public static let dimReadPosts = "settings.dimReadPosts"
+        public static let swipeCollapseThreads = "settings.swipeCollapseThreads"
+        public static let showNextCommentButton = "settings.showNextCommentButton"
     }
 
     public enum Login {
@@ -34,12 +40,31 @@ public enum AccessibilityIdentifier {
         public static let list = "comments.list"
         public static let nextCommentButton = "comments.nextCommentButton"
 
+        public static let composerCollapsed = "comments.composer.collapsed"
+        public static let composerExpanded = "comments.composer.expanded"
+        public static let composerEditor = "comments.composer.editor"
+        public static let composerCancel = "comments.composer.cancel"
+        public static let composerPost = "comments.composer.post"
+        public static let composerSpinner = "comments.composer.spinner"
+        public static let composerReplyLabel = "comments.composer.replyLabel"
+        public static let composerError = "comments.composer.error"
+        public static let discardDraftAlert = "comments.composer.discardDraftAlert"
+        public static let outcomeUnknownAlert = "comments.composer.outcomeUnknownAlert"
+
         public static func comment(_ id: Int) -> String {
             "comments.comment.\(id)"
         }
 
+        public static func collapseThreadAction(_ id: Int) -> String {
+            "comments.collapseThreadAction.\(id)"
+        }
+
         public static func vote(_ id: Int) -> String {
             "comments.vote.\(id)"
+        }
+
+        public static func reply(_ id: Int) -> String {
+            "comments.reply.\(id)"
         }
     }
 

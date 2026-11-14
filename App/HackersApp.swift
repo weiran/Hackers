@@ -21,7 +21,11 @@ struct HackersApp: App {
 
     private var runtimePolicy: AppRuntimePolicy {
         #if DEBUG
-        UITestingBootstrap.runtimePolicy
+        if UITestingBootstrap.isEnabled {
+            return UITestingBootstrap.runtimePolicy
+        }
+        let commentingEnabled = !ProcessInfo.processInfo.arguments.contains("disableCommenting")
+        return AppRuntimePolicy.standard.withCommenting(commentingEnabled)
         #else
         .standard
         #endif
@@ -45,6 +49,9 @@ struct HackersApp: App {
                 .environment(\.appRuntimePolicy, runtimePolicy)
                 .onAppear {
                     setupAppearance()
+                    #if DEBUG
+                    UITestSizeClassOverride.shared.startListeningIfNeeded()
+                    #endif
                     handleInitialUITestingRouteIfNeeded()
                 }
                 .onOpenURL { url in

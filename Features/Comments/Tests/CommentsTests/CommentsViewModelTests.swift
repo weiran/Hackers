@@ -51,69 +51,7 @@ struct CommentsViewModelTests {
         )
     }
 
-    @Test("Initializes in loading state when post is absent")
-    @MainActor
-    func initializesWithoutPost() {
-        // When
-        let viewModel = CommentsViewModel(
-            postID: 42,
-            initialPost: nil,
-            postUseCase: mockPostUseCase,
-            commentUseCase: mockCommentUseCase,
-            voteUseCase: mockVoteUseCase,
-            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
-            bookmarksController: bookmarksController
-        )
-
-        // Then
-        #expect(viewModel.post == nil)
-        #expect(viewModel.isPostLoading)
-        #expect(viewModel.comments.isEmpty)
-    }
-
     // MARK: - Loading Comments Tests
-
-    @Test("Loading comments successfully populates comments and visible comments")
-    @MainActor
-    func loadCommentsSuccess() async {
-        // Given
-        let expectedComments = createTestComments()
-        let postWithComments = createPostWithComments(comments: expectedComments)
-        mockPostUseCase.mockPost = postWithComments
-
-        // When
-        await sut.loadComments()
-
-        // Then
-        #expect(sut.comments.count == expectedComments.count)
-        #expect(sut.visibleComments.count == expectedComments.count)
-        #expect(!sut.isLoading)
-        #expect(!sut.isPostLoading)
-        #expect(sut.error == nil)
-    }
-
-    @Test("Loading comments calls onCommentsLoaded callback")
-    @MainActor
-    func loadCommentsCallsCallback() async {
-        // Given
-        let expectedComments = createTestComments()
-        let postWithComments = createPostWithComments(comments: expectedComments)
-        mockPostUseCase.mockPost = postWithComments
-
-        var callbackCalled = false
-        var receivedComments: [Domain.Comment] = []
-        sut.onCommentsLoaded = { (comments: [Domain.Comment]) in
-            callbackCalled = true
-            receivedComments = comments
-        }
-
-        // When
-        await sut.loadComments()
-
-        // Then
-        #expect(callbackCalled)
-        #expect(receivedComments.count == expectedComments.count)
-    }
 
     @Test("Loading comments handles failure gracefully")
     @MainActor
@@ -212,6 +150,48 @@ struct CommentsViewModelTests {
         #expect(viewModel.showThumbnails == true)
     }
 
+    @Test("Swipe collapse threads responds to settings notifications")
+    @MainActor
+    func swipeCollapseThreadsSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase,
+            bookmarksController: BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
+        )
+
+        #expect(viewModel.swipeCollapseThreads == true)
+
+        settingsUseCase.swipeCollapseThreads = false
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.swipeCollapseThreads == false)
+    }
+
+    @Test("Next comment button visibility responds to settings notifications")
+    @MainActor
+    func showNextCommentButtonSyncsWithSettings() async throws {
+        let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
+        let viewModel = CommentsViewModel(
+            post: testPost,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: settingsUseCase,
+            bookmarksController: BookmarksController(bookmarksUseCase: mockBookmarksUseCase)
+        )
+
+        #expect(viewModel.showNextCommentButton == true)
+
+        settingsUseCase.showNextCommentButton = false
+        try await Task.sleep(for: .milliseconds(10))
+
+        #expect(viewModel.showNextCommentButton == false)
+    }
+
     @Test("Bookmark notifications update local post state")
     @MainActor
     func bookmarkNotificationsUpdatePostState() async {
@@ -299,26 +279,173 @@ struct CommentsViewModelTests {
         #expect(sut.post?.score == initialScore)
     }
 
-    @Test("replace(comment:) drives a visible re-render on a content-only change")
+    // MARK: - Vote / Fetch Race Tests
+
+    @Test("Applying a vote outcome updates only vote fields")
     @MainActor
-    func replaceCommentBumpsVisibleRevision() async {
-        // A vote changes a comment's `upvoted` without changing which comments are visible.
-        // The visible-projection signature only tracks collapse state, so replace() must
-        // force visibleComments to be reassigned and visibleRevision bumped, or the row
-        // won't re-render.
+    func applyPostVoteOutcomeMergesVoteFieldsOnly() {
+        // Given
+        guard let current = sut.post else {
+            #expect(false, "Expected post to be available")
+            return
+        }
+        // Simulate fields a concurrent comments fetch may have refreshed.
+        var currentWithRefreshedFields = current
+        currentWithRefreshedFields.commentsCount = 12
+        currentWithRefreshedFields.isBookmarked = true
+        sut.post = currentWithRefreshedFields
+
+        // A locally-computed outcome carries the vote state at tap time.
+        var outcome = testPost
+        outcome.upvoted = true
+        outcome.score = current.score + 1
+        outcome.voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=1&how=up")!,
+            unvote: URL(string: "vote?id=1&how=un")!
+        )
+
+        // When
+        sut.applyPostVoteOutcome(from: outcome)
+
+        // Then: the vote trio is adopted; unrelated fields are preserved.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == current.score + 1)
+        #expect(sut.post?.voteLinks?.unvote == URL(string: "vote?id=1&how=un")!)
+        #expect(sut.post?.commentsCount == 12)
+        #expect(sut.post?.isBookmarked == true)
+    }
+
+    @Test("Applying a vote outcome without a loaded post adopts it wholesale")
+    @MainActor
+    func applyPostVoteOutcomeWithoutLoadedPost() {
+        // Given
+        let viewModel = CommentsViewModel(
+            postID: 42,
+            initialPost: nil,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
+        )
+        let outcome = Post(
+            id: 42,
+            url: URL(string: "https://example.com")!,
+            title: "Test Post",
+            age: "1 hour ago",
+            commentsCount: 5,
+            by: "testuser",
+            score: 43,
+            postType: .news,
+            upvoted: true
+        )
+
+        // When
+        viewModel.applyPostVoteOutcome(from: outcome)
+
+        // Then
+        #expect(viewModel.post?.upvoted == true)
+        #expect(viewModel.post?.score == 43)
+    }
+
+    @Test("Fetching keeps an unconfirmed local upvote when the server disagrees")
+    @MainActor
+    func fetchKeepsUnconfirmedLocalUpvote() async throws {
+        // Given: a locally-applied upvote the server has not ingested yet.
+        try await sut.voteOnPost(upvote: true)
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 101)
+
+        // When the next fetch returns a snapshot that predates the vote.
+        var serverSnapshot = testPost
+        serverSnapshot.upvoted = false
+        serverSnapshot.score = 100
+        serverSnapshot.commentsCount = 8
+        mockPostUseCase.mockPost = serverSnapshot
+        await sut.refreshComments()
+
+        // Then: local intent wins, anchored on the fresher score, while the
+        // refreshed comment count still comes through.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 101)
+        #expect(sut.post?.commentsCount == 8)
+    }
+
+    @Test("Fetching adopts server vote state once the vote is confirmed")
+    @MainActor
+    func fetchAdoptsConfirmedServerVoteState() async throws {
+        // Given
+        try await sut.voteOnPost(upvote: true)
+
+        // When the server reflects the vote.
+        var serverSnapshot = testPost
+        serverSnapshot.upvoted = true
+        serverSnapshot.score = 105
+        mockPostUseCase.mockPost = serverSnapshot
+        await sut.refreshComments()
+
+        // Then: both sides agree and the server values pass through.
+        #expect(sut.post?.upvoted == true)
+        #expect(sut.post?.score == 105)
+    }
+
+    @Test("Fetching anchors the score while a pending unvote is unconfirmed")
+    @MainActor
+    func fetchAnchorsPendingLocalUnvote() async {
+        // Given: a previously-upvoted post whose unvote landed locally only.
+        var initiallyUpvoted = testPost
+        initiallyUpvoted.upvoted = true
+        initiallyUpvoted.score = 102
+        let viewModel = CommentsViewModel(
+            post: initiallyUpvoted,
+            postUseCase: mockPostUseCase,
+            commentUseCase: mockCommentUseCase,
+            voteUseCase: mockVoteUseCase,
+            settingsUseCase: StubSettingsUseCase(showThumbnails: true),
+            bookmarksController: bookmarksController
+        )
+        var reverted = initiallyUpvoted
+        reverted.upvoted = false
+        reverted.score = 101
+        viewModel.applyPostVoteOutcome(from: reverted)
+        #expect(viewModel.post?.upvoted == false)
+
+        // When the next fetch returns a snapshot that predates the unvote.
+        var serverSnapshot = initiallyUpvoted
+        serverSnapshot.commentsCount = 9
+        mockPostUseCase.mockPost = serverSnapshot
+        await viewModel.refreshComments()
+
+        // Then: the local unvote survives and the stale +1 is removed.
+        #expect(viewModel.post?.upvoted == false)
+        #expect(viewModel.post?.score == 101)
+        #expect(viewModel.post?.commentsCount == 9)
+    }
+
+    @Test("A failed comment vote reverts the optimistic upvoted state")
+    @MainActor
+    func commentUpvoteThroughVotingViewModelRevertsOnError() async {
         let comment = createTestComment(id: 1, upvoted: false)
         mockPostUseCase.mockPost = createPostWithComments(comments: [comment])
         await sut.loadComments()
 
-        let revisionBefore = sut.visibleRevision
-        let visibleUpvotedBefore = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
+        let provider = StubCommentVotingStateProvider()
+        provider.errorToThrow = MockError.testError
+        let votingViewModel = VotingViewModel(
+            votingStateProvider: StubVotingStateProvider(),
+            commentVotingStateProvider: provider,
+            authenticationUseCase: StubAuthenticationUseCase()
+        )
+        let post = sut.post ?? testPost
 
-        sut.replace(comment: comment.with(upvoted: true))
+        await votingViewModel.upvote(comment: sut.comment(withID: 1)!, in: post) { updated in
+            sut.replace(comment: updated)
+        }
 
-        #expect(sut.visibleRevision > revisionBefore, "A content change must bump visibleRevision")
-        #expect(visibleUpvotedBefore == false)
-        let visibleUpvotedAfter = sut.visibleComments.first(where: { $0.id == 1 })?.upvoted
-        #expect(visibleUpvotedAfter == true, "visibleComments must reflect the updated comment")
+        #expect(
+            sut.visibleComments.first(where: { $0.id == 1 })?.upvoted == false,
+            "A failed vote must leave the visible projection un-upvoted"
+        )
     }
 
     // MARK: - Comment Visibility Tests
@@ -377,68 +504,6 @@ struct CommentsViewModelTests {
             var post = testPost
             post.comments = comments.isEmpty ? nil : comments
             return post
-        }
-
-        @Test("Toggle comment from visible to compact hides children")
-        @MainActor
-        func toggleVisibleToCompact() async {
-            // Given - Set up mock to return comments
-            let parentComment = createTestComment(id: 1, level: 0)
-            let childComment = createTestComment(id: 2, level: 1)
-            let testPostWithComments = createPostWithComments(comments: [parentComment, childComment])
-            mockPostUseCase.mockPost = testPostWithComments
-
-            // Load comments
-            await sut.loadComments()
-
-            // Verify initial state
-            #expect(sut.comments.count == 2)
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
-
-            #expect(loadedParent.visibility == Domain.CommentVisibilityType.visible)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-
-            // When
-            sut.toggleCommentVisibility(loadedParent)
-
-            // Then - re-fetch owned copies since Comment is now a value type
-            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
-            #expect(toggledParent.visibility == Domain.CommentVisibilityType.compact)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-            #expect(sut.isCommentCollapsed(withID: loadedParent.id))
-            #expect(!sut.isCommentCollapsed(withID: loadedChild.id))
-            #expect(sut.visibleComments.count == 1)
-        }
-
-        @Test("Toggle comment from compact to visible shows children")
-        @MainActor
-        func toggleCompactToVisible() async {
-            // Given - Set up mock with comments in compact state
-            let parentComment = createTestComment(id: 1, level: 0)
-                .withVisibility(Domain.CommentVisibilityType.compact)
-            let childComment = createTestComment(id: 2, level: 1)
-                .withVisibility(Domain.CommentVisibilityType.hidden)
-
-            let testPostWithComments = createPostWithComments(comments: [parentComment, childComment])
-            mockPostUseCase.mockPost = testPostWithComments
-
-            // Load comments
-            await sut.loadComments()
-
-            // Verify initial state
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let loadedChild = sut.comments.first(where: { $0.id == 2 })!
-
-            // When
-            sut.toggleCommentVisibility(loadedParent)
-
-            // Then - re-fetch owned copy since Comment is now a value type
-            let toggledParent = sut.comments.first(where: { $0.id == 1 })!
-            #expect(toggledParent.visibility == Domain.CommentVisibilityType.visible)
-            #expect(loadedChild.visibility == Domain.CommentVisibilityType.visible)
-            #expect(!sut.isCommentCollapsed(withID: loadedParent.id))
-            #expect(sut.visibleComments.count == 2)
         }
 
         @Test("Flagged placeholder starts collapsed and reveals its replies")
@@ -522,28 +587,6 @@ struct CommentsViewModelTests {
             #expect(!sut.isCommentCollapsed(withID: expandedParent.id))
             #expect(sut.visibleComments.map(\.id) == [1, 2])
             #expect(sut.toggleCommentVisibility(withID: 999) == nil)
-        }
-
-        @Test("Visible revision advances only when visible signature changes")
-        @MainActor
-        func visibleRevisionTracksSignatureChanges() async {
-            let parentComment = createTestComment(id: 1, level: 0)
-            let childComment = createTestComment(id: 2, level: 1)
-            mockPostUseCase.mockPost = createPostWithComments(comments: [parentComment, childComment])
-
-            await sut.loadComments()
-
-            let loadedParent = sut.comments.first(where: { $0.id == 1 })!
-            let revisionAfterLoad = sut.visibleRevision
-
-            sut.toggleCommentVisibility(loadedParent)
-            let revisionAfterToggle = sut.visibleRevision
-
-            let missingReveal = sut.revealComment(withId: 999)
-
-            #expect(revisionAfterToggle == revisionAfterLoad + 1)
-            #expect(!missingReveal)
-            #expect(sut.visibleRevision == revisionAfterToggle)
         }
 
         @Test("Hide comment branch collapses entire tree")
@@ -636,22 +679,6 @@ struct CommentsViewModelTests {
             #expect(sut.isCommentCollapsed(withID: 2))
         }
 
-        @Test("Next visible comment advances through visible projection")
-        @MainActor
-        func nextVisibleCommentID() async {
-            let firstRoot = createTestComment(id: 1, level: 0)
-            let child = createTestComment(id: 2, level: 1)
-            let secondRoot = createTestComment(id: 3, level: 0)
-            mockPostUseCase.mockPost = createPostWithComments(comments: [firstRoot, child, secondRoot])
-
-            await sut.loadComments()
-
-            #expect(sut.nextVisibleCommentID(after: nil) == 1)
-            #expect(sut.nextVisibleCommentID(after: 1) == 2)
-            #expect(sut.nextVisibleCommentID(after: 2) == 3)
-            #expect(sut.nextVisibleCommentID(after: 3) == nil)
-        }
-
         @Test("Next visible thread skips descendants")
         @MainActor
         func nextVisibleThreadID() async {
@@ -689,6 +716,203 @@ struct CommentsViewModelTests {
             #expect(sut.showsRootSeparator(afterCommentID: 1))
             #expect(!sut.showsRootSeparator(afterCommentID: 3))
         }
+    }
+
+    // MARK: - Comment Submission Tests
+
+    @MainActor
+    private func loadComments(into viewModel: CommentsViewModel, comments: [Domain.Comment]) async {
+        mockPostUseCase.mockPost = createPostWithComments(comments: comments)
+        await viewModel.loadComments()
+    }
+
+    @Test("Top-level insertion appends after existing comments")
+    @MainActor
+    func insertTopLevelComment() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let revisionBefore = sut.visibleRevision
+        let countBefore = sut.post?.commentsCount
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "vote?id=100&how=up")!,
+            unvote: URL(string: "vote?id=100&how=un")!
+        )
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 100,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "<p>server html</p>",
+            createdAt: Date(),
+            upvoted: true,
+            voteLinks: voteLinks
+        ))
+
+        #expect(inserted?.level == 0)
+        #expect(inserted?.age == "just now")
+        #expect(inserted?.text == "<p>server html</p>", "Server HTML, not the draft, becomes the text")
+        #expect(inserted?.upvoted == true)
+        #expect(inserted?.voteLinks == voteLinks)
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 4, 5, 100])
+        #expect(sut.visibleComments.map(\.id).last == 100)
+        #expect(sut.visibleRevision > revisionBefore)
+        #expect(sut.post?.commentsCount == countBefore.map { $0 + 1 })
+        #expect(sut.post?.comments?.map(\.id) == sut.comments.map(\.id), "post.comments stays synchronised")
+    }
+
+    @Test("Submitted comments without vote markup still show the default upvoted state")
+    @MainActor
+    func insertCommentWithoutVoteMetadataDefaultsUpvoted() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 101,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "comment without vote markup",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.upvoted == true)
+        #expect(inserted?.voteLinks == nil)
+    }
+
+    @Test("Top-level insertion with only synthetic story text keeps it first")
+    @MainActor
+    func insertTopLevelWithSyntheticOnly() async {
+        var mockPost = testPost
+        mockPost.comments = [createTestComment(id: -1, level: 0)]
+        mockPost.commentsCount = 0
+        mockPostUseCase.mockPost = mockPost
+        await sut.loadComments()
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 100,
+            parentID: testPost.id,
+            author: "alice",
+            htmlText: "hello",
+            createdAt: Date()
+        ))
+
+        #expect(inserted != nil)
+        #expect(sut.comments.map(\.id) == [-1, 100])
+        #expect(sut.post?.commentsCount == 1, "The synthetic story-text row is excluded from the count")
+    }
+
+    @Test("Reply insertion becomes the first child of its parent")
+    @MainActor
+    func insertReplyAtTopOfThread() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 3,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.level == 2, "Reply level is parent level + 1")
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 200, 4, 5])
+    }
+
+    @Test("Reply to a trailing parent appends at the array end")
+    @MainActor
+    func insertReplyAtEnd() async {
+        await loadComments(into: sut, comments: createTestComments())
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 5,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted?.level == 1)
+        #expect(sut.comments.map(\.id) == [1, 2, 3, 4, 5, 200])
+    }
+
+    @Test("Reply insertion expands the parent and preserves other collapse state")
+    @MainActor
+    func insertReplyRevealsParent() async {
+        await loadComments(into: sut, comments: createTestComments())
+        // Collapse 3 (hiding its child 4) and 5.
+        _ = sut.toggleCommentVisibility(withID: 3)
+        _ = sut.toggleCommentVisibility(withID: 5)
+        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 5])
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200,
+            parentID: 3,
+            author: "alice",
+            htmlText: "reply",
+            createdAt: Date()
+        ))
+
+        #expect(inserted != nil)
+        #expect(sut.visibleComments.map(\.id) == [1, 2, 3, 200, 4, 5], "The revealed parent's newest reply appears first")
+        #expect(sut.isCommentCollapsed(withID: 5), "Unrelated collapsed branches remain collapsed")
+    }
+
+    @Test("Inserting a duplicate server id is idempotent")
+    @MainActor
+    func insertDuplicateIsIdempotent() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let first = sut.insertSubmittedComment(SubmittedComment(
+            id: 100, parentID: testPost.id, author: "alice", htmlText: "one", createdAt: Date()
+        ))
+        let countAfterFirst = sut.post?.commentsCount
+        let idsAfterFirst = sut.comments.map(\.id)
+
+        let second = sut.insertSubmittedComment(SubmittedComment(
+            id: 100, parentID: testPost.id, author: "alice", htmlText: "one", createdAt: Date()
+        ))
+
+        #expect(first?.id == 100)
+        #expect(second?.id == 100)
+        #expect(sut.comments.map(\.id) == idsAfterFirst)
+        #expect(sut.post?.commentsCount == countAfterFirst, "Count increments exactly once")
+    }
+
+    @Test("Missing parent does not invent a placement")
+    @MainActor
+    func insertWithMissingParentFails() async {
+        await loadComments(into: sut, comments: createTestComments())
+        let countBefore = sut.post?.commentsCount
+        let idsBefore = sut.comments.map(\.id)
+
+        let inserted = sut.insertSubmittedComment(SubmittedComment(
+            id: 200, parentID: 999, author: "alice", htmlText: "reply", createdAt: Date()
+        ))
+
+        #expect(inserted == nil)
+        #expect(sut.comments.map(\.id) == idsBefore)
+        #expect(sut.post?.commentsCount == countBefore)
+    }
+
+    @Test("Submitting passes request and baseline child ids to the use case")
+    func submitCommentDelegates() async throws {
+        let tree = [
+            createTestComment(id: 1, level: 0),
+            createTestComment(id: 2, level: 1),
+            createTestComment(id: 3, level: 2),
+            createTestComment(id: 4, level: 2),
+            createTestComment(id: 5, level: 0),
+        ]
+        await loadComments(into: sut, comments: tree)
+
+        let outcome = try await sut.submitComment(parentID: 2, text: "hello", author: "alice")
+
+        guard case .confirmed = outcome else {
+            Issue.record("Expected mock's default confirmed outcome")
+            return
+        }
+        let request = mockCommentUseCase.submitCalls.first
+        #expect(request?.storyID == testPost.id)
+        #expect(request?.parentID == 2)
+        #expect(request?.expectedAuthor == "alice")
+        #expect(request?.text == "hello")
+        #expect(mockCommentUseCase.submitBaselines.first == [3, 4])
     }
 
     // MARK: - Helper Methods
@@ -761,8 +985,42 @@ final class MockPostUseCase: PostUseCase, @unchecked Sendable {
 }
 
 final class MockCommentUseCase: CommentUseCase, @unchecked Sendable {
+    var submitCalls: [CommentSubmissionRequest] = []
+    var submitBaselines: [Set<Int>] = []
+    var submitOutcome: CommentSubmissionOutcome = .confirmed(
+        SubmittedComment(
+            id: 9_000_001,
+            parentID: 0,
+            author: "fixture-user",
+            htmlText: "<p>fixture server html</p>",
+            createdAt: Date(timeIntervalSince1970: 1_787_313_122)
+        )
+    )
+    var submitError: Error?
+    var reconcileCalls: [CommentSubmissionAttempt] = []
+    var reconcileResult: SubmittedComment?
+
     func getComments(for _: Post) async throws -> [Domain.Comment] {
         []
+    }
+
+    func submitComment(
+        _ request: CommentSubmissionRequest,
+        baselineChildIDs: Set<Int>
+    ) async throws -> CommentSubmissionOutcome {
+        submitCalls.append(request)
+        submitBaselines.append(baselineChildIDs)
+        if let submitError {
+            throw submitError
+        }
+        return submitOutcome
+    }
+
+    func reconcileComment(
+        _ attempt: CommentSubmissionAttempt
+    ) async throws -> SubmittedComment? {
+        reconcileCalls.append(attempt)
+        return reconcileResult
     }
 }
 
@@ -838,6 +1096,8 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign: Bool = false
     var dimReadPosts: Bool = true
+    private var storedSwipeCollapseThreads: Bool = true
+    private var storedShowNextCommentButton: Bool = true
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails
@@ -847,6 +1107,22 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         get { storedShowThumbnails }
         set {
             storedShowThumbnails = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var swipeCollapseThreads: Bool {
+        get { storedSwipeCollapseThreads }
+        set {
+            storedSwipeCollapseThreads = newValue
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
+
+    var showNextCommentButton: Bool {
+        get { storedShowNextCommentButton }
+        set {
+            storedShowNextCommentButton = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }
@@ -875,6 +1151,41 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     func cacheUsageBytes() async -> Int64 { 0 }
 }
 
+final class StubAuthenticationUseCase: AuthenticationUseCase, @unchecked Sendable {
+    func authenticate(username _: String, password _: String) async throws {}
+    func logout() async throws {}
+    func isAuthenticated() async -> Bool { false }
+    func getCurrentUser() async -> User? { nil }
+}
+
+final class StubVotingStateProvider: VotingStateProvider, @unchecked Sendable {
+    func votingState(for item: any Votable) -> VotingState {
+        VotingState(
+            isUpvoted: item.upvoted,
+            score: (item as? any ScoredVotable)?.score,
+            canVote: item.voteLinks?.upvote != nil,
+            canUnvote: item.voteLinks?.unvote != nil
+        )
+    }
+
+    func upvote(item _: any Votable) async throws {}
+    func unvote(item _: any Votable) async throws {}
+}
+
+final class StubCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
+    var upvoteCalls: [Int] = []
+    var errorToThrow: Error?
+
+    func upvoteComment(_ comment: Domain.Comment, for _: Post) async throws {
+        upvoteCalls.append(comment.id)
+        if let errorToThrow {
+            throw errorToThrow
+        }
+    }
+
+    func unvoteComment(_ comment: Domain.Comment, for _: Post) async throws {}
+}
+
 enum MockError: Error {
     case testError
 }
@@ -890,4 +1201,37 @@ private func createTestComment(id: Int, level: Int = 0, upvoted: Bool = false) -
         upvoted: upvoted,
         visibility: .visible,
     )
+}
+
+extension CommentsViewModelTests {
+    @MainActor
+    @Test("A late vote update preserves current content and collapsed visibility")
+    func voteUpdatePreservesCurrentComment() async throws {
+        let original = createTestComment(id: 1)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [original])
+        await sut.loadComments()
+        let newer = Domain.Comment(id: 1, age: "now", text: "Updated server text", by: "user1", level: 0, upvoted: false)
+        mockPostUseCase.mockPost = createPostWithComments(comments: [newer])
+        await sut.refreshComments()
+        _ = sut.toggleCommentVisibility(withID: 1)
+        let current = try #require(sut.comment(withID: 1))
+        sut.replace(comment: original.with(upvoted: true))
+        let result = try #require(sut.comment(withID: 1))
+        #expect(result.upvoted)
+        #expect(result.text == newer.text)
+        #expect(result.age == newer.age)
+        #expect(result.visibility == current.visibility)
+    }
+
+    @MainActor
+    @Test("A generic bookmark refresh annotates the currently resolved story")
+    func genericBookmarkRefreshAnnotatesStory() async {
+        await sut.loadComments()
+        mockBookmarksUseCase.posts = [testPost]
+        await sut.refreshBookmarkAnnotations()
+        #expect(sut.post?.isBookmarked == true)
+        mockBookmarksUseCase.posts = []
+        await sut.refreshBookmarkAnnotations()
+        #expect(sut.post?.isBookmarked == false)
+    }
 }

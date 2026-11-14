@@ -5,57 +5,15 @@
 //  Created by Codex on 2025-09-18.
 //
 
+import Comments
 import DesignSystem
+import CoreImage.CIFilterBuiltins
 import Domain
 import Foundation
 import Shared
 import SwiftUI
 import UIKit
 import WebKit
-
-struct PageHeaderBlurTint: Equatable {
-    let red: Double
-    let green: Double
-    let blue: Double
-    let alpha: Double
-
-    var color: Color {
-        Color(red: red, green: green, blue: blue, opacity: alpha)
-    }
-
-    init?(_ uiColor: UIColor?) {
-        guard let uiColor else { return nil }
-        let resolvedColor = uiColor.resolvedColor(with: UITraitCollection.current)
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        if resolvedColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
-            self.init(red: red, green: green, blue: blue, alpha: alpha)
-            return
-        }
-
-        var white: CGFloat = 0
-        if resolvedColor.getWhite(&white, alpha: &alpha) {
-            self.init(red: white, green: white, blue: white, alpha: alpha)
-            return
-        }
-
-        return nil
-    }
-
-    private init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-        self.red = Self.rounded(red)
-        self.green = Self.rounded(green)
-        self.blue = Self.rounded(blue)
-        self.alpha = Self.rounded(alpha)
-    }
-
-    private static func rounded(_ value: CGFloat) -> Double {
-        (Double(value) * 1000).rounded() / 1000
-    }
-}
 
 @MainActor
 final class BrowserController: ObservableObject {
@@ -64,25 +22,45 @@ final class BrowserController: ObservableObject {
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
-    @Published private(set) var pageHeaderBlurTint: PageHeaderBlurTint?
+    @Published private(set) var pageBackgroundColor = UIColor.systemBackground
     var fallbackURL: URL?
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate?
     private var observations: [NSKeyValueObservation] = []
-    private var pageHeaderBlurTintURL: URL?
     private var reloadOverride: (() -> Void)?
+    private var mediaPlaybackSuspended = false
+    private var requestedMediaPlaybackSuspension = false
+    private var mediaPlaybackSuspensionUpdateInFlight = false
+    private var pendingMediaPlaybackAction: (() -> Void)?
+    private var bottomChromeInset: CGFloat = 0
+    private var usesNativeViewport = false
+    private var usesVerticalToolbar = false
+    private var hasConfiguredObscuredInsets = false
 
-    init() {
+    init(mediaPlaybackSuspended: Bool = false) {
+        requestedMediaPlaybackSuspension = mediaPlaybackSuspended
         let configuration = WKWebViewConfiguration()
         // Some app-shell sites gate rendering on Safari UA tokens; keep the browser identified as Mobile Safari.
         configuration.applicationNameForUserAgent = Self.safariApplicationNameForUserAgent
-        webView = WKWebView(frame: .zero, configuration: configuration)
+        #if DEBUG
+        if UITestingBootstrap.configuration?.mediaPlayback == .autoplayFixture {
+            configuration.mediaTypesRequiringUserActionForPlayback = []
+            configuration.allowsInlineMediaPlayback = true
+        }
+        #endif
+        let browserWebView = ChromeAwareWebView(frame: .zero, configuration: configuration)
+        webView = browserWebView
+        webView.scrollView.topEdgeEffect.isHidden = true
 
         let navigationDelegate = BrowserNavigationDelegate(controller: self)
         self.navigationDelegate = navigationDelegate
         webView.navigationDelegate = navigationDelegate
+        browserWebView.onLayout = { [weak self] in
+            self?.updateChromeInsets()
+        }
         installStateObservers()
         updateState()
+        applyMediaPlaybackSuspensionIfNeeded()
     }
 
     func load(_ target: URL) {
@@ -90,16 +68,28 @@ final class BrowserController: ObservableObject {
         fallbackURL = target
         guard currentURL != target else { return }
         currentURL = target
-        webView.load(URLRequest(url: target))
-        updateState()
+        enqueueMediaPlaybackAction { [weak self] in
+            guard let self else { return }
+            self.webView.load(URLRequest(url: target))
+            self.updateState()
+        }
+    }
+
+    func loadHTMLString(_ html: String, baseURL: URL?) {
+        enqueueMediaPlaybackAction { [weak self] in
+            guard let self else { return }
+            self.webView.loadHTMLString(html, baseURL: baseURL)
+            self.updateState()
+        }
+    }
+
+    func setMediaPlaybackSuspended(_ suspended: Bool) {
+        requestedMediaPlaybackSuspension = suspended
+        applyMediaPlaybackSuspensionIfNeeded()
     }
 
     func updateState() {
         let updatedURL = webView.url ?? currentURL ?? fallbackURL
-        if pageHeaderBlurTintURL != updatedURL {
-            pageHeaderBlurTint = nil
-            pageHeaderBlurTintURL = nil
-        }
         currentURL = updatedURL
         currentTitle = webView.title
         canGoBack = webView.canGoBack
@@ -108,7 +98,6 @@ final class BrowserController: ObservableObject {
     }
 
     func reload() {
-        resetHeaderBlurTint()
         if let reloadOverride {
             reloadOverride()
         } else {
@@ -128,30 +117,84 @@ final class BrowserController: ObservableObject {
 
     func goBack() {
         guard webView.canGoBack else { return }
-        resetHeaderBlurTint()
         webView.goBack()
         updateState()
     }
 
     func goForward() {
         guard webView.canGoForward else { return }
-        resetHeaderBlurTint()
         webView.goForward()
         updateState()
     }
 
-    func applyBottomChromeInset(_ bottomInset: CGFloat) {
-        let inset = max(bottomInset, 0)
-        applyObscuredBottomInset(inset)
-        applyScrollViewBottomInset(inset)
+    private func enqueueMediaPlaybackAction(_ action: @escaping () -> Void) {
+        pendingMediaPlaybackAction = action
+        applyMediaPlaybackSuspensionIfNeeded()
     }
 
-    private func applyObscuredBottomInset(_ inset: CGFloat) {
-        guard abs(webView.obscuredContentInsets.bottom - inset) > 0.5 else { return }
+    private func applyMediaPlaybackSuspensionIfNeeded() {
+        guard !mediaPlaybackSuspensionUpdateInFlight else { return }
 
-        var obscuredContentInsets = webView.obscuredContentInsets
-        obscuredContentInsets.bottom = inset
-        webView.obscuredContentInsets = obscuredContentInsets
+        guard requestedMediaPlaybackSuspension != mediaPlaybackSuspended else {
+            flushPendingMediaPlaybackActionIfReady()
+            return
+        }
+
+        let targetSuspension = requestedMediaPlaybackSuspension
+        mediaPlaybackSuspensionUpdateInFlight = true
+        webView.setAllMediaPlaybackSuspended(targetSuspension) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.mediaPlaybackSuspended = targetSuspension
+                self.mediaPlaybackSuspensionUpdateInFlight = false
+                self.applyMediaPlaybackSuspensionIfNeeded()
+            }
+        }
+    }
+
+    private func flushPendingMediaPlaybackActionIfReady() {
+        guard !mediaPlaybackSuspensionUpdateInFlight,
+              requestedMediaPlaybackSuspension == mediaPlaybackSuspended,
+              let action = pendingMediaPlaybackAction else { return }
+        pendingMediaPlaybackAction = nil
+        action()
+    }
+
+    func applyBottomChromeInset(_ bottomInset: CGFloat, usesNativeViewport: Bool = false, usesVerticalToolbar: Bool = false) {
+        self.usesVerticalToolbar = usesVerticalToolbar
+        if self.usesNativeViewport != usesNativeViewport {
+            self.usesNativeViewport = usesNativeViewport
+            if usesNativeViewport && hasConfiguredObscuredInsets {
+                webView.obscuredContentInsets = .zero
+                webView.scrollView.contentInset = .zero
+                webView.scrollView.verticalScrollIndicatorInsets = .zero
+                hasConfiguredObscuredInsets = false
+            }
+        }
+        bottomChromeInset = max(bottomInset, 0)
+        updateChromeInsets()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateChromeInsets()
+        }
+    }
+
+    private func updateChromeInsets() {
+        guard let window = webView.window, !usesNativeViewport || usesVerticalToolbar else { return }
+        // A vertical toolbar leaves the top unobscured. Keep native sizing and
+        // scrolling, but exclude the navigation container's inherited top inset.
+        let obscuredInsets = UIEdgeInsets(
+            top: usesVerticalToolbar ? 0 : window.safeAreaInsets.top,
+            left: 0,
+            bottom: usesVerticalToolbar ? window.safeAreaInsets.bottom : bottomChromeInset,
+            right: 0
+        )
+        if !hasConfiguredObscuredInsets || webView.obscuredContentInsets != obscuredInsets {
+            webView.obscuredContentInsets = obscuredInsets
+            hasConfiguredObscuredInsets = true
+        }
+        if !usesNativeViewport {
+            applyScrollViewBottomInset(bottomChromeInset)
+        }
     }
 
     private func applyScrollViewBottomInset(_ bottomInset: CGFloat) {
@@ -175,13 +218,14 @@ final class BrowserController: ObservableObject {
         }
     }
 
-    private func resetHeaderBlurTint() {
-        pageHeaderBlurTint = nil
-        pageHeaderBlurTintURL = nil
-    }
-
     private func installStateObservers() {
         observations = [
+            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    self.pageBackgroundColor = self.webView.underPageBackgroundColor
+                }
+            },
             webView.observe(\.url, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
             },
@@ -196,23 +240,27 @@ final class BrowserController: ObservableObject {
             },
             webView.observe(\.isLoading, options: [.new]) { [weak self] _, _ in
                 Task { @MainActor [weak self] in self?.updateState() }
-            },
-            webView.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] _, _ in
-                Task { @MainActor [weak self] in self?.updateHeaderTintFromPageBackground() }
             }
         ]
     }
 
-    func updateHeaderTintFromPageBackground() {
-        guard let updatedTint = PageHeaderBlurTint(webView.underPageBackgroundColor) else { return }
-        if pageHeaderBlurTint != updatedTint {
-            pageHeaderBlurTint = updatedTint
-        }
-        pageHeaderBlurTintURL = currentURL
-    }
-
     private static var safariApplicationNameForUserAgent: String {
         "Version/\(UIDevice.current.systemVersion) Mobile/15E148 Safari/604.1"
+    }
+}
+
+/// Refresh native chrome geometry when cached browsers move between layouts.
+private final class ChromeAwareWebView: WKWebView {
+    var onLayout: (() -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        onLayout?()
+    }
+
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        onLayout?()
     }
 }
 
@@ -232,7 +280,7 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateState(refreshesHeaderTint: true)
+        updateState()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -247,12 +295,9 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate {
         updateState()
     }
 
-    private func updateState(refreshesHeaderTint: Bool = false) {
+    private func updateState() {
         Task { @MainActor [weak controller] in
             controller?.updateState()
-            if refreshesHeaderTint {
-                controller?.updateHeaderTintFromPageBackground()
-            }
         }
     }
 }
@@ -266,7 +311,9 @@ enum WebViewAnimations {
 }
 
 struct EmbeddedWebView: View {
-    private static let statusBarBlurFadeExtension: CGFloat = 0
+    private static let headerBlurHeight: CGFloat = 48
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalBrowserControlsEdge) private var verticalControlsEdge
 
     let url: URL
     let onDismiss: @MainActor () -> Void
@@ -295,6 +342,34 @@ struct EmbeddedWebView: View {
     }
 
     var body: some View {
+        Group {
+            if usesSystemBrowserLayout {
+                content
+                    .ignoresSafeArea(.container, edges: verticalControlsEdge == nil ? .bottom : [.top, .bottom])
+                    .background {
+                        if let verticalControlsEdge {
+                            Color(uiColor: controller.pageBackgroundColor)
+                                .ignoresSafeArea(.container, edges: verticalControlsEdge == .leading ? [.leading, .top, .bottom] : [.trailing, .top, .bottom])
+                        }
+                    }
+            } else {
+                extendedBrowserContent
+            }
+        }
+        .toolbarBackground(usesStandardTopToolbar ? .visible : usesSystemBrowserLayout ? .automatic : .hidden, for: .navigationBar)
+        .toolbarBackground(usesStandardTopToolbar ? Color(uiColor: .systemBackground) : .clear, for: .navigationBar)
+        .toolbar { browserToolbar }
+    }
+
+    private var usesStandardTopToolbar: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && showsToolbar
+    }
+
+    private var usesSystemBrowserLayout: Bool {
+        usesStandardTopToolbar || (isPadLayout && showsToolbar)
+    }
+
+    private var extendedBrowserContent: some View {
         GeometryReader { proxy in
             content
                 .frame(
@@ -308,51 +383,44 @@ struct EmbeddedWebView: View {
                         headerBlur
                     }
                 }
+
         }
         .ignoresSafeArea(edges: isPadLayout ? [.top, .bottom] : [])
-        .toolbar {
-            if showsToolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if controller.canGoBack {
-                        backButton
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if controller.canGoForward {
-                        forwardButton
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    reloadButton
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    shareButton
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    openInSafariButton
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if showsCloseButton {
-                        closeButton
-                    }
-                }
+    }
+
+    @ToolbarContentBuilder
+    private var browserToolbar: some ToolbarContent {
+        if showsToolbar {
+            // Add items only when they apply so no empty slot is left in a bar, and
+            // give each one a title and symbol so it can sit in the iPhone Duo vertical
+            // bar. Close is the primary navigation item, so it goes first.
+            if showsCloseButton {
+                ToolbarItem(placement: .cancellationAction) { closeButton }
+                    .preferVerticalToolbarAxis()
             }
+            if controller.canGoBack {
+                ToolbarItem(placement: .topBarTrailing) { backButton }
+                    .preferVerticalToolbarAxis()
+            }
+            if controller.canGoForward {
+                ToolbarItem(placement: .topBarTrailing) { forwardButton }
+                    .preferVerticalToolbarAxis()
+            }
+            ToolbarItem(placement: .topBarTrailing) { reloadButton }
+                .preferVerticalToolbarAxis()
+            ToolbarItem(placement: .topBarTrailing) { shareButton }
+                .preferVerticalToolbarAxis()
+            ToolbarItem(placement: .topBarTrailing) { openInSafariButton }
+                .preferVerticalToolbarAxis()
         }
-        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     private var headerBlur: some View {
-        GeometryReader { proxy in
-            ProgressiveHeaderBlurBackground(
-                height: proxy.safeAreaInsets.top,
-                fadeExtension: Self.statusBarBlurFadeExtension,
-                tintMiddleLocation: 0.45,
-                tint: controller.pageHeaderBlurTint?.color
-            )
+        HeaderVariableBlur(maxBlurRadius: 6)
+            .frame(height: Self.headerBlurHeight)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .animation(.easeInOut(duration: 0.2), value: controller.pageHeaderBlurTint)
-        .allowsHitTesting(false)
+            .ignoresSafeArea(edges: .top)
+            .allowsHitTesting(false)
     }
 
     @ViewBuilder
@@ -365,7 +433,9 @@ struct EmbeddedWebView: View {
                     controller: controller,
                     url: url,
                     article: article,
-                    obscuredBottomInset: obscuredBottomInset
+                    obscuredBottomInset: obscuredBottomInset,
+                    usesNativeViewport: usesSystemBrowserLayout,
+                    usesVerticalToolbar: verticalControlsEdge != nil
                 )
             } else {
                 UITestMissingArticleView(url: url)
@@ -382,14 +452,16 @@ struct EmbeddedWebView: View {
         BrowserWebView(
             controller: controller,
             url: url,
-            obscuredBottomInset: obscuredBottomInset
+            obscuredBottomInset: obscuredBottomInset,
+            usesNativeViewport: usesSystemBrowserLayout,
+            usesVerticalToolbar: verticalControlsEdge != nil
         )
+        .ignoresSafeArea(edges: usesSystemBrowserLayout ? [] : .top)
     }
 
     private var isPadLayout: Bool {
-        DeviceLayout.usesPadLayout
+        horizontalSizeClass == .regular || DeviceLayout.isRunningOnMac
     }
-
     private var bottomPanelInsetHeight: CGFloat {
         guard !showsToolbar else { return 0 }
         return bottomWebViewInset
@@ -402,9 +474,8 @@ struct EmbeddedWebView: View {
                 ContentSharePresenter.shared.shareURL(targetURL, title: controller.currentTitle)
             }
         } label: {
-            Image(systemName: "square.and.arrow.up")
+            Label("Share", systemImage: "square.and.arrow.up")
         }
-        .accessibilityLabel("Share")
     }
 
     private var openInSafariButton: some View {
@@ -414,18 +485,16 @@ struct EmbeddedWebView: View {
                 LinkOpener.openInSystemBrowser(targetURL)
             }
         } label: {
-            Image(systemName: "safari")
+            Label("Open in Safari", systemImage: "safari")
         }
-        .accessibilityLabel("Open in Safari")
     }
 
     private var closeButton: some View {
         Button {
             Task { @MainActor in onDismiss() }
         } label: {
-            Image(systemName: "xmark")
+            Label("Close", systemImage: "xmark")
         }
-        .accessibilityLabel("Close")
     }
 
     private var reloadButton: some View {
@@ -436,35 +505,117 @@ struct EmbeddedWebView: View {
                 controller.reload()
             }
         } label: {
-            Image(systemName: controller.isLoading ? "xmark" : "arrow.clockwise")
+            Label(controller.isLoading ? "Stop" : "Reload",
+                  systemImage: controller.isLoading ? "xmark" : "arrow.clockwise")
         }
-        .accessibilityLabel(controller.isLoading ? "Stop" : "Reload")
     }
 
     private var backButton: some View {
         Button {
             controller.goBack()
         } label: {
-            Image(systemName: "chevron.backward")
+            Label("Previous Page", systemImage: "arrow.backward")
         }
-        .accessibilityLabel("Back")
     }
 
     private var forwardButton: some View {
         Button {
             controller.goForward()
         } label: {
-            Image(systemName: "chevron.forward")
+            Label("Next Page", systemImage: "arrow.forward")
         }
-        .accessibilityLabel("Forward")
     }
 
+}
+
+private extension ToolbarContent {
+    /// Symbol items normally choose their own axis, but the embedded web view can stay
+    /// alive while an iPhone Duo changes displays. Explicitly opting in ensures its
+    /// existing items migrate into the vertical bar instead of remaining in a top pill.
+    @ToolbarContentBuilder
+    func preferVerticalToolbarAxis() -> some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            axisBehavior(UIDevice.current.userInterfaceIdiom == .pad ? .horizontalOnly : .verticalPreferred)
+        } else {
+            self
+        }
+    }
+}
+
+/// True progressive gaussian blur: the blur radius ramps to zero across the
+/// strip while every pixel stays at full contrast, matching Safari's header
+/// scrim. Public materials cannot vary blur radius (only opacity and tint,
+/// which read as a fade), so this uses the private variableBlur CAFilter that
+/// Safari and the previous VariableBlur package rely on.
+/// Technique credit: nikstar/VariableBlur and jtrivedi/VariableBlurView (MIT).
+private struct HeaderVariableBlur: UIViewRepresentable {
+    let maxBlurRadius: CGFloat
+
+    func makeUIView(context: Context) -> VariableBlurUIView {
+        VariableBlurUIView(maxBlurRadius: maxBlurRadius)
+    }
+
+    func updateUIView(_ uiView: VariableBlurUIView, context: Context) {}
+}
+
+private final class VariableBlurUIView: UIVisualEffectView {
+    init(maxBlurRadius: CGFloat) {
+        super.init(effect: UIBlurEffect(style: .regular))
+
+        guard let filterClass = NSClassFromString(String("retliFAC".reversed())) as? NSObject.Type,
+              let variableBlur = filterClass
+                  .perform(NSSelectorFromString(String(":epyThtiWretlif".reversed())), with: "variableBlur")?
+                  .takeUnretainedValue() as? NSObject else {
+            return
+        }
+
+        // The blur radius at each pixel scales with the mask's alpha, so the
+        // gradient ramps the radius from max at the top to zero at the bottom.
+        variableBlur.setValue(maxBlurRadius, forKey: "inputRadius")
+        variableBlur.setValue(Self.gradientMask(), forKey: "inputMaskImage")
+        variableBlur.setValue(true, forKey: "inputNormalizeEdges")
+
+        subviews.first?.layer.filters = [variableBlur]
+        for subview in subviews.dropFirst() {
+            subview.alpha = 0
+        }
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToWindow() {
+        // Keeps the unblurred bottom edge crisp instead of pixelated.
+        guard let window, let backdropLayer = subviews.first?.layer else { return }
+        backdropLayer.setValue(window.traitCollection.displayScale, forKey: "scale")
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        // Calling super here crashes; the appearance-agnostic blur needs no
+        // trait-driven update anyway.
+    }
+
+    private static func gradientMask() -> CGImage {
+        let gradient = CIFilter.linearGradient()
+        gradient.color0 = CIColor.black
+        gradient.color1 = CIColor.clear
+        gradient.point0 = CGPoint(x: 0, y: 100)
+        gradient.point1 = CGPoint(x: 0, y: 0)
+        return CIContext().createCGImage(
+            gradient.outputImage!,
+            from: CGRect(x: 0, y: 0, width: 100, height: 100)
+        )!
+    }
 }
 
 private struct BrowserWebView: UIViewRepresentable {
     let controller: BrowserController
     let url: URL
     let obscuredBottomInset: CGFloat
+    let usesNativeViewport: Bool
+    let usesVerticalToolbar: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -473,14 +624,16 @@ private struct BrowserWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         context.coordinator.requestedURL = url
         controller.setReloadOverride(nil)
-        controller.applyBottomChromeInset(obscuredBottomInset)
-        context.coordinator.scheduleLoad(controller: controller, url: url)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
+        if controller.currentURL == nil {
+            context.coordinator.scheduleLoad(controller: controller, url: url)
+        }
         return controller.webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         controller.setReloadOverride(nil)
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         guard context.coordinator.requestedURL != url else { return }
         context.coordinator.requestedURL = url
         context.coordinator.scheduleLoad(controller: controller, url: url)
@@ -512,6 +665,8 @@ private struct UITestArticleView: UIViewRepresentable {
     let url: URL
     let article: UITestArticleContent
     let obscuredBottomInset: CGFloat
+    let usesNativeViewport: Bool
+    let usesVerticalToolbar: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -519,20 +674,33 @@ private struct UITestArticleView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = controller.webView
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         webView.accessibilityIdentifier = AccessibilityIdentifier.Browser.fixtureArticle
-        loadArticle(in: webView, coordinator: context.coordinator)
+        let coordinator = context.coordinator
+        if controller.currentURL == nil {
+            coordinator.scheduleLoad { [self, weak coordinator] in
+                guard let coordinator else { return }
+                loadArticle(in: webView, coordinator: coordinator)
+            }
+        } else {
+            coordinator.loadedArticle = article
+            coordinator.loadedURL = url
+        }
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        controller.applyBottomChromeInset(obscuredBottomInset)
+        controller.applyBottomChromeInset(obscuredBottomInset, usesNativeViewport: usesNativeViewport, usesVerticalToolbar: usesVerticalToolbar)
         guard context.coordinator.loadedArticle != article
             || context.coordinator.loadedURL != url else { return }
-        loadArticle(in: webView, coordinator: context.coordinator)
+        let coordinator = context.coordinator
+        coordinator.scheduleLoad { [self, weak coordinator] in
+            guard let coordinator else { return }
+            loadArticle(in: webView, coordinator: coordinator)
+        }
     }
 
     private func loadArticle(in webView: WKWebView, coordinator: Coordinator) {
@@ -541,49 +709,23 @@ private struct UITestArticleView: UIViewRepresentable {
         controller.fallbackURL = url
         controller.currentURL = url
         let html = html
-        controller.setReloadOverride { [weak webView] in
-            webView?.loadHTMLString(html, baseURL: url)
+        controller.setReloadOverride { [weak controller] in
+            controller?.loadHTMLString(html, baseURL: url)
         }
-        webView.loadHTMLString(html, baseURL: url)
+        controller.loadHTMLString(html, baseURL: url)
         controller.updateState()
     }
 
     private var html: String {
-        """
-        <!doctype html>
-        <html lang="en">
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>
-            :root { color-scheme: light dark; }
-            body {
-              box-sizing: border-box;
-              max-width: 760px;
-              margin: 0 auto;
-              padding: 32px 24px 180px;
-              font: -apple-system-body;
-              line-height: 1.55;
-              background: Canvas;
-              color: CanvasText;
-            }
-            h1 {
-              margin: 0 0 20px;
-              font: -apple-system-title1;
-              font-weight: 700;
-              line-height: 1.15;
-            }
-            p { margin: 0 0 18px; }
-          </style>
-        </head>
-        <body>
-          <article>
-            <h1>\(escaped(article.title))</h1>
-            <p>\(escaped(article.body))</p>
-          </article>
-        </body>
-        </html>
-        """
+        let resourceName = article.htmlResourceName ?? "ArticleFixture"
+        guard let resourceURL = Bundle.main.url(forResource: resourceName, withExtension: "html"),
+              let resourceHTML = try? String(contentsOf: resourceURL, encoding: .utf8) else {
+            preconditionFailure("Missing UI-test article HTML resource: \(resourceName).html")
+        }
+
+        return resourceHTML
+            .replacingOccurrences(of: "{{TITLE}}", with: escaped(article.title))
+            .replacingOccurrences(of: "{{BODY}}", with: escaped(article.body))
     }
 
     private func escaped(_ value: String) -> String {
@@ -593,9 +735,24 @@ private struct UITestArticleView: UIViewRepresentable {
             .replacingOccurrences(of: ">", with: "&gt;")
     }
 
+    @MainActor
     final class Coordinator {
         var loadedArticle: UITestArticleContent?
         var loadedURL: URL?
+        private var loadTask: Task<Void, Never>?
+
+        func scheduleLoad(operation: @escaping @MainActor () -> Void) {
+            loadTask?.cancel()
+            loadTask = Task { @MainActor in
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                operation()
+            }
+        }
+
+        deinit {
+            loadTask?.cancel()
+        }
     }
 }
 
@@ -614,240 +771,3 @@ private struct UITestMissingArticleView: View {
     }
 }
 #endif
-
-@MainActor
-private struct NavigationBackSwipeRestorer: UIViewControllerRepresentable {
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    func makeUIViewController(context: Context) -> ProbeViewController {
-        let viewController = ProbeViewController()
-        viewController.view.backgroundColor = .clear
-        viewController.view.isUserInteractionEnabled = false
-        viewController.onLifecycle = { [weak coordinator = context.coordinator] viewController in
-            coordinator?.installIfPossible(from: viewController)
-        }
-        return viewController
-    }
-
-    func updateUIViewController(_ viewController: ProbeViewController, context: Context) {
-        viewController.onLifecycle = { [weak coordinator = context.coordinator] viewController in
-            coordinator?.installIfPossible(from: viewController)
-        }
-        context.coordinator.installIfPossible(from: viewController)
-
-        let coordinator = context.coordinator
-        Task { @MainActor [weak viewController, weak coordinator] in
-            guard let viewController else { return }
-            coordinator?.installIfPossible(from: viewController)
-        }
-    }
-
-    static func dismantleUIViewController(_ viewController: ProbeViewController, coordinator: Coordinator) {
-        coordinator.restore()
-        viewController.onLifecycle = nil
-    }
-
-    final class ProbeViewController: UIViewController {
-        var onLifecycle: ((ProbeViewController) -> Void)?
-
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
-            onLifecycle?(self)
-        }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            onLifecycle?(self)
-        }
-
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            onLifecycle?(self)
-        }
-    }
-
-    @MainActor
-    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        private weak var navigationController: UINavigationController?
-        private weak var edgeGesture: UIGestureRecognizer?
-        private weak var contentGesture: UIGestureRecognizer?
-        private weak var originalEdgeDelegate: UIGestureRecognizerDelegate?
-        private weak var originalContentDelegate: UIGestureRecognizerDelegate?
-
-        func installIfPossible(from viewController: UIViewController) {
-            guard let navigationController = viewController.nearestNavigationController else { return }
-            install(on: navigationController)
-        }
-
-        private func install(on navigationController: UINavigationController) {
-            self.navigationController = navigationController
-
-            if let gesture = navigationController.interactivePopGestureRecognizer {
-                if edgeGesture !== gesture {
-                    edgeGesture = gesture
-                    originalEdgeDelegate = gesture.delegate
-                } else if gesture.delegate !== self {
-                    originalEdgeDelegate = gesture.delegate
-                }
-                gesture.isEnabled = true
-                gesture.delegate = self
-            }
-
-            if #available(iOS 26.0, *),
-               let gesture = navigationController.interactiveContentPopGestureRecognizer {
-                if contentGesture !== gesture {
-                    contentGesture = gesture
-                    originalContentDelegate = gesture.delegate
-                } else if gesture.delegate !== self {
-                    originalContentDelegate = gesture.delegate
-                }
-                gesture.isEnabled = true
-                gesture.delegate = self
-            }
-        }
-
-        func restore() {
-            if edgeGesture?.delegate === self {
-                edgeGesture?.delegate = originalEdgeDelegate
-            }
-            if #available(iOS 26.0, *),
-               contentGesture?.delegate === self {
-                contentGesture?.delegate = originalContentDelegate
-            }
-            edgeGesture = nil
-            contentGesture = nil
-            navigationController = nil
-        }
-
-        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            guard isManagedPopGesture(gestureRecognizer) else { return true }
-            guard let navigationController else { return false }
-            guard navigationController.viewControllers.count > 1 else { return false }
-            guard navigationController.transitionCoordinator == nil else { return false }
-
-            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
-                let location = gestureRecognizer.location(in: navigationController.view)
-                return location.x <= systemPopStartMaxX(in: navigationController)
-            }
-
-            return true
-        }
-
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-            guard isManagedPopGesture(gestureRecognizer) else { return true }
-            guard let navigationController else { return false }
-
-            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
-                let location = touch.location(in: navigationController.view)
-                return location.x <= systemPopStartMaxX(in: navigationController)
-            }
-
-            return true
-        }
-
-        func gestureRecognizer(
-            _ gestureRecognizer: UIGestureRecognizer,
-            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-        ) -> Bool {
-            isManagedPopGesture(gestureRecognizer) || isManagedPopGesture(otherGestureRecognizer)
-        }
-
-        private func isManagedPopGesture(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            if gestureRecognizer === edgeGesture {
-                return true
-            }
-            if #available(iOS 26.0, *), gestureRecognizer === contentGesture {
-                return true
-            }
-            return false
-        }
-
-        private func systemPopStartMaxX(in navigationController: UINavigationController) -> CGFloat {
-            navigationController.view.safeAreaInsets.left + 32
-        }
-    }
-}
-
-private extension UIViewController {
-    var nearestNavigationController: UINavigationController? {
-        if let navigationController {
-            return navigationController
-        }
-
-        var current = parent
-        while let viewController = current {
-            if let navigationController = viewController as? UINavigationController {
-                return navigationController
-            }
-            if let navigationController = viewController.navigationController {
-                return navigationController
-            }
-            current = viewController.parent
-        }
-
-        return nil
-    }
-}
-
-struct PostLinkBrowserView: View {
-    @Environment(\.dismiss) private var dismiss
-    let post: Post
-    let presentation: PostLinkPresentation
-    @State private var showingCommentsPane = false
-    @State private var collapsedCommentsHeight = PostCommentsSheet.initialCollapsedHeight
-    @State private var browserObscuredBottomInset = PostCommentsSheet.defaultCollapsedBrowserObscuredBottomInset
-    @StateObject private var browserController = BrowserController()
-
-    init(post: Post, presentation: PostLinkPresentation) {
-        self.post = post
-        self.presentation = presentation
-        _showingCommentsPane = State(initialValue: presentation == .expandedComments)
-    }
-
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            EmbeddedWebView(
-                url: post.url,
-                onDismiss: { dismiss() },
-                showsCloseButton: false,
-                showsToolbar: false,
-                bottomWebViewInset: browserBottomInset,
-                obscuredBottomInset: browserObscuredBottomInset,
-                controller: browserController
-            )
-
-            if showingCommentsPane {
-                PostCommentsSheet(
-                    post: post,
-                    controller: browserController,
-                    initialPresentation: presentation,
-                    onDismiss: { dismiss() },
-                    onCollapsedHeightChange: { collapsedCommentsHeight = $0 },
-                    onBrowserObscuredBottomInsetChange: { browserObscuredBottomInset = $0 }
-                )
-                .transition(.move(edge: .bottom))
-            }
-        }
-        .tint(.accentColor)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityIdentifier.Browser.view)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .navigationBarTitleDisplayMode(.inline)
-        .background {
-            NavigationBackSwipeRestorer()
-                .frame(width: 0, height: 0)
-        }
-        .task {
-            guard !showingCommentsPane else { return }
-            withAnimation(WebViewAnimations.panel) {
-                showingCommentsPane = true
-            }
-        }
-    }
-
-    private var browserBottomInset: CGFloat {
-        max(collapsedCommentsHeight - PostCommentsSheet.collapsedTopCornerRadius, 0)
-    }
-}

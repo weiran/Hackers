@@ -43,7 +43,7 @@ final class FeedAndSettingsUITests: HackersUITestCase {
 
         collapseCommentsByTappingTitle()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browser
         )
     }
@@ -113,18 +113,24 @@ final class FeedAndSettingsUITests: HackersUITestCase {
 
         let username = assertHittable(app.textFields[AccessibilityIdentifier.Login.username])
         let password = assertHittable(app.secureTextFields[AccessibilityIdentifier.Login.password])
+
+        // Submit both attempts with Return. The keyboard can cover Sign In,
+        // and the failed attempt clears the password before the retry.
         username.tap()
-        username.typeText("ui-user")
-        password.tap()
-        password.typeText("wrong")
-        assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
+        username.typeText("ui-user\n")
+        password.typeText("wrong\n")
+
         let loginFailure = assertFullyContained(app.alerts["Login Failed"], in: app)
         assertHittable(loginFailure.buttons["OK"]).tap()
+        waitForFrameToSettle(password, timeout: 2)
 
-        password.tap()
-        password.typeText("password")
-        assertHittable(app.buttons[AccessibilityIdentifier.Login.signIn]).tap()
-
-        assertHasVisibleIntersection(app.staticTexts["Logged in as ui-user"], in: app)
+        assertHittable(password).tap()
+        password.typeText("password\n")
+        let accountButton = app.buttons[AccessibilityIdentifier.Settings.account]
+        expectation(
+            for: NSPredicate(format: "label == %@", "Logged in as ui-user"),
+            evaluatedWith: accountButton
+        )
+        waitForExpectations(timeout: 5)
     }
 }

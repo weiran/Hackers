@@ -16,6 +16,7 @@ struct AuthenticationRepositoryTests {
     @Test("Successful authentication stores username through injected defaults")
     func successfulAuthenticationStoresUsername() async throws {
         let network = MockAuthenticationNetworkManager()
+        network.cookieNames = ["user"]
         let userDefaults = MockAuthenticationUserDefaults()
         let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
 
@@ -29,6 +30,7 @@ struct AuthenticationRepositoryTests {
     @Test("Complex 64-character credentials are form encoded without delimiters")
     func complexCredentialsUseFormEncoding() async throws {
         let network = MockAuthenticationNetworkManager()
+        network.cookieNames = ["user"]
         let userDefaults = MockAuthenticationUserDefaults()
         let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
         let username = "test user+&"
@@ -67,6 +69,7 @@ struct AuthenticationRepositoryTests {
         // failure. This guards the operator-precedence of the failure check.
         let response = "<html><body>news<a href='/login'>Login</a></body></html>"
         let network = MockAuthenticationNetworkManager(postResponse: response)
+        network.cookieNames = ["user"]
         let userDefaults = MockAuthenticationUserDefaults()
         let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
 
@@ -74,6 +77,22 @@ struct AuthenticationRepositoryTests {
 
         #expect(userDefaults.string(forKey: "hn_username") == "user",
                 "Stray 'Login' without the form should not block successful login")
+    }
+
+    @Test("Login responses without a HN user cookie are rejected")
+    func loginWithoutUserCookieIsRejected() async {
+        let network = MockAuthenticationNetworkManager()
+        let userDefaults = MockAuthenticationUserDefaults()
+        let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
+
+        await #expect {
+            try await repository.authenticate(username: "user", password: "secret")
+        } throws: { error in
+            guard case HackersKitError.authenticationError(error: .sessionNotEstablished) = error else { return false }
+            return true
+        }
+
+        #expect(userDefaults.string(forKey: "hn_username") == nil)
     }
 
     @Test("Logout clears cookies and stored username")
@@ -89,7 +108,7 @@ struct AuthenticationRepositoryTests {
         #expect(userDefaults.string(forKey: "hn_username") == nil)
     }
 
-    @Test("Authentication state requires cookies and stored username")
+    @Test("Authentication state requires the named user cookie and a stored username")
     func authenticationStateRequiresCookiesAndUsername() async {
         let network = MockAuthenticationNetworkManager()
         let userDefaults = MockAuthenticationUserDefaults()
@@ -97,40 +116,74 @@ struct AuthenticationRepositoryTests {
 
         #expect(await repository.isAuthenticated() == false)
 
-        network.hasCookie = true
+        // An unrelated HN cookie must not count as a session.
+        userDefaults.set("user", forKey: "hn_username")
+        network.cookieNames = ["prefs"]
+        #expect(await repository.isAuthenticated() == false)
+
+        // The user cookie without a stored username is still logged out.
+        network.cookieNames = ["user"]
+        userDefaults.set(nil, forKey: "hn_username")
         #expect(await repository.isAuthenticated() == false)
 
         userDefaults.set("user", forKey: "hn_username")
         #expect(await repository.isAuthenticated())
     }
+
+    @Test("Current user requires a valid session")
+    func currentUserRequiresValidSession() async {
+        let network = MockAuthenticationNetworkManager()
+        let userDefaults = MockAuthenticationUserDefaults()
+        let repository = AuthenticationRepository(networkManager: network, userDefaults: userDefaults)
+
+        userDefaults.set("user", forKey: "hn_username")
+        #expect(await repository.getCurrentUser() == nil)
+
+        network.cookieNames = ["user"]
+        let user = await repository.getCurrentUser()
+        #expect(user?.username == "user")
+    }
 }
 
 private final class MockAuthenticationNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
-    var hasCookie = false
+    var cookieNames: Set<String> = []
     var postBodies: [String] = []
     var clearCookiesCallCount = 0
-    private let postResponse: String
+    private let loginPage: String
 
     init(postResponse: String = "<html><body>news</body></html>") {
-        self.postResponse = postResponse
+        self.loginPage = postResponse
     }
 
-    func get(url _: URL) async throws -> String {
+    func get(url: URL) async throws -> String {
         "<html><body>login</body></html>"
     }
 
     func post(url _: URL, body: String) async throws -> String {
         postBodies.append(body)
-        return postResponse
+        return loginPage
+    }
+
+    func getResponse(url: URL) async throws -> NetworkResponse {
+        NetworkResponse(body: "<html><body>login</body></html>", statusCode: 200, finalURL: url)
+    }
+
+    func postResponse(url: URL, body: String) async throws -> NetworkResponse {
+        postBodies.append(body)
+        return NetworkResponse(body: loginPage, statusCode: 200, finalURL: url)
     }
 
     func clearCookies() {
         clearCookiesCallCount += 1
-        hasCookie = false
+        cookieNames = []
     }
 
     func containsCookie(for _: URL) -> Bool {
-        hasCookie
+        !cookieNames.isEmpty
+    }
+
+    func containsCookie(named name: String, for _: URL) -> Bool {
+        cookieNames.contains(name)
     }
 }
 

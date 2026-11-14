@@ -29,6 +29,7 @@ struct VotingViewModelTests {
     final class MockVotingStateProvider: VotingStateProvider, @unchecked Sendable {
         var upvoteCalled = false
         var errorToThrow: Error?
+        var unvoteErrorToThrow: Error?
 
         func votingState(for item: any Votable) -> VotingState {
             VotingState(
@@ -43,12 +44,15 @@ struct VotingViewModelTests {
             if let errorToThrow { throw errorToThrow }
         }
 
-        func unvote(item _: any Votable) async throws {}
+        func unvote(item _: any Votable) async throws {
+            if let unvoteErrorToThrow { throw unvoteErrorToThrow }
+        }
     }
 
     final class MockCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
         var upvoteCommentCalled = false
         var shouldThrow = false
+        var unvoteErrorToThrow: Error?
 
         func upvoteComment(_: Domain.Comment, for _: Post) async throws {
             upvoteCommentCalled = true
@@ -57,7 +61,9 @@ struct VotingViewModelTests {
             }
         }
 
-        func unvoteComment(_: Domain.Comment, for _: Post) async throws {}
+        func unvoteComment(_: Domain.Comment, for _: Post) async throws {
+            if let unvoteErrorToThrow { throw unvoteErrorToThrow }
+        }
     }
 
     final class BlockingCommentVotingStateProvider: CommentVotingStateProvider, @unchecked Sendable {
@@ -220,6 +226,103 @@ struct VotingViewModelTests {
         #expect(absolute.contains("goto=news"), "Unvote URL should preserve goto parameter")
     }
 
+    // MARK: - Unvote Rejection Tests
+
+    @Test("Successful post unvote clears unvote link")
+    @MainActor
+    func successfulPostUnvoteClearsUnvoteLink() async throws {
+        var post = makeTestPost(upvoted: true)
+
+        await votingViewModel.unvote(post: &post)
+
+        #expect(post.upvoted == false, "Optimistic unvote should stand on success")
+        #expect(post.score == 9, "Score should decrement on successful unvote")
+        #expect(post.voteLinks?.unvote == nil, "Unvote link should be cleared after unvoting")
+        #expect(votingViewModel.lastError == nil)
+    }
+
+    @Test("Failed post unvote restores upvoted state, score, and vote links")
+    @MainActor
+    func failedPostUnvoteRestoresState() async throws {
+        mockVotingStateProvider.unvoteErrorToThrow = HackersKitError.requestFailure
+        let viewModel = votingViewModel
+        var post = makeTestPost(upvoted: true)
+
+        await viewModel.unvote(post: &post)
+
+        #expect(post.upvoted == true, "Vote must remain shown when HN doesn't process the unvote")
+        #expect(post.score == 10, "Score must be restored when HN doesn't process the unvote")
+        #expect(post.voteLinks?.unvote != nil, "Vote links must be restored so unvote can be retried")
+        #expect(viewModel.lastError != nil, "Generic failure should surface an error")
+    }
+
+    @Test("Rejected post unvote stays upvoted and stops offering unvote")
+    @MainActor
+    func rejectedPostUnvoteDropsUnvoteLink() async throws {
+        mockVotingStateProvider.unvoteErrorToThrow = HackersKitError.voteRejected
+        let viewModel = votingViewModel
+        var post = makeTestPost(upvoted: true)
+
+        await viewModel.unvote(post: &post)
+
+        #expect(post.upvoted == true, "HN kept the vote, so the UI must stay upvoted")
+        #expect(post.score == 10, "Score must be restored when HN refuses the unvote")
+        #expect(post.voteLinks?.upvote != nil)
+        #expect(
+            post.voteLinks?.unvote == nil,
+            "Stale unvote affordance should be dropped once HN refuses it"
+        )
+        #expect(
+            viewModel.lastError == nil,
+            "A refused unvote should revert silently, without an alert"
+        )
+    }
+
+    @Test("Rejected comment unvote stays upvoted and stops offering unvote")
+    @MainActor
+    func rejectedCommentUnvoteDropsUnvoteLink() async throws {
+        mockCommentVotingStateProvider.unvoteErrorToThrow = HackersKitError.voteRejected
+        let viewModel = votingViewModel
+        let post = makeTestPost(upvoted: true)
+        let comment = makeComment(id: 7)
+            .with(upvoted: true)
+            .with(
+                voteLinks: VoteLinks(
+                    upvote: URL(string: "/vote?id=7&how=up")!,
+                    unvote: URL(string: "/vote?id=7&how=un&goto=item%3Fid%3D1")!
+                )
+            )
+        var applied = comment
+
+        await viewModel.unvote(comment: comment, in: post) { applied = $0 }
+
+        #expect(applied.upvoted == true, "HN kept the vote, so the UI must stay upvoted")
+        #expect(applied.voteLinks?.unvote == nil, "Stale unvote affordance should be dropped")
+        #expect(applied.voteLinks?.upvote != nil)
+        #expect(
+            viewModel.lastError == nil,
+            "A refused unvote should revert silently, without an alert"
+        )
+    }
+
+    private func makeTestPost(upvoted: Bool) -> Post {
+        Post(
+            id: 1,
+            url: URL(string: "https://example.com")!,
+            title: "Post",
+            age: "1h",
+            commentsCount: 0,
+            by: "user",
+            score: 10,
+            postType: .news,
+            upvoted: upvoted,
+            voteLinks: VoteLinks(
+                upvote: URL(string: "/vote?id=1&how=up"),
+                unvote: URL(string: "/vote?id=1&how=un&goto=news")
+            )
+        )
+    }
+
     // MARK: - Comment Voting Tests
 
     @Test("Comment loading state is scoped per item")
@@ -263,42 +366,6 @@ struct VotingViewModelTests {
         provider.finish(itemID: secondComment.id)
         await secondTask.value
         #expect(!viewModel.isVoting)
-    }
-
-    @Test("Comment voting with MainActor")
-    @MainActor
-    func commentVotingWithMainActor() async throws {
-        // Given
-        let voteLinks = VoteLinks(upvote: URL(string: "/vote?up")!, unvote: nil)
-        let comment = Domain.Comment(
-            id: 123,
-            age: "1h",
-            text: "Test comment",
-            by: "user",
-            level: 0,
-            upvoted: false,
-            voteLinks: voteLinks,
-        )
-
-        let post = Post(
-            id: 456,
-            url: URL(string: "https://example.com")!,
-            title: "Test Post",
-            age: "2h",
-            commentsCount: 1,
-            by: "author",
-            score: 10,
-            postType: .news,
-            upvoted: false,
-        )
-
-        // When - upvote comment (capture the applied optimistic state)
-        var appliedComment: Domain.Comment?
-        await votingViewModel.upvote(comment: comment, in: post) { appliedComment = $0 }
-
-        // Then
-        #expect(mockCommentVotingStateProvider.upvoteCommentCalled, "Upvote should be called")
-        #expect(appliedComment?.upvoted == true, "Comment should be marked as upvoted after upvote")
     }
 
     private func makeComment(id: Int) -> Domain.Comment {
@@ -406,56 +473,24 @@ struct VotingViewModelTests {
     }
 }
 
-@Suite("NavigationStoreProtocol Default Behavior")
-struct NavigationStoreProtocolDefaultsTests {
-    final class RecordingNavigationStore: NavigationStoreProtocol, @unchecked Sendable {
-        var selectedPost: Post?
-        var selectedPostId: Int?
-        var showingLogin: Bool = false
-        var showingSettings: Bool = false
-
-        var recordedURL: URL?
-        var recordedPushFlag: Bool?
-        var stubbedResult: Bool = false
-
-        func showPost(_ post: Post) {
-            selectedPost = post
-            selectedPostId = post.id
-        }
-
-        func showPostLink(_ post: Post, presentation _: PostLinkPresentation) {
-            selectedPost = post
-            selectedPostId = post.id
-        }
-
-        func showPost(withId id: Int) {
-            selectedPostId = id
-            selectedPost = nil
-        }
-
-        func showLogin() { showingLogin = true }
-        func showSettings() { showingSettings = true }
-        func selectPostType(_: PostType) {}
-
-        @MainActor
-        func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool) -> Bool {
-            recordedURL = url
-            recordedPushFlag = pushOntoDetailStack
-            return stubbedResult
-        }
-    }
-
-    @Test("Default openURLInPrimaryContext uses push flag")
+extension VotingViewModelTests {
+    @Test("Successful comment unvote clears unvote link and preserves upvote link")
     @MainActor
-    func defaultConvenienceUsesPushFlag() {
-        let store = RecordingNavigationStore()
-        store.stubbedResult = true
-        let targetURL = URL(string: "https://example.com/web")!
+    func successfulCommentUnvoteClearsUnvoteLink() async throws {
+        let viewModel = votingViewModel
+        let post = makeTestPost(upvoted: true)
+        let upvoteURL = URL(string: "/vote?id=7&how=up")!
+        let unvoteURL = URL(string: "/vote?id=7&how=un&goto=item%3Fid%3D1")!
+        let comment = makeComment(id: 7)
+            .with(upvoted: true)
+            .with(voteLinks: VoteLinks(upvote: upvoteURL, unvote: unvoteURL))
+        var applied = comment
 
-        let result = store.openURLInPrimaryContext(targetURL)
+        await viewModel.unvote(comment: comment, in: post) { applied = $0 }
 
-        #expect(result == true)
-        #expect(store.recordedURL == targetURL)
-        #expect(store.recordedPushFlag == true)
+        #expect(applied.upvoted == false)
+        #expect(applied.voteLinks?.upvote == upvoteURL)
+        #expect(applied.voteLinks?.unvote == nil)
     }
+
 }

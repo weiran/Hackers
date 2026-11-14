@@ -24,6 +24,9 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var visibleComments: [Comment] = []
     public private(set) var visibleRevision = 0
     public var showThumbnails: Bool
+    public var swipeCollapseThreads: Bool
+    public var showNextCommentButton: Bool
+    @ObservationIgnored let composer = CommentComposerModel()
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?
@@ -76,14 +79,13 @@ public final class CommentsViewModel: @unchecked Sendable {
         self.settingsUseCase = settingsUseCase
         self.bookmarksController = bookmarksController ?? DependencyContainer.shared.makeBookmarksController()
         showThumbnails = settingsUseCase.showThumbnails
+        swipeCollapseThreads = settingsUseCase.swipeCollapseThreads
+        showNextCommentButton = settingsUseCase.showNextCommentButton
 
         let initialComments = initialPost?.comments ?? []
         commentsLoader = LoadingStateManager(initialData: initialComments)
         commentsLoader.setLoadFunction(
-            shouldSkipLoad: { [weak self] comments in
-                guard let self else { return false }
-                return !comments.isEmpty
-            },
+            shouldSkipLoad: { comments in !comments.isEmpty },
             loadData: { [weak self] in
                 try await self?.fetchComments() ?? []
             }
@@ -96,9 +98,17 @@ public final class CommentsViewModel: @unchecked Sendable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
-                let currentValue = settingsUseCase.showThumbnails
-                if self.showThumbnails != currentValue {
-                    self.showThumbnails = currentValue
+                let currentThumbnails = settingsUseCase.showThumbnails
+                if self.showThumbnails != currentThumbnails {
+                    self.showThumbnails = currentThumbnails
+                }
+                let currentSwipeCollapse = settingsUseCase.swipeCollapseThreads
+                if self.swipeCollapseThreads != currentSwipeCollapse {
+                    self.swipeCollapseThreads = currentSwipeCollapse
+                }
+                let currentShowNextButton = settingsUseCase.showNextCommentButton
+                if self.showNextCommentButton != currentShowNextButton {
+                    self.showNextCommentButton = currentShowNextButton
                 }
             }
 
@@ -106,13 +116,17 @@ public final class CommentsViewModel: @unchecked Sendable {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let self else { return }
-                guard let postId = notification.userInfo?["postId"] as? Int,
-                      postId == self.postID,
-                      let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
-                else { return }
-                if var currentPost = self.post {
-                    currentPost.isBookmarked = isBookmarked
-                    self.post = currentPost
+                if let postId = notification.userInfo?["postId"] as? Int,
+                   let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool {
+                    guard postId == self.post?.id else { return }
+                    if var currentPost = self.post {
+                        currentPost.isBookmarked = isBookmarked
+                        self.post = currentPost
+                    }
+                } else {
+                    Task { @MainActor [weak self] in
+                        await self?.refreshBookmarkAnnotations()
+                    }
                 }
             }
     }
@@ -136,7 +150,9 @@ public final class CommentsViewModel: @unchecked Sendable {
             bookmarksController: bookmarksController
         )
     }
+}
 
+extension CommentsViewModel {
     @MainActor
     public func loadComments() async {
         if post == nil {
@@ -175,7 +191,7 @@ public final class CommentsViewModel: @unchecked Sendable {
             let commentCountExcludingStoryText = loadedComments.count(where: { $0.id >= 0 })
 
             await MainActor.run {
-                self.post = annotatedPost
+                self.post = reconciledPost(annotatedPost)
                 self.post?.commentsCount = max(annotatedPost.commentsCount, commentCountExcludingStoryText)
                 self.isPostLoading = false
                 self.onCommentsLoaded?(loadedComments)
@@ -207,6 +223,22 @@ public final class CommentsViewModel: @unchecked Sendable {
             post = currentPost
             throw error
         }
+    }
+
+    /// Merges a locally-computed post vote outcome (the optimistic/reverted
+    /// snapshot produced by `VotingViewModel`) into the loaded post without
+    /// clobbering unrelated fields a concurrent comments fetch may have just
+    /// refreshed, such as score drift from other readers or bookmark state.
+    @MainActor
+    public func applyPostVoteOutcome(from updated: Post) {
+        guard var current = post, current.id == updated.id else {
+            post = updated
+            return
+        }
+        current.upvoted = updated.upvoted
+        current.score = updated.score
+        current.voteLinks = updated.voteLinks
+        post = current
     }
 
     @MainActor
@@ -268,15 +300,25 @@ public final class CommentsViewModel: @unchecked Sendable {
     /// Writes an updated comment back into the loaded set by id, used for value-type
     /// optimistic updates (voting) where the caller cannot mutate a shared instance.
     ///
-    /// Unlike collapse/expand, a vote changes a comment's content (e.g. `upvoted`) without
+    /// Merge only vote fields into the current row so late outcomes preserve its content
+    /// and collapse state. Unlike collapse/expand, a vote changes `upvoted` without
     /// changing which comments are visible. The visible-projection signature only tracks
     /// collapse state, so we must force `visibleComments` to be reassigned and
     /// `visibleRevision` bumped or the row won't re-render.
     @MainActor
     public func replace(comment updated: Comment) {
         guard let index = indexByID[updated.id], allComments.indices.contains(index) else { return }
-        allComments[index] = updated
+        allComments[index] = allComments[index]
+            .with(upvoted: updated.upvoted)
+            .with(voteLinks: updated.voteLinks)
         rebuildVisibleComments(forceRevisionBump: true)
+    }
+
+    func refreshBookmarkAnnotations() async {
+        await bookmarksController.refreshBookmarks()
+        if let currentPost = post {
+            post = bookmarksController.annotatedPosts(from: [currentPost]).first
+        }
     }
 
     @MainActor
@@ -337,9 +379,28 @@ public final class CommentsViewModel: @unchecked Sendable {
         guard nextIndex < visibleComments.endIndex else { return nil }
         return visibleComments[nextIndex...].first(where: { $0.level == 0 })?.id
     }
+
 }
 
 private extension CommentsViewModel {
+    /// A comments fetch can race a locally-applied post vote: the fetched
+    /// snapshot may predate Hacker News registering the vote and come back
+    /// looking un-voted. When the local post's vote state disagrees with the
+    /// fresh snapshot, keep the local intent and anchor the snapshot's score
+    /// with the pending ±1 delta. Fresh vote links still win so later
+    /// unvote taps use current tokens; once the server confirms the vote,
+    /// both sides agree and the snapshot passes through untouched.
+    func reconciledPost(_ serverPost: Post) -> Post {
+        guard let local = post, local.id == serverPost.id,
+              local.upvoted != serverPost.upvoted else {
+            return serverPost
+        }
+        var reconciled = serverPost
+        reconciled.upvoted = local.upvoted
+        reconciled.score = local.upvoted ? serverPost.score + 1 : max(serverPost.score - 1, 0)
+        return reconciled
+    }
+
     struct VisibleCommentSignature: Equatable {
         let id: Int
         let visibility: CommentVisibilityType
@@ -350,7 +411,7 @@ private extension CommentsViewModel {
         parentIndexByID = [:]
 
         var validCommentIDs = Set<Int>()
-        var stack: [(index: Int, id: Int, level: Int)] = []
+        var stack: [(index: Int, level: Int)] = []
         // Mutate a local copy and assign once: writing through the allComments computed
         // setter per-element is O(n) each (whole-array copy) and fragile if the accessor
         // ever stops returning the live backing array.
@@ -375,7 +436,7 @@ private extension CommentsViewModel {
                 parentIndexByID[comment.id] = parent.index
             }
 
-            stack.append((index: index, id: comment.id, level: comment.level))
+            stack.append((index: index, level: comment.level))
         }
 
         if didUpdate { allComments = updated }
@@ -448,5 +509,150 @@ private extension CommentsViewModel {
             currentCommentID = parent.id
         }
         allComments = updated
+    }
+}
+
+// MARK: - Comment submission
+
+extension CommentsViewModel {
+    // MARK: - Comment submission
+
+    /// Submits a comment for this story. The baseline is the caller's currently
+    /// loaded children of the target parent; the repository uses it to resolve
+    /// the server-created comment. Does not mutate the local tree.
+    @MainActor
+    public func submitComment(
+        parentID: Int,
+        text: String,
+        author: String
+    ) async throws -> CommentSubmissionOutcome {
+        let request = CommentSubmissionRequest(
+            storyID: postID,
+            parentID: parentID,
+            expectedAuthor: author,
+            text: text
+        )
+        return try await commentUseCase.submitComment(
+            request,
+            baselineChildIDs: currentChildIDs(of: parentID)
+        )
+    }
+
+    /// Re-resolves an unconfirmed submission attempt without re-submitting.
+    @MainActor
+    public func reconcileSubmittedComment(
+        attempt: CommentSubmissionAttempt
+    ) async throws -> SubmittedComment? {
+        try await commentUseCase.reconcileComment(attempt)
+    }
+
+    /// Inserts a server-confirmed comment into the loaded tree and refreshes
+    /// indexes, the visible projection, and the post's comment count. Returns
+    /// the inserted comment, an existing comment when the id was already
+    /// present (idempotent), or nil when a reply's parent cannot be placed.
+    @MainActor
+    @discardableResult
+    public func insertSubmittedComment(_ submitted: SubmittedComment) -> Comment? {
+        if let existingIndex = indexByID[submitted.id] {
+            return allComments[existingIndex]
+        }
+
+        // A newly submitted HN comment is shown as already upvoted. The
+        // confirmation page normally carries the real vote URLs; when it
+        // does not, keep that local display state without inventing a token.
+        let submittedVoteLinks: VoteLinks? = {
+            guard let links = submitted.voteLinks,
+                  links.upvote != nil || links.unvote != nil else {
+                return nil
+            }
+            return links
+        }()
+        let submittedUpvoted = submitted.upvoted || submittedVoteLinks == nil
+
+        var updated = allComments
+
+        if submitted.parentID != postID {
+            guard let parentIndex = indexByID[submitted.parentID],
+                  allComments.indices.contains(parentIndex) else {
+                return nil
+            }
+            let parent = updated[parentIndex]
+
+            // Insert immediately after the parent so the newest reply appears
+            // at the top of that thread, ahead of existing descendants.
+            updated.insert(
+                Domain.Comment(
+                    id: submitted.id,
+                    age: "just now",
+                    text: submitted.htmlText,
+                    by: submitted.author,
+                    isFlagged: false,
+                    level: parent.level + 1,
+                    upvoted: submittedUpvoted,
+                    voteLinks: submittedVoteLinks,
+                    visibility: .visible
+                ),
+                at: parentIndex + 1
+            )
+
+            // Reveal the parent so the reply is visible; unrelated collapse
+            // state is preserved.
+            collapsedCommentIDs.remove(parent.id)
+            if parent.visibility == .compact {
+                updated[parentIndex] = parent.withVisibility(.visible)
+            }
+        } else {
+            // Top-level: appended after the last real comment. The synthetic
+            // story-text row is always first, so appending preserves it there.
+            updated.append(
+                Domain.Comment(
+                    id: submitted.id,
+                    age: "just now",
+                    text: submitted.htmlText,
+                    by: submitted.author,
+                    isFlagged: false,
+                    level: 0,
+                    upvoted: submittedUpvoted,
+                    voteLinks: submittedVoteLinks,
+                    visibility: .visible
+                )
+            )
+        }
+
+        allComments = updated
+        rebuildCommentIndexes()
+        rebuildVisibleComments(forceRevisionBump: true)
+        synchronizePost(afterInserting: true)
+
+        guard let newIndex = indexByID[submitted.id] else { return nil }
+        return allComments[newIndex]
+    }
+
+    /// Children of the given parent currently loaded in the tree. For the
+    /// story itself, the top-level comment ids.
+    private func currentChildIDs(of parentID: Int) -> Set<Int> {
+        guard let parentIndex = indexByID[parentID] else {
+            return Set(allComments.filter { $0.level == 0 }.map(\.id))
+        }
+        let parentLevel = allComments[parentIndex].level
+        var ids = Set<Int>()
+        for index in (parentIndex + 1) ..< allComments.endIndex {
+            guard allComments[index].level > parentLevel else { break }
+            ids.insert(allComments[index].id)
+        }
+        return ids
+    }
+
+    private func synchronizePost(afterInserting inserted: Bool) {
+        guard var updatedPost = post else { return }
+        updatedPost.comments = allComments.isEmpty ? nil : allComments
+        if inserted {
+            let realCommentCount = allComments.count(where: { $0.id >= 0 })
+            updatedPost.commentsCount = max(
+                updatedPost.commentsCount + 1,
+                realCommentCount
+            )
+        }
+        post = updatedPost
     }
 }

@@ -83,13 +83,13 @@ run_with_timeout() {
 
 has_available_ios_runtime() {
   xcrun simctl list runtimes -j | ruby -rjson -e '
-    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_SDK_VERSION"))
+    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_RUNTIME_VERSION"))
     sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     exit(runtimes.any? { |runtime|
       runtime["platform"] == "iOS" &&
         runtime["isAvailable"] != false &&
-        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) == 0
     } ? 0 : 1)
   '
 }
@@ -100,21 +100,57 @@ if [[ -z "$XCODE_VERSION" && -f "$XCODE_VERSION_FILE" ]]; then
 fi
 
 if [[ -n "$XCODE_VERSION" ]]; then
+  XCODE_MAJOR="${XCODE_VERSION%%.*}"
   shopt -s nullglob
   candidates=(
     "/Applications/Xcode_${XCODE_VERSION}.app"
     "/Applications/Xcode_${XCODE_VERSION}"*.app
     "/Applications/Xcode-${XCODE_VERSION}.app"
     "/Applications/Xcode-${XCODE_VERSION}"*.app
+    "/Applications/Xcode_${XCODE_MAJOR}_beta"*.app
   )
+  if [[ -d "/Applications/Xcode-beta.app" ]]; then
+    candidates+=("/Applications/Xcode-beta.app")
+  fi
   shopt -u nullglob
 
+  matched_candidates=()
   for candidate in "${candidates[@]}"; do
-    if [[ -d "$candidate" ]]; then
-      sudo xcode-select -s "$candidate/Contents/Developer"
-      break
+    if [[ ! -d "$candidate" ]]; then
+      continue
     fi
+
+    candidate_output="$({
+      DEVELOPER_DIR="$candidate/Contents/Developer" xcodebuild -version 2>/dev/null || true
+    })"
+    candidate_version="$(awk '$1 == "Xcode" { print $2; exit }' <<<"$candidate_output")"
+    if [[ "$candidate_version" != "$XCODE_VERSION" ]]; then
+      echo "Ignoring Xcode candidate $candidate (reports ${candidate_version:-unknown}; expected $XCODE_VERSION)." >&2
+      continue
+    fi
+
+    candidate_build="$(awk '$1 == "Build" { print $3; exit }' <<<"$candidate_output")"
+    matched_candidates+=("${candidate_build:-0}|$candidate")
   done
+
+  if [[ ${#matched_candidates[@]} -eq 0 ]]; then
+    echo "Requested Xcode $XCODE_VERSION is not installed on this runner." >&2
+    echo "Checked: ${candidates[*]}" >&2
+    exit 1
+  fi
+
+  # Several seeds of the same Xcode version can coexist on beta-season runner
+  # images. Prefer the newest build because App Store Connect only accepts
+  # uploads from the latest seed.
+  selected_xcode="$(
+    printf '%s\n' "${matched_candidates[@]}" |
+      sort -t'|' -k1,1 |
+      tail -1 |
+      cut -d'|' -f2-
+  )"
+  echo "Selected Xcode $selected_xcode (newest of ${#matched_candidates[@]} matching candidate(s))."
+
+  sudo xcode-select -s "$selected_xcode/Contents/Developer"
 fi
 
 echo "::group::Selected Xcode"
@@ -133,15 +169,17 @@ fi
 
 IOS_SIMULATOR_SDK_VERSION="$(xcrun --sdk iphonesimulator --show-sdk-version)"
 export IOS_SIMULATOR_SDK_VERSION
+IOS_SIMULATOR_RUNTIME_VERSION="${CI_IOS_RUNTIME_VERSION:-$IOS_SIMULATOR_SDK_VERSION}"
+export IOS_SIMULATOR_RUNTIME_VERSION
 
 if has_available_ios_runtime; then
-  echo "An iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION is already installed."
+  echo "An iOS $IOS_SIMULATOR_RUNTIME_VERSION simulator runtime is already installed (SDK $IOS_SIMULATOR_SDK_VERSION)."
 else
   if [[ "$DOWNLOAD_IOS_PLATFORM" == "1" ]]; then
-    echo "No iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION found; downloading iOS platform."
+    echo "No iOS $IOS_SIMULATOR_RUNTIME_VERSION simulator runtime found; downloading iOS platform."
     run_with_timeout 900 xcodebuild -downloadPlatform iOS
   else
-    echo "No iOS simulator runtime compatible with SDK $IOS_SIMULATOR_SDK_VERSION found on this runner image." >&2
+    echo "No iOS $IOS_SIMULATOR_RUNTIME_VERSION simulator runtime found on this runner image." >&2
     echo "Set CI_DOWNLOAD_IOS_PLATFORM=1 or pass --download-ios-platform to allow an on-runner download." >&2
     exit 1
   fi
@@ -149,15 +187,15 @@ fi
 
 RUNTIME_ID="$(
   xcrun simctl list runtimes -j | ruby -rjson -e '
-    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_SDK_VERSION"))
+    sdk_version = Gem::Version.new(ENV.fetch("IOS_SIMULATOR_RUNTIME_VERSION"))
     sdk_release = sdk_version.segments.first(2)
     runtimes = JSON.parse(STDIN.read).fetch("runtimes", [])
     ios = runtimes.select { |runtime|
       runtime["platform"] == "iOS" &&
         runtime["isAvailable"] != false &&
-        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) <= 0
+        (Gem::Version.new(runtime.fetch("version")).segments.first(2) <=> sdk_release) == 0
     }
-    abort("No iOS simulator runtime compatible with SDK #{sdk_version} found") if ios.empty?
+    abort("No iOS #{sdk_version} simulator runtime found") if ios.empty?
     puts ios.sort_by { |runtime| Gem::Version.new(runtime.fetch("version")) }.last.fetch("identifier")
   '
 )"

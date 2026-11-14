@@ -13,6 +13,8 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var textSize: TextSize = .medium
     var compactFeedDesign = false
     var dimReadPosts: Bool
+    var swipeCollapseThreads = true
+    var showNextCommentButton = true
 
     init() {
         guard let configuration = UITestingBootstrap.configuration else {
@@ -77,6 +79,14 @@ final class UITestAuthenticationUseCase: AuthenticationUseCase, @unchecked Senda
     private let lock = NSLock()
     private var user: User?
 
+    /// Launches with an established session so authenticated flows (voting, account
+    /// settings) can be exercised without driving the login form first.
+    init(initiallyAuthenticated: Bool = false) {
+        if initiallyAuthenticated {
+            user = User(username: "ui-user", karma: 1_337, joined: Date(timeIntervalSince1970: 1_700_000_000))
+        }
+    }
+
     func authenticate(username: String, password: String) async throws {
         guard username == "ui-user", password == "password" else {
             throw HackersKitError.authenticationError(error: .badCredentials)
@@ -106,6 +116,14 @@ final class UITestVotingStateProvider: VoteUseCase,
     private let lock = NSLock()
     private var upvotedIDs: Set<Int> = []
 
+    /// Matches the perceived latency of a real Hacker News vote request so voting
+    /// UI exercises the in-flight spinner state instead of completing instantly.
+    private static let voteLatency: UInt64 = 600_000_000
+
+    private func simulateVoteLatency() async {
+        try? await Task.sleep(nanoseconds: Self.voteLatency)
+    }
+
     func votingState(for item: any Votable) -> VotingState {
         let isUpvoted = lock.withLock { upvotedIDs.contains(item.id) || item.upvoted }
         let score = (item as? any ScoredVotable)?.score
@@ -119,18 +137,22 @@ final class UITestVotingStateProvider: VoteUseCase,
     }
 
     func upvote(post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.insert(post.id) }
     }
 
     func upvote(comment: Comment, for post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.insert(comment.id) }
     }
 
     func unvote(post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.remove(post.id) }
     }
 
     func unvote(comment: Comment, for post: Post) async throws {
+        await simulateVoteLatency()
         lock.withLock { _ = upvotedIDs.remove(comment.id) }
     }
 

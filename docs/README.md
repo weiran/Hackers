@@ -2,6 +2,10 @@
 
 This folder contains the canonical project documentation. It is intentionally small: keep docs current, operational, and close to how the app is actually built today.
 
+If you are new to the project, start with the repository's
+[contribution guide](../CONTRIBUTING.md), then use the development guide for local
+setup and validation.
+
 ## Documents
 
 | Document | Purpose |
@@ -9,6 +13,12 @@ This folder contains the canonical project documentation. It is intentionally sm
 | [Project Overview](./project-overview.md) | Architecture, module map, main features, and important implementation patterns. |
 | [Development](./development.md) | Local setup, build/test commands, coding standards, CI, and troubleshooting. |
 | [Release Process](./release-process.md) | TestFlight release workflow, signing, build numbers, artifacts, and failure recovery. |
+
+Community and contribution policies live at the repository root:
+
+* [Contributing](../CONTRIBUTING.md)
+* [Security policy](../SECURITY.md)
+* [Support](../SUPPORT.md)
 
 ## Source-Of-Truth Hierarchy
 
@@ -36,3 +46,4 @@ Use Xcode with the `Hackers` scheme for day-to-day app work. Use `./run_tests.sh
 * Delete stale historical docs instead of keeping them as competing sources of truth.
 * Keep examples short and executable from the repository root.
 * Put release-specific operational details in [Release Process](./release-process.md).
+* Keep contributor expectations in `CONTRIBUTING.md`; do not duplicate them here.

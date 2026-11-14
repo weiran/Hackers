@@ -27,6 +27,8 @@ public protocol NavigationStoreProtocol: AnyObject, Observable {
     func showSettings()
     func selectPostType(_ type: PostType)
     func openURLInPrimaryContext(_ url: URL, pushOntoDetailStack: Bool) -> Bool
+    func commentScrollAnchor(for postID: Int) -> Int?
+    func setCommentScrollAnchor(_ commentID: Int?, for postID: Int)
 }
 
 public extension NavigationStoreProtocol {
@@ -37,4 +39,9 @@ public extension NavigationStoreProtocol {
     func openURLInPrimaryContext(_ url: URL) -> Bool {
         openURLInPrimaryContext(url, pushOntoDetailStack: true)
     }
+
+    /// Stores navigation continuity rather than persistent reading history. Implementations
+    /// that don't own navigation state (for example test doubles) can use these defaults.
+    func commentScrollAnchor(for _: Int) -> Int? { nil }
+    func setCommentScrollAnchor(_: Int?, for _: Int) {}
 }

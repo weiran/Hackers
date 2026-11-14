@@ -4,6 +4,69 @@ import XCTest
 
 @MainActor
 final class BrowserCommentsUITests: HackersUITestCase {
+    func testBrowserControlsAdaptToVerticalBar() throws {
+        if ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo" {
+            XCUIDevice.shared.orientation = .landscapeRight
+        }
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: .collapsedBrowser)
+        ))
+        assertFixtureArticleLoaded()
+        let isDuo = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] == "iPhone Duo"
+        // In the vertical bar the browser is ordinary navigation, so the system Back
+        // button leads the bar (Apple's vertical bar guidance); elsewhere the floating
+        // browser controls keep their own Close button.
+        let leading = assertHittable(
+            isDuo ? app.buttons.matching(NSPredicate(format: "identifier == 'BackButton' OR label == 'Back'")).firstMatch
+                : app.buttons["Close"]
+        )
+        if isDuo {
+            // The vertical bar keeps the pinned comments toggle and high-priority Share;
+            // secondary page actions live in the overflow menu.
+            let toggle = assertHittable(app.buttons["Show Comments"])
+            let share = assertHittable(app.buttons["Share"])
+            XCTAssertGreaterThan(leading.frame.midX, app.frame.width * 0.8)
+            for control in [toggle, share] {
+                XCTAssertEqual(control.frame.midX, leading.frame.midX, accuracy: 2)
+                XCTAssertGreaterThan(control.frame.minY, leading.frame.minY)
+            }
+        } else {
+            let reload = assertHittable(app.buttons["Reload"])
+            assertHittable(app.buttons["Share"])
+            assertHittable(app.buttons["Open in Safari"])
+            XCTAssertLessThan(leading.frame.midX, app.frame.width * 0.2)
+            XCTAssertEqual(leading.frame.midY, reload.frame.midY, accuracy: 2)
+        }
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Collapsed browser controls"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        assertHittable(collapsedCommentsHeader).tap()
+        assertHasVisibleIntersection(commentsList, in: app)
+        let expanded = XCTAttachment(screenshot: app.screenshot())
+        expanded.name = "Expanded browser comments"
+        expanded.lifetime = .keepAlways
+        add(expanded)
+    }
+
+    func testCustomBrowserExpandedCommentsBlockMediaAutoplay() throws {
+        launchMediaAutoplayFixture(presentation: .expandedComments)
+
+        assertFullyContained(browserView, in: app)
+        assertHasVisibleIntersection(expandedCommentsTitle, in: app)
+        assertHasVisibleIntersection(commentsList, in: app)
+        assertMediaAutoplayState("blocked")
+    }
+
+    func testCustomBrowserCollapsedCommentsRetainMediaAutoplay() throws {
+        launchMediaAutoplayFixture(presentation: .collapsedBrowser)
+
+        assertHasVisibleIntersection(browserView, in: app)
+        assertMediaAutoplayState("play-resolved")
+        assertMediaAutoplayState("started")
+    }
+
     func testCustomBrowserCommentsSheetCollapsedPreview() throws {
         launchApp(linkBrowserMode: .customBrowser)
 
@@ -15,11 +78,28 @@ final class BrowserCommentsUITests: HackersUITestCase {
 
         collapseCommentsByTappingTitle()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browser
         )
         assertHasVisibleIntersection(app.staticTexts["366 comments"].firstMatch, in: collapsedCommentsHeader)
         assertHasVisibleIntersection(app.staticTexts["675"].firstMatch, in: collapsedCommentsHeader)
+    }
+
+    private func launchMediaAutoplayFixture(presentation: PostLinkPresentation) {
+        launchApp(configuration: UITestLaunchConfiguration(
+            browserMode: .customBrowser,
+            route: .story(postID: screenshotPostID, presentation: presentation),
+            mediaPlayback: .autoplayFixture
+        ))
+    }
+
+    private func assertMediaAutoplayState(_ state: String, timeout: TimeInterval = 12) {
+        let article = app.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
+        XCTAssertTrue(article.waitForExistence(timeout: timeout), app.debugDescription)
+        XCTAssertTrue(
+            article.staticTexts[state].waitForExistence(timeout: timeout),
+            "Expected media autoplay fixture to report \(state).\n\(app.debugDescription)"
+        )
     }
 
     func testCustomBrowserExpandedCommentsChrome() throws {
@@ -48,7 +128,7 @@ final class BrowserCommentsUITests: HackersUITestCase {
         reloadButton.tap()
         assertFixtureArticleLoaded()
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: browserView
         )
         let sheetHandle = assertHasVisibleIntersection(commentsSheetHandle, in: app)
@@ -89,7 +169,7 @@ final class BrowserCommentsUITests: HackersUITestCase {
         postTapScreenshot.lifetime = .deleteOnSuccess
         add(postTapScreenshot)
         assertHasVisibleIntersection(
-            app.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."],
+            app.staticTexts["A focused read with the story, context, and conversation kept in one place."],
             in: app
         )
         assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
@@ -159,9 +239,24 @@ final class BrowserCommentsUITests: HackersUITestCase {
         let post = assertHittable(app.buttons[AccessibilityIdentifier.Feed.post(longCommentsPostID)], timeout: 8)
         tapPost(post)
 
-        collapseCommentsByTappingTitle()
+        // Collapse by dragging the content down so the scroll offset stays
+        // at the top for the re-expand assertions below.
+        let firstCommentForDrag = assertHasVisibleIntersection(
+            app.buttons[AccessibilityIdentifier.Comments.comment(UITestFixtureReference.firstLongCommentID)],
+            in: app
+        )
+        let collapseDragStart = app.coordinate(withNormalizedOffset: CGVector(
+            dx: firstCommentForDrag.frame.midX / app.frame.width,
+            dy: firstCommentForDrag.frame.midY / app.frame.height
+        ))
+        collapseDragStart.press(
+            forDuration: 0.1,
+            thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        )
+        assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
+
         let sheetHandle = assertHasVisibleIntersection(commentsSheetHandle, in: app)
-        XCTAssertGreaterThan(sheetHandle.frame.minY, app.frame.midY)
+        waitForFrameMinY(of: sheetHandle, greaterThan: app.frame.midY, timeout: 5)
 
         let handle = app.coordinate(withNormalizedOffset: CGVector(
             dx: sheetHandle.frame.midX / app.frame.width,

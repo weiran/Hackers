@@ -136,7 +136,6 @@ public struct Comment: Sendable, Identifiable {
     public let upvoted: Bool
     public let voteLinks: VoteLinks?
     public let visibility: CommentVisibilityType
-    public let parsedText: AttributedString?
 
     public init(
         id: Int,
@@ -148,7 +147,6 @@ public struct Comment: Sendable, Identifiable {
         upvoted: Bool,
         voteLinks: VoteLinks? = nil,
         visibility: CommentVisibilityType = .visible,
-        parsedText: AttributedString? = nil,
     ) {
         self.id = id
         self.age = age
@@ -159,16 +157,26 @@ public struct Comment: Sendable, Identifiable {
         self.upvoted = upvoted
         self.voteLinks = voteLinks
         self.visibility = visibility
-        self.parsedText = parsedText
     }
 }
 
 extension Comment: Hashable {
-    /// Identity-based equality: two comments with the same id are considered equal so that
-    /// value copies with differing presentation state (e.g. visibility) collapse correctly
-    /// in sets/dictionaries keyed by comment.
+    /// Content equality: comments are equal only when every rendered field matches.
+    /// SwiftUI's ForEach/LazyVStack row diffing uses `==` to decide whether a row's
+    /// content closure needs re-invoking, so identity-only equality (same id) hid
+    /// content-only updates such as an optimistic upvote and the row kept rendering
+    /// stale state. Hashing stays keyed by id: content-equal comments always share
+    /// an id, so equal values still hash equally.
     public static func == (lhs: Comment, rhs: Comment) -> Bool {
         lhs.id == rhs.id
+            && lhs.age == rhs.age
+            && lhs.text == rhs.text
+            && lhs.by == rhs.by
+            && lhs.isFlagged == rhs.isFlagged
+            && lhs.level == rhs.level
+            && lhs.upvoted == rhs.upvoted
+            && lhs.voteLinks == rhs.voteLinks
+            && lhs.visibility == rhs.visibility
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -181,8 +189,7 @@ public extension Comment {
     func with(upvoted: Bool) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 
@@ -190,8 +197,7 @@ public extension Comment {
     func with(voteLinks: VoteLinks?) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 
@@ -199,8 +205,7 @@ public extension Comment {
     func withVisibility(_ visibility: CommentVisibilityType) -> Comment {
         Comment(
             id: id, age: age, text: text, by: by, isFlagged: isFlagged, level: level,
-            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility,
-            parsedText: parsedText
+            upvoted: upvoted, voteLinks: voteLinks, visibility: visibility
         )
     }
 }
@@ -227,11 +232,26 @@ public enum HackersKitError: Error, Sendable {
     case requestFailure
     case scraperError
     case unauthenticated
+    /// Hacker News refused the vote itself (e.g. an unvote outside the short window
+    /// it allows), served as a bare error page rather than the usual whence redirect.
+    case voteRejected
     case authenticationError(error: HackersKitAuthenticationError)
+}
+
+extension HackersKitError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .voteRejected:
+            "Hacker News didn’t accept this vote. Votes can only be undone shortly after they’re cast."
+        default:
+            nil
+        }
+    }
 }
 
 public enum HackersKitAuthenticationError: Error, Sendable {
     case badCredentials
+    case sessionNotEstablished
     case serverUnreachable
     case noInternet
     case unknown

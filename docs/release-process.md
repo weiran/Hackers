@@ -13,11 +13,19 @@ Releases are source-controlled and tag-driven:
 * `CURRENT_PROJECT_VERSION` controls the App Store Connect build number, for example `160`.
 * The GitHub Release title/body is used as TestFlight "What to Test."
 * App Store release notes are separate public-facing customer copy. They must not be copied from GitHub Release notes, TestFlight notes, generated changelog output, pull request links, or `Full Changelog` links.
+* Every TestFlight build is distributed to the configured external tester group. If Apple requires TestFlight beta review, the workflow submits the build for that review automatically.
 * Published vs draft GitHub Release status is the release-state differentiator:
-  * draft = built and available internally, not yet marked for App Store candidacy
+  * draft = built and available to the configured TestFlight audience, not yet marked for App Store candidacy
   * published = selected for App Store release candidacy
 * TestFlight upload uses `.github/workflows/release-testflight.yml`.
 * App Store submission uses `.github/workflows/release-appstore.yml`.
+
+When the GitHub-hosted Xcode image cannot build the project, a locally built IPA can
+still use the protected GitHub upload path. Attach the IPA to the release tag as a
+GitHub Release asset, then dispatch TestFlight with `local_ipa_asset` set to the exact
+asset filename. The workflow downloads that asset on the GitHub runner and uses the
+same App Store Connect secrets and protected environment as a normal upload; it does
+not archive a second build.
 
 ## Prerequisites
 
@@ -36,6 +44,16 @@ Before starting a release, confirm:
 * The match repository contains App Store signing assets for both bundle IDs:
   * `com.weiranzhang.Hackers`
   * `com.weiranzhang.Hackers.ActionExtension`
+* Your local `master` is current, clean, and points to the commit intended for release:
+
+  ```bash
+  git fetch origin master --tags
+  git status --short
+  git rev-parse master
+  git rev-parse origin/master
+  ```
+
+  The two commit IDs should match before creating a release tag.
 
 ## Release Checklist
 
@@ -82,7 +100,10 @@ Commit and push the release-prep change to `master` after required checks pass.
 
 ## Tag And Trigger TestFlight
 
-Tag format must be `v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`.
+Tag format for build-tracked releases must be
+`v<MARKETING_VERSION>+<CURRENT_PROJECT_VERSION>`. Some fastlane helper code accepts
+the older `vX.Y.Z` form, but do not use suffix-less tags for TestFlight or App Store
+releases.
 
 ```bash
 tag=v5.3.2+160
@@ -91,9 +112,21 @@ git tag "$tag" master
 git push origin "refs/tags/$tag"
 ```
 
-When the tag push starts `Release TestFlight`, approve the protected `testflight` deployment in GitHub Actions.
+The TestFlight workflow is manually dispatched so a release can use a locally built
+IPA when the GitHub-hosted Xcode image is not suitable. Approve the protected
+`testflight` deployment in GitHub Actions.
 
-A tag push uploads the build and makes it available to internal testers only. External tester distribution is a separate, opt-in step so a build can be uploaded without committing to a beta audience:
+A TestFlight dispatch uploads the build and distributes it to the `External Testers` group by default. Set `external_groups` to a comma-separated list of App Store Connect external testing groups when a different group is needed:
+
+```bash
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.3.2+160 \
+  -f external_groups="External Testers"
+```
+
+The workflow waits for processing before distributing the build. TestFlight beta-review submission is enabled by default; pass `-f submit_beta_review=false` only when the external build is already approved or beta-review submission will be handled manually. An empty `external_groups` value is rejected.
+
+To distribute an already uploaded build without uploading a new binary, use:
 
 ```bash
 gh workflow run release-testflight.yml \
@@ -102,13 +135,46 @@ gh workflow run release-testflight.yml \
   -f external_groups="External Testers"
 ```
 
-Set `external_groups` to the comma-separated App Store Connect group name(s). Omitting it uploads to internal testers only.
+Existing-build distribution, local IPA upload, and App Store submission validate the
+Release version and build number of both app targets in the requested Git tag.
+They select that tag's version/build even when the workflow checkout has advanced
+to a newer version. Keep running the maintained workflow/Fastlane code; do not
+check out old release automation merely to select an older build. New archives
+still require the checked-out app's marketing version to match the release tag.
 
-Manual dispatch for an upload-only build is also supported:
+Offline release selection checks:
+
+```bash
+ruby scripts/tests/release-tag-tests.rb
+```
+
+When the TestFlight "What to Test" text must be limited to a specific customer-facing fix, pass `what_to_test` to override generated GitHub notes:
+
+```bash
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.3.2+160 \
+  -f what_to_test='Fixes audio and video autoplay in the embedded browser.'
+```
+
+Manual dispatch is the supported upload path:
 
 ```bash
 gh workflow run release-testflight.yml -f release_tag=v5.3.2+160
 ```
+
+To upload a locally built IPA attached to the release, use:
+
+```bash
+gh release upload v5.5.0+166 artifacts/release/Hackers.ipa --clobber
+gh workflow run release-testflight.yml \
+  -f release_tag=v5.5.0+166 \
+  -f local_ipa_asset=Hackers.ipa
+```
+
+The local IPA must already contain the intended marketing version and build number,
+both app targets must be signed for distribution, and the filename must match the
+asset passed to `local_ipa_asset`. Do not upload a locally built IPA under a tag whose
+build number does not match the IPA.
 
 When you need another build for the same marketing version, bump `CURRENT_PROJECT_VERSION`, create a new release-prep commit, and tag the new commit with the new `+N` value.
 
@@ -116,7 +182,7 @@ When you need another build for the same marketing version, bump `CURRENT_PROJEC
 
 The TestFlight workflow resolves `artifacts/release/what-to-test.txt` before upload and creates or updates the GitHub Release for the tag. Draft releases use generated notes from the previous tag. Published releases use generated notes from the previous published release, which makes the candidate changelog cumulative.
 
-Normal workflow-created notes are generated from GitHub release notes. Review and edit the GitHub Release body after the workflow prepares it if the generated text needs cleanup before broader TestFlight or App Store candidacy. Edits made before a TestFlight workflow run can be replaced by the workflow's generated notes.
+When `what_to_test` is omitted, normal workflow-created notes are generated from GitHub release notes. Review and edit the GitHub Release body after the workflow prepares it if the generated text needs cleanup before broader TestFlight or App Store candidacy. Edits made before a TestFlight workflow run can be replaced by the workflow's generated notes.
 
 If you need to create or replace notes manually outside the normal workflow path, use concise user-facing bullets and keep the title aligned with the tag without the leading `v`:
 
@@ -227,6 +293,14 @@ If a release fails:
 Only force-move a release tag during in-progress failed release recovery. Once a TestFlight build has completed successfully, treat the tag as immutable.
 
 ## Appendix: Recovery Commands
+
+Before force-moving a failed release tag, verify that no release workflow is still
+running and that App Store Connect has not received a usable build:
+
+```bash
+git ls-remote origin "refs/tags/$tag"
+gh run list --workflow release-testflight.yml --limit 10
+```
 
 Force-move a failed release tag only before a usable TestFlight build exists:
 

@@ -60,7 +60,9 @@ public enum CommentHTMLParser {
     }()
 
     static let paragraphRegex: NSRegularExpression = {
-        let pattern = #"<p\b[^>]*>(.*?)</p>"#
+        // Hacker News occasionally omits closing </p> tags and uses the next
+        // opening <p> (or end-of-input) as the paragraph boundary.
+        let pattern = #"<p\b[^>]*>(.*?)(?:</p>|(?=<p\b)|$)"#
         do {
             return try NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators])
         } catch {
@@ -96,8 +98,9 @@ public enum CommentHTMLParser {
             return AttributedString("")
         }
 
-        let decodedHTML = decodeHTMLEntities(htmlString)
-        return processHTMLContent(decodedHTML)
+        // Keep entities encoded while identifying structural tags. Otherwise
+        // escaped literal markup such as &lt;b&gt; would become real formatting.
+        return processHTMLContent(htmlString)
     }
 
     // MARK: - Private Implementation
@@ -112,13 +115,10 @@ public enum CommentHTMLParser {
     // Processes content with paragraph tags, creating proper spacing between paragraphs
     // moved to extension in CommentHTMLParser+Blocks.swift
 
-    // Creates proper paragraph spacing with larger line height
+    // Creates semantic paragraph separators
     // moved to extension in CommentHTMLParser+Blocks.swift
 
     // Processes links and formatting within a text block
-    // moved to extension in CommentHTMLParser+Blocks.swift
-
-    // Applies paragraph styling with proper line height
     // moved to extension in CommentHTMLParser+Blocks.swift
 
     // Extracts and creates an attributed link component

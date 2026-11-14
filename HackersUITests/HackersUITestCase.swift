@@ -58,6 +58,11 @@ class HackersUITestCase: XCTestCase {
     }
 
     func collapseCommentsByTappingTitle() {
+        // The bar title only appears once the comments have been scrolled;
+        // bring it in like a reader would before tapping it to collapse.
+        if !expandedCommentsTitle.exists || !expandedCommentsTitle.isHittable {
+            commentsList.swipeUp()
+        }
         let title = assertHasVisibleIntersection(expandedCommentsTitle, in: app)
         tapAbsolutePoint(x: title.frame.maxX - 12, y: title.frame.midY)
         assertHasVisibleIntersection(collapsedCommentsHeader, in: app)
@@ -67,7 +72,7 @@ class HackersUITestCase: XCTestCase {
         let article = app.webViews[AccessibilityIdentifier.Browser.fixtureArticle]
         XCTAssertTrue(article.waitForExistence(timeout: timeout), "Expected the fixture article web view to load")
         XCTAssertTrue(
-            article.staticTexts["Fixture article loaded from the UI-test Hacker News Active snapshot."]
+            article.staticTexts["A focused read with the story, context, and conversation kept in one place."]
                 .waitForExistence(timeout: timeout),
             "Expected fixture article content in the accessibility hierarchy"
         )
@@ -187,9 +192,14 @@ class HackersUITestCase: XCTestCase {
         return isMeaningfullyVisible(element.frame, in: container.frame)
     }
 
-    func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxSwipes: Int = 6) {
-        for _ in 0 ..< maxSwipes where !hasVisibleIntersection(element, in: container) {
-            container.swipeUp()
+    /// Controlled half-viewport drags instead of `swipeUp()` flings: fling
+    /// momentum outlives the settle window, so the visibility check runs
+    /// mid-scroll and a repeat swipe pushes the target further away.
+    func scroll(_ container: XCUIElement, untilVisible element: XCUIElement, maxDrags: Int = 8) {
+        let start = container.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78))
+        let end = container.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.28))
+        for _ in 0 ..< maxDrags where !hasVisibleIntersection(element, in: container) {
+            start.press(forDuration: 0.05, thenDragTo: end)
             waitForFrameToSettle(element, timeout: 1)
         }
     }

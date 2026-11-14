@@ -19,7 +19,7 @@ public struct SettingsView: View {
     let isAuthenticated: Bool
     let currentUsername: String?
     let onLogin: (String, String) async throws -> Void
-    let onLogout: () -> Void
+    let onLogout: () async throws -> Void
     let onWhatsNewDismiss: () -> Void
     @State private var viewModel: SettingsViewModel
     @State private var mailResult: Result<MFMailComposeResult, Error>?
@@ -37,7 +37,7 @@ public struct SettingsView: View {
         isAuthenticated: Bool = false,
         currentUsername: String? = nil,
         onLogin: @escaping (String, String) async throws -> Void = { _, _ in },
-        onLogout: @escaping () -> Void = {},
+        onLogout: @escaping () async throws -> Void = {},
         onWhatsNewDismiss: @escaping () -> Void = {}
     ) {
         _viewModel = State(initialValue: viewModel)
@@ -82,6 +82,7 @@ public struct SettingsView: View {
                             }
                         },
                     )
+                    .accessibilityIdentifier(AccessibilityIdentifier.Settings.account)
                     .sheet(isPresented: $showLogin) {
                         LoginView(
                             isAuthenticated: isAuthenticated,
@@ -180,6 +181,20 @@ public struct SettingsView: View {
                     .accessibilityIdentifier(AccessibilityIdentifier.Settings.dimReadPosts)
                 }
 
+                if #available(iOS 27, *) {
+                    Section(header: Text("Comments")) {
+                        Toggle(isOn: $viewModel.swipeCollapseThreads) {
+                            Label("Swipe to Collapse Threads", systemImage: "minus.circle")
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.swipeCollapseThreads)
+
+                        Toggle(isOn: $viewModel.showNextCommentButton) {
+                            Label("Show Next Comment Button", systemImage: "arrow.down.circle")
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextCommentButton)
+                    }
+                }
+
                 Section(header: Text("Storage")) {
                     HStack(spacing: 12) {
                         Label("Storage Used", systemImage: "externaldrive")
@@ -200,7 +215,9 @@ public struct SettingsView: View {
                         }
                         Button("Cancel", role: .cancel) {}
                     } message: {
-                        Text("This removes cached images, network responses, and in-app browser data to reduce storage.")
+                        Text(
+                            "This removes cached images, network responses, and in-app browser data to reduce storage."
+                        )
                     }
                 }
             }
@@ -235,7 +252,9 @@ public struct SettingsView: View {
         }
         .textScaling(for: viewModel.textSize)
     }
+}
 
+private extension SettingsView {
     private func openGitHub() {
         if let url = URL(string: "https://github.com/weiran/hackers") {
             UIApplication.shared.open(url)
@@ -243,7 +262,9 @@ public struct SettingsView: View {
     }
 
     private var feedbackBodyLines: [String] {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let version = Self.displayVersion(
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        ) ?? "Unknown"
         let deviceIdentifier = UIDevice.current.modelIdentifier
         let systemVersion = UIDevice.current.systemVersion
         return [
@@ -266,8 +287,20 @@ public struct SettingsView: View {
         )
     }
 
+    static func displayVersion(_ version: String?) -> String? {
+        guard var components = version?.split(separator: "."), !components.isEmpty else {
+            return version
+        }
+        if components.count > 2, components.last == "0" {
+            components.removeLast()
+        }
+        return components.joined(separator: ".")
+    }
+
     private var versionLabel: some View {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let appVersion = Self.displayVersion(
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        )
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         let versionText = [appVersion, buildNumber.map { "(\($0))" }]
             .compactMap(\.self)

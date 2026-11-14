@@ -43,8 +43,8 @@ extension PostRepository {
         if tableElement.hasClass("fatitem") {
             let allRows = try tableElement.select("tr")
             guard allRows.size() >= 2 else { throw HackersKitError.scraperError }
-            let titleElement = try allRows.get(0)
-            let metadataElement = try allRows.get(1)
+            let titleElement = allRows.get(0)
+            let metadataElement = allRows.get(1)
             let postElements = Elements([titleElement, metadataElement])
             let post = try post(from: postElements, type: type)
             return [post]
@@ -72,8 +72,8 @@ extension PostRepository {
     func post(from elements: Elements, type: PostType) throws -> Post {
         guard elements.size() >= 2 else { throw HackersKitError.scraperError }
 
-        let titleElement = try elements.get(0)
-        let metadataElement = try elements.get(1)
+        let titleElement = elements.get(0)
+        let metadataElement = elements.get(1)
 
         let id = try Int(titleElement.attr("id")) ?? 0
         guard let titleLink = try titleElement.select("span.titleline > a").first() else {
@@ -91,7 +91,7 @@ extension PostRepository {
         let ageElement = try metadataElement.select("span.age")
         let age = try ageElement.first()?.attr("title") ?? ""
 
-        let byElement = try metadataElement.select("a.hnuser")
+        let byElement = try metadataElement.select("a.hnuser, a[href^=\"user?id=\"]")
         let by = try byElement.first()?.text() ?? ""
 
         let linkElements = try metadataElement.select("a")
@@ -156,7 +156,7 @@ extension PostRepository {
         }
 
         let age = try element.select(".age").text()
-        let user = try element.select(".hnuser").text()
+        let user = try element.select(".comhead a.hnuser, .comhead a[href^=\"user?id=\"]").first()?.text() ?? ""
         let idValue = try element.attr("id")
         guard let id = Int(idValue), !idValue.isEmpty else {
             throw HackersKitError.scraperError
@@ -168,8 +168,6 @@ extension PostRepository {
         let voteLinksResult = try voteLinks(from: element)
         let upvoted = voteLinksResult.upvoted
 
-        let parsedText = CommentHTMLParser.parseHTMLText(parsedComment.text)
-
         return Domain.Comment(
             id: id,
             age: age,
@@ -180,7 +178,6 @@ extension PostRepository {
             upvoted: upvoted,
             voteLinks: VoteLinks(upvote: voteLinksResult.upvote, unvote: voteLinksResult.unvote),
             visibility: parsedComment.isFlagged ? .compact : .visible,
-            parsedText: parsedText,
         )
     }
 

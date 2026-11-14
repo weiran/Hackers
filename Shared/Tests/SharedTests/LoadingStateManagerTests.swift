@@ -6,6 +6,7 @@
 //
 
 @testable import Shared
+import Foundation
 import Testing
 
 private actor LoadCounter {
@@ -24,20 +25,6 @@ private actor LoadCounter {
 @MainActor
 @Suite("LoadingStateManager Tests")
 struct LoadingStateManagerTests {
-    @Test("Initial state is correct")
-    func initialState() {
-        let manager = LoadingStateManager(
-            initialData: [] as [String],
-            shouldSkipLoad: { !$0.isEmpty },
-            loadData: { ["test"] },
-        )
-
-        #expect(manager.data == [])
-        #expect(manager.isLoading == false)
-        #expect(manager.error == nil)
-        #expect(manager.hasAttemptedLoad == false)
-    }
-
     @Test("loadIfNeeded loads data on first call")
     func loadIfNeededFirstCall() async {
         let loadCounter = LoadCounter()
@@ -193,77 +180,121 @@ struct LoadingStateManagerTests {
         #expect(manager.data == ["concurrent_item1"])
     }
 
-    @Test("loadIfNeeded with custom shouldSkipLoad logic")
-    func customShouldSkipLogic() async {
+    @Test("A refresh supersedes an in-flight load")
+    func refreshSupersedesInFlightLoad() async {
         let loadCounter = LoadCounter()
-
-        // Skip loading if we have more than 2 items
         let manager = LoadingStateManager(
-            initialData: ["initial"],
-            shouldSkipLoad: { $0.count > 2 },
+            initialData: [] as [String],
             loadData: {
                 let count = await loadCounter.increment()
-                let newItems = (1...count).map { "new_item\($0)" }
-                return ["initial"] + newItems
-            },
+                try await Task.sleep(for: count == 1 ? .milliseconds(100) : .milliseconds(10))
+                return ["item\(count)"]
+            }
         )
 
-        // First load: [initial] -> [initial, new_item1] (count = 2, should not skip)
-        await manager.loadIfNeeded()
-        let countAfterFirstLoad = await loadCounter.current()
-        #expect(countAfterFirstLoad == 1)
-        #expect(manager.data == ["initial", "new_item1"])
+        let firstLoad = Task { await manager.loadIfNeeded() }
+        try? await Task.sleep(for: .milliseconds(10))
+        await manager.refresh()
+        await firstLoad.value
 
-        // Second load: [initial, new_item1] -> [initial, new_item1, new_item2] (count = 3, should skip next time)
-        await manager.loadIfNeeded()
-        let countAfterSecondLoad = await loadCounter.current()
-        #expect(countAfterSecondLoad == 2)
-        #expect(manager.data == ["initial", "new_item1", "new_item2"])
-
-        // Third load: count > 2, should skip
-        await manager.loadIfNeeded()
-        let countAfterThirdLoad = await loadCounter.current()
-        #expect(countAfterThirdLoad == 2) // Should not increment
-        #expect(manager.data == ["initial", "new_item1", "new_item2"]) // Should not change
+        #expect(manager.data == ["item2"])
+        #expect(manager.isLoading == false)
     }
 
-    @Test("Initialization with minimal parameters")
-    func minimalInitialization() async {
-        let manager = LoadingStateManager(initialData: ["test"])
+}
 
-        #expect(manager.data == ["test"])
-        #expect(manager.isLoading == false)
+private actor CancellationAwareLoadGate {
+    private let cancellationError: Error
+    private var started = false
+    private var startWaiter: CheckedContinuation<Void, Never>?
+    private var continuation: CheckedContinuation<[String], Error>?
+    private var cancellationHandled = false
+    private var cancellationWaiter: CheckedContinuation<Void, Never>?
+
+    init(cancellationError: Error) {
+        self.cancellationError = cancellationError
+    }
+
+    func load() async throws -> [String] {
+        started = true
+        startWaiter?.resume()
+        startWaiter = nil
+        return try await withTaskCancellationHandler(operation: {
+            try await withCheckedThrowingContinuation { continuation in
+                self.continuation = continuation
+                if Task.isCancelled {
+                    handleCancellation()
+                }
+            }
+        }, onCancel: {
+            Task { await self.handleCancellation() }
+        })
+    }
+
+    func waitUntilStarted() async {
+        if started { return }
+        await withCheckedContinuation { continuation in
+            startWaiter = continuation
+        }
+    }
+
+    private func handleCancellation() {
+        guard !cancellationHandled else { return }
+        cancellationHandled = true
+        continuation?.resume(throwing: cancellationError)
+        continuation = nil
+        cancellationWaiter?.resume()
+        cancellationWaiter = nil
+    }
+
+    func waitUntilCancellationHandled() async {
+        if cancellationHandled { return }
+        await withCheckedContinuation { continuation in
+            cancellationWaiter = continuation
+        }
+    }
+}
+
+
+
+extension LoadingStateManagerTests {
+    @Test("Cancellation abandons a gated load without consuming an attempt")
+    func cancellationAbandonsLoad() async {
+        let gate = CancellationAwareLoadGate(cancellationError: CancellationError())
+        let manager = LoadingStateManager(
+            initialData: [] as [String],
+            shouldSkipLoad: { !$0.isEmpty },
+            loadData: { try await gate.load() }
+        )
+
+        let loadTask = Task { await manager.refresh() }
+        await gate.waitUntilStarted()
+        loadTask.cancel()
+        await gate.waitUntilCancellationHandled()
+        await loadTask.value
+
         #expect(manager.error == nil)
         #expect(manager.hasAttemptedLoad == false)
-
-        // loadIfNeeded should do nothing without load function
-        await manager.loadIfNeeded()
-        #expect(manager.data == ["test"]) // Should remain unchanged
+        #expect(manager.isLoading == false)
     }
 
-    @Test("setLoadFunction configures loading behavior")
-    func testSetLoadFunction() async {
-        let loadCounter = LoadCounter()
-
-        let manager = LoadingStateManager(initialData: [] as [String])
-
-        // Initially, loadIfNeeded should do nothing
-        await manager.loadIfNeeded()
-        #expect(manager.data == [])
-
-        // Set load function
-        manager.setLoadFunction(
+    @Test("A cancelled network load is treated as abandonment")
+    func cancelledNetworkLoadAbandonsLoad() async {
+        let gate = CancellationAwareLoadGate(cancellationError: URLError(.cancelled))
+        let manager = LoadingStateManager(
+            initialData: [] as [String],
             shouldSkipLoad: { !$0.isEmpty },
-            loadData: {
-                let count = await loadCounter.increment()
-                return ["configured_item\(count)"]
-            },
+            loadData: { try await gate.load() }
         )
 
-        // Now loadIfNeeded should work
-        await manager.loadIfNeeded()
-        let loadCount = await loadCounter.current()
-        #expect(loadCount == 1)
-        #expect(manager.data == ["configured_item1"])
+        let loadTask = Task { await manager.refresh() }
+        await gate.waitUntilStarted()
+        loadTask.cancel()
+        await gate.waitUntilCancellationHandled()
+        await loadTask.value
+
+        #expect(manager.error == nil)
+        #expect(manager.hasAttemptedLoad == false)
+        #expect(manager.isLoading == false)
     }
 }

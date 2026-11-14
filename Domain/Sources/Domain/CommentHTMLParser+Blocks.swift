@@ -5,7 +5,7 @@
 //  Split block/paragraph/link processing from CommentHTMLParser to reduce file length
 //
 
-import UIKit
+import Foundation
 
 extension CommentHTMLParser {
     /// Processes HTML content to extract paragraphs and links with proper formatting
@@ -89,10 +89,9 @@ extension CommentHTMLParser {
             if match.range.location > lastEnd {
                 let beforeRange = NSRange(location: lastEnd, length: match.range.location - lastEnd)
                 let beforeText = nsString.substring(with: beforeRange)
-                let trimmedBeforeText = beforeText.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmedBeforeText.isEmpty {
+                let beforeAttributedText = trimDisplayWhitespace(processLinksInText(beforeText))
+                if !beforeAttributedText.characters.isEmpty {
                     if !result.characters.isEmpty { result += createParagraphSpacing() }
-                    let beforeAttributedText = processLinksInText(trimmedBeforeText)
                     result += beforeAttributedText
                 }
             }
@@ -110,14 +109,14 @@ extension CommentHTMLParser {
 
         if lastEnd < nsString.length {
             let remainingText = nsString.substring(from: lastEnd)
-            let trimmed = remainingText.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmed.isEmpty {
+            let trimmed = trimDisplayWhitespace(processLinksInText(remainingText))
+            if !trimmed.characters.isEmpty {
                 if !result.characters.isEmpty { result += createParagraphSpacing() }
-                result += processLinksInText(trimmed)
+                result += trimmed
             }
         }
 
-        return applyParagraphStyling(result)
+        return result
     }
 
     /// Creates double newline for paragraph spacing
@@ -157,17 +156,6 @@ extension CommentHTMLParser {
         return result
     }
 
-    /// Applies paragraph styling with proper line height
-    static func applyParagraphStyling(_ attributedString: AttributedString) -> AttributedString {
-        var styled = attributedString
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.5
-        paragraphStyle.paragraphSpacing = 20.0
-        let fullRange = styled.startIndex ..< styled.endIndex
-        styled[fullRange].paragraphStyle = paragraphStyle
-        return styled
-    }
-
     /// Extracts and creates an attributed link component
     static func extractLinkComponent(from match: NSTextCheckingResult, in nsString: NSString) -> AttributedString? {
         guard match.numberOfRanges >= 4 else { return nil }
@@ -175,9 +163,10 @@ extension CommentHTMLParser {
         let textRange = match.range(at: 3)
         guard urlRange.location != NSNotFound, textRange.location != NSNotFound else { return nil }
 
-        let urlString = nsString.substring(with: urlRange)
+        // Extract the raw attribute first, then decode entities in its value.
+        let urlString = decodeHTMLEntities(nsString.substring(with: urlRange))
         let linkText = nsString.substring(with: textRange)
-        let cleanLinkText = stripHTMLTagsAndNormalizeWhitespace(linkText)
+        let cleanLinkText = cleanDisplayText(linkText, preservingWhitespace: false)
         guard !cleanLinkText.isEmpty else { return nil }
 
         var linkAttributedString = AttributedString(cleanLinkText)
@@ -206,7 +195,8 @@ extension CommentHTMLParser {
         let textRange = match.range(at: 3)
         guard urlRange.location != NSNotFound, textRange.location != NSNotFound else { return nil }
 
-        let urlString = nsString.substring(with: urlRange)
+        // Extract the raw attribute first, then decode entities in its value.
+        let urlString = decodeHTMLEntities(nsString.substring(with: urlRange))
         let linkText = nsString.substring(with: textRange)
         guard !linkText.isEmpty else { return nil }
 

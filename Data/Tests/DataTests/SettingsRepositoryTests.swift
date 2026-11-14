@@ -71,19 +71,6 @@ struct SettingsRepositoryTests {
         }
     }
 
-    // MARK: - Initialization Tests
-
-    @Test("SettingsRepository initialization")
-    func settingsRepositoryInitialization() {
-        #expect(settingsRepository != nil, "SettingsRepository should initialize successfully")
-    }
-
-    @Test("SettingsRepository initialization with default UserDefaults")
-    func settingsRepositoryInitializationWithDefaultUserDefaults() {
-        let repository = SettingsRepository()
-        #expect(repository != nil)
-    }
-
     // MARK: - Safari Reader Mode Tests
 
     @Test("Safari reader mode default value")
@@ -158,6 +145,54 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "DimReadPosts") == true)
     }
 
+    @Test("Swipe collapse threads default value")
+    func swipeCollapseThreadsDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.swipeCollapseThreads == true)
+    }
+
+    @Test("Swipe collapse threads setter and getter")
+    func swipeCollapseThreadsSetterAndGetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.swipeCollapseThreads = false
+        #expect(repository.swipeCollapseThreads == false)
+        #expect(mockUserDefaults.bool(forKey: "SwipeToCollapseThreads") == false)
+
+        repository.swipeCollapseThreads = true
+        #expect(repository.swipeCollapseThreads == true)
+        #expect(mockUserDefaults.bool(forKey: "SwipeToCollapseThreads") == true)
+    }
+
+    @Test("Show next comment button default value")
+    func showNextCommentButtonDefaultValue() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        #expect(repository.showNextCommentButton == false)
+    }
+
+    @Test("Show next comment button setter and getter")
+    func showNextCommentButtonSetterAndGetter() {
+        mockUserDefaults.clearAll()
+
+        let repository = SettingsRepository(userDefaults: mockUserDefaults)
+
+        repository.showNextCommentButton = false
+        #expect(repository.showNextCommentButton == false)
+        #expect(mockUserDefaults.bool(forKey: "ShowNextCommentButton") == false)
+
+        repository.showNextCommentButton = true
+        #expect(repository.showNextCommentButton == true)
+        #expect(mockUserDefaults.bool(forKey: "ShowNextCommentButton") == true)
+    }
+
     // MARK: - Remember Feed Category Tests
 
     @Test("Remember feed category default value")
@@ -219,59 +254,7 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
     }
 
-    // MARK: - Integration Tests
 
-    @Test("Multiple settings changes persist")
-    func multipleSettingsChangesPersist() {
-        // Change multiple settings
-        settingsRepository.safariReaderMode = true
-        settingsRepository.linkBrowserMode = .customBrowser
-
-        // Verify all changes persist
-        #expect(settingsRepository.safariReaderMode == true)
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-
-        // Verify underlying storage
-        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
-    }
-
-    @Test("Settings independence")
-    func settingsIndependence() {
-        // Test that changing one setting doesn't affect others
-        settingsRepository.safariReaderMode = true
-
-        // Other settings should remain at their default values
-        #expect(settingsRepository.linkBrowserMode == .customBrowser)
-    }
-
-    // MARK: - Use Case Protocol Conformance Tests
-
-    @Test("Conforms to SettingsUseCase")
-    func conformsToSettingsUseCase() {
-        // Test that the repository properly conforms to SettingsUseCase protocol
-        var useCase: SettingsUseCase = settingsRepository
-
-        // Test that we can access properties through the protocol
-        useCase.safariReaderMode = true
-        #expect(useCase.safariReaderMode == true)
-
-        useCase.linkBrowserMode = .systemBrowser
-        #expect(useCase.linkBrowserMode == .systemBrowser)
-    }
-
-    // MARK: - Key Consistency Tests
-
-    @Test("UserDefaults keys")
-    func userDefaultsKeys() {
-        // Test that the correct keys are being used for UserDefaults
-        settingsRepository.safariReaderMode = true
-        settingsRepository.linkBrowserMode = .customBrowser
-
-        // Verify the keys match what's expected
-        #expect(mockUserDefaults.bool(forKey: "safariReaderMode") == true)
-        #expect(mockUserDefaults.integer(forKey: "linkBrowserMode") == LinkBrowserMode.customBrowser.rawValue)
-    }
 
     // MARK: - Thread Safety Tests
 

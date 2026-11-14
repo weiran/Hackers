@@ -7,6 +7,7 @@
 
 import Domain
 import Foundation
+import Feed
 import WhatsNew
 import SwiftUI
 
@@ -26,6 +27,17 @@ final class WhatsNewCoordinator {
 
     func markWhatsNewShown() {
         whatsNewUseCase.markWhatsNewShown(for: appVersion)
+    }
+
+    func makeWhatsNewPanel(
+        onOpen: @escaping () -> Void,
+        onDismiss: @escaping () -> Void
+    ) -> WhatsNewPanel {
+        WhatsNewPanel(
+            title: WhatsNewService.currentTitle(),
+            action: onOpen,
+            dismissAction: onDismiss
+        )
     }
 
     func makeWhatsNewView(onDismiss: @escaping () -> Void) -> some View {

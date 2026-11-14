@@ -16,6 +16,7 @@ import SwiftUI
 @Observable
 public final class FeedViewModel: @unchecked Sendable {
     public var isLoadingMore = false
+    public private(set) var paginationError: Error?
     public var postType: Domain.PostType = .news
 
     private var postIds: Set<Int> = Set()
@@ -89,7 +90,9 @@ public final class FeedViewModel: @unchecked Sendable {
         bookmarksObservation = startObservingBookmarks()
         readStatusObservation = startObservingReadStatus()
     }
+}
 
+extension FeedViewModel {
     @MainActor
     public func loadFeed() async {
         await feedLoader.loadIfNeeded()
@@ -101,18 +104,18 @@ public final class FeedViewModel: @unchecked Sendable {
         guard postType != .bookmarks else { return }
 
         isLoadingMore = true
+        paginationError = nil
+        defer { isLoadingMore = false }
 
-        if postType == .newest || postType == .jobs {
-            lastPostId = posts.last?.id ?? lastPostId
-        } else {
-            pageIndex += 1
-        }
+        let usesCursorPagination = postType == .newest || postType == .jobs
+        let requestedPage = usesCursorPagination ? pageIndex : pageIndex + 1
+        let requestedNextID = usesCursorPagination ? (posts.last?.id ?? lastPostId) : lastPostId
 
         do {
             let fetchedPosts = try await postUseCase.getPosts(
                 type: postType,
-                page: pageIndex,
-                nextId: lastPostId > 0 ? lastPostId : nil,
+                page: requestedPage,
+                nextId: requestedNextID > 0 ? requestedNextID : nil,
             )
 
             await bookmarksController.refreshBookmarks()
@@ -125,12 +128,15 @@ public final class FeedViewModel: @unchecked Sendable {
             // Update the LoadingStateManager's data with appended posts
             feedLoader.data.append(contentsOf: newPosts)
             postIds.formUnion(newPostIds)
-
-            isLoadingMore = false
+            pageIndex = requestedPage
+            lastPostId = requestedNextID
         } catch {
-            // Can't set error directly anymore, could log or handle differently
-            isLoadingMore = false
+            paginationError = error
         }
+    }
+
+    public func clearPaginationError() {
+        paginationError = nil
     }
 
     @MainActor
@@ -210,6 +216,7 @@ public final class FeedViewModel: @unchecked Sendable {
         pageIndex = 1
         lastPostId = 0
         isFetching = false
+        paginationError = nil
         feedLoader.reset()
     }
 
@@ -397,6 +404,23 @@ public final class FeedViewModel: @unchecked Sendable {
     }
 }
 
+extension FeedViewModel {
+    func refreshBookmarkAnnotations() async {
+        await bookmarksController.refreshBookmarks()
+        if postType == .bookmarks {
+            let posts = await bookmarksController.bookmarkedPosts()
+            await readStatusController.refreshReadStatus()
+            guard postType == .bookmarks else { return }
+            feedLoader.data = readStatusController.annotatedPosts(from: posts)
+            postIds = Set(posts.map(\.id))
+        } else {
+            feedLoader.data = bookmarksController.annotatedPosts(from: feedLoader.data)
+        }
+        searchResults = bookmarksController.annotatedPosts(from: searchResults)
+    }
+
+}
+
 private extension FeedViewModel {
     func configureFeedLoader() {
         // Set up the loading function after initialization.
@@ -441,13 +465,14 @@ private extension FeedViewModel {
         NotificationCenter.default.publisher(for: .bookmarksDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
-                guard
-                    let postId = notification.userInfo?["postId"] as? Int,
-                    let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool
-                else { return }
                 Task { @MainActor [weak self] in
                     guard let self else { return }
-                    await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
+                    if let postId = notification.userInfo?["postId"] as? Int,
+                       let isBookmarked = notification.userInfo?["isBookmarked"] as? Bool {
+                        await self.handleBookmarksUpdate(postId: postId, isBookmarked: isBookmarked)
+                    } else {
+                        await self.refreshBookmarkAnnotations()
+                    }
                 }
             }
     }

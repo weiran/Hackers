@@ -18,7 +18,10 @@ enum UITestingBootstrap {
 
     static let fixtures: UITestFixtures? = {
         guard let configuration else { return nil }
-        let fixtures = UITestFixtures(profile: configuration.fixtureProfile)
+        let fixtures = UITestFixtures(
+            profile: configuration.fixtureProfile,
+            commentSubmission: configuration.commentSubmission
+        )
         do {
             try fixtures.validate(configuration: configuration)
         } catch {
@@ -32,7 +35,8 @@ enum UITestingBootstrap {
     }
 
     static var runtimePolicy: AppRuntimePolicy {
-        isEnabled ? .automation : .standard
+        guard isEnabled else { return .standard }
+        return .automation.withCommenting(configuration?.commentingEnabled ?? false)
     }
 
     @MainActor
@@ -40,7 +44,9 @@ enum UITestingBootstrap {
         guard configuration != nil, let fixtures else { return }
 
         let settingsUseCase = UITestSettingsUseCase()
-        let authenticationUseCase = UITestAuthenticationUseCase()
+        let authenticationUseCase = UITestAuthenticationUseCase(
+            initiallyAuthenticated: UITestingBootstrap.configuration?.authenticated ?? false
+        )
         let bookmarksUseCase = UITestBookmarksUseCase()
         let readStatusUseCase = UITestReadStatusUseCase()
         let votingStateProvider = UITestVotingStateProvider()

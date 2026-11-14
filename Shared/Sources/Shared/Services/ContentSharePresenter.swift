@@ -79,7 +79,11 @@ extension ContentSharePresenter {
 
     static func hackerNewsPostActivities(for url: URL) -> [UIActivity] {
         [
-            OpenInSafariActivity(url: url) { UIApplication.shared.open($0) },
+            OpenInSafariActivity(url: url) { url in
+                Task { @MainActor in
+                    UIApplication.shared.open(url)
+                }
+            },
             CopyLinkActivity(url: url) { UIPasteboard.general.string = $0.absoluteString }
         ]
     }
@@ -107,7 +111,7 @@ final class OpenInSafariActivity: UIActivity {
         UIImage(systemName: "safari")
     }
 
-    override class var activityCategory: UIActivity.Category {
+    override static var activityCategory: UIActivity.Category {
         .action
     }
 
@@ -143,7 +147,7 @@ final class CopyLinkActivity: UIActivity {
         UIImage(systemName: "doc.on.doc")
     }
 
-    override class var activityCategory: UIActivity.Category {
+    override static var activityCategory: UIActivity.Category {
         .action
     }
 

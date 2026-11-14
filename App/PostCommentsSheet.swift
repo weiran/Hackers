@@ -5,16 +5,15 @@ import Shared
 import SwiftUI
 import UIKit
 
-// swiftlint:disable type_body_length
-
+// swiftlint:disable:next type_body_length
 struct PostCommentsSheet: View {
     static let initialCollapsedHeight: CGFloat = PostCommentsSheetMetrics.initialCollapsedHeight
     static let collapsedTopCornerRadius: CGFloat = PostCommentsSheetMetrics.collapsedTopCornerRadius
     static let collapsedBrowserControlsHeight: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsHeight
     static let collapsedBrowserControlsSpacing: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsSpacing
     static let collapsedBrowserControlsMargin: CGFloat = PostCommentsSheetMetrics.collapsedBrowserControlsMargin
-    static var defaultCollapsedBrowserObscuredBottomInset: CGFloat {
-        PostCommentsSheetMetrics.defaultCollapsedBrowserObscuredBottomInset
+    static var collapsedBrowserBottomInset: CGFloat {
+        PostCommentsSheetMetrics.collapsedBrowserBottomInset
     }
 
     private static let handleWidth: CGFloat = 36
@@ -25,30 +24,42 @@ struct PostCommentsSheet: View {
     private static let navigationBarHeight: CGFloat = 44
     private static let expandedContentSpacing: CGFloat = 8
     private static let expandedTopDragTrailingPassthroughWidth: CGFloat = 88
-    private static let toolbarControlExclusionWidth: CGFloat = 88
     private static let sheetAnimationDuration: TimeInterval = WebViewAnimations.panelDuration
 
     let onDismiss: @MainActor () -> Void
     let onCollapsedHeightChange: @MainActor (CGFloat) -> Void
     let onBrowserObscuredBottomInsetChange: @MainActor (CGFloat) -> Void
+    let onMediaPlaybackSuspensionChange: @MainActor (Bool) -> Void
     let fallbackURL: URL
+    @Binding private var requestedExpanded: Bool
     @ObservedObject private var browserController: BrowserController
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.usesVerticalBrowserControls) private var usesVerticalBrowserControls
     @State private var viewModel: CommentsViewModel
     @State private var votingViewModel: VotingViewModel
     @State private var presentation: PostCommentsSheetPresentation
     @State private var collapsedHeight: CGFloat = initialCollapsedHeight
     @State private var controlsHeight: CGFloat = 0
+    @State private var keyboardHeight: CGFloat = 0
+    // The keyboard reports its target frame once, ahead of the slide; this is
+    // the transaction the viewport resize rides so it tracks the system
+    // keyboard instead of snapping to its final height.
+    @State private var keyboardResizeAnimation = Animation.easeInOut(duration: 0.25)
     @State private var expandedTitleVisibility = CommentsHeaderTitleVisibility()
     @State private var toolbarGeometry = CommentsToolbarGeometry()
+    @State private var isPostHeaderMatchedGeometryEnabled = false
     @Namespace private var postHeaderNamespace
 
     init(
         post: Post,
         controller: BrowserController,
+        viewModel: CommentsViewModel? = nil,
+        isExpanded: Binding<Bool>,
         initialPresentation: PostLinkPresentation = .collapsedBrowser,
         onDismiss: @MainActor @escaping () -> Void,
         onCollapsedHeightChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
-        onBrowserObscuredBottomInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in }
+        onBrowserObscuredBottomInsetChange: @MainActor @escaping (CGFloat) -> Void = { _ in },
+        onMediaPlaybackSuspensionChange: @MainActor @escaping (Bool) -> Void = { _ in }
     ) {
         let initialSheetState: SheetState = switch initialPresentation {
         case .collapsedBrowser:
@@ -57,7 +68,7 @@ struct PostCommentsSheet: View {
             .expanded
         }
 
-        _viewModel = State(initialValue: CommentsViewModel(post: post))
+        _viewModel = State(initialValue: viewModel ?? CommentsViewModel(post: post))
         let container = DependencyContainer.shared
         _votingViewModel = State(initialValue: VotingViewModel(
             votingStateProvider: container.getVotingStateProvider(),
@@ -65,10 +76,12 @@ struct PostCommentsSheet: View {
             authenticationUseCase: container.getAuthenticationUseCase()
         ))
         _browserController = ObservedObject(wrappedValue: controller)
+        _requestedExpanded = isExpanded
         _presentation = State(initialValue: PostCommentsSheetPresentation(sheetState: initialSheetState))
         self.onDismiss = onDismiss
         self.onCollapsedHeightChange = onCollapsedHeightChange
         self.onBrowserObscuredBottomInsetChange = onBrowserObscuredBottomInsetChange
+        self.onMediaPlaybackSuspensionChange = onMediaPlaybackSuspensionChange
         fallbackURL = post.url
     }
 
@@ -76,16 +89,19 @@ struct PostCommentsSheet: View {
         GeometryReader { proxy in
             let safeInsets = resolvedSafeAreaInsets(for: proxy)
             let containerSize = resolvedContainerSize(for: proxy)
-            let expandedHandleAreaHeight = max(
-                proxy.safeAreaInsets.top - safeInsets.top,
-                Self.navigationBarHeight
+            let keyboardAdjustedContainerSize = adjustedContainerSize(
+                containerSize,
+                keyboardHeight: keyboardHeight
             )
+            let expandedHandleAreaHeight = usesVerticalBrowserControls
+                ? Self.handleAreaHeight
+                : max(proxy.safeAreaInsets.top - safeInsets.top, Self.navigationBarHeight)
             let layout = PostCommentsSheetLayout(
                 safeInsets: safeInsets,
-                containerSize: containerSize,
+                containerSize: keyboardAdjustedContainerSize,
                 commentsHorizontalInsets: (
-                    proxy.safeAreaInsets.leading,
-                    proxy.safeAreaInsets.trailing
+                    usesVerticalBrowserControls ? 0 : proxy.safeAreaInsets.leading,
+                    usesVerticalBrowserControls ? 0 : proxy.safeAreaInsets.trailing
                 ),
                 collapsedHeight: collapsedHeight,
                 controlsHeight: controlsHeight,
@@ -93,18 +109,21 @@ struct PostCommentsSheet: View {
                 isExpanded: presentation.isExpanded,
                 expandedCommentsTopInset: expandedCommentsTopInset(handleTopInset:)
             )
+            // Keep the sheet's occluding surface at the full container height
+            // while the inner comments viewport makes room for the keyboard.
+            // Otherwise the browser underneath can become visible between the
+            // sheet's new bottom edge and the keyboard during its animation.
+            let sheetContainerSize = CGSize(
+                width: layout.containerSize.width,
+                height: presentation.isExpanded ? containerSize.height : layout.containerSize.height
+            )
             let currentChromeAreaHeight = Self.handleAreaHeight
                 + ((expandedHandleAreaHeight - Self.handleAreaHeight) * layout.expansionProgress)
             let showsExpandedPresentation = viewModel.post != nil
-            let titleMaximumWidth = max(
-                containerSize.width
-                    - proxy.safeAreaInsets.leading
-                    - proxy.safeAreaInsets.trailing
-                    - (Self.toolbarControlExclusionWidth * 2),
-                0
-            )
-            let toolbarControlCenterY = toolbarGeometry.controlCenterY.map {
-                $0 - layout.alignedTop
+            let commentsBottomSafeInset = if presentation.isExpanded, keyboardHeight > 0 {
+                0 as CGFloat
+            } else {
+                safeInsets.bottom
             }
 
             ZStack(alignment: .topLeading) {
@@ -114,13 +133,12 @@ struct PostCommentsSheet: View {
                     layout: layout,
                     isInteractiveMove: presentation.isInteractiveMove,
                     chromeAreaHeight: currentChromeAreaHeight,
-                    titleMaximumWidth: titleMaximumWidth,
-                    toolbarControlCenterY: toolbarControlCenterY,
-                    showsExpandedPresentation: showsExpandedPresentation
+                    showsExpandedPresentation: showsExpandedPresentation,
+                    commentsBottomSafeInset: commentsBottomSafeInset
                 )
-                .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .top)
-                .background(sheetBackground)
-                .clipShape(sheetShape)
+                .frame(width: sheetContainerSize.width, height: sheetContainerSize.height, alignment: .top)
+                .background(sheetShape(expansionProgress: layout.expansionProgress).fill(AppColors.background))
+                .clipShape(sheetShape(expansionProgress: layout.expansionProgress))
                 .shadow(
                     color: .black.opacity(0.12),
                     radius: 10,
@@ -129,25 +147,32 @@ struct PostCommentsSheet: View {
                 )
                 .offset(y: layout.alignedTop)
 
-                CollapsedBrowserControlsOverlay(
-                    isVisible: presentation.showsCollapsedControls,
-                    fallbackURL: fallbackURL,
-                    onDismiss: onDismiss,
-                    controller: browserController
-                )
-                .frame(width: layout.containerSize.width, alignment: .center)
-                .offset(y: layout.controlsTop)
-                .background(
-                    GeometryReader { controlsProxy in
-                        Color.clear.preference(
-                            key: ControlsHeightPreferenceKey.self,
-                            value: controlsProxy.size.height
-                        )
-                    }
-                )
+                if #unavailable(iOS 27.1) {
+                    CollapsedBrowserControlsOverlay(
+                        isVisible: presentation.showsCollapsedControls,
+                        fallbackURL: fallbackURL,
+                        onDismiss: onDismiss,
+                        controller: browserController
+                    )
+                    .frame(width: layout.containerSize.width, alignment: .center)
+                    .offset(y: layout.controlsTop)
+                    .background(
+                        GeometryReader { controlsProxy in
+                            Color.clear.preference(
+                                key: ControlsHeightPreferenceKey.self,
+                                value: controlsProxy.size.height
+                            )
+                        }
+                    )
+                }
             }
-            .frame(width: layout.containerSize.width, height: layout.containerSize.height, alignment: .topLeading)
-            .ignoresSafeArea(.container)
+            .frame(width: containerSize.width, height: containerSize.height, alignment: .topLeading)
+            // Extend the sheet through the top and horizontal container
+            // insets. The sheet also owns the keyboard adjustment below:
+            // keeping the outer geometry stable prevents SwiftUI's keyboard
+            // safe-area resize from being applied a second time while the
+            // keyboard is animating in.
+            .ignoresSafeArea(edges: usesVerticalBrowserControls ? [.top] : [.top, .leading, .trailing])
             .overlay {
                 ExpandedCommentsTopDragHitArea(
                     isEnabled: showsExpandedPresentation && presentation.isExpanded,
@@ -158,8 +183,9 @@ struct PostCommentsSheet: View {
                     onTap: collapseSheet,
                     onDragChanged: { translation in
                         presentation.updateHandleDrag(translationHeight: max(0, translation.height))
+                        toolbarGeometry.setBarTitleSuppressed(true)
                     },
-                    onDragEnded: { translation, predictedTranslationHeight in
+                    onDragEnded: { translation, predictedTranslationHeight, velocity in
                         presentation.updateHandleDrag(
                             translationHeight: max(0, translation.height, predictedTranslationHeight)
                         )
@@ -167,7 +193,12 @@ struct PostCommentsSheet: View {
                             scheduleCollapsedUpvoteReenable()
                             return
                         }
-                        settleSheet(predictedTranslation: predictedTranslationHeight, layout.expandedTop, layout.collapsedTop)
+                        settleSheet(
+                            predictedTranslation: predictedTranslationHeight,
+                            releaseVelocity: velocity,
+                            layout.expandedTop,
+                            layout.collapsedTop
+                        )
                     },
                     onDragCancelled: {
                         animateSheet(WebViewAnimations.fast) {
@@ -180,13 +211,68 @@ struct PostCommentsSheet: View {
             }
             .animation(WebViewAnimations.fast, value: collapsedHeight)
             .onAppear {
-                onCollapsedHeightChange(collapsedHeight)
-                updateBrowserObscuredBottomInset()
+                DispatchQueue.main.async { @MainActor in
+                    // The comments page can be inserted inside a navigation
+                    // transition. Keep the initial post header static and
+                    // enable matched geometry only after that first frame;
+                    // subsequent collapsed/expanded sheet changes still use
+                    // the shared namespace for their intentional animation.
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        isPostHeaderMatchedGeometryEnabled = true
+                    }
+                    onMediaPlaybackSuspensionChange(presentation.isExpanded)
+                    onCollapsedHeightChange(collapsedHeight)
+                    updateBrowserObscuredBottomInset()
+                }
             }
-            .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { updateCollapsedHeight($0) }
-            .onPreferenceChange(ControlsHeightPreferenceKey.self) { updateControlsHeight($0) }
+            .onChange(of: presentation.isExpanded) { _, isExpanded in
+                DispatchQueue.main.async { @MainActor in
+                    onMediaPlaybackSuspensionChange(isExpanded)
+                }
+            }
+            .onPreferenceChange(CollapsedHeaderHeightPreferenceKey.self) { newHeight in
+                DispatchQueue.main.async { @MainActor in
+                    updateCollapsedHeight(newHeight)
+                }
+            }
+            .onPreferenceChange(ControlsHeightPreferenceKey.self) { newHeight in
+                DispatchQueue.main.async { @MainActor in
+                    updateControlsHeight(newHeight)
+                }
+            }
             .onChange(of: controlsHeight) { _, _ in
-                updateBrowserObscuredBottomInset()
+                DispatchQueue.main.async { @MainActor in
+                    updateBrowserObscuredBottomInset()
+                }
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)
+            ) { notification in
+                keyboardResizeAnimation = keyboardAnimation(from: notification)
+                updateKeyboardHeight(keyboardHeight(for: notification))
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { notification in
+                keyboardResizeAnimation = keyboardAnimation(from: notification)
+                updateKeyboardHeight(0)
+            }
+        }
+        .tint(AppColors.appTintColor)
+        .onChange(of: usesVerticalBrowserControls) { _, _ in
+            updateBrowserObscuredBottomInset()
+        }
+        .onChange(of: requestedExpanded) { _, shouldExpand in
+            guard shouldExpand != isExpanded else { return }
+            if shouldExpand {
+                animateSheet { presentation.expand() }
+            } else {
+                collapseSheet()
+            }
+        }
+        .onChange(of: isExpanded) { _, expanded in
+            if requestedExpanded != expanded {
+                requestedExpanded = expanded
             }
         }
     }
@@ -203,41 +289,42 @@ struct PostCommentsSheet: View {
         Self.handleAreaHeight
     }
 
-    private var sheetShape: UnevenRoundedRectangle {
-        UnevenRoundedRectangle(
-            topLeadingRadius: Self.collapsedTopCornerRadius,
+    private func sheetShape(expansionProgress: CGFloat) -> UnevenRoundedRectangle {
+        // Follow the same progress as the sheet's position during both drags
+        // and animated settling. The Duo panel seals the web view at full height.
+        let radius = usesVerticalBrowserControls
+            ? Self.collapsedTopCornerRadius * (1 - min(max(expansionProgress, 0), 1))
+            : Self.collapsedTopCornerRadius
+        return UnevenRoundedRectangle(
+            topLeadingRadius: radius,
             bottomLeadingRadius: 0,
             bottomTrailingRadius: 0,
-            topTrailingRadius: Self.collapsedTopCornerRadius
+            topTrailingRadius: radius
         )
-    }
-
-    private var sheetBackground: some View {
-        sheetShape.fill(.background)
     }
 
     private func sheetContent(
         layout: PostCommentsSheetLayout,
         isInteractiveMove: Bool,
         chromeAreaHeight: CGFloat,
-        titleMaximumWidth: CGFloat,
-        toolbarControlCenterY: CGFloat?,
-        showsExpandedPresentation: Bool
+        showsExpandedPresentation: Bool,
+        commentsBottomSafeInset: CGFloat
     ) -> some View {
         ZStack(alignment: .top) {
             if showsExpandedPresentation {
                 expandedCommentsView(
                     layout: layout,
-                    showsPostHeader: true
+                    showsPostHeader: true,
+                    bottomSafeInset: commentsBottomSafeInset
                 )
                 .overlay {
                     if layout.contentFadeProgress < 0.01 {
                         Rectangle()
-                            .fill(.background)
+                            .fill(AppColors.background)
                             .allowsHitTesting(false)
                     } else if !isInteractiveMove, layout.contentFadeProgress < 1 {
                         Rectangle()
-                            .fill(.background)
+                            .fill(AppColors.background)
                             .opacity(1 - layout.contentFadeProgress)
                             .allowsHitTesting(false)
                     }
@@ -264,24 +351,22 @@ struct PostCommentsSheet: View {
             .accessibilityHidden(layout.contentFadeProgress >= 0.5)
 
             sheetHandle(
-                expandedTop: layout.expandedTop,
-                collapsedTop: layout.collapsedTop,
-                handleTopInset: layout.handleTopInset,
+                layout: layout,
                 chromeAreaHeight: chromeAreaHeight,
-                titleMaximumWidth: titleMaximumWidth,
-                toolbarControlCenterY: toolbarControlCenterY,
-                titleProgress: titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
+                toolbarGeometry: toolbarGeometry
             )
         }
     }
 
     private func expandedCommentsView(
         layout: PostCommentsSheetLayout,
-        showsPostHeader: Bool
+        showsPostHeader: Bool,
+        bottomSafeInset: CGFloat
     ) -> some View {
         let viewport = layout.commentsViewport
 
         return StableCommentsHost(
+            usesVerticalBrowserControls: usesVerticalBrowserControls,
             postID: viewModel.postID,
             topContentInset: layout.expandedCommentsTopInset,
             showsPostHeader: showsPostHeader,
@@ -289,6 +374,7 @@ struct PostCommentsSheet: View {
             viewModel: viewModel,
             votingViewModel: votingViewModel,
             postHeaderMatchedGeometryNamespace: postHeaderNamespace,
+            isPostHeaderMatchedGeometryEnabled: isPostHeaderMatchedGeometryEnabled,
             isPostHeaderMatchedGeometrySource: isExpanded,
             titleVisibility: expandedTitleVisibility,
             toolbarGeometry: toolbarGeometry,
@@ -302,6 +388,9 @@ struct PostCommentsSheet: View {
                     translation: value.translation,
                     systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
                 )
+                if presentation.isTrackingDrag {
+                    toolbarGeometry.setBarTitleSuppressed(true)
+                }
             },
             onTitleDragEnded: { value in
                 guard presentation.canEndExpandedToolbarDrag() else {
@@ -310,20 +399,32 @@ struct PostCommentsSheet: View {
                 }
                 settleSheet(
                     predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
                     layout.expandedTop,
                     layout.collapsedTop
                 )
             }
         )
         .equatable()
+        // The embedded sheet spans the full window, so its hosted comments
+        // view does not inherit the system bottom safe area. Mirror that inset
+        // here; when the keyboard is present, the viewport already ends at its
+        // top edge and needs no additional spacing.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Color.clear
+                .frame(height: bottomSafeInset)
+                .allowsHitTesting(false)
+        }
         .frame(width: viewport.width, height: viewport.height, alignment: .topLeading)
         .onScrollPhaseChange { oldPhase, newPhase, context in
             let offsetY = context.geometry.contentOffset.y + context.geometry.contentInsets.top
-            presentation.updateScrollDragEligibility(
-                oldPhase: oldPhase,
-                newPhase: newPhase,
-                isAtRestingTop: offsetY <= 1
-            )
+            DispatchQueue.main.async { @MainActor in
+                presentation.updateScrollDragEligibility(
+                    oldPhase: oldPhase,
+                    newPhase: newPhase,
+                    isAtRestingTop: offsetY <= 1
+                )
+            }
         }
         .offset(x: viewport.minX, y: viewport.minY)
         .frame(
@@ -331,27 +432,31 @@ struct PostCommentsSheet: View {
             height: layout.containerSize.height,
             alignment: .topLeading
         )
+        // The comments host sits above a live WKWebView. Keep this whole
+        // viewport opaque during keyboard-safe layout changes so the WebView
+        // cannot flash through before the inner scroll view redraws.
+        .background(AppColors.background)
+    }
+
+    private var expandedChromeHeight: CGFloat {
+        usesVerticalBrowserControls ? Self.handleAreaHeight : Self.navigationBarHeight
     }
 
     private func expandedCommentsTopInset(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset + Self.navigationBarHeight + Self.expandedContentSpacing
+        handleTopInset + expandedChromeHeight + Self.expandedContentSpacing
     }
 
     private func expandedTopDragHitAreaHeight(handleTopInset: CGFloat) -> CGFloat {
-        handleTopInset
-            + Self.navigationBarHeight
-            + Self.expandedContentSpacing
+        handleTopInset + expandedChromeHeight + Self.expandedContentSpacing
     }
 
     private func sheetHandle(
-        expandedTop: CGFloat,
-        collapsedTop: CGFloat,
-        handleTopInset: CGFloat,
+        layout: PostCommentsSheetLayout,
         chromeAreaHeight: CGFloat,
-        titleMaximumWidth: CGFloat,
-        toolbarControlCenterY: CGFloat?,
-        titleProgress: CGFloat
+        toolbarGeometry: CommentsToolbarGeometry
     ) -> some View {
+        let handleTopInset = layout.handleTopInset
+        let titleProgress = titleChromeProgress(contentFadeProgress: layout.contentFadeProgress)
         let handleHitTargetHeight = handleTopInset > 0 ? Self.expandedHandleHitTargetHeight : Self.handleAreaHeight
 
         return ZStack(alignment: .top) {
@@ -359,18 +464,18 @@ struct PostCommentsSheet: View {
                 post: viewModel.post,
                 showThumbnails: viewModel.showThumbnails,
                 titleProgress: titleProgress,
+                morphProgress: layout.contentFadeProgress,
                 isInteractiveMove: presentation.isInteractiveMove,
+                isBarTitleSuppressed: toolbarGeometry.isBarTitleSuppressed,
+                isBarTitleVisible: expandedTitleVisibility.isVisible,
+                barTitleFrame: toolbarGeometry.barTitleFrame,
+                containerWidth: layout.containerSize.width,
                 handleTopInset: handleTopInset,
                 chromeAreaHeight: chromeAreaHeight,
-                titleMaximumWidth: titleMaximumWidth,
-                toolbarControlCenterY: toolbarControlCenterY,
                 handleWidth: Self.handleWidth,
                 handleThickness: Self.handleThickness,
-                navigationBarHeight: Self.navigationBarHeight,
-                onTitleTap: collapseSheet
+                navigationBarHeight: expandedChromeHeight
             )
-            .simultaneousGesture(titlePillDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
-            .allowsHitTesting(titleProgress > 0.5)
 
             HStack {
                 Spacer()
@@ -379,7 +484,12 @@ struct PostCommentsSheet: View {
                     .fill(.background.opacity(0.001))
                     .frame(width: Self.expandedHandleHitTargetWidth, height: handleHitTargetHeight)
                     .contentShape(Rectangle())
-                    .highPriorityGesture(handleDragGesture(expandedTop: expandedTop, collapsedTop: collapsedTop))
+                    .highPriorityGesture(
+                        handleDragGesture(
+                            expandedTop: layout.expandedTop,
+                            collapsedTop: layout.collapsedTop
+                        )
+                    )
                     .allowsHitTesting(titleProgress <= 0.5)
                     .accessibilityElement()
                     .accessibilityLabel("Comments sheet handle")
@@ -391,7 +501,7 @@ struct PostCommentsSheet: View {
             .padding(.top, handleTopInset)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Self.navigationBarHeight + handleTopInset, alignment: .top)
+        .frame(height: expandedChromeHeight + handleTopInset, alignment: .top)
     }
 
     private func titleChromeProgress(contentFadeProgress: CGFloat) -> CGFloat {
@@ -403,6 +513,9 @@ struct PostCommentsSheet: View {
         collapsedHeaderView(onExpand: {
             animateSheet {
                 presentation.expand()
+                // The collapsed header expands the sheet directly, bypassing
+                // settleSheet(), so return title ownership to the system bar.
+                toolbarGeometry.setBarTitleSuppressed(false)
             }
         })
         .background(
@@ -446,7 +559,7 @@ struct PostCommentsSheet: View {
                 await votingViewModel.upvote(post: &updatedPost)
             }
             await MainActor.run {
-                viewModel.post = updatedPost
+                viewModel.applyPostVoteOutcome(from: updatedPost)
             }
         }
     }
@@ -461,6 +574,7 @@ struct PostCommentsSheet: View {
         guard isExpanded else { return }
         animateSheet {
             presentation.collapse()
+            toolbarGeometry.setBarTitleSuppressed(true)
         }
     }
 }
@@ -484,8 +598,50 @@ private extension PostCommentsSheet {
 
     private func updateBrowserObscuredBottomInset() {
         onBrowserObscuredBottomInsetChange(
-            PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
+            usesVerticalBrowserControls
+                ? collapsedHeight
+                : PostCommentsSheetMetrics.browserObscuredBottomInset(controlsHeight: controlsHeight)
         )
+    }
+
+    private func adjustedContainerSize(_ containerSize: CGSize, keyboardHeight: CGFloat) -> CGSize {
+        guard isExpanded, keyboardHeight > 0 else { return containerSize }
+        return CGSize(
+            width: containerSize.width,
+            height: max(containerSize.height - keyboardHeight, 0)
+        )
+    }
+
+    private func keyboardHeight(for notification: Notification) -> CGFloat {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return 0
+        }
+
+        let window = PresentationContextProvider.shared.keyWindow
+        let frameInWindow = window?.convert(keyboardFrame, from: nil) ?? keyboardFrame
+        let windowBottom = window?.bounds.maxY ?? keyboardFrame.maxY
+        return max(0, windowBottom - frameInWindow.minY)
+    }
+
+    private func keyboardAnimation(from notification: Notification) -> Animation {
+        if reduceMotion {
+            return .easeInOut(duration: 0.1)
+        }
+        // Mirror ComposerMotion.animation so the composer capsule grows on
+        // the same curve the viewport rides, keeping it visually glued to
+        // the keyboard's leading edge throughout the slide.
+        return .easeInOut(duration: 0.25)
+    }
+
+    private func updateKeyboardHeight(_ newHeight: CGFloat) {
+        let resolvedHeight = newHeight.isFinite ? max(newHeight, 0) : 0
+        guard abs(keyboardHeight - resolvedHeight) > 0.5 else { return }
+        // Animate the resize so the comments viewport (and the floating
+        // composer with it) tracks the keyboard slide instead of jumping to
+        // its final height in a single frame and masking the morph.
+        withAnimation(keyboardResizeAnimation) {
+            keyboardHeight = resolvedHeight
+        }
     }
 
     private func resolvedSafeAreaInsets(for proxy: GeometryProxy) -> UIEdgeInsets {
@@ -507,6 +663,9 @@ private extension PostCommentsSheet {
     private func resolvedContainerSize(for proxy: GeometryProxy) -> CGSize {
         let size = proxy.size
         let insets = proxy.safeAreaInsets
+        if usesVerticalBrowserControls {
+            return CGSize(width: size.width, height: size.height + insets.top + insets.bottom)
+        }
         let fullSize = CGSize(
             width: size.width + insets.leading + insets.trailing,
             height: size.height + insets.top + insets.bottom
@@ -525,6 +684,9 @@ private extension PostCommentsSheet {
                     translation: value.translation,
                     systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
                 )
+                if presentation.isInteractiveMove {
+                    toolbarGeometry.setBarTitleSuppressed(true)
+                }
             }
             .onEnded { value in
                 guard presentation.canEndSheetDrag(
@@ -534,7 +696,12 @@ private extension PostCommentsSheet {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
+                settleSheet(
+                    predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
+                    expandedTop,
+                    collapsedTop
+                )
             }
     }
 
@@ -542,6 +709,7 @@ private extension PostCommentsSheet {
         DragGesture(minimumDistance: 0, coordinateSpace: .global)
             .onChanged { value in
                 presentation.updateHandleDrag(translationHeight: value.translation.height)
+                toolbarGeometry.setBarTitleSuppressed(true)
             }
             .onEnded { value in
                 if !presentation.canEndHandleDrag() {
@@ -554,25 +722,12 @@ private extension PostCommentsSheet {
                     scheduleCollapsedUpvoteReenable()
                     return
                 }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
-            }
-    }
-
-    private func titlePillDragGesture(expandedTop: CGFloat, collapsedTop: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 18, coordinateSpace: .global)
-            .onChanged { value in
-                presentation.updateExpandedToolbarDrag(
-                    startX: value.startLocation.x,
-                    translation: value.translation,
-                    systemBackGestureEdgeWidth: systemBackGestureEdgeWidth
+                settleSheet(
+                    predictedTranslation: value.predictedEndTranslation.height,
+                    releaseVelocity: value.velocity.height,
+                    expandedTop,
+                    collapsedTop
                 )
-            }
-            .onEnded { value in
-                guard presentation.canEndExpandedToolbarDrag() else {
-                    scheduleCollapsedUpvoteReenable()
-                    return
-                }
-                settleSheet(predictedTranslation: value.predictedEndTranslation.height, expandedTop, collapsedTop)
             }
     }
 
@@ -581,13 +736,34 @@ private extension PostCommentsSheet {
         return leadingInset + 56
     }
 
-    private func settleSheet(predictedTranslation: CGFloat, _ expandedTop: CGFloat, _ collapsedTop: CGFloat) {
-        animateSheet {
+    private func settleSheet(
+        predictedTranslation: CGFloat,
+        releaseVelocity: CGFloat,
+        _ expandedTop: CGFloat,
+        _ collapsedTop: CGFloat
+    ) {
+        // Hand the sheet to the settle animation at the finger's release
+        // velocity so the gesture and animation velocities match at the
+        // handoff; a flick keeps flying while a slow release glides.
+        let baseTop = presentation.isExpanded ? expandedTop : collapsedTop
+        let releaseTop = min(max(baseTop + presentation.dragTranslation, expandedTop), collapsedTop)
+        let targetTop = presentation.targetState(
+            forPredictedTranslation: predictedTranslation,
+            expandedTop: expandedTop,
+            collapsedTop: collapsedTop
+        ) == .expanded ? expandedTop : collapsedTop
+        withAnimation(Animation(SheetSettleAnimation(
+            velocity: releaseVelocity,
+            distance: targetTop - releaseTop
+        ))) {
             presentation.settle(
                 predictedTranslation: predictedTranslation,
                 expandedTop: expandedTop,
                 collapsedTop: collapsedTop
             )
+            // Once settled expanded the real bar title owns the top again;
+            // while collapsed the bar is hidden anyway.
+            toolbarGeometry.setBarTitleSuppressed(!presentation.isExpanded)
         }
         scheduleCollapsedUpvoteReenable()
     }
@@ -610,7 +786,7 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
     let trailingPassthroughWidth: CGFloat
     let onTap: () -> Void
     let onDragChanged: (_ translation: CGSize) -> Void
-    let onDragEnded: (_ translation: CGSize, _ predictedTranslationHeight: CGFloat) -> Void
+    let onDragEnded: (_ translation: CGSize, _ predictedTranslationHeight: CGFloat, _ velocity: CGFloat) -> Void
     let onDragCancelled: () -> Void
 
     func makeUIView(context: Context) -> WindowAttachmentObserverView {
@@ -745,7 +921,8 @@ private struct ExpandedCommentsTopDragHitArea: UIViewRepresentable {
                 let predictedTranslationHeight = translation.y + (velocity.y * 0.2)
                 configuration.onDragEnded(
                     translation.size,
-                    max(translation.y, predictedTranslationHeight)
+                    max(translation.y, predictedTranslationHeight),
+                    velocity.y
                 )
                 hasActiveDrag = false
 

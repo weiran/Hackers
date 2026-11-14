@@ -14,25 +14,21 @@ class OpenInViewController: UIViewController {
         if let item = extensionContext?.inputItems.first as? NSExtensionItem,
            let itemProvider = item.attachments?.first,
            itemProvider.hasItemConformingToTypeIdentifier("public.url") {
-            itemProvider.loadItem(
-                forTypeIdentifier: "public.url",
-                options: nil,
-                completionHandler: { url, _ in
-                    if let shareURL = url as? URL,
-                       shareURL.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
-                       let components = URLComponents(url: shareURL, resolvingAgainstBaseURL: true),
-                       let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
-                       let id = Int(idString), id > 0,
-                       let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)") {
-                        Task { @MainActor in
-                            self.openURL(openInURL)
-                            self.close()
-                        }
-                    } else {
-                        Task { @MainActor in self.error() }
+            _ = itemProvider.loadObject(ofClass: URL.self) { object, _ in
+                if let shareURL = object,
+                   shareURL.host?.localizedCaseInsensitiveCompare("news.ycombinator.com") == .orderedSame,
+                   let components = URLComponents(url: shareURL, resolvingAgainstBaseURL: true),
+                   let idString = components.queryItems?.first(where: { $0.name == "id" })?.value,
+                   let id = Int(idString), id > 0,
+                   let openInURL = URL(string: "com.weiranzhang.Hackers://item?id=\(id)") {
+                    Task { @MainActor in
+                        self.openURL(openInURL)
+                        self.close()
                     }
-                },
-            )
+                } else {
+                    Task { @MainActor in self.error() }
+                }
+            }
         } else {
             error()
         }

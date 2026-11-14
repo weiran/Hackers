@@ -25,7 +25,7 @@ struct PostRepositoryTests {
 
     final class MockNetworkManager: NetworkManagerProtocol, @unchecked Sendable {
         private enum PendingResponse {
-            case success(String)
+            case success(String, redirectedTo: URL?)
             case failure(Error)
         }
 
@@ -39,35 +39,45 @@ struct PostRepositoryTests {
         var lastPostURL: URL?
         var lastPostBody: String?
 
-        func get(url: URL) async throws -> String {
+        func getResponse(url: URL) async throws -> NetworkResponse {
             getCallCount += 1
             lastGetURL = url
             if !getResponses.isEmpty {
                 let response = getResponses.removeFirst()
                 switch response {
-                case let .success(html):
-                    return html
+                case let .success(html, redirect):
+                    // Mirrors URLSession redirect handling: a nil redirect means HN
+                    // served this response at the requested URL itself.
+                    return NetworkResponse(body: html, statusCode: 200, finalURL: redirect ?? url)
                 case let .failure(error):
                     throw error
                 }
             }
-            return stubbedGetResponse
+            return NetworkResponse(body: stubbedGetResponse, statusCode: 200, finalURL: url)
         }
 
-        func post(url: URL, body: String) async throws -> String {
+        func postResponse(url: URL, body: String) async throws -> NetworkResponse {
             postCallCount += 1
             lastPostURL = url
             lastPostBody = body
             if !postResponses.isEmpty {
                 let response = postResponses.removeFirst()
                 switch response {
-                case let .success(html):
-                    return html
+                case let .success(html, _):
+                    return NetworkResponse(body: html, statusCode: 200, finalURL: url)
                 case let .failure(error):
                     throw error
                 }
             }
-            return stubbedPostResponse
+            return NetworkResponse(body: stubbedPostResponse, statusCode: 200, finalURL: url)
+        }
+
+        func get(url: URL) async throws -> String {
+            try await getResponse(url: url).body
+        }
+
+        func post(url: URL, body: String) async throws -> String {
+            try await postResponse(url: url, body: body).body
         }
 
         func clearCookies() {
@@ -78,10 +88,20 @@ struct PostRepositoryTests {
             false // Return false for testing simplicity
         }
 
+        func containsCookie(named _: String, for _: URL) -> Bool {
+            false
+        }
+
         // MARK: - Helpers
 
         func enqueueGetResponse(_ html: String) {
-            getResponses.append(.success(html))
+            getResponses.append(.success(html, redirectedTo: nil))
+        }
+
+        /// Enqueues a success response whose final URL differs from the request, modelling
+        /// HN's redirect to the whence/goto page after an accepted vote.
+        func enqueueGetResponse(_ html: String, redirectedTo finalURL: URL) {
+            getResponses.append(.success(html, redirectedTo: finalURL))
         }
 
         func enqueueGetError(_ error: Error) {
@@ -89,19 +109,12 @@ struct PostRepositoryTests {
         }
 
         func enqueuePostResponse(_ html: String) {
-            postResponses.append(.success(html))
+            postResponses.append(.success(html, redirectedTo: nil))
         }
 
         func enqueuePostError(_ error: Error) {
             postResponses.append(.failure(error))
         }
-    }
-
-    // MARK: - Initialization Tests
-
-    @Test("PostRepository initialization")
-    func postRepositoryInitialization() {
-        #expect(postRepository != nil, "PostRepository should initialize successfully")
     }
 
     // MARK: - GetPosts Tests
@@ -131,6 +144,23 @@ struct PostRepositoryTests {
         #expect(post.score == 10)
         #expect(post.age == "2023-01-01T10:00:00")
         #expect(post.voteLinks?.upvote != nil)
+    }
+
+    @Test("Parses current classless post author links")
+    func parsesClasslessPostAuthor() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockPostsHTML()
+            .replacingOccurrences(of: "class=\"hnuser\" href=\"user?id=testuser\"", with: "href=\"user?id=testuser\"")
+        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+        #expect(posts.first?.by == "testuser")
+    }
+
+    @Test("Parses current classless comment author links without using links in the comment")
+    func parsesClasslessCommentAuthor() throws {
+        let html = commentTreeRowsHTML(storyID: 123, commentIDs: [456])
+            .replacingOccurrences(of: "href=\"user?id=commenter\" class=\"hnuser\"", with: "href=\"user?id=commenter\"")
+            .replacingOccurrences(of: "Comment 456", with: "<a href=\"user?id=other\">other</a>")
+        let comments = try postRepository.comments(from: "<table>\(html)</table>")
+        #expect(comments.first?.by == "commenter")
     }
 
     @Test("Get posts with newest type")
@@ -313,6 +343,162 @@ struct PostRepositoryTests {
 
     // Unvote post test removed
 
+    @Test("Unvote accepted when response shows the vote removed")
+    func unvotePostAcceptedFromVoteResponse() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // HN redirects to the rewritten goto target (the item page), which shows a
+        // plain (not hidden) upvote arrow — proof the vote is gone.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: false))
+
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.getCallCount == 1, "Unvote must be a single request")
+        #expect(
+            mockNetworkManager.lastGetURL?.absoluteString.contains("goto=item%3Fid%3D123") == true,
+            "goto must be rewritten to the item page so the response carries the vote state"
+        )
+        #expect(mockNetworkManager.lastGetURL?.absoluteString.contains("how=un") == true)
+    }
+
+    @Test("Unvote refused when response still shows the vote standing")
+    func unvoteRefusedWhenVoteResponseStillShowsVote() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=item%3Fid%3D123")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // A months-old unvote: HN answers with a normal-looking redirect page, but
+        // the unvote link is still there — the vote was silently kept.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 123, upvoted: true))
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected when the vote is still shown after unvoting")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(mockNetworkManager.getCallCount == 1)
+    }
+
+    @Test("Unvote with no recognizable item in response counts as applied")
+    func unvoteInconclusiveResponseCountsAsApplied() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // HN silently ignores refused unvotes with a success-looking redirect; when
+        // the response doesn't contain the item at all there is nothing more to
+        // learn, and no extra request may be made.
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body><table class=\"itemlist\"><tr><td>feed</td></tr></table></body></html>"
+        )
+
+        try await postRepository.unvote(post: post)
+
+        #expect(mockNetworkManager.getCallCount == 1, "No verification refetch may be issued")
+    }
+
+    @Test("Unvote refused with vote-too-old error page throws voteRejected")
+    func unvotePostRejectedTooOld() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body>Vote too old to be modified.</body></html>"
+        )
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected for an out-of-window unvote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(mockNetworkManager.getCallCount == 1, "Bare refusal should not trigger a refetch")
+    }
+
+    @Test("Unknown bare error page served at /vote also throws voteRejected")
+    func unvotePostRejectedUnknownErrorPage() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=123&how=up")!,
+            unvote: URL(string: "/vote?id=123&how=un&goto=news")!
+        )
+        let post = createTestPost(voteLinks: voteLinks)
+        // No redirect away from /vote and no page structure — must not count as success.
+        mockNetworkManager.enqueueGetResponse("<html><body>Some future refusal text.</body></html>")
+
+        do {
+            try await postRepository.unvote(post: post)
+            Issue.record("Expected voteRejected for a refusal served at /vote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+    }
+
+    @Test("Rejected comment unvote throws voteRejected")
+    func unvoteCommentRejected() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=456&how=up")!,
+            unvote: URL(string: "/vote?id=456&how=un&goto=item%3Fid%3D123")!
+        )
+        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
+        let post = createTestPost()
+        mockNetworkManager.enqueueGetResponse(
+            "<html><body>Can't make that vote.</body></html>"
+        )
+
+        do {
+            try await postRepository.unvote(comment: comment, for: post)
+            Issue.record("Expected voteRejected for a refused comment unvote")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+    }
+
+    @Test("Comment unvote verifies the comment's own state")
+    func unvoteCommentRefusedByState() async throws {
+        let voteLinks = VoteLinks(
+            upvote: URL(string: "/vote?id=456&how=up")!,
+            unvote: URL(string: "/vote?id=456&how=un&goto=item%3Fid%3D123")!
+        )
+        let comment = createTestComment(voteLinks: voteLinks, upvoted: true)
+        let post = createTestPost()
+        // Response still shows comment 456 as upvoted: unvote silently ignored.
+        mockNetworkManager.enqueueGetResponse(upvotedItemPageHTML(id: 456, upvoted: true))
+
+        do {
+            try await postRepository.unvote(comment: comment, for: post)
+            Issue.record("Expected voteRejected when the comment is still shown upvoted")
+        } catch let error as HackersKitError {
+            guard case HackersKitError.voteRejected = error else {
+                Issue.record("Expected voteRejected, got \(error)")
+                return
+            }
+        }
+        #expect(
+            mockNetworkManager.lastGetURL?.absoluteString.contains("goto=item%3Fid%3D456") == true,
+            "goto must point at the comment so its own vote state comes back"
+        )
+    }
+
     @Test("Upvote post without vote links")
     func upvotePostWithoutVoteLinks() async {
         let post = createTestPost(voteLinks: nil)
@@ -484,6 +670,53 @@ struct PostRepositoryTests {
             upvoted: upvoted,
             voteLinks: voteLinks,
         )
+    }
+
+    /// Minimal item page showing the item's vote area the way HN renders it for a
+    /// logged-in user: an upvoted item has a hidden (`nosee`) arrow plus an unvote
+    /// link, an un-upvoted item a plain arrow.
+    private func upvotedItemPageHTML(id: Int, upvoted: Bool) -> String {
+        let voteArea: String
+        if upvoted {
+            voteArea = """
+                <a id='up_\(id)' class='clicky nosee' href='vote?id=\(id)&how=up&auth=t'>
+                    <div class='votearrow' title='upvote'></div>
+                </a>
+                """
+        } else {
+            voteArea = """
+                <a id='up_\(id)' href='vote?id=\(id)&how=up'>
+                    <div class='votearrow' title='upvote'></div>
+                </a>
+                """
+        }
+        let unvoteArea = upvoted
+            ? "\n<span id='unv_\(id)'> | <a id='un_\(id)' class='clicky' href='vote?id=\(id)&how=un&auth=t'>unvote</a></span>"
+            : ""
+
+        return """
+        <html>
+        <body>
+        <table class="fatitem">
+            <tr class="athing" id="\(id)">
+                <td valign="top" class="votelinks">
+                    <center>
+                        \(voteArea)
+                    </center>
+                </td>
+                <td class="title"><span class="titleline"><a href="https://example.com/a">Title</a></span></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td class="subtext">
+                    <span class="score" id="score_\(id)">10 points</span>
+                    <span class="age">2 hours ago</span>\(unvoteArea)
+                </td>
+            </tr>
+        </table>
+        </body>
+        </html>
+        """
     }
 
     private func createMockPostsHTML() -> String {
@@ -859,7 +1092,7 @@ struct PostRepositoryTests {
 
 @Suite("PostRepository Number Parsing")
 struct PostRepositoryNumberParsingTests {
-    let repository = PostRepository(networkManager: StubNetworkManager())
+    let repository = PostRepository(networkManager: PostRepositoryTests.MockNetworkManager())
 
     @Test("Parses plain plural counts")
     func plainPlural() {
@@ -912,14 +1145,14 @@ struct PostRepositoryNumberParsingTests {
 
 @Suite("PostRepository NBSP Score Parsing")
 struct PostRepositoryNBSPParsingTests {
-    let network = StubNetworkManager()
+    let network = PostRepositoryTests.MockNetworkManager()
     var postRepository: PostRepository {
         PostRepository(networkManager: network)
     }
 
     @Test("Parses NBSP-formatted score and singular score from feed HTML")
     func nbspAndSingularScoreFromFeed() async throws {
-        network.enqueue(html: """
+        network.enqueueGetResponse("""
         <html><body><table class="itemlist">
             <tr class="athing submission" id="1">
                 <td valign="top" class="votelinks"><center><a id='up_1' href='vote?id=1&how=up'><div class='votearrow'></div></a></center></td>
@@ -955,3 +1188,26 @@ struct PostRepositoryNBSPParsingTests {
 }
 
 // swiftlint:enable type_body_length
+
+extension PostRepositoryTests {
+    @Test("Comment upvote rejects unauthenticated message without a login form")
+    func upvoteCommentRejectsUnauthenticatedMessage() async {
+        let voteLinks = VoteLinks(upvote: URL(string: "/vote?id=456&how=up")!, unvote: nil)
+        let comment = createTestComment(voteLinks: voteLinks)
+        let post = createTestPost()
+        mockNetworkManager.stubbedGetResponse = "You have to be logged in to vote."
+
+        do {
+            try await postRepository.upvote(comment: comment, for: post)
+            Issue.record("Expected unauthenticated comment vote response")
+        } catch let error as HackersKitError {
+            guard case .unauthenticated = error else {
+                Issue.record("Expected HackersKitError.unauthenticated, got \(error)")
+                return
+            }
+        } catch {
+            Issue.record("Expected HackersKitError.unauthenticated, got \(error)")
+        }
+    }
+
+}

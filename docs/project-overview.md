@@ -1,6 +1,6 @@
 # Project Overview
 
-Hackers is an iOS Hacker News client built with SwiftUI, Swift Package Manager modules, Swift 6.3, and an iOS 26+ deployment target.
+Hackers is an iOS Hacker News client built with SwiftUI, Swift Package Manager modules, Swift 6.4, and an iOS 26+ deployment target.
 
 The app is organized around feature modules, protocol-based use cases, repository implementations, and a small shared dependency container. UI state lives in SwiftUI views and feature ViewModels; networking, parsing, persistence, voting, settings, authentication, and release-note state are kept behind protocols where practical.
 
@@ -25,7 +25,9 @@ The app is organized around feature modules, protocol-based use cases, repositor
 
 ## Module Shape
 
-Each package has its own `Package.swift` and test target. Packages use Swift tools 6.2 and `platforms: [.iOS(.v26)]`.
+Each top-level Swift package has its own `Package.swift` and test target. The feature
+modules are products within the shared `Features/Package.swift`, rather than separate
+packages. Packages use Swift tools 6.4 and `platforms: [.iOS(.v26)]`.
 
 Current package set:
 
@@ -71,15 +73,21 @@ Search is part of the Feed feature. Search queries use `SearchUseCase`, keep sep
 
 Comments are loaded through `CommentsViewModel`. If a post is already available from the feed, it is passed as the initial post; otherwise comments load by post ID. The repository resolves comment permalink pages back to their parent story, inserts story text as a synthetic top comment with a negative ID, builds comment-tree indexes, and keeps a `visibleComments` projection for collapse/expand behavior.
 
+Commenting and replies submit through the HN website forms. `PostRepository` fetches the item or `/reply` page form (hidden `parent`, `goto`, `hmac` fields), posts it with the shared form encoder, handles at most one `commconfirm` round, and classifies `/x` message pages and auth failures. Read-back and server-ID resolution re-use the same HN item and `threads` pages the app already parses — no Firebase or other third-party API. HMACs are fetched per submission and never persisted. Only a server-confirmed comment is inserted into the in-memory tree (no full refresh, no optimistic rows); ambiguous transport outcomes reconcile without ever re-POSTing. The feature is gated by `AppRuntimePolicy.allowsCommenting` (off in release builds; DEBUG builds enable it by default, with a `disableCommenting` launch argument to opt out) plus an authenticated session, drafts are view-local in `CommentComposerModel`, and HTML-contract fixtures plus live verification are required before the production gate is enabled.
+
 Voting is optimistic in the UI and link-driven in the data layer. Hacker News vote/unvote URLs are parsed from HTML into `VoteLinks`; upvoted state can come from explicit `unvote` links or hidden `nosee` upvote arrows. Post and comment voting should go through the shared voting use cases/providers so score, upvoted state, and authentication failure handling stay consistent.
 
-Authentication is HN-cookie based. `AuthenticationRepository` posts credentials to `/login`, stores the username in `UserDefaults` under `hn_username`, and treats authentication as valid only when both an HN cookie and stored username exist. Logout clears cookies and the stored username.
+Authentication is HN-cookie based. `AuthenticationRepository` posts credentials to `/login`, stores the username in `UserDefaults` under `hn_username`, and treats authentication as valid only when both a cookie named exactly `user` for the HN origin and a stored username exist; login responses that do not set that cookie are rejected. Logout clears cookies and the stored username.
 
-Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
+Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, swipe-to-collapse comment threads (iOS 27+), and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
 
 WhatsNew is version-gated by `WhatsNewUseCase`. First launch stores the current version without showing the sheet, minor/major version increases can show it, and `disableWhatsNew` suppresses it for automated runs unless force-show is requested.
 
-Navigation differs by device class. iPhone uses a `NavigationStack`; iPad and iOS-on-Mac use `NavigationSplitView` with a sidebar feed and detail comments/browser area. `NavigationStore` owns selected posts, pending deep links, modal presentation, and embedded browser state.
+Navigation uses a single root `NavigationSplitView` on every device, following Apple's iPhone Duo guidance. It shows the feed sidebar and detail side by side in regular width (iPad, iPhone Duo inner display, large iPhones in landscape) and collapses to one stack in compact width, so the visible screen survives size-class changes such as folding. `NavigationStore` owns one model for all widths: `detailRoot` plus `detailPath` (`NavigationDetailDestination`: comments, custom post browser, or web) and `preferredCompactColumn`. Links opened from detail screens push onto `detailPath`. To keep the reader's place through folds, the feed is a single `List` in both presentations (sidebar styling changes only values, never view structure), and comments track their top row with `scrollPosition(_:anchor: .top)` so reflowing rows don't move it. Views decide layout from `horizontalSizeClass`; `DeviceLayout.usesRegularWidthLayout` mirrors it only for UIKit code.
+
+At regular width, story links use the same `EmbeddedWebView` detail browser as other web links, with system browser toolbar items and no draggable comments panel. Comment selections show `CommentsView` directly in the detail column. A system-colored separator marks the feed boundary, and the balanced split view retains its native sidebar toggle. Compact width continues to use the custom story browser and comments panel. Cached browser controllers and comment models remain above the compact/regular navigation-host boundary.
+
+The custom story browser reads `toolbarVerticalEdge` on iOS 27.1+ to adopt native vertical toolbar items on iPhone Duo. Individual symbol actions use `axisBehavior(.verticalPreferred)`; the system owns placement and overflow. When the edge is nil (including ordinary iPhones and the Duo inner display in portrait), the original floating browser controls and comments toolbar remain. The vertical presentation keeps comments inside the toolbar-safe viewport and provides a Show Comments/Show Article action in the rail. In this presentation, the panel's top corner radius follows expansion progress to zero at full height, and the top content inset reserves only the drag-handle area plus the physical safe inset, without a horizontal navigation-bar allowance.
 
 ## Action Extension
 
@@ -96,11 +104,11 @@ Keep the action extension's `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` al
 
 ## Data And Persistence
 
-Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, and `DimReadPosts`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
+Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, `DimReadPosts`, and `SwipeToCollapseThreads`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
 
 Bookmarks use `NSUbiquitousKeyValueStore` under `Bookmarks.posts`. Stored bookmark entries include enough post metadata to render the Bookmarks feed offline from HN feed pages, plus optional vote links and the bookmark timestamp used for recency ordering.
 
-Read state uses `NSUbiquitousKeyValueStore` under `ReadStatus.posts`. It stores recent read IDs with timestamps and trims to 5,000 entries. Feed and search rows are annotated from this state, and `dimReadPosts` controls whether read rows are visually dimmed.
+Read state uses `NSUbiquitousKeyValueStore` under `ReadStatus.posts`. It stores recent read IDs with timestamps and trims to 5,000 entries. The repository checks stored bytes before each read or mutation and reuses decoded entries only while those bytes are unchanged. Bookmark and read-history repositories preserve malformed stored payloads and their last valid snapshots, refusing writes until valid data returns. Feed and search rows are annotated from this state, and `dimReadPosts` controls whether read rows are visually dimmed. Shared controllers refresh external changes without applying snapshots invalidated by local mutations; generic bookmark changes update Feed and Comments annotations.
 
 Authentication stores only the HN username in `UserDefaults`; the authenticated session itself is held by shared HN cookies in `HTTPCookieStorage`. Networking deliberately preserves shared cookie behavior so login, voting, and page fetches see the same session.
 

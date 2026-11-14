@@ -13,26 +13,28 @@ struct WhatsNewDataTests {
     func currentWhatsNewData() {
         let data = WhatsNewData.currentWhatsNew()
 
-        #expect(data.title == "What's New in Hackers 5.4")
-        #expect(data.items.count == 2)
-        #expect(data.items.contains { $0.title == "Threaded Comment Guides" })
-        #expect(data.items.contains { $0.title == "Redesigned iPad Browser" })
-        #expect(data.items.contains {
-            $0.subtitle == "Comment replies now show clear visual guides so you can follow threads at a glance."
-        })
-    }
+        let expectedItems: [(title: String, subtitle: String, systemImage: String)] = [
+            (
+                "iPhone Duo Support",
+                "Support for iPhone Duo’s distinctive design.",
+                "rectangle.split.2x1"
+            ),
+            (
+                "Usernames Restored",
+                "Usernames appear again on posts and comments.",
+                "person.crop.circle"
+            ),
+        ]
 
-    @Test("WhatsNewItem has proper initialization")
-    func whatsNewItemInitialization() {
-        let item = WhatsNewItem(
-            title: "Test Title",
-            subtitle: "Test Subtitle",
-            systemImage: "star",
-        )
+        #expect(data.title == "What's New in Hackers 5.6")
+        #expect(data.items.count == expectedItems.count)
 
-        #expect(item.title == "Test Title")
-        #expect(item.subtitle == "Test Subtitle")
-        #expect(item.systemImage == "star")
-        #expect(!item.id.uuidString.isEmpty)
+        for expected in expectedItems {
+            #expect(data.items.contains {
+                $0.title == expected.title &&
+                    $0.subtitle == expected.subtitle &&
+                    $0.systemImage == expected.systemImage
+            })
+        }
     }
 }

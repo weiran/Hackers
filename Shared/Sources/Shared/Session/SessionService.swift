@@ -15,15 +15,21 @@ import Observation
 public final class SessionService {
     private var user: Domain.User?
     private let authenticationUseCase: any AuthenticationUseCase
-    nonisolated(unsafe) private var logoutObserver: NSObjectProtocol?
+    @ObservationIgnored private var logoutObserver: NSObjectProtocol?
+    @ObservationIgnored private var currentUserTask: Task<Void, Never>?
+    private var currentUserGeneration = 0
+    public private(set) var logoutError: Error?
 
     public init(authenticationUseCase: any AuthenticationUseCase) {
         self.authenticationUseCase = authenticationUseCase
 
-        Task { [weak self] in
-            guard let self else { return }
+        currentUserGeneration += 1
+        let generation = currentUserGeneration
+        currentUserTask = Task { [weak self, authenticationUseCase] in
             let user = await authenticationUseCase.getCurrentUser()
-            await MainActor.run { self.user = user }
+            guard !Task.isCancelled else { return }
+            guard let self, self.currentUserGeneration == generation else { return }
+            self.user = user
         }
 
         logoutObserver = NotificationCenter.default.addObserver(
@@ -31,13 +37,15 @@ public final class SessionService {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in
-                self?.user = nil
+            guard let self else { return }
+            MainActor.assumeIsolated {
+                self.handleLogoutNotification()
             }
         }
     }
 
-    deinit {
+    isolated deinit {
+        currentUserTask?.cancel()
         if let observer = logoutObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -52,17 +60,32 @@ public final class SessionService {
     }
 
     public func authenticate(username: String, password: String) async throws -> AuthenticationState {
+        currentUserTask?.cancel()
+        currentUserGeneration += 1
         try await authenticationUseCase.authenticate(username: username, password: password)
         user = await authenticationUseCase.getCurrentUser()
+        logoutError = nil
         return .authenticated
     }
 
-    public func unauthenticate() {
-        Task { [weak self] in
-            guard let self else { return }
-            try? await authenticationUseCase.logout()
-            await MainActor.run { self.user = nil }
+    public func unauthenticate() async throws {
+        currentUserTask?.cancel()
+        currentUserGeneration += 1
+        logoutError = nil
+        do {
+            try await authenticationUseCase.logout()
+            user = nil
+        } catch {
+            logoutError = error
+            user = await authenticationUseCase.getCurrentUser()
+            throw error
         }
+    }
+
+    private func handleLogoutNotification() {
+        currentUserTask?.cancel()
+        currentUserGeneration += 1
+        user = nil
     }
 
     public enum AuthenticationState {

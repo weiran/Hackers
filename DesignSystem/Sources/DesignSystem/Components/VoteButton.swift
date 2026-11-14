@@ -34,6 +34,7 @@ public struct VoteButton: View {
                         if votingState.isVoting {
                             ProgressView()
                                 .scaleEffect(style.progressScale)
+                                .tint(style.foregroundColor(for: votingState))
                                 .foregroundStyle(style.foregroundColor(for: votingState))
                         }
                     }

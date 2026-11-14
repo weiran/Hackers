@@ -39,10 +39,19 @@ private enum CommentsScrollTarget: Hashable {
     }
 }
 
+private struct BottomControlsHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 struct CommentsContentView: View {
     private static let commentCollapseAnimation = Animation.easeInOut(duration: 0.3)
 
     @Environment(\.textScaling) private var textScaling
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(SessionService.self) private var sessionService
     let showsPostHeader: Bool
     let handleLinkTap: () -> Void
@@ -57,7 +66,19 @@ struct CommentsContentView: View {
     @State var viewModel: CommentsViewModel
     @State var votingViewModel: VotingViewModel
     @Binding var pendingCommentID: Int?
+    let canComment: Bool
+    let composer: CommentComposerModel
+    @Binding var replyScrollTarget: Int?
+    let onReply: (Int, String) -> Void
+    let onSubmitComposerDraft: () -> Void
+    let restoredCommentID: () -> Int?
+    let onTopCommentChange: (Int?) -> Void
     @State private var visibleCommentTarget = VisibleCommentTarget()
+    @State private var bottomControlsHeight: CGFloat = 0
+    @State private var collapsedThreadScrollTarget: Int?
+    @State private var needsScrollRestoration = true
+    @State private var resizeAnchorID: Int?
+    @State private var resizeSettlingTask: Task<Void, Never>?
 
     var body: some View {
         Group {
@@ -74,41 +95,95 @@ struct CommentsContentView: View {
     private func content(for post: Post) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        postHeaderSection(for: post)
-                        commentsSection(for: post)
+                ZStack(alignment: .bottom) {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 0) {
+                            postHeaderSection(for: post)
+                            commentsSection(for: post)
+                        }
+                        .scrollTargetLayout()
                     }
-                    .scrollTargetLayout()
-                }
-                .onScrollTargetVisibilityChange(idType: CommentsScrollTarget.self, threshold: 0.1) { visibleTargets in
-                    updateVisibleCommentTarget(visibleTargets: visibleTargets)
-                }
-                .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
-                    geometry.contentOffset.y + geometry.contentInsets.top
-                }, action: { _, offsetY in
-                    updateHeaderState(offsetY: offsetY)
-                })
-                .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    commentScrollTopSafeAreaInset
-                }
-                .safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-                    if !viewModel.visibleComments.isEmpty {
-                        NextCommentFloatingButton(
-                            isEnabled: visibleCommentTarget.hasNextComment,
-                            onNextComment: { scrollToNextComment(using: proxy) },
-                            onNextThread: { scrollToNextThread(using: proxy) }
+                    .onScrollTargetVisibilityChange(
+                        idType: CommentsScrollTarget.self,
+                        threshold: 0.1
+                    ) { visibleTargets in
+                        DispatchQueue.main.async { @MainActor in
+                            updateVisibleCommentTarget(visibleTargets: visibleTargets)
+                        }
+                    }
+                    // Scrolling leaves the editor and keyboard in place.
+                    .scrollDismissesKeyboard(.never)
+                    // A focused editor can cause the first tap after a scroll
+                    // to be handled by the scroll view instead of the row's
+                    // local gesture. Keep that non-scroll interaction path
+                    // explicit so taps and holds still dismiss the composer.
+                    .onTapGesture(perform: dismissComposerForInteraction)
+                    .onLongPressGesture(minimumDuration: 0.5) {
+                        dismissComposerForInteraction()
+                    }
+                    .modifier(CommentSwipeActionsContainerModifier())
+                    .onScrollGeometryChange(for: CGFloat.self, of: { geometry in
+                        geometry.contentOffset.y + geometry.contentInsets.top
+                    }, action: { _, offsetY in
+                        DispatchQueue.main.async { @MainActor in
+                            updateHeaderState(offsetY: offsetY)
+                        }
+                    })
+                    .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { oldWidth, newWidth in
+                        preserveAnchorAcrossResize(
+                            from: oldWidth,
+                            to: newWidth,
+                            using: proxy
                         )
-                        .padding(.trailing, 28)
-                        .padding(.bottom, 28)
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifier.Comments.list)
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        commentScrollTopSafeAreaInset
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        if bottomControlsHeight > 0 {
+                            Color.clear
+                                .frame(height: bottomControlsHeight)
+                                .allowsHitTesting(false)
+                        }
+                    }
+                    CommentsBottomBar(
+                        canComment: canComment,
+                        composer: composer,
+                        showsNextCommentButton: viewModel.showNextCommentButton,
+                        hasNextComment: visibleCommentTarget.hasNextComment,
+                        onNextComment: { scrollToNextComment(using: proxy) },
+                        onNextThread: { scrollToNextThread(using: proxy) },
+                        onSubmit: onSubmitComposerDraft
+                    )
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        GeometryReader { controlsProxy in
+                            Color.clear.preference(
+                                key: BottomControlsHeightKey.self,
+                                value: controlsProxy.size.height
+                            )
+                        }
+                    )
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .onPreferenceChange(BottomControlsHeightKey.self) { height in
+                    bottomControlsHeight = height
                 }
                 .onChange(of: pendingCommentID) { _, _ in
                     scrollToPendingComment(using: proxy)
                 }
                 .onChange(of: viewModel.visibleRevision) { _, _ in
+                    restoreScrollAnchor(using: proxy)
                     scrollToPendingComment(using: proxy)
+                    scrollToReplyTarget(using: proxy)
+                    scrollToCollapsedThread(using: proxy)
+                }
+                .onChange(of: replyScrollTarget) { _, _ in
+                    scrollToReplyTarget(using: proxy)
+                }
+                .onAppear {
+                    restoreScrollAnchor(using: proxy)
                 }
                 .task(id: viewModel.visibleRevision) {
                     await CommentTextCache.prewarm(
@@ -120,7 +195,9 @@ struct CommentsContentView: View {
             }
         }
     }
+}
 
+private extension CommentsContentView {
     private func updateHeaderState(offsetY: CGFloat) {
         updateHeaderState(offsetY: offsetY, animatesTitleChange: true)
     }
@@ -149,10 +226,68 @@ struct CommentsContentView: View {
 
     private func updateVisibleCommentTarget(visibleTargets: [CommentsScrollTarget]) {
         let topID = visibleTargets.first?.commentID
+        if !needsScrollRestoration, resizeAnchorID == nil {
+            onTopCommentChange(topID)
+        }
         visibleCommentTarget.update(
             topCommentID: topID,
             hasNextComment: viewModel.hasNextVisibleComment(after: topID)
         )
+    }
+
+    /// Width changes can arrive every frame while the Duo hinge moves. Freeze the comment
+    /// that was at the top when resizing began, keep putting that identity back at the top,
+    /// and release it only after geometry settles. This avoids accumulating reflow drift and
+    /// never reuses a pixel offset from another display.
+    private func preserveAnchorAcrossResize(
+        from oldWidth: CGFloat,
+        to newWidth: CGFloat,
+        using proxy: ScrollViewProxy
+    ) {
+        guard abs(newWidth - oldWidth) > 0.5, !needsScrollRestoration else { return }
+        if resizeAnchorID == nil {
+            resizeAnchorID = restoredCommentID() ?? visibleCommentTarget.topCommentID
+        }
+        guard let commentID = resizeAnchorID else { return }
+
+        resizeSettlingTask?.cancel()
+        Task { @MainActor in
+            await Task.yield()
+            guard !Task.isCancelled else { return }
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+        }
+        resizeSettlingTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+            resizeAnchorID = nil
+            onTopCommentChange(commentID)
+        }
+    }
+
+    /// Restores an identity, not an absolute offset. A real iPhone Duo display transfer can
+    /// recreate this view with entirely different geometry; reusing the old pixel offset can
+    /// place lazy content outside the viewport. The navigation store survives that transfer.
+    private func restoreScrollAnchor(using proxy: ScrollViewProxy) {
+        guard needsScrollRestoration else { return }
+        guard pendingCommentID == nil else {
+            needsScrollRestoration = false
+            return
+        }
+        guard let commentID = restoredCommentID() else {
+            needsScrollRestoration = false
+            return
+        }
+        guard viewModel.visibleComments.contains(where: { $0.id == commentID }) else {
+            // Comments may still be loading. `visibleRevision` will call this again.
+            return
+        }
+
+        Task { @MainActor in
+            await Task.yield()
+            proxy.scrollTo(CommentsScrollTarget.comment(commentID), anchor: .commentTop)
+            needsScrollRestoration = false
+        }
     }
 
     private func scrollToPendingComment(using proxy: ScrollViewProxy) {
@@ -160,6 +295,44 @@ struct CommentsContentView: View {
         guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
 
         scrollToComment(withID: targetID, using: proxy)
+
+        // The row may not have been laid out yet when visibleRevision changes.
+        // Repeat once after the list has committed the inserted row.
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+            }
+        }
+    }
+
+    /// Scrolls the reply target to the top of the viewport once visible, then
+    /// issues one corrective scroll after the keyboard settles.
+    private func scrollToReplyTarget(using proxy: ScrollViewProxy) {
+        guard let targetID = replyScrollTarget else { return }
+        guard viewModel.visibleComments.contains(where: { $0.id == targetID }) else { return }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+        }
+        replyScrollTarget = nil
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeInOut(duration: 0.3)) {
+                proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+            }
+        }
+    }
+
+    private func scrollToCollapsedThread(using proxy: ScrollViewProxy) {
+        guard let targetID = collapsedThreadScrollTarget else { return }
+
+        withAnimation(Self.commentCollapseAnimation) {
+            proxy.scrollTo(CommentsScrollTarget.comment(targetID), anchor: .commentTop)
+        }
+        collapsedThreadScrollTarget = nil
     }
 
     private func scrollToNextComment(using proxy: ScrollViewProxy) {
@@ -192,8 +365,41 @@ struct CommentsContentView: View {
             onUpvote: { upvoteComment(withID: state.id, in: post) },
             onUnvote: { unvoteComment(withID: state.id, in: post) },
             onCopy: { copyComment(withID: state.id) },
-            onShare: { shareComment(withID: state.id) }
+            onShare: { shareComment(withID: state.id) },
+            onReply: { onReply(state.id, state.author) },
+            onInteraction: dismissComposerForInteraction
         )
+        .if(viewModel.swipeCollapseThreads) { row in
+            row.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button {
+                    dismissComposerForInteraction()
+                    collapseThread(for: state)
+                } label: {
+                    Label(
+                        state.visibility == .visible ? "Collapse" : "Expand",
+                        systemImage: state.visibility == .visible ? "minus.circle" : "plus.circle"
+                    )
+                }
+                .accessibilityIdentifier(AccessibilityIdentifier.Comments.collapseThreadAction(state.id))
+            }
+        }
+    }
+
+    /// Swipe-to-collapse keeps the pre-scroll-view-migration behaviour: collapsing any
+    /// row hides its whole thread from the level-0 root, not just that row's subtree.
+    private func collapseThread(for state: CommentRowState) {
+        guard let comment = viewModel.comment(withID: state.id) else { return }
+        withAnimation(Self.commentCollapseAnimation) {
+            guard let rootComment = viewModel.hideCommentBranch(comment) else { return }
+            collapsedThreadScrollTarget = rootComment.id
+        }
+    }
+
+    private func dismissComposerForInteraction() {
+        guard composer.isExpanded else { return }
+        withAnimation(ComposerMotion.animation(isReducedMotion: reduceMotion)) {
+            composer.collapsePreservingDraft()
+        }
     }
 
     private func upvoteComment(withID commentID: Int, in post: Post) {
@@ -234,6 +440,8 @@ struct CommentsContentView: View {
             isAuthenticated: sessionService.authenticationState == .authenticated,
             canVote: comment.voteLinks?.upvote != nil,
             canUnvote: comment.voteLinks?.unvote != nil,
+            canReply: canComment && comment.id > 0,
+            isCommentSubmissionInProgress: composer.isPosting,
             styledText: isCollapsed && !comment.isFlagged
                 ? nil
                 : CommentTextCache.styledText(for: comment, textScaling: textScaling)
@@ -306,13 +514,12 @@ struct CommentsContentView: View {
         PostHeader(
             post: post,
             votingViewModel: votingViewModel,
-            isLoadingComments: viewModel.isLoading,
             showThumbnails: viewModel.showThumbnails,
             matchedGeometryNamespace: postHeaderMatchedGeometryNamespace,
             isMatchedGeometrySource: isPostHeaderMatchedGeometrySource,
             onLinkTap: { handleLinkTap() },
             onPostUpdated: { updatedPost in
-                viewModel.post = updatedPost
+                viewModel.applyPostVoteOutcome(from: updatedPost)
             },
             onBookmarkToggle: { await viewModel.toggleBookmark() }
         )
@@ -340,6 +547,71 @@ struct CommentsContentView: View {
                 .allowsHitTesting(false)
         }
     }
+}
+
+/// Row `swipeActions` only work inside a `List` before iOS 27; `swipeActionsContainer`
+/// extends them to the comments `ScrollView`. On earlier OSes the rows render without
+/// swipe actions.
+private struct CommentSwipeActionsContainerModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 27, *) {
+            content.swipeActionsContainer()
+        } else {
+            content
+        }
+    }
+}
+
+/// Shared bottom-bar controls for normal comments and embedded-browser
+/// comments. The row ends at the container's bottom safe-area baseline, like
+/// a system `bottomBar` toolbar item.
+private struct CommentsBottomBar: View {
+    let canComment: Bool
+    @Bindable var composer: CommentComposerModel
+    let showsNextCommentButton: Bool
+    let hasNextComment: Bool
+    let onNextComment: () -> Void
+    let onNextThread: () -> Void
+    let onSubmit: () -> Void
+
+    var body: some View {
+        if showsControls {
+            HStack(alignment: .bottom, spacing: 12) {
+                if canComment {
+                    CommentComposerView(model: composer, onSubmit: onSubmit)
+                }
+                if showsNextButton {
+                    NextCommentFloatingButton(
+                        isEnabled: hasNextComment,
+                        onNextComment: onNextComment,
+                        onNextThread: onNextThread
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
+            // The collapsed pill keeps equal margins on every screen edge.
+            // The expanded editor preserves its original compact inset above
+            // the keyboard and beside the screen edges.
+            .padding(.horizontal, composer.isExpanded ? 8 : 24)
+            .padding(.bottom, composer.isExpanded ? 8 : 0)
+            // SwiftUI lays the row above the home-indicator safe area. Move
+            // only the collapsed pill into that region far enough to give it
+            // the requested 24pt physical screen margin; the expanded editor
+            // remains on its keyboard-safe baseline.
+            .offset(y: composer.isExpanded ? 0 : 10)
+            .animation(.easeInOut(duration: 0.2), value: composer.isExpanded)
+        }
+    }
+
+    private var showsControls: Bool {
+        canComment || showsNextCommentButton
+    }
+
+        private var showsNextButton: Bool {
+            // Keep the control in the row from the moment the panel appears. It
+            // remains disabled until the first visible target is known.
+            !composer.isExpanded && showsNextCommentButton
+        }
 }
 
 private struct NextCommentFloatingButton: View {
@@ -388,12 +660,11 @@ private struct NextCommentFloatingButton: View {
 struct PostHeader: View {
     let post: Post
     let votingViewModel: VotingViewModel
-    let isLoadingComments: Bool
     let showThumbnails: Bool
     let matchedGeometryNamespace: Namespace.ID?
     let isMatchedGeometrySource: Bool
     let onLinkTap: () -> Void
-    let onPostUpdated: @Sendable (Post) -> Void
+    let onPostUpdated: @MainActor @Sendable (Post) -> Void
     let onBookmarkToggle: @Sendable () async -> Bool
 
     var body: some View {
@@ -414,23 +685,29 @@ struct PostHeader: View {
         }
         .buttonStyle(.plain)
         .contextMenu {
-            VotingContextMenuItems.postVotingMenuItems(
-                for: post,
-                onVote: { Task { await handleUpvote() } },
-                onUnvote: { Task { await handleUnvote() } }
-            )
-            Divider()
-            Button { onLinkTap() } label: {
-                Label("Open Link", systemImage: "safari")
+            Group {
+                VotingContextMenuItems.postVotingMenuItems(
+                    for: post,
+                    onVote: { Task { await handleUpvote() } },
+                    onUnvote: { Task { await handleUnvote() } }
+                )
+                if !HackerNewsConstants.isItemURL(post.url) {
+                    Divider()
+                    Button { onLinkTap() } label: {
+                        Label("Open Link", systemImage: "safari")
+                    }
+                }
+                Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
             }
-            Button { ContentSharePresenter.shared.shareHackerNewsPost(post) } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            }
+            // Menu icons stay neutral even though the surrounding comments
+            // presentation uses the app tint for interactive affordances.
+            .tint(nil)
         }
     }
 
     private func handleUpvote() async -> Bool {
-        guard !isLoadingComments else { return false }
         guard votingViewModel.canVote(item: post), !post.upvoted else { return false }
 
         var mutablePost = post
@@ -447,7 +724,6 @@ struct PostHeader: View {
     }
 
     private func handleUnvote() async -> Bool {
-        guard !isLoadingComments else { return true }
         guard votingViewModel.canUnvote(item: post), post.upvoted else { return true }
 
         var mutablePost = post

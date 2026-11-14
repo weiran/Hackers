@@ -11,7 +11,11 @@
 		AA2000010000000000000001 /* HackersUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000001 /* HackersUITestCase.swift */; };
 		AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000002 /* BrowserCommentsUITests.swift */; };
 		AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */; };
-		243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00032E8B000100000001 /* HackersScreenshotTests.swift */; };
+		AA20000100000000000000F1 /* FoldContinuityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10000100000000000000F1 /* FoldContinuityUITests.swift */; };
+		AA2000010000000000000004 /* CommentVotingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000004 /* CommentVotingUITests.swift */; };
+		AA2000010000000000000005 /* CommentingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000005 /* CommentingUITests.swift */; };
+		AA2000010000000000000007 /* ComposerScreenshotDiag.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000010000000000000007 /* ComposerScreenshotDiag.swift */; };
+				243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00032E8B000100000001 /* HackersScreenshotTests.swift */; };
 		243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243C00042E8B000100000001 /* SnapshotHelper.swift */; };
 		243C00102E8B000100000001 /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 243C00122E8B000100000001 /* Shared */; };
 		241E7B412E511BC20013EEA1 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = 241E7B402E511BC20013EEA1 /* Data */; };
@@ -70,7 +74,11 @@
 		AA1000010000000000000001 /* HackersUITestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersUITestCase.swift; sourceTree = "<group>"; };
 		AA1000010000000000000002 /* BrowserCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserCommentsUITests.swift; sourceTree = "<group>"; };
 		AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationAndCommentsUITests.swift; sourceTree = "<group>"; };
-		243C00032E8B000100000001 /* HackersScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersScreenshotTests.swift; sourceTree = "<group>"; };
+		AA10000100000000000000F1 /* FoldContinuityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldContinuityUITests.swift; sourceTree = "<group>"; };
+		AA1000010000000000000004 /* CommentVotingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentVotingUITests.swift; sourceTree = "<group>"; };
+		AA1000010000000000000005 /* CommentingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentingUITests.swift; sourceTree = "<group>"; };
+		AA1000010000000000000007 /* ComposerScreenshotDiag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerScreenshotDiag.swift; sourceTree = "<group>"; };
+				243C00032E8B000100000001 /* HackersScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HackersScreenshotTests.swift; sourceTree = "<group>"; };
 		243C00042E8B000100000001 /* SnapshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
 		17AFE2AC4DD34C2F82AF632D /* HackersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HackersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -155,7 +163,11 @@
 				AA1000010000000000000001 /* HackersUITestCase.swift */,
 				AA1000010000000000000002 /* BrowserCommentsUITests.swift */,
 				AA1000010000000000000003 /* NavigationAndCommentsUITests.swift */,
-				243C00032E8B000100000001 /* HackersScreenshotTests.swift */,
+				AA10000100000000000000F1 /* FoldContinuityUITests.swift */,
+				AA1000010000000000000004 /* CommentVotingUITests.swift */,
+				AA1000010000000000000005 /* CommentingUITests.swift */,
+				AA1000010000000000000007 /* ComposerScreenshotDiag.swift */,
+								243C00032E8B000100000001 /* HackersScreenshotTests.swift */,
 				243C00042E8B000100000001 /* SnapshotHelper.swift */,
 			);
 			path = HackersUITests;
@@ -267,8 +279,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				CLASSPREFIX = GU;
-				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2620;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
 				ORGANIZATIONNAME = "Glass Umbrella";
 				TargetAttributes = {
 					2419D01F24898DF700740184 = {
@@ -361,7 +373,11 @@
 				AA2000010000000000000001 /* HackersUITestCase.swift in Sources */,
 				AA2000010000000000000002 /* BrowserCommentsUITests.swift in Sources */,
 				AA2000010000000000000003 /* NavigationAndCommentsUITests.swift in Sources */,
-				243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */,
+				AA20000100000000000000F1 /* FoldContinuityUITests.swift in Sources */,
+				AA2000010000000000000004 /* CommentVotingUITests.swift in Sources */,
+				AA2000010000000000000005 /* CommentingUITests.swift in Sources */,
+				AA2000010000000000000007 /* ComposerScreenshotDiag.swift in Sources */,
+								243C00012E8B000100000001 /* HackersScreenshotTests.swift in Sources */,
 				243C00022E8B000100000001 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -411,7 +427,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.HackersUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.3;
+				SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Hackers;
 			};
@@ -431,7 +447,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.HackersUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 6.3;
+				SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Hackers;
 			};
@@ -449,7 +465,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 162;
+				CURRENT_PROJECT_VERSION = 172;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -460,7 +476,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-					MARKETING_VERSION = 5.4.0;
+					MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.ActionExtension;
@@ -469,7 +485,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			SWIFT_VERSION = 6.3;
+			SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -484,10 +500,10 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 162;
+				CURRENT_PROJECT_VERSION = 172;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -498,14 +514,14 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-					MARKETING_VERSION = 5.4.0;
+					MARKETING_VERSION = 5.6.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers.ActionExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.weiranzhang.Hackers.ActionExtension";
 				SKIP_INSTALL = YES;
-			SWIFT_VERSION = 6.3;
+			SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -627,7 +643,7 @@
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 162;
+				CURRENT_PROJECT_VERSION = 172;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
@@ -638,14 +654,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-					MARKETING_VERSION = 5.4.0;
+					MARKETING_VERSION = 5.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			SWIFT_VERSION = 6.3;
+			SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -657,9 +673,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "App/Supporting Files/Hackers.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 162;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 172;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "App/Supporting Files/Hackers2-Prefix.pch";
@@ -670,12 +686,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-					MARKETING_VERSION = 5.4.0;
+					MARKETING_VERSION = 5.6.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.weiranzhang.Hackers;
 				PRODUCT_NAME = Hackers;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.weiranzhang.Hackers";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
-			SWIFT_VERSION = 6.3;
+			SWIFT_VERSION = 6.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

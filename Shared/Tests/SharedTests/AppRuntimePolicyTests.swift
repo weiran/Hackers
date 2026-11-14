@@ -3,15 +3,23 @@ import Testing
 
 @Suite("App runtime policy")
 struct AppRuntimePolicyTests {
-    @Test("Standard runtime enables user-facing system behavior")
-    func standardPolicy() {
-        #expect(AppRuntimePolicy.standard.allowsCredentialAutoFill)
-        #expect(AppRuntimePolicy.standard.allowsReviewPrompts)
+    @Test("Commenting is opt-in for automation and can be changed independently")
+    func commentingIsOptIn() {
+        #expect(AppRuntimePolicy.automation.allowsCommenting == false)
+        #expect(!AppRuntimePolicy(
+            allowsCredentialAutoFill: true,
+            allowsReviewPrompts: true
+        ).allowsCommenting)
     }
 
-    @Test("Automation runtime removes nondeterministic system behavior")
-    func automationPolicy() {
-        #expect(!AppRuntimePolicy.automation.allowsCredentialAutoFill)
-        #expect(!AppRuntimePolicy.automation.allowsReviewPrompts)
+    @Test("withCommenting enables commenting without touching other capabilities")
+    func withCommenting() {
+        let enabled = AppRuntimePolicy.standard.withCommenting(true)
+
+        #expect(enabled.allowsCommenting)
+        let automationEnabled = AppRuntimePolicy.automation.withCommenting(true)
+        #expect(automationEnabled.allowsCommenting)
+        #expect(!automationEnabled.allowsCredentialAutoFill)
+        #expect(!automationEnabled.allowsReviewPrompts)
     }
 }

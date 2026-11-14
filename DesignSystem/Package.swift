@@ -5,7 +5,7 @@
 //  Copyright © 2025 Weiran Zhang. All rights reserved.
 //
 
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 import PackageDescription
 
 let package = Package(
@@ -21,16 +21,14 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Domain"),
-        .package(path: "../Shared"),
-        .package(url: "https://github.com/nikstar/VariableBlur", exact: "1.3.0")
+        .package(path: "../Shared")
     ],
     targets: [
         .target(
             name: "DesignSystem",
             dependencies: [
                 "Domain",
-                "Shared",
-                .product(name: "VariableBlur", package: "VariableBlur")
+                "Shared"
             ],
         ),
         .testTarget(

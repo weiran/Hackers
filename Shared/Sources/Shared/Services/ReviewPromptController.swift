@@ -38,7 +38,7 @@ public enum ReviewPromptController {
         if shouldRequest {
             Task { @MainActor in
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                    SKStoreReviewController.requestReview(in: windowScene)
+                    AppStore.requestReview(in: windowScene)
                     UserDefaults.standard.set(Date(), forKey: lastRequestTimeKey)
                 }
             }
