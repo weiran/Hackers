@@ -195,11 +195,10 @@ public struct SettingsView: View {
 
                         Picker(selection: $viewModel.nextCommentButtonAction) {
                             ForEach(NextCommentButtonAction.allCases, id: \.self) { action in
-                                Label(action.displayName, systemImage: action.settingsIconName)
-                                    .tag(action)
+                                Text(action.displayName).tag(action)
                             }
                         } label: {
-                            Label("Next Button Action", systemImage: viewModel.nextCommentButtonAction.settingsIconName)
+                            Label("Next Button Action", systemImage: "arrow.down.circle")
                         }
                         .disabled(!viewModel.showNextCommentButton)
                         .accessibilityIdentifier(AccessibilityIdentifier.Settings.nextCommentButtonAction)
@@ -262,15 +261,6 @@ public struct SettingsView: View {
             }
         }
         .textScaling(for: viewModel.textSize)
-    }
-}
-
-private extension NextCommentButtonAction {
-    var settingsIconName: String {
-        switch self {
-        case .nextComment: "arrow.down.circle"
-        case .nextTopLevelComment: "arrow.down.to.line.circle"
-        }
     }
 }
 

@@ -15,6 +15,11 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool
     var swipeCollapseThreads = true
     var showNextCommentButton = true
+    var nextCommentButtonAction: NextCommentButtonAction = .nextComment {
+        didSet {
+            NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        }
+    }
 
     init() {
         guard let configuration = UITestingBootstrap.configuration else {
