@@ -52,11 +52,8 @@ public final class SettingsViewModel: @unchecked Sendable {
         didSet { propagateChangesIfNeeded(\.showNextCommentButton, showNextCommentButton) }
     }
 
-    public var nextCommentButtonAction: NextCommentButtonAction = .nextComment {
-        didSet {
-            guard hasLoadedSettings else { return }
-            settingsUseCase.nextCommentButtonAction = nextCommentButtonAction
-        }
+    public var showNextTopLevelCommentButton: Bool = false {
+        didSet { propagateChangesIfNeeded(\.showNextTopLevelCommentButton, showNextTopLevelCommentButton) }
     }
 
     public var cacheUsageText: String = "Calculating…"
@@ -77,7 +74,7 @@ public final class SettingsViewModel: @unchecked Sendable {
         dimReadPosts = settingsUseCase.dimReadPosts
         swipeCollapseThreads = settingsUseCase.swipeCollapseThreads
         showNextCommentButton = settingsUseCase.showNextCommentButton
-        nextCommentButtonAction = settingsUseCase.nextCommentButtonAction
+        showNextTopLevelCommentButton = settingsUseCase.showNextTopLevelCommentButton
 
         hasLoadedSettings = true
     }
@@ -99,6 +96,8 @@ public final class SettingsViewModel: @unchecked Sendable {
             settingsUseCase.swipeCollapseThreads = value
         case \.showNextCommentButton:
             settingsUseCase.showNextCommentButton = value
+        case \.showNextTopLevelCommentButton:
+            settingsUseCase.showNextTopLevelCommentButton = value
         default:
             break
         }

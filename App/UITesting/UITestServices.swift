@@ -15,7 +15,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool
     var swipeCollapseThreads = true
     var showNextCommentButton = true
-    var nextCommentButtonAction: NextCommentButtonAction = .nextComment {
+    var showNextTopLevelCommentButton: Bool {
         didSet {
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
@@ -28,6 +28,7 @@ final class UITestSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         linkBrowserMode = configuration.browserMode
         showThumbnails = configuration.showThumbnails
         dimReadPosts = configuration.dimReadPosts
+        showNextTopLevelCommentButton = configuration.showNextTopLevelCommentButton
     }
 
     func clearCache() async {}

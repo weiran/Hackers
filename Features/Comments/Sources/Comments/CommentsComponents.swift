@@ -155,9 +155,9 @@ struct CommentsContentView: View {
                         canComment: canComment,
                         composer: composer,
                         showsNextCommentButton: viewModel.showNextCommentButton,
+                        showsNextTopLevelCommentButton: viewModel.showNextTopLevelCommentButton,
                         hasNextComment: visibleCommentTarget.hasNextComment,
                         hasNextThread: visibleCommentTarget.hasNextThread,
-                        action: viewModel.nextCommentButtonAction,
                         onNextComment: { scrollToNextComment(using: proxy) },
                         onNextThread: { scrollToNextThread(using: proxy) },
                         onSubmit: onSubmitComposerDraft
@@ -576,9 +576,9 @@ private struct CommentsBottomBar: View {
     let canComment: Bool
     @Bindable var composer: CommentComposerModel
     let showsNextCommentButton: Bool
+    let showsNextTopLevelCommentButton: Bool
     let hasNextComment: Bool
     let hasNextThread: Bool
-    let action: NextCommentButtonAction
     let onNextComment: () -> Void
     let onNextThread: () -> Void
     let onSubmit: () -> Void
@@ -589,16 +589,28 @@ private struct CommentsBottomBar: View {
                 if canComment {
                     CommentComposerView(model: composer, onSubmit: onSubmit)
                 }
-                if showsNextButton {
-                    NextCommentFloatingButton(
-                        isEnabled: action == .nextComment ? hasNextComment : hasNextThread,
-                        action: action,
-                        onNextComment: onNextComment,
-                        onNextThread: onNextThread
-                    )
+                if showsNavigationButtons {
+                    HStack(spacing: 8) {
+                        if showsNextCommentButton {
+                            CommentNavigationButton(
+                                isEnabled: hasNextComment,
+                                action: .nextComment,
+                                onPrimaryAction: onNextComment,
+                                onAlternateAction: onNextThread
+                            )
+                        }
+                        if showsNextTopLevelCommentButton {
+                            CommentNavigationButton(
+                                isEnabled: hasNextThread,
+                                action: .nextTopLevelComment,
+                                onPrimaryAction: onNextThread,
+                                onAlternateAction: onNextComment
+                            )
+                        }
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: showsNextButton && !canComment ? .trailing : .leading)
+            .frame(maxWidth: .infinity, alignment: showsNavigationButtons && !canComment ? .trailing : .leading)
             // The collapsed pill keeps equal margins on every screen edge.
             // The expanded editor preserves its original compact inset above
             // the keyboard and beside the screen edges.
@@ -614,21 +626,40 @@ private struct CommentsBottomBar: View {
     }
 
     private var showsControls: Bool {
-        canComment || showsNextCommentButton
+        canComment || showsNextCommentButton || showsNextTopLevelCommentButton
     }
 
-        private var showsNextButton: Bool {
-            // Keep the control in the row from the moment the panel appears. It
-            // remains disabled until the first visible target is known.
-            !composer.isExpanded && showsNextCommentButton
-        }
+    private var showsNavigationButtons: Bool {
+        // Keep the control in the row from the moment the panel appears. It
+        // remains disabled until the first visible target is known.
+        !composer.isExpanded && (showsNextCommentButton || showsNextTopLevelCommentButton)
+    }
 }
 
-private struct NextCommentFloatingButton: View {
+private enum CommentNavigationAction: Equatable {
+    case nextComment
+    case nextTopLevelComment
+
+    var iconName: String {
+        self == .nextComment ? "arrow.down" : "arrow.down.to.line"
+    }
+
+    var accessibilityLabel: String {
+        self == .nextComment ? "Next comment" : "Next top-level comment"
+    }
+
+    var identifier: String {
+        self == .nextComment
+            ? AccessibilityIdentifier.Comments.nextCommentButton
+            : AccessibilityIdentifier.Comments.nextTopLevelCommentButton
+    }
+}
+
+private struct CommentNavigationButton: View {
     let isEnabled: Bool
-    let action: NextCommentButtonAction
-    let onNextComment: () -> Void
-    let onNextThread: () -> Void
+    let action: CommentNavigationAction
+    let onPrimaryAction: () -> Void
+    let onAlternateAction: () -> Void
     @State private var performedLongPress = false
 
     var body: some View {
@@ -637,9 +668,9 @@ private struct NextCommentFloatingButton: View {
                 performedLongPress = false
                 return
             }
-            performPrimaryAction()
+            onPrimaryAction()
         } label: {
-            Image(systemName: iconName)
+            Image(systemName: action.iconName)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(isEnabled ? Color.primary : Color.secondary)
                 .frame(width: 48, height: 48)
@@ -655,36 +686,20 @@ private struct NextCommentFloatingButton: View {
                     guard isEnabled else { return }
                     performedLongPress = true
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    performAlternateAction()
+                    onAlternateAction()
                 }
         )
-        .accessibilityLabel(accessibilityLabel)
+        .accessibilityLabel(action.accessibilityLabel)
         .accessibilityHint("Long press for \(alternateAccessibilityLabel.lowercased())")
         .accessibilityAction(named: Text(alternateAccessibilityLabel)) {
             guard isEnabled else { return }
-            performAlternateAction()
+            onAlternateAction()
         }
-        .accessibilityIdentifier(AccessibilityIdentifier.Comments.nextCommentButton)
-    }
-
-    private var iconName: String {
-        action == .nextComment ? "arrow.down" : "arrow.down.to.line"
-    }
-
-    private var accessibilityLabel: String {
-        action == .nextComment ? "Next comment" : "Next top-level comment"
+        .accessibilityIdentifier(action.identifier)
     }
 
     private var alternateAccessibilityLabel: String {
         action == .nextComment ? "Next top-level comment" : "Next comment"
-    }
-
-    private func performPrimaryAction() {
-        if action == .nextComment { onNextComment() } else { onNextThread() }
-    }
-
-    private func performAlternateAction() {
-        if action == .nextComment { onNextThread() } else { onNextComment() }
     }
 }
 

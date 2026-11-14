@@ -193,27 +193,24 @@ struct SettingsRepositoryTests {
         #expect(mockUserDefaults.bool(forKey: "ShowNextCommentButton") == true)
     }
 
-    @Test("Next comment button action defaults to next comment")
-    func nextCommentButtonActionDefaultValue() {
+    @Test("Show next top-level comment button defaults to false")
+    func showNextTopLevelCommentButtonDefaultValue() {
         mockUserDefaults.clearAll()
 
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        #expect(repository.nextCommentButtonAction == .nextComment)
+        #expect(repository.showNextTopLevelCommentButton == false)
     }
 
-    @Test("Next comment button action setter and getter")
-    func nextCommentButtonActionSetterAndGetter() {
+    @Test("Show next top-level comment button setter and getter")
+    func showNextTopLevelCommentButtonSetterAndGetter() {
         mockUserDefaults.clearAll()
         let repository = SettingsRepository(userDefaults: mockUserDefaults)
 
-        repository.nextCommentButtonAction = .nextTopLevelComment
+        repository.showNextTopLevelCommentButton = true
 
-        #expect(repository.nextCommentButtonAction == .nextTopLevelComment)
-        #expect(
-            mockUserDefaults.integer(forKey: "NextCommentButtonAction")
-                == NextCommentButtonAction.nextTopLevelComment.rawValue
-        )
+        #expect(repository.showNextTopLevelCommentButton == true)
+        #expect(mockUserDefaults.bool(forKey: "ShowNextTopLevelCommentButton") == true)
     }
 
     // MARK: - Remember Feed Category Tests

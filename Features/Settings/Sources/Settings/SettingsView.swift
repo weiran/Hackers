@@ -193,15 +193,10 @@ public struct SettingsView: View {
                         }
                         .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextCommentButton)
 
-                        Picker(selection: $viewModel.nextCommentButtonAction) {
-                            ForEach(NextCommentButtonAction.allCases, id: \.self) { action in
-                                Text(action.displayName).tag(action)
-                            }
-                        } label: {
-                            Label("Next Button Action", systemImage: "arrow.down.circle")
+                        Toggle(isOn: $viewModel.showNextTopLevelCommentButton) {
+                            Label("Show Next Top-Level Button", systemImage: "arrow.down.to.line.circle")
                         }
-                        .disabled(!viewModel.showNextCommentButton)
-                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.nextCommentButtonAction)
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextTopLevelCommentButton)
                     }
                 }
 

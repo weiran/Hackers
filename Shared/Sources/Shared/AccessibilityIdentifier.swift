@@ -27,7 +27,7 @@ public enum AccessibilityIdentifier {
         public static let dimReadPosts = "settings.dimReadPosts"
         public static let swipeCollapseThreads = "settings.swipeCollapseThreads"
         public static let showNextCommentButton = "settings.showNextCommentButton"
-        public static let nextCommentButtonAction = "settings.nextCommentButtonAction"
+        public static let showNextTopLevelCommentButton = "settings.showNextTopLevelCommentButton"
     }
 
     public enum Login {
@@ -40,6 +40,7 @@ public enum AccessibilityIdentifier {
     public enum Comments {
         public static let list = "comments.list"
         public static let nextCommentButton = "comments.nextCommentButton"
+        public static let nextTopLevelCommentButton = "comments.nextTopLevelCommentButton"
 
         public static let composerCollapsed = "comments.composer.collapsed"
         public static let composerExpanded = "comments.composer.expanded"

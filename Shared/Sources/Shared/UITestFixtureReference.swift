@@ -7,6 +7,7 @@ public enum UITestFixtureReference {
 
     public static let firstLongCommentID = 48_346_154
     public static let secondLongRootCommentID = 48_354_612
+    public static let secondLongTopLevelCommentID = 48_354_157
     public static let collapsibleRootCommentID = 48_348_985
     public static let collapsibleChildCommentID = 48_349_298
     public static let firstScreenshotCommentID = 48_354_262

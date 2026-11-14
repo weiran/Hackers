@@ -192,11 +192,11 @@ struct CommentsViewModelTests {
         #expect(viewModel.showNextCommentButton == false)
     }
 
-    @Test("Next comment button action follows settings changes")
+    @Test("Next top-level comment button visibility follows settings changes")
     @MainActor
-    func nextCommentButtonActionSyncsWithSettings() async throws {
+    func nextTopLevelCommentButtonSyncsWithSettings() async throws {
         let settingsUseCase = StubSettingsUseCase(showThumbnails: true)
-        settingsUseCase.nextCommentButtonAction = .nextTopLevelComment
+        settingsUseCase.showNextTopLevelCommentButton = true
         let viewModel = CommentsViewModel(
             post: testPost,
             postUseCase: mockPostUseCase,
@@ -205,12 +205,12 @@ struct CommentsViewModelTests {
             settingsUseCase: settingsUseCase,
             bookmarksController: bookmarksController
         )
-        #expect(viewModel.nextCommentButtonAction == .nextTopLevelComment)
+        #expect(viewModel.showNextTopLevelCommentButton == true)
 
-        settingsUseCase.nextCommentButtonAction = .nextComment
+        settingsUseCase.showNextTopLevelCommentButton = false
         try await Task.sleep(for: .milliseconds(10))
 
-        #expect(viewModel.nextCommentButtonAction == .nextComment)
+        #expect(viewModel.showNextTopLevelCommentButton == false)
     }
 
     @Test("Bookmark notifications update local post state")
@@ -1119,7 +1119,7 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
     var dimReadPosts: Bool = true
     private var storedSwipeCollapseThreads: Bool = true
     private var storedShowNextCommentButton: Bool = true
-    private var storedNextCommentButtonAction: NextCommentButtonAction = .nextComment
+    private var storedShowNextTopLevelCommentButton = false
 
     init(showThumbnails: Bool) {
         storedShowThumbnails = showThumbnails
@@ -1149,10 +1149,10 @@ final class StubSettingsUseCase: SettingsUseCase, @unchecked Sendable {
         }
     }
 
-    var nextCommentButtonAction: NextCommentButtonAction {
-        get { storedNextCommentButtonAction }
+    var showNextTopLevelCommentButton: Bool {
+        get { storedShowNextTopLevelCommentButton }
         set {
-            storedNextCommentButtonAction = newValue
+            storedShowNextTopLevelCommentButton = newValue
             NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
         }
     }

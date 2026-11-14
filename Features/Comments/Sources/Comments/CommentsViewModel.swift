@@ -26,7 +26,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var showThumbnails: Bool
     public var swipeCollapseThreads: Bool
     public var showNextCommentButton: Bool
-    public var nextCommentButtonAction: NextCommentButtonAction
+    public var showNextTopLevelCommentButton: Bool
     @ObservationIgnored let composer = CommentComposerModel()
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
@@ -82,7 +82,7 @@ public final class CommentsViewModel: @unchecked Sendable {
         showThumbnails = settingsUseCase.showThumbnails
         swipeCollapseThreads = settingsUseCase.swipeCollapseThreads
         showNextCommentButton = settingsUseCase.showNextCommentButton
-        nextCommentButtonAction = settingsUseCase.nextCommentButtonAction
+        showNextTopLevelCommentButton = settingsUseCase.showNextTopLevelCommentButton
 
         let initialComments = initialPost?.comments ?? []
         commentsLoader = LoadingStateManager(initialData: initialComments)
@@ -112,9 +112,9 @@ public final class CommentsViewModel: @unchecked Sendable {
                 if self.showNextCommentButton != currentShowNextButton {
                     self.showNextCommentButton = currentShowNextButton
                 }
-                let currentNextAction = settingsUseCase.nextCommentButtonAction
-                if self.nextCommentButtonAction != currentNextAction {
-                    self.nextCommentButtonAction = currentNextAction
+                let currentShowNextTopLevel = settingsUseCase.showNextTopLevelCommentButton
+                if self.showNextTopLevelCommentButton != currentShowNextTopLevel {
+                    self.showNextTopLevelCommentButton = currentShowNextTopLevel
                 }
             }
 
