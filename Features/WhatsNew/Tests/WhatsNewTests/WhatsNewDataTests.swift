@@ -19,6 +19,11 @@ struct WhatsNewDataTests {
                 "Support for iPhone Duo’s distinctive design.",
                 "rectangle.split.2x1"
             ),
+            (
+                "Usernames Restored",
+                "Usernames appear again on posts and comments.",
+                "person.crop.circle"
+            ),
         ]
 
         #expect(data.title == "What's New in Hackers 5.6")

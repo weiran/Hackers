@@ -26,6 +26,7 @@ public final class CommentsViewModel: @unchecked Sendable {
     public var showThumbnails: Bool
     public var swipeCollapseThreads: Bool
     public var showNextCommentButton: Bool
+    @ObservationIgnored let composer = CommentComposerModel()
 
     // Callback for when comments are loaded (used for HTML parsing in the view layer)
     public var onCommentsLoaded: (([Comment]) -> Void)?

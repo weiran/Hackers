@@ -23,9 +23,15 @@ public struct WhatsNewData: Sendable {
             systemImage: "rectangle.split.2x1",
         )
 
+        let usernames = WhatsNewItem(
+            title: "Usernames Restored",
+            subtitle: "Usernames appear again on posts and comments.",
+            systemImage: "person.crop.circle",
+        )
+
         return WhatsNewData(
             title: "What's New in Hackers 5.6",
-            items: [duoSupport],
+            items: [duoSupport, usernames],
         )
     }
 }

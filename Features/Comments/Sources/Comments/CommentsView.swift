@@ -61,7 +61,7 @@ public struct CommentsView<Store: NavigationStoreProtocol>: View {
     @State private var titleVisibility: CommentsHeaderTitleVisibility
     @State private var pendingCommentID: Int?
     @State private var replyScrollTarget: Int?
-    @State private var composer = CommentComposerModel()
+    @State private var composer: CommentComposerModel
 }
 
 public extension CommentsView {
@@ -106,18 +106,19 @@ public extension CommentsView {
         _titleVisibility = State(initialValue: headerTitleVisibility ?? CommentsHeaderTitleVisibility())
         let initialTargetID = targetCommentID ?? (initialPost == nil && viewModel == nil ? postID : nil)
         _pendingCommentID = State(initialValue: initialTargetID)
-        if let viewModel {
-            _viewModel = State(initialValue: viewModel)
+        let resolvedViewModel = viewModel ?? CommentsViewModel(postID: postID, initialPost: initialPost)
+        _viewModel = State(initialValue: resolvedViewModel)
+        _composer = State(initialValue: resolvedViewModel.composer)
+        if let votingViewModel {
+            _votingViewModel = State(initialValue: votingViewModel)
         } else {
-            _viewModel = State(initialValue: CommentsViewModel(postID: postID, initialPost: initialPost))
+            let container = DependencyContainer.shared
+            _votingViewModel = State(initialValue: VotingViewModel(
+                votingStateProvider: container.getVotingStateProvider(),
+                commentVotingStateProvider: container.getCommentVotingStateProvider(),
+                authenticationUseCase: container.getAuthenticationUseCase()
+            ))
         }
-        let container = DependencyContainer.shared
-        let defaultVotingViewModel = VotingViewModel(
-            votingStateProvider: container.getVotingStateProvider(),
-            commentVotingStateProvider: container.getCommentVotingStateProvider(),
-            authenticationUseCase: container.getAuthenticationUseCase()
-        )
-        _votingViewModel = State(initialValue: votingViewModel ?? defaultVotingViewModel)
     }
 
     init(
@@ -199,6 +200,12 @@ public extension CommentsView {
                     onReply: handleReplyActivation(commentID:author:),
                     onSubmitComposerDraft: {
                         Task { await submitComposerDraft() }
+                    },
+                    restoredCommentID: {
+                        navigationStore.commentScrollAnchor(for: viewModel.postID)
+                    },
+                    onTopCommentChange: { commentID in
+                        navigationStore.setCommentScrollAnchor(commentID, for: viewModel.postID)
                     }
                 )
             } else if viewModel.isPostLoading {
@@ -214,13 +221,11 @@ public extension CommentsView {
             }
         }
         .tint(AppColors.appTintColor)
-        .if(controlsNavigationBarVisibility) { view in
-            view
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar(showsToolbar ? .visible : .hidden, for: .navigationBar)
-        }
+        // Keep the modifier structure stable while the persistent detail changes bars.
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(navigationBarVisibility, for: .navigationBar)
         .toolbar {
-            if controlsNavigationBarVisibility && showsToolbar {
+            if showsToolbar {
                 ToolbarItem(placement: .principal) {
                     if let post = viewModel.post {
                         ToolbarTitle(
@@ -238,11 +243,7 @@ public extension CommentsView {
                         )
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if let post = viewModel.post {
-                        ShareMenu(post: post, toolbarGeometry: toolbarGeometry)
-                    }
-                }
+                commentsActionsToolbarItems
             }
         }
         .task { [navigationStore] in
@@ -318,6 +319,24 @@ public extension CommentsView {
 }
 
 private extension CommentsView {
+    var navigationBarVisibility: Visibility {
+        guard controlsNavigationBarVisibility else { return .automatic }
+        return showsToolbar ? .visible : .hidden
+    }
+
+    @ToolbarContentBuilder
+    var commentsActionsToolbarItems: some ToolbarContent {
+        if #available(iOS 27.1, *) {
+            AdaptiveCommentsToolbarActions(post: viewModel.post)
+        } else {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if let post = viewModel.post {
+                    ShareMenu(post: post, toolbarGeometry: toolbarGeometry)
+                }
+            }
+        }
+    }
+
     private func handleLinkTap() {
         // Self posts have no external link; their URL is the HN item page of
         // this very view, so opening it would just re-push these comments.
@@ -329,11 +348,6 @@ private extension CommentsView {
             return
         }
         if navigationStore.openURLInPrimaryContext(post.url) {
-            return
-        }
-        let mode = DependencyContainer.shared.getSettingsUseCase().linkBrowserMode
-        if DeviceLayout.prefersInlineCustomBrowser(mode: mode) {
-            navigationStore.showPostLink(post)
             return
         }
         LinkOpener.openURL(post.url, with: post)
@@ -351,7 +365,10 @@ private extension CommentsView {
             return true
         }
 
-        navigationStore.showPost(withId: itemId)
+        // Push the linked item over these comments so Back returns here.
+        if !navigationStore.openURLInPrimaryContext(url) {
+            navigationStore.showPost(withId: itemId)
+        }
         return true
     }
 

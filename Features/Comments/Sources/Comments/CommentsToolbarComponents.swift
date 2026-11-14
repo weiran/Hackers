@@ -284,6 +284,23 @@ struct ShareMenu: View {
     }
 }
 
+/// Keep one title-and-symbol item set in every pose. The persistent split detail then lets
+/// the system move these controls between horizontal and vertical bars without stale slots.
+@available(iOS 27.1, *)
+struct AdaptiveCommentsToolbarActions: ToolbarContent {
+    let post: Post?
+
+    var body: some ToolbarContent {
+        if let post {
+            ToolbarItem(id: "comments.share", placement: .topBarTrailing) {
+                Button("Share", systemImage: "square.and.arrow.up") {
+                    ContentSharePresenter.shared.shareHackerNewsPost(post)
+                }
+            }
+        }
+    }
+}
+
 struct LoadingView: View {
     var body: some View {
         AppLoadingStateView(message: "Loading...")

@@ -146,6 +146,23 @@ struct PostRepositoryTests {
         #expect(post.voteLinks?.upvote != nil)
     }
 
+    @Test("Parses current classless post author links")
+    func parsesClasslessPostAuthor() async throws {
+        mockNetworkManager.stubbedGetResponse = createMockPostsHTML()
+            .replacingOccurrences(of: "class=\"hnuser\" href=\"user?id=testuser\"", with: "href=\"user?id=testuser\"")
+        let posts = try await postRepository.getPosts(type: .news, page: 1, nextId: nil)
+        #expect(posts.first?.by == "testuser")
+    }
+
+    @Test("Parses current classless comment author links without using links in the comment")
+    func parsesClasslessCommentAuthor() throws {
+        let html = commentTreeRowsHTML(storyID: 123, commentIDs: [456])
+            .replacingOccurrences(of: "href=\"user?id=commenter\" class=\"hnuser\"", with: "href=\"user?id=commenter\"")
+            .replacingOccurrences(of: "Comment 456", with: "<a href=\"user?id=other\">other</a>")
+        let comments = try postRepository.comments(from: "<table>\(html)</table>")
+        #expect(comments.first?.by == "commenter")
+    }
+
     @Test("Get posts with newest type")
     func getPostsNewestType() async throws {
         mockNetworkManager.stubbedGetResponse = createMockPostsHTML()
