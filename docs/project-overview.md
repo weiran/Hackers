@@ -79,7 +79,7 @@ Voting is optimistic in the UI and link-driven in the data layer. Hacker News vo
 
 Authentication is HN-cookie based. `AuthenticationRepository` posts credentials to `/login`, stores the username in `UserDefaults` under `hn_username`, and treats authentication as valid only when both a cookie named exactly `user` for the HN origin and a stored username exist; login responses that do not set that cookie are rejected. Logout clears cookies and the stored username.
 
-Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, swipe-to-collapse comment threads (iOS 27+), and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
+Settings are immediate-write preferences backed by `SettingsUseCase`. They control browser mode, Safari reader mode, thumbnails, remembered feed category, text size, compact feed layout, dimming read posts, swipe-to-collapse comment threads (iOS 27+), independently visible next-comment and next-top-level-comment buttons, and cache clearing/usage display. Feed and comments observe defaults changes so visual settings update without recreating the app.
 
 WhatsNew is version-gated by `WhatsNewUseCase`. First launch stores the current version without showing the sheet, minor/major version increases can show it, and `disableWhatsNew` suppresses it for automated runs unless force-show is requested.
 
@@ -104,7 +104,7 @@ Keep the action extension's `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` al
 
 ## Data And Persistence
 
-Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, `DimReadPosts`, and `SwipeToCollapseThreads`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
+Settings use `UserDefaults` through `UserDefaultsProtocol` for testability. Current keys include `safariReaderMode`, `linkBrowserMode`, `ShowThumbnails`, `RememberFeedCategory`, `LastFeedCategory`, `textSize`, `compactFeedDesign`, `DimReadPosts`, `SwipeToCollapseThreads`, `ShowNextCommentButton`, and `ShowNextTopLevelCommentButton`. `openInDefaultBrowser` is a legacy key migrated into `linkBrowserMode`.
 
 Bookmarks use `NSUbiquitousKeyValueStore` under `Bookmarks.posts`. Stored bookmark entries include enough post metadata to render the Bookmarks feed offline from HN feed pages, plus optional vote links and the bookmark timestamp used for recency ordering.
 
@@ -177,7 +177,7 @@ Search requests use `tags=story`, page/hits-per-page parameters, and optional `c
 
 UI tests do not hit live Hacker News by default. `App/UITesting/UITestingBootstrap.swift` installs dependency overrides only when `HACKERS_UI_TESTING=1` is set.
 
-The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. A typed launch configuration shared by the app and UI-test targets validates the fixture profile, browser mode, initial route, post ID, story presentation, article source, read-state options, and thumbnail option. Unknown keys, invalid values, unavailable fixture posts/articles, and incompatible route options fail at launch.
+The fixture layer provides deterministic posts, comments, search results, settings, bookmarks, read-state, authentication, voting, article content, and WhatsNew behavior. A typed launch configuration shared by the app and UI-test targets validates the fixture profile, browser mode, initial route, post ID, story presentation, article source, read-state options, thumbnail option, and top-level comment navigation button visibility. Unknown keys, invalid values, unavailable fixture posts/articles, and incompatible route options fail at launch.
 
 Functional UI tests use stable, state-specific accessibility identifiers, but assert hittability and stable, meaningful viewport intersection rather than treating hierarchy existence as visibility. This proves functional presentation, while screenshots remain the source of truth for visual claims. The `HackersScreenshotTests` class is separate manual capture orchestration, excluded from automatic smoke and full runs, and uses the deterministic `marketing` fixture profile through the same typed `HACKERS_UI_*` launch contract.
 

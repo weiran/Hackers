@@ -192,6 +192,11 @@ public struct SettingsView: View {
                             Label("Show Next Comment Button", systemImage: "arrow.down.circle")
                         }
                         .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextCommentButton)
+
+                        Toggle(isOn: $viewModel.showNextTopLevelCommentButton) {
+                            Label("Show Next Top-Level Button", systemImage: "arrow.down.to.line.circle")
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifier.Settings.showNextTopLevelCommentButton)
                     }
                 }
 

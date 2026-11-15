@@ -119,6 +119,7 @@ The typed launch contract is:
 * `HACKERS_UI_DIM_READ_POSTS`: set to `1` or `0` for read-state visual coverage.
 * `HACKERS_UI_READ_POST_IDS`: comma-separated post IDs to pre-mark as read.
 * `HACKERS_UI_SHOW_THUMBNAILS`: set to `1` or `0`.
+* `HACKERS_UI_SHOW_NEXT_TOP_LEVEL_COMMENT_BUTTON`: set to `1` to show the additional top-level comment navigation button; defaults to `0`.
 * `HACKERS_UI_MEDIA_PLAYBACK`: `standard` or `autoplayFixture`; the latter enables the deterministic local media fixture used by browser autoplay regression tests.
 * `HACKERS_UI_AUTHENTICATED`: set to `1` or `0` to launch with the deterministic authenticated session fixture.
 * `HACKERS_UI_COMMENTING_ENABLED`: set to `1` or `0`; defaults to `0` and gates the commenting feature surface in UI tests.

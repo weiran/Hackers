@@ -14,6 +14,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         case readPostIDs = "HACKERS_UI_READ_POST_IDS"
         case dimReadPosts = "HACKERS_UI_DIM_READ_POSTS"
         case showThumbnails = "HACKERS_UI_SHOW_THUMBNAILS"
+        case showNextTopLevelCommentButton = "HACKERS_UI_SHOW_NEXT_TOP_LEVEL_COMMENT_BUTTON"
         case authenticated = "HACKERS_UI_AUTHENTICATED"
         case commentingEnabled = "HACKERS_UI_COMMENTING_ENABLED"
         case commentSubmission = "HACKERS_UI_COMMENT_SUBMISSION"
@@ -82,6 +83,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
     public let readPostIDs: Set<Int>
     public let dimReadPosts: Bool
     public let showThumbnails: Bool
+    public let showNextTopLevelCommentButton: Bool
     public let authenticated: Bool
     public let commentingEnabled: Bool
     public let commentSubmission: CommentSubmissionFixture
@@ -95,6 +97,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         readPostIDs: Set<Int> = [],
         dimReadPosts: Bool = true,
         showThumbnails: Bool = false,
+        showNextTopLevelCommentButton: Bool = false,
         authenticated: Bool = false,
         commentingEnabled: Bool = false,
         commentSubmission: CommentSubmissionFixture = .success
@@ -107,6 +110,7 @@ public struct UITestLaunchConfiguration: Equatable, Sendable {
         self.readPostIDs = readPostIDs
         self.dimReadPosts = dimReadPosts
         self.showThumbnails = showThumbnails
+        self.showNextTopLevelCommentButton = showNextTopLevelCommentButton
         self.authenticated = authenticated
         self.commentingEnabled = commentingEnabled
         self.commentSubmission = commentSubmission
@@ -123,6 +127,7 @@ extension UITestLaunchConfiguration {
             EnvironmentKey.mediaPlayback.rawValue: mediaPlayback.rawValue,
             EnvironmentKey.dimReadPosts.rawValue: dimReadPosts ? "1" : "0",
             EnvironmentKey.showThumbnails.rawValue: showThumbnails ? "1" : "0",
+            EnvironmentKey.showNextTopLevelCommentButton.rawValue: showNextTopLevelCommentButton ? "1" : "0",
             EnvironmentKey.authenticated.rawValue: authenticated ? "1" : "0",
             EnvironmentKey.commentingEnabled.rawValue: commentingEnabled ? "1" : "0",
             EnvironmentKey.commentSubmission.rawValue: commentSubmission.rawValue
@@ -182,11 +187,16 @@ extension UITestLaunchConfiguration {
         let readPostIDsKey = EnvironmentKey.readPostIDs.rawValue
         let dimReadPostsKey = EnvironmentKey.dimReadPosts.rawValue
         let showThumbnailsKey = EnvironmentKey.showThumbnails.rawValue
+        let showNextTopLevelCommentButtonKey = EnvironmentKey.showNextTopLevelCommentButton.rawValue
         let authenticatedKey = EnvironmentKey.authenticated.rawValue
         let commentingEnabledKey = EnvironmentKey.commentingEnabled.rawValue
         let readPostIDs = try positiveIntegerSet(environment[readPostIDsKey], key: readPostIDsKey)
         let dimReadPosts = try boolean(environment[dimReadPostsKey], key: dimReadPostsKey) ?? true
         let showThumbnails = try boolean(environment[showThumbnailsKey], key: showThumbnailsKey) ?? false
+        let showNextTopLevelCommentButton = try boolean(
+            environment[showNextTopLevelCommentButtonKey],
+            key: showNextTopLevelCommentButtonKey
+        ) ?? false
         let authenticated = try boolean(environment[authenticatedKey], key: authenticatedKey) ?? false
         let commentingEnabled = try boolean(environment[commentingEnabledKey], key: commentingEnabledKey) ?? false
 
@@ -199,6 +209,7 @@ extension UITestLaunchConfiguration {
             readPostIDs: readPostIDs,
             dimReadPosts: dimReadPosts,
             showThumbnails: showThumbnails,
+            showNextTopLevelCommentButton: showNextTopLevelCommentButton,
             authenticated: authenticated,
             commentingEnabled: commentingEnabled,
             commentSubmission: commentSubmission

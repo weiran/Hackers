@@ -29,6 +29,7 @@ struct SettingsViewModelTests {
         var dimReadPosts = true
         var swipeCollapseThreads = true
         var showNextCommentButton = true
+        var showNextTopLevelCommentButton = false
         var clearCacheCallCount = 0
         var cacheUsageBytesValue: Int64 = 0
         var cacheUsageCallCount = 0
@@ -51,6 +52,7 @@ struct SettingsViewModelTests {
         mockSettingsUseCase.dimReadPosts = false
         mockSettingsUseCase.swipeCollapseThreads = false
         mockSettingsUseCase.showNextCommentButton = false
+        mockSettingsUseCase.showNextTopLevelCommentButton = true
 
         let viewModel = settingsViewModel
 
@@ -63,6 +65,7 @@ struct SettingsViewModelTests {
         #expect(viewModel.dimReadPosts == false)
         #expect(viewModel.swipeCollapseThreads == false)
         #expect(viewModel.showNextCommentButton == false)
+        #expect(viewModel.showNextTopLevelCommentButton == true)
     }
 
     @Test("Setting changes persist to use case")
@@ -78,6 +81,7 @@ struct SettingsViewModelTests {
         viewModel.dimReadPosts = false
         viewModel.swipeCollapseThreads = false
         viewModel.showNextCommentButton = false
+        viewModel.showNextTopLevelCommentButton = true
 
         #expect(mockSettingsUseCase.safariReaderMode == true)
         #expect(mockSettingsUseCase.linkBrowserMode == .inAppBrowser)
@@ -88,6 +92,7 @@ struct SettingsViewModelTests {
         #expect(mockSettingsUseCase.dimReadPosts == false)
         #expect(mockSettingsUseCase.swipeCollapseThreads == false)
         #expect(mockSettingsUseCase.showNextCommentButton == false)
+        #expect(mockSettingsUseCase.showNextTopLevelCommentButton == true)
     }
 
     @Test("Cache usage refresh formats byte count")
